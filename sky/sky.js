@@ -18,8 +18,8 @@
 
     /* ======================= settings you can edit ======================= */
 
-    // where Polaris takes you. on the live site '/' works too.
-    var HOME = 'index.html';
+    // where Polaris takes you
+    var HOME = 'https://dav-nky.pleroma.nexus/';
 
     // the four constellation links in the night sky (same on every page)
     var LINKS = [
