@@ -14,52 +14,35 @@
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="sky/sky.css">
-    <link rel="stylesheet" href="sky/paper.css">
 </head>
 <body data-place="city" data-voyage="160">
 
-    <!-- the telescope: click it to look at the sky (night falls, the constellations
-         come out, and the day/night player appears). your own art goes in
-         assets/city/telescope.(svg|png|webp|gif) -->
-    <button class="telescope sky-viewer" type="button" data-view-mode="scope" data-exit-label="lower the telescope"
-            data-asset="assets/city/telescope" aria-label="look through the telescope">
-        <svg class="placeholder" viewBox="0 0 200 220" aria-hidden="true">
-            <g fill="#3a2716">
-                <path d="M96 118 L60 216 L68 218 L102 122 Z"/>
-                <path d="M104 118 L140 216 L132 218 L98 122 Z"/>
-                <path d="M98 120 L96 218 L104 218 L102 120 Z"/>
-                <rect x="88" y="108" width="24" height="16" rx="3"/>
-            </g>
-            <g transform="rotate(-38 100 110)">
-                <rect x="30" y="98" width="150" height="22" rx="4" fill="#c49a52"/>
-                <rect x="150" y="94" width="34" height="30" rx="4" fill="#a67c3a"/>
-                <rect x="14" y="102" width="22" height="14" rx="3" fill="#8a6a30"/>
-                <rect x="70" y="98" width="6" height="22" fill="#6b4a22"/>
-                <rect x="120" y="98" width="6" height="22" fill="#6b4a22"/>
-                <rect x="36" y="100" width="140" height="4" fill="rgba(255,240,200,.45)"/>
-            </g>
-        </svg>
-        <span class="hint">look through the telescope</span>
+    <!-- the telescope (an interface button, bottom-left): look across the lit skyline.
+         the warm, glowing windows each hold a scene from content/city/ (one file = one window);
+         click one to zoom right in. "look up at the sky" shows Polaris, the constellations and
+         the day/night player.
+         a custom icon can go in assets/city/telescope.(svg|png|webp|gif) -->
+    <button class="ui-button telescope-btn" type="button" data-folder="content/city/">
+        <span class="ui-icon" data-asset="assets/city/telescope">
+            <svg class="placeholder" viewBox="0 0 32 32" aria-hidden="true" fill="currentColor">
+                <g transform="rotate(-32 16 16)">
+                    <rect x="3" y="13" width="22" height="6" rx="1.5"/>
+                    <rect x="23" y="11.5" width="6" height="9" rx="1.5"/>
+                    <rect x="1" y="14.2" width="3" height="3.6" rx=".8"/>
+                </g>
+                <path d="M15 19 L10 30 H12 L16 21 L20 30 H22 L17 19 Z"/>
+            </svg>
+        </span>
+        <span>telescope</span>
     </button>
 
     <!-- the traveller, stargazing. your own: assets/characters/city.(gif|png|webp|svg) -->
     <div class="character scene-character" data-asset="assets/characters/city" data-say="clear skies tonight"
-         aria-label="the traveller" style="position: fixed; z-index: 2; left: calc(5vw + 186px); bottom: 5vh; height: 17vh; min-height: 90px;"></div>
+         aria-label="the traveller" style="position: fixed; z-index: 2; right: 16vw; bottom: 5vh; height: 17vh; min-height: 90px;"></div>
 
-    <!-- the city: a starter page. write letters here like on the homepage,
-         or replace this section with whatever the city turns into. -->
-    <section class="letters">
-        <article class="letter" data-nodate>
-            <h2>the city</h2>
-            <p class="subtitle">under construction</p>
-            <hr>
-            <p class="lede">streets still being drawn. scroll down and watch the windows switch on one by one as the sun goes down, or look through the telescope.</p>
-            <p class="signoff">follow the north star home</p>
-        </article>
-    </section>
 
     <script src="sky/sky.js"></script>
     <script src="sky/ground-city.js"></script>
-    <script src="sky/letters.js"></script>
+    <script src="sky/peeper.js"></script>
 </body>
 </html>
