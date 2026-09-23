@@ -234,6 +234,23 @@
     if (body.dataset.voyage) voyage.style.height = (+body.dataset.voyage) + 'vh';
     body.appendChild(voyage);
 
+    /* ---------------- gliding the time of day (a slow, eased scroll) ---------------- */
+    var glideId = 0;
+    function glideTo(y, ms) {
+        var id = ++glideId, from = window.scrollY, t0 = performance.now();
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, y); return; }
+        function stop() { glideId++; }
+        window.addEventListener('wheel', stop, { once: true, passive: true });
+        window.addEventListener('touchstart', stop, { once: true, passive: true });
+        (function frame(now) {
+            if (id !== glideId) return;                        // the visitor took over the scrolling
+            var t = Math.min(1, (now - t0) / ms);
+            var e = t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            window.scrollTo(0, from + (y - from) * e);
+            if (t < 1) requestAnimationFrame(frame);
+        })(t0);
+    }
+
     /* ---------------- rooms: a window you can step out of ---------------- */
     var room = document.querySelector('.room');
     if (room) {
@@ -262,6 +279,9 @@
         fitWindow();
         window.addEventListener('resize', fitWindow);
 
+        // stepping outside lets night fall (so Polaris and the constellations come out);
+        // going back inside returns you to whatever time it was
+        var timeInside = 0;
         if (win) {
             win.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -270,11 +290,14 @@
                 room.style.transformOrigin = (r.left + r.width / 2) + 'px ' + (r.top + r.height / 2) + 'px';
                 room.classList.add('outside');
                 body.classList.add('is-outside');
+                timeInside = window.scrollY;
+                glideTo(root.scrollHeight - window.innerHeight, 2400);
             });
         }
         back.addEventListener('click', function () {
             room.classList.remove('outside');
             body.classList.remove('is-outside');
+            glideTo(timeInside, 1400);
         });
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && body.classList.contains('is-outside')) back.click();

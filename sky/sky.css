@@ -233,20 +233,11 @@ a:hover {
     filter: drop-shadow(0 6px 5px rgba(0, 0, 0, .45));
     transition: transform .45s cubic-bezier(.3, .7, .3, 1);
 }
-.signpost .post {
-    position: absolute;
-    right: 50px;
-    top: -26px;
-    bottom: -60px;
-    width: 18px;
-    border-radius: 9px 9px 2px 2px;
-    background:
-        repeating-linear-gradient(to bottom, transparent 0 13px, rgba(40, 20, 8, .25) 13px 14px, transparent 14px 29px),
-        linear-gradient(to right, #3f2614, #7a5132 45%, #5a3920 80%, #3f2614);
-}
+.signpost .post { display: none; }
 .signpost .plank {
+    --nail: radial-gradient(circle at 173px 50%, #2a1a0e 0 2.4px, #b08a60 2.9px 3.6px, transparent 4.2px);
     --wood:
-        radial-gradient(circle at 173px 50%, #2a1a0e 0 2.4px, #b08a60 2.9px 3.6px, transparent 4.2px),
+        var(--nail),
         radial-gradient(ellipse 40px 5px at 60px 62%, rgba(50, 25, 8, .35), transparent 70%),
         repeating-linear-gradient(to bottom, transparent 0 5px, rgba(60, 30, 10, .2) 5px 6px, transparent 6px 9px, rgba(255, 220, 170, .06) 9px 10px, transparent 10px 13px),
         linear-gradient(to bottom, #a4744a 0%, #86583a 55%, #6d4628 100%);
@@ -281,8 +272,9 @@ a:hover {
     outline: none;
 }
 .signpost .plank.here {
+    --nail: radial-gradient(circle at 163px 50%, #2a1a0e 0 2.4px, #b08a60 2.9px 3.6px, transparent 4.2px);
     --wood:
-        radial-gradient(circle at 163px 50%, #2a1a0e 0 2.4px, #b08a60 2.9px 3.6px, transparent 4.2px),
+        var(--nail),
         repeating-linear-gradient(to bottom, transparent 0 5px, rgba(60, 30, 10, .22) 5px 6px, transparent 6px 13px),
         linear-gradient(to bottom, #6f5038 0%, #5a3f2a 100%);
     color: #d9c6a0;
@@ -303,6 +295,10 @@ a:hover {
     box-shadow: 0 0 0 2px rgba(154, 59, 31, .35);
 }
 .signpost .plank.here span { padding-left: 6px; }
+
+/* away from the homepage's dock there's no post: the planks sit on the screen edge as tabs */
+body:not([data-page="home"]) .signpost .plank { --nail: none; }
+body:not([data-page="home"]) .signpost { filter: drop-shadow(-2px 5px 5px rgba(0, 0, 0, .45)); }
 
 /* when a scene plays a send-off (the ship sailing away), the page's paper fades out of its way */
 body.leaving .letters,
