@@ -1,8 +1,7 @@
 {
-    "name": "",
-    "color": "",
-    "font": "",
+    "name": "Da V - nkey",
+    "color": "#5100ff",
+    "font": "comic",
     "button": "",
-    "screenshot": "",
-    "mature": "false"
+    "mature": "true"
 }
