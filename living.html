@@ -77,12 +77,13 @@
             .armchair { left: 30%; width: 44%; }
             .lamp { left: 4%; height: 40vh; }
             .rug { left: 20%; right: 10%; }
+            .room .character { left: 70% !important; height: 18vh !important; }
         }
     </style>
 </head>
 <body data-place="living" data-voyage="300">
 
-    <!-- a room (see workshop.html for how rooms work). the city is outside. -->
+    <!-- a room (see workshop.html for how rooms work and how the asset slots fill in). -->
     <div class="room" style="--lamp-x:8%; --lamp-y:40%">
 
         <a class="window" href="#outside" aria-label="look outside"
@@ -90,11 +91,11 @@
 
         <div class="furnish pinned">
             <h1>the living space</h1>
-            <p>not furnished yet. the city's out the window.</p>
+            <p>not furnished yet. there's a garden out the window.</p>
         </div>
 
         <!-- framed picture -->
-        <svg class="furnish frame" viewBox="0 0 140 110" aria-hidden="true" style="filter: drop-shadow(0 5px 6px rgba(0,0,0,.4))">
+        <svg class="furnish frame" data-asset="assets/living/picture" viewBox="0 0 140 110" aria-hidden="true" style="filter: drop-shadow(0 5px 6px rgba(0,0,0,.4))">
             <rect x="0" y="0" width="140" height="110" fill="#2a1d14"/>
             <rect x="10" y="10" width="120" height="90" fill="#e9dbb8"/>
             <path d="M10 80 C40 60 60 70 80 58 C100 48 115 55 130 50 V100 H10 Z" fill="#6e5236" opacity=".5"/>
@@ -102,7 +103,7 @@
         </svg>
 
         <!-- floor lamp: glows brighter as evening comes -->
-        <svg class="furnish lamp" viewBox="0 0 80 400" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+        <svg class="furnish lamp" data-asset="assets/living/lamp" viewBox="0 0 80 400" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
             <ellipse class="glow" cx="40" cy="70" rx="40" ry="46" fill="rgba(255,200,110,.3)"/>
             <path class="glow" d="M16 40 H64 L74 96 H6 Z" fill="#ffd98a"/>
             <path d="M14 36 H66 L76 98 H4 Z M18 42 L10 92 M62 42 L70 92" fill="none" stroke="#1f1610" stroke-width="3"/>
@@ -111,13 +112,13 @@
         </svg>
 
         <!-- rug -->
-        <svg class="furnish rug" viewBox="0 0 600 40" preserveAspectRatio="none" aria-hidden="true">
+        <svg class="furnish rug" data-asset="assets/living/rug" viewBox="0 0 600 40" preserveAspectRatio="none" aria-hidden="true">
             <path d="M20 4 H580 L600 36 H0 Z" fill="#6e2f24"/>
             <path d="M44 10 H556 L570 30 H30 Z" fill="none" stroke="#d9b98a" stroke-width="2" opacity=".6"/>
         </svg>
 
         <!-- armchair -->
-        <svg class="furnish armchair" viewBox="0 0 260 200" aria-hidden="true" style="filter: drop-shadow(0 -2px 8px rgba(0,0,0,.35))">
+        <svg class="furnish armchair" data-asset="assets/living/armchair" viewBox="0 0 260 200" aria-hidden="true" style="filter: drop-shadow(0 -2px 8px rgba(0,0,0,.35))">
             <g fill="#1f1610">
                 <path d="M40 40 C40 10 220 10 220 40 V120 H40 Z"/>
                 <path d="M10 90 C10 70 50 70 50 90 V170 H10 Z M210 90 C210 70 250 70 250 90 V170 H210 Z"/>
@@ -128,7 +129,7 @@
         </svg>
 
         <!-- bookshelf under the window -->
-        <svg class="furnish shelf" viewBox="0 0 360 170" aria-hidden="true" style="filter: drop-shadow(0 -2px 8px rgba(0,0,0,.35))">
+        <svg class="furnish shelf" data-asset="assets/living/bookshelf" viewBox="0 0 360 170" aria-hidden="true" style="filter: drop-shadow(0 -2px 8px rgba(0,0,0,.35))">
             <g fill="#1f1610">
                 <rect x="0" y="0" width="360" height="12"/>
                 <rect x="0" y="0" width="12" height="170"/><rect x="348" y="0" width="12" height="170"/>
@@ -141,9 +142,15 @@
                 <path d="M250 158 C230 130 240 110 262 102 C284 110 294 130 274 158 Z"/>
             </g>
         </svg>
+
+        <!-- the traveller, at home. your own: assets/characters/living.(gif|png|webp|svg) -->
+        <div class="furnish character scene-character" data-asset="assets/characters/living"
+             data-say="make yourself at home" aria-label="the traveller"
+             style="left: 34%; bottom: 3vh; height: 25vh;"></div>
     </div>
 
     <script src="sky/sky.js"></script>
-    <script src="sky/ground-city.js"></script>
+    <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
+    <script src="sky/ground-view.js" data-view="assets/living/view"></script>
 </body>
 </html>

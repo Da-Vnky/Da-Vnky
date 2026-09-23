@@ -18,6 +18,34 @@
 </head>
 <body data-place="city" data-voyage="160">
 
+    <!-- the telescope: click it to look at the sky (night falls, the constellations
+         come out, and the day/night player appears). your own art goes in
+         assets/city/telescope.(svg|png|webp|gif) -->
+    <button class="telescope sky-viewer" type="button" data-view-mode="scope" data-exit-label="lower the telescope"
+            data-asset="assets/city/telescope" aria-label="look through the telescope">
+        <svg class="placeholder" viewBox="0 0 200 220" aria-hidden="true">
+            <g fill="#3a2716">
+                <path d="M96 118 L60 216 L68 218 L102 122 Z"/>
+                <path d="M104 118 L140 216 L132 218 L98 122 Z"/>
+                <path d="M98 120 L96 218 L104 218 L102 120 Z"/>
+                <rect x="88" y="108" width="24" height="16" rx="3"/>
+            </g>
+            <g transform="rotate(-38 100 110)">
+                <rect x="30" y="98" width="150" height="22" rx="4" fill="#c49a52"/>
+                <rect x="150" y="94" width="34" height="30" rx="4" fill="#a67c3a"/>
+                <rect x="14" y="102" width="22" height="14" rx="3" fill="#8a6a30"/>
+                <rect x="70" y="98" width="6" height="22" fill="#6b4a22"/>
+                <rect x="120" y="98" width="6" height="22" fill="#6b4a22"/>
+                <rect x="36" y="100" width="140" height="4" fill="rgba(255,240,200,.45)"/>
+            </g>
+        </svg>
+        <span class="hint">look through the telescope</span>
+    </button>
+
+    <!-- the traveller, stargazing. your own: assets/characters/city.(gif|png|webp|svg) -->
+    <div class="character scene-character" data-asset="assets/characters/city" data-say="clear skies tonight"
+         aria-label="the traveller" style="position: fixed; z-index: 2; left: calc(5vw + 186px); bottom: 5vh; height: 17vh; min-height: 90px;"></div>
+
     <!-- the city: a starter page. write letters here like on the homepage,
          or replace this section with whatever the city turns into. -->
     <section class="letters">
@@ -25,7 +53,7 @@
             <h2>the city</h2>
             <p class="subtitle">under construction</p>
             <hr>
-            <p class="lede">streets still being drawn. scroll down and watch the windows switch on one by one as the sun goes down.</p>
+            <p class="lede">streets still being drawn. scroll down and watch the windows switch on one by one as the sun goes down, or look through the telescope.</p>
             <p class="signoff">follow the north star home</p>
         </article>
     </section>
