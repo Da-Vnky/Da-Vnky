@@ -1,4 +1,4 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
-01-harbour-lullaby-example.mp3
-02-north-star-waltz-example.mp3
+01-Aerie.mp3
+02-Gravity.mp3
