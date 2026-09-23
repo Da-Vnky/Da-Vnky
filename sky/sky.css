@@ -218,9 +218,101 @@ a:hover {
 .sky-link:focus-visible .ln { stroke: rgba(255,246,220,.9); stroke-dasharray: none; }
 
 .sky-link.l1 { left: 5vw;   top: 38vh; }
-.sky-link.l2 { right: 6vw;  top: 10vh; }
-.sky-link.l3 { right: 14vw; top: 36vh; }
+.sky-link.l2 { right: 6vw;  top: 8vh; }
+.sky-link.l3 { right: 21vw; top: 36vh; }
 .sky-link.l4 { left: 24vw;  top: 30vh; }
+
+/* ================= the signpost: wooden arrow planks ================= */
+.signpost {
+    position: fixed;
+    right: 0;
+    top: 27vh;
+    z-index: 5;
+    width: 250px;
+    padding: 6px 0 10px;
+    filter: drop-shadow(0 6px 5px rgba(0, 0, 0, .45));
+    transition: transform .45s cubic-bezier(.3, .7, .3, 1);
+}
+.signpost .post {
+    position: absolute;
+    right: 50px;
+    top: -26px;
+    bottom: -60px;
+    width: 18px;
+    border-radius: 9px 9px 2px 2px;
+    background:
+        repeating-linear-gradient(to bottom, transparent 0 13px, rgba(40, 20, 8, .25) 13px 14px, transparent 14px 29px),
+        linear-gradient(to right, #3f2614, #7a5132 45%, #5a3920 80%, #3f2614);
+}
+.signpost .plank {
+    --wood:
+        radial-gradient(circle at 173px 50%, #2a1a0e 0 2.4px, #b08a60 2.9px 3.6px, transparent 4.2px),
+        radial-gradient(ellipse 40px 5px at 60px 62%, rgba(50, 25, 8, .35), transparent 70%),
+        repeating-linear-gradient(to bottom, transparent 0 5px, rgba(60, 30, 10, .2) 5px 6px, transparent 6px 9px, rgba(255, 220, 170, .06) 9px 10px, transparent 10px 13px),
+        linear-gradient(to bottom, #a4744a 0%, #86583a 55%, #6d4628 100%);
+    position: relative;
+    display: block;
+    width: 232px;
+    height: 44px;
+    margin: 0 0 12px auto;
+    padding: 0 34px 0 20px;
+    background: none;
+    background-image: var(--wood);
+    clip-path: polygon(0 4%, calc(100% - 26px) 0, 100% 50%, calc(100% - 26px) 100%, 0 96%, 7px 50%);
+    color: #f6e7c4;
+    font-size: 1.12rem;
+    font-style: italic;
+    line-height: 44px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, .6), 0 1px 0 rgba(255, 230, 190, .22);   /* carved into the wood */
+    transform: rotate(var(--tilt, 0deg));
+    transition: transform .25s ease, filter .25s ease;
+}
+.signpost a.plank:hover,
+.signpost a.plank:focus-visible {
+    color: #fff4d8;
+    background-image: var(--wood);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, .6), 0 0 8px rgba(255, 220, 150, .6);
+    filter: brightness(1.12);
+    transform: translateX(-5px) rotate(0deg);
+    outline: none;
+}
+.signpost .plank.here {
+    --wood:
+        radial-gradient(circle at 163px 50%, #2a1a0e 0 2.4px, #b08a60 2.9px 3.6px, transparent 4.2px),
+        repeating-linear-gradient(to bottom, transparent 0 5px, rgba(60, 30, 10, .22) 5px 6px, transparent 6px 13px),
+        linear-gradient(to bottom, #6f5038 0%, #5a3f2a 100%);
+    color: #d9c6a0;
+    cursor: default;
+    transform: translateX(10px) rotate(var(--tilt, 0deg));
+}
+/* a red-chalk mark on the sign you're standing at */
+.signpost .plank.here::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    margin-top: -3px;
+    border-radius: 50%;
+    background: var(--sanguine);
+    box-shadow: 0 0 0 2px rgba(154, 59, 31, .35);
+}
+.signpost .plank.here span { padding-left: 6px; }
+
+/* when a scene plays a send-off (the ship sailing away), the page's paper fades out of its way */
+body.leaving .letters,
+body.leaving .credit { opacity: 0; transition: opacity .7s ease; }
+
+/* narrow screens: the signpost peeks in from the edge until tapped */
+@media (max-width: 1100px) {
+    .signpost { transform: translateX(178px); cursor: pointer; }
+    .signpost.open { transform: none; }
+}
 
 /* ================= grounds (sea, countryside, city …) ================= */
 .ground {
@@ -315,6 +407,12 @@ a:hover {
 }
 .room .furnish { position: absolute; z-index: 2; }
 
+/* while you're indoors, the constellations you can see through the glass can still be clicked */
+body.has-room:not(.is-outside) .sky-links {
+    z-index: 4;
+    clip-path: inset(var(--wy) calc(100% - var(--wx) - var(--ww)) calc(100% - var(--wy) - var(--wh)) var(--wx));
+}
+
 /* while you're indoors, the ground rises so its horizon shows in the bottom of the window */
 .ground { transition: transform .9s cubic-bezier(.55, 0, .25, 1); }
 body.has-room:not(.is-outside) .ground {
@@ -364,9 +462,10 @@ body.is-outside .back-inside {
     .hide-small { display: none; }
     .sky-link { width: 104px; font-size: .85rem; }
     .sky-link.l1 { left: 4vw;  top: 44vh; }
-    .sky-link.l2 { right: 4vw; top: 32vh; }
+    .sky-link.l2 { right: 16vw; top: 30vh; }
     .sky-link.l3 { left: 36vw; top: 55vh; right: auto; }
-    .sky-link.l4 { right: 6vw; top: 47vh; left: auto; }
+    .sky-link.l4 { right: 16vw; top: 45vh; left: auto; }
+    .signpost { top: 17vh; }
     .room .window { border-width: 9px; }
 }
 

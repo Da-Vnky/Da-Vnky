@@ -8,10 +8,12 @@
        <script src="sky/ground-sea.js"></script>   (or -countryside / -city)
 
    Page options (attributes on <body>):
-       data-page="home"   this page IS the homepage (Polaris scrolls back up
-                          to daylight instead of reloading)
-       data-voyage="110"  how much empty sky to scroll through after your
-                          content, in % of the screen height. more = slower sunset.
+       data-page="home"      this page IS the homepage (Polaris scrolls back up
+                             to daylight instead of reloading)
+       data-place="workshop" which of the PLACES below this page is, so its
+                             sign reads "you are here"
+       data-voyage="110"     how much empty sky to scroll through after your
+                             content, in % of the screen height. more = slower sunset.
    ===================================================================== */
 
 (function () {
@@ -21,12 +23,15 @@
     // where Polaris takes you
     var HOME = 'https://dav-nky.pleroma.nexus/';
 
-    // the four constellation links in the night sky (same on every page)
-    var LINKS = [
-        { text: 'link one',   href: '#' },
-        { text: 'link two',   href: '#' },
-        { text: 'link three', href: '#' },
-        { text: 'link four',  href: '#' }
+    // every place on the site. each one gets a wooden sign on the signpost
+    // (right side of the screen) and a constellation in the night sky.
+    // to add a place: add a line here, in the order you want the signs.
+    // the first four also get constellations.
+    var PLACES = [
+        { id: 'sea',      name: 'the sea',          href: HOME },
+        { id: 'workshop', name: 'the workshop',     href: 'workshop.html' },
+        { id: 'city',     name: 'the city',         href: 'city.html' },
+        { id: 'living',   name: 'the living space', href: 'living.html' }
     ];
 
     // sky colours along the scroll: [position 0–1, top of sky, horizon]
@@ -148,18 +153,79 @@
         '<path class="ln" d="M45 8 L58 40 L78 45 L98 50 L110 12 M58 40 L50 76 M98 50 L106 78"/><g class="st"><circle cx="45" cy="8" r="3"/><circle cx="110" cy="12" r="2.6"/><circle cx="58" cy="40" r="2"/><circle cx="78" cy="45" r="2"/><circle cx="98" cy="50" r="2"/><circle cx="50" cy="76" r="2.4"/><circle cx="106" cy="78" r="2.8"/></g>',
         '<path class="ln" d="M12 62 L50 46 L90 32 L134 16 M90 32 L80 12 M90 32 L102 50"/><g class="st"><circle cx="12" cy="62" r="2"/><circle cx="50" cy="46" r="2.2"/><circle cx="90" cy="32" r="2.8"/><circle cx="134" cy="16" r="2.4"/><circle cx="80" cy="12" r="1.8"/><circle cx="102" cy="50" r="1.8"/></g>'
     ];
+    var here = body.dataset.place || (isHome ? PLACES[0].id : '');
     var nav = document.createElement('nav');
     nav.className = 'sky-links';
-    nav.setAttribute('aria-label', 'links');
-    LINKS.slice(0, 4).forEach(function (l, i) {
+    nav.setAttribute('aria-label', 'places, among the stars');
+    PLACES.slice(0, 4).forEach(function (pl, i) {
         var a = document.createElement('a');
         a.className = 'sky-link l' + (i + 1);
-        a.href = l.href;
+        a.href = pl.href;
+        a.dataset.place = pl.id;
         a.innerHTML = '<svg viewBox="0 0 150 80" aria-hidden="true">' + SHAPES[i] + '</svg><span></span>';
-        a.querySelector('span').textContent = l.text;
+        a.querySelector('span').textContent = pl.name;
         nav.appendChild(a);
     });
     body.appendChild(nav);
+
+    /* ---------------- the signpost: wooden arrow planks on the right ---------------- */
+    var sign = document.createElement('nav');
+    sign.className = 'signpost';
+    sign.setAttribute('aria-label', 'places');
+    sign.innerHTML = '<div class="post" aria-hidden="true"></div>';
+    var TILTS = [-1.6, 1.2, -0.8, 1.8, -1.3, 0.9];
+    PLACES.forEach(function (pl, i) {
+        var el = document.createElement(pl.id === here ? 'span' : 'a');
+        el.className = 'plank' + (pl.id === here ? ' here' : '');
+        el.style.setProperty('--tilt', TILTS[i % TILTS.length] + 'deg');
+        el.dataset.place = pl.id;
+        if (pl.id === here) {
+            el.setAttribute('aria-current', 'page');
+            el.title = 'you are here';
+        } else {
+            el.href = pl.href;
+        }
+        el.innerHTML = '<span></span>';
+        el.firstChild.textContent = pl.name;
+        sign.appendChild(el);
+    });
+    body.appendChild(sign);
+
+    // on narrow screens the signpost tucks mostly off the edge; a tap pulls it out
+    var compact = window.matchMedia('(max-width: 1100px)');
+    sign.addEventListener('click', function (e) {
+        if (compact.matches && !sign.classList.contains('open')) {
+            e.preventDefault();
+            sign.classList.add('open');
+        }
+    }, true);
+    document.addEventListener('click', function (e) {
+        if (!sign.contains(e.target)) sign.classList.remove('open');
+    });
+
+    /* ---------------- leaving the page (scenes can play a little send-off first) ---------------- */
+    var leaveHooks = [], leaving = false;
+    function leave(href) {
+        if (leaving) return;
+        leaving = true;
+        var waiting = false, gone = false;
+        function go() { if (gone) return; gone = true; location.href = href; }
+        leaveHooks.forEach(function (fn) { if (fn(go)) waiting = true; });
+        if (waiting) { body.classList.add('leaving'); setTimeout(go, 2600); } else go();
+    }
+    function onPlaceClick(e) {
+        var a = e.target.closest('a[data-place]');
+        if (!a || e.defaultPrevented) return;
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // new tab etc.
+        e.preventDefault();
+        if (a.dataset.place === here) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+        leave(a.href);
+    }
+    sign.addEventListener('click', onPlaceClick);
+    nav.addEventListener('click', onPlaceClick);
+    window.addEventListener('pageshow', function (e) {         // coming back with the browser's back button
+        if (e.persisted) { leaving = false; sign.classList.remove('open'); body.classList.remove('leaving'); }
+    });
 
     /* ---------------- the stretch of sky after the content ---------------- */
     var voyage = document.createElement('div');
@@ -185,10 +251,11 @@
             if (!win) return;
             if (room.classList.contains('outside')) return;
             var r = win.getBoundingClientRect(), rr = room.getBoundingClientRect();
-            room.style.setProperty('--wx', (r.left - rr.left) + 'px');
-            room.style.setProperty('--wy', (r.top - rr.top) + 'px');
-            room.style.setProperty('--ww', r.width + 'px');
-            room.style.setProperty('--wh', r.height + 'px');
+            // (set on the whole page so the night-sky links can be clipped to the glass too)
+            root.style.setProperty('--wx', (r.left - rr.left) + 'px');
+            root.style.setProperty('--wy', (r.top - rr.top) + 'px');
+            root.style.setProperty('--ww', r.width + 'px');
+            root.style.setProperty('--wh', r.height + 'px');
             // how far to raise the ground so its bottom lines up with the bottom of the glass
             root.style.setProperty('--win-lift', (window.innerHeight - (r.bottom - 12)) + 'px');
         };
@@ -290,6 +357,11 @@
     window.Sky = {
         // run fn(p) every frame the scene changes; p goes 0 (noon) → 1 (midnight)
         onFrame: function (fn) { hooks.push(fn); fn(shown); },
+        // run fn(go) when a sign or constellation is clicked; return true and
+        // call go() yourself when your send-off animation is done
+        onLeave: function (fn) { leaveHooks.push(fn); },
+        places: PLACES,
+        here: here,
         get progress() { return shown; },
         refresh: kick,
         isHome: isHome,
