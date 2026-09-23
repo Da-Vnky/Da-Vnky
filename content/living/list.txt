@@ -1,8 +1,6 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
 01-where heaven and earth meet.ogg
-02-Gravity.ogg
-03-I Feel Human Nature.ogg
-04-Song on the Beach.ogg
-05-Aerie.ogg
-06-Frame of Mind.ogg
+02-Song on the Beach.ogg
+03-Aerie.ogg
+04-Frame of Mind.ogg
