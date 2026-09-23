@@ -1,0 +1,234 @@
+/* =====================================================================
+   paper.css — the aged-paper letters (and the bottle they arrive in).
+   Used with sky/letters.js.
+   ===================================================================== */
+
+:root {
+    --paper:       #e9dbb8;
+    --paper-light: #f3e8cc;
+    --paper-dark:  #c9b082;
+    --ink-blot:    #24170c;
+}
+
+/* the container lets clicks fall through its empty space to the scene behind */
+.letters { position: relative; z-index: 2; pointer-events: none; }
+
+.letter {
+    position: relative;
+    max-width: 780px;
+    margin: 0 auto 110px;
+    pointer-events: auto;
+}
+.letter.corked { clip-path: inset(0 0 100% 0); }
+
+.sheet {
+    position: relative;
+    padding: 72px 72px 80px;
+    overflow: hidden;
+    background-color: var(--paper);
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0 0.12 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 82% 14%, rgba(139, 90, 43, 0.18) 0 38px, transparent 70px),
+        radial-gradient(circle at 12% 78%, rgba(139, 90, 43, 0.14) 0 26px, transparent 60px),
+        radial-gradient(circle at 64% 92%, rgba(120, 72, 30, 0.12) 0 50px, transparent 110px),
+        radial-gradient(ellipse at 30% 30%, var(--paper-light), transparent 60%),
+        radial-gradient(ellipse at center, transparent 58%, var(--paper-dark) 100%);
+    box-shadow:
+        0 0 0 1px rgba(60, 40, 20, 0.25),
+        inset 0 0 80px rgba(110, 70, 30, 0.35),
+        inset 0 14px 18px -10px rgba(80, 55, 25, 0.45),
+        inset 0 -14px 18px -10px rgba(80, 55, 25, 0.45),
+        0 22px 50px rgba(0, 0, 0, 0.6);
+}
+.sheet::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(to bottom, transparent 0 31px, rgba(110, 82, 54, 0.08) 31px 32px);
+}
+
+/* the rolled-up top and bottom edges */
+.curl {
+    position: absolute;
+    left: -12px;
+    right: -12px;
+    height: 24px;
+    z-index: 3;
+    border-radius: 12px;
+    background: linear-gradient(to bottom, #9c7f4f 0%, #e9d9b2 22%, #f6ecd2 42%, #d9c393 70%, #8e7045 100%);
+    box-shadow: 0 5px 8px rgba(0,0,0,.35);
+}
+.curl-top    { top: -12px; }
+.curl-bottom { bottom: -12px; }
+.curl::before,
+.curl::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 16px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #6e5236 0 2px, #cdb585 3px 5px, #8e7045 6px 7px, #e2cfa3 8px);
+}
+.curl::before { left: 0; }
+.curl::after  { right: 0; }
+
+.content { position: relative; z-index: 1; }
+
+/* ---------- ink spots & stars (scattered by letters.js) ---------- */
+.marks { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.marks svg { position: absolute; overflow: visible; }
+.blot        { color: var(--ink-blot); opacity: 0.82; }
+.blot.faint  { opacity: 0.35; }
+.star        { color: var(--ink-faded); opacity: 0.8; }
+.star.red    { color: var(--sanguine); opacity: 0.75; }
+
+/* ---------- type ---------- */
+.date {
+    margin: 0 0 6px;
+    font-style: italic;
+    font-size: .9rem;
+    color: var(--ink-faded);
+    letter-spacing: .02em;
+}
+.letter h2 {
+    font-family: "IM Fell English SC", Georgia, serif;
+    font-weight: normal;
+    font-size: clamp(2rem, 5.5vw, 3rem);
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+    margin: 0 0 6px;
+}
+.letter h3 {
+    font-family: "IM Fell English SC", Georgia, serif;
+    font-weight: normal;
+    font-size: 1.5rem;
+    margin: 1.4em 0 .4em;
+}
+.subtitle { font-style: italic; color: var(--ink-faded); margin: 0 0 20px; }
+.letter hr {
+    border: none;
+    height: 14px;
+    margin: 8px 0 28px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='14' viewBox='0 0 400 14'%3E%3Cpath d='M2 8 C 60 3, 120 11, 200 7 S 340 4, 398 8' fill='none' stroke='%236e5236' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+    opacity: 0.8;
+}
+.letter p { margin: 0 0 1.1em; position: relative; }
+.letter img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 10px auto 20px;
+    filter: sepia(.35) contrast(.95);
+    box-shadow: 0 2px 8px rgba(60,40,20,.35);
+}
+.lede::first-letter {
+    float: left;
+    font-family: "IM Fell English SC", Georgia, serif;
+    font-size: 3.4em;
+    line-height: 0.85;
+    padding: 6px 8px 0 0;
+    color: var(--sanguine);
+}
+.sketch {
+    float: right;
+    width: 190px;
+    margin: 0 -24px 12px 24px;
+    opacity: 0.75;
+    transform: rotate(3deg);
+}
+.mirror {
+    display: block;
+    transform: scaleX(-1);
+    text-align: right;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--ink-faded);
+    margin-top: 36px;
+    opacity: 0.8;
+}
+.signoff { font-style: italic; text-align: right; margin-top: 28px; }
+
+.credit {
+    position: relative;
+    z-index: 2;
+    margin: 0 0 40px;
+    text-align: center;
+    font-style: italic;
+    font-size: .9rem;
+    color: #fdf3da;
+    text-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+.credit a { color: #fdf3da; }
+
+/* ---------- today's message in a bottle ---------- */
+.bottle-wrap {
+    position: absolute;
+    left: 60vw;
+    bottom: 12%;
+    width: 190px;
+    pointer-events: auto;
+    cursor: pointer;
+    transform-origin: 50% 60%;
+    -webkit-user-select: none;
+            user-select: none;
+    touch-action: none;
+}
+.bottle {
+    display: block;
+    width: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 4px 5px rgba(0,0,0,.4));
+    transition: filter .25s;
+}
+.bottle-wrap:hover .bottle { filter: drop-shadow(0 4px 5px rgba(0,0,0,.4)) drop-shadow(0 0 10px rgba(255,240,200,.65)); }
+.b-cork { cursor: grab; transform-box: fill-box; transform-origin: center; }
+
+.bottle-hint {
+    position: absolute;
+    left: calc(60vw + 95px);
+    bottom: calc(12% + 96px);
+    z-index: 3;
+    margin: 0;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    text-align: center;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: #fdf8ec;
+    text-shadow: 0 1px 4px rgba(20,40,60,.55);
+    transition: opacity .5s;
+}
+.bottle-hint small { display: block; font-size: .95rem; opacity: .85; }
+
+.flying-scroll {
+    position: fixed;
+    z-index: 6;
+    border-radius: 999px;
+    background: linear-gradient(to bottom, #9c7f4f 0%, #e9d9b2 22%, #f6ecd2 42%, #d9c393 70%, #8e7045 100%);
+    box-shadow: 0 6px 10px rgba(0,0,0,.35);
+    pointer-events: none;
+}
+.flying-scroll::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -1px;
+    bottom: -1px;
+    width: 8px;
+    margin-left: -4px;
+    background: var(--sanguine);
+    transition: opacity .4s;
+}
+.flying-scroll.untied::after { opacity: 0; }
+
+/* ---------- small screens ---------- */
+@media (max-width: 620px) {
+    .sheet { padding: 52px 24px 58px; }
+    .curl { left: -8px; right: -8px; }
+    .sketch { width: 120px; margin: 0 -6px 8px 12px; }
+    .marks svg.blot { width: 30px !important; height: 30px !important; opacity: .45; }
+    .bottle-wrap { width: 130px; left: 52vw; }
+    .bottle-hint { font-size: 1.1rem; left: calc(52vw + 65px); bottom: calc(12% + 70px); }
+}
