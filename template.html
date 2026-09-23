@@ -55,6 +55,13 @@
 
      Characters and art slots: see assets/README.txt.
 
+     Things that show a folder of your files (see content/README.txt):
+       sky/letters.js   <section class="letters" data-folder="content/…/"></section>
+       sky/gallery.js   an easel:     <div class="furnish easel" data-folder="…"></div>
+       sky/records.js   a turntable:  <div class="furnish turntable" data-folder="…"></div>
+       sky/peeper.js    a telescope on the city ground:
+                        <button class="ui-button telescope-btn" data-folder="…"></button>
+
      Making your own ground? copy ground-countryside.js. The only rules:
        - build your layers inside <div class="ground ...">
        - call Sky.onFrame(function (p) { ... }) and move things by p,
