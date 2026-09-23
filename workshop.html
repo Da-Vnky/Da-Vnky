@@ -59,6 +59,7 @@
             .pinned { left: 50%; top: 11%; width: 220px; margin-left: -110px; }
             .lantern { left: 6%; }
             .bench { height: 24vh; }
+            .room .character { left: 58% !important; height: 20vh !important; }
         }
     </style>
 </head>
@@ -74,6 +75,10 @@
          left / top / width / height. anything with class="furnish" sits
          on the wall; position it however you like.
          --lamp-x / --lamp-y is where the warm evening glow on the wall centres.
+
+         ASSETS: every drawn piece below has a data-asset slot. drop a file with
+         that name into assets/workshop/ (svg, gif, webp or png) and it replaces
+         the drawing. a matching -glow file (lantern-glow.png) fades in at dusk.
          ===================================================================== -->
     <div class="room" style="--wall:#6e4e36; --frame:#3b2618; --lamp-x:28%; --lamp-y:18%">
 
@@ -86,7 +91,7 @@
         </div>
 
         <!-- hanging lantern: glows brighter as evening comes -->
-        <svg class="furnish lantern" viewBox="0 0 60 150" aria-hidden="true">
+        <svg class="furnish lantern" data-asset="assets/workshop/lantern" viewBox="0 0 60 150" aria-hidden="true">
             <circle class="glow" cx="30" cy="112" r="30" fill="rgba(255,200,110,.35)"/>
             <rect x="29" y="0" width="2" height="72" fill="#2a1a10"/>
             <path d="M18 76 H42 L46 82 H14 Z" fill="#2a1a10"/>
@@ -96,7 +101,7 @@
         </svg>
 
         <!-- shelf with jars and a book -->
-        <svg class="furnish shelf" viewBox="0 0 300 120" aria-hidden="true" style="filter: drop-shadow(0 6px 6px rgba(0,0,0,.35))">
+        <svg class="furnish shelf" data-asset="assets/workshop/shelf" viewBox="0 0 300 120" aria-hidden="true" style="filter: drop-shadow(0 6px 6px rgba(0,0,0,.35))">
             <g fill="#3b2618">
                 <rect x="0" y="96" width="300" height="10"/>
                 <path d="M20 106 L40 106 L28 120 Z M260 106 L280 106 L272 120 Z"/>
@@ -109,7 +114,7 @@
         </svg>
 
         <!-- pegboard of tools -->
-        <svg class="furnish tools" viewBox="0 0 120 220" aria-hidden="true" style="filter: drop-shadow(0 6px 6px rgba(0,0,0,.35))">
+        <svg class="furnish tools" data-asset="assets/workshop/tools" viewBox="0 0 120 220" aria-hidden="true" style="filter: drop-shadow(0 6px 6px rgba(0,0,0,.35))">
             <g fill="#3b2618">
                 <rect x="30" y="10" width="8" height="120"/><path d="M20 10 H48 V30 H20 Z"/>
                 <rect x="70" y="20" width="10" height="70"/><path d="M58 90 H92 L88 118 H62 Z"/>
@@ -118,7 +123,7 @@
         </svg>
 
         <!-- workbench -->
-        <svg class="furnish bench" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true" style="filter: drop-shadow(0 -4px 8px rgba(0,0,0,.35))">
+        <svg class="furnish bench" data-asset="assets/workshop/bench" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true" style="filter: drop-shadow(0 -4px 8px rgba(0,0,0,.35))">
             <g fill="#3b2618">
                 <rect x="0" y="40" width="1000" height="26"/>
                 <rect x="40" y="66" width="30" height="154"/><rect x="930" y="66" width="30" height="154"/>
@@ -128,6 +133,11 @@
                 <circle cx="820" cy="26" r="14"/><rect x="812" y="0" width="16" height="14"/>
             </g>
         </svg>
+
+        <!-- the traveller, at the bench. your own: assets/characters/workshop.(gif|png|webp|svg) -->
+        <div class="furnish character scene-character" data-asset="assets/characters/workshop"
+             data-say="mind the sawdust" aria-label="the traveller"
+             style="left: 36%; bottom: 3vh; height: 27vh;"></div>
     </div>
 
     <script src="sky/sky.js"></script>
