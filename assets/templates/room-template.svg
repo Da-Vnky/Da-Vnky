@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ROOM TEMPLATE · 1920 × 1080 (one full desktop screen)
+
+  Use this to LAY OUT a room (workshop, living space …) and see how things fit
+  around the window, Polaris and the signs. Then export each piece as its own
+  file (see prop-template.svg): the site places pieces separately so it can
+  rearrange them on phones and make the lights glow at dusk.
+
+  Layers (open in Inkscape, Illustrator, Affinity, Figma …):
+    00 guides          reference only, hide before exporting
+    10 wall            optional wall art / texture (the site already draws a flat wall colour)
+    20 window frame    optional custom frame; the glass area MUST stay empty
+    30 back pieces     shelves, pictures, things on the wall
+    40 front pieces    furniture on the floor
+    50 lights          glow shapes only (lamp light, candle flames); fade in at dusk
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     width="1920" height="1080" viewBox="0 0 1920 1080">
+
+  <g id="guides" inkscape:groupmode="layer" inkscape:label="00 guides (hide before export)" font-family="Georgia, serif" font-style="italic">
+    <rect width="1920" height="1080" fill="#6e4e36"/>
+
+    <!-- the window, where it sits in workshop.html (left 50%, top 13%, 32% × 46%) -->
+    <rect x="960" y="140" width="614" height="497" fill="#8fc3e6" stroke="#3b2618" stroke-width="12"/>
+    <rect x="972" y="152" width="590" height="473" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="10 8"/>
+    <text x="1267" y="400" text-anchor="middle" font-size="28" fill="#1c2a5e">glass: the live sky shows here</text>
+    <text x="1267" y="436" text-anchor="middle" font-size="22" fill="#1c2a5e">keep it empty (you can move it)</text>
+
+    <!-- Polaris: always on top, top centre -->
+    <circle cx="960" cy="60" r="70" fill="none" stroke="#fff6dc" stroke-width="2" stroke-dasharray="6 6"/>
+    <text x="960" y="66" text-anchor="middle" font-size="20" fill="#fff6dc">Polaris</text>
+    <text x="1042" y="66" font-size="18" fill="#fff6dc">keep clear</text>
+
+    <!-- the signs on the right edge -->
+    <rect x="1670" y="286" width="250" height="250" fill="rgba(255,255,255,.08)" stroke="#fff6dc" stroke-width="2" stroke-dasharray="6 6"/>
+    <text x="1795" y="400" text-anchor="middle" font-size="20" fill="#fff6dc">signs</text>
+    <text x="1795" y="428" text-anchor="middle" font-size="18" fill="#fff6dc">keep clear</text>
+
+    <!-- floor line (a rough guide: furniture usually stands on it) -->
+    <line x1="0" y1="1000" x2="1920" y2="1000" stroke="#f3e6c2" stroke-width="2" stroke-dasharray="14 10"/>
+    <text x="24" y="990" font-size="20" fill="#f3e6c2">floor</text>
+
+    <!-- phones: the room is rearranged, so each piece needs to be its own file -->
+    <rect x="752" y="0" width="416" height="1080" fill="none" stroke="#9a3b1f" stroke-width="3" stroke-dasharray="4 10"/>
+    <text x="960" y="1060" text-anchor="middle" font-size="18" fill="#f3b8a0">roughly what a phone sees (pieces get moved around to fit)</text>
+  </g>
+
+  <g id="wall"          inkscape:groupmode="layer" inkscape:label="10 wall"/>
+  <g id="window-frame"  inkscape:groupmode="layer" inkscape:label="20 window frame"/>
+  <g id="back-pieces"   inkscape:groupmode="layer" inkscape:label="30 back pieces"/>
+  <g id="front-pieces"  inkscape:groupmode="layer" inkscape:label="40 front pieces"/>
+  <g id="lights"        inkscape:groupmode="layer" inkscape:label="50 lights (glow at dusk)"/>
+</svg>

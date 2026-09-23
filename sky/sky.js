@@ -98,6 +98,27 @@
     var body = document.body, root = document.documentElement;
     var isHome = body.dataset.page === 'home';
 
+    /* ---------------- which art files exist (see findAsset, further down) ---------------- */
+    // several names can be given, best first: "assets/sky/cloud-2|assets/sky/cloud"
+    //
+    // each assets/<folder>/ has a list.txt naming its files (tools/update-lists.sh writes them
+    // on every commit), and the server's listing and the Forgejo repo are asked too, just like
+    // the content folders. so the site only asks for pictures that are really there. a folder
+    // it can't find out about gets each file type tried in turn instead.
+    var EXTS = ['svg', 'gif', 'webp', 'png', 'jpg'];
+    var assetDirs = {}, assetMemo = {};
+    function assetDir(dir) {
+        if (!assetDirs[dir]) assetDirs[dir] = Promise.all([
+            fetch(dir + 'list.txt', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; }),
+            new Promise(function (done) { listFolder(dir, EXTS.concat(['jpeg', 'json']), done); })
+        ]).then(function (r) {
+            var known = !!r[0] && !/<html/i.test(r[0]), names = {};
+            r[1].forEach(function (f) { names[f.name] = 1; });
+            return (known || r[1].length) ? names : null;             // null: we don't know, so try each file
+        });
+        return assetDirs[dir];
+    }
+
     /* ---------------- build the sky ---------------- */
     var rays = '';
     for (var a = 0; a < 360; a += 30) {
@@ -125,13 +146,14 @@
             '</g>' +
             '<text x="44" y="234" text-anchor="end" font-size="11" font-style="italic" font-family="\'IM Fell English\', Georgia, serif" fill="rgba(225,232,255,.6)">Ursa Minor</text>' +
         '</svg>' +
-        '<svg class="sun" viewBox="-50 -50 100 100"><g fill="currentColor"><circle r="24"/>' + rays + '</g></svg>' +
-        '<svg class="moon" viewBox="0 0 60 60"><path fill="currentColor" d="M30 2 A28 28 0 0 0 30 58 A36 36 0 0 1 30 2 Z"/></svg>' +
-        '<svg class="cloud" data-dir="-1" style="left:3%;  top:14%; width:190px"><use href="#sky-cloud"/></svg>' +
-        '<svg class="cloud" data-dir="1"  style="right:5%; top:26%; width:150px"><use href="#sky-cloud"/></svg>' +
-        '<svg class="cloud hide-small" data-dir="1"  style="left:24%; top:5%;  width:130px"><use href="#sky-cloud"/></svg>' +
-        '<svg class="cloud hide-small" data-dir="-1" style="right:22%; top:9%; width:170px"><use href="#sky-cloud"/></svg>' +
-        '<svg class="cloud hide-small" data-dir="-1" style="left:12%; top:34%; width:110px"><use href="#sky-cloud"/></svg>';
+        // slots: assets/sky/sun (+ sun-glow, the setting sun), assets/sky/moon, assets/sky/cloud (or cloud-1 … cloud-5)
+        '<div class="sun" data-asset="assets/sky/sun"><svg class="placeholder" viewBox="-50 -50 100 100"><g fill="currentColor"><circle r="24"/>' + rays + '</g></svg></div>' +
+        '<div class="moon" data-asset="assets/sky/moon"><svg class="placeholder" viewBox="0 0 60 60"><path fill="currentColor" d="M30 2 A28 28 0 0 0 30 58 A36 36 0 0 1 30 2 Z"/></svg></div>' +
+        [['', '-1', 'left:3%;  top:14%; width:190px'], ['', '1', 'right:5%; top:26%; width:150px'], [' hide-small', '1', 'left:24%; top:5%;  width:130px'],
+         [' hide-small', '-1', 'right:22%; top:9%; width:170px'], [' hide-small', '-1', 'left:12%; top:34%; width:110px']].map(function (c, i) {
+            return '<div class="cloud' + c[0] + '" data-dir="' + c[1] + '" style="' + c[2] + '" data-asset="assets/sky/cloud-' + (i + 1) + '|assets/sky/cloud">' +
+                   '<svg class="placeholder" viewBox="0 0 200 90"><use href="#sky-cloud"/></svg></div>';
+        }).join('');
     body.insertBefore(backdrop, body.firstChild);
 
     /* ---------------- Polaris ---------------- */
@@ -141,9 +163,9 @@
     polaris.setAttribute('aria-label', 'return home');
     polaris.title = 'return home';
     polaris.innerHTML =
-        '<svg viewBox="-26 -26 52 52" aria-hidden="true">' +
-            // by day: a little brass-and-paper compass, needle to the north
-            '<g class="p-compass">' +
+        // by day: a little brass-and-paper compass, needle to the north (slot: assets/sky/compass)
+        '<span class="p-compass" data-asset="assets/sky/compass" aria-hidden="true"><svg class="placeholder" viewBox="-26 -26 52 52">' +
+            '<g>' +
                 '<circle r="21" fill="#eadcb9" stroke="#8a6a30" stroke-width="2.4"/>' +
                 '<circle r="17" fill="none" stroke="#6e5236" stroke-width=".6" stroke-dasharray="1.2 2.1"/>' +
                 '<path d="M0 -15 L3 0 L0 15 L-3 0 Z M-15 0 L0 -3 L15 0 L0 3 Z" fill="#6e5236" opacity=".45"/>' +
@@ -151,15 +173,15 @@
                 '<circle r="2" fill="#c49a52"/>' +
                 '<text y="-22.5" text-anchor="middle" font-size="6" font-family="Georgia, serif" fill="#3a2716">N</text>' +
             '</g>' +
-            // by night: Polaris
-            '<g class="p-star">' +
+        '</svg></span>' +
+        // by night: Polaris (slot: assets/sky/polaris)
+        '<span class="p-star" data-asset="assets/sky/polaris" aria-hidden="true"><svg class="placeholder" viewBox="-26 -26 52 52">' +
             '<g class="rays">' +
                 '<line x1="0" y1="-18" x2="0" y2="18"/><line x1="-18" y1="0" x2="18" y2="0"/>' +
                 '<line x1="-8" y1="-8" x2="8" y2="8" opacity=".6"/><line x1="-8" y1="8" x2="8" y2="-8" opacity=".6"/>' +
             '</g>' +
             '<circle class="core" r="4.6"/>' +
-            '</g>' +
-        '</svg>' +
+        '</svg></span>' +
         '<span class="polaris-name">Polaris</span>' +
         '<span class="polaris-hint">return home</span>';
     body.appendChild(polaris);
@@ -213,6 +235,14 @@
         sign.appendChild(el);
     });
     body.appendChild(sign);
+    // slots: assets/sky/plank (every sign) and assets/sky/plank-here (the one you're standing at)
+    sign.dataset.slot = 'assets/sky/plank assets/sky/plank-here';
+    findAsset('assets/sky/plank', function (url) {
+        if (!url) return;
+        sign.classList.add('has-plank-art', 'has-art');
+        sign.style.setProperty('--plank-art', 'url("' + new URL(url, location.href).href + '")');
+        findAsset('assets/sky/plank-here', function (u2) { if (u2) sign.style.setProperty('--plank-here-art', 'url("' + new URL(u2, location.href).href + '")'); });
+    });
 
     // on narrow screens the signpost tucks mostly off the edge; a tap pulls it out
     var compact = window.matchMedia('(max-width: 1100px)');
@@ -521,6 +551,18 @@
     if (room) {
         var win = room.querySelector('.window');
         body.classList.add('has-room');
+        // slots: assets/<place>/wall (the wallpaper; the window is cut out of it for you)
+        //        assets/<place>/window (the frame, drawn around transparent glass)
+        var place = body.dataset.place;
+        if (place) {
+            room.dataset.slot = 'assets/' + place + '/wall';
+            findAsset(room.dataset.slot, function (url) {
+                if (!url) return;
+                room.classList.add('has-wall', 'has-art');
+                room.style.setProperty('--wall-art', 'url("' + new URL(url, location.href).href + '")');
+            });
+            if (win && !win.dataset.asset) win.dataset.asset = 'assets/' + place + '/window';
+        }
         var fitWindow = function () {
             if (!win) return;
             if (room.classList.contains('outside')) return;
@@ -563,23 +605,102 @@
     // bench.svg, bench.gif, bench.webp or bench.png (first one found wins).
     // if found it replaces the drawn placeholder; if not, the placeholder stays.
     // a matching bench-glow.(svg|png|webp|gif) is laid on top and fades in at dusk.
-    var EXTS = ['svg', 'gif', 'webp', 'png'];
+    // several names can be given, best first: "assets/sky/cloud-2|assets/sky/cloud"
     function findAsset(base, cb) {
-        var list = /\.(svg|gif|webp|png|jpe?g)$/i.test(base) ? [base] : EXTS.map(function (x) { return base + '.' + x; });
-        var i = 0;
-        (function next() {
-            if (i >= list.length) return cb(null);
-            var url = list[i++], im = new Image();
-            im.onload = function () { cb(url, im); };
-            im.onerror = next;
-            im.src = url;
-        })();
+        if (!assetMemo[base]) assetMemo[base] = Promise.resolve().then(function () {
+            var list = [];
+            base.split('|').forEach(function (b) {
+                b = b.trim();
+                if (/\.(svg|gif|webp|png|jpe?g|json)$/i.test(b)) list.push(b);
+                else EXTS.forEach(function (x) { list.push(b + '.' + x); });
+            });
+            var dirs = {};
+            list.forEach(function (u) { dirs[u.replace(/[^\/]*$/, '')] = 1; });
+            return Promise.all(Object.keys(dirs).map(function (d) { return assetDir(d).then(function (n) { dirs[d] = n; }); })).then(function () {
+                return list.filter(function (u) {
+                    var d = u.replace(/[^\/]*$/, ''), n = dirs[d];
+                    return !n || n[u.slice(d.length)];
+                });
+            });
+        }).then(function (list) {
+            return new Promise(function (done) {
+                var i = 0;
+                (function next() {
+                    if (i >= list.length) return done(null);
+                    var url = list[i++];
+                    if (/\.json$/i.test(url)) {
+                        fetch(url, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+                            .then(function (j) { done({ url: url, data: j }); }, next);
+                        return;
+                    }
+                    var im = new Image();
+                    im.onload = function () { done({ url: url, img: im }); };
+                    im.onerror = next;
+                    im.src = url;
+                })();
+            });
+        });
+        assetMemo[base].then(function (hit) { hit ? cb(hit.url, hit.img || hit.data) : cb(null); });
+    }
+    function glowOf(url) { return url.replace(/\.\w+$/, '') + '-glow'; }
+    // put art into a drawn SVG group, keeping the group (and anything animating it):
+    // the picture is laid on the same canvas as the drawing (x, y, w, h in its viewBox)
+    function svgArt(g, base, box, done) {
+        findAsset(base, function (url) {
+            if (!url) { if (done) done(null); return; }
+            var NS = 'http://www.w3.org/2000/svg';
+            function image(u, cls) {
+                var im = document.createElementNS(NS, 'image');
+                im.setAttribute('href', u);
+                im.setAttribute('x', box[0]); im.setAttribute('y', box[1]);
+                im.setAttribute('width', box[2]); im.setAttribute('height', box[3]);
+                im.setAttribute('preserveAspectRatio', box[4] || 'xMidYMid meet');
+                if (cls) im.setAttribute('class', cls);
+                return im;
+            }
+            while (g.firstChild) g.removeChild(g.firstChild);
+            var main = image(url, 'art');
+            g.appendChild(main);
+            g.classList.add('has-art');
+            findAsset(glowOf(url), function (gu) {
+                if (!gu) return;
+                var glow = main.cloneNode();                      // same place and size as the main picture
+                glow.setAttribute('href', gu);
+                glow.setAttribute('class', 'art glow-layer');
+                g.appendChild(glow);
+            });
+            if (done) done(url);
+        });
+    }
+    // a whole layer of scenery (a row of hills, a row of buildings) as one picture:
+    // it fills the layer's width, sits on its bottom edge, and keeps the layer's drift and night dimming
+    function layerArt(svg, name, onFound) {
+        svg.dataset.slot = name;
+        findAsset(name, function (url, img) {
+            if (!url) return;
+            var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('class', 'layer-art');
+            svg.appendChild(g);
+            svg.classList.add('has-art');
+            svgArt(g, name, [0, 0, 1, 1, 'xMidYMax slice'], function () {
+                fitLayerArt(svg);
+                if (onFound) onFound(url, img);
+            });
+        });
+    }
+    function fitLayerArt(svg) {
+        var vb = svg.viewBox && svg.viewBox.baseVal;
+        if (!vb || !vb.width) return;
+        svg.querySelectorAll('.layer-art image').forEach(function (im) {
+            im.setAttribute('x', vb.x); im.setAttribute('y', vb.y);
+            im.setAttribute('width', vb.width); im.setAttribute('height', vb.height);
+        });
     }
     function fillSlot(el) {
         var base = el.dataset.asset;
         if (!base || el.dataset.assetDone) return;
         el.dataset.assetDone = '1';
-        if (el.classList.contains('character')) addPoses(el, base);
+        if (el.classList.contains('character')) addPoses(el, base.split('|')[0]);
         findAsset(base, function (url) {
             if (!url) return;                                         // keep the placeholder
             var img = document.createElement('img');
@@ -601,8 +722,10 @@
                 if (ph2) ph2.replaceWith(img); else el.appendChild(img);
                 img.className = 'art';
             }
+            el.classList.add('has-art');
+            el.dispatchEvent(new CustomEvent('asset', { detail: { url: url, img: img } }));
             if (/-glow$/.test(base)) return;
-            findAsset(base.replace(/\.\w+$/, '') + '-glow', function (gurl) {
+            findAsset(glowOf(url), function (gurl) {
                 if (!gurl) return;
                 var g = document.createElement('img');
                 g.src = gurl;
@@ -614,9 +737,10 @@
         });
     }
     // extra poses for a character, each its own optional file next to the main one:
-    //   <name>-held   shown while they're picked up (e.g. a struggling GIF)
-    // a pose appears whenever the character has the matching class (.held)
-    var POSES = ['held'];
+    //   <name>-held       shown while they're picked up (e.g. a struggling GIF)
+    //   <name>-startled   the double-take when the ship leaves without them
+    // a pose appears whenever the character has the matching class (.held, .startled)
+    var POSES = ['held', 'startled'];
     function addPoses(el, base) {
         POSES.forEach(function (pose) {
             findAsset(base + '-' + pose, function (url) {
@@ -634,6 +758,62 @@
 
     function fillAssets(scope) {
         (scope || document).querySelectorAll('[data-asset]').forEach(fillSlot);
+    }
+
+    /* ---------------- the bottle: three pieces of art on one 2000 x 900 canvas ---------------- */
+    //   assets/sea/bottle         the glass, empty
+    //   assets/sea/bottle-scroll  the rolled message inside it (slides out when it's opened)
+    //   assets/sea/bottle-cork    the cork (pulled out and tossed away)
+    function dressBottle(svg) {
+        if (svg.dataset.dressed) return;
+        svg.dataset.dressed = '1';
+        var box = [0, 0, 200, 90];
+        [['.b-glass', 'assets/sea/bottle'], ['.b-scroll', 'assets/sea/bottle-scroll'], ['.b-cork', 'assets/sea/bottle-cork']].forEach(function (part) {
+            var g = svg.querySelector(part[0]);
+            if (g) svgArt(g, part[1], box);
+        });
+    }
+    function dressBottles(scope) { (scope || document).querySelectorAll('svg[data-bottle]').forEach(dressBottle); }
+    new MutationObserver(function (list) {
+        list.forEach(function (m) {
+            m.addedNodes.forEach(function (n) {
+                if (n.nodeType !== 1) return;
+                if (n.matches('svg[data-bottle]')) dressBottle(n); else dressBottles(n);
+            });
+        });
+    }).observe(document.documentElement, { childList: true, subtree: true });
+
+    /* ---------------- ?slots: see every slot on the page and whether it has art yet ---------------- */
+    // open any page with ?slots on the end (…/city.html?slots) to get a list of its slots
+    function showSlots() {
+        if (!/[?&]slots\b/.test(location.search)) return;
+        body.classList.add('show-slots');
+        css(
+            'body.show-slots [data-asset], body.show-slots [data-slot] { outline: 2px dashed rgba(255,70,140,.9); outline-offset: 2px; }' +
+            'body.show-slots .has-art[data-asset], body.show-slots .has-art[data-slot] { outline-color: rgba(60,220,140,.95); }' +
+            '.slot-panel { position: fixed; left: 12px; bottom: 12px; z-index: 50; max-height: 60vh; overflow: auto; padding: 10px 14px; border-radius: 8px;' +
+                'background: rgba(20,16,12,.92); color: #f3e6c2; font: 13px/1.5 ui-monospace, Menlo, monospace; box-shadow: 0 6px 20px rgba(0,0,0,.5); }' +
+            '.slot-panel b { display: block; font: italic 15px Georgia, serif; margin-bottom: 4px; }' +
+            '.slot-panel .on { color: #7fe0a8; } .slot-panel .off { color: #c9b89a; opacity: .8; }'
+        );
+        var panel = document.createElement('div');
+        panel.className = 'slot-panel';
+        body.appendChild(panel);
+        function list() {
+            var seen = {}, rows = [];
+            document.querySelectorAll('[data-asset], [data-slot]').forEach(function (el) {
+                (el.dataset.asset || el.dataset.slot).split(' ').forEach(function (name) {
+                    if (!name || seen[name]) return;
+                    seen[name] = 1;
+                    var on = el.classList.contains('has-art') || !!el.querySelector('.has-art');
+                    rows.push('<div class="' + (on ? 'on' : 'off') + '">' + (on ? '✓ ' : '· ') + name.split('|').join(' or ') + '</div>');
+                });
+            });
+            panel.innerHTML = '<b>slots on this page (✓ = your art is in)</b>' + rows.join('');
+        }
+        setTimeout(list, 1500);
+        setTimeout(list, 4000);
+        panel.addEventListener('click', list);
     }
 
     /* ---------------- characters: click one and it speaks ---------------- */
@@ -671,7 +851,7 @@
     }
 
     // run once every script on the page (grounds included) has built its pieces
-    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); fillAssets(); });
+    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); fillAssets(); showSlots(); });
 
     render(shown);
 
@@ -823,17 +1003,19 @@
         inbox: BOTTLE_INBOX,
         // a glass bottle drawing (viewBox 0 0 200 90): .b-scroll (the note inside), .b-cork
         bottleSVG: function (cls) {
-            return '<svg class="' + (cls || 'bottle') + '" viewBox="0 0 200 90" aria-hidden="true">' +
+            return '<svg class="' + (cls || 'bottle') + '" viewBox="0 0 200 90" aria-hidden="true" data-bottle data-slot="assets/sea/bottle assets/sea/bottle-cork assets/sea/bottle-scroll">' +
                 '<g class="b-scroll">' +
                     '<rect x="36" y="37" width="100" height="16" rx="7" fill="#e9dbb8"/>' +
                     '<rect x="36" y="37" width="100" height="5" rx="2.5" fill="#f6ecd2" opacity=".7"/>' +
                     '<rect x="36" y="48" width="100" height="5" rx="2.5" fill="#b89d6c" opacity=".6"/>' +
                     '<rect x="82" y="36" width="7" height="18" fill="#9a3b1f"/>' +
                 '</g>' +
+                '<g class="b-glass">' +
                 '<path d="M32 20 H118 C135 20 142 30 152 36 H168 V54 H152 C142 60 135 70 118 70 H32 C18 70 10 58 10 45 C10 32 18 20 32 20 Z" fill="rgba(96,158,146,.5)" stroke="rgba(215,240,232,.75)" stroke-width="1.6"/>' +
                 '<rect x="164" y="33" width="6" height="24" rx="2" fill="rgba(96,158,146,.75)" stroke="rgba(215,240,232,.75)" stroke-width="1.2"/>' +
                 '<path d="M28 28 H108" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="round"/>' +
                 '<path d="M22 60 Q16 50 20 38" stroke="rgba(255,255,255,.3)" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+                '</g>' +
                 '<g class="b-cork"><rect x="168" y="37" width="18" height="16" rx="3" fill="#9a6b3c"/><path d="M174 39 V51 M180 39 V51" stroke="#7a4f28" stroke-width="1.2"/></g>' +
             '</svg>';
         },
@@ -842,6 +1024,7 @@
         makeMedia: makeMedia, txtToHtml: txtToHtml,
         holdTime: holdTime, releaseTime: releaseTime,
         fillAssets: fillAssets,
+        svgArt: svgArt, layerArt: layerArt, fitLayerArt: fitLayerArt,
         findAsset: findAsset,
         setupCharacters: setupCharacters,
         figure: FIGURE,

@@ -786,3 +786,42 @@ body.scope-view .ground { transform: translateY(110%); opacity: 0; }
 /* with a struggling GIF of your own, the site stops doing its own wiggle */
 .character.has-held.held .pose-held { animation: none !important; transform: none; }
 .character.has-held.held.face-left .pose-held { transform: scaleX(-1); }
+.character.has-startled.startled .pose-startled { display: block; }
+.character.has-startled.startled > .placeholder,
+.character.has-startled.startled > .art { display: none; }
+.character.has-startled.startled.face-left .pose-startled { transform: scaleX(-1); }
+
+/* =====================================================================
+   your art in the slots (see assets/README.txt)
+   ===================================================================== */
+.sun .placeholder, .moon .placeholder, .cloud .placeholder,
+.sun > .art, .moon > .art, .cloud > .art { display: block; width: 100%; height: auto; }
+.sun > .glow-layer, .moon > .glow-layer, .cloud > .glow-layer { position: absolute; left: 0; top: 0; }
+.sun.has-art, .moon.has-art { filter: none; }
+.cloud.has-art { filter: none; }
+
+.polaris .p-compass, .polaris .p-star { position: absolute; inset: 0; display: block; }
+.polaris .p-compass > .art, .polaris .p-star > .art { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+.signpost.has-plank-art .plank,
+.signpost.has-plank-art a.plank:hover,
+.signpost.has-plank-art a.plank:focus-visible { background: var(--plank-art) center / 100% 100% no-repeat; clip-path: none; }
+.signpost.has-plank-art .plank.here { background-image: var(--plank-here-art, var(--plank-art)); filter: brightness(.82); }
+
+.room.has-wall::before {
+    background:
+        radial-gradient(ellipse at var(--lamp-x, 20%) var(--lamp-y, 40%), rgba(255, 200, 120, calc(.22 * var(--dusk))), transparent 45%),
+        linear-gradient(rgba(10, 14, 30, calc(.45 * var(--dusk))), rgba(10, 14, 30, calc(.45 * var(--dusk)))),
+        var(--wall-art) center / cover no-repeat;
+}
+.room.has-wall::after { display: none; }
+.room .window.has-art { border-color: transparent; background: none; }
+.room .window.has-art::after { display: none; }
+.room .window > .art { position: absolute; left: -12px; top: -12px; width: calc(100% + 24px); height: calc(100% + 24px); object-fit: fill; pointer-events: none; }
+/* a cork of your own still spins about its own middle when it's pulled */
+svg[data-bottle] .b-cork.has-art { transform-box: view-box; transform-origin: 177px 45px; }
+/* a layer of scenery replaced by your picture: the drawing hides, the picture dims at night,
+   and its -glow twin (lit windows, lamps) fades in */
+.layer.has-art > :not(.layer-art):not(defs) { display: none; }
+.layer .layer-art .art:not(.glow-layer) { filter: brightness(calc(1 - .55 * var(--dusk))) saturate(calc(1 - .3 * var(--dusk))); }
+.layer .layer-art .glow-layer { opacity: var(--dusk); }
