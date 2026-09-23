@@ -31,6 +31,8 @@
         '.ship.held .hull { animation: ship-shake .09s linear infinite alternate; }' +
         '@keyframes ship-shake { from { transform: rotate(-3.5deg) translateX(-1.5px); } to { transform: rotate(3.5deg) translateX(1.5px); } }' +
 
+        '.ground-sea .sea-char { height: 70px; pointer-events: auto; transform-origin: 50% 100%; }' +
+        '@media (max-width: 620px) { .ground-sea .sea-char { height: 46px; } }' +
         '.splash-layer { position: fixed; inset: 0; z-index: 1; pointer-events: none; }' +
         '.splash-layer .drop { position: absolute; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: 0 1px 2px rgba(0,0,0,.3); }' +
         '.splash-layer .ring { position: absolute; border: 3px solid #e2d9c6; border-radius: 50%; }' +
@@ -55,6 +57,9 @@
             '<defs><radialGradient id="dock-glow"><stop offset="0" stop-color="rgba(255,205,120,.6)"/><stop offset="1" stop-color="rgba(255,205,120,0)"/></radialGradient></defs>' +
             '<circle class="d-glow" fill="url(#dock-glow)"/><path class="d-flame"/>' +
         '</svg>' +
+        // the traveller: rides in the ship, steps onto the dock at nightfall.
+        // put your own at assets/characters/sea.(gif|png|webp|svg)
+        '<div class="character sea-char" data-asset="assets/characters/sea" data-say="ahoy! where to?" aria-label="the traveller"></div>' +
         wave(2, .53, .15, 155, 110) +
         '<svg class="ship" viewBox="0 0 120 100"><g class="hull" fill="currentColor">' +
             '<path d="M8 72 L112 72 L98 90 L22 90 Z"/><rect x="58" y="10" width="3" height="62"/>' +
@@ -123,7 +128,7 @@
     window.addEventListener('resize', buildWaves);
 
     /* ---------------- the dock, on the right ---------------- */
-    var dock = sea.querySelector('.dock');
+    var dock = sea.querySelector('.dock'), dockAt = null;
     function R(x, y, w, h) { return 'M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'h' + w.toFixed(1) + 'v' + h.toFixed(1) + 'h' + (-w).toFixed(1) + 'Z'; }
     function buildDock() {
         var W = sea.clientWidth, S = sea.clientHeight, small = W < 620;
@@ -175,6 +180,7 @@
             for (var ry = pTop + 30; ry < y - 10; ry += 30) shade += R(px, ry, 18, 1.2);
         }
 
+        dockAt = { W: W, S: S, x0: x0, dw: dw, deck: y, small: small, post: W > 1100 ? W - 68 : null };
         dock.setAttribute('viewBox', '0 0 ' + W + ' ' + S);
         dock.querySelector('.d-wood').setAttribute('d', wood);
         dock.querySelector('.d-shade').setAttribute('d', shade);
@@ -202,6 +208,13 @@
     // sx = how far it has sailed off toward the right edge when you leave the page
     var drag = { x: 0, y: 0, dip: 0, s: 1, sx: 0 }, held = false, grab = { x: 0, y: 0 }, tweenId = 0;
 
+    // the voyage: from the left edge at midday to a berth beside the dock at midnight
+    function shipLeft(p) {
+        var W = sea.clientWidth, start = W * 0.03;
+        var end = dockAt ? dockAt.x0 - ship.clientWidth * 0.93 + 4 : W * 0.97 - ship.clientWidth;
+        return start + (end - start) * p;
+    }
+    var shipBob = { x: 0, y: 0 };
     function placeShip() {
         var p = Sky.progress, r = p * Math.PI * 2.4;
         var rock = held ? 0 : Math.sin(r + 0.8) * 3;
@@ -211,10 +224,13 @@
             rock += Math.sin(t * 5.5) * 3.5 - 2;
             bob += Math.sin(t * 5.5 + 1.2) * 4;
         }
-        ship.style.left = 'calc(3vw + (94vw - ' + ship.clientWidth + 'px) * ' + p.toFixed(4) + ')';
+        ship.style.left = shipLeft(p) + 'px';
+        shipBob.x = drag.x + drag.sx;
+        shipBob.y = drag.y + drag.dip + bob;
         ship.style.transform =
             'translate(' + (drag.x + drag.sx) + 'px, ' + (drag.y + drag.dip + bob) + 'px) ' +
             'rotate(' + rock + 'deg) scale(' + drag.s + ')';
+        if (typeof placeMateAboard === 'function') placeMateAboard();
     }
 
     function tween(to, ms, ease, id, done) {
@@ -298,6 +314,93 @@
         }
     }
 
+
+    /* ---------------- the traveller: aboard by day, ashore at the dock by night ---------------- */
+    var mate = sea.querySelector('.sea-char');
+    var crew = { state: 'aboard', x: 0, b: 0, run: 0 };      // x = left px, b = bottom px (in the sea box)
+
+    function mateW() { return mate.offsetWidth || mate.offsetHeight * 0.5; }
+    function aboardSpot() {                                    // standing in the stern, legs hidden by the hull
+        var sw = ship.clientWidth, sh = sw * 100 / 120, S = sea.clientHeight;
+        return {
+            x: shipLeft(Sky.progress) + shipBob.x + sw * 0.24 - mateW() / 2,
+            b: S * 0.30 + sh * 0.28 - mate.offsetHeight * 0.34 - shipBob.y
+        };
+    }
+    function deckB() { return dockAt ? dockAt.S - dockAt.deck : 0; }
+    function landSpot() { return { x: dockAt.x0 + (dockAt.small ? 14 : 22), b: deckB() }; }
+    function talkSpot() {
+        var x = dockAt.post ? dockAt.post - mateW() - 18 : dockAt.x0 + dockAt.dw * 0.5 - mateW() / 2;
+        return { x: x, b: deckB() };
+    }
+    function putMate(x, b) {
+        crew.x = x; crew.b = b;
+        mate.style.left = x.toFixed(1) + 'px';
+        mate.style.bottom = b.toFixed(1) + 'px';
+    }
+    function placeMateAboard() {
+        if (!crew || !mate || crew.state !== 'aboard') return;
+        var s = aboardSpot();
+        putMate(s.x, s.b);
+    }
+
+    // move to a spot (which may itself be moving, like the bobbing ship), hopping or walking
+    function moveTo(spot, ms, hop, run, done) {
+        var fx = crew.x, fb = crew.b, t0 = performance.now();
+        mate.classList.toggle('walking', !hop);
+        (function frame(now) {
+            if (run !== crew.run) return;
+            var t = Math.min(1, (now - t0) / ms), to = spot();
+            var e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            var x = fx + (to.x - fx) * (hop ? e : t), b = fb + (to.b - fb) * e;
+            if (hop) b += Math.sin(t * Math.PI) * hop;
+            mate.classList.toggle('face-left', to.x < fx - 1);
+            putMate(x, b);
+            if (t < 1) requestAnimationFrame(frame);
+            else { mate.classList.remove('walking'); if (done) done(); }
+        })(t0);
+    }
+    function walkTime(a, b) { return Math.max(250, Math.abs(a - b) / 90 * 1000); }
+
+    function goAshore() {
+        var run = ++crew.run;
+        crew.state = 'landing';
+        drag.dip = 7;                                          // the hull bumps the dock
+        tween({ dip: 0 }, 700, easeBack, ++tweenId);
+        setTimeout(function () {
+            if (run !== crew.run) return;
+            moveTo(landSpot, 620, dockAt.small ? 34 : 50, run, function () {
+                var to = talkSpot();
+                moveTo(talkSpot, walkTime(crew.x, to.x), 0, run, function () {
+                    crew.state = 'ashore';
+                    mate.classList.remove('face-left');
+                    mate.classList.add('talking');
+                });
+            });
+        }, 450);
+    }
+    function goAboard(fast, done) {
+        var run = ++crew.run;
+        crew.state = 'boarding';
+        mate.classList.remove('talking');
+        var land = landSpot(), k = fast ? 0.35 : 1;
+        moveTo(landSpot, walkTime(crew.x, land.x) * k, 0, run, function () {
+            moveTo(aboardSpot, 620 * k, dockAt.small ? 34 : 50, run, function () {
+                crew.state = 'aboard';
+                mate.classList.remove('face-left');
+                placeMateAboard();
+                if (done) done();
+            });
+        });
+    }
+    function tendCrew(p) {
+        if (!dockAt || held) return;
+        var ashore = crew.state === 'landing' || crew.state === 'ashore';
+        if (p >= 0.965 && crew.state === 'aboard' && !drag.sx) goAshore();
+        else if (p < 0.94 && ashore) goAboard(false);
+        placeMateAboard();
+    }
+
     Sky.onFrame(function (p) {
         waves.forEach(function (w, i) {
             var k = SWAY[i], a = p * Math.PI * k[0] + k[1];
@@ -305,6 +408,7 @@
         });
         paintDock(p);
         placeShip();
+        tendCrew(p);
     });
 
     // clicking a sign or a constellation: the ship sails off the right edge, then the page changes
@@ -313,9 +417,12 @@
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
         held = false;
         ship.classList.remove('held');
-        var r = ship.getBoundingClientRect();
-        var dist = window.innerWidth - r.left + 60 - drag.x;
-        tween({ sx: dist, x: 0, y: 0, dip: 0, s: 1 }, 1500, easeInOut, ++tweenId, go);
+        function sail() {
+            var r = ship.getBoundingClientRect();
+            var dist = window.innerWidth - r.left + 60 - drag.x;
+            tween({ sx: dist, x: 0, y: 0, dip: 0, s: 1 }, 1500, easeInOut, ++tweenId, go);
+        }
+        if (crew.state !== 'aboard' && dockAt) goAboard(true, sail); else sail();
         return true;
     });
     // coming back with the browser's back button: put the ship back where it belongs
@@ -324,6 +431,9 @@
         tweenId++;
         drag.sx = drag.x = drag.y = drag.dip = 0;
         drag.s = 1;
+        crew.run++;
+        crew.state = 'aboard';
+        mate.classList.remove('talking', 'walking', 'face-left');
         placeShip();
     });
 
