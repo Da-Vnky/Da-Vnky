@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>new page</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+
+    <!-- 1. the sky (every page). add paper.css if you want the paper letters. -->
+    <link rel="stylesheet" href="sky/sky.css">
+    <link rel="stylesheet" href="sky/paper.css">
+</head>
+
+<!-- =========================================================================
+     STARTER PAGE: copy this file, rename it, and build from here.
+
+     Every page gets, for free:
+       - the day → sunset → midnight sky driven by scrolling
+       - sun, moon, clouds, stars, Ursa Minor
+       - Polaris at top centre, always visible, always links home
+       - the four night-sky links (edit them once, at the top of sky/sky.js)
+
+     Pick ONE ground at the bottom of the page:
+       sky/ground-sea.js           waves, the ship (and the bottle, on the homepage)
+       sky/ground-countryside.js   hills, trees, windmill, farmhouse
+       sky/ground-city.js          skyline, windows light up at dusk
+
+     Options on <body>:
+       data-voyage="110"   how much empty sky to scroll after your content
+                           (in % of screen height; bigger = slower sunset)
+       data-page="home"    only on the homepage
+
+     Want an interior instead (workshop, living space)? see workshop.html:
+     a .room with a .window you can look through and step out of.
+
+     Making your own ground? copy ground-countryside.js. The only rules:
+       - build your layers inside <div class="ground ...">
+       - call Sky.onFrame(function (p) { ... }) and move things by p,
+         which goes 0 (midday) → 1 (midnight)
+       - helpers: Sky.mix(dayColour, nightColour, t), Sky.ramp(p, from, to),
+         Sky.smooth(t), Sky.seeded(n) (repeatable random numbers), Sky.css(text)
+     ========================================================================= -->
+<body data-voyage="160">
+
+    <section class="letters">
+        <article class="letter" data-nodate>
+            <h2>a new page</h2>
+            <p class="subtitle">copy me, rename me, fill me in</p>
+            <hr>
+            <p class="lede">this page stands on the city ground. scroll down and the windows switch on one by one as the sun sets.</p>
+            <p>letters here work exactly like on the homepage. give one a <code>data-date</code> and it gets a date line; leave <code>data-nodate</code> on it for a plain page like this one.</p>
+            <p class="signoff">back home by the north star</p>
+        </article>
+    </section>
+
+    <!-- 2. the sky, 3. one ground, 4. letters (only if you use them) -->
+    <script src="sky/sky.js"></script>
+    <script src="sky/ground-city.js"></script>
+    <script src="sky/letters.js"></script>
+</body>
+</html>
