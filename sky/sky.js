@@ -234,77 +234,7 @@
     if (body.dataset.voyage) voyage.style.height = (+body.dataset.voyage) + 'vh';
     body.appendChild(voyage);
 
-    /* ---------------- gliding the time of day (a slow, eased scroll) ---------------- */
-    var glideId = 0;
-    function glideTo(y, ms) {
-        var id = ++glideId, from = window.scrollY, t0 = performance.now();
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, y); return; }
-        function stop() { glideId++; }
-        window.addEventListener('wheel', stop, { once: true, passive: true });
-        window.addEventListener('touchstart', stop, { once: true, passive: true });
-        (function frame(now) {
-            if (id !== glideId) return;                        // the visitor took over the scrolling
-            var t = Math.min(1, (now - t0) / ms);
-            var e = t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-            window.scrollTo(0, from + (y - from) * e);
-            if (t < 1) requestAnimationFrame(frame);
-        })(t0);
-    }
-
-    /* ---------------- rooms: a window you can step out of ---------------- */
-    var room = document.querySelector('.room');
-    if (room) {
-        var win = room.querySelector('.window');
-        var back = document.createElement('button');
-        back.className = 'back-inside';
-        back.type = 'button';
-        back.innerHTML =
-            '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 21V4.5L14 2v19H5zm10 0V4h4v17h-4zM11 12.2a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>' +
-            '<span>back inside</span>';
-        body.appendChild(back);
-
-        body.classList.add('has-room');
-        var fitWindow = function () {
-            if (!win) return;
-            if (room.classList.contains('outside')) return;
-            var r = win.getBoundingClientRect(), rr = room.getBoundingClientRect();
-            // (set on the whole page so the night-sky links can be clipped to the glass too)
-            root.style.setProperty('--wx', (r.left - rr.left) + 'px');
-            root.style.setProperty('--wy', (r.top - rr.top) + 'px');
-            root.style.setProperty('--ww', r.width + 'px');
-            root.style.setProperty('--wh', r.height + 'px');
-            // how far to raise the ground so its bottom lines up with the bottom of the glass
-            root.style.setProperty('--win-lift', (window.innerHeight - (r.bottom - 12)) + 'px');
-        };
-        fitWindow();
-        window.addEventListener('resize', fitWindow);
-
-        // stepping outside lets night fall (so Polaris and the constellations come out);
-        // going back inside returns you to whatever time it was
-        var timeInside = 0;
-        if (win) {
-            win.addEventListener('click', function (e) {
-                e.preventDefault();
-                fitWindow();
-                var r = win.getBoundingClientRect();
-                room.style.transformOrigin = (r.left + r.width / 2) + 'px ' + (r.top + r.height / 2) + 'px';
-                room.classList.add('outside');
-                body.classList.add('is-outside');
-                timeInside = window.scrollY;
-                glideTo(root.scrollHeight - window.innerHeight, 2400);
-            });
-        }
-        back.addEventListener('click', function () {
-            room.classList.remove('outside');
-            body.classList.remove('is-outside');
-            glideTo(timeInside, 1400);
-        });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && body.classList.contains('is-outside')) back.click();
-        });
-    }
-
-    /* ---------------- the scroll engine ---------------- */
+    /* ---------------- the scroll engine (with a time override for the sky view) ---------------- */
     var stars = backdrop.querySelector('.stars');
     var ursa  = backdrop.querySelector('.ursa');
     var sun   = backdrop.querySelector('.sun');
@@ -312,8 +242,10 @@
     var clouds = Array.prototype.slice.call(backdrop.querySelectorAll('.cloud'));
     var links  = Array.prototype.slice.call(nav.querySelectorAll('.sky-link'));
     var hooks = [];
+    var override = null;          // when set, time follows this instead of the scroll position
 
     function progress() {
+        if (override !== null) return override;
         var max = root.scrollHeight - window.innerHeight;
         return max > 0 ? clamp(window.scrollY / max) : 1;
     }
@@ -355,11 +287,13 @@
         });
         nav.classList.toggle('live', lo > 0.6);
 
+        if (player) player.time.textContent = timeName(p);
         for (var i = 0; i < hooks.length; i++) hooks[i](p);
     }
 
-    // the scene eases toward the scroll position instead of snapping to it,
+    // the scene eases toward its target instead of snapping to it,
     // so a fast flick of the wheel reads as a smooth swell, not a jitter
+    var player = null;
     var target = progress(), shown = target, running = false;
     function step() {
         shown += (target - shown) * 0.1;
@@ -374,6 +308,279 @@
     }
     window.addEventListener('scroll', kick, { passive: true });
     window.addEventListener('resize', kick);
+
+    function timeName(p) {
+        return p < .18 ? 'midday' : p < .3 ? 'afternoon' : p < .38 ? 'golden hour' : p < .5 ? 'sunset'
+             : p < .64 ? 'dusk' : p < .82 ? 'twilight' : p < .95 ? 'night' : 'midnight';
+    }
+
+    /* ---------------- the sky view: look at the sky, let the day turn ---------------- */
+    // opened by a room's window, a telescope, or anything with class="sky-viewer".
+    // it lets night fall, then offers a player that loops day ⇄ night, gently.
+    var SPEEDS = [
+        { name: 'slow',   half: 120 },     // seconds from midday to midnight
+        { name: 'gentle', half: 60 },
+        { name: 'brisk',  half: 25 }
+    ];
+    var view = null;                       // { onClose, mode }
+    var clock = { playing: false, speed: 1, phase: 0, last: 0, fade: null };
+
+    var exitBtn = document.createElement('button');
+    exitBtn.className = 'back-inside';
+    exitBtn.type = 'button';
+    exitBtn.innerHTML =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 21V4.5L14 2v19H5zm10 0V4h4v17h-4zM11 12.2a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>' +
+        '<span>back inside</span>';
+    body.appendChild(exitBtn);
+
+    var playerEl = document.createElement('div');
+    playerEl.className = 'sky-player';
+    playerEl.setAttribute('role', 'group');
+    playerEl.setAttribute('aria-label', 'day and night');
+    playerEl.innerHTML =
+        '<button type="button" class="sp-play" aria-label="play">' +
+            '<svg class="i-play"  viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4 L16 10 L6 16 Z"/></svg>' +
+            '<svg class="i-pause" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4h3.5v12H5zM11.5 4H15v12h-3.5z"/></svg>' +
+        '</button>' +
+        '<span class="sp-speeds">' + SPEEDS.map(function (s, i) {
+            return '<button type="button" data-speed="' + i + '">' + s.name + '</button>';
+        }).join('') + '</span>' +
+        '<span class="sp-time"></span>';
+    body.appendChild(playerEl);
+
+    var lens = document.createElement('div');                // the telescope's circle (shown in scope view)
+    lens.className = 'scope-lens';
+    lens.setAttribute('aria-hidden', 'true');
+    body.appendChild(lens);
+
+    player ={ el: playerEl, time: playerEl.querySelector('.sp-time'), play: playerEl.querySelector('.sp-play') };
+
+    function setSpeed(i) {
+        clock.speed = i;
+        playerEl.querySelectorAll('[data-speed]').forEach(function (b) {
+            b.setAttribute('aria-pressed', String(+b.dataset.speed === i));
+        });
+    }
+    setSpeed(1);
+
+    function setPlaying(on) {
+        clock.playing = on;
+        playerEl.classList.toggle('playing', on);
+        player.play.setAttribute('aria-label', on ? 'pause' : 'play');
+        if (on) {
+            clock.fade = null;
+            clock.phase = Math.acos(clamp(1 - 2 * (override === null ? shown : override)));   // pick up from where the sky is now
+            ensureLoop();
+        }
+    }
+    function ensureLoop() {
+        if (clock.looping) return;
+        clock.looping = true;
+        clock.last = performance.now();
+        requestAnimationFrame(tick);
+    }
+    player.play.addEventListener('click', function () { setPlaying(!clock.playing); });
+    playerEl.querySelector('.sp-speeds').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-speed]');
+        if (b) setSpeed(+b.dataset.speed);
+    });
+
+    // the loop: time = (1 − cos φ) / 2, so it eases gently into midday and midnight and turns back
+    function tick(now) {
+        if (!view || (!clock.fade && !clock.playing)) { clock.looping = false; return; }
+        var dt = Math.min(0.1, (now - clock.last) / 1000);
+        clock.last = now;
+        if (clock.fade) {                                     // the opening nightfall
+            var f = clock.fade, t = Math.min(1, (now - f.t0) / f.ms);
+            var e = t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            override = f.from + (f.to - f.from) * e;
+            kick();
+            if (t >= 1) clock.fade = null;
+            requestAnimationFrame(tick);
+            return;
+        }
+        clock.phase += dt * Math.PI / SPEEDS[clock.speed].half;
+        override = (1 - Math.cos(clock.phase)) / 2;
+        kick();
+        requestAnimationFrame(tick);
+    }
+
+    function openSkyView(opts) {
+        if (view) return;
+        view = opts || {};
+        body.classList.add('sky-view');
+        if (view.mode) body.classList.add(view.mode + '-view');
+        exitBtn.querySelector('span').textContent = view.exitLabel || 'back inside';
+        setPlaying(false);
+        var from = override === null ? shown : override;
+        override = from;
+        clock.fade = { from: from, to: 1, t0: performance.now(), ms: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 2400 };
+        ensureLoop();
+    }
+    function closeSkyView() {
+        if (!view) return;
+        var v = view;
+        view = null;
+        clock.playing = false;
+        clock.fade = null;
+        playerEl.classList.remove('playing');
+        body.classList.remove('sky-view');
+        if (v.mode) body.classList.remove(v.mode + '-view');
+        override = null;                                      // back to the time the scroll says
+        kick();
+        if (v.onClose) v.onClose();
+    }
+    exitBtn.addEventListener('click', closeSkyView);
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeSkyView();
+        if (view && e.key === ' ' && e.target === body) { e.preventDefault(); setPlaying(!clock.playing); }
+    });
+
+    // anything marked class="sky-viewer" (a telescope, a hatch …) opens the sky view
+    document.addEventListener('click', function (e) {
+        var v = e.target.closest('.sky-viewer');
+        if (!v) return;
+        e.preventDefault();
+        openSkyView({ mode: v.dataset.viewMode || 'open', exitLabel: v.dataset.exitLabel || 'back' });
+    });
+
+    /* ---------------- rooms: a window you can step out of ---------------- */
+    var room = document.querySelector('.room');
+    if (room) {
+        var win = room.querySelector('.window');
+        body.classList.add('has-room');
+        var fitWindow = function () {
+            if (!win) return;
+            if (room.classList.contains('outside')) return;
+            var r = win.getBoundingClientRect(), rr = room.getBoundingClientRect();
+            // (set on the whole page so the night-sky links can be clipped to the glass too)
+            root.style.setProperty('--wx', (r.left - rr.left) + 'px');
+            root.style.setProperty('--wy', (r.top - rr.top) + 'px');
+            root.style.setProperty('--ww', r.width + 'px');
+            root.style.setProperty('--wh', r.height + 'px');
+            // how far to raise the ground so its bottom lines up with the bottom of the glass
+            root.style.setProperty('--win-lift', (window.innerHeight - (r.bottom - 12)) + 'px');
+        };
+        fitWindow();
+        window.addEventListener('resize', fitWindow);
+
+        // stepping outside lets night fall (so Polaris and the constellations come out)
+        // and brings up the day/night player; going back inside returns to the scroll's time
+        if (win) {
+            win.addEventListener('click', function (e) {
+                e.preventDefault();
+                fitWindow();
+                var r = win.getBoundingClientRect();
+                room.style.transformOrigin = (r.left + r.width / 2) + 'px ' + (r.top + r.height / 2) + 'px';
+                room.classList.add('outside');
+                body.classList.add('is-outside');
+                openSkyView({
+                    mode: 'window',
+                    exitLabel: 'back inside',
+                    onClose: function () {
+                        room.classList.remove('outside');
+                        body.classList.remove('is-outside');
+                    }
+                });
+            });
+        }
+    }
+
+    /* ---------------- asset slots: drop a file in, it replaces the placeholder ---------------- */
+    // any element with data-asset="assets/workshop/bench" looks for
+    // bench.svg, bench.gif, bench.webp or bench.png (first one found wins).
+    // if found it replaces the drawn placeholder; if not, the placeholder stays.
+    // a matching bench-glow.(svg|png|webp|gif) is laid on top and fades in at dusk.
+    var EXTS = ['svg', 'gif', 'webp', 'png'];
+    function findAsset(base, cb) {
+        var list = /\.(svg|gif|webp|png|jpe?g)$/i.test(base) ? [base] : EXTS.map(function (x) { return base + '.' + x; });
+        var i = 0;
+        (function next() {
+            if (i >= list.length) return cb(null);
+            var url = list[i++], im = new Image();
+            im.onload = function () { cb(url, im); };
+            im.onerror = next;
+            im.src = url;
+        })();
+    }
+    function fillSlot(el) {
+        var base = el.dataset.asset;
+        if (!base || el.dataset.assetDone) return;
+        el.dataset.assetDone = '1';
+        findAsset(base, function (url) {
+            if (!url) return;                                         // keep the placeholder
+            var img = document.createElement('img');
+            img.src = url;
+            img.alt = el.getAttribute('aria-label') || '';
+            img.decoding = 'async';
+            if (el.classList.contains('character')) {                 // characters keep their speech bubble
+                var ph = el.querySelector('.placeholder');
+                if (ph) ph.replaceWith(img); else el.insertBefore(img, el.firstChild);
+                img.className = 'art';
+            } else if (el.tagName.toLowerCase() === 'svg') {           // a drawn prop: swap it for the image
+                img.className = el.getAttribute('class');
+                img.setAttribute('style', el.getAttribute('style') || '');
+                img.dataset.asset = base;
+                el.replaceWith(img);
+                el = img;
+            } else {                                                   // a box (button, div): fill it
+                var ph2 = el.querySelector('.placeholder');
+                if (ph2) ph2.replaceWith(img); else el.appendChild(img);
+                img.className = 'art';
+            }
+            if (/-glow$/.test(base)) return;
+            findAsset(base.replace(/\.\w+$/, '') + '-glow', function (gurl) {
+                if (!gurl) return;
+                var g = document.createElement('img');
+                g.src = gurl;
+                g.alt = '';
+                g.setAttribute('aria-hidden', 'true');
+                if (img.className === 'art') { g.className = 'art glow-layer'; img.parentNode.appendChild(g); }
+                else { g.className = img.className + ' glow-layer'; g.setAttribute('style', img.getAttribute('style') || ''); img.after(g); }
+            });
+        });
+    }
+    function fillAssets(scope) {
+        (scope || document).querySelectorAll('[data-asset]').forEach(fillSlot);
+    }
+
+    /* ---------------- characters: click one and it speaks ---------------- */
+    // <div class="character" data-asset="assets/characters/workshop" data-say="hello!">
+    var FIGURE =
+        '<svg class="placeholder" viewBox="0 0 60 120" aria-hidden="true">' +
+            '<path d="M8 40 Q30 32 52 40 L50 44 Q30 38 10 44 Z" fill="#3a2716"/>' +          // hat brim
+            '<path d="M17 40 Q18 22 30 21 Q42 22 43 40 Z" fill="#3a2716"/>' +                 // hat crown
+            '<circle cx="30" cy="50" r="9" fill="#f0dfbd"/>' +                                // face
+            '<path d="M16 62 Q30 56 44 62 L48 100 L12 100 Z" fill="#9a3b1f"/>' +             // coat
+            '<path d="M29 62 L31 62 L31 100 L29 100 Z" fill="#6e2a16"/>' +
+            '<path d="M18 100 H27 V118 H18 Z M33 100 H42 V118 H33 Z" fill="#3a2716"/>' +     // legs
+            '<path d="M14 116 H28 V120 H14 Z M32 116 H46 V120 H32 Z" fill="#24170c"/>' +     // boots
+        '</svg>';
+    function setupCharacter(el) {
+        if (el.dataset.charDone) return;
+        el.dataset.charDone = '1';
+        if (!el.querySelector('.placeholder, img')) el.insertAdjacentHTML('afterbegin', FIGURE);
+        var say = el.dataset.say;
+        if (say) {
+            var b = document.createElement('span');
+            b.className = 'bubble';
+            b.textContent = say;
+            el.appendChild(b);
+        }
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('aria-label', el.getAttribute('aria-label') || 'a traveller');
+        function toggle() { el.classList.toggle('talking'); }
+        el.addEventListener('click', toggle);
+        el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    }
+    function setupCharacters(scope) {
+        (scope || document).querySelectorAll('.character').forEach(setupCharacter);
+    }
+
+    // run once every script on the page (grounds included) has built its pieces
+    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); fillAssets(); });
+
     render(shown);
 
     /* ---------------- what grounds and page scripts can use ---------------- */
@@ -383,6 +590,12 @@
         // run fn(go) when a sign or constellation is clicked; return true and
         // call go() yourself when your send-off animation is done
         onLeave: function (fn) { leaveHooks.push(fn); },
+        openSkyView: openSkyView,
+        closeSkyView: closeSkyView,
+        fillAssets: fillAssets,
+        findAsset: findAsset,
+        setupCharacters: setupCharacters,
+        figure: FIGURE,
         places: PLACES,
         here: here,
         get progress() { return shown; },

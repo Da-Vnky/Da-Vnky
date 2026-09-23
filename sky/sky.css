@@ -445,7 +445,7 @@ body.has-room:not(.is-outside) .ground {
 }
 .back-inside svg { width: 22px; height: 22px; }
 .back-inside:hover { background: rgba(40, 28, 18, .9); }
-body.is-outside .back-inside {
+body.sky-view .back-inside {
     opacity: 1;
     visibility: visible;
     transform: none;
@@ -468,4 +468,250 @@ body.is-outside .back-inside {
 @media (prefers-reduced-motion: reduce) {
     .stars::before, .stars::after { animation: none; }
     .room, .room.outside { transition: opacity .3s, visibility 0s .3s; transform: none; }
+}
+
+/* =====================================================================
+   the sky view: a window, a telescope … anything that lets you look up
+   ===================================================================== */
+
+/* the page's paper and props step aside while you look at the sky */
+.letters, .credit, .telescope { transition: opacity .6s ease, visibility 0s; }
+body.sky-view .letters,
+body.sky-view .credit,
+body.sky-view .telescope,
+body.sky-view .scene-character {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .6s ease, visibility 0s .6s;
+}
+
+/* ---------- the day/night player ---------- */
+.sky-player {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    z-index: 7;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px 6px 6px;
+    border-radius: 999px;
+    background: #eadcb9;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .45), inset 0 0 18px rgba(120, 80, 30, .25);
+    color: var(--ink);
+    font-style: italic;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 16px);
+    transition: opacity .4s ease, transform .4s ease, visibility 0s .4s;
+}
+body.sky-view .sky-player {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+    transition: opacity .5s ease .9s, transform .5s ease .9s, visibility 0s .9s;
+}
+.sky-player button {
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+.sky-player .sp-play {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #f3e6c2;
+    transition: background .2s;
+}
+.sky-player .sp-play:hover { background: var(--sanguine); }
+.sky-player .sp-play svg { width: 18px; height: 18px; fill: currentColor; }
+.sky-player .i-pause,
+.sky-player.playing .i-play { display: none; }
+.sky-player.playing .i-pause { display: block; }
+.sky-player .sp-speeds { display: flex; gap: 2px; margin-left: 4px; }
+.sky-player .sp-speeds button {
+    position: relative;
+    padding: 6px 9px;
+    border-radius: 999px;
+    color: var(--ink-faded);
+    font-size: 1rem;
+}
+.sky-player .sp-speeds button:hover { color: var(--ink); background: rgba(110, 82, 54, .12); }
+.sky-player .sp-speeds button[aria-pressed="true"] { color: var(--ink); }
+.sky-player .sp-speeds button[aria-pressed="true"]::after {           /* a red-chalk dot under the chosen speed */
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 1px;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    border-radius: 50%;
+    background: var(--sanguine);
+}
+.sky-player .sp-time {
+    min-width: 6.5em;
+    padding-left: 10px;
+    border-left: 1px solid rgba(110, 82, 54, .35);
+    color: var(--ink-faded);
+    font-size: .95rem;
+    white-space: nowrap;
+}
+
+/* ---------- the telescope's lens ---------- */
+.scope-lens {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    --r: min(45vh, 46vw);
+    background:
+        radial-gradient(circle at 50% 48%,
+            transparent 0 calc(var(--r) - 2px),
+            #6b4a22 calc(var(--r) - 1px) var(--r),
+            #c49a52 calc(var(--r) + 1px) calc(var(--r) + 6px),
+            #5a3c1a calc(var(--r) + 7px) calc(var(--r) + 10px),
+            rgba(6, 8, 16, .97) calc(var(--r) + 11px));
+    transition: opacity .8s ease, visibility 0s .8s;
+}
+.scope-lens::after {                   /* faint crosshair etched on the glass */
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: calc(var(--r) * 2);
+    height: calc(var(--r) * 2);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background:
+        linear-gradient(rgba(255, 246, 220, .12), rgba(255, 246, 220, .12)) center / 1px 100% no-repeat,
+        linear-gradient(rgba(255, 246, 220, .12), rgba(255, 246, 220, .12)) center / 100% 1px no-repeat,
+        radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .06), transparent 45%);
+}
+body.scope-view .scope-lens { opacity: 1; visibility: visible; transition: opacity 1s ease .2s; }
+
+/* through the lens, the constellations gather inside the circle and stay clickable */
+body.scope-view .sky-links { z-index: 4; clip-path: circle(min(45vh, 46vw) at 50% 48%); }
+body.scope-view .sky-link.l1 { left: calc(50% - 300px); right: auto; top: 44vh; }
+body.scope-view .sky-link.l2 { left: calc(50% + 120px); right: auto; top: 24vh; }
+body.scope-view .sky-link.l3 { left: calc(50% + 110px); right: auto; top: 56vh; }
+body.scope-view .sky-link.l4 { left: calc(50% - 250px); right: auto; top: 66vh; }
+
+/* ---------- the telescope itself (city) ---------- */
+.telescope {
+    position: fixed;
+    left: 5vw;
+    bottom: 6vh;
+    z-index: 2;
+    width: 190px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+    filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .4));
+    transition: transform .25s ease, filter .25s ease, opacity .6s ease;
+}
+.telescope svg, .telescope img { display: block; width: 100%; height: auto; }
+.telescope:hover { transform: rotate(-2deg) translateY(-3px); filter: drop-shadow(0 8px 8px rgba(0, 0, 0, .45)) brightness(1.08); }
+.telescope .hint {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-style: italic;
+    font-size: .95rem;
+    color: #fdf8ec;
+    text-shadow: 0 1px 4px rgba(20, 40, 60, .7);
+    opacity: 0;
+    transition: opacity .25s;
+}
+.telescope:hover .hint, .telescope:focus-visible .hint { opacity: 1; }
+
+/* =====================================================================
+   characters (placeholders until assets/characters/<scene> exists)
+   ===================================================================== */
+.character {
+    position: absolute;
+    height: 120px;
+    cursor: pointer;
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .35));
+    -webkit-tap-highlight-color: transparent;
+}
+.character .placeholder,
+.character .art { display: block; height: 100%; width: auto; }
+.character .art.glow-layer { position: absolute; left: 0; top: 0; opacity: var(--dusk); }
+.character:focus-visible { outline: 2px dashed #fff6dc; outline-offset: 4px; }
+
+.bubble {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 12px);
+    z-index: 3;
+    max-width: 220px;
+    width: max-content;
+    padding: 8px 14px;
+    border-radius: 14px;
+    background: #f3e8cc;
+    color: var(--ink);
+    font-size: 1rem;
+    font-style: italic;
+    line-height: 1.35;
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .3), inset 0 0 12px rgba(120, 80, 30, .18);
+    opacity: 0;
+    transform: translate(-50%, 6px) scale(.9);
+    transform-origin: 50% 100%;
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+}
+.bubble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    margin-left: -8px;
+    border: 8px solid transparent;
+    border-top-color: #f3e8cc;
+}
+.character.talking .bubble { opacity: 1; transform: translate(-50%, 0) scale(1); }
+
+/* an asset that has a -glow twin: the twin fades in at dusk */
+img.glow-layer { opacity: var(--dusk); pointer-events: none; }
+img.furnish { object-fit: contain; object-position: 50% 100%; }
+
+@media (max-width: 620px) {
+    .sky-player { gap: 2px; padding-right: 10px; }
+    .sky-player .sp-time { display: none; }
+    .sky-player .sp-speeds button { padding: 6px 7px; }
+    .telescope { width: 120px; left: 3vw; }
+    body.scope-view .sky-link { width: 96px; }
+    body.scope-view .sky-link.l1 { left: calc(50% - 150px); top: 40vh; }
+    body.scope-view .sky-link.l2 { left: calc(50% + 30px);  top: 34vh; }
+    body.scope-view .sky-link.l3 { left: calc(50% + 10px);  top: 50vh; }
+    body.scope-view .sky-link.l4 { left: calc(50% - 130px); top: 56vh; }
+}
+
+/* characters on the move: facing and a little walking bob */
+.character.face-left .placeholder,
+.character.face-left .art { transform: scaleX(-1); }
+.character.walking .placeholder,
+.character.walking .art { animation: char-step .32s ease-in-out infinite alternate; }
+.character.walking.face-left .placeholder,
+.character.walking.face-left .art { animation-name: char-step-left; }
+@keyframes char-step      { from { transform: translateY(0) rotate(-2deg); }            to { transform: translateY(-4px) rotate(2deg); } }
+@keyframes char-step-left { from { transform: scaleX(-1) translateY(0) rotate(-2deg); } to { transform: scaleX(-1) translateY(-4px) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) { .character.walking .placeholder, .character.walking .art { animation: none; } }
+@media (max-width: 620px) {
+    /* on phones the exit button sits just above the player, clear of Polaris */
+    .back-inside { top: auto; bottom: 84px; left: 50%; transform: translate(-50%, 8px); }
+    body.sky-view .back-inside { transform: translate(-50%, 0); }
 }
