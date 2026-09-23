@@ -21,6 +21,7 @@
     if (!crate) return;
     var KINDS = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'txt'];
     var OPENED = 'bottles-opened';
+    var UNPINNED = 'bottles-unpinned';            // opened, then taken down off the board
 
     Sky.css(
         '.bottle-crate { cursor: pointer; }' +
@@ -51,7 +52,12 @@
             'border-radius: 50%; background: radial-gradient(circle at 35% 35%, #e0795a, #7a2a18); box-shadow: 0 2px 2px rgba(0,0,0,.4); }' +
         '.pinboard .empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 10%;' +
             'font-style: italic; font-size: .85rem; color: rgba(60,35,15,.75); }' +
-        '.pinboard:hover { box-shadow: 0 8px 14px rgba(0,0,0,.45), inset 0 0 18px rgba(60,35,15,.55), 0 0 18px rgba(255,220,150,.35); }' +
+        // your own board (assets/living/pinboard, 4:3): the notes are pinned on top of it
+        '.pinboard.has-art { border: 0; background: none; box-shadow: none; }' +
+        '.pinboard > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; z-index: 0; }' +
+        '.pinboard .pins { z-index: 1; }' +
+        '.pinboard.has-art:hover { box-shadow: none; filter: drop-shadow(0 0 10px rgba(255,220,150,.45)); }' +
+        '.pinboard:not(.has-art):hover { box-shadow: 0 8px 14px rgba(0,0,0,.45), inset 0 0 18px rgba(60,35,15,.55), 0 0 18px rgba(255,220,150,.35); }' +
 
         /* taking a bottle out */
         '.uncork { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center; visibility: hidden; opacity: 0;' +
@@ -91,12 +97,32 @@
         '.bv-card img { display: block; width: 100%; height: auto; }' +
         '.bv-card .bv-from { display: block; padding: 8px 14px 10px; border-top: 1px solid rgba(110,82,54,.25); }' +
         '.board-view .bv-empty { color: #3a2716; font-style: italic; text-align: center; margin-top: 20vh; }' +
+        // taking a note down
+        '.bv-card .bv-unpin { position: absolute; right: -10px; top: -12px; z-index: 2; display: flex; align-items: center; gap: 5px;' +
+            'border: 0; cursor: pointer; padding: 5px 11px 5px 9px; border-radius: 999px; font: italic .95rem "IM Fell English", Georgia, serif;' +
+            'background: #3a2716; color: #f3e6c2; box-shadow: 0 3px 6px rgba(0,0,0,.4); opacity: .0; transition: opacity .2s, background .2s; }' +
+        '.bv-card:hover .bv-unpin, .bv-card:focus-within .bv-unpin, .bv-card .bv-unpin:focus-visible { opacity: 1; }' +
+        '@media (hover: none) { .bv-card .bv-unpin { opacity: .92; } }' +
+        '.bv-card .bv-unpin:hover { background: #9a3b1f; }' +
+        '.bv-card .bv-unpin svg { width: 13px; height: 13px; }' +
+        '.board-view .bv-restore { display: block; margin: 0 auto; border: 0; cursor: pointer; padding: 8px 16px; border-radius: 999px;' +
+            'font: italic 1rem "IM Fell English", Georgia, serif; background: rgba(58,39,22,.75); color: #f3e6c2; }' +
+        '.board-view .bv-restore:hover { background: #3a2716; }' +
+        '.board-view .bv-undo { position: fixed; left: 50%; bottom: 22px; z-index: 3; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;' +
+            'display: flex; gap: 12px; align-items: center; padding: 8px 10px 8px 16px; border-radius: 999px; background: #2a1d14; color: #f3e6c2;' +
+            'font-style: italic; box-shadow: 0 6px 16px rgba(0,0,0,.5); transition: opacity .25s, transform .25s; }' +
+        '.board-view .bv-undo.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }' +
+        '.board-view .bv-undo button { border: 0; cursor: pointer; padding: 5px 12px; border-radius: 999px; background: #eadcb9; color: #3a2716;' +
+            'font: italic .95rem "IM Fell English", Georgia, serif; }' +
         'body.crate-open .signpost { opacity: 0; pointer-events: none; }'
     );
 
     var opened = [];
     try { opened = JSON.parse(localStorage.getItem(OPENED)) || []; } catch (e) {}
     function saveOpened() { try { localStorage.setItem(OPENED, JSON.stringify(opened)); } catch (e) {} }
+    var unpinned = [];
+    try { unpinned = JSON.parse(localStorage.getItem(UNPINNED)) || []; } catch (e) {}
+    function saveUnpinned() { try { localStorage.setItem(UNPINNED, JSON.stringify(unpinned)); } catch (e) {} }
     var bottles = [];                                   // { file, id, date, meta: promise }
 
     /* ---------------- reading the words tucked inside a png ---------------- */
@@ -197,7 +223,10 @@
         board.insertAdjacentHTML('beforeend', '<div class="pins"></div><span class="board-hint">read the board</span>');
     }
     function pinnedBottles() {
-        return bottles.filter(function (b) { return opened.indexOf(b.id) !== -1; });
+        return bottles.filter(function (b) { return opened.indexOf(b.id) !== -1 && unpinned.indexOf(b.id) === -1; });
+    }
+    function takenDown() {
+        return bottles.filter(function (b) { return unpinned.indexOf(b.id) !== -1; });
     }
     function drawBoard() {
         if (!board) return;
@@ -231,7 +260,7 @@
 
     function takeOne() {
         var list = unopened();
-        if (!list.length) { if (pinnedBottles().length) openBoard(); return; }
+        if (!list.length) { if (pinnedBottles().length || takenDown().length) openBoard(); return; }
         current = list[0];
         uncorked = false;
         un.classList.remove('read');
@@ -249,6 +278,8 @@
         if (uncorked || !current) return;
         uncorked = true;
         if (opened.indexOf(current.id) === -1) { opened.push(current.id); saveOpened(); }
+        var was = unpinned.indexOf(current.id);
+        if (was !== -1) { unpinned.splice(was, 1); saveUnpinned(); }
         var fx = corkDrag ? corkDrag.dx : 0, fy = corkDrag ? corkDrag.dy : 0;
         corkDrag = null;
         cork.animate([
@@ -318,13 +349,21 @@
     bv.className = 'board-view';
     bv.setAttribute('role', 'dialog');
     bv.setAttribute('aria-label', 'the pinboard');
-    bv.innerHTML = '<div class="bv-top"><h2>the pinboard</h2><button type="button" class="bv-close">step back</button></div><div class="bv-list"></div>';
+    bv.innerHTML = '<div class="bv-top"><h2>the pinboard</h2><button type="button" class="bv-close">step back</button></div><div class="bv-list"></div>' +
+        '<div class="bv-undo" role="status"><span></span><button type="button">put it back</button></div>';
     document.body.appendChild(bv);
-    function openBoard() {
-        var list = bv.querySelector('.bv-list'), pinned = pinnedBottles();
+    var PIN_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3 L13 13 M13 3 L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    var undo = bv.querySelector('.bv-undo'), undoTimer = 0, lastDown = null;
+    function boardTitle() {
+        var n = pinnedBottles().length;
+        bv.querySelector('h2').textContent = 'the pinboard' + (n ? ' · ' + n + (n === 1 ? ' message' : ' messages') : '');
+    }
+    function drawBoardView(keepScroll) {
+        var list = bv.querySelector('.bv-list'), pinned = pinnedBottles(), down = takenDown();
+        var y = bv.scrollTop;
         list.innerHTML = '';
-        bv.querySelector('h2').textContent = 'the pinboard' + (pinned.length ? ' · ' + pinned.length + (pinned.length === 1 ? ' message' : ' messages') : '');
-        if (!pinned.length) list.innerHTML = '<p class="bv-empty">nothing pinned yet. take a bottle from the crate and open it.</p>';
+        boardTitle();
+        if (!pinned.length) list.innerHTML = '<p class="bv-empty">' + (down.length ? 'nothing on the board right now.' : 'nothing pinned yet. take a bottle from the crate and open it.') + '</p>';
         pinned.forEach(function (b, i) {
             var c = document.createElement('article');
             c.className = 'bv-card';
@@ -335,14 +374,59 @@
             f.textContent = fromLine(b, {});
             readMeta(b).then(function (m) { f.textContent = fromLine(b, m); });
             c.appendChild(f);
+            var ub = document.createElement('button');
+            ub.type = 'button';
+            ub.className = 'bv-unpin';
+            ub.innerHTML = PIN_ICON + '<span>unpin</span>';
+            ub.setAttribute('aria-label', 'unpin this message');
+            ub.addEventListener('click', function () { unpin(b, c); });
+            c.appendChild(ub);
             list.appendChild(c);
         });
+        if (down.length) {
+            var r = document.createElement('button');
+            r.type = 'button';
+            r.className = 'bv-restore';
+            r.textContent = 'pin back the ' + (down.length === 1 ? 'one' : down.length) + ' you took down';
+            r.addEventListener('click', function () { unpinned = []; saveUnpinned(); drawBoardView(true); drawBoard(); });
+            list.appendChild(r);
+        }
+        if (keepScroll) bv.scrollTop = y;
+    }
+    // the pin comes out and the note drops away
+    function unpin(b, card) {
+        if (unpinned.indexOf(b.id) === -1) { unpinned.push(b.id); saveUnpinned(); }
+        lastDown = b.id;
+        var h = card.offsetHeight;
+        card.style.pointerEvents = 'none';
+        card.animate([
+            { transform: card.style.transform, opacity: 1 },
+            { transform: 'translateY(40px) rotate(14deg)', opacity: 0 }
+        ], { duration: 420, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' }).onfinish = function () {
+            card.animate([{ height: h + 'px', marginBottom: '0px' }, { height: '0px', marginBottom: '-34px' }], { duration: 260, easing: 'ease-in', fill: 'forwards' })
+                .onfinish = function () { drawBoardView(true); drawBoard(); };
+        };
+        boardTitle();
+        undo.querySelector('span').textContent = 'unpinned';
+        undo.classList.add('show');
+        clearTimeout(undoTimer);
+        undoTimer = setTimeout(function () { undo.classList.remove('show'); }, 5000);
+    }
+    undo.querySelector('button').addEventListener('click', function () {
+        var i = unpinned.indexOf(lastDown);
+        if (i !== -1) { unpinned.splice(i, 1); saveUnpinned(); }
+        undo.classList.remove('show');
+        drawBoardView(true);
+        drawBoard();
+    });
+    function openBoard() {
+        drawBoardView(false);
         bv.scrollTop = 0;
         bv.classList.add('open');
         document.body.classList.add('crate-open');
         bv.querySelector('.bv-close').focus({ preventScroll: true });
     }
-    function closeBoard() { bv.classList.remove('open'); document.body.classList.remove('crate-open'); }
+    function closeBoard() { bv.classList.remove('open'); undo.classList.remove('show'); document.body.classList.remove('crate-open'); }
     bv.querySelector('.bv-close').addEventListener('click', closeBoard);
     if (board) {
         board.addEventListener('click', openBoard);

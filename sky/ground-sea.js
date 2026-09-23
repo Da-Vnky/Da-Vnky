@@ -21,6 +21,10 @@
         '.ground-sea .dock { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 -3px 5px rgba(0,0,0,.3)); }' +
         '.ground-sea .d-rope  { fill: none; stroke: #c9b184; stroke-width: 2.4; stroke-linecap: round; }' +
         '.ground-sea .d-flame { fill: #ffd98a; }' +
+        // your own waves: a strip as tall as the sea that repeats sideways
+        '.ground-sea .wave.has-art { background-repeat: repeat-x; background-position: left bottom; background-size: auto 100%; }' +
+        '.ground-sea .wave.has-art path { display: none; }' +
+        '.ground-sea .dock .glow-layer, .ship .glow-layer { opacity: var(--dusk); }' +
         
 
         '.ship { position: absolute; left: 3vw; bottom: 30%; width: 230px; color: #cbbd9c;' +
@@ -36,6 +40,14 @@
         '.ground-sea .sea-char.held { cursor: grabbing; filter: drop-shadow(0 16px 10px rgba(0,0,0,.35)); z-index: 5; }' +
         '.ground-sea .sea-char.held .placeholder, .ground-sea .sea-char.held .art { animation: ship-shake .09s linear infinite alternate; }' +
         '.ground-sea .sea-char.under { opacity: 0; pointer-events: none; }' +
+        // startled: the ship's leaving without them. a jump, a double-take, a shiver
+        '.ground-sea .sea-char.startled > .placeholder, .ground-sea .sea-char.startled > .art, .ground-sea .sea-char.startled > .pose { animation: mate-startle 1.3s ease-out both; }' +
+        '@keyframes mate-startle { 0% { translate: 0 0; rotate: 0deg; } 14% { translate: 0 -24px; rotate: 9deg; } 30% { translate: 0 0; rotate: 0deg; }' +
+            ' 40% { translate: -4px 0; } 48% { translate: 4px 0; } 56% { translate: -4px 0; } 64% { translate: 4px 0; } 72%, 100% { translate: 0 0; rotate: 0deg; } }' +
+        '.ground-sea .sea-char .bubble.shout { font-style: normal; font-weight: bold; color: #9a3b1f; white-space: nowrap; max-width: none; }' +
+        '.ground-sea .sea-char.talking .bubble.pop { animation: bubble-pop .32s ease-out; }' +
+        '@keyframes bubble-pop { 0% { transform: translate(-50%, 4px) scale(.7); } 60% { transform: translate(-50%, 0) scale(1.1); } 100% { transform: translate(-50%, 0) scale(1); } }' +
+        '@media (prefers-reduced-motion: reduce) { .ground-sea .sea-char.startled > *, .ground-sea .sea-char .bubble.pop { animation: none; } }' +
         '@media (max-width: 620px) { .ground-sea .sea-char { height: 46px; } }' +
         '.splash-layer { position: fixed; inset: 0; z-index: 1; pointer-events: none; }' +
         '.splash-layer .drop { position: absolute; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: 0 1px 2px rgba(0,0,0,.3); }' +
@@ -56,7 +68,7 @@
     sea.innerHTML =
         wave(1, .36, .15, 135, 40) +
         // the dock (drawn by buildDock below): pilings, deck, bollard, lamp, and the signpost's post
-        '<svg class="dock">' +
+        '<svg class="dock" data-slot="assets/sea/dock">' +
             '<path class="d-shade"/><path class="d-wood"/><path class="d-light"/><path class="d-rope"/>' +
             '<defs><radialGradient id="dock-glow"><stop offset="0" stop-color="rgba(255,205,120,.6)"/><stop offset="1" stop-color="rgba(255,205,120,0)"/></radialGradient></defs>' +
             '<circle class="d-glow" fill="url(#dock-glow)"/><path class="d-flame"/>' +
@@ -65,7 +77,8 @@
         // put your own at assets/characters/sea.(gif|png|webp|svg)
         '<div class="character sea-char" data-asset="assets/characters/sea" data-say="ahoy! where to?" aria-label="the traveller"></div>' +
         wave(2, .53, .15, 155, 110) +
-        '<svg class="ship" viewBox="0 0 120 100"><g class="hull" fill="currentColor">' +
+        // slot: assets/sea/ship (a 1200 x 1000 canvas, facing right, keel about 90% down; ship-glow = lit at night)
+        '<svg class="ship" viewBox="0 0 120 100" data-slot="assets/sea/ship"><g class="hull" fill="currentColor">' +
             '<path d="M8 72 L112 72 L98 90 L22 90 Z"/><rect x="58" y="10" width="3" height="62"/>' +
             '<path d="M62 14 C 84 26, 90 48, 86 66 L62 66 Z"/><path d="M57 20 C 40 32, 36 50, 40 66 L57 66 Z"/>' +
             '<path d="M61 8 L76 12 L61 16 Z"/>' +
@@ -130,20 +143,59 @@
     }
     buildWaves();
     window.addEventListener('resize', buildWaves);
+    // slots: assets/sea/wave-1 (furthest back) … assets/sea/wave-4 (nearest)
+    waves.forEach(function (svg, i) {
+        var name = 'assets/sea/wave-' + (i + 1);
+        svg.dataset.slot = name;
+        Sky.findAsset(name, function (url) {
+            if (!url) return;
+            svg.classList.add('has-art');
+            svg.style.backgroundImage = 'url("' + url + '")';
+        });
+    });
+    // slot: the ship
+    Sky.svgArt(sea.querySelector('.ship .hull'), 'assets/sea/ship', [0, 0, 120, 100]);
 
     /* ---------------- the dock, on the right ---------------- */
     var dock = sea.querySelector('.dock'), dockAt = null;
+    // slot: assets/sea/dock. your dock is anchored bottom-right at the sea's full height;
+    // draw the top of the deck 30% down from the top of the picture, running off the right edge.
+    // (dock-glow fades in at dusk: a lit lamp.) the signpost's post is still drawn for you.
+    var dockArt = null;
+    Sky.findAsset('assets/sea/dock', function (url, img) {
+        if (!url) return;
+        dockArt = { url: url, ratio: img.naturalWidth / img.naturalHeight || 1.6 };
+        Sky.findAsset(url.replace(/\.\w+$/, '') + '-glow', function (g) { dockArt.glow = g; buildDock(); });
+        dock.classList.add('has-art');
+        buildDock();
+        Sky.refresh();
+    });
     function R(x, y, w, h) { return 'M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'h' + w.toFixed(1) + 'v' + h.toFixed(1) + 'h' + (-w).toFixed(1) + 'Z'; }
     function buildDock() {
         var W = sea.clientWidth, S = sea.clientHeight, small = W < 620;
         var dw = small ? 200 : 360, x0 = W - dw, y = S * 0.30, dh = small ? 11 : 14;
         var wood = '', shade = '', light = '', rope = '';
+        dock.querySelectorAll('image').forEach(function (im) { im.remove(); });
+        if (dockArt) {
+            var aw = S * dockArt.ratio;
+            dw = aw - 20; x0 = W - aw;
+            [[dockArt.url, 'art'], [dockArt.glow, 'art glow-layer']].forEach(function (a) {
+                if (!a[0]) return;
+                var im = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                im.setAttribute('href', a[0]); im.setAttribute('class', a[1]);
+                im.setAttribute('x', x0); im.setAttribute('y', 0); im.setAttribute('width', aw); im.setAttribute('height', S);
+                im.setAttribute('preserveAspectRatio', 'none');
+                dock.insertBefore(im, dock.querySelector('.d-wood'));
+            });
+            dock.querySelector('.d-flame').setAttribute('d', '');
+            dock.querySelector('.d-glow').setAttribute('r', 0);
+        } else {
 
-        // pilings and cross-braces (mostly hidden by the front waves)
-        var step = small ? 52 : 70, xs = [];
-        for (var x = x0 + 12; x < W + 20; x += step) {
-            xs.push(x);
-            shade += R(x, y + dh - 2, small ? 10 : 13, S - y + 20);
+            // pilings and cross-braces (mostly hidden by the front waves)
+            var step = small ? 52 : 70, xs = [];
+            for (var x = x0 + 12; x < W + 20; x += step) {
+                xs.push(x);
+                shade += R(x, y + dh - 2, small ? 10 : 13, S - y + 20);
         }
         for (var i = 0; i + 1 < xs.length; i += 2) {
             var a = xs[i] + 6, b = xs[i + 1] + 6, top = y + dh + 6, bot = y + dh + (small ? 40 : 56);
@@ -175,6 +227,7 @@
         dock.querySelector('.d-flame').setAttribute('d', R(kx - 6, ky + 9, 12, 18));
         var g = dock.querySelector('.d-glow');
         g.setAttribute('cx', kx); g.setAttribute('cy', ky + 18); g.setAttribute('r', small ? 40 : 60);
+        }
 
         // on wide screens the signpost's post stands on the dock, reaching up to the planks
         if (W > 1100) {
@@ -336,11 +389,46 @@
        aboard by day, ashore at the dock by night. can be picked up and dropped:
        onto the dock, back into the ship, or into the sea (then they swim back).
        easter egg: sail away while they're ashore and they dive in after you,
-       surfacing about 20 seconds later to climb aboard. */
-    var SWIM_AFTER_SHIP = 20000;      // the easter egg: ms underwater before they surface
+       surfacing about 5 seconds later to climb aboard.
+       while held they complain, and after a few seconds they wriggle free and fall. */
+    var SWIM_AFTER_SHIP = 5000;       // the easter egg: ms underwater before they surface
     var SWIM_AFTER_DROP = 5000;       // dropped in the sea by you: a shorter swim
     var mate = sea.querySelector('.sea-char');
     var crew = { state: 'aboard', x: 0, b: 0, run: 0, timer: 0 };   // x = left px, b = bottom px (in the sea box)
+
+    // what they say (the words are all here, easy to change)
+    var LEFT_BEHIND = 'Hey?! Wait for me!';
+    var HELD_LINES = ['Hey! Put me down!', "I'm serious!!", 'F$#K You!'];
+    var HELD_LINE_MS = 1700;          // each complaint shows this long
+    var BREAK_FREE_MS = 5000;         // held this long, they wriggle loose and fall
+    var STARTLE_MS = 1400;            // the double-take before they chase the ship
+
+    // speech: shout(text) shows a line in their bubble; hush() puts it away again
+    var sayId = 0;
+    function bubble() { return mate.querySelector('.bubble'); }
+    function shout(text) {
+        var b = bubble();
+        if (!b) return;
+        sayId++;
+        b.textContent = text;
+        b.classList.add('shout');
+        b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+        mate.classList.add('talking');
+    }
+    function hush(after) {
+        var id = ++sayId;
+        setTimeout(function () {
+            if (id !== sayId) return;
+            var b = bubble();
+            if (!b || !b.classList.contains('shout')) return;
+            mate.classList.remove('talking');
+            setTimeout(function () {                           // once it's faded, back to their usual line
+                if (id !== sayId) return;
+                b.classList.remove('shout', 'pop');
+                b.textContent = mate.dataset.say || '';
+            }, 300);
+        }, after || 0);
+    }
 
     function mateW() { return mate.offsetWidth || mate.offsetHeight * 0.5; }
     function mateH() { return mate.offsetHeight || 70; }
@@ -408,6 +496,21 @@
     function cancelCrew() {
         crew.run++;
         clearTimeout(crew.timer);
+        mate.classList.remove('startled');
+    }
+    function shipGone() { return dockAt && landSpot().x - shipBox().r > 50; }
+    // the double-take: they see the ship going without them
+    function startle(run, done) {
+        mate.classList.remove('talking', 'walking', 'startled');
+        mate.classList.add('face-left');
+        void mate.offsetWidth;
+        mate.classList.add('startled');
+        shout(LEFT_BEHIND);
+        crew.timer = setTimeout(function () {
+            if (run !== crew.run) return;
+            mate.classList.remove('startled');
+            done();
+        }, STARTLE_MS);
     }
 
     function goAshore() {
@@ -435,14 +538,22 @@
         crew.state = 'boarding';
         mate.classList.remove('talking');
         var land = landSpot(), k = fast ? 0.35 : 1;
-        moveTo(landSpot, walkTime(crew.x, land.x) * k, 0, run, function () {
-            var gap = landSpot().x - shipBox().r;
-            if (!fast && gap > 50) { dive(run, SWIM_AFTER_SHIP); return; }
-            moveTo(aboardSpot, 620 * k, hopH(), run, function () { settle('aboard'); if (done) done(); });
+        if (fast) hush();
+        function toEdge(speed, then) { moveTo(landSpot, walkTime(crew.x, landSpot().x) * speed, 0, run, then); }
+        function leap() {
+            if (!fast && shipGone()) { dive(run, SWIM_AFTER_SHIP); return; }
+            moveTo(aboardSpot, 620 * k, hopH(), run, function () { hush(600); settle('aboard'); if (done) done(); });
+        }
+        // left behind? a double-take and a shout, then a dash to the edge and a dive
+        if (!fast && shipGone()) { startle(run, function () { toEdge(0.45, leap); }); return; }
+        toEdge(k, function () {
+            if (!fast && shipGone()) { startle(run, leap); return; }
+            leap();
         });
     }
     function dive(run, swimFor) {
         crew.state = 'diving';
+        hush(250);                                             // the shout stays on the dock, not under the waves
         mate.classList.add('face-left');
         var from = { x: crew.x, b: crew.b };
         moveTo(function () { return { x: from.x - mateW() * 1.6, b: underB() }; }, 760, 46, run, function () {
@@ -453,6 +564,7 @@
     }
     function goUnder(run, swimFor) {
         crew.state = 'swimming';
+        hush();
         mate.classList.add('under');
         mate.classList.remove('talking');
         crew.timer = setTimeout(function () { if (run === crew.run) surface(run); }, swimFor);
@@ -492,7 +604,7 @@
         if (crew.state === 'swimming' || crew.state === 'diving' || crew.state === 'surfacing') return;
         e.preventDefault();
         mate.setPointerCapture(e.pointerId);
-        pick = { x: e.clientX, y: e.clientY, on: false, dx: 0, db: 0 };
+        pick = { x: e.clientX, y: e.clientY, on: false, dx: 0, db: 0, id: e.pointerId };
     });
     mate.addEventListener('pointermove', function (e) {
         if (!pick) return;
@@ -506,17 +618,43 @@
             mate.classList.add('held');
             pick.dx = e.clientX - (r.left + crew.x);
             pick.db = (r.bottom - crew.b) - e.clientY;
+            complain(pick);
         }
+        if (pick.freed) return;
         putMate(e.clientX - r.left - pick.dx, r.bottom - e.clientY - pick.db);
     });
+    // while held: "put me down!" ... and after BREAK_FREE_MS they wriggle loose and drop
+    function complain(p) {
+        var i = 0;
+        shout(HELD_LINES[0]);
+        p.lines = setInterval(function () {
+            if (pick !== p) { clearInterval(p.lines); return; }
+            i = Math.min(i + 1, HELD_LINES.length - 1);
+            shout(HELD_LINES[i]);
+            if (i === HELD_LINES.length - 1) clearInterval(p.lines);
+        }, HELD_LINE_MS);
+        p.free = setTimeout(function () {
+            if (pick !== p) return;
+            p.freed = true;                                    // your hand stays down, but they're gone
+            clearInterval(p.lines);
+            try { mate.releasePointerCapture(p.id); } catch (err) {}
+            mate.classList.remove('held');
+            drop();
+            hush(1400);
+        }, BREAK_FREE_MS);
+    }
     function letGo() {
         if (!pick) return;
-        var was = pick.on;
+        var p = pick, was = p.on;
         pick = null;
+        clearInterval(p.lines);
+        clearTimeout(p.free);
         if (!was) return;                                      // a plain click: let it show the speech bubble
         eatClick = true;
         setTimeout(function () { eatClick = false; }, 0);
+        if (p.freed) return;                                   // they already broke free
         mate.classList.remove('held');
+        hush(500);
         drop();
     }
     mate.addEventListener('pointerup', letGo);
@@ -582,6 +720,7 @@
         drag.s = 1;
         cancelCrew();
         mate.classList.remove('talking', 'held');
+        hush();
         settle('aboard');
         placeShip();
         paintWaves(Sky.progress, 0);

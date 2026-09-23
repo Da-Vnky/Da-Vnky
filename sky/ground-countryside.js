@@ -108,7 +108,9 @@
         });
     }
     build();
-    window.addEventListener('resize', function () { build(); Sky.refresh(); });
+    window.addEventListener('resize', function () { build(); svgs.forEach(Sky.fitLayerArt); Sky.refresh(); });
+    // slots, back to front: assets/countryside/hills-1 … hills-4 (each can have a -glow twin for lit windows)
+    svgs.forEach(function (svg, i) { Sky.layerArt(svg, 'assets/countryside/hills-' + (i + 1)); });
 
     Sky.onFrame(function (p) {
         var dusk = Sky.smooth(Sky.ramp(p, 0.3, 0.85));

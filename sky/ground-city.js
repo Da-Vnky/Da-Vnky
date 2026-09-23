@@ -17,7 +17,19 @@
         '.ground-city .lit { fill: #ffd98a; }' +
         '.ground-city .beacon { fill: #ff5a4a; animation: city-blink 2.4s steps(1) infinite; }' +
         '@keyframes city-blink { 0%, 60% { opacity: 1; } 61%, 100% { opacity: .15; } }' +
-        '@media (prefers-reduced-motion: reduce) { .ground-city .beacon { animation: none; } }'
+        '@media (prefers-reduced-motion: reduce) { .ground-city .beacon { animation: none; } }' +
+
+        /* the rooftop the traveller stands on, in front of the skyline */
+        '.city-roof { position: fixed; left: 0; right: 0; bottom: 0; z-index: 2; height: 20vh; min-height: 130px; pointer-events: none;' +
+            'filter: drop-shadow(0 -6px 10px rgba(0,0,0,.35)); transition: transform .9s cubic-bezier(.55,0,.25,1), opacity .6s; }' +
+        '.city-roof .placeholder { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }' +
+        '.city-roof > .art { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }' +
+        '.city-roof > .art:not(.glow-layer) { filter: brightness(calc(1 - .55 * var(--dusk))) saturate(calc(1 - .3 * var(--dusk))); }' +
+        '.city-roof > .glow-layer { opacity: var(--dusk); }' +
+        '.city-roof .r-bulb { fill: #fff0c4; }' +
+        '.city-roof .r-halo { fill: url(#roof-glow); }' +
+        'body.peep-view .city-roof, body.peep-close .city-roof, body.sky-view .city-roof, body.scope-view .city-roof { transform: translateY(110%); opacity: 0; }' +
+        '@media (max-width: 620px) { .city-roof { height: 17vh; min-height: 110px; } }'
     );
 
     // back to front. top/bottom = how tall buildings get (fraction of the ground's height),
@@ -40,6 +52,113 @@
     document.body.appendChild(ground);
 
     var svgs = Array.prototype.slice.call(ground.querySelectorAll('.layer'));
+
+    /* ---------------- the rooftop in front (slot: assets/city/foreground) ----------------
+       your picture fills the strip along the bottom (20% of the screen's height), anchored to
+       the bottom edge; the traveller's feet are about 55% of the way down it. -glow = its lights. */
+    var roof = document.createElement('div');
+    roof.className = 'city-roof';
+    roof.setAttribute('aria-hidden', 'true');
+    roof.dataset.asset = 'assets/city/foreground';
+    roof.innerHTML = '<svg class="placeholder">' +
+        '<defs><radialGradient id="roof-glow"><stop offset="0" stop-color="rgba(255,214,140,.75)"/><stop offset="1" stop-color="rgba(255,214,140,0)"/></radialGradient></defs>' +
+        '<path class="r-far"/><path class="r-top"/><path class="r-cap"/><path class="r-face"/><path class="r-mortar"/>' +
+        '<path class="r-metal"/><path class="r-glass"/><path class="r-warm"/><path class="r-pot"/><path class="r-leaf"/><path class="r-wire"/>' +
+        '<g class="r-lights"></g></svg>';
+    document.body.appendChild(roof);
+    var ROOF = {
+        'r-far':   ['#8e7f78', '#26222c'],   // the back of the roof, a shade darker
+        'r-top':   ['#a29385', '#2f2b35'],   // the roof you stand on
+        'r-cap':   ['#cdbfa9', '#43404a'],   // stone coping along the edge
+        'r-face':  ['#8d523b', '#2b1b1d'],   // brick
+        'r-mortar':['#6f3d2b', '#1e1315'],
+        'r-metal': ['#6d7580', '#22252d'],   // chimney pots, pipes, poles
+        'r-glass': ['#b9d0dc', '#27344f'],
+        'r-pot':   ['#a65b3b', '#341d18'],
+        'r-leaf':  ['#5f804f', '#18241e'],
+        'r-wire':  ['#3a302a', '#141014']
+    };
+    function buildRoof() {
+        var svg = roof.querySelector('.placeholder');
+        if (!svg) return;
+        var W = roof.clientWidth, H = roof.clientHeight, k = W < 620 ? .72 : 1;
+        var top = H * 0.44, feet = H * 0.55;              // the roof's back edge, and where feet stand
+        var cap = H * 0.62, face = cap + 9 * k;
+        var d = {}; for (var c in ROOF) d[c] = '';
+        function R(x, y, w, h) { return 'M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'h' + w.toFixed(1) + 'v' + h.toFixed(1) + 'h' + (-w).toFixed(1) + 'Z'; }
+        d['r-far'] += R(0, top, W, 5 * k);
+        d['r-top'] += R(0, top + 4 * k, W, cap - top - 4 * k);
+        d['r-cap'] += R(0, cap, W, 10 * k);
+        d['r-face'] += R(0, face, W, H - face + 2);
+        for (var row = 0, y = face + 9 * k; y < H; row++, y += 11 * k) {                  // brickwork
+            d['r-mortar'] += R(0, y, W, 1.4);
+            for (var x = (row % 2 ? 13 : 0) * k; x < W; x += 26 * k) d['r-mortar'] += R(x, y - 11 * k, 1.4, 11 * k);
+        }
+        // a chimney stack with two pots
+        var cx = W * 0.07, cw = 54 * k, ch = 96 * k;
+        d['r-face'] += R(cx, feet - ch, cw, ch + 2);
+        for (var cy = feet - ch + 10 * k; cy < feet; cy += 11 * k) d['r-mortar'] += R(cx, cy, cw, 1.2);
+        d['r-cap'] += R(cx - 5 * k, feet - ch - 8 * k, cw + 10 * k, 9 * k);
+        d['r-pot'] += R(cx + 8 * k, feet - ch - 26 * k, 14 * k, 19 * k) + R(cx + 31 * k, feet - ch - 21 * k, 13 * k, 14 * k);
+        // a skylight
+        var sx = W * 0.3, sw = 86 * k;
+        d['r-cap'] += R(sx, feet - 22 * k, sw, 24 * k);
+        d['r-glass'] += 'M' + (sx + 4 * k) + ' ' + (feet - 22 * k) + 'L' + (sx + 14 * k) + ' ' + (feet - 38 * k) + 'H' + (sx + sw - 14 * k) + 'L' + (sx + sw - 4 * k) + ' ' + (feet - 22 * k) + 'Z';
+        // a vent pipe with a cap
+        var vx = W * 0.46;
+        d['r-metal'] += R(vx, feet - 48 * k, 9 * k, 50 * k) + R(vx - 6 * k, feet - 55 * k, 21 * k, 8 * k);
+        // a pole for the string of lights
+        var px = W * 0.58, ph = 120 * k;
+        d['r-metal'] += R(px, feet - ph, 5 * k, ph + 2) + R(px - 7 * k, feet - ph, 19 * k, 3 * k);
+        // a potted plant
+        var gx = W * 0.66;
+        d['r-pot'] += 'M' + (gx - 14 * k) + ' ' + (feet - 22 * k) + 'h' + (28 * k) + 'l' + (-4 * k) + ' ' + (24 * k) + 'h' + (-20 * k) + 'Z';
+        d['r-leaf'] += 'M' + gx + ' ' + (feet - 20 * k) + 'q' + (-26 * k) + ' ' + (-8 * k) + ' ' + (-20 * k) + ' ' + (-34 * k) + 'q' + (12 * k) + ' ' + (14 * k) + ' ' + (20 * k) + ' ' + (34 * k) + 'Z' +
+                       'M' + gx + ' ' + (feet - 20 * k) + 'q' + (4 * k) + ' ' + (-30 * k) + ' ' + (22 * k) + ' ' + (-40 * k) + 'q' + (-8 * k) + ' ' + (20 * k) + ' ' + (-22 * k) + ' ' + (40 * k) + 'Z' +
+                       'M' + gx + ' ' + (feet - 20 * k) + 'q' + (-4 * k) + ' ' + (-26 * k) + ' ' + (4 * k) + ' ' + (-46 * k) + 'q' + (2 * k) + ' ' + (22 * k) + ' ' + (-4 * k) + ' ' + (46 * k) + 'Z';
+        // an old TV aerial far right
+        var ax = W * 0.95, ah = 92 * k;
+        d['r-metal'] += R(ax, feet - ah, 3 * k, ah + 2) + R(ax - 18 * k, feet - ah + 8 * k, 39 * k, 2.5 * k) + R(ax - 12 * k, feet - ah + 20 * k, 27 * k, 2.5 * k);
+        // the string of lights: sags from the chimney to the pole
+        var x1 = cx + cw, y1 = feet - ch + 16 * k, x2 = px, y2 = feet - ph + 4 * k, sag = 46 * k;
+        var mx = (x1 + x2) / 2, my = Math.max(y1, y2) + sag;
+        d['r-wire'] += 'M' + x1 + ' ' + y1 + ' Q' + mx + ' ' + (2 * my - (y1 + y2) / 2) + ' ' + x2 + ' ' + y2;
+        var lights = '', n = Math.max(6, Math.round((x2 - x1) / (38 * k)));
+        for (var i = 1; i < n; i++) {
+            var t = i / n, qx = (1 - t) * (1 - t) * x1 + 2 * (1 - t) * t * mx + t * t * x2,
+                qy = (1 - t) * (1 - t) * y1 + 2 * (1 - t) * t * (2 * my - (y1 + y2) / 2) + t * t * y2;
+            lights += '<circle class="r-halo" cx="' + qx.toFixed(1) + '" cy="' + (qy + 5 * k).toFixed(1) + '" r="' + (16 * k).toFixed(1) + '"/>' +
+                      '<circle class="r-bulb" cx="' + qx.toFixed(1) + '" cy="' + (qy + 5 * k).toFixed(1) + '" r="' + (3.2 * k).toFixed(1) + '"/>';
+        }
+        svg.querySelector('.r-lights').innerHTML = lights;
+        svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+        for (c in d) svg.querySelector('.' + c).setAttribute('d', d[c]);
+        svg.querySelector('.r-warm').setAttribute('d', d['r-glass']);
+        svg.querySelector('.r-warm').setAttribute('fill', '#ffd98a');
+        svg.querySelector('.r-wire').setAttribute('fill', 'none');
+        svg.querySelector('.r-wire').setAttribute('stroke-width', 1.4);
+    }
+    buildRoof();
+    window.addEventListener('resize', buildRoof);
+    function paintRoof(p) {
+        var svg = roof.querySelector('.placeholder');
+        if (!svg) return;
+        var dusk = Sky.smooth(Sky.ramp(p, 0.3, 0.85)), lit = Sky.smooth(Sky.ramp(p, 0.4, 0.55));
+        for (var c in ROOF) {
+            var el = svg.querySelector('.' + c), col = Sky.mix(ROOF[c][0], ROOF[c][1], dusk);
+            if (c === 'r-wire') el.setAttribute('stroke', col); else el.setAttribute('fill', col);
+        }
+        svg.querySelector('.r-warm').style.opacity = lit * 0.85;             // a lamp on below the skylight
+        svg.querySelector('.r-lights').style.opacity = 0.15 + 0.85 * lit;
+    }
+
+    /* ---------------- your own skyline: three slots, back to front ----------------
+       assets/city/skyline-back, skyline-middle, skyline-front (each with an optional -glow
+       twin for lit windows). the front row is where the telescope looks: say where its
+       windows are in assets/city/skyline-front-windows.json (see assets/README.txt). */
+    var SKYLINE = ['assets/city/skyline-back', 'assets/city/skyline-middle', 'assets/city/skyline-front'];
+    var frontArt = null;          // { w, h, windows: [[x%, y%, w%, h%], …] } once your front row is in
+
     var front = null;           // the nearest row of buildings and its windows (for the telescope)
     function f(n) { return n.toFixed(1); }
     function rect(x, y, w, h) { return 'M ' + f(x) + ' ' + f(y) + ' h ' + f(w) + ' v ' + f(h) + ' h ' + f(-w) + ' Z '; }
@@ -94,7 +213,7 @@
                 x += bw + (rnd() < 0.3 ? rnd() * 14 * small : -2);
             }
 
-            if (i === LAYERS.length - 1) front = { svg: svg, windows: wins, W: W, H: B };
+            if (i === LAYERS.length - 1) front = { svg: svg, windows: frontArt ? artWindows(W, B) : wins, W: W, H: B };
             svg.setAttribute('viewBox', '0 0 ' + W + ' ' + B);
             svg.querySelector('.body').setAttribute('d', body);
             svg.querySelector('.glass').setAttribute('d', glass);
@@ -102,11 +221,39 @@
             svg.querySelectorAll('.lit').forEach(function (el, b) { el.setAttribute('d', lit[b]); });
         });
     }
+    // the telescope's windows on your own front row: from the .json, or spread along it
+    function artWindows(W, B) {
+        var sc = Math.max(W / frontArt.w, B / frontArt.h), iw = frontArt.w * sc, ih = frontArt.h * sc;
+        var ox = (W - iw) / 2, oy = B - ih, list = frontArt.windows, out = [];
+        if (!list || !list.length) {                                      // no map: a row across the middle
+            list = [];
+            for (var i = 0; i < 24; i++) list.push([6 + i * 3.9, 62, 0.9, 1.6]);
+        }
+        list.forEach(function (w) {
+            var ww = (w[2] || 0.9) / 100 * iw, wh = (w[3] || 1.6) / 100 * ih;
+            var x = ox + w[0] / 100 * iw - ww / 2, y = oy + w[1] / 100 * ih - wh / 2;
+            if (x > 0 && x + ww < W) out.push({ x: x, y: y, w: ww, h: wh, lit: true, top: y - 20 });
+        });
+        return out;
+    }
     build();
-    window.addEventListener('resize', function () { build(); Sky.refresh(); if (Sky.city.onBuild) Sky.city.onBuild(); });
-    Sky.city = { el: ground, get front() { return front; }, onBuild: null };
+    function rebuild() { build(); svgs.forEach(Sky.fitLayerArt); Sky.refresh(); if (Sky.city.onBuild) Sky.city.onBuild(); }
+    window.addEventListener('resize', rebuild);
+    svgs.forEach(function (svg, i) {
+        Sky.layerArt(svg, SKYLINE[i], i === svgs.length - 1 ? function (url, img) {
+            frontArt = { w: img.naturalWidth || 1920, h: img.naturalHeight || 800, windows: null };
+            rebuild();
+            Sky.findAsset(SKYLINE[i] + '-windows.json', function (u, data) {
+                if (!u) return;
+                frontArt.windows = Array.isArray(data) ? data : (data && data.windows) || null;
+                rebuild();
+            });
+        } : null);
+    });
+    Sky.city = { el: ground, roof: roof, get front() { return front; }, onBuild: null };
 
     Sky.onFrame(function (p) {
+        paintRoof(p);
         var dusk = Sky.smooth(Sky.ramp(p, 0.3, 0.85));
         svgs.forEach(function (svg, i) {
             var L = LAYERS[i];
