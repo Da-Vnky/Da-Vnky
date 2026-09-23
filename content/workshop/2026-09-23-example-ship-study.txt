@@ -1,2 +1,0 @@
-ship study, example
-a caption file: same name as the picture, ending in .txt. first line is the title, the rest a note. delete both whenever you like.
