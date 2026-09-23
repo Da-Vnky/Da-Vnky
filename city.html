@@ -14,6 +14,11 @@
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="sky/sky.css">
+    <style>
+        /* feet on the rooftop: 45% of the way up the roof strip (20vh tall, 17vh on phones) */
+        .city-char { position: fixed; z-index: 3; right: 16vw; bottom: calc(max(20vh, 130px) * .45 - 2px); height: 17vh; min-height: 90px; }
+        @media (max-width: 620px) { .city-char { bottom: calc(max(17vh, 110px) * .45 - 2px); height: 14vh; min-height: 70px; } }
+    </style>
 </head>
 <body data-place="city" data-voyage="160">
 
@@ -37,8 +42,9 @@
     </button>
 
     <!-- the traveller, stargazing. your own: assets/characters/city.(gif|png|webp|svg) -->
-    <div class="character scene-character" data-asset="assets/characters/city" data-say="clear skies tonight"
-         aria-label="the traveller" style="position: fixed; z-index: 2; right: 16vw; bottom: 5vh; height: 17vh; min-height: 90px;"></div>
+    <!-- they stand on the rooftop (sky/ground-city.js draws it; your own: assets/city/foreground) -->
+    <div class="character scene-character city-char" data-asset="assets/characters/city" data-say="clear skies tonight"
+         aria-label="the traveller"></div>
 
 
     <script src="sky/sky.js"></script>
