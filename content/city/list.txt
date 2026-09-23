@@ -1,0 +1,5 @@
+# written by tools/update-lists.sh: every file in this folder.
+# no need to edit it; it's rewritten each commit.
+example-cat-on-the-sill.svg
+example-cat-on-the-sill.txt
+example-late-night-reader.svg
