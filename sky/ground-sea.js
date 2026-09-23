@@ -18,6 +18,11 @@
             'background: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'300\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix values=\'0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.09 0\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E");' +
             '-webkit-mask-image: linear-gradient(to top, #000 60%, transparent 100%); mask-image: linear-gradient(to top, #000 60%, transparent 100%); }' +
 
+        '.ground-sea .dock { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 -3px 5px rgba(0,0,0,.3)); }' +
+        '.ground-sea .d-rope  { fill: none; stroke: #c9b184; stroke-width: 2.4; stroke-linecap: round; }' +
+        '.ground-sea .d-flame { fill: #ffd98a; }' +
+        
+
         '.ship { position: absolute; left: 3vw; bottom: 30%; width: 230px; color: #cbbd9c;' +
             'filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)); transform-origin: 50% 90%;' +
             'pointer-events: auto; cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; transition: filter .2s; }' +
@@ -44,6 +49,12 @@
     sea.setAttribute('aria-hidden', 'true');
     sea.innerHTML =
         wave(1, .36, .15, 135, 40) +
+        // the dock (drawn by buildDock below): pilings, deck, bollard, lamp, and the signpost's post
+        '<svg class="dock">' +
+            '<path class="d-shade"/><path class="d-wood"/><path class="d-light"/><path class="d-rope"/>' +
+            '<defs><radialGradient id="dock-glow"><stop offset="0" stop-color="rgba(255,205,120,.6)"/><stop offset="1" stop-color="rgba(255,205,120,0)"/></radialGradient></defs>' +
+            '<circle class="d-glow" fill="url(#dock-glow)"/><path class="d-flame"/>' +
+        '</svg>' +
         wave(2, .53, .15, 155, 110) +
         '<svg class="ship" viewBox="0 0 120 100"><g class="hull" fill="currentColor">' +
             '<path d="M8 72 L112 72 L98 90 L22 90 Z"/><rect x="58" y="10" width="3" height="62"/>' +
@@ -110,6 +121,78 @@
     }
     buildWaves();
     window.addEventListener('resize', buildWaves);
+
+    /* ---------------- the dock, on the right ---------------- */
+    var dock = sea.querySelector('.dock');
+    function R(x, y, w, h) { return 'M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'h' + w.toFixed(1) + 'v' + h.toFixed(1) + 'h' + (-w).toFixed(1) + 'Z'; }
+    function buildDock() {
+        var W = sea.clientWidth, S = sea.clientHeight, small = W < 620;
+        var dw = small ? 200 : 360, x0 = W - dw, y = S * 0.30, dh = small ? 11 : 14;
+        var wood = '', shade = '', light = '', rope = '';
+
+        // pilings and cross-braces (mostly hidden by the front waves)
+        var step = small ? 52 : 70, xs = [];
+        for (var x = x0 + 12; x < W + 20; x += step) {
+            xs.push(x);
+            shade += R(x, y + dh - 2, small ? 10 : 13, S - y + 20);
+        }
+        for (var i = 0; i + 1 < xs.length; i += 2) {
+            var a = xs[i] + 6, b = xs[i + 1] + 6, top = y + dh + 6, bot = y + dh + (small ? 40 : 56);
+            shade += 'M' + a + ' ' + top + 'L' + (a + 4) + ' ' + top + 'L' + (b + 4) + ' ' + bot + 'L' + b + ' ' + bot + 'Z';
+            shade += 'M' + b + ' ' + top + 'L' + (b + 4) + ' ' + top + 'L' + (a + 4) + ' ' + bot + 'L' + a + ' ' + bot + 'Z';
+        }
+
+        // deck, with plank seams and a lighter top edge
+        wood  += R(x0, y, dw + 20, dh);
+        shade += R(x0, y + dh - 3, dw + 20, 3);
+        light += R(x0, y, dw + 20, 2.5);
+        for (var sx = x0 + 22; sx < W; sx += 22) shade += R(sx, y + 2.5, 1.2, dh - 5);
+
+        // bollard with a mooring rope
+        var bx = x0 + (small ? 28 : 40), bh = small ? 14 : 20;
+        wood  += R(bx, y - bh, 12, bh + 1);
+        shade += R(bx - 2, y - bh - 4, 16, 5);
+        rope  += 'M' + (bx + 6) + ' ' + (y - bh + 6) + ' C' + (bx - 14) + ' ' + (y + 4) + ' ' + (bx - 26) + ' ' + (y + 30) + ' ' + (bx - 22) + ' ' + (y + 64);
+        rope  += 'M' + (bx + 26) + ' ' + (y - 3) + ' a9 4 0 1 0 18 0 a9 4 0 1 0 -18 0 M' + (bx + 29) + ' ' + (y - 4) + ' a6 2.5 0 1 0 12 0';
+
+        // lamp post at the end of the dock
+        var lx = x0 + (small ? 8 : 12), lh = small ? 70 : 100, ly = y - lh;
+        wood  += R(lx, ly, 6, lh);
+        wood  += R(lx, ly, small ? 18 : 24, 4);
+        var kx = lx + (small ? 12 : 17), ky = ly + 4;
+        shade += R(kx - 1, ky, 2, 5);
+        wood  += 'M' + (kx - 9) + ' ' + (ky + 5) + 'h18l-3 4h-12z';
+        shade += R(kx - 8, ky + 9, 2, 18) + R(kx + 6, ky + 9, 2, 18) + R(kx - 9, ky + 27, 18, 3);
+        dock.querySelector('.d-flame').setAttribute('d', R(kx - 6, ky + 9, 12, 18));
+        var g = dock.querySelector('.d-glow');
+        g.setAttribute('cx', kx); g.setAttribute('cy', ky + 18); g.setAttribute('r', small ? 40 : 60);
+
+        // on wide screens the signpost's post stands on the dock, reaching up to the planks
+        if (W > 1100) {
+            var vh = window.innerHeight, pTop = vh * 0.27 - 26 - (vh - S), px = W - 68;
+            wood  += 'M' + px + ' ' + (y + 1) + 'V' + (pTop + 9) + 'a9 9 0 0 1 18 0V' + (y + 1) + 'Z';
+            shade += R(px + 13, pTop + 9, 5, y - pTop - 9);
+            for (var ry = pTop + 30; ry < y - 10; ry += 30) shade += R(px, ry, 18, 1.2);
+        }
+
+        dock.setAttribute('viewBox', '0 0 ' + W + ' ' + S);
+        dock.querySelector('.d-wood').setAttribute('d', wood);
+        dock.querySelector('.d-shade').setAttribute('d', shade);
+        dock.querySelector('.d-light').setAttribute('d', light);
+        dock.querySelector('.d-rope').setAttribute('d', rope);
+    }
+    buildDock();
+    window.addEventListener('resize', buildDock);
+
+    function paintDock(p) {
+        var dusk = Sky.smooth(Sky.ramp(p, 0.3, 0.85)), lit = Sky.smooth(Sky.ramp(p, 0.42, 0.6));
+        dock.querySelector('.d-wood').setAttribute('fill', Sky.mix('#8a5c3a', '#3a2b2a', dusk));
+        dock.querySelector('.d-shade').setAttribute('fill', Sky.mix('#5a3920', '#1f1719', dusk));
+        dock.querySelector('.d-light').setAttribute('fill', Sky.mix('#b88c5e', '#4b3b36', dusk));
+        dock.querySelector('.d-rope').style.stroke = Sky.mix('#c9b184', '#5a5048', dusk);
+        dock.querySelector('.d-flame').style.opacity = 0.25 + 0.75 * lit;
+        dock.querySelector('.d-glow').style.opacity = lit;
+    }
 
     // how much each layer sways: [cycles over the whole scroll, phase, % sideways, px up/down]
     var SWAY = [[0.9, 0.0, 2.0, 3], [1.1, 1.3, 2.6, 4], [0.8, 2.1, 3.2, 5], [1.3, 0.7, 3.8, 5]];
@@ -220,6 +303,7 @@
             var k = SWAY[i], a = p * Math.PI * k[0] + k[1];
             w.style.transform = 'translate(' + (Math.sin(a) * k[2]) + '%, ' + (Math.cos(a) * k[3]) + 'px)';
         });
+        paintDock(p);
         placeShip();
     });
 

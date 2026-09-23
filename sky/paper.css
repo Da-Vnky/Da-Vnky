@@ -165,7 +165,7 @@
 /* ---------- today's message in a bottle ---------- */
 .bottle-wrap {
     position: absolute;
-    left: 60vw;
+    left: 46vw;
     bottom: 12%;
     width: 190px;
     pointer-events: auto;
@@ -187,7 +187,7 @@
 
 .bottle-hint {
     position: absolute;
-    left: calc(60vw + 95px);
+    left: calc(46vw + 95px);
     bottom: calc(12% + 96px);
     z-index: 3;
     margin: 0;
@@ -229,6 +229,6 @@
     .curl { left: -8px; right: -8px; }
     .sketch { width: 120px; margin: 0 -6px 8px 12px; }
     .marks svg.blot { width: 30px !important; height: 30px !important; opacity: .45; }
-    .bottle-wrap { width: 130px; left: 52vw; }
-    .bottle-hint { font-size: 1.1rem; left: calc(52vw + 65px); bottom: calc(12% + 70px); }
+    .bottle-wrap { width: 130px; left: 30vw; }
+    .bottle-hint { font-size: 1.1rem; left: calc(30vw + 65px); bottom: calc(12% + 70px); }
 }
