@@ -1,0 +1,9 @@
+#!/bin/sh
+# before each commit: refresh every content/<scene>/list.txt and include them in the commit.
+# turn it on once, from the top of the site:   git config core.hooksPath tools/hooks
+root=$(git rev-parse --show-toplevel) || exit 0
+sh "$root/tools/update-lists.sh"
+for f in "$root"/content/*/list.txt "$root"/content/*/*/list.txt; do
+    [ -f "$f" ] && git add "$f"
+done
+exit 0
