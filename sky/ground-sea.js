@@ -116,14 +116,21 @@
 
     /* ---------------- the ship: sails with the scroll, and can be picked up ---------------- */
     var ship = sea.querySelector('.ship');
-    var drag = { x: 0, y: 0, dip: 0, s: 1 }, held = false, grab = { x: 0, y: 0 }, tweenId = 0;
+    // sx = how far it has sailed off toward the right edge when you leave the page
+    var drag = { x: 0, y: 0, dip: 0, s: 1, sx: 0 }, held = false, grab = { x: 0, y: 0 }, tweenId = 0;
 
     function placeShip() {
         var p = Sky.progress, r = p * Math.PI * 2.4;
         var rock = held ? 0 : Math.sin(r + 0.8) * 3;
+        var bob = Math.sin(r) * 5;
+        if (drag.sx) {                                   // under way: pitch and heave with the swell
+            var t = performance.now() / 1000;
+            rock += Math.sin(t * 5.5) * 3.5 - 2;
+            bob += Math.sin(t * 5.5 + 1.2) * 4;
+        }
         ship.style.left = 'calc(3vw + (94vw - ' + ship.clientWidth + 'px) * ' + p.toFixed(4) + ')';
         ship.style.transform =
-            'translate(' + drag.x + 'px, ' + (drag.y + drag.dip + Math.sin(r) * 5) + 'px) ' +
+            'translate(' + (drag.x + drag.sx) + 'px, ' + (drag.y + drag.dip + bob) + 'px) ' +
             'rotate(' + rock + 'deg) scale(' + drag.s + ')';
     }
 
@@ -213,6 +220,26 @@
             var k = SWAY[i], a = p * Math.PI * k[0] + k[1];
             w.style.transform = 'translate(' + (Math.sin(a) * k[2]) + '%, ' + (Math.cos(a) * k[3]) + 'px)';
         });
+        placeShip();
+    });
+
+    // clicking a sign or a constellation: the ship sails off the right edge, then the page changes
+    function easeInOut(t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+    Sky.onLeave(function (go) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+        held = false;
+        ship.classList.remove('held');
+        var r = ship.getBoundingClientRect();
+        var dist = window.innerWidth - r.left + 60 - drag.x;
+        tween({ sx: dist, x: 0, y: 0, dip: 0, s: 1 }, 1500, easeInOut, ++tweenId, go);
+        return true;
+    });
+    // coming back with the browser's back button: put the ship back where it belongs
+    window.addEventListener('pageshow', function (e) {
+        if (!e.persisted) return;
+        tweenId++;
+        drag.sx = drag.x = drag.y = drag.dip = 0;
+        drag.s = 1;
         placeShip();
     });
 
