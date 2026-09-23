@@ -34,6 +34,16 @@
         { id: 'living',   name: 'the living space', href: 'living.html' }
     ];
 
+    // your Forgejo repo's API address. if Mel's Forgejo allows it, the site asks it
+    // which files are in each content folder (one of three ways it finds new files).
+    var REPO_API = 'https://members.pleroma.nexus/api/v1/repos/subdomains/DaV-nky';
+
+    // where visitors' messages in bottles are sent for you to read and approve.
+    // a FormSubmit address (see content/README.txt, "your post office"), e.g.
+    //   'https://formsubmit.co/1a2b3c4d5e6f…'
+    // leave it '' and bottles still get tossed, but nothing is delivered.
+    var BOTTLE_INBOX = 'https://formsubmit.co/pneumatichylic@proton.me';
+
     // sky colours along the scroll: [position 0–1, top of sky, horizon]
     var SKY = [
         [0.00, '#5fa8dc', '#bfe3f5'],   // daylight
@@ -129,13 +139,26 @@
     polaris.className = 'polaris';
     polaris.href = HOME;
     polaris.setAttribute('aria-label', 'return home');
+    polaris.title = 'return home';
     polaris.innerHTML =
         '<svg viewBox="-26 -26 52 52" aria-hidden="true">' +
+            // by day: a little brass-and-paper compass, needle to the north
+            '<g class="p-compass">' +
+                '<circle r="21" fill="#eadcb9" stroke="#8a6a30" stroke-width="2.4"/>' +
+                '<circle r="17" fill="none" stroke="#6e5236" stroke-width=".6" stroke-dasharray="1.2 2.1"/>' +
+                '<path d="M0 -15 L3 0 L0 15 L-3 0 Z M-15 0 L0 -3 L15 0 L0 3 Z" fill="#6e5236" opacity=".45"/>' +
+                '<g class="needle"><path d="M0 -14 L3.4 0 L-3.4 0 Z" fill="#9a3b1f"/><path d="M0 14 L3.4 0 L-3.4 0 Z" fill="#3a2716"/></g>' +
+                '<circle r="2" fill="#c49a52"/>' +
+                '<text y="-22.5" text-anchor="middle" font-size="6" font-family="Georgia, serif" fill="#3a2716">N</text>' +
+            '</g>' +
+            // by night: Polaris
+            '<g class="p-star">' +
             '<g class="rays">' +
                 '<line x1="0" y1="-18" x2="0" y2="18"/><line x1="-18" y1="0" x2="18" y2="0"/>' +
                 '<line x1="-8" y1="-8" x2="8" y2="8" opacity=".6"/><line x1="-8" y1="8" x2="8" y2="-8" opacity=".6"/>' +
             '</g>' +
             '<circle class="core" r="4.6"/>' +
+            '</g>' +
         '</svg>' +
         '<span class="polaris-name">Polaris</span>' +
         '<span class="polaris-hint">return home</span>';
@@ -261,16 +284,27 @@
         stars.style.opacity = smooth(ramp(p, 0.66, 0.9));
         ursa.style.opacity  = smooth(ramp(p, 0.82, 0.97));
 
-        // sun: high on the right, sinks below the horizon by sunset
+        // two ways the sun and moon can move, blended by celest.w:
+        //  0 = the scroll's story: the sun sinks on the right, the moon rises on the left
+        //  1 = the loop's sky: both travel full circles, rising left, setting right
+        var phone = window.innerWidth < 620;
         var s = ramp(p, 0, 0.52);
-        sun.style.left  = (80 + 10 * s) + 'vw';
-        sun.style.top   = (12 + 80 * s * s) + 'vh';
-        sun.style.color = mix('#f7d35e', '#e8683c', ramp(p, 0.28, 0.5));
-
-        // moon: rises on the left after sunset, ends high (lower on phones, clear of Polaris)
-        var m = ramp(p, 0.5, 0.95), moonEnd = window.innerWidth < 620 ? 30 : 14;
-        moon.style.left = (7 + 9 * m) + 'vw';
-        moon.style.top  = (92 - (92 - moonEnd) * (1 - (1 - m) * (1 - m))) + 'vh';
+        var sunA = [80 + 10 * s, 12 + 80 * s * s], sunHeat = ramp(p, 0.28, 0.5);
+        var m = ramp(p, 0.5, 0.95), moonEnd = phone ? 30 : 14;
+        var moonA = [7 + 9 * m, 92 - (92 - moonEnd) * (1 - (1 - m) * (1 - m))];
+        var w = celest.w;
+        if (w > 0) {
+            var th = celest.theta !== null ? celest.theta : p * Math.PI;
+            var sunB = orbit(th, 20), moonB = orbit(th + Math.PI + 0.55, phone ? 32 : 26);
+            sunA = [sunA[0] + (sunB[0] - sunA[0]) * w, sunA[1] + (sunB[1] - sunA[1]) * w];
+            moonA = [moonA[0] + (moonB[0] - moonA[0]) * w, moonA[1] + (moonB[1] - moonA[1]) * w];
+            sunHeat += (ramp(sunB[1], 48, 88) - sunHeat) * w;
+        }
+        sun.style.left  = sunA[0] + 'vw';
+        sun.style.top   = sunA[1] + 'vh';
+        sun.style.color = mix('#f7d35e', '#e8683c', sunHeat);
+        moon.style.left = moonA[0] + 'vw';
+        moon.style.top  = moonA[1] + 'vh';
 
         // clouds drift apart and fade out through sunset
         var cf = ramp(p, 0.3, 0.6);
@@ -287,7 +321,7 @@
         });
         nav.classList.toggle('live', lo > 0.6);
 
-        if (player) player.time.textContent = timeName(p);
+        if (player) player.time.textContent = timeName(p, celest.theta);
         for (var i = 0; i < hooks.length; i++) hooks[i](p);
     }
 
@@ -309,7 +343,21 @@
     window.addEventListener('scroll', kick, { passive: true });
     window.addEventListener('resize', kick);
 
-    function timeName(p) {
+    // a body on a circle across the sky: angle 0 = high overhead, π/2 = setting on the right,
+    // π = straight below, 3π/2 = rising on the left. returns [vw, vh]
+    function orbit(a, zenith) {
+        // through the telescope the view is narrower, so the path is too
+        var scope = body.classList.contains('scope-view'), amp = scope ? 17 : 46, low = scope ? 84 : 100;
+        return [50 + amp * Math.sin(a), low - (low - zenith) * Math.cos(a)];
+    }
+    var celest = { w: 0, theta: null };
+
+    function timeName(p, theta) {
+        var rising = theta !== null && theta !== undefined && ((theta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) > Math.PI;
+        if (rising) {
+            return p < .18 ? 'midday' : p < .3 ? 'morning' : p < .42 ? 'sunrise' : p < .6 ? 'dawn'
+                 : p < .8 ? 'first light' : p < .95 ? 'small hours' : 'midnight';
+        }
         return p < .18 ? 'midday' : p < .3 ? 'afternoon' : p < .38 ? 'golden hour' : p < .5 ? 'sunset'
              : p < .64 ? 'dusk' : p < .82 ? 'twilight' : p < .95 ? 'night' : 'midnight';
     }
@@ -318,7 +366,7 @@
     // opened by a room's window, a telescope, or anything with class="sky-viewer".
     // it lets night fall, then offers a player that loops day ⇄ night, gently.
     var SPEEDS = [
-        { name: 'slow',   half: 120 },     // seconds from midday to midnight
+        { name: 'slow',   half: 120 },     // seconds from midday to midnight (a full day is twice that)
         { name: 'gentle', half: 60 },
         { name: 'brisk',  half: 25 }
     ];
@@ -367,11 +415,18 @@
         clock.playing = on;
         playerEl.classList.toggle('playing', on);
         player.play.setAttribute('aria-label', on ? 'pause' : 'play');
+        body.classList.toggle('sky-playing', on);
         if (on) {
             clock.fade = null;
-            clock.phase = Math.acos(clamp(1 - 2 * (override === null ? shown : override)));   // pick up from where the sky is now
+            celest.w = 1;
+            if (celest.theta === null) celest.theta = (override === null ? shown : override) * Math.PI;   // pick up where the sky is now
             ensureLoop();
         }
+    }
+    // the sky's brightness for an angle: midday 0 → midnight 1 → back to 0 by the next midday
+    function dayPart(theta) {
+        var t = ((theta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+        return t <= Math.PI ? t / Math.PI : 2 - t / Math.PI;
     }
     function ensureLoop() {
         if (clock.looping) return;
@@ -385,36 +440,51 @@
         if (b) setSpeed(+b.dataset.speed);
     });
 
-    // the loop: time = (1 − cos φ) / 2, so it eases gently into midday and midnight and turns back
+    // the loop: the sun and moon keep turning the same way, a full circle each day,
+    // so the sky goes midday → sunset → midnight → sunrise → midday, for ever
     function tick(now) {
-        if (!view || (!clock.fade && !clock.playing)) { clock.looping = false; return; }
+        var blending = celest.blend;
+        if ((!view && !blending) || (!clock.fade && !clock.playing && !blending)) { clock.looping = false; return; }
         var dt = Math.min(0.1, (now - clock.last) / 1000);
         clock.last = now;
-        if (clock.fade) {                                     // the opening nightfall
+        if (blending) {                                       // easing between the scroll's paths and the circles
+            var bt = Math.min(1, (now - blending.t0) / blending.ms);
+            celest.w = blending.from + (blending.to - blending.from) * (bt < .5 ? 2 * bt * bt : 1 - Math.pow(-2 * bt + 2, 2) / 2);
+            if (bt >= 1) celest.blend = null;
+            kick();
+        }
+        if (view && clock.fade) {                             // the opening nightfall
             var f = clock.fade, t = Math.min(1, (now - f.t0) / f.ms);
             var e = t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
             override = f.from + (f.to - f.from) * e;
             kick();
-            if (t >= 1) clock.fade = null;
-            requestAnimationFrame(tick);
-            return;
+            if (t >= 1) { clock.fade = null; celest.theta = Math.PI; }
+        } else if (view && clock.playing) {
+            celest.theta += dt * Math.PI / SPEEDS[clock.speed].half;
+            override = dayPart(celest.theta);
+            kick();
         }
-        clock.phase += dt * Math.PI / SPEEDS[clock.speed].half;
-        override = (1 - Math.cos(clock.phase)) / 2;
-        kick();
         requestAnimationFrame(tick);
+    }
+    function blendCelest(to, ms) {
+        celest.blend = { from: celest.w, to: to, t0: performance.now(), ms: ms };
+        ensureLoop();
     }
 
     function openSkyView(opts) {
         if (view) return;
         view = opts || {};
+        holdId++;
         body.classList.add('sky-view');
         if (view.mode) body.classList.add(view.mode + '-view');
         exitBtn.querySelector('span').textContent = view.exitLabel || 'back inside';
         setPlaying(false);
         var from = override === null ? shown : override;
         override = from;
-        clock.fade = { from: from, to: 1, t0: performance.now(), ms: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 2400 };
+        celest.theta = null;
+        var ms = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 2400;
+        clock.fade = { from: from, to: 1, t0: performance.now(), ms: ms };
+        blendCelest(1, ms);
         ensureLoop();
     }
     function closeSkyView() {
@@ -424,7 +494,9 @@
         clock.playing = false;
         clock.fade = null;
         playerEl.classList.remove('playing');
-        body.classList.remove('sky-view');
+        body.classList.remove('sky-view', 'sky-playing');
+        celest.theta = null;
+        blendCelest(0, 1400);
         if (v.mode) body.classList.remove(v.mode + '-view');
         override = null;                                      // back to the time the scroll says
         kick();
@@ -507,6 +579,7 @@
         var base = el.dataset.asset;
         if (!base || el.dataset.assetDone) return;
         el.dataset.assetDone = '1';
+        if (el.classList.contains('character')) addPoses(el, base);
         findAsset(base, function (url) {
             if (!url) return;                                         // keep the placeholder
             var img = document.createElement('img');
@@ -540,6 +613,25 @@
             });
         });
     }
+    // extra poses for a character, each its own optional file next to the main one:
+    //   <name>-held   shown while they're picked up (e.g. a struggling GIF)
+    // a pose appears whenever the character has the matching class (.held)
+    var POSES = ['held'];
+    function addPoses(el, base) {
+        POSES.forEach(function (pose) {
+            findAsset(base + '-' + pose, function (url) {
+                if (!url) return;
+                var img = document.createElement('img');
+                img.src = url;
+                img.alt = '';
+                img.className = 'pose pose-' + pose;
+                img.setAttribute('aria-hidden', 'true');
+                el.insertBefore(img, el.querySelector('.bubble'));
+                el.classList.add('has-' + pose);
+            });
+        });
+    }
+
     function fillAssets(scope) {
         (scope || document).querySelectorAll('[data-asset]').forEach(fillSlot);
     }
@@ -583,6 +675,141 @@
 
     render(shown);
 
+
+    /* ---------------- content folders: what files are in content/<scene>/ ? ----------------
+       a browser can't look inside a folder by itself, so three sources are asked and combined:
+         1. content/<scene>/list.txt   written for you by tools/update-lists.sh (git hook)
+         2. the server's own folder listing, if it shows one
+         3. your Forgejo repo's API, if it answers browsers
+       files that turn out to be missing are skipped. */
+    var folderCache = {};
+    function listFolder(dir, exts, cb) {
+        dir = dir.replace(/\/?$/, '/');
+        var key = dir + '|' + exts.join(',');
+        if (folderCache[key]) return folderCache[key].then(cb);
+        var want = new RegExp('\\.(' + exts.join('|') + ')$', 'i');
+        function clean(names) {
+            return names.map(function (n) { return decodeURIComponent(String(n).split(/[?#]/)[0]).replace(/^.*\//, '').trim(); })
+                        .filter(function (n) { return n && n !== 'list.txt' && !/^[._]/.test(n) && want.test(n); });
+        }
+        function get(url, as) {
+            return fetch(url, { cache: 'no-cache' }).then(function (r) {
+                if (!r.ok) throw new Error(r.status);
+                return as === 'json' ? r.json() : r.text();
+            }).catch(function () { return null; });
+        }
+        var fromList = get(dir + 'list.txt').then(function (t) {
+            if (!t || /<html/i.test(t)) return [];
+            return clean(t.split(/\r?\n/).filter(function (l) { return l.trim() && !/^\s*#/.test(l); }));
+        });
+        var fromServer = get(dir).then(function (t) {
+            if (!t) return [];
+            var path = new URL(dir, location.href).pathname;
+            var looksLikeListing = t.indexOf(path) !== -1 && /Index of|Directory listing|\.\.\/|parent directory/i.test(t);
+            if (!looksLikeListing) return [];
+            var out = [], re = /href\s*=\s*["']([^"']+)["']/gi, m;
+            while ((m = re.exec(t))) if (m[1].indexOf('/') === -1 || m[1].indexOf(path) === 0) out.push(m[1]);
+            return clean(out);
+        });
+        var fromRepo = !REPO_API || location.protocol === 'file:' ? Promise.resolve([]) :
+            get(REPO_API + '/contents/' + new URL(dir, location.href).pathname.replace(/^\/|\/$/g, ''), 'json').then(function (j) {
+                return Array.isArray(j) ? clean(j.filter(function (f) { return f.type === 'file'; }).map(function (f) { return f.name; })) : [];
+            });
+        folderCache[key] = Promise.all([fromList, fromServer, fromRepo]).then(function (all) {
+            var seen = {}, names = [];
+            all.forEach(function (list) { list.forEach(function (n) { if (!seen[n]) { seen[n] = 1; names.push(n); } }); });
+            // a list can be out of date: keep only the files that are really there
+            return Promise.all(names.map(function (n) {
+                var url = dir + encodeURIComponent(n);
+                return fetch(url, { method: 'HEAD', cache: 'no-cache' })
+                    .then(function (r) { return r.ok || r.status === 405 ? { name: n, url: url } : null; })
+                    .catch(function () { return { name: n, url: url }; });
+            })).then(function (found) { return found.filter(Boolean); });
+        });
+        return folderCache[key].then(cb);
+    }
+
+    // "2026-09-23-lighthouse_study.png" → date "2026-09-23", title "lighthouse study"
+    function fileDate(name) { var m = /^(\d{4}-\d{2}-\d{2})/.exec(name); return m ? m[1] : ''; }
+    function fileTitle(name) {
+        return name.replace(/\.[^.]+$/, '').replace(/^\d{4}-\d{2}-\d{2}[-_ ]*/, '').replace(/^\d+[-_. ]+/, '')
+                   .replace(/[-_]+/g, ' ').trim();
+    }
+    // newest-dated first, then everything else in name order
+    function sortNewest(files) {
+        return files.slice().sort(function (a, b) {
+            var da = fileDate(a.name), db = fileDate(b.name);
+            if (da && db && da !== db) return db.localeCompare(da);
+            if (da && !db) return -1;
+            if (db && !da) return 1;
+            return a.name.localeCompare(b.name, undefined, { numeric: true });
+        });
+    }
+    function sortByName(files) {
+        return files.slice().sort(function (a, b) { return a.name.localeCompare(b.name, undefined, { numeric: true }); });
+    }
+    // an <img>, <video> or html fragment for a file, by its extension
+    function makeMedia(file, cls) {
+        var ext = (/\.([^.]+)$/.exec(file.name) || [])[1] || '';
+        ext = ext.toLowerCase();
+        var el;
+        if (ext === 'mp4' || ext === 'webm') {
+            el = document.createElement('video');
+            el.src = file.url; el.muted = true; el.loop = true; el.autoplay = true;
+            el.setAttribute('playsinline', ''); el.setAttribute('muted', '');
+        } else if (ext === 'html' || ext === 'txt') {
+            el = document.createElement('div');
+            fetch(file.url, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+                el.innerHTML = ext === 'txt' ? txtToHtml(t) : t;
+            });
+        } else {
+            el = document.createElement('img');
+            el.src = file.url; el.alt = fileTitle(file.name); el.decoding = 'async';
+        }
+        if (cls) el.className = cls;
+        return el;
+    }
+    // plain-text letters: first line is the title, blank lines separate paragraphs,
+    // *italic*, **bold**, [link](url), ![picture](url), --- for a rule, "~ " starts a sign-off
+    function txtToHtml(t) {
+        function esc(x) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function inline(x) {
+            return esc(x)
+                .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, '<img src="$2" alt="$1">')
+                .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        }
+        var blocks = t.replace(/\r/g, '').trim().split(/\n\s*\n/), out = '';
+        blocks.forEach(function (b, i) {
+            b = b.trim();
+            if (i === 0) {
+                var lines = b.split('\n'), title = lines.shift().replace(/^#+\s*/, '');
+                out += '<h2>' + inline(title) + '</h2>';
+                if (lines.length) out += '<p class="subtitle">' + inline(lines.join(' ')) + '</p>';
+                return;
+            }
+            if (/^-{3,}$/.test(b)) { out += '<hr>'; return; }
+            if (/^~\s/.test(b)) { out += '<p class="signoff">' + inline(b.replace(/^~\s*/, '')) + '</p>'; return; }
+            out += '<p' + (i === 1 ? ' class="lede"' : '') + '>' + inline(b).replace(/\n/g, '<br>') + '</p>';
+        });
+        return out;
+    }
+
+    /* ---------------- holding the time of day (for views that want a set hour) ---------------- */
+    var holdId = 0;
+    function holdTime(to, ms) {
+        var id = ++holdId, from = override === null ? shown : override, t0 = performance.now();
+        (function frame(now) {
+            if (id !== holdId) return;
+            var t = Math.min(1, (now - t0) / (ms || 1)), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            override = from + (to - from) * e;
+            kick();
+            if (t < 1) requestAnimationFrame(frame);
+        })(t0);
+    }
+    function releaseTime() { holdId++; override = null; kick(); }
+
     /* ---------------- what grounds and page scripts can use ---------------- */
     window.Sky = {
         // run fn(p) every frame the scene changes; p goes 0 (noon) → 1 (midnight)
@@ -592,6 +819,28 @@
         onLeave: function (fn) { leaveHooks.push(fn); },
         openSkyView: openSkyView,
         closeSkyView: closeSkyView,
+        listFolder: listFolder,
+        inbox: BOTTLE_INBOX,
+        // a glass bottle drawing (viewBox 0 0 200 90): .b-scroll (the note inside), .b-cork
+        bottleSVG: function (cls) {
+            return '<svg class="' + (cls || 'bottle') + '" viewBox="0 0 200 90" aria-hidden="true">' +
+                '<g class="b-scroll">' +
+                    '<rect x="36" y="37" width="100" height="16" rx="7" fill="#e9dbb8"/>' +
+                    '<rect x="36" y="37" width="100" height="5" rx="2.5" fill="#f6ecd2" opacity=".7"/>' +
+                    '<rect x="36" y="48" width="100" height="5" rx="2.5" fill="#b89d6c" opacity=".6"/>' +
+                    '<rect x="82" y="36" width="7" height="18" fill="#9a3b1f"/>' +
+                '</g>' +
+                '<path d="M32 20 H118 C135 20 142 30 152 36 H168 V54 H152 C142 60 135 70 118 70 H32 C18 70 10 58 10 45 C10 32 18 20 32 20 Z" fill="rgba(96,158,146,.5)" stroke="rgba(215,240,232,.75)" stroke-width="1.6"/>' +
+                '<rect x="164" y="33" width="6" height="24" rx="2" fill="rgba(96,158,146,.75)" stroke="rgba(215,240,232,.75)" stroke-width="1.2"/>' +
+                '<path d="M28 28 H108" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="round"/>' +
+                '<path d="M22 60 Q16 50 20 38" stroke="rgba(255,255,255,.3)" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+                '<g class="b-cork"><rect x="168" y="37" width="18" height="16" rx="3" fill="#9a6b3c"/><path d="M174 39 V51 M180 39 V51" stroke="#7a4f28" stroke-width="1.2"/></g>' +
+            '</svg>';
+        },
+        fileDate: fileDate, fileTitle: fileTitle,
+        sortNewest: sortNewest, sortByName: sortByName,
+        makeMedia: makeMedia, txtToHtml: txtToHtml,
+        holdTime: holdTime, releaseTime: releaseTime,
         fillAssets: fillAssets,
         findAsset: findAsset,
         setupCharacters: setupCharacters,

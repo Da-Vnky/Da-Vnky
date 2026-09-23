@@ -715,3 +715,74 @@ img.furnish { object-fit: contain; object-position: 50% 100%; }
     .back-inside { top: auto; bottom: 84px; left: 50%; transform: translate(-50%, 8px); }
     body.sky-view .back-inside { transform: translate(-50%, 0); }
 }
+
+/* =====================================================================
+   the home button: a compass by day, Polaris by night
+   ===================================================================== */
+.polaris .p-compass { opacity: calc(1 - var(--night)); transition: opacity .3s; }
+.polaris .p-star    { opacity: var(--night); transition: opacity .3s; }
+.polaris .needle  { transform-box: fill-box; transform-origin: 50% 50%; animation: needle 6s ease-in-out infinite alternate; }
+@keyframes needle { 0% { transform: rotate(-7deg); } 60% { transform: rotate(5deg); } 100% { transform: rotate(-2deg); } }
+.polaris:hover .needle { animation-duration: 1.2s; }
+@media (prefers-reduced-motion: reduce) { .polaris .needle { animation: none; } }
+
+/* while the day/night loop plays, Polaris is just a star in the sky:
+   it can't be clicked, and it comes and goes with the night */
+body.sky-playing .polaris { pointer-events: none; }
+body.sky-playing .polaris .p-compass,
+body.sky-playing .polaris .polaris-hint { opacity: 0; }
+body.sky-playing .polaris .p-star { opacity: var(--night); }
+body.sky-playing .polaris .polaris-name { opacity: var(--night); }
+body.sky-playing .polaris { filter: drop-shadow(0 0 calc(7px * var(--night)) rgba(255, 240, 200, .9)); }
+
+/* =====================================================================
+   interface buttons (the city's telescope)
+   ===================================================================== */
+.ui-button {
+    position: fixed;
+    left: 18px;
+    bottom: 18px;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 16px 6px 6px;
+    border: 0;
+    border-radius: 999px;
+    background: #eadcb9;
+    color: var(--ink);
+    font: italic 1.05rem "IM Fell English", Georgia, serif;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .4), inset 0 0 18px rgba(120, 80, 30, .25);
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, opacity .5s ease, visibility 0s;
+}
+.ui-button .ui-icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #f3e6c2;
+    overflow: hidden;
+    transition: background .2s;
+}
+.ui-button .ui-icon svg, .ui-button .ui-icon img { width: 26px; height: 26px; display: block; object-fit: contain; }
+.ui-button:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, .45), inset 0 0 18px rgba(120, 80, 30, .25); }
+.ui-button:hover .ui-icon { background: var(--sanguine); }
+body.sky-view .ui-button { opacity: 0; visibility: hidden; transition: opacity .4s ease, visibility 0s .4s; }
+
+/* looking through the telescope: the ground drops away and the sky draws closer */
+.backdrop { transition: transform 1.6s cubic-bezier(.3, .6, .2, 1); transform-origin: 50% calc(3vh + 28px); }
+body.scope-view .backdrop { transform: scale(1.3); }
+.ground { transition: transform .9s cubic-bezier(.55, 0, .25, 1), opacity .9s ease; }
+body.scope-view .ground { transform: translateY(110%); opacity: 0; }
+
+/* character poses: <name>-held.gif replaces the picture while they're picked up */
+.character .pose { display: none; height: 100%; width: auto; }
+.character.has-held.held .pose-held { display: block; }
+.character.has-held.held > .placeholder,
+.character.has-held.held > .art { display: none; }
+/* with a struggling GIF of your own, the site stops doing its own wiggle */
+.character.has-held.held .pose-held { animation: none !important; transform: none; }
+.character.has-held.held.face-left .pose-held { transform: scaleX(-1); }
