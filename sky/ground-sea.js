@@ -27,11 +27,15 @@
             'filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)); transform-origin: 50% 90%;' +
             'pointer-events: auto; cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; transition: filter .2s; }' +
         '.ship .hull { transform-box: fill-box; transform-origin: 50% 85%; }' +
+        '.ship { pointer-events: none !important; } .ship .hull, .ship .hull * { pointer-events: visiblePainted; }' +
         '.ship.held { cursor: grabbing; filter: drop-shadow(0 22px 16px rgba(0,0,0,.4)); }' +
         '.ship.held .hull { animation: ship-shake .09s linear infinite alternate; }' +
         '@keyframes ship-shake { from { transform: rotate(-3.5deg) translateX(-1.5px); } to { transform: rotate(3.5deg) translateX(1.5px); } }' +
 
-        '.ground-sea .sea-char { height: 70px; pointer-events: auto; transform-origin: 50% 100%; }' +
+        '.ground-sea .sea-char { height: 70px; pointer-events: auto; transform-origin: 50% 100%; cursor: grab; touch-action: none; transition: opacity .25s; }' +
+        '.ground-sea .sea-char.held { cursor: grabbing; filter: drop-shadow(0 16px 10px rgba(0,0,0,.35)); z-index: 5; }' +
+        '.ground-sea .sea-char.held .placeholder, .ground-sea .sea-char.held .art { animation: ship-shake .09s linear infinite alternate; }' +
+        '.ground-sea .sea-char.under { opacity: 0; pointer-events: none; }' +
         '@media (max-width: 620px) { .ground-sea .sea-char { height: 46px; } }' +
         '.splash-layer { position: fixed; inset: 0; z-index: 1; pointer-events: none; }' +
         '.splash-layer .drop { position: absolute; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: 0 1px 2px rgba(0,0,0,.3); }' +
@@ -223,6 +227,7 @@
             var t = performance.now() / 1000;
             rock += Math.sin(t * 5.5) * 3.5 - 2;
             bob += Math.sin(t * 5.5 + 1.2) * 4;
+            paintWaves(p, (performance.now() - (sailStart || performance.now())) / 1000);
         }
         ship.style.left = shipLeft(p) + 'px';
         shipBob.x = drag.x + drag.sx;
@@ -278,10 +283,8 @@
     ship.addEventListener('pointerup', release);
     ship.addEventListener('pointercancel', release);
 
-    function splash(el) {
-        var b = el.getBoundingClientRect();
-        var cx = b.left + b.width / 2, cy = b.top + b.height * 0.86, size = b.width / 230;
-
+    // a splash at a point on screen (size 1 = the ship's own)
+    function splashAt(cx, cy, size, spread) {
         var ring = document.createElement('div');
         ring.className = 'ring';
         ring.style.left = cx + 'px';
@@ -289,16 +292,17 @@
         splashLayer.appendChild(ring);
         ring.animate([
             { width: '0px', height: '0px', opacity: 1, transform: 'translate(-50%, -50%)' },
-            { width: (b.width * 1.2) + 'px', height: (26 * size) + 'px', opacity: 0, transform: 'translate(-50%, -50%)' }
+            { width: (spread * 1.2) + 'px', height: (26 * size) + 'px', opacity: 0, transform: 'translate(-50%, -50%)' }
         ], { duration: 700, easing: 'ease-out' }).onfinish = function () { ring.remove(); };
 
-        for (var i = 0; i < 18; i++) {
+        var n = Math.round(8 + 10 * Math.min(1, size));
+        for (var i = 0; i < n; i++) {
             var d = document.createElement('div');
-            var w = (4 + Math.random() * 6) * size;
+            var w = (4 + Math.random() * 6) * Math.max(size, .6);
             d.className = 'drop';
             d.style.width = w + 'px';
             d.style.height = (w * 1.25) + 'px';
-            d.style.left = (cx + (Math.random() - 0.5) * b.width * 0.7) + 'px';
+            d.style.left = (cx + (Math.random() - 0.5) * spread * 0.7) + 'px';
             d.style.top = cy + 'px';
             d.style.background = i % 3 ? '#e2d9c6' : '#8a97a3';
             splashLayer.appendChild(d);
@@ -313,18 +317,38 @@
              .onfinish = (function (el) { return function () { el.remove(); }; })(d);
         }
     }
+    function splash(el) {
+        var b = el.getBoundingClientRect();
+        splashAt(b.left + b.width / 2, b.top + b.height * 0.86, b.width / 230, b.width);
+    }
 
+    /* ---------------- the waves (by scroll, and rolling by the clock while under way) ---------------- */
+    var sailStart = 0;
+    function paintWaves(p, sailing) {
+        waves.forEach(function (w, i) {
+            var k = SWAY[i], a = p * Math.PI * k[0] + k[1] + (sailing || 0) * (2.2 + i * 0.5);
+            var lift = sailing ? 1 + Math.min(1, sailing) * 1.4 : 1;          // a livelier swell once we're moving
+            w.style.transform = 'translate(' + (Math.sin(a) * k[2]) + '%, ' + (Math.cos(a) * k[3] * lift) + 'px)';
+        });
+    }
 
-    /* ---------------- the traveller: aboard by day, ashore at the dock by night ---------------- */
+    /* ---------------- the traveller ----------------
+       aboard by day, ashore at the dock by night. can be picked up and dropped:
+       onto the dock, back into the ship, or into the sea (then they swim back).
+       easter egg: sail away while they're ashore and they dive in after you,
+       surfacing about 20 seconds later to climb aboard. */
+    var SWIM_AFTER_SHIP = 20000;      // the easter egg: ms underwater before they surface
+    var SWIM_AFTER_DROP = 5000;       // dropped in the sea by you: a shorter swim
     var mate = sea.querySelector('.sea-char');
-    var crew = { state: 'aboard', x: 0, b: 0, run: 0 };      // x = left px, b = bottom px (in the sea box)
+    var crew = { state: 'aboard', x: 0, b: 0, run: 0, timer: 0 };   // x = left px, b = bottom px (in the sea box)
 
     function mateW() { return mate.offsetWidth || mate.offsetHeight * 0.5; }
+    function mateH() { return mate.offsetHeight || 70; }
     function aboardSpot() {                                    // standing in the stern, legs hidden by the hull
         var sw = ship.clientWidth, sh = sw * 100 / 120, S = sea.clientHeight;
         return {
             x: shipLeft(Sky.progress) + shipBob.x + sw * 0.24 - mateW() / 2,
-            b: S * 0.30 + sh * 0.28 - mate.offsetHeight * 0.34 - shipBob.y
+            b: S * 0.30 + sh * 0.28 - mateH() * 0.34 - shipBob.y
         };
     }
     function deckB() { return dockAt ? dockAt.S - dockAt.deck : 0; }
@@ -333,6 +357,14 @@
         var x = dockAt.post ? dockAt.post - mateW() - 18 : dockAt.x0 + dockAt.dw * 0.5 - mateW() / 2;
         return { x: x, b: deckB() };
     }
+    function underB() { return -mateH() * 0.2; }               // below the second wave: out of sight
+    function surfaceB() { return sea.clientHeight * 0.47 - mateH() * 0.55; }   // head and shoulders above the swell
+    function shipDocked() { return Sky.progress >= 0.965 && !drag.sx && !held; }
+    function shipBox() {
+        var l = shipLeft(Sky.progress) + shipBob.x, sw = ship.clientWidth;
+        return { l: l + sw * 0.07, r: l + sw * 0.93 };
+    }
+
     function putMate(x, b) {
         crew.x = x; crew.b = b;
         mate.style.left = x.toFixed(1) + 'px';
@@ -343,75 +375,189 @@
         var s = aboardSpot();
         putMate(s.x, s.b);
     }
+    function mateSplash(size) {
+        var r = sea.getBoundingClientRect();
+        splashAt(r.left + crew.x + mateW() / 2, r.bottom - (sea.clientHeight * 0.47), size, mateW() * 2.4);
+    }
 
-    // move to a spot (which may itself be moving, like the bobbing ship), hopping or walking
-    function moveTo(spot, ms, hop, run, done) {
+    // move to a spot (which may itself be moving, like the bobbing ship): hop, walk or fall
+    function moveTo(spot, ms, hop, run, done, fall) {
         var fx = crew.x, fb = crew.b, t0 = performance.now();
-        mate.classList.toggle('walking', !hop);
+        mate.classList.toggle('walking', !hop && !fall);
         (function frame(now) {
             if (run !== crew.run) return;
             var t = Math.min(1, (now - t0) / ms), to = spot();
-            var e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-            var x = fx + (to.x - fx) * (hop ? e : t), b = fb + (to.b - fb) * e;
+            var e = fall ? t * t : (t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+            var x = fx + (to.x - fx) * (hop || fall ? e : t), b = fb + (to.b - fb) * e;
             if (hop) b += Math.sin(t * Math.PI) * hop;
-            mate.classList.toggle('face-left', to.x < fx - 1);
+            if (Math.abs(to.x - fx) > 2) mate.classList.toggle('face-left', to.x < fx);
             putMate(x, b);
             if (t < 1) requestAnimationFrame(frame);
             else { mate.classList.remove('walking'); if (done) done(); }
         })(t0);
     }
     function walkTime(a, b) { return Math.max(250, Math.abs(a - b) / 90 * 1000); }
+    function hopH() { return dockAt && dockAt.small ? 34 : 50; }
+    function settle(state) {
+        crew.state = state;
+        mate.classList.remove('face-left', 'walking', 'under');
+        if (state === 'aboard') placeMateAboard();
+        // look around: is the ship at the dock, or sailing off without them?
+        setTimeout(function () { tendCrew(Sky.progress); }, 60);
+    }
+    function cancelCrew() {
+        crew.run++;
+        clearTimeout(crew.timer);
+    }
 
     function goAshore() {
-        var run = ++crew.run;
+        cancelCrew();
+        var run = crew.run;
         crew.state = 'landing';
         drag.dip = 7;                                          // the hull bumps the dock
         tween({ dip: 0 }, 700, easeBack, ++tweenId);
-        setTimeout(function () {
+        crew.timer = setTimeout(function () {
             if (run !== crew.run) return;
-            moveTo(landSpot, 620, dockAt.small ? 34 : 50, run, function () {
-                var to = talkSpot();
-                moveTo(talkSpot, walkTime(crew.x, to.x), 0, run, function () {
-                    crew.state = 'ashore';
-                    mate.classList.remove('face-left');
-                    mate.classList.add('talking');
-                });
-            });
+            moveTo(landSpot, 620, hopH(), run, function () { walkToTalk(run); });
         }, 450);
     }
+    function walkToTalk(run) {
+        var to = talkSpot();
+        moveTo(talkSpot, walkTime(crew.x, to.x), 0, run, function () {
+            settle('ashore');
+            mate.classList.add('talking');
+        });
+    }
+    // back to the ship from the dock: hop aboard if it's still close, otherwise dive in after it
     function goAboard(fast, done) {
-        var run = ++crew.run;
+        cancelCrew();
+        var run = crew.run;
         crew.state = 'boarding';
         mate.classList.remove('talking');
         var land = landSpot(), k = fast ? 0.35 : 1;
         moveTo(landSpot, walkTime(crew.x, land.x) * k, 0, run, function () {
-            moveTo(aboardSpot, 620 * k, dockAt.small ? 34 : 50, run, function () {
-                crew.state = 'aboard';
-                mate.classList.remove('face-left');
-                placeMateAboard();
-                if (done) done();
-            });
+            var gap = landSpot().x - shipBox().r;
+            if (!fast && gap > 50) { dive(run, SWIM_AFTER_SHIP); return; }
+            moveTo(aboardSpot, 620 * k, hopH(), run, function () { settle('aboard'); if (done) done(); });
         });
     }
+    function dive(run, swimFor) {
+        crew.state = 'diving';
+        mate.classList.add('face-left');
+        var from = { x: crew.x, b: crew.b };
+        moveTo(function () { return { x: from.x - mateW() * 1.6, b: underB() }; }, 760, 46, run, function () {
+            goUnder(run, swimFor);
+        });
+        // the splash as they hit the water
+        setTimeout(function () { if (run === crew.run) mateSplash(0.55); }, 520);
+    }
+    function goUnder(run, swimFor) {
+        crew.state = 'swimming';
+        mate.classList.add('under');
+        mate.classList.remove('talking');
+        crew.timer = setTimeout(function () { if (run === crew.run) surface(run); }, swimFor);
+    }
+    // up they come: beside the dock if the ship is berthed (then climb up), else beside the ship (then climb in)
+    function surface(run) {
+        var toDock = shipDocked() && dockAt;
+        var popX = toDock ? landSpot().x - mateW() * 1.4 : shipBox().l - mateW() * 0.9;
+        putMate(popX, underB());
+        mate.classList.remove('under');
+        mate.classList.toggle('face-left', false);
+        crew.state = 'surfacing';
+        mateSplash(0.4);
+        moveTo(function () { return { x: popX, b: surfaceB() }; }, 520, 0, run, function () {
+            setTimeout(function () {                           // a breath, a shake, then climb
+                if (run !== crew.run) return;
+                if (toDock && shipDocked()) {
+                    moveTo(landSpot, 700, hopH() * 0.7, run, function () { walkToTalk(run); });
+                } else {
+                    moveTo(aboardSpot, 700, hopH() * 0.9, run, function () { settle('aboard'); });
+                }
+            }, 700);
+        });
+    }
+
     function tendCrew(p) {
-        if (!dockAt || held) return;
+        if (!dockAt || held || crew.state === 'held') return;
         var ashore = crew.state === 'landing' || crew.state === 'ashore';
         if (p >= 0.965 && crew.state === 'aboard' && !drag.sx) goAshore();
         else if (p < 0.94 && ashore) goAboard(false);
         placeMateAboard();
     }
 
+    /* ---------------- picking the traveller up ---------------- */
+    var pick = null, eatClick = false;
+    mate.addEventListener('pointerdown', function (e) {
+        if (crew.state === 'swimming' || crew.state === 'diving' || crew.state === 'surfacing') return;
+        e.preventDefault();
+        mate.setPointerCapture(e.pointerId);
+        pick = { x: e.clientX, y: e.clientY, on: false, dx: 0, db: 0 };
+    });
+    mate.addEventListener('pointermove', function (e) {
+        if (!pick) return;
+        var r = sea.getBoundingClientRect();
+        if (!pick.on) {
+            if (Math.hypot(e.clientX - pick.x, e.clientY - pick.y) < 6) return;
+            pick.on = true;                                    // it's a drag, not a click
+            cancelCrew();
+            crew.state = 'held';
+            mate.classList.remove('talking', 'walking', 'under');
+            mate.classList.add('held');
+            pick.dx = e.clientX - (r.left + crew.x);
+            pick.db = (r.bottom - crew.b) - e.clientY;
+        }
+        putMate(e.clientX - r.left - pick.dx, r.bottom - e.clientY - pick.db);
+    });
+    function letGo() {
+        if (!pick) return;
+        var was = pick.on;
+        pick = null;
+        if (!was) return;                                      // a plain click: let it show the speech bubble
+        eatClick = true;
+        setTimeout(function () { eatClick = false; }, 0);
+        mate.classList.remove('held');
+        drop();
+    }
+    mate.addEventListener('pointerup', letGo);
+    mate.addEventListener('pointercancel', letGo);
+    mate.addEventListener('click', function (e) { if (eatClick) { e.stopImmediatePropagation(); eatClick = false; } }, true);
+
+    // where did they land? the ship, the dock, or the sea
+    function drop() {
+        cancelCrew();
+        var run = crew.run, cx = crew.x + mateW() / 2, box = shipBox();
+        if (cx > box.l && cx < box.r && crew.b > aboardSpot().b - 30) {             // back into the ship
+            crew.state = 'falling';
+            moveTo(aboardSpot, 380, 0, run, function () { settle('aboard'); }, true);
+            return;
+        }
+        if (dockAt && cx > dockAt.x0 && crew.b > deckB() - 10) {                     // onto the dock
+            crew.state = 'falling';
+            var spotX = Math.min(crew.x, dockAt.W - mateW() - 6);
+            moveTo(function () { return { x: spotX, b: deckB() }; }, 300 + Math.max(0, crew.b - deckB()) / 2, 0, run, function () {
+                if (shipDocked()) walkToTalk(run);
+                else settle('ashore');                         // ship's away: they'll go after it
+            }, true);
+            return;
+        }
+        crew.state = 'falling';                                // into the sea
+        moveTo(function () { return { x: crew.x, b: underB() }; }, 300 + Math.max(0, crew.b) / 2.2, 0, run, function () {
+            goUnder(run, SWIM_AFTER_DROP);
+        }, true);
+        var fallMs = 300 + Math.max(0, crew.b - surfaceB()) / 2.2;
+        setTimeout(function () { if (run === crew.run) mateSplash(0.5); }, Math.max(120, fallMs * 0.75));
+    }
+
     Sky.onFrame(function (p) {
-        waves.forEach(function (w, i) {
-            var k = SWAY[i], a = p * Math.PI * k[0] + k[1];
-            w.style.transform = 'translate(' + (Math.sin(a) * k[2]) + '%, ' + (Math.cos(a) * k[3]) + 'px)';
-        });
+        paintWaves(p, 0);
         paintDock(p);
         placeShip();
         tendCrew(p);
     });
 
-    // clicking a sign or a constellation: the ship sails off the right edge, then the page changes
+    // clicking a sign or a constellation: the traveller hurries aboard, the waves pick up,
+    // and the ship sails off the right edge before the page changes
     function easeInOut(t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
     Sky.onLeave(function (go) {
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
@@ -420,23 +566,27 @@
         function sail() {
             var r = ship.getBoundingClientRect();
             var dist = window.innerWidth - r.left + 60 - drag.x;
-            tween({ sx: dist, x: 0, y: 0, dip: 0, s: 1 }, 1500, easeInOut, ++tweenId, go);
+            sailStart = performance.now();
+            tween({ sx: dist, x: 0, y: 0, dip: 0, s: 1 }, 1700, easeInOut, ++tweenId, go);
         }
-        if (crew.state !== 'aboard' && dockAt) goAboard(true, sail); else sail();
+        var onDock = crew.state === 'landing' || crew.state === 'ashore' || crew.state === 'boarding';
+        if (onDock && dockAt) goAboard(true, sail); else sail();
         return true;
     });
-    // coming back with the browser's back button: put the ship back where it belongs
+    // coming back with the browser's back button: put everyone back where they belong
     window.addEventListener('pageshow', function (e) {
         if (!e.persisted) return;
         tweenId++;
+        sailStart = 0;
         drag.sx = drag.x = drag.y = drag.dip = 0;
         drag.s = 1;
-        crew.run++;
-        crew.state = 'aboard';
-        mate.classList.remove('talking', 'walking', 'face-left');
+        cancelCrew();
+        mate.classList.remove('talking', 'held');
+        settle('aboard');
         placeShip();
+        paintWaves(Sky.progress, 0);
     });
 
-    // for letters.js: where to float today's bottle
-    Sky.sea = { el: sea, front: sea.querySelector('.wave-4'), splash: splash };
+    // for letters.js: where to float today's bottle (and a peek at the traveller, for testing)
+    Sky.sea = { el: sea, front: sea.querySelector('.wave-4'), splash: splash, crew: crew };
 })();

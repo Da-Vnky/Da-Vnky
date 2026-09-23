@@ -40,6 +40,7 @@
     document.body.appendChild(ground);
 
     var svgs = Array.prototype.slice.call(ground.querySelectorAll('.layer'));
+    var front = null;           // the nearest row of buildings and its windows (for the telescope)
     function f(n) { return n.toFixed(1); }
     function rect(x, y, w, h) { return 'M ' + f(x) + ' ' + f(y) + ' h ' + f(w) + ' v ' + f(h) + ' h ' + f(-w) + ' Z '; }
 
@@ -48,7 +49,7 @@
         svgs.forEach(function (svg, i) {
             var L = LAYERS[i], W = svg.clientWidth, S = svg.clientHeight - 12, B = S + 12;
             var rnd = Sky.seeded(L.seed * 7919);
-            var body = '', glass = '', beacon = '', lit = [];
+            var body = '', glass = '', beacon = '', lit = [], wins = [];
             for (var b = 0; b < BUCKETS; b++) lit.push('');
 
             for (var x = -10; x < W; ) {
@@ -84,13 +85,16 @@
                             var wx = ox + c * gx, wy = B - bh + 12 + r * gy;
                             var w = rect(wx, wy, ww, wh);
                             glass += w;
-                            if (rnd() < 0.78) lit[Math.floor(rnd() * BUCKETS)] += w;
+                            var isLit = rnd() < 0.78;
+                            if (isLit) lit[Math.floor(rnd() * BUCKETS)] += w;
+                            if (i === LAYERS.length - 1) wins.push({ x: wx, y: wy, w: ww, h: wh, lit: isLit, top: B - bh });
                         }
                     }
                 }
                 x += bw + (rnd() < 0.3 ? rnd() * 14 * small : -2);
             }
 
+            if (i === LAYERS.length - 1) front = { svg: svg, windows: wins, W: W, H: B };
             svg.setAttribute('viewBox', '0 0 ' + W + ' ' + B);
             svg.querySelector('.body').setAttribute('d', body);
             svg.querySelector('.glass').setAttribute('d', glass);
@@ -99,7 +103,8 @@
         });
     }
     build();
-    window.addEventListener('resize', function () { build(); Sky.refresh(); });
+    window.addEventListener('resize', function () { build(); Sky.refresh(); if (Sky.city.onBuild) Sky.city.onBuild(); });
+    Sky.city = { el: ground, get front() { return front; }, onBuild: null };
 
     Sky.onFrame(function (p) {
         var dusk = Sky.smooth(Sky.ramp(p, 0.3, 0.85));
