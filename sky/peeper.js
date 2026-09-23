@@ -33,7 +33,9 @@
         'body.peep-view .ground-city { transform-origin: 50% 100%; }' +
         'body.peep-view .scope-lens, body.peep-close .scope-lens { opacity: 1; visibility: visible; transition: opacity .8s ease .15s; }' +
         'body.peep-view .scene-character, body.peep-view .ui-button { opacity: 0; visibility: hidden; pointer-events: none; }' +
-        'body.peep-view { cursor: grab; } body.peep-view.peep-dragging { cursor: grabbing; }' +
+        'body.peep-view .signpost, body.peep-close .signpost { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .4s, visibility 0s .4s; }' +
+        'body.peep-view { cursor: crosshair; } body.peep-view.peep-pushing { cursor: move; }' +
+        '@media (hover: none), (pointer: coarse) { body.peep-view { cursor: grab; } body.peep-view.peep-dragging { cursor: grabbing; } }' +
 
         /* things drawn on the telescope's glass */
         '.peep-ui { position: fixed; inset: 0; z-index: 6; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .4s, visibility 0s .4s;' +
@@ -146,7 +148,8 @@
 
     function hintText() {
         if (!scenes.length) return 'no windows lit yet. scenes go in content/city/';
-        return 'drag to look around. the brightest windows have something to see (' + scenes.length + ')';
+        return (fine.matches ? 'move toward the edge of the lens to look around.' : 'drag to look around.') +
+            ' the brightest windows have something to see (' + scenes.length + ')';
     }
 
     /* ---------------- aiming the telescope ---------------- */
@@ -157,7 +160,9 @@
         var mx = (Z - 1) * W / 2;
         return { x: Math.max(-mx, Math.min(mx, p.x)), y: Math.max(0, Math.min(Math.max(0, Z * Hg - vh() * 0.62), p.y)) };
     }
+    var holdUntil = 0;            // while an aimed move is gliding, the rim doesn't push
     function applyPan(zoom, p, ms) {
+        if (ms !== 0) holdUntil = performance.now() + (ms || 1100);
         ground.style.transition = ms === 0 ? 'none' : 'transform ' + (ms || 1100) + 'ms cubic-bezier(.3,.6,.2,1), opacity .9s';
         ground.style.transform = 'translate(' + p.x.toFixed(1) + 'px,' + p.y.toFixed(1) + 'px) scale(' + zoom.toFixed(3) + ')';
     }
@@ -179,9 +184,46 @@
         applyPan(Z, pan, ms);
     }
 
-    /* ---------------- dragging the view ---------------- */
+    /* ---------------- moving the view ----------------
+       with a mouse: no clicking needed. move toward the rim of the lens and the telescope
+       follows, as if your pointer were pushing its edge; the further past the rim, the faster.
+       on a touch screen: drag to look around. */
+    var EDGE = 0.72;              // the push starts this far out from the middle (1 = the rim)
+    var PUSH = 1100;              // px per second at full push
+    var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    var aimPt = null, pushT = 0, pushing = false;
+    function lensR() {
+        var lens = document.querySelector('.scope-lens');
+        var r = lens ? parseFloat(getComputedStyle(lens).getPropertyValue('--r')) : NaN;
+        return r > 0 ? r : Math.min(vh() * 0.45, vw() * 0.46);
+    }
+    document.addEventListener('pointermove', function (e) {
+        if (e.pointerType !== 'mouse') return;
+        aimPt = e.target.closest && e.target.closest('button, a, .signpost, .polaris, .peep-ui') ? null : { x: e.clientX, y: e.clientY };
+        if (state === 'looking' && aimPt && !pushing) { pushing = true; pushT = performance.now(); requestAnimationFrame(push); }
+    });
+    document.documentElement.addEventListener('mouseleave', function () { aimPt = null; });
+    window.addEventListener('blur', function () { aimPt = null; });
+    function push(now) {
+        if (state !== 'looking' || !aimPt) { pushing = false; document.body.classList.remove('peep-pushing'); return; }
+        var dt = Math.min(0.05, (now - pushT) / 1000);
+        pushT = now;
+        var cx = vw() / 2, cy = vh() * 0.48, R = lensR();
+        var dx = aimPt.x - cx, dy = aimPt.y - cy, dist = Math.hypot(dx, dy);
+        var k = Math.max(0, Math.min(1, (dist - R * EDGE) / (R * (1.25 - EDGE))));
+        k = k * k * (3 - 2 * k);                             // gentle at first, then firmer
+        document.body.classList.toggle('peep-pushing', k > 0.02);
+        if (k > 0 && now > holdUntil) {
+            var v = PUSH * k * dt;
+            var next = clampPan({ x: pan.x - dx / dist * v, y: pan.y - dy / dist * v });
+            if (Math.abs(next.x - pan.x) + Math.abs(next.y - pan.y) > 0.01) { pan = next; applyPan(Z, pan, 0); }
+        }
+        requestAnimationFrame(push);
+    }
+
     var drag = null, dragged = false;
     document.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'mouse' && fine.matches) return;            // the mouse steers by the rim instead
         if (state !== 'looking' || e.button !== 0 || e.target.closest('button, a, .signpost, .polaris')) return;
         drag = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
         dragged = false;
@@ -218,6 +260,8 @@
         placeSpots();
         note.textContent = hintText();
         requestAnimationFrame(function () { chosen.length ? aim(at, 1300) : applyPan(Z, pan = clampPan({ x: 0, y: 0 }), 1300); });
+        // don't start pushing until the zoom-in has settled and the pointer has moved
+        aimPt = null;
     }
     function lower() {
         if (state === 'off') return;

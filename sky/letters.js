@@ -157,20 +157,7 @@
     var bottleWrap = document.createElement('div');
     bottleWrap.className = 'bottle-wrap';
     bottleWrap.title = 'pull the cork';
-    bottleWrap.innerHTML =
-        '<svg class="bottle" viewBox="0 0 200 90">' +
-            '<g class="b-scroll">' +
-                '<rect x="36" y="37" width="100" height="16" rx="7" fill="#e9dbb8"/>' +
-                '<rect x="36" y="37" width="100" height="5" rx="2.5" fill="#f6ecd2" opacity=".7"/>' +
-                '<rect x="36" y="48" width="100" height="5" rx="2.5" fill="#b89d6c" opacity=".6"/>' +
-                '<rect x="82" y="36" width="7" height="18" fill="#9a3b1f"/>' +
-            '</g>' +
-            '<path d="M32 20 H118 C135 20 142 30 152 36 H168 V54 H152 C142 60 135 70 118 70 H32 C18 70 10 58 10 45 C10 32 18 20 32 20 Z" fill="rgba(96,158,146,.5)" stroke="rgba(215,240,232,.75)" stroke-width="1.6"/>' +
-            '<rect x="164" y="33" width="6" height="24" rx="2" fill="rgba(96,158,146,.75)" stroke="rgba(215,240,232,.75)" stroke-width="1.2"/>' +
-            '<path d="M28 28 H108" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="round"/>' +
-            '<path d="M22 60 Q16 50 20 38" stroke="rgba(255,255,255,.3)" stroke-width="2" fill="none" stroke-linecap="round"/>' +
-            '<g class="b-cork"><rect x="168" y="37" width="18" height="16" rx="3" fill="#9a6b3c"/><path d="M174 39 V51 M180 39 V51" stroke="#7a4f28" stroke-width="1.2"/></g>' +
-        '</svg>';
+    bottleWrap.innerHTML = Sky.bottleSVG('bottle');
     Sky.sea.el.insertBefore(bottleWrap, Sky.sea.front);
     Sky.sea.el.appendChild(hint);
 
