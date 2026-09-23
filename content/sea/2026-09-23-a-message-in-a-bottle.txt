@@ -1,0 +1,11 @@
+a message in a bottle
+
+this one's a plain .txt file. the first line is the title, and a blank line starts a new paragraph. *stars* make italics, **double stars** make bold, and [words in brackets](https://pleroma.nexus) make a link.
+
+every file you drop into content/sea/ becomes a letter. a new one arrives corked in a bottle; the older ones are already unrolled below.
+
+---
+
+delete this file (and the welcome one) whenever you're ready to write your own.
+
+~ more soon
