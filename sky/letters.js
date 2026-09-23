@@ -43,14 +43,35 @@
         '</defs></svg>';
     document.body.insertBefore(defs, document.body.firstChild);
 
+    /* ---------------- letters from the folder (content/sea/), plus any written into the page ---------------- */
+    var folder = section.dataset.folder;
+    if (folder) {
+        Sky.listFolder(folder, ['html', 'txt'], function (files) {
+            Promise.all(files.map(function (f) {
+                return fetch(f.url, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : null; })
+                    .catch(function () { return null; })
+                    .then(function (text) {
+                        if (text === null || /<html[\s>]/i.test(text)) return null;       // missing file, or a 404 page
+                        var a = document.createElement('article');
+                        a.className = 'letter';
+                        a.dataset.id = f.name;
+                        var d = Sky.fileDate(f.name);
+                        if (d) a.dataset.date = d; else a.setAttribute('data-nodate', '');
+                        a.innerHTML = /\.txt$/i.test(f.name) ? Sky.txtToHtml(text) : text;
+                        return a;
+                    });
+            })).then(function (arts) {
+                arts.forEach(function (a) { if (a) section.appendChild(a); });
+                begin();
+            });
+        });
+    } else begin();
+
+    function begin() {
     /* ---------------- build the letters ---------------- */
     var today = ymd(new Date());
     var letters = Array.prototype.slice.call(section.querySelectorAll('article.letter'));
     var bottled = null;
-
-    var alreadyOpened = false;
-    try { alreadyOpened = localStorage.getItem('uncorked') === today; } catch (e) {}
-    if (location.hash === '#bottle') alreadyOpened = false;   // add #bottle to the URL to see the bottle again
 
     // newest first; undated letters keep their place at the end
     letters.sort(function (a, b) { return (b.dataset.date || '').localeCompare(a.dataset.date || ''); });
@@ -93,22 +114,35 @@
         a.style.transform = 'rotate(' + a.dataset.rot + 'deg)';
     }
 
+    // which letters has this visitor already seen? a letter they haven't (a file you just
+    // added, dated or not) arrives in the bottle. only one bottle at a time: the newest.
+    var SEEN = 'letters-seen', seen = null;
+    try { seen = JSON.parse(localStorage.getItem(SEEN)); } catch (e) {}
+    var shown = [];
     letters.forEach(function (a) {
         var d = a.dataset.date || '';
         if (d && d > today) { a.style.display = 'none'; return; }    // not its day yet
+        if (!a.dataset.id) a.dataset.id = 'page:' + d + ':' + a.textContent.trim().slice(0, 30);
         buildLetter(a);
-        if (Sky.sea && d === today && !bottled && !alreadyOpened) bottled = a;
+        shown.push(a);
     });
+    var ids = shown.map(function (a) { return a.dataset.id; });
+    function markAllSeen() { try { localStorage.setItem(SEEN, JSON.stringify(ids)); } catch (e) {} }
+    if (Sky.sea && shown.length) {
+        if (location.hash === '#bottle' || !Array.isArray(seen)) bottled = shown[0];     // first visit (or #bottle): the newest
+        else for (var si = 0; si < shown.length; si++) if (seen.indexOf(ids[si]) === -1) { bottled = shown[si]; break; }
+    }
+    if (bottled && bottled !== shown[0]) section.insertBefore(bottled, shown[0]);      // the new one goes on top
     Sky.refresh();
 
-    if (!bottled) return;
+    if (!bottled) { markAllSeen(); return; }
 
     /* ---------------- today's bottle ---------------- */
     bottled.classList.add('corked');
 
     var hint = document.createElement('p');
     hint.className = 'bottle-hint';
-    hint.innerHTML = 'a bottle washed in today<small>pull its cork, or just click it</small>';
+    hint.innerHTML = 'a bottle washed in<small>pull its cork, or just click it</small>';
 
     // while it's corked, keep the older letters below the fold so the sea stays clear
     function reserveSea() {
@@ -186,7 +220,7 @@
     function uncork() {
         if (opening) return;
         opening = true;
-        try { localStorage.setItem('uncorked', today); } catch (e) {}
+        markAllSeen();
         var fx = corkDrag ? corkDrag.dx : 0, fy = corkDrag ? corkDrag.dy : 0;
         corkDrag = null;
 
@@ -253,4 +287,5 @@
             setTimeout(Sky.refresh, 1050);
         };
     }
+    }   // begin()
 })();
