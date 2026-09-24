@@ -301,7 +301,7 @@
     }
     $('.fetch').addEventListener('click', check);
     $('.publish').addEventListener('click', function () {
-        api('/__letters/publish', {}).then(function (r) { alert(r.error || 'the publish window is open: type a few words about what changed, then press Enter.'); });
+        api('/__letters/publish', {}).then(function (r) { alert(r.error || 'publishing! a small window shows it going up, and closes by itself when it’s done. the live site updates a minute or two later.'); });
     });
     // look for post as it opens, if FormSubmit allows (it only lets you check a few times a day): at most every 8 hours
     api('/__post/state').then(function (st) {

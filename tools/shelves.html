@@ -223,7 +223,7 @@
         });
     });
     $('.publish').addEventListener('click', function () {
-        api('/__letters/publish', {}).then(function (r) { alert(r.error || 'the publish window is open: type a few words about what changed, then press Enter.'); });
+        api('/__letters/publish', {}).then(function (r) { alert(r.error || 'publishing! a small window shows it going up, and closes by itself when it’s done. the live site updates a minute or two later.'); });
     });
     loadAll();
 })();

@@ -6,6 +6,8 @@ rem    1. fetches anything new from Forgejo (songs you uploaded there too)
 rem    2. rewrites every list.txt, so new files appear and deleted ones go
 rem    3. asks what you changed, commits, and pushes
 rem  preview first with preview.bat if you like.
+rem  (the content manager runs it with a message, e.g. publish.bat "content push":
+rem   then it doesn't ask, and closes itself when it's done)
 rem =====================================================================
 cd /d "%~dp0.."
 set "GITSH="
@@ -35,12 +37,22 @@ echo  2. updating the file lists...
 echo.
 git status --short
 echo.
-set "MSG="
-set /p "MSG=  3. what did you change? (a few words, then Enter): "
+set "MSG=%~1"
+if not defined MSG set /p "MSG=  3. what did you change? (a few words, then Enter): "
 if not defined MSG set "MSG=update"
 git add -A
 git commit -m "%MSG%" --no-verify
 git push
+if errorlevel 1 (
+    echo.
+    echo  The push didn't go through. Copy what it says above and ask for help.
+    pause
+    goto :eof
+)
 echo.
 echo  Done. The live site updates in a minute or two.
+if not "%~1"=="" (
+    timeout /t 6
+    goto :eof
+)
 pause
