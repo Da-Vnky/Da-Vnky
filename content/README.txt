@@ -148,17 +148,8 @@ the crate counts only the ones new to them.
   • THE BOARD AND THE PILE (only you decide)
       What's pinned and what's on the pile is kept in one small file,
       content/living/bottles/board.json, the same for every visitor.
-      To change it, open  https://dav-nky.pleroma.nexus/living.html?owner
-      (owner mode, remembered by that browser). Now when you read a bottle you
-      can pin it to the board, put it on the pile, or put it back; on the
-      board you can unpin (onto the pile), and in the pile you can pin or put
-      back. A bar in the corner counts your changes; only you see them until
-      you press "publish": download board.json, put it in the bottles folder
-      and push. (Or, if Mel's Forgejo allows it, publish straight from the
-      page with a Forgejo access token.) Works in your local preview too.
-      ?owner=off (or "leave owner mode") turns it off in that browser.
-      Anyone could type ?owner, but it only lets them download a file:
-      nothing changes for anyone else without a push to your repo.
+      Change it in the letters manager: tools\letters.bat, "the post office",
+      then pin / pile / crate on any bottle, and publish.
 
 
 PREVIEW BEFORE YOU PUSH

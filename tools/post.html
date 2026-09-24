@@ -94,7 +94,10 @@
     function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
     function api(path, body) {
         var opt = body === undefined ? {} : { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } };
-        return fetch(path, opt).then(function (r) { return r.json(); }, function () { return { error: 'the manager isn’t running. open it with tools\\letters.bat' }; });
+        var OLD = { error: 'the letters manager window that’s open is an older version. close its black window, then double-click tools\\letters.bat again' };
+        return fetch(path, opt).then(function (r) {
+            return r.json().then(function (j) { return j && j.error === 'unknown' ? OLD : j; }, function () { return OLD; });
+        }, function () { return { error: 'the manager isn’t running. open it with tools\\letters.bat' }; });
     }
     function nice(d) {
         if (!d) return '';
@@ -196,7 +199,7 @@
         shelf(bottles, 'bottles', st.bottles);
         shelf(art, 'art', st.art);
     }
-    function refresh() { return api('/__post/state').then(function (st) { if (st.error) { say(st.error, true); return; } draw(st); }); }
+    function refresh() { return api('/__post/state').then(function (st) { if (st.error) { say(st.error, true); $('.fetch').hidden = true; return; } draw(st); }); }
 
     $('.save-key').addEventListener('click', function () {
         api('/__post/key', { key: $('.key').value }).then(function (r) {

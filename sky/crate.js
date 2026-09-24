@@ -6,12 +6,12 @@
    that you haven't read yet. Anyone can take one out, pull the cork and read
    it; visitors then put it back.
 
-   YOU decide what happens next. Open the living space with ?owner on the end
-   (…/living.html?owner) and you're in OWNER MODE: after reading a bottle you
-   can pin it to the board, put it on the pile, or put it back. Unpin from the
-   board onto the pile, pin from the pile, and so on. Then press "publish":
-   that writes content/living/bottles/board.json, which is what every visitor
-   sees. (…/living.html?owner=off leaves owner mode on that browser.)
+   YOU decide what happens next, in the letters manager (tools\letters.bat,
+   "the post office"): pin a bottle to the board, put it on the pile, or leave
+   it in the crate. That writes content/living/bottles/board.json, which is
+   what every visitor sees once you publish.
+   (There's also an OWNER MODE on the page itself, ?owner on the address, for
+   doing the same in the browser; it's switched off: see OWNER_MODE below.)
 
    board.json can also be written by hand:
        { "pinned": ["2026-09-23-a-bottle.jpg"], "pile": ["2026-09-20-another.txt"] }
@@ -41,10 +41,13 @@
     function get(store, k) { try { return JSON.parse(store.getItem(k)); } catch (e) { return null; } }
     function put(store, k, v) { try { if (v === null) store.removeItem(k); else store.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
-    // owner mode: ?owner turns it on in this browser, ?owner=off turns it off
+    // owner mode: pinning from the page itself (?owner turns it on in a browser, ?owner=off off).
+    // switched off: pins are set in the letters manager instead. true brings it back.
+    var OWNER_MODE = false;
     var q = /[?&]owner(?:=(\w+))?/.exec(location.search);
-    if (q) put(localStorage, OWNER, q[1] === 'off' ? null : true);
-    var owner = get(localStorage, OWNER) === true;
+    if (q && OWNER_MODE) put(localStorage, OWNER, q[1] === 'off' ? null : true);
+    if (!OWNER_MODE) put(localStorage, OWNER, null);
+    var owner = OWNER_MODE && get(localStorage, OWNER) === true;
     if (owner) document.body.classList.add('owner-mode');
 
     Sky.css(
