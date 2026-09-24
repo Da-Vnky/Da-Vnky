@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260924g">
+    <link rel="stylesheet" href="sky/sky.css?v=20260924h">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -28,7 +28,8 @@
         .lantern .glow { opacity: calc(.25 + .75 * var(--dusk)); }
         .easel   { left: 13%; bottom: 1vh; height: 56vh; aspect-ratio: 62 / 100; z-index: 3; filter: drop-shadow(0 6px 8px rgba(0,0,0,.4)); }
         .easel > .art { position: absolute; inset: 0; width: 100%; height: 100%; }
-        .portfolio { left: 70%; bottom: 0; height: 21vh; aspect-ratio: 125 / 100; z-index: 3; }
+        .portfolio { left: 76%; bottom: 0; height: 21vh; aspect-ratio: 125 / 100; z-index: 3; }
+        .paint-easel { left: 55%; bottom: 1vh; height: 42vh; aspect-ratio: 62 / 100; z-index: 3; filter: drop-shadow(0 6px 8px rgba(0,0,0,.4)); }
 
         .pinned {
             left: 8%;
@@ -67,9 +68,10 @@
             .bench { height: 24vh; }
             .groove.manikin { left: 42%; bottom: calc(24vh * .818 - 2px); height: 9vh; }
             .groove.metronome { display: none; }
-            .room .character { left: 64% !important; height: 20vh !important; }
+            .room .character { left: 73% !important; height: 18vh !important; }
             .easel { left: 8%; height: 38vh; }
             .portfolio { left: auto; right: 4%; height: 11vh; }
+            .paint-easel { left: 41%; height: 27vh; z-index: 4; }
         }
     </style>
 </head>
@@ -160,6 +162,32 @@
             </svg>
         </div>
 
+        <!-- the easel visitors paint on: click it and the painting desk opens (sky/paint.js).
+             your own easel: assets/workshop/paint-easel (the same shape as the drawn one) -->
+        <div class="furnish paint-easel" data-paint data-asset="assets/workshop/paint-easel">
+            <svg class="placeholder" viewBox="0 0 62 100" preserveAspectRatio="none" aria-hidden="true">
+                <g fill="#3b2618">
+                    <path d="M29.5 0 H32.5 V98 H29.5 Z" opacity=".75"/>
+                    <path d="M29 2 L32 2 L9 100 L5 100 Z"/>
+                    <path d="M30 2 L33 2 L57 100 L53 100 Z"/>
+                    <rect x="7" y="56" width="48" height="4" rx="1"/>
+                    <rect x="27" y="3" width="8" height="4" rx="1"/>
+                </g>
+                <rect x="10.5" y="7" width="41" height="49" fill="#f6ecd4"/>
+                <rect x="10.5" y="7" width="41" height="49" fill="none" stroke="rgba(110,82,54,.35)" stroke-width=".5"/>
+                <rect x="14" y="11" width="34" height="41" fill="none" stroke="rgba(110,82,54,.35)" stroke-width=".4" stroke-dasharray="1.4 1.4"/>
+                <text x="31" y="33" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-style="italic" font-size="6.2" fill="#6e5236">paint here</text>
+                <path d="M22 37 q9 -3 18 0" fill="none" stroke="#9a3b1f" stroke-width=".7" stroke-linecap="round" opacity=".7"/>
+                <g transform="rotate(-14 30 54)">
+                    <rect x="17" y="53.2" width="17" height="1.6" rx=".8" fill="#8a5a34"/>
+                    <rect x="33.5" y="53.1" width="3" height="1.8" fill="#c49a52"/>
+                    <path d="M36.5 53 Q40 54 36.5 55.2 Z" fill="#9a3b1f"/>
+                </g>
+                <circle cx="46" cy="54.4" r="2.2" fill="#6fa3c7"/><circle cx="50.5" cy="54.6" r="1.9" fill="#e8b33c"/>
+            </svg>
+            <span class="pe-hint">paint here</span>
+        </div>
+
         <!-- the visitors' portfolio: art people leave with "leave some art" and you keep
              (save it into content/workshop/visitors/). your own: assets/workshop/portfolio -->
         <div class="furnish portfolio" data-visitors="content/workshop/visitors/" data-asset="assets/workshop/portfolio">
@@ -192,13 +220,14 @@
              style="left: 36%; bottom: 3vh; height: 27vh;"></div>
     </div>
 
-    <script src="sky/sky.js?v=20260924g"></script>
-    <script src="sky/ground-countryside.js?v=20260924g"></script>
-    <script src="sky/gallery.js?v=20260924g"></script>
-    <script src="sky/studio.js?v=20260924g"></script>
-    <script src="sky/panel.js?v=20260924g"></script>
-    <script src="sky/music.js?v=20260924g"></script>
-    <script src="sky/weather.js?v=20260924g"></script>
-    <script src="sky/noise.js?v=20260924g"></script>
+    <script src="sky/sky.js?v=20260924h"></script>
+    <script src="sky/ground-countryside.js?v=20260924h"></script>
+    <script src="sky/gallery.js?v=20260924h"></script>
+    <script src="sky/paint.js?v=20260924h"></script>
+    <script src="sky/studio.js?v=20260924h"></script>
+    <script src="sky/panel.js?v=20260924h"></script>
+    <script src="sky/music.js?v=20260924h"></script>
+    <script src="sky/weather.js?v=20260924h"></script>
+    <script src="sky/noise.js?v=20260924h"></script>
 </body>
 </html>

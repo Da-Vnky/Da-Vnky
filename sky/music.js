@@ -234,6 +234,32 @@
     });
     window.addEventListener('pagehide', save);
 
+    // going to another page: the music fades out as you leave and back in on the next page,
+    // so the moment the browser swaps pages reads as a soft breath rather than a cut
+    function fade(to, ms, done) {
+        var from = audio.volume, t0 = performance.now();
+        (function step(now) {
+            var k = Math.min(1, (now - t0) / ms);
+            audio.volume = Math.max(0, Math.min(1, from + (to - from) * k));
+            if (k < 1) requestAnimationFrame(step); else if (done) done();
+        })(t0);
+    }
+    function wanted() { try { var v = localStorage.getItem('records-volume'); return v === null ? 1 : Math.max(0, Math.min(1, +v / 100)); } catch (e) { return 1; } }
+    if (Sky.onLeave) Sky.onLeave(function (done) {
+        if (!playing()) return false;
+        save();
+        fade(0, 450, done);
+        return true;
+    });
+    window.addEventListener('pageshow', function (e) { if (e.persisted) audio.volume = wanted(); });   // back with the browser's back button
+    var fadeIn = false;
+    audio.addEventListener('playing', function () {
+        if (!fadeIn) return;
+        fadeIn = false;
+        audio.volume = 0;
+        fade(wanted(), 900);
+    });
+
     // the phone's lock screen / the computer's media keys
     function media(t) {
         if (!('mediaSession' in navigator) || !t) return;
@@ -253,6 +279,7 @@
     if (saved && saved.tracks && saved.tracks.length && saved.at >= 0) {
         tracks = saved.tracks;
         var gone = saved.playing ? (Date.now() - saved.savedAt) / 1000 : 0;
+        if (saved.playing) fadeIn = true;                          // coming from another page: ease back in
         load(saved.at, !!saved.playing, (saved.time || 0) + (gone < 30 ? gone : 0));
         // a cover picture that lived inside the file: read it again
         var t0 = current();

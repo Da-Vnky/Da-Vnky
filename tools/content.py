@@ -774,7 +774,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if url.path == '/__letters/publish':
                 bat = os.path.join(HERE, 'publish.bat')
                 if os.name == 'nt' and os.path.exists(bat):
-                    subprocess.Popen(['cmd', '/c', bat, 'content push'], cwd=ROOT, creationflags=getattr(subprocess, 'CREATE_NEW_CONSOLE', 0))
+                    subprocess.Popen(['cmd', '/c', bat, 'content push'], cwd=ROOT, env=dict(os.environ, PUBLISH_MSG='content push'),
+                                     creationflags=getattr(subprocess, 'CREATE_NEW_CONSOLE', 0))
                     return self.reply({'ok': True})
                 return self.reply({'error': 'run tools/publish.bat (or git add, commit and push) to publish'}, 400)
         except Exception as e:

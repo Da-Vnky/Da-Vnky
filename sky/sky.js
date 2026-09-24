@@ -94,10 +94,11 @@
     //   cursor           everywhere                     cursor-pointer   over things you can click
     //   cursor-star      over the constellations        cursor-grab      over things you can pick up
     //   cursor-grabbing  while holding something        cursor-look      over things to look into
+    //   cursor-brush     over the easel you paint on (its tip is the hotspot, bottom left)
     // set CURSORS = null to keep the computer's usual cursors.
     var CURSORS = {
         'cursor': [3, 2], 'cursor-pointer': [4, 3], 'cursor-star': [16, 16],
-        'cursor-grab': [16, 14], 'cursor-grabbing': [16, 14], 'cursor-look': [12, 12]
+        'cursor-grab': [16, 14], 'cursor-grabbing': [16, 14], 'cursor-look': [12, 12], 'cursor-brush': [3, 29]
     };
 
     // things that cross the sky while you're looking at it (the sky view):
@@ -418,10 +419,15 @@
     function leave(href) {
         if (leaving) return;
         leaving = true;
-        var waiting = false, gone = false;
+        var waiting = 0, gone = false;
         function go() { if (gone) return; gone = true; location.href = href; }
-        leaveHooks.forEach(function (fn) { if (fn(go)) waiting = true; });
-        if (waiting) { body.classList.add('leaving'); setTimeout(go, 2600); } else go();
+        // each send-off gets its own "done"; the page changes once they're all done (or after 2.6 s at most)
+        leaveHooks.forEach(function (fn) {
+            var called = false;
+            if (fn(function () { if (called) return; called = true; if (--waiting <= 0) go(); })) waiting++;
+            else called = true;
+        });
+        if (waiting > 0) { body.classList.add('leaving'); setTimeout(go, 2600); } else go();
     }
     function onPlaceClick(e) {
         var a = e.target.closest('a[data-place]');
@@ -1110,7 +1116,11 @@
             '<circle cx="12" cy="12" r="8.5" fill="rgba(220,235,245,.45)" stroke="#c49a52" stroke-width="3"/><circle cx="12" cy="12" r="8.5" fill="none" stroke="#2a1d14" stroke-width="1" opacity=".6"/>' +
             '<path d="M8 9 a5 5 0 0 1 4 -3" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/>'
     };
-    var CURSOR_FALLBACK = { 'cursor': 'auto', 'cursor-pointer': 'pointer', 'cursor-star': 'pointer', 'cursor-grab': 'grab', 'cursor-grabbing': 'grabbing', 'cursor-look': 'zoom-in' };
+    CURSOR_ART['cursor-brush'] =
+        '<path d="M27 2.5 L29.5 5 L15.5 19 L13 16.5 Z" fill="#8a5a34" stroke="#2a1d14" stroke-width="1.2" stroke-linejoin="round"/>' +
+        '<path d="M13 16.5 L15.5 19 L13.5 21 L11 18.5 Z" fill="#c49a52" stroke="#2a1d14" stroke-width="1.1" stroke-linejoin="round"/>' +
+        '<path d="M11 18.5 L13.5 21 C11.5 25.5 7.5 28.5 3 29 C3.5 24.5 6.5 20.5 11 18.5 Z" fill="#9a3b1f" stroke="#2a1d14" stroke-width="1.1" stroke-linejoin="round"/>';
+    var CURSOR_FALLBACK = { 'cursor-brush': 'crosshair', 'cursor': 'auto', 'cursor-pointer': 'pointer', 'cursor-star': 'pointer', 'cursor-grab': 'grab', 'cursor-grabbing': 'grabbing', 'cursor-look': 'zoom-in' };
     function setupCursors() {
         if (!CURSORS) return;
         Object.keys(CURSORS).forEach(function (name) {
@@ -1131,7 +1141,8 @@
             '.sea-char.held, .sea-char.held *, .ship.held .hull, .ship.held .hull *, body.peep-dragging, body.peep-dragging * { cursor: var(--cursor-grabbing) !important; }' +
             '.pinboard, .room .window, body.peep-view, body.peep-view .ground, body.peep-view .ground * { cursor: var(--cursor-look) !important; }' +
             'body.peep-view .peep-spot { cursor: var(--cursor-pointer) !important; }' +
-            '.note-draw { cursor: crosshair !important; }';
+            '.note-draw { cursor: crosshair !important; }' +
+            '.paint-easel, .paint-easel * { cursor: var(--cursor-brush) !important; }';
         document.head.appendChild(st);
     }
 

@@ -22,9 +22,7 @@
     var WAIT = 10 * 60 * 1000;                 // one piece per visitor every ten minutes
     var LIMIT = 1024 * 1024 - 1;               // uploads (and paintings) under 1 MB
     var W = 800, H = 1000;                     // the painting's size in pixels (4:5)
-    var PAPER = '#f6ecd4';                     // the paper's colour (the eraser paints this)
-    var COLOURS = ['#2a1d14', '#6e5236', '#9a3b1f', '#d8744a', '#e8b33c', '#6f8f4e', '#36526a', '#6fa3c7', '#8a5a8c', '#ffffff'];
-    var SIZES = [['fine', 4], ['medium', 12], ['broad', 30]];
+    var PAPER = '#f6ecd4';                     // the paper's colour
     /* ===================================================================== */
 
     var FOLDER = folio.dataset.visitors.replace(/\/?$/, '/');
@@ -44,6 +42,14 @@
             'font-style: italic; font-size: .95rem; color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.7); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
         '.portfolio:hover .pf-hint, .portfolio:focus-visible .pf-hint { opacity: 1; }' +
 
+        /* the easel you paint on */
+        '.paint-easel { transition: transform .25s, filter .25s; }' +
+        '.paint-easel:hover { transform: translateY(-3px); filter: drop-shadow(0 8px 10px rgba(0,0,0,.45)) brightness(1.06); }' +
+        '.paint-easel .placeholder, .paint-easel > .art { position: absolute; inset: 0; width: 100%; height: 100%; }' +
+        '.paint-easel .pe-hint { position: absolute; left: 50%; top: -1.5em; transform: translateX(-50%); white-space: nowrap; font-style: italic; font-size: .95rem;' +
+            'color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.6); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
+        '.paint-easel:hover .pe-hint, .paint-easel:focus-visible .pe-hint { opacity: 1; }' +
+        'body.art-open .paint-easel, body.gallery-open .paint-easel { pointer-events: none; }' +
         /* the button */
         '.art-btn { left: 18px; bottom: 18px; }' +
         'body.art-open .art-btn, body.sky-view .art-btn, body.gallery-open .art-btn, body.visitors-open .art-btn { opacity: 0; visibility: hidden; pointer-events: none; }' +
@@ -199,16 +205,25 @@
     zoom.addEventListener('click', function () { zoom.classList.remove('open'); });
     vv.addEventListener('click', function (e) { if (e.target === vv || e.target.classList.contains('vv-inner')) closeFolio(); });
 
-    /* ---------------- the button ---------------- */
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'ui-button art-btn';
-    btn.innerHTML = '<span class="ui-icon" data-asset="assets/ui/leave-art"><svg class="placeholder" viewBox="0 0 32 32" aria-hidden="true">' +
-        '<path d="M16 4 C8 4 3 9.5 3 16 C3 23 8.5 28 14 28 C16.5 28 17 26.5 16.5 25 C16 23.2 17 22 19 22 H22 C26 22 29 19.5 29 15 C29 9 23.5 4 16 4 Z" fill="#eadcb9" stroke="#6e5236" stroke-width="1"/>' +
-        '<circle cx="9.5" cy="15" r="2.4" fill="#9a3b1f"/><circle cx="12.5" cy="9.5" r="2.4" fill="#e8b33c"/><circle cx="19" cy="8.5" r="2.4" fill="#6f8f4e"/><circle cx="24" cy="13" r="2.4" fill="#36526a"/></svg></span><span>leave some art</span>';
-    document.body.appendChild(btn);
+    /* ---------------- the easel you paint on (or, on a page without one, a button) ---------------- */
+    var easel = document.querySelector('[data-paint]'), btn;
+    if (easel) {
+        btn = easel;
+        easel.setAttribute('role', 'button');
+        easel.setAttribute('tabindex', '0');
+        easel.setAttribute('aria-label', 'paint here: leave some art for the workshop');
+        easel.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    } else {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ui-button art-btn';
+        btn.innerHTML = '<span class="ui-icon" data-asset="assets/ui/leave-art"><svg class="placeholder" viewBox="0 0 32 32" aria-hidden="true">' +
+            '<path d="M16 4 C8 4 3 9.5 3 16 C3 23 8.5 28 14 28 C16.5 28 17 26.5 16.5 25 C16 23.2 17 22 19 22 H22 C26 22 29 19.5 29 15 C29 9 23.5 4 16 4 Z" fill="#eadcb9" stroke="#6e5236" stroke-width="1"/>' +
+            '<circle cx="9.5" cy="15" r="2.4" fill="#9a3b1f"/><circle cx="12.5" cy="9.5" r="2.4" fill="#e8b33c"/><circle cx="19" cy="8.5" r="2.4" fill="#6f8f4e"/><circle cx="24" cy="13" r="2.4" fill="#36526a"/></svg></span><span>leave some art</span>';
+        document.body.appendChild(btn);
+    }
 
-    /* ---------------- the painting desk ---------------- */
+    /* ---------------- the painting desk: the painting app (sky/paint.js), or a picture of your own ---------------- */
     var st = document.createElement('div');
     st.className = 'studio';
     st.setAttribute('role', 'dialog');
@@ -220,18 +235,8 @@
                 '<button type="button" class="m-paint" aria-pressed="true">✐ paint</button>' +
                 '<label class="m-upload">▣ upload a picture<input type="file" accept="image/png,image/jpeg,image/gif,image/webp" hidden></label>' +
             '</div>' +
-            '<div class="st-bar paint-only">' +
-                COLOURS.map(function (c, i) { return '<button type="button" class="sw" data-c="' + i + '" style="background:' + c + '" aria-label="colour ' + c + '" title="' + c + '"></button>'; }).join('') +
-                '<label class="st-own" title="any colour"><input type="color" value="#4a7a9a" aria-label="pick any colour"></label>' +
-                '<span class="sep"></span>' +
-                SIZES.map(function (z, i) { return '<button type="button" data-z="' + i + '" title="' + z[0] + '" aria-label="' + z[0] + '"><span class="dot" style="width:' + (4 + i * 5) + 'px;height:' + (4 + i * 5) + 'px"></span></button>'; }).join('') +
-                '<span class="sep"></span>' +
-                '<button type="button" data-t="brush">brush</button><button type="button" data-t="eraser">eraser</button><button type="button" data-t="fill">fill</button>' +
-                '<span class="sep"></span>' +
-                '<button type="button" class="t-undo">undo</button><button type="button" class="t-clear">clear</button>' +
-            '</div>' +
-            '<div class="st-sheet"><canvas width="' + W + '" height="' + H + '"></canvas>' +
-                '<div class="st-drop"><span>click to choose a picture, or drop one here<br><small>png, jpg, gif or webp, under 1 MB</small></span><img alt="your picture"></div></div>' +
+            '<div class="st-paint"></div>' +
+            '<div class="st-sheet st-upload"><div class="st-drop"><span>click to choose a picture, or drop one here<br><small>png, jpg, gif or webp, under 1 MB</small></span><img alt="your picture"></div></div>' +
             '<div class="st-fields"><input type="text" class="f-title" maxlength="50" placeholder="its title (optional)">' +
                 '<input type="text" class="f-name" maxlength="40" placeholder="your name (optional)">' +
                 '<input class="st-hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true"></div>' +
@@ -239,106 +244,31 @@
             '<div class="st-actions"><button type="button" class="no">never mind</button><button type="button" class="go">send it to the workshop</button></div>' +
         '</div>';
     document.body.appendChild(st);
+    Sky.css(
+        '.studio .st-paint { display: block; }' +
+        '.studio.uploading .st-paint, .studio:not(.uploading) .st-upload { display: none; }' +
+        '.studio .st-upload .st-drop { display: grid; }' +
+        '.studio .st-desk { max-width: 100%; }'
+    );
 
-    var sheet = st.querySelector('.st-sheet'), cv = sheet.querySelector('canvas'), g = cv.getContext('2d', { willReadFrequently: true });
+    var sheet = st.querySelector('.st-upload');
     var drop = st.querySelector('.st-drop'), dropImg = drop.querySelector('img'), fileIn = st.querySelector('.m-upload input');
     var msg = st.querySelector('.st-msg'), goBtn = st.querySelector('.go'), titleIn = st.querySelector('.f-title'), nameIn = st.querySelector('.f-name');
-    var honey = st.querySelector('.st-hp'), ownIn = st.querySelector('.st-own input');
-
-    var colour = COLOURS[0], size = 1, tool = 'brush', painted = false, upload = null, undoStack = [];
+    var honey = st.querySelector('.st-hp');
+    var upload = null;
 
     function say(t) { msg.textContent = t || ''; }
-    function press(sel, test) { st.querySelectorAll(sel).forEach(function (b) { b.setAttribute('aria-pressed', String(test(b))); }); }
-    function setColour(c) { colour = c; press('[data-c]', function (b) { return COLOURS[+b.dataset.c] === c; }); if (tool === 'eraser') setTool('brush'); }
-    function setSize(i) { size = i; press('[data-z]', function (b) { return +b.dataset.z === i; }); }
-    function setTool(t) { tool = t; press('[data-t]', function (b) { return b.dataset.t === t; }); cv.style.cursor = t === 'fill' ? 'cell' : 'crosshair'; }
+    function refresh() { goBtn.disabled = st.classList.contains('uploading') ? !upload : painter.isEmpty(); }
+    var painter = Sky.paint(st.querySelector('.st-paint'), { width: W, height: H, paper: PAPER, onChange: function () { if (painter) refresh(); }, say: say });
     function setMode(up) {
         st.classList.toggle('uploading', up);
         st.querySelector('.m-paint').setAttribute('aria-pressed', String(!up));
         st.querySelector('.m-upload').setAttribute('aria-pressed', String(up));
+        painter.active = !up && document.body.classList.contains('art-open');
         say('');
         refresh();
+        if (!up) requestAnimationFrame(painter.fit);
     }
-    function refresh() { goBtn.disabled = st.classList.contains('uploading') ? !upload : !painted; }
-    function blank() { g.globalCompositeOperation = 'source-over'; g.fillStyle = PAPER; g.fillRect(0, 0, W, H); }
-    blank();
-    setColour(COLOURS[0]); setSize(1); setTool('brush');
-
-    /* ---------------- painting ---------------- */
-    function remember() {
-        undoStack.push(g.getImageData(0, 0, W, H));
-        if (undoStack.length > 25) undoStack.shift();
-    }
-    function at(e) {
-        var r = cv.getBoundingClientRect();
-        return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height];
-    }
-    var last = null, mid = null;
-    cv.addEventListener('pointerdown', function (e) {
-        if (e.button !== 0) return;
-        e.preventDefault();
-        var p = at(e);
-        remember();
-        if (tool === 'fill') { flood(Math.floor(p[0]), Math.floor(p[1]), colour); painted = true; refresh(); sfx('brush'); return; }
-        cv.setPointerCapture(e.pointerId);
-        g.strokeStyle = g.fillStyle = tool === 'eraser' ? PAPER : colour;
-        g.lineWidth = SIZES[size][1] * (tool === 'eraser' ? 1.6 : 1);
-        g.lineCap = g.lineJoin = 'round';
-        g.beginPath(); g.arc(p[0], p[1], g.lineWidth / 2, 0, 7); g.fill();
-        last = mid = p;
-        painted = true; refresh();
-        if (tool === 'brush') sfx('brush');
-    });
-    cv.addEventListener('pointermove', function (e) {
-        if (!last) return;
-        (e.getCoalescedEvents ? e.getCoalescedEvents() : [e]).forEach(function (ev) {
-            var p = at(ev), m = [(last[0] + p[0]) / 2, (last[1] + p[1]) / 2];
-            g.beginPath(); g.moveTo(mid[0], mid[1]); g.quadraticCurveTo(last[0], last[1], m[0], m[1]); g.stroke();
-            last = p; mid = m;
-        });
-    });
-    function endStroke() {
-        if (last) { g.beginPath(); g.moveTo(mid[0], mid[1]); g.lineTo(last[0], last[1]); g.stroke(); }
-        last = mid = null;
-    }
-    cv.addEventListener('pointerup', endStroke);
-    cv.addEventListener('pointercancel', endStroke);
-
-    // the paint bucket: fills the patch of (nearly) the same colour under the click
-    function flood(x, y, hexc) {
-        if (x < 0 || y < 0 || x >= W || y >= H) return;
-        var img = g.getImageData(0, 0, W, H), d = img.data, i0 = (y * W + x) * 4;
-        var tr = d[i0], tg = d[i0 + 1], tb = d[i0 + 2];
-        var c = [parseInt(hexc.slice(1, 3), 16), parseInt(hexc.slice(3, 5), 16), parseInt(hexc.slice(5, 7), 16)];
-        if (Math.abs(tr - c[0]) + Math.abs(tg - c[1]) + Math.abs(tb - c[2]) < 6) return;
-        var TOL = 70, seen = new Uint8Array(W * H), stack = [x, y];
-        function same(k) { var j = k * 4; return !seen[k] && Math.abs(d[j] - tr) + Math.abs(d[j + 1] - tg) + Math.abs(d[j + 2] - tb) <= TOL; }
-        while (stack.length) {
-            var py = stack.pop(), px = stack.pop(), k = py * W + px;
-            while (px > 0 && same(k - 1)) { px--; k--; }
-            var up = false, dn = false;
-            for (; px < W && same(k); px++, k++) {
-                seen[k] = 1;
-                var j = k * 4;
-                d[j] = c[0]; d[j + 1] = c[1]; d[j + 2] = c[2]; d[j + 3] = 255;
-                if (py > 0) { if (same(k - W)) { if (!up) { stack.push(px, py - 1); up = true; } } else up = false; }
-                if (py < H - 1) { if (same(k + W)) { if (!dn) { stack.push(px, py + 1); dn = true; } } else dn = false; }
-            }
-        }
-        g.putImageData(img, 0, 0);
-    }
-
-    st.querySelectorAll('[data-c]').forEach(function (b) { b.addEventListener('click', function () { setColour(COLOURS[+b.dataset.c]); }); });
-    ownIn.addEventListener('input', function () { setColour(ownIn.value); });
-    st.querySelectorAll('[data-z]').forEach(function (b) { b.addEventListener('click', function () { setSize(+b.dataset.z); }); });
-    st.querySelectorAll('[data-t]').forEach(function (b) { b.addEventListener('click', function () { setTool(b.dataset.t); }); });
-    st.querySelector('.t-undo').addEventListener('click', function () {
-        if (!undoStack.length) return;
-        g.putImageData(undoStack.pop(), 0, 0);
-        if (!undoStack.length) painted = false;
-        refresh();
-    });
-    st.querySelector('.t-clear').addEventListener('click', function () { if (painted) remember(); blank(); painted = false; refresh(); });
     st.querySelector('.m-paint').addEventListener('click', function () { setMode(false); });
 
     /* ---------------- or a picture of their own ---------------- */
@@ -388,18 +318,22 @@
     }
     function close() {
         document.body.classList.remove('art-open');
+        painter.active = false;
         btn.focus({ preventScroll: true });
     }
     function reset() {
-        blank(); painted = false; undoStack = []; upload = null;
+        painter.reset(); upload = null;
         if (dropImg.src) URL.revokeObjectURL(dropImg.src);
         dropImg.removeAttribute('src'); drop.classList.remove('has-pic');
         titleIn.value = ''; nameIn.value = '';
         say(''); refresh();
     }
     btn.addEventListener('click', open);
-    st.querySelector('.no').addEventListener('click', close);
-    st.addEventListener('pointerdown', function (e) { if (e.target === st) close(); });
+    st.querySelector('.no').addEventListener('click', function () {
+        if (!painter.isEmpty() && !st.classList.contains('uploading') && !confirm('put the painting away? (it’ll still be here if you come back before leaving the page)')) return;
+        close();
+    });
+    st.addEventListener('pointerdown', function (e) { if (e.target === st && painter.isEmpty()) close(); });
     document.addEventListener('keydown', function (e) {
         if (e.key !== 'Escape') return;
         if (document.body.classList.contains('art-open')) { e.stopImmediatePropagation(); close(); }
@@ -410,13 +344,7 @@
     function slug(t) {
         return (t || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
     }
-    function painting() {                                             // the painting as a png (or a jpg, if a png won't fit)
-        function blob(type, q) { return new Promise(function (res) { cv.toBlob(res, type, q); }); }
-        return blob('image/png').then(function (b) {
-            if (b && b.size <= LIMIT) return b;
-            return blob('image/jpeg', 0.92).then(function (j) { return j && j.size <= LIMIT ? j : blob('image/jpeg', 0.8); });
-        });
-    }
+    function painting() { return painter.toBlob(LIMIT); }            // the painting, flattened: a png (or a jpg, if a png won't fit)
     function send(blob, filename) {                                     // to your post office (Supabase), or by FormSubmit (see sky/sky.js)
         return Sky.sendPost({ kind: 'art', from: nameIn.value.trim(), title: titleIn.value.trim(), file: blob, filename: filename });
     }
@@ -432,12 +360,13 @@
             var name = new Date().toISOString().slice(0, 10) + '-' + (slug(titleIn.value) || 'untitled') + (slug(nameIn.value) ? '-by-' + slug(nameIn.value) : '') + ext;
             var delivered = send(blob, name);
             delivered.then(function (how) { if (how === 'sent') try { localStorage.setItem('art-sent', String(Date.now())); } catch (e) {} });
-            tuckAway(up ? dropImg.src : cv.toDataURL('image/png'), delivered);
+            tuckAway(up ? dropImg.src : painter.toDataURL(), delivered, up ? sheet : st.querySelector('.pt-stage'));
         });
     });
 
     // the sheet slides into the portfolio by the bench
-    function tuckAway(src, delivered) {
+    function tuckAway(src, delivered, sheet) {
+        painter.active = false;
         st.classList.add('sending');
         var r = sheet.getBoundingClientRect(), f = folio.getBoundingClientRect();
         var fly = document.createElement('img');

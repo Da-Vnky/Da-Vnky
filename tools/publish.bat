@@ -38,6 +38,7 @@ echo.
 git status --short
 echo.
 set "MSG=%~1"
+if defined PUBLISH_MSG set "MSG=%PUBLISH_MSG%"
 if not defined MSG set /p "MSG=  3. what did you change? (a few words, then Enter): "
 if not defined MSG set "MSG=update"
 git add -A
@@ -51,7 +52,7 @@ if errorlevel 1 (
 )
 echo.
 echo  Done. The live site updates in a minute or two.
-if not "%~1"=="" (
+if not "%~1%PUBLISH_MSG%"=="" (
     timeout /t 6
     goto :eof
 )

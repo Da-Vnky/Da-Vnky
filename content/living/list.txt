@@ -8,4 +8,6 @@
 03-Aerie.ogg
 04-Frame of Mind.jpg
 04-Frame of Mind.ogg
+05-I'm Upping My P(Doom).gif
+05-I'm Upping My P(Doom).ogg
 frames.json

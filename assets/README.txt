@@ -72,6 +72,7 @@ CURSORS (every page; drawn stand-ins until yours are in)
                                 the ship, a cork)                               browsers)
     assets/ui/cursor-grabbing   while you're holding one
     assets/ui/cursor-look       over things to look into (the pinboard, a window, the telescope)
+    assets/ui/cursor-brush      over the "paint here" easel (hotspot: the brush tip, bottom left)
     -> PNG with a transparent background. The "hotspot" (the pixel that does the
        pointing) is set per cursor in CURSORS near the top of sky/sky.js: for the
        stand-ins, the arrow's tip is 3, 2 (from the top left), the star's middle 16, 16.
@@ -190,6 +191,9 @@ THE CITY
     assets/city/telescope    the icon on the telescope button          128 x 128
 
 THE COUNTRYSIDE (what the workshop looks out on)
+    assets/countryside/sheep          one sheep, facing RIGHT, feet at the bottom, about 3:2   (e.g. 360 x 240)
+    assets/countryside/sheep-jumping  the same sheep mid-leap (optional)
+      (the flock grazes on the near hill and hops the little fence one by one)
 ------------------------------------------------
     assets/countryside/hills-1 … hills-4                               3840 x 700
                              four rows of hills, back to front,
@@ -226,6 +230,9 @@ workshop                          living space
        no art? the frames are drawn:
        data-look gilt / wood / dark /
        white / plain, or your colours)
+    assets/workshop/paint-easel
+      (the "paint here" easel visitors
+       paint on, 62:100 like the other)
     assets/workshop/portfolio
       (the visitors' portfolio by the
        bench, about 5:4; its count
