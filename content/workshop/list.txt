@@ -1,4 +1,8 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
+10.jpg
+Untitled-1 24 .jpg
 cat.png
+droolers.png
+foot.jpg
 frames.json
