@@ -190,6 +190,6 @@ See your changes on your own computer first, so nothing half-done goes live:
     in the installer) or Node.js.
 
 Edit, save, refresh the browser (Ctrl+F5 if it looks stale). While previewing,
-Polaris and "the sea" take you to your own copy, not the live site, and new
+"the sea" takes you to your own copy, not the live site, and new
 files show up without list.txt (the preview shows folders). Happy with it?
 Then commit and push as usual.

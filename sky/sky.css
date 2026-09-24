@@ -183,7 +183,13 @@ a:hover {
     transform: scale(1.12);
 }
 .polaris:hover .polaris-hint,
-.polaris:focus-visible .polaris-hint { opacity: 1; }
+.polaris:focus-visible .polaris-hint,
+.polaris.flare .polaris-hint { opacity: 1; }
+/* Polaris only shows (and can be clicked) at night, like the constellations */
+.polaris { pointer-events: none; }
+.polaris.live { pointer-events: auto; }
+.polaris.flare { animation: star-flare 2.4s ease-out; }
+.polaris.flare .core { animation: star-pop .6s ease-out 2 alternate; transform-box: fill-box; transform-origin: 50% 50%; }
 
 /* ================= constellation links in the night sky ================= */
 .sky-links { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
@@ -797,7 +803,6 @@ img.furnish { object-fit: contain; object-position: 50% 100%; }
 /* =====================================================================
    the home button: a compass by day, Polaris by night
    ===================================================================== */
-.polaris .p-compass { opacity: calc(1 - var(--night)); transition: opacity .3s; }
 .polaris .p-star    { opacity: var(--night); transition: opacity .3s; }
 .polaris .needle  { transform-box: fill-box; transform-origin: 50% 50%; animation: needle 6s ease-in-out infinite alternate; }
 @keyframes needle { 0% { transform: rotate(-7deg); } 60% { transform: rotate(5deg); } 100% { transform: rotate(-2deg); } }

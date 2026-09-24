@@ -32,8 +32,8 @@ THE SKY (every page)                                     canvas to draw on
     assets/sky/moon          the moon                                  400 x 400, centred
     assets/sky/cloud         every cloud ... or give each its own:     800 x 360
     assets/sky/cloud-1 … cloud-5
-    assets/sky/compass       the home button by day (Polaris by night) 200 x 200, centred
-    assets/sky/polaris       the home button by night                  200 x 200, centred
+    assets/sky/polaris       the north star, top centre at night       200 x 200, centred
+                             (an easter egg: EGGS.polaris in sky/sky.js)
     assets/sky/plank         each signpost sign, pointing RIGHT; the    464 x 88
                              place's name is written across it for
                              you, so keep the middle fairly plain.

@@ -223,24 +223,15 @@
         }).join('');
     body.insertBefore(backdrop, body.firstChild);
 
-    /* ---------------- Polaris ---------------- */
+    /* ---------------- Polaris ----------------
+       the north star, at the top of Ursa Minor. it comes out at night like the constellations,
+       and it's an easter egg too: EGGS.polaris below (a placeholder that twinkles for now). */
     var polaris = document.createElement('a');
     polaris.className = 'polaris';
-    polaris.href = HOME;
-    polaris.setAttribute('aria-label', 'return home');
-    polaris.title = 'return home';
+    polaris.href = '#';
+    polaris.setAttribute('role', 'button');
+    polaris.setAttribute('aria-label', 'Polaris');
     polaris.innerHTML =
-        // by day: a little brass-and-paper compass, needle to the north (slot: assets/sky/compass)
-        '<span class="p-compass" data-asset="assets/sky/compass" aria-hidden="true"><svg class="placeholder" viewBox="-26 -26 52 52">' +
-            '<g>' +
-                '<circle r="21" fill="#eadcb9" stroke="#8a6a30" stroke-width="2.4"/>' +
-                '<circle r="17" fill="none" stroke="#6e5236" stroke-width=".6" stroke-dasharray="1.2 2.1"/>' +
-                '<path d="M0 -15 L3 0 L0 15 L-3 0 Z M-15 0 L0 -3 L15 0 L0 3 Z" fill="#6e5236" opacity=".45"/>' +
-                '<g class="needle"><path d="M0 -14 L3.4 0 L-3.4 0 Z" fill="#9a3b1f"/><path d="M0 14 L3.4 0 L-3.4 0 Z" fill="#3a2716"/></g>' +
-                '<circle r="2" fill="#c49a52"/>' +
-                '<text y="-22.5" text-anchor="middle" font-size="6" font-family="Georgia, serif" fill="#3a2716">N</text>' +
-            '</g>' +
-        '</svg></span>' +
         // by night: Polaris (slot: assets/sky/polaris)
         '<span class="p-star" data-asset="assets/sky/polaris" aria-hidden="true"><svg class="placeholder" viewBox="-26 -26 52 52">' +
             '<g class="rays">' +
@@ -250,12 +241,16 @@
             '<circle class="core" r="4.6"/>' +
         '</svg></span>' +
         '<span class="polaris-name">Polaris</span>' +
-        '<span class="polaris-hint">return home</span>';
+        '<span class="polaris-hint">a secret…</span>';
     body.appendChild(polaris);
     polaris.addEventListener('click', function (e) {
-        if (!isHome) return;                                      // other pages: follow the link home
-        e.preventDefault();                                       // homepage: sail back to daylight
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        e.preventDefault();
+        if (EGGS.polaris) { EGGS.polaris(polaris); return; }
+        polaris.classList.remove('flare'); void polaris.offsetWidth; polaris.classList.add('flare');
+        polaris.querySelector('.polaris-hint').textContent = 'not yet… something will happen here someday';
+        if (window.Sky && Sky.sounds) Sky.sounds.sfx('twinkle');
+        clearTimeout(polaris._tw);
+        polaris._tw = setTimeout(function () { polaris.classList.remove('flare'); }, 2400);
     });
 
     /* ---------------- the constellations: links and easter eggs in the night sky ---------------- */
@@ -307,7 +302,7 @@
        a constellation with egg: 'name' runs EGGS[name](the constellation, its settings)
        when clicked. write your own here, or from any page's script:
            Sky.egg('lantern', function (star) { … });
-       until one exists, clicking just twinkles. */
+       until one exists, clicking just twinkles. Polaris is one too: EGGS.polaris. */
     var EGGS = {
         // a shooting star streaks away from the constellation: make a wish
         'shooting-star': function (a) {
@@ -526,6 +521,7 @@
             a.style.visibility = lo > 0.01 ? 'visible' : 'hidden';
         });
         nav.classList.toggle('live', lo > 0.6);
+        polaris.classList.toggle('live', lo > 0.6);
 
         if (player) player.time.textContent = timeName(p, celest.theta);
         for (var i = 0; i < hooks.length; i++) hooks[i](p);
