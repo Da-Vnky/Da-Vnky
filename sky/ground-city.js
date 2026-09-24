@@ -16,6 +16,15 @@
         '.ground-city .glass { fill: rgba(255,255,255,.14); }' +
         '.ground-city .lit { fill: #ffd98a; }' +
         '.ground-city .beacon { fill: #ff5a4a; animation: city-blink 2.4s steps(1) infinite; }' +
+        // the derelict building: every window dark, some broken or boarded; one boarded window has someone behind it
+        '.ground-city .dead { fill: #06080f; }' +
+        '.ground-city .boards { fill: #4a3526; }' +
+        '.ground-city .cracks { fill: none; stroke: rgba(0,0,0,.45); stroke-width: 1; }' +
+        '.ground-city .mel-leak { fill: #ffb866; filter: drop-shadow(0 0 3px rgba(255,170,90,.9)); animation: mel-flicker 3.4s ease-in-out infinite; }' +
+        '.ground-city .mel-boards { fill: #5b4030; }' +
+        'body.mel-in .ground-city .mel-boards { display: none; }' +
+        'body.mel-in .ground-city .mel-leak { fill: #ffd28a; animation: none; }' +
+        '@keyframes mel-flicker { 0%, 100% { opacity: .55; } 40% { opacity: .85; } 47% { opacity: .35; } 52% { opacity: .8; } }' +
         '@keyframes city-blink { 0%, 60% { opacity: 1; } 61%, 100% { opacity: .15; } }' +
         '@media (prefers-reduced-motion: reduce) { .ground-city .beacon { animation: none; } }' +
 
@@ -50,7 +59,8 @@
     ground.innerHTML = LAYERS.map(function (L, i) {
         var lit = '';
         for (var b = 0; b < BUCKETS; b++) lit += '<path class="lit" data-b="' + b + '"/>';
-        return '<svg class="layer c' + (i + 1) + '"><path class="body"/><path class="glass"/>' + lit + '<path class="beacon"/></svg>';
+        return '<svg class="layer c' + (i + 1) + '"><path class="body"/><path class="glass"/>' + lit + '<path class="beacon"/>' +
+            (i === LAYERS.length - 1 ? '<path class="dead"/><path class="cracks"/><path class="boards"/><path class="mel-leak"/><path class="mel-boards"/>' : '') + '</svg>';
     }).join('');
     document.body.appendChild(ground);
 
@@ -181,11 +191,16 @@
             var L = LAYERS[i], W = svg.clientWidth, S = svg.clientHeight - 12, B = S + 12;
             var rnd = Sky.seeded(L.seed * 7919);
             var body = '', glass = '', beacon = '', lit = [], wins = [];
+            var dead = '', cracks = '', boards = '', melLeak = '', melBoards = '', mel = null, derelict = false;
+            var aim = W * (W < 620 ? 0.3 : 0.36);             // the derelict building: the first tall-enough one past here
             for (var b = 0; b < BUCKETS; b++) lit.push('');
 
             for (var x = -10; x < W; ) {
                 var bw = (L.w[0] + rnd() * (L.w[1] - L.w[0])) * small;
                 var bh = S * (L.lo + rnd() * (L.hi - L.lo));
+                // mel's building: an old tenement, tall enough to stand over the rooftop you're on
+                var dz = i === LAYERS.length - 1 && !derelict && !frontArt && x + bw / 2 > aim && bw >= 44 * small;
+                if (dz) bh = Math.max(bh, S * 0.6);
                 var top = B - bh;
                 body += rect(x, top, bw, bh);
 
@@ -211,13 +226,35 @@
                     var ww = 5 * small + i, wh = 7 * small + i, gx = 11 * small + i * 2, gy = 15 * small + i * 2;
                     var cols = Math.floor((bw - 10) / gx), rows = Math.floor((bh - 18) / gy);
                     var ox = x + (bw - (cols - 1) * gx - ww) / 2;
+                    // mel's building: abandoned, not a light on, except behind one boarded-up window
+                    var isDead = dz && rows >= 3 && cols >= 2;
+                    if (isDead) {
+                        derelict = true;
+                        var mr = 1, mc = cols > 2 ? 1 : 0;          // near the top, where the rooftop you stand on doesn't hide it
+                        var crnd = Sky.seeded(4242);
+                        cracks += 'M ' + f(x + bw * .2) + ' ' + f(B - bh + 4) + ' l 3 9 l -2 7 l 4 10 M ' + f(x + bw * .78) + ' ' + f(B - bh * .5) + ' l -4 8 l 3 6 ';
+                    }
                     for (var r = 0; r < rows; r++) {
                         for (var c = 0; c < cols; c++) {
                             var wx = ox + c * gx, wy = B - bh + 12 + r * gy;
                             var w = rect(wx, wy, ww, wh);
+                            var isLit = rnd() < 0.78, bucket = isLit ? Math.floor(rnd() * BUCKETS) : 0;
+                            if (isDead) {                           // (the dice still roll, so the rest of the city stays put)
+                                if (r === mr && c === mc) {
+                                    mel = { x: wx, y: wy, w: ww, h: wh, lit: false, top: B - bh, mel: true };
+                                    dead += w;
+                                    melLeak += rect(wx + ww * .12, wy + wh * .2, ww * .76, wh * .7);
+                                    melBoards += rect(wx - 1, wy + wh * .08, ww + 2, wh * .26) + rect(wx - 1, wy + wh * .42, ww + 2, wh * .24) + rect(wx - 1, wy + wh * .74, ww + 2, wh * .24);
+                                } else {
+                                    var roll = crnd();
+                                    if (roll < 0.22) boards += rect(wx - .5, wy + wh * .15, ww + 1, wh * .3) + rect(wx - .5, wy + wh * .6, ww + 1, wh * .3);
+                                    else if (roll < 0.4) dead += 'M ' + f(wx) + ' ' + f(wy) + ' h ' + f(ww) + ' l ' + f(-ww * .45) + ' ' + f(wh * .5) + ' l ' + f(ww * .45) + ' ' + f(wh * .5) + ' h ' + f(-ww) + ' Z ';
+                                    else dead += w;
+                                }
+                                continue;
+                            }
                             glass += w;
-                            var isLit = rnd() < 0.78;
-                            if (isLit) lit[Math.floor(rnd() * BUCKETS)] += w;
+                            if (isLit) lit[bucket] += w;
                             if (i === LAYERS.length - 1) wins.push({ x: wx, y: wy, w: ww, h: wh, lit: isLit, top: B - bh });
                         }
                     }
@@ -225,7 +262,15 @@
                 x += bw + (rnd() < 0.3 ? rnd() * 14 * small : -2);
             }
 
-            if (i === LAYERS.length - 1) front = { svg: svg, windows: frontArt ? artWindows(W, B) : wins, W: W, H: B };
+            if (i === LAYERS.length - 1) {
+                if (frontArt) mel = artMel(W, B);
+                front = { svg: svg, windows: frontArt ? artWindows(W, B) : wins, W: W, H: B, mel: mel };
+                svg.querySelector('.dead').setAttribute('d', dead);
+                svg.querySelector('.cracks').setAttribute('d', cracks);
+                svg.querySelector('.boards').setAttribute('d', boards);
+                svg.querySelector('.mel-leak').setAttribute('d', frontArt ? '' : melLeak);
+                svg.querySelector('.mel-boards').setAttribute('d', frontArt ? '' : melBoards);
+            }
             svg.setAttribute('viewBox', '0 0 ' + W + ' ' + B);
             svg.querySelector('.body').setAttribute('d', body);
             svg.querySelector('.glass').setAttribute('d', glass);
@@ -248,6 +293,14 @@
         });
         return out;
     }
+    // mel's window on your own front row: "mel": [x%, y%, w%, h%] in skyline-front-windows.json
+    function artMel(W, B) {
+        var m = frontArt && frontArt.mel;
+        if (!m || m.length < 2) return null;
+        var sc = Math.max(W / frontArt.w, B / frontArt.h), iw = frontArt.w * sc, ih = frontArt.h * sc;
+        var ww = (m[2] || 0.9) / 100 * iw, wh = (m[3] || 1.6) / 100 * ih;
+        return { x: (W - iw) / 2 + m[0] / 100 * iw - ww / 2, y: B - ih + m[1] / 100 * ih - wh / 2, w: ww, h: wh, lit: false, top: 0, mel: true };
+    }
     build();
     function rebuild() { build(); svgs.forEach(Sky.fitLayerArt); Sky.refresh(); if (Sky.city.onBuild) Sky.city.onBuild(); }
     window.addEventListener('resize', rebuild);
@@ -258,6 +311,7 @@
             Sky.findAsset(SKYLINE[i] + '-windows.json', function (u, data) {
                 if (!u) return;
                 frontArt.windows = Array.isArray(data) ? data : (data && data.windows) || null;
+                frontArt.mel = data && !Array.isArray(data) ? data.mel || null : null;
                 rebuild();
             });
         } : null);

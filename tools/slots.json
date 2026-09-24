@@ -763,6 +763,22 @@
        "optional": true
       }
      ]
+    },
+    {
+     "name": "mel's window (the boarded-up one in the abandoned building)",
+     "slots": [
+      {
+       "slot": "assets/city/mel-room",
+       "what": "mel's room, revealed once the boards are off (a picture, a GIF, or a .webm / .mp4)",
+       "size": "about 1.27:1, e.g. 1270 x 1000",
+       "kind": "model"
+      },
+      {
+       "slot": "assets/city/mel-board",
+       "what": "one board nailed over her window (a plank, stretched to fit)",
+       "size": "about 6:1, e.g. 900 x 150"
+      }
+     ]
     }
    ],
    "page": "city.html"
@@ -1233,6 +1249,16 @@
       {
        "slot": "assets/sounds/blip",
        "what": "one letter of the mirror’s text typing out (Undertale-style)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/knock",
+       "what": "knocking on mel's boarded-up window",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/crack",
+       "what": "a board splintering off her window and clattering down",
        "kind": "sound"
       }
      ]

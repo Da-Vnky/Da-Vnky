@@ -252,7 +252,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {
@@ -329,6 +329,15 @@
             var loud = size === undefined ? 1 : size;
             tone(out, t, 'sine', 110, 70, 0.07, 0.22 * loud);
             noiseHit(out, t, 0.05, 'lowpass', 700, 0.5, 0.12 * loud);
+        },
+        'knock': function (out, t) {                                   // knuckles on a boarded-up window: knock, knock
+            knock(out, t, 1); knock(out, t + 0.2, 0.85);
+        },
+        'crack': function (out, t) {                                   // a board splintering off and clattering down
+            var f = noiseHit(out, t, 0.18, 'bandpass', 2600, 0.7, 0.55, 0.004);
+            f.frequency.exponentialRampToValueAtTime(900, t + 0.18);
+            for (var i = 0; i < 5; i++) noiseHit(out, t + 0.02 + Math.random() * 0.12, 0.03, 'highpass', 3000, 0, 0.25, 0.002);
+            knock(out, t + 0.42, 0.55); knock(out, t + 0.58, 0.3);
         },
         'blip': function (out, t) {                                    // one letter of a text box typing out
             tone(out, t, 'square', 330, 330, 0.035, 0.05);

@@ -40,6 +40,8 @@ SHELVES = {
     'easel': (os.path.join(ROOT, 'content', 'workshop'), 'png jpg jpeg webp gif svg mp4 webm'),
     'city':  (os.path.join(ROOT, 'content', 'city'), 'png jpg jpeg webp gif svg mp4 webm html'),
     'music': (os.path.join(ROOT, 'content', 'living'), 'mp3 ogg'),
+    # pictures for the walls: hidden (never on the easel or anywhere else), only for hanging in frames
+    'walls': (os.path.join(ROOT, 'content', 'frames'), 'png jpg jpeg webp gif svg'),
 }
 PICS = ('png', 'jpg', 'jpeg', 'webp', 'gif', 'svg')
 UPLOAD_LIMIT = 30 * 1024 * 1024
@@ -567,6 +569,8 @@ def shelf(which):
         if which == 'easel':
             item['hang'] = 'content/workshop/' + n            # as the living space names it
             item['hangHere'] = n                              # as the workshop names it (its own folder)
+        if which == 'walls':
+            item['hang'] = item['hangHere'] = 'content/frames/' + n
         out.append(item)
     if which == 'music':
         return sorted(out, key=lambda i: i['name'].lower())
@@ -635,7 +639,36 @@ def shelf_delete(which, name):
     if which == 'easel':
         hang('content/workshop/' + name, None, 'living')
         hang(name, None, 'workshop')
+    if which == 'walls':
+        for room in ROOMS:
+            hang('content/frames/' + name, None, room)
     write_list(folder)
+
+
+def shelf_move(name, to):
+    """move a picture between the easel (content/workshop/) and the hidden pool for the walls
+    (content/frames/), with its caption; the frames it hangs in keep it"""
+    src, dst = ('easel', 'walls') if to == 'walls' else ('walls', 'easel')
+    sf, df = SHELVES[src][0], SHELVES[dst][0]
+    if not name or os.path.basename(name) != name or not os.path.exists(os.path.join(sf, name)):
+        raise ValueError('that picture isn\'t there')
+    stem, ext = os.path.splitext(name)
+    os.makedirs(df, exist_ok=True)
+    final = unique(df, stem, ext)
+    os.replace(os.path.join(sf, name), os.path.join(df, final))
+    cap = os.path.join(sf, stem + '.txt')
+    if os.path.exists(cap):
+        os.replace(cap, os.path.join(df, os.path.splitext(final)[0] + '.txt'))
+    old = {'living': 'content/workshop/' + name, 'workshop': name} if src == 'easel' else {r: 'content/frames/' + name for r in ROOMS}
+    new = {'living': 'content/workshop/' + final, 'workshop': final} if dst == 'easel' else {r: 'content/frames/' + final for r in ROOMS}
+    for room in ROOMS:
+        m = frames(room)
+        for k, v in list(m.items()):
+            if v == old[room]:
+                hang(new[room], k, room)
+    write_list(sf)
+    write_list(df)
+    return final
 
 
 # the workshop's clipboard: your to-do list and notes
@@ -740,6 +773,39 @@ def asset_clear(slot):
     if os.path.isdir(folder):
         write_list(folder)
     return gone
+
+
+# slots the site itself uses, found by reading the pages and scripts, so a new piece
+# (data-asset="assets/workshop/clock" or <img src="assets/garden/gate.svg">) shows up in
+# the asset manager by itself, even before it's described in tools/slots.json
+FOUND_IN_HTML = re.compile(r'(?:data-(?:asset|slot)|src|href)\s*=\s*["\']([^"\']+)["\']')
+FOUND_IN_JS = re.compile(r'assets/([a-z0-9-]+)/([a-z0-9]+(?:-[a-z0-9]+)*)(?:\.[a-z0-9]+)?(?=["\'|\s])')
+SLOT_IN = re.compile(r'^assets/([a-z0-9-]+)/([a-z0-9]+(?:-[a-z0-9]+)*)(?:\.[a-z0-9]+)?$')
+
+
+def found_slots():
+    found = {}
+
+    def add(folder, stem, where):
+        if folder in ('templates',) or stem in ('list', 'readme', 'noise'):
+            return
+        found.setdefault('assets/' + folder + '/' + stem, set()).add(where)
+    for n in sorted(os.listdir(ROOT)):
+        if n.endswith('.html') and n != 'template.html':
+            with open(os.path.join(ROOT, n), encoding='utf-8', errors='replace') as f:
+                text = f.read()
+            for m in FOUND_IN_HTML.finditer(text):
+                for part in re.split(r'[|\s]+', m.group(1)):
+                    x = SLOT_IN.match(part.strip())
+                    if x:
+                        add(x.group(1), x.group(2), n)
+    sky = os.path.join(ROOT, 'sky')
+    for n in sorted(os.listdir(sky)) if os.path.isdir(sky) else []:
+        if n.endswith('.js'):
+            with open(os.path.join(sky, n), encoding='utf-8', errors='replace') as f:
+                for m in FOUND_IN_JS.finditer(f.read()):
+                    add(m.group(1), m.group(2), 'sky/' + n)
+    return [{'slot': k, 'where': sorted(v)} for k, v in sorted(found.items())]
 
 
 # ---------------- the record player: content/living/, numbered 01-name.mp3, 02-name.mp3 … ----------------
@@ -960,7 +1026,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(raw)
                 return
             if url.path == '/__assets/state':
-                return self.reply({'files': asset_files(), 'tracks': tracks(), 'noise': noise_extra()})
+                return self.reply({'files': asset_files(), 'tracks': tracks(), 'noise': noise_extra(), 'found': found_slots()})
             if url.path == '/__notes':
                 return self.reply(dict(notes(), today=datetime.date.today().isoformat()))
             if url.path == '/__letters/read':
@@ -1057,6 +1123,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     raise ValueError('which shelf?')
                 shelf_delete(d['which'], d.get('name'))
                 return self.reply({'ok': True})
+            if url.path == '/__shelf/move':
+                d = json.loads(raw or b'{}')
+                return self.reply({'name': shelf_move(d.get('name'), d.get('to'))})
             if url.path == '/__post/delete':
                 d = json.loads(raw or b'{}')
                 if d.get('which') not in FOLDERS:

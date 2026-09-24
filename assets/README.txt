@@ -158,6 +158,8 @@ SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
     assets/sounds/step           a footstep (the walk to the bathroom)
     assets/sounds/chime          the pomodoro timer ringing, time's up
     assets/sounds/shimmer        looking into the bathroom mirror
+    assets/sounds/knock          knocking on mel's boarded-up window
+    assets/sounds/crack          a board splintering off it
     assets/sounds/blip           one letter of the mirror's words typing out
                                  (Undertale-style; it plays every other letter)
 
@@ -228,6 +230,16 @@ THE CITY
                              one each. without the file, the telescope
                              spreads them along the middle of the row.
     assets/city/telescope    the icon on the telescope button          128 x 128
+    MEL'S WINDOW: one building on the front row is abandoned (not a light on),
+    except one boarded-up window. Click it: knock, keep knocking, and the boards
+    come off one by one until you're in.
+    assets/city/mel-room     her room, once you're in (picture, GIF,     about 1.27:1
+                             or a .webm / .mp4)
+    assets/city/mel-board    one board over her window (a plank,          about 6:1
+                             stretched to fit)
+    on your own front-row art, say where her window is in
+    skyline-front-windows.json:  { "windows": [ … ], "mel": [41.5, 38, 1, 1.6] }
+    (the words she gets: MEL near the top of sky/peeper.js)
 
 THE COUNTRYSIDE (what the workshop looks out on)
     assets/countryside/sheep          one sheep, facing RIGHT, feet at the bottom, about 3:2   (e.g. 360 x 240)

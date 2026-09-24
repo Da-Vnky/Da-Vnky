@@ -37,7 +37,7 @@
     .card .meta { padding: 8px 14px 4px; font-style: italic; color: var(--faded); font-size: .9rem; }
     .card .meta b { color: var(--ink); font-weight: normal; }
     .card .warn { margin: 0 14px 6px; font-size: .82rem; font-style: italic; color: var(--red); }
-    .card .acts { display: flex; gap: 6px; padding: 6px 12px 12px; margin-top: auto; }
+    .card .acts { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 12px 12px; margin-top: auto; }
     .card .acts button { flex: 1; padding: 6px 10px; border-radius: 999px; cursor: pointer; font-style: italic; border: 1px solid rgba(110,82,54,.35); background: #f8f0dc; color: var(--ink); }
     .card .acts button:hover { background: #fff8e6; }
     .card .acts .yes { background: var(--ink); color: #f3e6c2; border-color: var(--ink); }
@@ -80,8 +80,12 @@
 </header>
 <main>
     <h2>paintings on the easel <button type="button" class="btn main add" data-add="easel">+ add</button></h2>
-    <p class="sub">the workshop's easel (content/workshop/): pictures or short videos. names that start with a date go newest first. a caption shows under each; hang one in a frame in the workshop or the living space with its number (click it again to take it down).</p>
+    <p class="sub">the workshop's easel (content/workshop/): pictures or short videos. names that start with a date go newest first. a caption shows under each; hang one in a frame in the workshop or the living space with its number (click it again to take it down). one hung on the workshop’s wall leaves the easel while it’s up there.</p>
     <div class="grid" data-shelf="easel"></div>
+
+    <h2>pictures for the walls <button type="button" class="btn main add" data-add="walls">+ add</button></h2>
+    <p class="sub">a hidden pool (content/frames/): these never show up on the easel or anywhere else by themselves, only in the frames you hang them in, in the workshop or the living space. a painting already on the easel can move here with “move to the walls pool”.</p>
+    <div class="grid" data-shelf="walls"></div>
 
     <h2>window scenes in the city <button type="button" class="btn main add" data-add="city">+ add</button></h2>
     <p class="sub">the lit windows you find with the telescope (content/city/): one file = one window. landscape pictures (about 4:3) fit best.</p>
@@ -96,7 +100,7 @@
 (function () {
     var $ = function (s) { return document.querySelector(s); };
     var statusEl = $('.status'), fileIn = $('.file-in');
-    var ACCEPT = { easel: 'image/*,video/mp4,video/webm', city: 'image/*,video/mp4,video/webm,.html', music: 'audio/mpeg,audio/ogg,.mp3,.ogg' };
+    var ACCEPT = { walls: 'image/*', easel: 'image/*,video/mp4,video/webm', city: 'image/*,video/mp4,video/webm,.html', music: 'audio/mpeg,audio/ogg,.mp3,.ogg' };
     function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
     var OLD = { error: 'the content manager window that\u2019s open is an older version. close its black window, then double-click tools\\content.bat again' };
     function api(path, body) {
@@ -151,13 +155,13 @@
             meta.innerHTML = esc(it.name) + (it.date ? '<br>' + nice(it.date) : '');
             c.appendChild(meta);
             if (it.caption) { var cap = document.createElement('p'); cap.className = 'cap'; cap.textContent = it.caption; c.appendChild(cap); }
-            if (which === 'easel') {                                      // hang it in a frame: in the workshop, or the living space
+            if (which === 'easel' || which === 'walls') {                 // hang it in a frame: in the workshop, or the living space
                 [['workshop', it.hangHere, r.workshopFrames || {}, r.workshopFrameNumbers || []], ['living space', it.hang, map, nums]].forEach(function (room) {
                     var label = room[0], what = room[1], rmap = room[2], rnums = room[3], key = label === 'workshop' ? 'workshop' : 'living';
                     if (!rnums.length) return;
                     var inFrame = '';
                     Object.keys(rmap).forEach(function (k) { if (rmap[k] === what) inFrame = k; });
-                    if (inFrame) meta.insertAdjacentHTML('beforeend', '<br><span class="where">in frame ' + inFrame + ' in the ' + label + '</span>');
+                    if (inFrame) meta.insertAdjacentHTML('beforeend', '<br><span class="where">in frame ' + inFrame + ' in the ' + label + (which === 'easel' && key === 'workshop' ? ' (so not on the easel)' : '') + '</span>');
                     var row = document.createElement('div');
                     row.className = 'acts hang';
                     row.innerHTML = '<span class="hl">' + label + ':</span>';
@@ -184,6 +188,11 @@
                     });
                 }));
             } else {
+                if (which === 'easel' || which === 'walls') acts.appendChild(button(which === 'easel' ? 'move to the walls pool' : 'put on the easel', function () {
+                    api('/__shelf/move', { name: it.name, to: which === 'easel' ? 'walls' : 'easel' }).then(function (x) {
+                        if (x.error) say(x.error, true); else { say(which === 'easel' ? 'moved ' + it.name + ' to the walls pool: off the easel, still in its frames.' : 'put ' + it.name + ' back on the easel.'); loadAll(); }
+                    });
+                }));
                 acts.appendChild(button(it.caption ? 'caption' : '+ caption', function () {
                     var t = prompt('a caption for ' + it.name + ' (the first line is its title; leave it empty to remove it):', it.caption || '');
                     if (t === null) return;
@@ -202,7 +211,7 @@
     function load(which) {
         return api('/__shelf/list?which=' + which).then(function (r) { if (r.error) { say(r.error, true); return; } draw(which, r); });
     }
-    function loadAll() { return Promise.all(['easel', 'city'].map(load)); }
+    function loadAll() { return Promise.all(['easel', 'walls', 'city'].map(load)); }
 
     var picked = null;
     function pick(accept, multiple, fn) { fileIn.accept = accept; fileIn.multiple = multiple; picked = fn; fileIn.click(); }

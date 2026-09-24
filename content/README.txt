@@ -39,6 +39,12 @@ Take a file out, and it's gone. That's the whole job.
                       too (content/workshop/cat.png). Set it with the "hang in"
                       buttons in the content manager.
 
+  content/frames/     PICTURES FOR THE WALLS (hidden)
+                      Not shown anywhere by themselves: only in the frames you
+                      hang them in, in the workshop or the living space. Content
+                      manager -> your things -> pictures for the walls. (A painting
+                      hung in a workshop frame leaves the easel while it's up.)
+
   content/workshop/notes.json
                       THE CLIPBOARD on the workshop wall: your to-do list and notes.
                       Write them in the content manager -> notes (it saves this file).

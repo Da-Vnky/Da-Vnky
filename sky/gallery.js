@@ -9,6 +9,8 @@
    files: .png .jpg .jpeg .webp .gif .svg (and .mp4 .webm for moving pieces)
    order: names starting with a date (2026-09-23-…) newest first, then the rest by name.
    caption: from the file name, or a .txt file with the same name beside it.
+   a painting hung in one of the workshop's frames (content/workshop/frames.json)
+   is on the wall instead, so it leaves the easel until it's taken down.
    ===================================================================== */
 
 (function () {
@@ -233,10 +235,19 @@
         canvas.appendChild(Sky.makeMedia(works[at].file));
     }
 
-    Sky.listFolder(easel.dataset.folder, IMG.concat(['txt']), function (files) {
+    // what hangs on this room's walls (content/workshop/frames.json) isn't on the easel too
+    var FOLDER = easel.dataset.folder.replace(/\/?$/, '/');
+    var onWall = fetch(FOLDER + 'frames.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
+    Sky.listFolder(easel.dataset.folder, IMG.concat(['txt']), function (files) { onWall.then(function (map) {
+        var hung = {};
+        Object.keys(map || {}).forEach(function (k) {
+            var v = typeof map[k] === 'string' ? map[k].trim() : '';
+            if (v.indexOf(FOLDER) === 0) v = v.slice(FOLDER.length);
+            if (v && v.indexOf('/') === -1) hung[v.toLowerCase()] = 1;
+        });
         var captions = {};
         files.forEach(function (f) { if (/\.txt$/i.test(f.name)) captions[f.name.replace(/\.txt$/i, '').toLowerCase()] = f.url; });
-        works = Sky.sortNewest(files.filter(function (f) { return !/\.txt$/i.test(f.name); })).map(function (f) {
+        works = Sky.sortNewest(files.filter(function (f) { return !/\.txt$/i.test(f.name) && !hung[f.name.toLowerCase()]; })).map(function (f) {
             return {
                 file: f,
                 title: Sky.fileTitle(f.name),
@@ -246,5 +257,5 @@
         });
         at = 0;
         paintEasel();
-    });
+    }); });
 })();
