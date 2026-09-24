@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260924p">
+    <link rel="stylesheet" href="sky/sky.css?v=20260924q">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -177,8 +177,10 @@
         <div class="furnish gallery-frame" data-frame="2" data-look="dark" style="left:85.5%; top:34%; width:6.5%; aspect-ratio:5 / 4; --tilt:1deg"></div>
         <div class="furnish gallery-frame" data-frame="3" data-look="gilt" style="left:31.5%; top:15%; width:4.5%; --tilt:1.5deg"></div>
 
-        <!-- back to the hallway (the living space's, with the door to the roof): the same arrow picture, pointing left -->
-        <a class="room-arrow exit point-left" href="living.html#hallway" data-hint="the hallway" data-sound="door" data-asset="assets/living/arrow" style="left: 14px; top: 60vh;" aria-label="back to the hallway"></a>
+        <!-- back to the hallway (the living space's, with the door to the roof), under the tabs on the right:
+             the traveller walks off to the right, a door opens and shuts. the arrow picture: assets/living/arrow -->
+        <a class="room-arrow exit" href="living.html#hallway" data-hint="the hallway" data-walk="off-right" data-sound="door"
+           data-arrive-via=".hall-door.to-workshop" data-under-tabs data-asset="assets/living/arrow" style="right: 8px; top: 60vh;" aria-label="back to the hallway"></a>
 
         <!-- a pomodoro timer on the bench (sky/timer.js): 25 minutes of focus, then a break. it rings when time's up.
              how long: data-focus / data-short / data-long (minutes), a long break every data-rounds.
@@ -255,18 +257,18 @@
              style="left: 36%; bottom: 3vh; height: 27vh;"></div>
     </div>
 
-    <script src="sky/sky.js?v=20260924p"></script>
-    <script src="sky/ground-countryside.js?v=20260924p"></script>
-    <script src="sky/gallery.js?v=20260924p"></script>
-    <script src="sky/frames.js?v=20260924p"></script>
-    <script src="sky/models.js?v=20260924p"></script>
-    <script src="sky/timer.js?v=20260924p"></script>
-    <script src="sky/notes.js?v=20260924p"></script>
-    <script src="sky/paint.js?v=20260924p"></script>
-    <script src="sky/studio.js?v=20260924p"></script>
-    <script src="sky/panel.js?v=20260924p"></script>
-    <script src="sky/music.js?v=20260924p"></script>
-    <script src="sky/weather.js?v=20260924p"></script>
-    <script src="sky/noise.js?v=20260924p"></script>
+    <script src="sky/sky.js?v=20260924q"></script>
+    <script src="sky/ground-countryside.js?v=20260924q"></script>
+    <script src="sky/gallery.js?v=20260924q"></script>
+    <script src="sky/frames.js?v=20260924q"></script>
+    <script src="sky/models.js?v=20260924q"></script>
+    <script src="sky/timer.js?v=20260924q"></script>
+    <script src="sky/notes.js?v=20260924q"></script>
+    <script src="sky/paint.js?v=20260924q"></script>
+    <script src="sky/studio.js?v=20260924q"></script>
+    <script src="sky/panel.js?v=20260924q"></script>
+    <script src="sky/music.js?v=20260924q"></script>
+    <script src="sky/weather.js?v=20260924q"></script>
+    <script src="sky/noise.js?v=20260924q"></script>
 </body>
 </html>

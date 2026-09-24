@@ -1278,6 +1278,81 @@
     var ARROW_ART = '<svg class="placeholder" viewBox="0 0 60 60" aria-hidden="true">' +
         '<circle cx="30" cy="30" r="27" fill="rgba(243,230,194,.16)" stroke="rgba(243,230,194,.55)" stroke-width="2"/>' +
         '<path d="M22 16 L38 30 L22 44" fill="none" stroke="#f3e6c2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    // walking about: a character strolls sideways from where it stands (dx px; 0 = back to its spot).
+    // works however the page places it, since it only nudges it with a transform
+    function stroll(el, dx, done) {
+        var cur = el._dx || 0, dist = Math.abs(dx - cur), W = window.innerWidth;
+        var secs = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0.01 : Math.max(0.35, Math.min(2.4, dist / Math.max(240, W * 0.28)));
+        el.classList.toggle('face-left', dx < cur);
+        el.classList.add('walking');
+        el.classList.remove('talking');
+        el.style.transition = 'transform ' + secs + 's linear, opacity .3s';
+        el.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+        el._dx = dx;
+        var steps = setInterval(function () { if (window.Sky && window.Sky.sounds) window.Sky.sounds.sfx('step', { size: 0.5 + Math.random() * 0.3 }); }, 380);
+        setTimeout(function () {
+            clearInterval(steps);
+            el.classList.remove('walking');
+            if (dx === 0) { el.classList.remove('face-left'); el.style.transform = ''; }
+            if (done) done();
+        }, secs * 1000 + 30);
+    }
+    function restX(el) { var r = el.getBoundingClientRect(); return r.left + r.width / 2 - (el._dx || 0); }
+    // coming through a door: the next page walks the traveller in from where you came
+    // (data-arrive-via on the link: "right", "left", or a door on that page, like ".roof-door")
+    function pageOf(href) { return (href || '').split('#')[0].split('?')[0].split('/').pop() || 'index.html'; }
+    function setArrival(href, via) {
+        try { sessionStorage.setItem('arrive', JSON.stringify({ page: pageOf(href), via: via, t: Date.now() })); } catch (e) {}
+    }
+    function takeArrival() {
+        var a = null;
+        try { a = JSON.parse(sessionStorage.getItem('arrive') || 'null'); } catch (e) {}
+        if (!a || a.page !== pageOf(location.pathname) || Date.now() - a.t > 30000) return null;
+        try { sessionStorage.removeItem('arrive'); } catch (e) {}
+        return a;
+    }
+    function doorSound(door) { if (window.Sky && window.Sky.sounds && door && door.dataset.sound) window.Sky.sounds.sfx(door.dataset.sound); }
+    function arrive() {
+        var a = takeArrival(), ch = document.querySelector('.scene-character');
+        if (!a || !ch) return;
+        var r = ch.getBoundingClientRect(), rest = r.left + r.width / 2, W = window.innerWidth, dx, door = null;
+        if (a.via === 'right') dx = W + r.width * 0.7 - rest;
+        else if (a.via === 'left') dx = -(rest + r.width * 0.7);
+        else {
+            door = document.querySelector(a.via);
+            if (!door) return;
+            var d = door.getBoundingClientRect();
+            dx = d.left + d.width / 2 - rest;
+        }
+        ch.style.transition = 'none';
+        ch.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+        ch._dx = dx;
+        if (door) { ch.style.opacity = 0; door.classList.add('open'); }
+        setTimeout(function () {
+            if (door) { doorSound(door); ch.style.transition = 'opacity .3s'; ch.style.opacity = ''; }
+            setTimeout(function () {
+                stroll(ch, 0);
+                if (door) setTimeout(function () { door.classList.remove('open'); }, 600);
+            }, door ? 350 : 0);
+        }, 450);
+    }
+    // an arrow or a door that leads to another page (<a class="room-arrow exit" href="living.html#hallway">): the send-offs play first.
+    // data-walk: "off-right" / "off-left" (the traveller walks off that edge first) or "to-door" (walks to the link itself)
+    // data-sound: the door's sound; data-arrive-via: where they turn up on the next page; data-under-tabs: sit under the place tabs
+    var ARROW_ART = '<svg class="placeholder" viewBox="0 0 60 60" aria-hidden="true">' +
+        '<circle cx="30" cy="30" r="27" fill="rgba(243,230,194,.16)" stroke="rgba(243,230,194,.55)" stroke-width="2"/>' +
+        '<path d="M22 16 L38 30 L22 44" fill="none" stroke="#f3e6c2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    function underTabs() {
+        var tabs = document.querySelector('.place-tabs');
+        document.querySelectorAll('.room-arrow[data-under-tabs]').forEach(function (a) {
+            if (!tabs) return;
+            var r = tabs.getBoundingClientRect(), h = a.offsetHeight || 54, top = r.bottom + 18;
+            if (top + h > window.innerHeight - 12) top = r.top - h - 14;
+            a.style.top = Math.round(top) + 'px';
+            a.style.right = '8px';
+            a.style.left = 'auto';
+        });
+    }
     function setupExits() {
         document.querySelectorAll('a.exit[href]').forEach(function (a) {
             if (a.dataset.exitDone) return;
@@ -1287,11 +1362,37 @@
             a.addEventListener('click', function (e) {
                 if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
                 e.preventDefault();
-                if (window.Sky && window.Sky.sounds && a.dataset.sound) window.Sky.sounds.sfx(a.dataset.sound);
-                leave(a.getAttribute('href'));
+                if (a._busy) return;
+                a._busy = true;
+                var href = a.getAttribute('href');
+                if (a.dataset.arriveVia) setArrival(href, a.dataset.arriveVia);
+                function through() {
+                    doorSound(a);
+                    a.classList.add('open');
+                    setTimeout(function () { leave(href); }, 450);
+                }
+                var ch = document.querySelector('.scene-character:not(.gore-hidden)'), walk = a.dataset.walk;
+                if (!walk || !ch) return through();
+                var r = ch.getBoundingClientRect(), rest = restX(ch), W = window.innerWidth, dx;
+                if (walk === 'off-right') dx = W + r.width * 0.7 - rest;
+                else if (walk === 'off-left') dx = -(rest + r.width * 0.7);
+                else { var d = a.getBoundingClientRect(); dx = d.left + d.width / 2 - rest; }
+                stroll(ch, dx, function () {
+                    if (walk === 'to-door') { ch.style.transition = 'opacity .35s'; setTimeout(function () { ch.style.opacity = 0; }, 250); }
+                    through();
+                });
             });
         });
+        underTabs();
+        window.addEventListener('resize', underTabs);
+        setTimeout(underTabs, 400);
     }
+    window.addEventListener('pageshow', function (e) {             // back with the browser's back button: everyone where they were
+        if (!e.persisted) return;
+        document.querySelectorAll('a.exit.open').forEach(function (a) { a.classList.remove('open'); });
+        document.querySelectorAll('.scene-character').forEach(function (c) { c.style.transform = ''; c.style.opacity = ''; c._dx = 0; c.classList.remove('walking', 'face-left'); });
+        document.querySelectorAll('a.exit').forEach(function (a) { a._busy = false; });
+    });
     function setupCharacters(scope) {
         (scope || document).querySelectorAll('.character').forEach(setupCharacter);
     }
@@ -1310,7 +1411,7 @@
             });
         });
     }
-    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); setupExits(); fillAssets(); showSlots(); setupCursors(); dressNotes(); });
+    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); setupExits(); fillAssets(); showSlots(); setupCursors(); dressNotes(); arrive(); });
     startAmbient();
 
     render(shown);
@@ -1546,6 +1647,7 @@
         onLeave: function (fn) { leaveHooks.push(fn); },
         // go to another page the way the signs do (the send-offs play, music carries on)
         leave: function (href) { leave(href); },
+        stroll: stroll, setArrival: setArrival, takeArrival: takeArrival,
         openSkyView: openSkyView,
         closeSkyView: closeSkyView,
         listFolder: listFolder,

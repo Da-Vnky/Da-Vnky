@@ -168,7 +168,8 @@ SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
     assets/sounds/pickup         something going into your bag
     assets/sounds/tap            the bath tap running (as long as it fills)
     assets/sounds/fizz           something electric in the bathwater
-    assets/sounds/door           a door opening (the hallway, the roof)
+    assets/sounds/door           a wooden door opening and shutting (the hallway, the workshop)
+    assets/sounds/door-metal     the steel roof access door: a clank, a squeal, a boom
     assets/sounds/knock          knocking on mel's boarded-up window
     assets/sounds/crack          a board splintering off it
     assets/sounds/blip           one letter of the mirror's words typing out

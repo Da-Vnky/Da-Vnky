@@ -57,8 +57,10 @@
         'body.art-open .room-arrow, body.visitors-open .room-arrow { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility 0s .3s; }' +
 
         // the bathroom: waits off to the right, slides in as the living space slides out
+        // (where they wait, hidden, is in sky/sky.css, so they're in place from the very first frame;
+        //  the slide is only switched on once the page is ready: body.sides-ready)
+        'body.sides-ready .bathroom, body.sides-ready .hallway { transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s .9s; }' +
         '.bathroom { position: fixed; inset: 0; z-index: 3; overflow: hidden; transform: translateX(100%); visibility: hidden;' +
-            'transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s .9s;' +
             '--bath-wall: #a9bfb6; --bath-tile: #e9ece5; --bath-grout: rgba(90,110,105,.35); --floor-h: 10vh;' +
             'background: linear-gradient(transparent 55%, rgba(0,0,0,.18) 55%, rgba(0,0,0,.18) calc(55% + 6px), transparent calc(55% + 6px)),' +
             'linear-gradient(var(--bath-wall) 55%, transparent 55%),' +
@@ -72,8 +74,7 @@
         'body.bath-panning .bathroom { visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
         'body.in-side .sky-links { visibility: hidden; }' +
         // the hallway: waits off to the left
-        '.hallway { position: fixed; inset: 0; z-index: 3; overflow: hidden; transform: translateX(-100%); visibility: hidden;' +
-            'transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s .9s; --floor-h: 11vh;' +
+        '.hallway { position: fixed; inset: 0; z-index: 3; overflow: hidden; transform: translateX(-100%); visibility: hidden; --floor-h: 11vh;' +
             'background: linear-gradient(transparent 62%, #3a2a1f 62%, #3a2a1f calc(62% + 10px), transparent calc(62% + 10px)),' +
             'repeating-linear-gradient(90deg, transparent 0 88px, rgba(0,0,0,.22) 88px 91px) 0 62% / 100% 38% no-repeat,' +
             'linear-gradient(#4d3a2c 62%, #5b4331 62%),' +
@@ -249,8 +250,27 @@
     SIDES.forEach(function (sd) {
         sd.go.addEventListener('click', function (e) { e.preventDefault(); goTo(sd); });
         if (sd.back) sd.back.addEventListener('click', function (e) { e.preventDefault(); goHome(); });
-        if (location.hash === sd.hash) goTo(sd, true);
+        if (location.hash !== sd.hash) return;
+        goTo(sd, true);
+        // back through one of this room's doors (from the workshop, off the roof): out of that door and back to their spot
+        var a = Sky.takeArrival ? Sky.takeArrival() : null, door = a && sd.me ? sd.el.querySelector(a.via) : null;
+        if (!door) return;
+        sd.me.classList.add('gore-hidden');
+        setTimeout(function () {
+            busy = true;
+            var at = (door.offsetLeft + door.offsetWidth / 2 - sd.me.offsetWidth / 2) / (sd.el.clientWidth || window.innerWidth) * 100;
+            place(sd.me, at, at > sd.standAt);
+            door.classList.add('open');
+            setTimeout(function () {
+                if (Sky.sounds) Sky.sounds.sfx(door.dataset.sound || 'door');
+                sd.me.classList.remove('gore-hidden');
+                walk(sd.me, sd.standAt, function () { busy = false; sd.me.classList.remove('face-left'); });
+                setTimeout(function () { door.classList.remove('open'); }, 700);
+            }, 350);
+        }, 450);
     });
+    // only now can the rooms slide (had it been on from the start, they'd have slid out from the middle as the page loaded)
+    requestAnimationFrame(function () { requestAnimationFrame(function () { body.classList.add('sides-ready'); }); });
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && inSide && !body.classList.contains('mirror-open') && !body.classList.contains('inv-holding')) goHome();
     });
@@ -267,7 +287,8 @@
                 door.classList.add('open');
                 var img = door.querySelector('img.art');
                 if (img && door.dataset.openArt) { door.dataset.shutArt = img.src; img.src = door.dataset.openArt; }
-                if (Sky.sounds) Sky.sounds.sfx('door');
+                if (Sky.sounds) Sky.sounds.sfx(door.dataset.sound || 'door');
+                if (door.dataset.arriveVia && Sky.setArrival) Sky.setArrival(href, door.dataset.arriveVia);   // they walk in from there on the next page
                 setTimeout(function () { if (sd && sd.me) sd.me.classList.add('gore-hidden'); }, 450);
                 setTimeout(function () { busy = false; Sky.leave ? Sky.leave(href) : (location.href = href); }, 700);
             }

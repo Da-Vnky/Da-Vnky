@@ -976,3 +976,8 @@ svg[data-bottle] .b-cork.has-art { transform-box: view-box; transform-origin: 17
 body.leaving .room-arrow, body.sky-view .room-arrow, body.is-outside .room-arrow, body.gallery-open .room-arrow, body.art-open .room-arrow,
 body.visitors-open .room-arrow, body.frame-open .room-arrow, body.model-open .room-arrow, body.notes-open .room-arrow, body.paint-open .room-arrow {
     opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility 0s .3s; }
+
+/* the living space's side rooms wait off either edge (hidden) from the very first frame; sky/bathroom.js slides them in */
+.bathroom, .hallway { position: fixed; inset: 0; z-index: 3; overflow: hidden; visibility: hidden; }
+.bathroom { transform: translateX(100%); }
+.hallway { transform: translateX(-100%); }

@@ -252,7 +252,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'angry'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {
@@ -418,6 +418,20 @@
                 noiseHit(out, at, len * 0.6, 'highpass', 4000, 0, 0.05 + anger * 0.06, 0.002);   // the rasp
                 at += len + 0.02 + Math.random() * (0.06 - anger * 0.03);
             }
+        },
+        'door-metal': function (out, t) {                              // a heavy steel door: the push bar clanks, the hinge squeals, it booms shut
+            [[520, 0.2], [1370, 0.12], [2260, 0.08], [3810, 0.05]].forEach(function (h) { tone(out, t, 'sine', h[0], h[0] * 0.995, 0.5, h[1]); });   // clank
+            noiseHit(out, t, 0.05, 'bandpass', 3000, 3, 0.4, 0.001);
+            var sq = ctx.createOscillator(), sg = gain(0), vib = ctx.createOscillator(), vg = gain(40);
+            sq.type = 'sawtooth'; sq.frequency.setValueAtTime(700, t + 0.15); sq.frequency.linearRampToValueAtTime(980, t + 0.7);
+            vib.frequency.value = 11; vib.connect(vg); vg.connect(sq.frequency);
+            var sf = filter('bandpass', 1800, 6);
+            chain(sq, sf, sg, out);
+            sg.gain.setValueAtTime(0.0001, t + 0.15); sg.gain.exponentialRampToValueAtTime(0.12, t + 0.25); sg.gain.exponentialRampToValueAtTime(0.0001, t + 0.75);
+            sq.start(t + 0.15); vib.start(t + 0.15); sq.stop(t + 0.8); vib.stop(t + 0.8);                          // the squeal
+            tone(out, t + 0.85, 'sine', 95, 45, 0.5, 0.9);                                                        // the boom as it shuts
+            noiseHit(out, t + 0.85, 0.12, 'lowpass', 600, 0.6, 0.5, 0.002);
+            [[180, 0.15], [433, 0.08], [760, 0.05]].forEach(function (h) { tone(out, t + 0.86, 'sine', h[0], h[0] * 0.99, 1.1, h[1]); });   // and rings
         },
         'door': function (out, t) {                                    // a door: the latch, a creak, and it swings
             noiseHit(out, t, 0.04, 'bandpass', 2200, 2, 0.35, 0.002);

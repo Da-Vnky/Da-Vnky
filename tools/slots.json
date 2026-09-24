@@ -1482,12 +1482,17 @@
       },
       {
        "slot": "assets/sounds/door",
-       "what": "a door opening",
+       "what": "a wooden door opening and shutting (the hallway, the workshop)",
        "kind": "sound"
       },
       {
        "slot": "assets/sounds/angry",
        "what": "the traveller’s furious chittering when picked up (played faster and higher the angrier they get)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/door-metal",
+       "what": "the steel roof access door: clank, squeal, boom",
        "kind": "sound"
       }
      ]
