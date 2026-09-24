@@ -100,7 +100,22 @@ list.txt naming its files. You never need to write it by hand:
     "Activate Form" in its first email (look in spam, too). Bottles thrown
     before that are lost, so ask for them again after activating.
 
-  • ONE-TIME SETUP (on your computer, from the top of the site):
+  • YOUR OWN POST OFFICE (Supabase: pictures and all, no daily limit)
+      1. Make a free project at supabase.com.
+      2. SQL Editor → New query → paste all of tools/supabase-setup.sql → Run.
+      3. In sky/sky.js, near the top, fill in SUPABASE: the Project URL and the
+         PUBLISHABLE key (sb_publishable_…). That key is made to be public:
+         it can only send post in.
+      4. In the content manager (tools\content.bat → visitors), connect with
+         the Project URL and the SECRET key (sb_secret_…). It stays on your
+         computer only.
+      Post then goes straight to your database; the content manager collects it
+      each time you open it, and deletes it from Supabase once you've kept or
+      thrown it back. FormSubmit (below) just emails you "something arrived".
+      A free project sleeps after a week with no activity: opening the content
+      manager counts. If it ever sleeps, restore it on supabase.com.
+
+  • ONE-TIME SETUP (FormSubmit: the email side) (on your computer, from the top of the site):
         git config core.hooksPath tools/hooks
     From then on every commit rewrites the list.txt files for you.
     (You can also run it any time:  sh tools/update-lists.sh)

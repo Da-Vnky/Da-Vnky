@@ -73,6 +73,17 @@
     // leave it '' and bottles still get tossed, but nothing is delivered.
     var BOTTLE_INBOX = 'https://formsubmit.co/2c5dbeae55bf1f0a6f5f746a90c805ac';
 
+    // your post office on Supabase: bottles and paintings are sent straight into your own
+    // database (pictures and all), and the content manager (tools\content.bat) collects them.
+    // url: your project's URL (https://xxxx.supabase.co). key: its PUBLISHABLE key
+    // (sb_publishable_…, or the older "anon" key). that one is made to be public: all it can
+    // do is send post in; only your secret key (kept in the content manager, never here) reads it.
+    // leave url '' and post goes by FormSubmit instead, as before.
+    // with Supabase set, FormSubmit (BOTTLE_INBOX) just emails you a short "something arrived";
+    // set NOTIFY_BY_EMAIL = false to stop those.
+    var SUPABASE = { url: 'https://hemevjpsdjesolnpwkry.supabase.co', key: 'sb_publishable_9-1CFzAUiC8-_mIfvvmHCg_-6IaG_PQ' };
+    var NOTIFY_BY_EMAIL = true;
+
     // every page but the homepage shows the sky as it is right now for the visitor
     // (the sun and moon where they'd really be, by their own clock). false = midday,
     // or whatever hour a page sets with data-time="…".
@@ -1357,6 +1368,72 @@
         })(t0);
     }
 
+    /* ---------------- sending post: bottles and paintings from visitors ----------------
+       Sky.sendPost({ kind: 'bottle' | 'art', from, message, title, file: Blob, filename })
+       resolves 'sent', 'closed' (no post office set up) or 'failed' */
+    function sbHeaders(extra) {
+        var h = { apikey: SUPABASE.key };
+        if (/^eyJ/.test(SUPABASE.key)) h.Authorization = 'Bearer ' + SUPABASE.key;   // an older "anon" key
+        for (var k in extra) h[k] = extra[k];
+        return h;
+    }
+    function viaSupabase(p) {
+        var base = SUPABASE.url.replace(/\/+$/, ''), path = '';
+        var upload = Promise.resolve();
+        if (p.file) {
+            var ext = (/\.[a-z0-9]+$/i.exec(p.filename || '') || ['.jpg'])[0].toLowerCase();
+            path = p.kind + '/' + new Date().toISOString().slice(0, 10) + '-' + Math.random().toString(36).slice(2, 10) + ext;
+            upload = fetch(base + '/storage/v1/object/post/' + path, {
+                method: 'POST', body: p.file, headers: sbHeaders({ 'Content-Type': p.file.type || 'application/octet-stream', 'x-upsert': 'false' })
+            }).then(function (r) { if (!r.ok) throw new Error('upload ' + r.status); });
+        }
+        return upload.then(function () {
+            return fetch(base + '/rest/v1/post', {
+                method: 'POST',
+                headers: sbHeaders({ 'Content-Type': 'application/json', Prefer: 'return=minimal' }),
+                body: JSON.stringify({ kind: p.kind, from_name: (p.from || '').slice(0, 40), message: (p.message || '').slice(0, 1000),
+                                       title: (p.title || '').slice(0, 60), file_path: path, file_name: (p.filename || '').slice(0, 120), page: location.href.slice(0, 300) })
+            });
+        }).then(function (r) { if (!r.ok) throw new Error('insert ' + r.status); return 'sent'; });
+    }
+    function viaFormSubmit(p, withFile) {
+        if (!BOTTLE_INBOX) return 'closed';
+        var frame = document.querySelector('iframe[name="post-frame"]');
+        if (!frame) {
+            frame = document.createElement('iframe');
+            frame.name = 'post-frame'; frame.title = 'post'; frame.hidden = true;
+            body.appendChild(frame);
+        }
+        var f = document.createElement('form');
+        f.action = BOTTLE_INBOX; f.method = 'POST'; f.enctype = 'multipart/form-data'; f.target = 'post-frame'; f.hidden = true;
+        function field(n, v) { var i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i); }
+        var art = p.kind === 'art';
+        field('_subject', (art ? 'art for the workshop' + (p.title ? ': “' + p.title + '”' : '') : 'a message in a bottle') + (p.from ? ' from ' + p.from : ''));
+        field('_captcha', 'false'); field('_template', 'table'); field('_honey', '');
+        field('from', p.from || '(no name)');
+        if (art) field('title', p.title || '(untitled)'); else field('message', p.message || '(a drawing or picture)');
+        if (!withFile) field('note', 'it’s waiting in the content manager (tools\\content.bat, visitors)');
+        field('page', location.href);
+        if (withFile && p.file) {
+            var file = document.createElement('input');
+            file.type = 'file'; file.name = 'attachment';
+            try { var dt = new DataTransfer(); dt.items.add(new File([p.file], p.filename || 'post.jpg', { type: p.file.type })); file.files = dt.files; f.appendChild(file); } catch (e) {}
+        }
+        body.appendChild(f);
+        f.submit();
+        setTimeout(function () { f.remove(); }, 4000);
+        return 'sent';
+    }
+    function sendPost(p) {
+        if (SUPABASE.url && SUPABASE.key) {
+            return viaSupabase(p).then(function (r) {
+                if (NOTIFY_BY_EMAIL) try { viaFormSubmit(p, false); } catch (e) {}
+                return r;
+            }, function () { return 'failed'; });
+        }
+        return Promise.resolve(viaFormSubmit(p, true));
+    }
+
     /* ---------------- what grounds and page scripts can use ---------------- */
     window.Sky = {
         // run fn(p) every frame the scene changes; p goes 0 (noon) → 1 (midnight)
@@ -1368,6 +1445,7 @@
         closeSkyView: closeSkyView,
         listFolder: listFolder,
         inbox: BOTTLE_INBOX,
+        sendPost: sendPost,
         // a glass bottle drawing (viewBox 0 0 200 90): .b-scroll (the note inside), .b-cork
         bottleSVG: function (cls) {
             return '<svg class="' + (cls || 'bottle') + '" viewBox="0 0 200 90" aria-hidden="true" data-bottle data-slot="assets/sea/bottle assets/sea/bottle-cork assets/sea/bottle-scroll">' +

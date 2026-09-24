@@ -341,41 +341,12 @@
         return out;
     }
 
-    /* ---------------- posting it (a normal form post into a hidden frame) ---------------- */
-    var frame = document.createElement('iframe');
-    frame.name = 'bottle-post';
-    frame.title = 'bottle post';
-    frame.hidden = true;
-    document.body.appendChild(frame);
+    /* ---------------- posting it: to your post office (Supabase), or by FormSubmit (see sky/sky.js) ---------------- */
     function send(blob) {
-        if (!Sky.inbox) return false;
-        var f = document.createElement('form');
-        f.action = Sky.inbox;
-        f.method = 'POST';
-        f.enctype = 'multipart/form-data';
-        f.target = 'bottle-post';
-        f.hidden = true;
-        function field(n, v) { var i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i); }
-        field('_subject', 'a message in a bottle' + (from.value.trim() ? ' from ' + from.value.trim() : ''));
-        field('_captcha', 'false');
-        field('_template', 'table');
-        field('_honey', '');
-        field('from', from.value.trim() || '(no name)');
-        field('message', text.value.trim() || '(a drawing or picture)');
-        field('page', location.href);
-        var file = document.createElement('input');
-        file.type = 'file';
-        file.name = 'attachment';
-        try {
-            var dt = new DataTransfer();
-            dt.items.add(new File([blob], new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-') + '-bottle.jpg', { type: 'image/jpeg' }));
-            file.files = dt.files;
-            f.appendChild(file);
-        } catch (e) { /* very old browsers: the words still arrive, without the picture */ }
-        document.body.appendChild(f);
-        f.submit();
-        setTimeout(function () { f.remove(); }, 4000);
-        return true;
+        return Sky.sendPost({
+            kind: 'bottle', from: from.value.trim(), message: text.value.trim(), file: blob,
+            filename: new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-') + '-bottle.jpg'
+        });
     }
 
     /* ---------------- rolling it up, bottling it, and over the side it goes ---------------- */
@@ -387,7 +358,7 @@
         document.fonts.load('20px "IM Fell English"').catch(function () {}).then(render).then(function (blob) {
             Sky.lastBottle = blob;
             var delivered = send(blob);
-            try { localStorage.setItem('bottle-sent', String(Date.now())); } catch (e) {}
+            delivered.then(function (how) { if (how === 'sent') try { localStorage.setItem('bottle-sent', String(Date.now())); } catch (e) {} });
             toss(delivered);
         });
     });
@@ -454,9 +425,11 @@
                 d.style.opacity = String(Math.max(0, 1 - Math.max(0, t - 5) / 2.5));
                 if (t < 7.5) requestAnimationFrame(bob); else { d.remove(); document.body.classList.remove('tossing'); }
             })(t0);
-            toast(delivered
-                ? 'your bottle is out to sea. if it washes up, you\'ll find it in the living space.'
-                : 'your bottle drifts out to sea… (the post office here isn\'t open yet, so it won\'t reach anyone)', 7000);
+            Promise.resolve(delivered).then(function (how) {
+                toast(how === 'sent' ? 'your bottle is out to sea. if it washes up, you\'ll find it in the living space.'
+                    : how === 'failed' ? 'your bottle drifts off… but it couldn\'t reach anyone just now. try again a little later?'
+                    : 'your bottle drifts out to sea… (the post office here isn\'t open yet, so it won\'t reach anyone)', 7000);
+            });
         };
     }
 })();

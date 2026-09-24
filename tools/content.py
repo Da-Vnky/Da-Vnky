@@ -14,7 +14,7 @@ change, in your browser:
 It opens http://localhost:8001/ . Everything stays on your computer until you
 press "publish" (or run tools\\publish.bat). Close the black window to stop it.
 """
-import datetime, hashlib, http.server, json, os, re, subprocess, sys, threading, unicodedata, urllib.parse, urllib.request, webbrowser
+import datetime, hashlib, http.server, json, os, re, subprocess, sys, threading, unicodedata, urllib.error, urllib.parse, urllib.request, webbrowser
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..'))
@@ -169,7 +169,101 @@ def unique(folder, stem, ext):
     return name
 
 
+# ---------------- your post office on Supabase ----------------
+def supabase():
+    c = load_json(inbox_path('supabase.json'), {}) if os.path.isdir(INBOX) else {}
+    return c if c.get('url') and c.get('secret') else None
+
+
+def sb_request(method, path, body=None, headers=None, conf=None):
+    c = conf or supabase()
+    h = {'apikey': c['secret'], 'User-Agent': 'DaV-nky content manager'}
+    if c['secret'].startswith('eyJ'):                            # an older "service_role" key
+        h['Authorization'] = 'Bearer ' + c['secret']
+    h.update(headers or {})
+    req = urllib.request.Request(c['url'].rstrip('/') + path, data=body, method=method, headers=h)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return r.read(), (r.headers.get('Content-Type') or '')
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode('utf-8', 'replace')[:300]
+        if e.code in (401, 403):
+            raise ValueError('Supabase said no: is that the SECRET key (sb_secret_…)? (' + detail + ')')
+        if e.code == 404 or 'post' in detail and 'does not exist' in detail:
+            raise ValueError('Supabase can\'t find the post table: run tools/supabase-setup.sql in its SQL Editor first. (' + detail + ')')
+        raise ValueError('Supabase: ' + str(e.code) + ' ' + detail)
+    except urllib.error.URLError as e:
+        raise ValueError('couldn\'t reach Supabase (' + str(e.reason) + '). if the project was paused for a quiet week, open supabase.com and restore it.')
+
+
+def connect_supabase(url, secret):
+    url = (url or '').strip().rstrip('/')
+    secret = (secret or '').strip()
+    if not re.match(r'^https://[a-z0-9-]+\.supabase\.(co|in)$|^http://(localhost|127\.0\.0\.1):\d+$', url):
+        raise ValueError('the project URL looks like https://abcdefgh.supabase.co')
+    if secret.startswith('sb_publishable') or not secret:
+        raise ValueError('that\'s the publishable key: the content manager needs the SECRET one (sb_secret_…)')
+    conf = {'url': url, 'secret': secret}
+    sb_request('GET', '/rest/v1/post?select=id&limit=1', conf=conf)          # does it work?
+    save_json(inbox_path('supabase.json'), conf)
+
+
+def fetch_supabase():
+    raw, _ = sb_request('GET', '/rest/v1/post?select=*&order=created_at.desc&limit=500')
+    rows = json.loads(raw.decode('utf-8'))
+    seen = set(load_json(inbox_path('seen.json'), []))
+    new = 0
+    for row in rows:
+        sid = row['id'].replace('-', '')[:16]
+        if sid in seen:                                          # handled already: tidy it out of Supabase
+            forget_remote({'sb_id': row['id'], 'sb_path': row.get('file_path')})
+            continue
+        old = load_json(inbox_path(sid + '.json'), None)
+        if old and (old.get('picture') or not row.get('file_path')):
+            continue
+        item = {'id': sid, 'kind': row.get('kind') or 'bottle', 'date': (row.get('created_at') or '')[:10],
+                'from': (row.get('from_name') or '').strip(), 'text': (row.get('message') or '').strip(),
+                'title': (row.get('title') or '').strip(), 'picture': '', 'sb_id': row['id'], 'sb_path': row.get('file_path') or ''}
+        if item['sb_path']:
+            try:
+                data, ctype = sb_request('GET', '/storage/v1/object/authenticated/post/' + urllib.parse.quote(item['sb_path']))
+                ext = os.path.splitext(item['sb_path'])[1].lower() or '.jpg'
+                with open(inbox_path(sid + ext), 'wb') as f:
+                    f.write(data)
+                item['picture'] = sid + ext
+            except Exception:
+                pass
+        item['only_email'] = False
+        item['missing'] = bool(item['sb_path'] and not item['picture'])
+        save_json(inbox_path(sid + '.json'), item)
+        if not old:
+            new += 1
+    st = load_json(inbox_path('state.json'), {})
+    st['last_ok'] = datetime.datetime.now().timestamp()
+    save_json(inbox_path('state.json'), st)
+    return new
+
+
+def forget_remote(item):
+    """once you've kept or thrown back a piece of post, it's deleted from Supabase (keeps the free space free)"""
+    if not item or not item.get('sb_id') or not supabase():
+        return
+    try:
+        if item.get('sb_path'):
+            sb_request('DELETE', '/storage/v1/object/post/' + urllib.parse.quote(item['sb_path']))
+        sb_request('DELETE', '/rest/v1/post?id=eq.' + urllib.parse.quote(item['sb_id']), headers={'Prefer': 'return=minimal'})
+    except Exception:
+        pass                                                     # it'll be tidied on the next check
+
+
 def fetch_post():
+    """collect new post: from Supabase if it's connected, otherwise ask FormSubmit"""
+    if supabase():
+        return fetch_supabase()
+    return fetch_formsubmit()
+
+
+def fetch_formsubmit():
     """ask FormSubmit for everything sent; anything new lands in the inbox"""
     k = key()
     if not k:
@@ -313,6 +407,7 @@ def inbox_items():
 
 
 def done_with(sid):
+    forget_remote(load_json(inbox_path(sid + '.json'), None))
     seen = load_json(inbox_path('seen.json'), [])
     if sid not in seen:
         seen.append(sid)
@@ -328,6 +423,8 @@ def keep(sid):
         raise ValueError('that one isn\'t in the inbox any more')
     date = item.get('date') or datetime.date.today().isoformat()
     who = item.get('from') or ''
+    if item.get('sb_path') and not item.get('picture'):
+        raise ValueError('its picture hasn\'t downloaded from Supabase yet: press "check for new post" again')
     if item['kind'] == 'art':
         if not item.get('picture'):
             raise ValueError('the picture only came by email: save the attachment from that email into content/workshop/visitors/')
@@ -556,7 +653,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'letters': letters(), 'today': datetime.date.today().isoformat()})
             if url.path == '/__post/state':
                 pst = load_json(inbox_path('state.json'), {})
-                return self.reply({'hasKey': bool(key()), 'lastCheck': pst.get('last_ok', 0), 'nextOk': pst.get('next_ok', 0), 'inbox': inbox_items(), 'bottles': site_files('bottles'), 'art': site_files('art'), 'board': board(),
+                return self.reply({'hasKey': bool(key() or supabase()), 'source': 'supabase' if supabase() else ('formsubmit' if key() else ''), 'lastCheck': pst.get('last_ok', 0), 'nextOk': pst.get('next_ok', 0), 'inbox': inbox_items(), 'bottles': site_files('bottles'), 'art': site_files('art'), 'board': board(),
                                    'frames': frames(), 'frameNumbers': frame_numbers()})
             if url.path == '/__shelf/list':
                 which = q.get('which', [''])[0]
@@ -624,6 +721,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     raise ValueError('that doesn\'t look like an API key')
                 with open(inbox_path('key.txt'), 'w', encoding='utf-8') as f:
                     f.write(k)
+                return self.reply({'ok': True})
+            if url.path == '/__post/supabase':
+                d = json.loads(raw or b'{}')
+                connect_supabase(d.get('url'), d.get('secret'))
                 return self.reply({'ok': True})
             if url.path == '/__post/fetch':
                 return self.reply({'new': fetch_post()})

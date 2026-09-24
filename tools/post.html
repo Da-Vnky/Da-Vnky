@@ -44,6 +44,10 @@
     .card .acts .yes:hover { background: var(--red); }
     .card .acts .no { color: var(--red); }
     .card .acts button[aria-pressed=true] { background: var(--red); color: #f3e6c2; border-color: var(--red); }
+    .card details.acts.paste { display: block; font-size: .85rem; color: var(--faded); }
+    .card details.acts.paste summary { cursor: pointer; font-style: italic; margin-bottom: 6px; }
+    .card details.acts.paste[open] { display: flex; flex-wrap: wrap; gap: 6px; }
+    .card details.acts.paste[open] summary { flex: 1 1 100%; }
     .card .acts.paste input { flex: 1; min-width: 0; padding: 5px 8px; border-radius: 8px; border: 1px solid rgba(110,82,54,.35); background: #fff8e6; color: var(--ink); font-size: .85rem; }
     .card .acts.paste button { flex: 0 0 auto; }
     .card .acts.hang { align-items: center; }
@@ -73,18 +77,25 @@
 </header>
 <main>
     <section class="setup" hidden>
-        <h2 style="margin-top:0">one-time setup</h2>
+        <h2 style="margin-top:0">connect your post office (Supabase)</h2>
         <ol>
-            <li>Open this address in your browser, with the email your bottles arrive at in place of YOUR-EMAIL:<br>
-                <code>https://formsubmit.co/api/get-apikey/YOUR-EMAIL</code></li>
-            <li>FormSubmit emails you an API key (a long string of letters and numbers).</li>
-            <li>Paste it here. It stays on this computer only (in the .inbox folder, which is never published).</li>
+            <li>On <a href="https://supabase.com/dashboard" target="_blank" style="color:#f3e6c2">supabase.com</a>, open your project, then <b>SQL Editor → New query</b>. Paste everything from <code>tools/supabase-setup.sql</code> and press <b>Run</b> (once).</li>
+            <li>In <b>Project Settings → Data API</b> (or API), copy the <b>Project URL</b>.</li>
+            <li>In <b>Project Settings → API Keys</b>, copy the <b>secret</b> key (sb_secret_…). It stays on this computer only (in the private .inbox folder), never on the site.</li>
         </ol>
-        <input type="text" class="key" placeholder="your FormSubmit API key" autocomplete="off" spellcheck="false">
-        <button type="button" class="btn main save-key">save it</button>
+        <p><input type="text" class="sb-url" placeholder="Project URL: https://….supabase.co" autocomplete="off" spellcheck="false"></p>
+        <p><input type="password" class="sb-secret" placeholder="secret key: sb_secret_…" autocomplete="off" spellcheck="false">
+           <button type="button" class="btn main save-sb">connect</button></p>
+        <p class="sub" style="margin-top:12px">the site itself also needs the Project URL and the <b>publishable</b> key (sb_publishable_…): those go in SUPABASE near the top of sky/sky.js.</p>
+        <details><summary class="sub" style="cursor:pointer">or use FormSubmit's API instead (a few checks a day, no pictures)</summary>
+            <p class="sub">open <code>https://formsubmit.co/api/get-apikey/YOUR-EMAIL</code>, then paste the key it emails you:</p>
+            <input type="text" class="key" placeholder="your FormSubmit API key" autocomplete="off" spellcheck="false">
+            <button type="button" class="btn save-key">save it</button>
+        </details>
     </section>
 
-    <h2>just arrived</h2>
+    <p class="sub"><button type="button" class="btn change-sb" hidden>change the Supabase connection</button></p>
+    <h2>just arrived <button type="button" class="btn keep-all" hidden>keep everything</button></h2>
     <p class="sub">new bottles and art from visitors. only you can see these; keep one and it goes on the site (after you publish).</p>
     <div class="grid inbox"></div>
 
@@ -141,7 +152,8 @@
     function esc(t) { var d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
 
     function draw(st) {
-        $('.setup').hidden = st.hasKey;
+        $('.setup').hidden = st.source === 'supabase' && !showSetup;    // connected: hidden unless you ask to change it
+        $('.change-sb').hidden = st.source !== 'supabase';
         $('.fetch').hidden = !st.hasKey;
         var inbox = $('.inbox'), bottles = $('.bottles'), art = $('.art');
         inbox.innerHTML = bottles.innerHTML = art.innerHTML = '';
@@ -155,11 +167,12 @@
                                                           : 'this one was a drawing or picture, which only came by email: save the .jpg from there into content/living/bottles/') : '';
             var toss = function (msg) { return function () { api('/__post/toss', { id: it.id }).then(function (r) { if (r.error) say(r.error, true); else { say(msg); refresh(); } }); }; };
             if (it.only_email) {
-                var c = card(look, meta, 'the picture came by email. in that email, right-click the picture (or its link) and "copy link", then paste it here:',
-                    [['done, I saved it', toss('marked as done.')], ['throw it back', toss('thrown back.'), 'no']]);
-                var row = document.createElement('div');
+                var c = card(look, '<span class="where">from the old email post (FormSubmit)</span><br>' + meta,
+                    'its picture only went to your email. if you want it, save it from there; then press done.',
+                    [['done', toss('marked as done.')], ['throw it back', toss('thrown back.'), 'no']]);
+                var row = document.createElement('details');
                 row.className = 'acts paste';
-                row.innerHTML = '<input type="url" placeholder="paste the picture\u2019s link"><button type="button" class="yes">fetch it</button>';
+                row.innerHTML = '<summary>or paste the picture\u2019s link from the email</summary><input type="url" placeholder="paste the link"><button type="button" class="yes">fetch it</button>';
                 row.querySelector('button').addEventListener('click', function () {
                     var u = row.querySelector('input').value.trim();
                     if (!u) return;
@@ -177,6 +190,14 @@
                 ['throw it back', function () { api('/__post/toss', { id: it.id }).then(function (r) { if (r.error) say(r.error, true); else { say('thrown back.'); refresh(); } }); }, 'no']
             ]));
         });
+        var keepable = st.inbox.filter(function (it) { return !it.only_email && (it.picture || (it.kind === 'bottle' && it.text)); });
+        $('.keep-all').hidden = keepable.length < 2;
+        $('.keep-all').onclick = function () {
+            if (!confirm('keep all ' + keepable.length + '? they all go on the site (after you publish).')) return;
+            say('keeping ' + keepable.length + '…');
+            keepable.reduce(function (p, it) { return p.then(function () { return api('/__post/keep', { id: it.id }); }); }, Promise.resolve())
+                .then(function () { say('kept them all. publish when you\u2019re ready.'); refresh(); });
+        };
         if (!st.inbox.length) inbox.innerHTML = '<p class="empty">' + (st.hasKey ? 'nothing new. press “check for new post” to look.' : 'set up the key above, then check for new post.') + '</p>';
 
         var pinned = (st.board && st.board.pinned) || [], pile = (st.board && st.board.pile) || [];
@@ -251,6 +272,18 @@
     }
     function refresh() { return api('/__post/state').then(function (st) { if (st.error) { say(st.error, true); $('.fetch').hidden = true; return; } draw(st); }); }
 
+    var showSetup = false;
+    $('.change-sb').addEventListener('click', function () { showSetup = !showSetup; $('.setup').hidden = !showSetup; });
+    $('.save-sb').addEventListener('click', function () {
+        say('connecting…');
+        api('/__post/supabase', { url: $('.sb-url').value, secret: $('.sb-secret').value }).then(function (r) {
+            if (r.error) { say(r.error, true); return; }
+            $('.sb-secret').value = '';
+            showSetup = false;
+            say('connected to Supabase. checking for post…');
+            refresh().then(check);
+        });
+    });
     $('.save-key').addEventListener('click', function () {
         api('/__post/key', { key: $('.key').value }).then(function (r) {
             if (r.error) { say(r.error, true); return; }
@@ -275,7 +308,8 @@
         if (st.error) { say(st.error, true); $('.fetch').hidden = true; return; }
         draw(st);
         var now = Date.now() / 1000;
-        if (st.hasKey && (!st.nextOk || st.nextOk < now) && now - (st.lastCheck || 0) > 8 * 3600) check();
+        if (st.source === 'supabase') check();                          // your own post office: no limits, check every time
+        else if (st.hasKey && (!st.nextOk || st.nextOk < now) && now - (st.lastCheck || 0) > 8 * 3600) check();
         else if (st.hasKey && st.lastCheck) say('last checked ' + new Date(st.lastCheck * 1000).toLocaleString().toLowerCase() + '. (FormSubmit only allows a few checks a day)');
     });
 })();

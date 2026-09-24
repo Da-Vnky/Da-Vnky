@@ -417,42 +417,8 @@
             return blob('image/jpeg', 0.92).then(function (j) { return j && j.size <= LIMIT ? j : blob('image/jpeg', 0.8); });
         });
     }
-    var frame = document.createElement('iframe');
-    frame.name = 'art-post';
-    frame.title = 'art post';
-    frame.hidden = true;
-    document.body.appendChild(frame);
-    function send(blob, filename) {
-        if (!Sky.inbox) return false;
-        var f = document.createElement('form');
-        f.action = Sky.inbox;
-        f.method = 'POST';
-        f.enctype = 'multipart/form-data';
-        f.target = 'art-post';
-        f.hidden = true;
-        function field(n, v) { var i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i); }
-        var who = nameIn.value.trim(), what = titleIn.value.trim();
-        field('_subject', 'art for the workshop' + (what ? ': “' + what + '”' : '') + (who ? ' from ' + who : ''));
-        field('_captcha', 'false');
-        field('_template', 'table');
-        field('_honey', '');
-        field('from', who || '(no name)');
-        field('title', what || '(untitled)');
-        field('keep it', 'save the attachment into content/workshop/visitors/ (its name is already right)');
-        field('page', location.href);
-        var file = document.createElement('input');
-        file.type = 'file';
-        file.name = 'attachment';
-        try {
-            var dt = new DataTransfer();
-            dt.items.add(new File([blob], filename, { type: blob.type }));
-            file.files = dt.files;
-            f.appendChild(file);
-        } catch (e) { /* very old browsers: the note arrives, without the picture */ }
-        document.body.appendChild(f);
-        f.submit();
-        setTimeout(function () { f.remove(); }, 4000);
-        return true;
+    function send(blob, filename) {                                     // to your post office (Supabase), or by FormSubmit (see sky/sky.js)
+        return Sky.sendPost({ kind: 'art', from: nameIn.value.trim(), title: titleIn.value.trim(), file: blob, filename: filename });
     }
 
     goBtn.addEventListener('click', function () {
@@ -465,7 +431,7 @@
             var ext = up ? TYPES[blob.type] : (blob.type === 'image/png' ? '.png' : '.jpg');
             var name = new Date().toISOString().slice(0, 10) + '-' + (slug(titleIn.value) || 'untitled') + (slug(nameIn.value) ? '-by-' + slug(nameIn.value) : '') + ext;
             var delivered = send(blob, name);
-            try { localStorage.setItem('art-sent', String(Date.now())); } catch (e) {}
+            delivered.then(function (how) { if (how === 'sent') try { localStorage.setItem('art-sent', String(Date.now())); } catch (e) {} });
             tuckAway(up ? dropImg.src : cv.toDataURL('image/png'), delivered);
         });
     });
@@ -498,9 +464,11 @@
             if (!calm) folio.animate([{ transform: 'none' }, { transform: 'translateY(2px) scaleY(.97)' }, { transform: 'none' }], { duration: 320 });
             reset();
             st.classList.remove('sending');
-            toast(delivered
-                ? 'sent! if it’s kept, you’ll find it in the visitors’ portfolio here by the bench.'
-                : 'it’s tucked away… (the post office here isn’t open yet, so it won’t reach anyone)', 7000);
+            Promise.resolve(delivered).then(function (how) {
+                toast(how === 'sent' ? 'sent! if it’s kept, you’ll find it in the visitors’ portfolio here by the bench.'
+                    : how === 'failed' ? 'it couldn’t be sent just now. try again a little later?'
+                    : 'it’s tucked away… (the post office here isn’t open yet, so it won’t reach anyone)', 7000);
+            });
         };
     }
 })();
