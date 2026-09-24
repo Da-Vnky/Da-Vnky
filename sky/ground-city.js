@@ -40,6 +40,14 @@
         '.city-roof .groove > .art:not(.glow-layer), .city-roof .groove > .placeholder { filter: brightness(calc(1 - .5 * var(--dusk))); }' +
         '@media (max-width: 620px) { .city-roof .groove { width: 34px; } .city-roof .roof-pigeon { width: 22px; } .city-roof .roof-pigeon.two { width: 19px; } }' +
         '.city-roof .r-halo { fill: url(#roof-glow); }' +
+        '.city-roof .roof-door, .city-roof .roof-door:hover { position: absolute; left: 43%; bottom: 44%; height: 58%; aspect-ratio: 110 / 120; padding: 0; background: none; pointer-events: auto; cursor: pointer; }' +
+        '.city-roof .roof-door > svg, .city-roof .roof-door > .art { display: block; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; }' +
+        '.city-roof .roof-door > svg, .city-roof .roof-door > .art:not(.glow-layer) { filter: brightness(calc(1 - .5 * var(--dusk))); }' +
+        '.city-roof .roof-door:hover > svg, .city-roof .roof-door:hover > .art { filter: brightness(calc(1.08 - .45 * var(--dusk))) drop-shadow(0 0 8px rgba(255,220,150,.5)); }' +
+        '.city-roof .roof-door .rd-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font-style: italic; font-size: .95rem;' +
+            'color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.8); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
+        '.city-roof .roof-door:hover .rd-hint { opacity: 1; }' +
+        '@media (max-width: 620px) { .city-roof .roof-door { left: 38%; height: 50%; } }' +
         'body.peep-view .city-roof, body.peep-close .city-roof, body.sky-view .city-roof, body.scope-view .city-roof { transform: translateY(110%); opacity: 0; }' +
         '@media (max-width: 620px) { .city-roof { height: 17vh; min-height: 110px; } }'
     );
@@ -79,6 +87,16 @@
         '<path class="r-metal"/><path class="r-glass"/><path class="r-warm"/><path class="r-pot"/><path class="r-leaf"/><path class="r-wire"/>' +
         '<g class="r-lights"></g></svg>' +
         // rooftop friends who dance when music plays: assets/city/cat, assets/city/pigeon
+        // the roof access door: back down the stairs to the hallway. your own: assets/city/roof-door
+        '<a class="roof-door exit" href="living.html#hallway" data-sound="door" data-asset="assets/city/roof-door" aria-label="the roof access door, down to the hallway">' +
+            '<svg class="placeholder" viewBox="0 0 110 120" aria-hidden="true">' +
+            '<path d="M4 120 V26 L55 6 L106 26 V120 Z" fill="#7d4a36"/><path d="M4 26 L55 6 L106 26 L106 32 L55 12 L4 32 Z" fill="#5a3326"/>' +
+            '<g stroke="#5f3526" stroke-width="1.2" opacity=".6"><path d="M4 44 H106 M4 62 H106 M4 80 H106 M4 98 H106"/><path d="M30 26 V44 M78 26 V44 M16 44 V62 M54 44 V62 M92 44 V62 M30 62 V80 M78 62 V80 M16 80 V98 M92 80 V98 M30 98 V120 M78 98 V120"/></g>' +
+            '<rect x="33" y="48" width="44" height="72" fill="#1c1d22"/><rect x="36" y="51" width="38" height="69" fill="#5d6570"/>' +
+            '<path d="M36 70 H74 M36 100 H74" stroke="#4a515b" stroke-width="1.5"/><rect x="66" y="84" width="6" height="3" rx="1.5" fill="#c9ccd0"/>' +
+            '<rect x="30" y="30" width="50" height="14" rx="2" fill="#b8402a"/>' +
+            '<text x="55" y="40.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="8.5" fill="#fff">ROOF ACCESS</text>' +
+            '<circle cx="55" cy="22" r="3" fill="#ffd98a" class="r-bulb"/></svg><span class="rd-hint">down to the hallway</span></a>' +
         '<div class="groove roof-cat" data-groove="cat" data-asset="assets/city/cat"></div>' +
         '<div class="groove roof-pigeon" data-groove="pigeon" data-asset="assets/city/pigeon"></div>' +
         '<div class="groove roof-pigeon two" data-groove="pigeon" data-asset="assets/city/pigeon"></div>';

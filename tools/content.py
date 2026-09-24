@@ -33,7 +33,15 @@ ART = os.path.join(ROOT, 'content', 'workshop', 'visitors')
 INBOX = os.path.join(ROOT, '.inbox')
 FOLDERS = {'bottles': BOTTLES, 'art': ART}
 SHOWN = re.compile(r'\.(txt|html|png|jpe?g|gif|webp|svg)$', re.I)
-ROOMS = ('living', 'workshop')                      # rooms with picture frames: content/<room>/frames.json
+# the walls with picture frames. each keeps its own list, content/<wall>/frames.json; a name alone in
+# it is from the wall's own folder, a path (content/frames/x.png) works on any wall.
+# a frame belongs to a wall by its page and data-wall (<div class="gallery-frame" data-wall="shame" …>)
+WALLS = {
+    'living':   {'label': 'living space',  'page': 'living.html',   'folder': 'content/workshop/visitors/'},
+    'workshop': {'label': 'workshop',      'page': 'workshop.html', 'folder': 'content/workshop/'},
+    'shame':    {'label': 'hall of shame', 'page': 'living.html',   'folder': 'content/workshop/visitors/'},
+}
+ROOMS = tuple(WALLS)
 
 # your own things: folder, the kinds of file it holds
 SHELVES = {
@@ -496,7 +504,7 @@ def delete_site_file(which, name):
         raise ValueError('that isn\'t one of the files')
     os.remove(os.path.join(folder, name))
     if which == 'art':
-        hang(name, None)
+        unhang_everywhere('content/workshop/visitors/' + name)
     if which == 'bottles':                                       # take it off the board and the pile too
         bj = os.path.join(BOTTLES, 'board.json')
         board = load_json(bj, None)
@@ -509,13 +517,25 @@ def delete_site_file(which, name):
     write_list(folder)
 
 
-# ---------------- the frames in the living space ----------------
+# ---------------- the frames on the walls ----------------
 def frame_numbers(room='living'):
+    """the frame numbers on one wall, read from its page"""
+    wall = WALLS.get(room)
+    if not wall:
+        return []
+    home = os.path.splitext(wall['page'])[0]
     try:
-        with open(os.path.join(ROOT, room + '.html'), encoding='utf-8') as f:
-            return sorted({int(n) for n in re.findall(r'data-frame="(\d+)"', f.read())})
+        with open(os.path.join(ROOT, wall['page']), encoding='utf-8') as f:
+            text = f.read()
     except Exception:
         return []
+    out = set()
+    for tag in re.findall(r'<div[^>]*\bgallery-frame\b[^>]*>', text):
+        n = re.search(r'data-frame="(\d+)"', tag)
+        w = re.search(r'data-wall="([a-z0-9-]+)"', tag)
+        if n and (w.group(1) if w else home) == room:
+            out.add(int(n.group(1)))
+    return sorted(out)
 
 
 def frames_file(room):
@@ -525,6 +545,31 @@ def frames_file(room):
 def frames(room='living'):
     m = load_json(frames_file(room), {})
     return {str(k): v for k, v in m.items() if isinstance(v, str)} if isinstance(m, dict) else {}
+
+
+def wall_ref(path, room):
+    """how a wall's frames.json names a picture: a name alone if it's in the wall's own folder"""
+    folder = WALLS[room]['folder']
+    rest = path[len(folder):] if path.startswith(folder) else None
+    return rest if rest and '/' not in rest else path
+
+
+def walls_state():
+    return [{'id': k, 'label': w['label'], 'numbers': frame_numbers(k), 'frames': frames(k)} for k, w in WALLS.items()]
+
+
+def moved(old_path, new_path):
+    """a picture changed folders: every frame it hangs in keeps it"""
+    for room in ROOMS:
+        old, new = wall_ref(old_path, room), wall_ref(new_path, room)
+        for k, v in list(frames(room).items()):
+            if v == old:
+                hang(new, k, room)
+
+
+def unhang_everywhere(path):
+    for room in ROOMS:
+        hang(wall_ref(path, room), None, room)
 
 
 def hang(what, frame, room='living'):
@@ -539,6 +584,7 @@ def hang(what, frame, room='living'):
         m[str(int(frame))] = what
     if not m and not os.path.exists(frames_file(room)):
         return
+    os.makedirs(os.path.dirname(frames_file(room)), exist_ok=True)
     with open(frames_file(room), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(dict(sorted(m.items(), key=lambda kv: int(kv[0]) if kv[0].isdigit() else 0)), f, indent=2)
 
@@ -556,7 +602,7 @@ def shelf(which):
         stem, ext = os.path.splitext(n)
         if ext[1:].lower() not in kinds:
             continue
-        item = {'name': n, 'url': rel + urllib.parse.quote(n), 'date': date_of(n), 'kind': ext[1:].lower()}
+        item = {'name': n, 'url': rel + urllib.parse.quote(n), 'date': date_of(n), 'kind': ext[1:].lower(), 'path': rel[1:] + n}
         cap = os.path.join(folder, stem + '.txt')
         if which != 'music' and os.path.exists(cap):
             with open(cap, encoding='utf-8', errors='replace') as f:
@@ -636,20 +682,22 @@ def shelf_delete(which, name):
         p = os.path.join(folder, stem + '.' + e)
         if os.path.exists(p) and (e == 'txt' or which == 'music'):
             os.remove(p)
-    if which == 'easel':
-        hang('content/workshop/' + name, None, 'living')
-        hang(name, None, 'workshop')
-    if which == 'walls':
-        for room in ROOMS:
-            hang('content/frames/' + name, None, room)
+    if which in ('easel', 'walls'):
+        unhang_everywhere(os.path.relpath(os.path.join(folder, name), ROOT).replace(os.sep, '/'))
     write_list(folder)
 
 
-def shelf_move(name, to):
-    """move a picture between the easel (content/workshop/) and the hidden pool for the walls
-    (content/frames/), with its caption; the frames it hangs in keep it"""
-    src, dst = ('easel', 'walls') if to == 'walls' else ('walls', 'easel')
-    sf, df = SHELVES[src][0], SHELVES[dst][0]
+PLACES = {'easel': SHELVES['easel'][0], 'walls': SHELVES['walls'][0], 'art': os.path.join(ROOT, 'content', 'workshop', 'visitors')}
+
+
+def shelf_move(name, to, frm=None):
+    """move a picture between the easel (content/workshop/), the visitors' portfolio
+    (content/workshop/visitors/) and the hidden pool for the walls (content/frames/),
+    with its caption; the frames it hangs in keep it"""
+    frm = frm or ('easel' if to == 'walls' else 'walls')
+    if frm not in PLACES or to not in PLACES or frm == to:
+        raise ValueError('move it where?')
+    sf, df = PLACES[frm], PLACES[to]
     if not name or os.path.basename(name) != name or not os.path.exists(os.path.join(sf, name)):
         raise ValueError('that picture isn\'t there')
     stem, ext = os.path.splitext(name)
@@ -659,13 +707,8 @@ def shelf_move(name, to):
     cap = os.path.join(sf, stem + '.txt')
     if os.path.exists(cap):
         os.replace(cap, os.path.join(df, os.path.splitext(final)[0] + '.txt'))
-    old = {'living': 'content/workshop/' + name, 'workshop': name} if src == 'easel' else {r: 'content/frames/' + name for r in ROOMS}
-    new = {'living': 'content/workshop/' + final, 'workshop': final} if dst == 'easel' else {r: 'content/frames/' + final for r in ROOMS}
-    for room in ROOMS:
-        m = frames(room)
-        for k, v in list(m.items()):
-            if v == old[room]:
-                hang(new[room], k, room)
+    rel = lambda folder, n: os.path.relpath(os.path.join(folder, n), ROOT).replace(os.sep, '/')
+    moved(rel(sf, name), rel(df, final))
     write_list(sf)
     write_list(df)
     return final
@@ -1006,13 +1049,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if url.path == '/__post/state':
                 pst = load_json(inbox_path('state.json'), {})
                 return self.reply({'hasKey': bool(key() or supabase()), 'source': 'supabase' if supabase() else ('formsubmit' if key() else ''), 'lastCheck': pst.get('last_ok', 0), 'nextOk': pst.get('next_ok', 0), 'inbox': inbox_items(), 'bottles': site_files('bottles'), 'art': site_files('art'), 'board': board(),
-                                   'frames': frames(), 'frameNumbers': frame_numbers()})
+                                   'frames': frames(), 'frameNumbers': frame_numbers(), 'walls': walls_state()})
             if url.path == '/__shelf/list':
                 which = q.get('which', [''])[0]
                 if which not in SHELVES:
                     raise ValueError('which shelf?')
                 return self.reply({'items': shelf(which), 'frames': frames(), 'frameNumbers': frame_numbers(),
-                                   'workshopFrames': frames('workshop'), 'workshopFrameNumbers': frame_numbers('workshop')})
+                                   'workshopFrames': frames('workshop'), 'workshopFrameNumbers': frame_numbers('workshop'), 'walls': walls_state()})
             if url.path.startswith('/__post/inbox/'):
                 name = os.path.basename(url.path)
                 if not re.match(r'^[a-f0-9]{16}\.(png|jpg|gif|webp)$', name) or not os.path.exists(inbox_path(name)):
@@ -1098,10 +1141,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'where': place_bottle(d.get('name'), d.get('where'))})
             if url.path == '/__post/hang':
                 d = json.loads(raw or b'{}')
-                what = (d.get('what') or '').strip()
+                room = d.get('room') or 'living'
+                if room not in WALLS:
+                    raise ValueError('which wall?')
+                what = wall_ref((d.get('path') or '').strip(), room) if d.get('path') else (d.get('what') or '').strip()
                 if not what or '..' in what or what.startswith('/'):
                     raise ValueError('which picture?')
-                room = d.get('room') or 'living'
                 hang(what, d.get('frame') or None, room)
                 return self.reply({'frames': frames(room)})
             if url.path == '/__shelf/add':
@@ -1125,7 +1170,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'ok': True})
             if url.path == '/__shelf/move':
                 d = json.loads(raw or b'{}')
-                return self.reply({'name': shelf_move(d.get('name'), d.get('to'))})
+                return self.reply({'name': shelf_move(d.get('name'), d.get('to'), d.get('from'))})
             if url.path == '/__post/delete':
                 d = json.loads(raw or b'{}')
                 if d.get('which') not in FOLDERS:

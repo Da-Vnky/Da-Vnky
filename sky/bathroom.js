@@ -23,7 +23,6 @@
     var room = document.querySelector('.room');
     var go = document.querySelector('.room-arrow.to-bath');
     if (!Sky || !bath || !room || !go) return;
-    var back = bath.querySelector('.room-arrow.to-living');
     var mirror = bath.querySelector('.bath-mirror');
     var home = room.querySelector('.scene-character');
     var me = bath.querySelector('.character');
@@ -32,7 +31,11 @@
     var ARROW = '<svg class="placeholder" viewBox="0 0 60 60" aria-hidden="true">' +
         '<circle cx="30" cy="30" r="27" fill="rgba(243,230,194,.16)" stroke="rgba(243,230,194,.55)" stroke-width="2"/>' +
         '<path d="M22 16 L38 30 L22 44" fill="none" stroke="#f3e6c2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    [go, back].forEach(function (a) { if (a && !a.querySelector('.placeholder, img')) a.insertAdjacentHTML('afterbegin', ARROW); });
+    Array.prototype.forEach.call(document.querySelectorAll('.room-arrow'), function (a) { if (!a.querySelector('.placeholder, img')) a.insertAdjacentHTML('afterbegin', ARROW); });
+    // door hints: the words on hover
+    Array.prototype.forEach.call(document.querySelectorAll('.side-door[data-hint]'), function (d) {
+        var h = document.createElement('span'); h.className = 'door-hint'; h.textContent = d.dataset.hint; d.appendChild(h);
+    });
 
     Sky.css(
         // the arrows: see-through until you point at them
@@ -42,10 +45,14 @@
         '.room-arrow:hover, .room-arrow:focus-visible { opacity: 1; transform: translateX(4px); outline: none; }' +
         '.room-arrow > svg, .room-arrow > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
         '.room-arrow.to-bath { right: 14px; top: 60vh; }' +
+        '.room-arrow.to-hall { left: 14px; top: 60vh; }' +
+        '.room-arrow.to-hall > svg, .room-arrow.to-hall > .art { transform: scaleX(-1); }' +
+        '.room-arrow.to-hall:hover, .room-arrow.to-hall:focus-visible { transform: translateX(-4px); }' +
         '.room-arrow.to-living { position: absolute; left: 14px; top: 50%; margin-top: -27px; }' +
         '.room-arrow.to-living > svg, .room-arrow.to-living > .art { transform: scaleX(-1); }' +
         '.room-arrow.to-living:hover, .room-arrow.to-living:focus-visible { transform: translateX(-4px); }' +
-        'body.in-bath .room-arrow.to-bath, body.bath-walking .room-arrow, body.leaving .room-arrow, body.sky-view .room-arrow.to-bath, body.is-outside .room-arrow.to-bath,' +
+        '.room-arrow.back-right { position: absolute; right: 14px; top: 74%; margin-top: -27px; }' +
+        'body.in-side .room-arrow.to-bath, body.in-side .room-arrow.to-hall, body.side-walking .room-arrow, body.leaving .room-arrow, body.sky-view .room-arrow, body.is-outside .room-arrow,' +
         'body.gallery-open .room-arrow, body.records-open .room-arrow, body.crate-open .room-arrow, body.frame-open .room-arrow, body.mirror-open .room-arrow,' +
         'body.art-open .room-arrow, body.visitors-open .room-arrow { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility 0s .3s; }' +
 
@@ -63,7 +70,35 @@
         'body.in-bath .bathroom { transform: none; visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
         'body.in-bath .room { transform: translateX(-100%); }' +
         'body.bath-panning .bathroom { visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
-        'body.in-bath .sky-links { visibility: hidden; }' +
+        'body.in-side .sky-links { visibility: hidden; }' +
+        // the hallway: waits off to the left
+        '.hallway { position: fixed; inset: 0; z-index: 3; overflow: hidden; transform: translateX(-100%); visibility: hidden;' +
+            'transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s .9s; --floor-h: 11vh;' +
+            'background: linear-gradient(transparent 62%, #3a2a1f 62%, #3a2a1f calc(62% + 10px), transparent calc(62% + 10px)),' +
+            'repeating-linear-gradient(90deg, transparent 0 88px, rgba(0,0,0,.22) 88px 91px) 0 62% / 100% 38% no-repeat,' +
+            'linear-gradient(#4d3a2c 62%, #5b4331 62%),' +
+            'repeating-linear-gradient(90deg, rgba(255,230,190,.05) 0 26px, transparent 26px 52px); }' +
+        '.hallway > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }' +
+        '.hallway::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;' +
+            'background: radial-gradient(ellipse at 50% 12%, rgba(255,200,120,calc(.18 + .12 * var(--dusk))), transparent 55%), linear-gradient(rgba(10,14,30,calc(.35 * var(--dusk))), rgba(10,14,30,calc(.35 * var(--dusk)))); }' +
+        'body.in-hall .hallway { transform: none; visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
+        'body.in-hall .room { transform: translateX(100%); }' +
+        'body.hall-panning .hallway { visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
+        '.hallway .furnish { position: absolute; z-index: 2; }' +
+        '.hallway .room-floor { position: absolute; left: 0; right: 0; bottom: 0; height: var(--floor-h); min-height: 34px; z-index: 1; pointer-events: none; }' +
+        '.hallway .room-floor .placeholder, .hallway .room-floor > .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: fill; }' +
+        '.hallway .room-floor .placeholder { border-top: 9px solid #2e2118; box-shadow: 0 -3px 8px rgba(0,0,0,.3);' +
+            'background: linear-gradient(rgba(0,0,0,.3), transparent 45%), repeating-linear-gradient(to bottom, transparent 0 13px, rgba(0,0,0,.3) 13px 15px), repeating-linear-gradient(to right, transparent 0 138px, rgba(0,0,0,.22) 138px 140px), #4a3322; }' +
+        '.side-door, .side-door:hover { padding: 0; background: none; text-shadow: none; cursor: pointer; }' +
+        '.side-door > svg, .side-door > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
+        '.side-door .leaf { transform-box: fill-box; transform-origin: 0 50%; transition: transform .45s cubic-bezier(.5,0,.3,1); }' +
+        '.side-door.open .leaf { transform: scaleX(.14); }' +
+        '.side-door.open:not(.has-open) > .art { opacity: .35; transition: opacity .4s; }' +
+        '.side-door .door-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font-style: italic;' +
+            'font-size: .95rem; color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.7); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
+        '.side-door:hover .door-hint, .side-door:focus-visible .door-hint { opacity: 1; }' +
+        '.side-door:hover, .side-door:focus-visible { filter: drop-shadow(0 0 10px rgba(255,220,150,.45)); outline: none; }' +
+        '.hall-character { transition-property: left; transition-timing-function: linear; }' +
         '.bathroom .furnish { position: absolute; z-index: 2; }' +
         '.bathroom .room-floor { position: absolute; left: 0; right: 0; bottom: 0; height: var(--floor-h); min-height: 34px; z-index: 1; pointer-events: none; }' +
         '.bathroom .room-floor .placeholder, .bathroom .room-floor > .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: fill; }' +
@@ -99,11 +134,11 @@
         '.mirror-view.done .mv-more { opacity: .6; }' +
         'body.mirror-open .place-tabs, body.mirror-open .cp { opacity: 0; pointer-events: none; }' +
         '@media (max-width: 620px) { .mv-text { font-size: 1.25rem; padding: 16px 18px; } }' +
-        '@media (prefers-reduced-motion: reduce) { .bathroom, .bath-character, .room .scene-character { transition-duration: 0s !important; } }'
+        '@media (prefers-reduced-motion: reduce) { .bathroom, .hallway, .bath-character, .hall-character, .room .scene-character { transition-duration: 0s !important; } }'
     );
 
-    /* ---------------- the arrow sits just under the tabs ---------------- */
-    function placeArrow() {
+    /* ---------------- the arrows sit just under the tabs (the hallway's on the left) ---------------- */
+    function placeArrows() {
         var tabs = document.querySelector('.place-tabs');
         if (!tabs) return;
         var r = tabs.getBoundingClientRect(), h = go.offsetHeight || 54;
@@ -111,11 +146,13 @@
         if (top + h > window.innerHeight - 12) top = r.top - h - 14;      // no room below (small screens): just above
         go.style.top = Math.round(top) + 'px';
         go.style.right = '8px';
+        var left = document.querySelector('.room-arrow.to-hall');
+        if (left) { left.style.top = Math.round(top) + 'px'; left.style.left = '8px'; }
     }
-    placeArrow();
-    window.addEventListener('resize', placeArrow);
-    window.addEventListener('load', placeArrow);
-    setTimeout(placeArrow, 400);
+    placeArrows();
+    window.addEventListener('resize', placeArrows);
+    window.addEventListener('load', placeArrows);
+    setTimeout(placeArrows, 400);
 
     /* ---------------- walking ---------------- */
     function leftPct(el) {
@@ -150,58 +187,107 @@
         void el.offsetWidth;
     }
 
-    var homeAt = home ? leftPct(home) : 34, standAt = me ? leftPct(me) : 28;
-    var busy = false;
-
-    function toBath(instant) {
-        if (busy || body.classList.contains('in-bath')) return;
-        busy = true;
-        body.classList.add('bath-walking');
+    /* ---------------- the rooms either side: the bathroom (right) and the hallway (left) ----------------
+       the traveller walks off that edge, the living space slides away and the other room slides in;
+       they walk in from the edge you'd expect. living.html#bathroom / #hallway starts you in there. */
+    var SIDES = [
+        { name: 'bath', el: bath, go: go, dir: 1, hash: '#bathroom' },
+        { name: 'hall', el: document.querySelector('.hallway'), go: document.querySelector('.room-arrow.to-hall'), dir: -1, hash: '#hallway' }
+    ].filter(function (sd) { return sd.el && sd.go; });
+    var homeAt = home ? leftPct(home) : 34, busy = false, inSide = null;
+    SIDES.forEach(function (sd) {
+        sd.me = sd.el.querySelector('.character');
+        sd.back = sd.el.querySelector('.room-arrow');
+        sd.standAt = sd.me ? leftPct(sd.me) : 40;
+    });
+    var OFF = { '1': 104, '-1': -14 };                       // just past the right / left edge
+    function goTo(sd, instant) {
+        if (busy || inSide) return;
+        busy = true; inSide = sd;
+        body.classList.add('side-walking');
         homeAt = home ? leftPct(home) : homeAt;
         function slide() {
-            bath.setAttribute('aria-hidden', 'false');
-            if (me) place(me, 2);
-            body.classList.add('bath-panning', 'in-bath');
+            sd.el.setAttribute('aria-hidden', 'false');
+            if (sd.me) place(sd.me, sd.dir > 0 ? 2 : 90, sd.dir < 0);       // in from the edge you came through
+            body.classList.add(sd.name + '-panning', 'in-' + sd.name, 'in-side');
             setTimeout(function () {
-                body.classList.remove('bath-panning');
-                var arrive = function () { busy = false; body.classList.remove('bath-walking'); if (me) me.classList.remove('face-left'); };
-                if (me) walk(me, standAt, arrive); else arrive();
+                body.classList.remove(sd.name + '-panning');
+                var arrive = function () { busy = false; body.classList.remove('side-walking'); if (sd.me) sd.me.classList.remove('face-left'); };
+                if (sd.me) walk(sd.me, sd.standAt, arrive); else arrive();
             }, instant ? 0 : 900);
-            try { history.replaceState(null, '', '#bathroom'); } catch (e) {}
+            try { history.replaceState(null, '', sd.hash); } catch (e) {}
         }
         if (instant || !home) {
-            if (instant) { bath.style.transition = room.style.transition = 'none'; }
+            if (instant) { sd.el.style.transition = room.style.transition = 'none'; }
             slide();
-            if (instant) { void bath.offsetWidth; if (me) place(me, standAt); setTimeout(function () { bath.style.transition = room.style.transition = ''; }, 50); }
+            if (instant) { void sd.el.offsetWidth; if (sd.me) place(sd.me, sd.standAt); setTimeout(function () { sd.el.style.transition = room.style.transition = ''; }, 50); }
             return;
         }
-        walk(home, 104);                         // off the right-hand edge; the room slides as they reach it
-        setTimeout(slide, walkSecs(home, 104) * 700);
+        walk(home, OFF[sd.dir]);                             // off the edge; the room slides as they reach it
+        setTimeout(slide, walkSecs(home, OFF[sd.dir]) * 700);
     }
-    function toLiving() {
-        if (busy || !body.classList.contains('in-bath')) return;
+    function goHome() {
+        var sd = inSide;
+        if (busy || !sd) return;
         busy = true;
-        body.classList.add('bath-walking');
+        body.classList.add('side-walking');
         function slide() {
-            if (home) place(home, 98, true);
-            body.classList.add('bath-panning');
-            body.classList.remove('in-bath');
-            bath.setAttribute('aria-hidden', 'true');
+            if (home) place(home, sd.dir > 0 ? 98 : -6, sd.dir > 0);
+            body.classList.add(sd.name + '-panning');
+            body.classList.remove('in-' + sd.name, 'in-side');
+            sd.el.setAttribute('aria-hidden', 'true');
+            inSide = null;
             try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
             setTimeout(function () {
-                body.classList.remove('bath-panning');
-                var arrive = function () { busy = false; body.classList.remove('bath-walking'); if (home) home.classList.remove('face-left'); };
+                body.classList.remove(sd.name + '-panning');
+                var arrive = function () { busy = false; body.classList.remove('side-walking'); if (home) home.classList.remove('face-left'); };
                 if (home) walk(home, homeAt, arrive); else arrive();
             }, 900);
         }
-        if (me) { walk(me, -14); setTimeout(slide, walkSecs(me, -14) * 700); } else slide();
+        if (sd.me && !sd.me.classList.contains('gore-hidden')) { walk(sd.me, OFF[-sd.dir]); setTimeout(slide, walkSecs(sd.me, OFF[-sd.dir]) * 700); } else slide();
     }
-    go.addEventListener('click', function (e) { e.preventDefault(); toBath(); });
-    if (back) back.addEventListener('click', function (e) { e.preventDefault(); toLiving(); });
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && body.classList.contains('in-bath') && !body.classList.contains('mirror-open')) toLiving();
+    SIDES.forEach(function (sd) {
+        sd.go.addEventListener('click', function (e) { e.preventDefault(); goTo(sd); });
+        if (sd.back) sd.back.addEventListener('click', function (e) { e.preventDefault(); goHome(); });
+        if (location.hash === sd.hash) goTo(sd, true);
     });
-    if (location.hash === '#bathroom') toBath(true);
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && inSide && !body.classList.contains('mirror-open') && !body.classList.contains('inv-holding')) goHome();
+    });
+    // a door in a side room: walk up to it, it opens, and through you go
+    Array.prototype.forEach.call(document.querySelectorAll('.side-door[href]'), function (door) {
+        // your own door art can have an -open twin (hall-door-roof-open.png): it's swapped in as it opens
+        if (door.dataset.asset) Sky.findAsset(door.dataset.asset + '-open', function (url) { if (url) { door.dataset.openArt = url; door.classList.add('has-open'); } });
+        door.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (busy) return;
+            var sd = SIDES.filter(function (x) { return x.el.contains(door); })[0], href = door.getAttribute('href');
+            busy = true;
+            function open() {
+                door.classList.add('open');
+                var img = door.querySelector('img.art');
+                if (img && door.dataset.openArt) { door.dataset.shutArt = img.src; img.src = door.dataset.openArt; }
+                if (Sky.sounds) Sky.sounds.sfx('door');
+                setTimeout(function () { if (sd && sd.me) sd.me.classList.add('gore-hidden'); }, 450);
+                setTimeout(function () { busy = false; Sky.leave ? Sky.leave(href) : (location.href = href); }, 700);
+            }
+            if (sd && sd.me) {
+                var p = door.offsetParent || sd.el, at = (door.offsetLeft + door.offsetWidth / 2 - sd.me.offsetWidth / 2) / p.clientWidth * 100;
+                walk(sd.me, at, open);
+            } else open();
+        });
+    });
+    window.addEventListener('pageshow', function (e) {         // back with the browser's back button: the doors are shut again
+        if (!e.persisted) return;
+        busy = false;
+        Array.prototype.forEach.call(document.querySelectorAll('.side-door.open'), function (d) {
+            d.classList.remove('open');
+            var img = d.querySelector('img.art');
+            if (img && d.dataset.shutArt) img.src = d.dataset.shutArt;
+        });
+        SIDES.forEach(function (sd) { if (sd.me) { sd.me.classList.remove('gore-hidden'); place(sd.me, sd.standAt); } });
+    });
+    Sky.sides = { get inSide() { return inSide && inSide.name; }, get busy() { return busy; }, walk: walk, place: place, leftPct: leftPct };
 
     /* ---------------- the mirror ---------------- */
     if (!mirror) return;

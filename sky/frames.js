@@ -20,6 +20,11 @@
    assets/<room>/frame-1, frame-2 … (a PNG with a see-through middle; the painting
    sits in the middle 76% unless you set --inset on the frame, e.g. --inset: 14%).
    They swing gently to the music.
+
+   More than one wall on a page: data-wall="shame" on a frame puts it on its own
+   wall with its own list (content/shame/frames.json) and its own numbers; its frame
+   art is assets/<room>/shame-frame (or shame-frame-1 …). The hall of shame in the
+   bathroom works this way.
    ===================================================================== */
 
 (function () {
@@ -29,8 +34,17 @@
     // each room keeps its own list: content/<room>/frames.json. a name alone is from the room's
     // own art folder (the living space: visitors' art; the workshop: your paintings); a path works anywhere
     var ROOM = document.body.dataset.place || 'living';
-    var FILE = frames[0].dataset.list || 'content/' + ROOM + '/frames.json';
-    var ART = frames[0].dataset.folder || (ROOM === 'living' ? 'content/workshop/visitors/' : 'content/' + ROOM + '/');
+    // each wall: its list, and the folder a name alone is from
+    var FOLDER = { living: 'content/workshop/visitors/', shame: 'content/workshop/visitors/', workshop: 'content/workshop/' };
+    function wallOf(f) { return f.dataset.wall || ROOM; }
+    function listOf(wall) {
+        var f = frames.filter(function (x) { return wallOf(x) === wall && x.dataset.list; })[0];
+        return f ? f.dataset.list : 'content/' + wall + '/frames.json';
+    }
+    function folderOf(wall) {
+        var f = frames.filter(function (x) { return wallOf(x) === wall && x.dataset.folder; })[0];
+        return f ? f.dataset.folder : FOLDER[wall] || 'content/' + wall + '/';
+    }
 
     Sky.css(
         '.gallery-frame * { box-sizing: border-box; }' +
@@ -89,9 +103,10 @@
         f.setAttribute('aria-label', 'a painting on the wall');
         f.querySelector('.gf-hint').textContent = 'an empty frame';
         // your own frame art: frame-<n> for this one, or frame for all of them
-        Sky.findAsset('assets/' + ROOM + '/frame-' + n, function (url) {
+        var art = 'assets/' + ROOM + '/' + (wallOf(f) === ROOM ? '' : wallOf(f) + '-') + 'frame';
+        Sky.findAsset(art + '-' + n, function (url) {
             if (url) return dress(url);
-            Sky.findAsset('assets/' + ROOM + '/frame', function (u2) { if (u2) dress(u2); });
+            Sky.findAsset(art, function (u2) { if (u2) dress(u2); });
         });
         function dress(url) {
             var im = document.createElement('img');
@@ -112,8 +127,12 @@
     zoom.addEventListener('click', closeZoom);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && zoom.classList.contains('open')) closeZoom(); });
 
-    fetch(FILE, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (map) {
-        frames.forEach(function (f) {
+    var walls = {};
+    frames.forEach(function (f) { walls[wallOf(f)] = 1; });
+    Object.keys(walls).forEach(function (wall) {
+      var ART = folderOf(wall);
+      fetch(listOf(wall), { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (map) {
+        frames.filter(function (f) { return wallOf(f) === wall; }).forEach(function (f) {
             var name = map && typeof map[f.dataset.frame] === 'string' ? map[f.dataset.frame].trim() : '';
             if (!name) return;
             var url = name.indexOf('/') !== -1 ? name : ART + encodeURIComponent(name), d = describe(name);
@@ -136,5 +155,6 @@
             };
             im.src = url;
         });
+      });
     });
 })();

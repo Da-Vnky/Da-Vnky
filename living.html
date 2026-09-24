@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260924m">
+    <link rel="stylesheet" href="sky/sky.css?v=20260924o">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -83,17 +83,41 @@
         .bath-sink   { left: 40.5%; bottom: 4vh; width: 14%; aspect-ratio: 140 / 200; }
         .bath-tub    { left: 62%; bottom: 3vh; width: 31%; aspect-ratio: 300 / 140; }
         .bath-towel  { left: 16%; top: 38%; width: 8%; aspect-ratio: 100 / 130; }
-        .bath-shelf  { left: 60%; top: 30%; width: 12%; aspect-ratio: 140 / 70; }
+        .bath-shelf  { left: 26.5%; top: 24%; width: 11%; aspect-ratio: 140 / 70; }
+        .shame-plaque { left: 70.5%; top: 7%; width: 13%; z-index: 3; }
+        .shame-plaque > svg, .shame-plaque > .art { display: block; width: 100%; height: auto; filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)); }
         .bath-mat    { left: 36%; right: 42%; bottom: 2vh; height: 4vh; pointer-events: none; }
         .bath-character { left: 28%; bottom: 3vh; height: 25vh; }
+        /* ---------- the hallway (the arrow on the left; see sky/bathroom.js) ---------- */
+        .hall-door.to-workshop { left: 16%; bottom: calc(11vh - 12px); height: 58vh; aspect-ratio: 90 / 170; }
+        .hall-door.to-roof     { left: 64%; bottom: calc(11vh - 12px); height: 58vh; aspect-ratio: 90 / 170; }
+        .hall-lamp   { left: 46%; top: 0; width: 5%; min-width: 50px; }
+        .hall-runner { left: 8%; right: 8%; bottom: 3vh; height: 5vh; pointer-events: none; }
+        .hall-hooks  { left: 37%; top: 30%; width: 10%; }
+        .hall-character { left: 44%; bottom: 3vh; height: 25vh; }
+        /* the toaster, on the floor by the plant: click it to take it (see sky/tub.js) */
+        .toaster { left: 89.5%; bottom: 2.6vh; width: 4.6vw; min-width: 52px; aspect-ratio: 100 / 70; z-index: 3; }
 
         @media (max-width: 620px) {
             .bath-mirror { left: 34%; top: 20%; width: 32%; }
             .bath-sink { left: 34%; width: 32%; }
             .bath-tub { left: 62%; width: 40%; }
             .bath-towel, .bath-shelf { display: none; }
+            .shame-plaque { left: 30%; top: 3%; width: 40%; }
+            .gallery-frame[data-wall=shame] { top: 9% !important; width: 13% !important; }
+            .gallery-frame[data-wall=shame][data-frame="1"] { left: 7% !important; }
+            .gallery-frame[data-wall=shame][data-frame="2"] { left: 25% !important; }
+            .gallery-frame[data-wall=shame][data-frame="3"] { left: 43% !important; }
+            .gallery-frame[data-wall=shame][data-frame="4"] { left: 61% !important; }
+            .gallery-frame[data-wall=shame][data-frame="5"] { left: 79% !important; }
             .bath-mat { left: 28%; right: 30%; }
             .bath-character { left: 6%; height: 14vh; }
+            .hall-door.to-workshop { left: 6%; height: 40vh; }
+            .hall-door.to-roof { left: 56%; height: 40vh; }
+            .hall-hooks { display: none; }
+            .hall-character { left: 36%; height: 14vh; }
+            .toaster { left: 44%; width: 11vw; min-width: 0; }
+            .hallway .room-arrow.back-right { top: 34% !important; }
             .room .window { left: 12% !important; width: 76% !important; top: 34% !important; height: 28% !important; }
             .shelf, .lamp, .gallery-frame { display: none; }
             .pinned { left: 50%; top: 11%; width: 220px; margin-left: -110px; }
@@ -232,10 +256,82 @@
         <div class="furnish groove cat" data-groove="cat" data-asset="assets/living/cat"></div>
         <div class="furnish groove plant" data-groove="plant" data-asset="assets/living/plant"></div>
 
+        <!-- a toaster on the floor by the plant: click it and it goes in your bag (sky/tub.js). your own: assets/living/toaster -->
+        <div class="furnish toaster" data-asset="assets/living/toaster"></div>
+
         <!-- the traveller, at home. your own: assets/characters/living.(gif|png|webp|svg) -->
         <div class="furnish character scene-character" data-asset="assets/characters/living"
              data-say="make yourself at home" aria-label="the traveller"
              style="left: 34%; bottom: 3vh; height: 25vh;"></div>
+    </div>
+
+    <!-- the arrow on the left: out to the hallway (the workshop and the roof). the same arrow picture, flipped -->
+    <a class="room-arrow to-hall" href="#hallway" aria-label="go to the hallway" data-asset="assets/living/arrow"></a>
+
+    <!-- the hallway (sky/bathroom.js): a door to the workshop, and the stairs up to the roof.
+         slots in assets/living/: hall-wall, hall-floor, hall-door-workshop, hall-door-roof, hall-lamp, hall-runner, hall-hooks.
+         the traveller in here: assets/characters/hallway (+ hallway-walking). a door's href says where it goes. -->
+    <div class="hallway" aria-hidden="true" data-asset="assets/living/hall-wall">
+        <div class="room-floor" data-asset="assets/living/hall-floor"><div class="placeholder"></div></div>
+
+        <svg class="furnish hall-lamp sways" data-asset="assets/living/hall-lamp" viewBox="0 0 50 150" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+            <rect x="24" y="0" width="2" height="96" fill="#1f1610"/>
+            <path d="M14 96 H36 L40 112 H10 Z" fill="#2a1d14"/>
+            <circle class="glow" cx="25" cy="120" r="9" fill="#ffe2a0"/>
+            <circle cx="25" cy="120" r="22" fill="rgba(255,210,130,.18)"/>
+        </svg>
+
+        <svg class="furnish hall-hooks" data-asset="assets/living/hall-hooks" viewBox="0 0 120 110" aria-hidden="true">
+            <rect x="0" y="0" width="120" height="10" rx="2" fill="#3a2716"/>
+            <g fill="#c49a52"><circle cx="20" cy="14" r="3"/><circle cx="60" cy="14" r="3"/><circle cx="100" cy="14" r="3"/></g>
+            <path d="M52 14 Q44 16 42 30 L36 96 Q60 104 84 96 L78 30 Q76 16 68 14 Z" fill="#6e3a26"/>
+            <path d="M60 14 V98" stroke="#4e2616" stroke-width="2"/>
+            <path d="M92 14 Q86 20 88 44 Q100 50 112 44 Q114 20 108 14 Z" fill="#9a8a6a"/>
+        </svg>
+
+        <a class="furnish side-door hall-door to-workshop" href="workshop.html" data-hint="the workshop" data-asset="assets/living/hall-door-workshop" aria-label="the door to the workshop">
+            <svg class="placeholder" viewBox="0 0 90 170" aria-hidden="true">
+                <rect x="0" y="0" width="90" height="170" fill="#2a1d14"/>
+                <rect x="7" y="7" width="76" height="163" fill="#120c08"/>
+                <g class="leaf">
+                    <rect x="7" y="7" width="76" height="163" fill="#7a5134"/>
+                    <rect x="15" y="16" width="60" height="58" rx="2" fill="none" stroke="#5a3a24" stroke-width="3"/>
+                    <rect x="15" y="86" width="60" height="74" rx="2" fill="none" stroke="#5a3a24" stroke-width="3"/>
+                    <circle cx="72" cy="94" r="3.4" fill="#c49a52"/>
+                    <rect x="27" y="38" width="36" height="14" rx="2" fill="#eadcb9"/>
+                    <text x="45" y="48.5" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-style="italic" font-size="8.5" fill="#3a2716">workshop</text>
+                </g>
+            </svg>
+        </a>
+
+        <a class="furnish side-door hall-door to-roof" href="city.html" data-hint="roof access" data-asset="assets/living/hall-door-roof" aria-label="roof access">
+            <svg class="placeholder" viewBox="0 0 90 170" aria-hidden="true">
+                <rect x="0" y="0" width="90" height="170" fill="#3c4148"/>
+                <rect x="7" y="7" width="76" height="163" fill="#0c0e12"/>
+                <g fill="#2a2f36" opacity=".9"><rect x="10" y="150" width="70" height="20"/><rect x="18" y="130" width="62" height="20"/><rect x="26" y="110" width="54" height="20"/></g>
+                <g class="leaf">
+                    <rect x="7" y="7" width="76" height="163" fill="#6b7480"/>
+                    <rect x="7" y="7" width="76" height="163" fill="none" stroke="#4c545e" stroke-width="2"/>
+                    <path d="M7 40 H83 M7 128 H83" stroke="#58606b" stroke-width="2"/>
+                    <rect x="68" y="84" width="12" height="4" rx="2" fill="#c9ccd0"/>
+                    <rect x="16" y="54" width="58" height="26" rx="2" fill="#b8402a"/>
+                    <text x="45" y="65" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="8" fill="#fff">ROOF</text>
+                    <text x="45" y="75" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="8" fill="#fff">ACCESS</text>
+                    <g fill="#f0c43a"><path d="M28 140 h34 v8 h-34 Z"/></g><g fill="#2a2f36"><path d="M32 140 l4 8 h4 l-4 -8 Z M42 140 l4 8 h4 l-4 -8 Z M52 140 l4 8 h4 l-4 -8 Z"/></g>
+                </g>
+            </svg>
+        </a>
+
+        <svg class="furnish hall-runner" data-asset="assets/living/hall-runner" viewBox="0 0 600 40" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M24 4 H576 L600 36 H0 Z" fill="#5a2a3c"/>
+            <path d="M48 10 H552 L566 30 H34 Z" fill="none" stroke="#d9b98a" stroke-width="2" opacity=".5"/>
+        </svg>
+
+        <!-- the traveller, in the hallway. your own: assets/characters/hallway (+ hallway-walking) -->
+        <div class="furnish character scene-character hall-character" data-asset="assets/characters/hallway" aria-label="the traveller"></div>
+
+        <!-- back to the living space (it's to the right of here) -->
+        <a class="room-arrow back-right" href="#living" aria-label="back to the living space" data-asset="assets/living/arrow"></a>
     </div>
 
     <!-- the arrow under the tabs: the traveller walks off to the bathroom. your own: assets/living/arrow
@@ -299,6 +395,24 @@
             <path d="M64 112 L52 138 H68 L76 114 Z M236 112 L248 138 H232 L224 114 Z" fill="#c49a52"/>
         </svg>
 
+        <!-- the hall of shame: five frames over the tub, a wall of their own (data-wall="shame").
+             hang art in them from the content manager (any picture: visitors' art, your paintings,
+             the hidden pool). their list: content/shame/frames.json. your own frame art:
+             assets/living/shame-frame (all) or shame-frame-1 … 5; the plaque: assets/living/shame-plaque -->
+        <div class="furnish shame-plaque" data-asset="assets/living/shame-plaque">
+            <svg class="placeholder" viewBox="0 0 200 44" aria-hidden="true">
+                <rect x="1" y="1" width="198" height="42" rx="5" fill="#b8862e" stroke="#7a5418" stroke-width="2"/>
+                <rect x="7" y="7" width="186" height="30" rx="3" fill="none" stroke="#e6c070" stroke-width="1" opacity=".7"/>
+                <circle cx="12" cy="22" r="2.4" fill="#7a5418"/><circle cx="188" cy="22" r="2.4" fill="#7a5418"/>
+                <text x="100" y="28.5" text-anchor="middle" font-family="IM Fell English SC, Georgia, serif" font-size="18" fill="#3a2716">hall of shame</text>
+            </svg>
+        </div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="1" data-look="dark"  style="left:60.5%; top:16%; width:8%; --tilt:-3deg"></div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="2" data-look="plain" style="left:73%; top:14.5%; width:7.5%; aspect-ratio:1; --tilt:2deg"></div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="3" data-look="wood"  style="left:85%; top:17%; width:7.5%; --tilt:-1.5deg"></div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="4" data-look="white" style="left:65.5%; top:37%; width:8%; aspect-ratio:5 / 4; --tilt:4deg"></div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="5" data-look="gilt"  style="left:80%; top:36%; width:7%; --tilt:-5deg"></div>
+
         <!-- the traveller, in here. your own: assets/characters/bathroom (+ bathroom-walking) -->
         <div class="furnish character scene-character bath-character" data-asset="assets/characters/bathroom" aria-label="the traveller"></div>
 
@@ -306,16 +420,18 @@
         <a class="room-arrow to-living" href="#living" aria-label="back to the living space" data-asset="assets/living/arrow"></a>
     </div>
 
-    <script src="sky/sky.js?v=20260924m"></script>
+    <script src="sky/sky.js?v=20260924o"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
-    <script src="sky/ground-view.js?v=20260924m" data-view="assets/living/view"></script>
-    <script src="sky/panel.js?v=20260924m"></script>
-    <script src="sky/music.js?v=20260924m"></script>
-    <script src="sky/weather.js?v=20260924m"></script>
-    <script src="sky/noise.js?v=20260924m"></script>
-    <script src="sky/records.js?v=20260924m"></script>
-    <script src="sky/crate.js?v=20260924m"></script>
-    <script src="sky/frames.js?v=20260924m"></script>
-    <script src="sky/bathroom.js?v=20260924m"></script>
+    <script src="sky/ground-view.js?v=20260924o" data-view="assets/living/view"></script>
+    <script src="sky/panel.js?v=20260924o"></script>
+    <script src="sky/music.js?v=20260924o"></script>
+    <script src="sky/weather.js?v=20260924o"></script>
+    <script src="sky/noise.js?v=20260924o"></script>
+    <script src="sky/records.js?v=20260924o"></script>
+    <script src="sky/crate.js?v=20260924o"></script>
+    <script src="sky/frames.js?v=20260924o"></script>
+    <script src="sky/bathroom.js?v=20260924o"></script>
+    <script src="sky/gore.js?v=20260924o"></script>
+    <script src="sky/tub.js?v=20260924o"></script>
 </body>
 </html>

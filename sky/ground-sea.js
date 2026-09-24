@@ -666,7 +666,7 @@
     /* ---------------- picking the traveller up ---------------- */
     var pick = null, eatClick = false;
     mate.addEventListener('pointerdown', function (e) {
-        if (crew.state === 'swimming' || crew.state === 'diving' || crew.state === 'surfacing') return;
+        if (crew.state === 'swimming' || crew.state === 'diving' || crew.state === 'surfacing' || crew.state === 'dead') return;
         e.preventDefault();
         mate.setPointerCapture(e.pointerId);
         pick = { x: e.clientX, y: e.clientY, on: false, dx: 0, db: 0, id: e.pointerId };
@@ -726,22 +726,48 @@
     mate.addEventListener('pointercancel', letGo);
     mate.addEventListener('click', function (e) { if (eatClick) { e.stopImmediatePropagation(); eatClick = false; } }, true);
 
+    // dropped from too high onto the deck or the dock: splat (see sky/gore.js). they're back a moment later.
+    // SPLAT_HEIGHT: how far they have to fall, as a share of the screen's height
+    var SPLAT_HEIGHT = 0.3;
+    function tooHigh(from, to) { return !!Sky.gore && from - to > Math.max(170, window.innerHeight * SPLAT_HEIGHT); }
+    function splatMate(run, spot, after) {
+        crew.state = 'dead';
+        mate.classList.remove('talking', 'walking', 'held');
+        var r = sea.getBoundingClientRect(), s = spot();
+        Sky.gore.splat(mate, r.left + s.x + mateW() / 2, r.bottom - s.b, function () {
+            if (run !== crew.run) return;
+            var s2 = spot();
+            putMate(s2.x, s2.b);
+            Sky.gore.respawn(mate);
+            after();
+        });
+    }
     // where did they land? the ship, the dock, or the sea
     function drop() {
         cancelCrew();
         var run = crew.run, cx = crew.x + mateW() / 2, box = shipBox();
         if (cx > box.l && cx < box.r && crew.b > aboardSpot().b - 30) {             // back into the ship
             crew.state = 'falling';
+            if (tooHigh(crew.b, aboardSpot().b)) {
+                hush(); sfx('scream');
+                moveTo(aboardSpot, 300 + (crew.b - aboardSpot().b) / 2.2, 0, run, function () {
+                    splatMate(run, aboardSpot, function () { settle('aboard'); });
+                }, true);
+                return;
+            }
             moveTo(aboardSpot, 380, 0, run, function () { settle('aboard'); }, true);
             return;
         }
         if (dockAt && cx > dockAt.x0 && crew.b > deckB() - 10) {                     // onto the dock
             crew.state = 'falling';
-            var spotX = Math.min(crew.x, dockAt.W - mateW() - 6);
-            moveTo(function () { return { x: spotX, b: deckB() }; }, 300 + Math.max(0, crew.b - deckB()) / 2, 0, run, function () {
+            var spotX = Math.min(crew.x, dockAt.W - mateW() - 6), deadly = tooHigh(crew.b, deckB());
+            var onDeck = function () { return { x: spotX, b: deckB() }; };
+            if (deadly) { hush(); sfx('scream'); }
+            moveTo(onDeck, 300 + Math.max(0, crew.b - deckB()) / (deadly ? 2.2 : 2), 0, run, function () {
+                var carryOn = function () { if (shipDocked()) walkToTalk(run); else settle('ashore'); };   // ship's away: they'll go after it
+                if (deadly) { splatMate(run, onDeck, carryOn); return; }
                 sfx('land', { size: 1 });
-                if (shipDocked()) walkToTalk(run);
-                else settle('ashore');                         // ship's away: they'll go after it
+                carryOn();
             }, true);
             return;
         }

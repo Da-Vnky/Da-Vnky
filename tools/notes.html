@@ -168,7 +168,7 @@
     });
     $('.add-note').addEventListener('click', function () { data.notes.unshift({ text: '', date: today }); drawNotes(0); });
     $('.publish').addEventListener('click', function () {
-        api('/__letters/publish', {}).then(function (r) { alert(r.error || 'publishing! a small window shows it going up, and closes by itself when it’s done. the live site updates a minute or two later.'); });
+        api('/__letters/publish', {}).then(function (r) { say(r.error || 'publishing: a small window shows it going up and closes by itself when it\u2019s done. the live site updates a minute or two later.', !!r.error); });
     });
 
     api('/__notes').then(function (r) {

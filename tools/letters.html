@@ -331,7 +331,7 @@ a blank line starts a new paragraph."></textarea>
     $('.new').addEventListener('click', fresh);
     $('.publish').addEventListener('click', function () {
         if (dirty && !confirm('the letter you’re on isn’t saved. publish without it?')) return;
-        api('publish', {}).then(function (r) { alert(r.error || 'publishing! a small window shows it going up, and closes by itself when it’s done. the live site updates a minute or two later.'); });
+        api('publish', {}).then(function (r) { say(r.error || 'publishing: a small window shows it going up and closes by itself when it\u2019s done. the live site updates a minute or two later.', !!r.error); });
     });
     window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 

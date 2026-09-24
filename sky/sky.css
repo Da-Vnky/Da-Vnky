@@ -959,3 +959,20 @@ svg[data-bottle] .b-cork.has-art { transform-box: view-box; transform-origin: 17
 .flyer-shooting-star { filter: drop-shadow(0 0 6px rgba(255,245,210,.9)); }
 @media (prefers-reduced-motion: reduce) { .flyer-blimp .prop, .flyer-birds .wing { animation: none; } }
 
+
+/* ================= the see-through arrows between places (the living space's side rooms, the way back from the workshop) ================= */
+.room-arrow, .room-arrow:hover { padding: 0; background: none; text-shadow: none; }
+.room-arrow { position: fixed; z-index: 5; width: 54px; height: 54px; display: block; opacity: .5; transition: opacity .25s, transform .25s, visibility 0s;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.45)); -webkit-tap-highlight-color: transparent; }
+.room-arrow:hover, .room-arrow:focus-visible { opacity: 1; transform: translateX(4px); outline: none; }
+.room-arrow > svg, .room-arrow > .art { display: block; width: 100%; height: 100%; object-fit: contain; }
+.room-arrow.point-left > svg, .room-arrow.point-left > .art { transform: scaleX(-1); }
+.room-arrow.point-left:hover, .room-arrow.point-left:focus-visible { transform: translateX(-4px); }
+.room-arrow .ra-hint { position: absolute; top: 50%; transform: translateY(-50%); white-space: nowrap; font-style: italic; font-size: .95rem; color: #f3e6c2;
+    text-shadow: 0 1px 3px rgba(0,0,0,.8); opacity: 0; transition: opacity .25s; pointer-events: none; }
+.room-arrow.point-left .ra-hint { left: calc(100% + 8px); }
+.room-arrow:not(.point-left) .ra-hint { right: calc(100% + 8px); }
+.room-arrow:hover .ra-hint, .room-arrow:focus-visible .ra-hint { opacity: 1; }
+body.leaving .room-arrow, body.sky-view .room-arrow, body.is-outside .room-arrow, body.gallery-open .room-arrow, body.art-open .room-arrow,
+body.visitors-open .room-arrow, body.frame-open .room-arrow, body.model-open .room-arrow, body.notes-open .room-arrow, body.paint-open .room-arrow {
+    opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility 0s .3s; }

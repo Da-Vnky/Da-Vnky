@@ -158,6 +158,14 @@ SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
     assets/sounds/step           a footstep (the walk to the bathroom)
     assets/sounds/chime          the pomodoro timer ringing, time's up
     assets/sounds/shimmer        looking into the bathroom mirror
+    assets/sounds/scream         the traveller screaming (a long fall, the toaster)
+    assets/sounds/splat          the splat, with giblets landing
+    assets/sounds/zap            the electrocution
+    assets/sounds/respawn        coming back to life
+    assets/sounds/pickup         something going into your bag
+    assets/sounds/tap            the bath tap running (as long as it fills)
+    assets/sounds/fizz           something electric in the bathwater
+    assets/sounds/door           a door opening (the hallway, the roof)
     assets/sounds/knock          knocking on mel's boarded-up window
     assets/sounds/crack          a board splintering off it
     assets/sounds/blip           one letter of the mirror's words typing out
@@ -349,11 +357,51 @@ THE BATHROOM (off the living space: the see-through arrow under the tabs)
     assets/living/bath-sink    140:200      assets/living/bath-tub     300:140
     assets/living/bath-towel   100:130      assets/living/bath-shelf   140:70
     assets/living/bath-mat     300:30
+    the hall of shame, over the tub: five frames on a wall of their own
+    assets/living/shame-plaque   the plaque, 200:44
+    assets/living/shame-frame    every one of its frames (see-through middle), or
+                                 shame-frame-1 … shame-frame-5 for each
+    (what hangs in them: content manager -> your things or visitors -> hall of shame)
     in the mirror:
     assets/characters/reflection   what you see: "Despite everything, it's still you."
     assets/living/mirror-close     the mirror's frame up close (PNG, see-through middle)
     assets/fonts/mirror.woff2      the text box's lettering (a pixel font; .woff/.ttf/.otf too)
     (the words are data-say on the mirror in living.html)
+
+THE HALLWAY (off the living space: the see-through arrow on the left)
+    assets/living/hall-wall            the whole wall                         3840 x 2160
+    assets/living/hall-floor           the floor, stretched                   3840 x 240
+    assets/living/hall-door-workshop   the door to the workshop               90:170
+    assets/living/hall-door-roof       the roof access door (up to the city)  90:170
+      (a door's picture swaps for its -open twin if you add one; without it,
+       the drawn door swings open. where a door goes: its href in living.html)
+    assets/living/hall-lamp  50:150    assets/living/hall-runner  600:40
+    assets/living/hall-hooks 120:110   assets/characters/hallway (the traveller)
+    and the way back: assets/city/roof-door (the access door on the rooftop,
+    110:120) and the arrow on the left of the workshop (assets/living/arrow).
+
+THE BATHTUB AND THE TOASTER
+    assets/living/toaster      the toaster on the living space's floor, about 10:7.
+                               click it: into your bag (bottom left). in the bathroom,
+                               click it in the bag, then the tub.
+    assets/living/bath-water   the water's surface along the top of the tub, stretched
+    assets/living/bath-outlet  the socket it's plugged into, 3:4
+    assets/ui/inventory        the bag, 1:1
+    (the tap fills the tub; pick the traveller up and drop them in. a full tub
+     with the toaster in it ... see below)
+
+MISFORTUNES (sky/gore.js; the homepage and the bathroom)
+    Dropped from high enough onto the ship or the dock, the traveller splats;
+    in a full tub with the toaster, they're electrocuted to a skeleton. Either
+    way they're back a moment later, with a -1 heart floating up.
+    assets/characters/splat              the splat left where they land
+    assets/characters/giblet-1 … 6       bits that fly off (hat, boot, coat, bone, …)
+    assets/characters/skeleton           what's left after the toaster (same canvas
+                                         as the character, feet at the bottom)
+    assets/characters/zapped             the x-ray frame flickered in (optional)
+    assets/ui/heart                      the heart in the "-1"
+    (how far is too far: SPLAT_HEIGHT in sky/ground-sea.js; what they shout
+     while held in the bathroom: HELD_LINES in sky/tub.js)
 
 CHARACTERS (one per scene; a GIF can loop an idle animation)
     assets/characters/sea         rides the ship, steps onto the dock at night,

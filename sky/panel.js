@@ -252,7 +252,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {
@@ -338,6 +338,71 @@
             f.frequency.exponentialRampToValueAtTime(900, t + 0.18);
             for (var i = 0; i < 5; i++) noiseHit(out, t + 0.02 + Math.random() * 0.12, 0.03, 'highpass', 3000, 0, 0.25, 0.002);
             knock(out, t + 0.42, 0.55); knock(out, t + 0.58, 0.3);
+        },
+        'scream': function (out, t) {                                  // a cartoon "AAAAAH": a wobbly voice through two vowel formants, falling away
+            var len = 1.25, o = ctx.createOscillator(), o2 = ctx.createOscillator(), vib = ctx.createOscillator(), vg = gain(0);
+            o.type = 'sawtooth'; o2.type = 'square';
+            o.frequency.setValueAtTime(520, t); o.frequency.linearRampToValueAtTime(760, t + 0.18); o.frequency.exponentialRampToValueAtTime(300, t + len);
+            o2.frequency.setValueAtTime(523, t); o2.frequency.linearRampToValueAtTime(765, t + 0.18); o2.frequency.exponentialRampToValueAtTime(302, t + len);
+            vib.frequency.value = 7; vg.gain.value = 22; vib.connect(vg); vg.connect(o.frequency); vg.connect(o2.frequency);
+            var f1 = filter('bandpass', 850, 6), f2 = filter('bandpass', 1300, 7), g = gain(0), mix = gain(0.5);
+            o.connect(f1); o.connect(f2); o2.connect(f1); f1.connect(mix); f2.connect(mix); mix.connect(g); g.connect(out);
+            g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.9, t + 0.06);
+            g.gain.setValueAtTime(0.9, t + len * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+            [o, o2, vib].forEach(function (x) { x.start(t); x.stop(t + len + 0.05); });
+        },
+        'splat': function (out, t) {                                   // a wet splat, a squelch, and bits pattering down
+            var f = noiseHit(out, t, 0.35, 'lowpass', 900, 1.5, 0.9, 0.003);
+            f.frequency.exponentialRampToValueAtTime(180, t + 0.35);
+            tone(out, t, 'sine', 130, 45, 0.22, 0.8);
+            tone(out, t + 0.05, 'triangle', 420, 90, 0.16, 0.25);          // the squelch
+            for (var i = 0; i < 9; i++) {                                   // giblets landing
+                var d = t + 0.15 + Math.random() * 0.8;
+                noiseHit(out, d, 0.06, 'bandpass', 500 + Math.random() * 700, 1.2, 0.18 + Math.random() * 0.15, 0.003);
+                tone(out, d, 'sine', 180 + Math.random() * 160, 70, 0.06, 0.12);
+            }
+        },
+        'zap': function (out, t) {                                     // electrocution: a mains buzz with crackling arcs
+            var len = 1.6, o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = gain(0), am = ctx.createOscillator(), ag = gain(0.5);
+            o.type = 'sawtooth'; o.frequency.value = 120; o2.type = 'square'; o2.frequency.value = 180.5;
+            am.type = 'square'; am.frequency.value = 23; am.connect(ag); ag.connect(g.gain);
+            var f = filter('highpass', 300);
+            o.connect(f); o2.connect(f); f.connect(g); g.connect(out);
+            g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.02);
+            g.gain.setValueAtTime(0.35, t + len - 0.2); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+            [o, o2, am].forEach(function (x) { x.start(t); x.stop(t + len + 0.05); });
+            for (var i = 0; i < 22; i++) noiseHit(out, t + Math.random() * len, 0.02 + Math.random() * 0.05, 'highpass', 2500, 0, 0.3 + Math.random() * 0.4, 0.001);
+            tone(out, t + len - 0.1, 'sine', 900, 60, 0.3, 0.4);            // the pop as it shorts out
+        },
+        'respawn': function (out, t) {                                 // back again: a quick rising arpeggio and a shimmer
+            [523, 659, 784, 1047, 1319].forEach(function (f, i) { tone(out, t + i * 0.07, 'triangle', f, f, 0.35, 0.16); });
+            var f = noiseHit(out, t + 0.1, 0.6, 'highpass', 5000, 0, 0.05, 0.2);
+            f.frequency.exponentialRampToValueAtTime(9000, t + 0.6);
+        },
+        'pickup': function (out, t) {                                  // into your pocket
+            tone(out, t, 'square', 660, 660, 0.06, 0.08); tone(out, t + 0.07, 'square', 990, 990, 0.1, 0.08);
+        },
+        'tap': function (out, t, size) {                               // the tap running (size = how long, in seconds)
+            var len = Math.max(0.6, size || 3);
+            var n = ctx.createBufferSource(); n.buffer = noiseBuf('white', 3); n.loop = true;
+            var f = filter('bandpass', 1400, 0.6), g = gain(0);
+            chain(n, f, g, out);
+            g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.22, t + 0.15);
+            f.frequency.setValueAtTime(1800, t); f.frequency.exponentialRampToValueAtTime(700, t + len);   // the pitch drops as it fills
+            g.gain.setValueAtTime(0.22, t + len - 0.2); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+            n.start(t); n.stop(t + len + 0.05);
+            tone(out, t, 'triangle', 700, 900, 0.08, 0.1);                 // the squeak of the handle
+        },
+        'door': function (out, t) {                                    // a door: the latch, a creak, and it swings
+            noiseHit(out, t, 0.04, 'bandpass', 2200, 2, 0.35, 0.002);
+            tone(out, t + 0.05, 'sawtooth', 190, 260, 0.45, 0.05);
+            tone(out, t + 0.05, 'triangle', 380, 520, 0.4, 0.06);
+            knock(out, t + 0.5, 0.25);
+        },
+        'fizz': function (out, t) {                                    // something electric hitting the water
+            for (var i = 0; i < 12; i++) noiseHit(out, t + Math.random() * 0.6, 0.03, 'highpass', 3000, 0, 0.25, 0.001);
+            var f = noiseHit(out, t, 0.7, 'bandpass', 3000, 0.8, 0.2, 0.01);
+            f.frequency.exponentialRampToValueAtTime(800, t + 0.7);
         },
         'blip': function (out, t) {                                    // one letter of a text box typing out
             tone(out, t, 'square', 330, 330, 0.035, 0.05);

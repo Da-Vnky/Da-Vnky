@@ -1274,6 +1274,24 @@
         el.addEventListener('click', toggle);
         el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
     }
+    // an arrow or a door that leads to another page (<a class="room-arrow exit" href="living.html#hallway">): the send-offs play first
+    var ARROW_ART = '<svg class="placeholder" viewBox="0 0 60 60" aria-hidden="true">' +
+        '<circle cx="30" cy="30" r="27" fill="rgba(243,230,194,.16)" stroke="rgba(243,230,194,.55)" stroke-width="2"/>' +
+        '<path d="M22 16 L38 30 L22 44" fill="none" stroke="#f3e6c2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    function setupExits() {
+        document.querySelectorAll('a.exit[href]').forEach(function (a) {
+            if (a.dataset.exitDone) return;
+            a.dataset.exitDone = '1';
+            if (a.classList.contains('room-arrow') && !a.querySelector('.placeholder, img')) a.insertAdjacentHTML('afterbegin', ARROW_ART);
+            if (a.dataset.hint && !a.querySelector('.ra-hint')) { var h = document.createElement('span'); h.className = 'ra-hint'; h.textContent = a.dataset.hint; a.appendChild(h); }
+            a.addEventListener('click', function (e) {
+                if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+                e.preventDefault();
+                if (window.Sky && window.Sky.sounds && a.dataset.sound) window.Sky.sounds.sfx(a.dataset.sound);
+                leave(a.getAttribute('href'));
+            });
+        });
+    }
     function setupCharacters(scope) {
         (scope || document).querySelectorAll('.character').forEach(setupCharacter);
     }
@@ -1292,7 +1310,7 @@
             });
         });
     }
-    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); fillAssets(); showSlots(); setupCursors(); dressNotes(); });
+    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); setupExits(); fillAssets(); showSlots(); setupCursors(); dressNotes(); });
     startAmbient();
 
     render(shown);
@@ -1526,6 +1544,8 @@
         // run fn(go) when a sign or constellation is clicked; return true and
         // call go() yourself when your send-off animation is done
         onLeave: function (fn) { leaveHooks.push(fn); },
+        // go to another page the way the signs do (the send-offs play, music carries on)
+        leave: function (href) { leave(href); },
         openSkyView: openSkyView,
         closeSkyView: closeSkyView,
         listFolder: listFolder,

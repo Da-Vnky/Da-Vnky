@@ -372,6 +372,16 @@
        "slot": "assets/ui/leave-art",
        "what": "“leave some art”, in the workshop",
        "size": "96 x 96"
+      },
+      {
+       "slot": "assets/ui/heart",
+       "what": "the heart in the “-1” when they come back",
+       "size": "1:1, e.g. 96 x 96"
+      },
+      {
+       "slot": "assets/ui/inventory",
+       "what": "the bag your things go in (bottom left)",
+       "size": "1:1, e.g. 96 x 96"
       }
      ]
     }
@@ -761,6 +771,11 @@
        "slot": "assets/city/pigeon-dancing",
        "what": "the pigeons dancing (a GIF)",
        "optional": true
+      },
+      {
+       "slot": "assets/city/roof-door",
+       "what": "the roof access door on the rooftop (click: down to the hallway)",
+       "size": "110:120"
       }
      ]
     },
@@ -881,6 +896,11 @@
        "slot": "assets/living/arrow",
        "what": "the see-through arrow to the bathroom (pointing right; flipped for the way back)",
        "size": "1:1, e.g. 120 x 120"
+      },
+      {
+       "slot": "assets/living/toaster",
+       "what": "the toaster on the floor by the plant (take it to the bathroom…)",
+       "size": "about 10:7"
       }
      ]
     },
@@ -1010,6 +1030,61 @@
        "slot": "assets/living/bath-mat",
        "what": "the bath mat",
        "size": "300:30"
+      },
+      {
+       "slot": "assets/living/bath-water",
+       "what": "the water’s surface, along the top of the tub (stretched)",
+       "size": "e.g. 1200 x 160"
+      },
+      {
+       "slot": "assets/living/bath-outlet",
+       "what": "the socket on the wall the toaster’s plugged into",
+       "size": "3:4"
+      }
+     ]
+    },
+    {
+     "name": "the hall of shame (over the tub)",
+     "slots": [
+      {
+       "slot": "assets/living/shame-plaque",
+       "what": "the brass plaque that says “hall of shame”",
+       "size": "200:44"
+      },
+      {
+       "slot": "assets/living/shame-frame",
+       "what": "every hall-of-shame frame (see-through middle), or one each below",
+       "size": "4:5"
+      },
+      {
+       "slot": "assets/living/shame-frame-1",
+       "what": "hall of shame frame 1",
+       "size": "4:5",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/shame-frame-2",
+       "what": "hall of shame frame 2",
+       "size": "1:1",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/shame-frame-3",
+       "what": "hall of shame frame 3",
+       "size": "4:5",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/shame-frame-4",
+       "what": "hall of shame frame 4",
+       "size": "5:4",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/shame-frame-5",
+       "what": "hall of shame frame 5",
+       "size": "4:5",
+       "optional": true
       }
      ]
     },
@@ -1038,6 +1113,58 @@
     }
    ],
    "page": "living.html#bathroom"
+  },
+  {
+   "id": "hallway",
+   "name": "the hallway",
+   "page": "living.html#hallway",
+   "groups": [
+    {
+     "name": "the hallway (left of the living space)",
+     "slots": [
+      {
+       "slot": "assets/living/hall-wall",
+       "what": "the whole wall",
+       "size": "3840 x 2160"
+      },
+      {
+       "slot": "assets/living/hall-floor",
+       "what": "the floor along the bottom, stretched",
+       "size": "3840 x 240"
+      },
+      {
+       "slot": "assets/living/hall-door-workshop",
+       "what": "the door to the workshop (click: through it)",
+       "size": "90:170"
+      },
+      {
+       "slot": "assets/living/hall-door-roof",
+       "what": "the roof access door (click: up to the city rooftop)",
+       "size": "90:170"
+      },
+      {
+       "slot": "assets/living/hall-lamp",
+       "what": "the hanging lamp",
+       "size": "50:150"
+      },
+      {
+       "slot": "assets/living/hall-runner",
+       "what": "the runner rug",
+       "size": "600:40"
+      },
+      {
+       "slot": "assets/living/hall-hooks",
+       "what": "the coat hooks",
+       "size": "120:110"
+      },
+      {
+       "slot": "assets/characters/hallway",
+       "what": "the traveller in the hallway",
+       "size": "240–480 px tall"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "characters",
@@ -1127,6 +1254,63 @@
       {
        "slot": "assets/characters/city-dancing",
        "what": "dancing while music plays (city)",
+       "size": "same canvas",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "misfortunes (sky/gore.js)",
+     "slots": [
+      {
+       "slot": "assets/characters/splat",
+       "what": "the splat left where they land from too high",
+       "size": "e.g. 600 x 180"
+      },
+      {
+       "slot": "assets/characters/giblet-1",
+       "what": "a bit that flies off (the stand-in: their hat)",
+       "size": "1:1"
+      },
+      {
+       "slot": "assets/characters/giblet-2",
+       "what": "a bit that flies off (a boot)",
+       "size": "1:1"
+      },
+      {
+       "slot": "assets/characters/giblet-3",
+       "what": "a bit that flies off (a scrap of coat)",
+       "size": "1:1"
+      },
+      {
+       "slot": "assets/characters/giblet-4",
+       "what": "a bit that flies off (a bone)",
+       "size": "1:1"
+      },
+      {
+       "slot": "assets/characters/giblet-5",
+       "what": "a bit that flies off (something pink)",
+       "size": "1:1"
+      },
+      {
+       "slot": "assets/characters/giblet-6",
+       "what": "a bit that flies off (something red)",
+       "size": "1:1"
+      },
+      {
+       "slot": "assets/characters/skeleton",
+       "what": "what’s left after the toaster: feet at the bottom, like the character",
+       "size": "same canvas as the character"
+      },
+      {
+       "slot": "assets/characters/zapped",
+       "what": "the x-ray frame flickered in while it happens",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/hallway-walking",
+       "what": "walking in the hallway (a GIF, facing right)",
        "size": "same canvas",
        "optional": true
       }
@@ -1259,6 +1443,46 @@
       {
        "slot": "assets/sounds/crack",
        "what": "a board splintering off her window and clattering down",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/scream",
+       "what": "the traveller’s scream (falling, and electrocuted)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/splat",
+       "what": "a splat, with giblets landing",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/zap",
+       "what": "the electrocution: a mains buzz and crackling",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/respawn",
+       "what": "coming back to life",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/pickup",
+       "what": "something going into your bag",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/tap",
+       "what": "the bath tap running (played for as long as it fills)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/fizz",
+       "what": "something electric in the bathwater",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/door",
+       "what": "a door opening",
        "kind": "sound"
       }
      ]

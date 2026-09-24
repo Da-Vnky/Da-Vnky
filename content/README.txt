@@ -39,9 +39,16 @@ Take a file out, and it's gone. That's the whole job.
                       too (content/workshop/cat.png). Set it with the "hang in"
                       buttons in the content manager.
 
+  content/shame/frames.json
+                      THE HALL OF SHAME (five frames in the bathroom): what hangs in
+                      each. Set it with the "hall of shame" buttons in the content
+                      manager (your things, visitors). Any picture can go up.
+
   content/frames/     PICTURES FOR THE WALLS (hidden)
                       Not shown anywhere by themselves: only in the frames you
-                      hang them in, in the workshop or the living space. Content
+                      hang them in: the workshop, the living space, the hall of shame.
+                      Visitors' art can move here too (visitors -> move to the walls
+                      pool): it leaves the portfolio but stays in its frames. Content
                       manager -> your things -> pictures for the walls. (A painting
                       hung in a workshop frame leaves the easel while it's up.)
 

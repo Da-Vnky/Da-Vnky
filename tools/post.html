@@ -37,7 +37,8 @@
     .card .meta { padding: 8px 14px 4px; font-style: italic; color: var(--faded); font-size: .9rem; }
     .card .meta b { color: var(--ink); font-weight: normal; }
     .card .warn { margin: 0 14px 6px; font-size: .82rem; font-style: italic; color: var(--red); }
-    .card .acts { display: flex; gap: 6px; padding: 6px 12px 12px; margin-top: auto; }
+    .card .acts { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 12px 12px; margin-top: auto; }
+    .card .acts button { white-space: nowrap; }
     .card .acts button { flex: 1; padding: 6px 10px; border-radius: 999px; cursor: pointer; font-style: italic; border: 1px solid rgba(110,82,54,.35); background: #f8f0dc; color: var(--ink); }
     .card .acts button:hover { background: #fff8e6; }
     .card .acts .yes { background: var(--ink); color: #f3e6c2; border-color: var(--ink); }
@@ -104,7 +105,7 @@
     <div class="grid bottles"></div>
 
     <h2>visitors' art on your site</h2>
-    <p class="sub">in the portfolio in the workshop (content/workshop/visitors/). hang one in a frame in the living space with its number (click it again to take it down).</p>
+    <p class="sub">in the portfolio in the workshop (content/workshop/visitors/). hang one in a frame with its number: the living space, the workshop or the hall of shame (click it again to take it down). “move to the walls pool” takes it out of the portfolio but keeps it for the frames.</p>
     <div class="grid art"></div>
 </main>
 
@@ -218,12 +219,16 @@
                 });
                 var w = which === 'bottles' ? whereIs(f.name) : '';
                 var c = card(look, esc(f.name) + (f.date ? '<br>' + nice(f.date) : '') + (w ? '<br><span class="where">' + LABEL[w] + '</span>' : ''), '', [
-                    ['open', function () { window.open(f.url, '_blank'); }],
+                    ['open', function () { window.open(f.url, '_blank'); }]].concat(which === 'art' ? [['move to the walls pool', function () {
+                        api('/__shelf/move', { name: f.name, from: 'art', to: 'walls' }).then(function (r) {
+                            if (r.error) say(r.error, true); else { say('moved ' + f.name + ' to the walls pool: out of the portfolio, still in its frames. publish when you\u2019re ready.'); refresh(); }
+                        });
+                    }]] : []).concat([
                     ['delete', function () {
                         if (!confirm('delete ' + f.name + '? it goes from your folder now, and from the live site when you next publish.')) return;
                         api('/__post/delete', { which: which, name: f.name }).then(function (r) { if (r.error) say(r.error, true); else { say('deleted ' + f.name + '. publish to take it off the live site.'); refresh(); } });
                     }, 'no']
-                ]);
+                ]));
                 if (which === 'art') addHang(c, f.name, st);
                 if (which === 'bottles') {                     // where it sits in the living space: the board, the pile, or the crate
                     var row = document.createElement('div');
@@ -245,28 +250,31 @@
         shelf(bottles, 'bottles', st.bottles);
         shelf(art, 'art', st.art);
     }
-    // hang a picture in one of the living space's frames (content/living/frames.json)
-    function addHang(c, what, st) {
-        var nums = st.frameNumbers || [], map = st.frames || {}, inFrame = '';
-        Object.keys(map).forEach(function (k) { if (map[k] === what) inFrame = k; });
-        if (!nums.length) return;
-        var row = document.createElement('div');
-        row.className = 'acts hang';
-        row.innerHTML = '<span class="hl">hang in:</span>';
-        nums.forEach(function (n) {
-            var b = document.createElement('button');
-            b.type = 'button'; b.textContent = n; b.title = 'frame ' + n + (map[n] && map[n] !== what ? ' (instead of what hangs there now)' : '');
-            b.setAttribute('aria-pressed', String(inFrame === String(n)));
-            b.addEventListener('click', function () { hangIt(what, inFrame === String(n) ? '' : n); });
-            row.appendChild(b);
+    // hang a picture on any wall (the living space, the workshop, the hall of shame)
+    function addHang(c, name, st) {
+        var path = 'content/workshop/visitors/' + name, acts = c.querySelectorAll('.acts')[c.querySelectorAll('.acts').length - 1];
+        (st.walls || []).forEach(function (w) {
+            if (!w.numbers.length) return;
+            var inFrame = '';
+            Object.keys(w.frames).forEach(function (k) { if (w.frames[k] === path || (w.frames[k] === name && w.id !== 'workshop')) inFrame = k; });
+            var row = document.createElement('div');
+            row.className = 'acts hang';
+            row.innerHTML = '<span class="hl">' + w.label + ':</span>';
+            w.numbers.forEach(function (n) {
+                var b = document.createElement('button');
+                b.type = 'button'; b.textContent = n; b.title = 'frame ' + n;
+                b.setAttribute('aria-pressed', String(inFrame === String(n)));
+                b.addEventListener('click', function () { hangIt(path, inFrame === String(n) ? '' : n, w); });
+                row.appendChild(b);
+            });
+            if (inFrame) c.querySelector('.meta').insertAdjacentHTML('beforeend', '<br><span class="where">in frame ' + inFrame + ' in the ' + w.label + '</span>');
+            c.insertBefore(row, acts);
         });
-        c.querySelector('.meta').insertAdjacentHTML('beforeend', inFrame ? '<br><span class="where">hanging in frame ' + inFrame + '</span>' : '');
-        c.insertBefore(row, c.querySelector('.acts'));
     }
-    function hangIt(what, frame) {
-        api('/__post/hang', { what: what, frame: frame }).then(function (r) {
+    function hangIt(path, frame, w) {
+        api('/__post/hang', { path: path, frame: frame, room: w.id }).then(function (r) {
             if (r.error) { say(r.error, true); return; }
-            say(frame ? 'hung in frame ' + frame + ' in the living space. publish to show everyone.' : 'taken down from its frame.');
+            say(frame ? 'hung in frame ' + frame + ' in the ' + w.label + '. publish to show everyone.' : 'taken down from its frame.');
             refresh();
         });
     }
@@ -301,7 +309,7 @@
     }
     $('.fetch').addEventListener('click', check);
     $('.publish').addEventListener('click', function () {
-        api('/__letters/publish', {}).then(function (r) { alert(r.error || 'publishing! a small window shows it going up, and closes by itself when it’s done. the live site updates a minute or two later.'); });
+        api('/__letters/publish', {}).then(function (r) { say(r.error || 'publishing: a small window shows it going up and closes by itself when it\u2019s done. the live site updates a minute or two later.', !!r.error); });
     });
     // look for post as it opens, if FormSubmit allows (it only lets you check a few times a day): at most every 8 hours
     api('/__post/state').then(function (st) {
