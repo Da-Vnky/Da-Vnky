@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260924d">
+    <link rel="stylesheet" href="sky/sky.css?v=20260924e">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -21,7 +21,6 @@
         .armchair { left: 12%; bottom: 4vh; width: 20%; max-width: 260px; }
         .lamp     { left: 3%;  bottom: 4vh; height: 56vh; }
         .shelf    { left: 44%; bottom: 0;  width: 26%; }
-        .frame    { left: 33%; top: 38%;  width: 8%; }
         .pinboard { left: 4%;  top: 11%;  width: 22%; }
         .letter-pile { left: 11%; top: calc(11% + 22vw * .75 + 24px); width: 13%; min-width: 120px; z-index: 3; filter: drop-shadow(0 4px 5px rgba(0,0,0,.35)); }
         .noise-machine { left: 63%; bottom: calc(26vw * 170 / 360 - 3px); width: 5.6vw; min-width: 64px; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
@@ -81,7 +80,7 @@
 
         @media (max-width: 620px) {
             .room .window { left: 12% !important; width: 76% !important; top: 34% !important; height: 28% !important; }
-            .frame, .shelf, .lamp { display: none; }
+            .shelf, .lamp, .gallery-frame { display: none; }
             .pinned { left: 50%; top: 11%; width: 220px; margin-left: -110px; }
             .pinboard { left: 8%; top: 66%; width: 42%; border-width: 7px; }
             .letter-pile { left: 54%; top: 66%; width: 28%; min-width: 0; }
@@ -128,13 +127,14 @@
             </svg>
         </div>
 
-        <!-- framed picture -->
-        <svg class="furnish frame wobbles" data-asset="assets/living/picture" viewBox="0 0 140 110" aria-hidden="true" style="filter: drop-shadow(0 5px 6px rgba(0,0,0,.4))">
-            <rect x="0" y="0" width="140" height="110" fill="#2a1d14"/>
-            <rect x="10" y="10" width="120" height="90" fill="#e9dbb8"/>
-            <path d="M10 80 C40 60 60 70 80 58 C100 48 115 55 130 50 V100 H10 Z" fill="#6e5236" opacity=".5"/>
-            <circle cx="100" cy="34" r="9" fill="#9a3b1f" opacity=".7"/>
-        </svg>
+        <!-- picture frames: art from the visitors' portfolio, hung from the content manager (tools\content.bat).
+             move one with left / top / width; its look with data-look (gilt, wood, dark, white, plain)
+             or your own colours: --frame, --frame-w, --mat, --mat-w; tilt it with --tilt.
+             your own frame art: assets/living/frame (all) or assets/living/frame-1, frame-2 … (see sky/frames.js).
+             another frame: copy a line and give it the next number. -->
+        <div class="furnish gallery-frame" data-frame="1" data-look="dark" style="left:33%; top:40%; width:6.5%; --tilt:-1.5deg"></div>
+        <div class="furnish gallery-frame" data-frame="2" data-look="gilt" style="left:77%; top:13%; width:8.5%"></div>
+        <div class="furnish gallery-frame" data-frame="3" data-look="wood" style="left:79%; top:43%; width:5.5%; aspect-ratio:1; --tilt:1deg"></div>
 
         <!-- floor lamp: glows brighter as evening comes -->
         <svg class="furnish lamp sways" data-asset="assets/living/lamp" viewBox="0 0 80 400" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
@@ -220,14 +220,15 @@
              style="left: 34%; bottom: 3vh; height: 25vh;"></div>
     </div>
 
-    <script src="sky/sky.js?v=20260924d"></script>
+    <script src="sky/sky.js?v=20260924e"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
-    <script src="sky/ground-view.js?v=20260924d" data-view="assets/living/view"></script>
-    <script src="sky/panel.js?v=20260924d"></script>
-    <script src="sky/music.js?v=20260924d"></script>
-    <script src="sky/weather.js?v=20260924d"></script>
-    <script src="sky/noise.js?v=20260924d"></script>
-    <script src="sky/records.js?v=20260924d"></script>
-    <script src="sky/crate.js?v=20260924d"></script>
+    <script src="sky/ground-view.js?v=20260924e" data-view="assets/living/view"></script>
+    <script src="sky/panel.js?v=20260924e"></script>
+    <script src="sky/music.js?v=20260924e"></script>
+    <script src="sky/weather.js?v=20260924e"></script>
+    <script src="sky/noise.js?v=20260924e"></script>
+    <script src="sky/records.js?v=20260924e"></script>
+    <script src="sky/crate.js?v=20260924e"></script>
+    <script src="sky/frames.js?v=20260924e"></script>
 </body>
 </html>

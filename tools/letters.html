@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>letters manager · DaV-nky</title>
-<!-- the letters manager: open it with tools\letters.bat (it only works through that). -->
+<title>content manager · DaV-nky</title>
+<!-- the content manager: open it with tools\content.bat (it only works through that). -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
@@ -66,18 +66,24 @@
     .preview .letter { margin: 0 auto 30px; }
     .preview .note { text-align: center; color: rgba(243,230,194,.8); font-style: italic; margin: 0 0 20px; }
     .empty { display: grid; place-items: center; height: 100%; color: rgba(243,230,194,.7); font-style: italic; text-align: center; padding: 30px; }
+    .cm-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: .92rem; }
+    .cm-nav span { font: normal 1rem "IM Fell English SC", Georgia, serif; color: #e0b070; margin-right: 6px; }
+    .cm-nav a { padding: 3px 10px; border-radius: 999px; color: #f3e6c2; text-decoration: none; font-style: italic; }
+    .cm-nav a:hover { background: rgba(243,230,194,.1); }
+    .cm-nav a.on { background: #f3e6c2; color: #3a2716; }
+    .side .cm-nav { padding: 12px 14px 0; }
     [hidden] { display: none !important; }
     @media (max-width: 1000px) { body { grid-template-columns: 1fr; height: auto; } main { grid-template-columns: 1fr; } .side { max-height: 45vh; } }
 </style>
 </head>
 <body>
     <aside class="side">
+        <nav class="cm-nav"><span>content manager</span><a href="letters.html" class="on">your letters</a><a href="shelves.html">your things</a><a href="post.html">visitors</a></nav>
         <h1>letters</h1>
         <p class="sub">the letters on your homepage (content/sea/)</p>
         <button type="button" class="new">+ write a new letter</button>
         <div class="list"></div>
         <div class="foot">
-            <a href="post.html">the post office: bottles &amp; art →</a>
             <a href="/index.html#bottle" target="_blank">see the homepage ↗</a>
             <button type="button" class="publish">publish to the live site</button>
         </div>
@@ -137,7 +143,7 @@ a blank line starts a new paragraph."></textarea>
         var opt = body === undefined ? {} : { method: 'POST', body: type ? body : JSON.stringify(body), headers: { 'Content-Type': type || 'application/json' } };
         return fetch('/__letters/' + path, opt).then(function (r) {
             return r.json().catch(function () { return { error: 'the manager isn’t answering (is its window still open?)' }; });
-        }, function () { return { error: 'the manager isn’t running. open it with tools\\letters.bat' }; });
+        }, function () { return { error: 'the manager isn’t running. open it with tools\\content.bat' }; });
     }
     function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
     function setDirty(d) { dirty = d; statusEl.classList.toggle('dirty', d); if (d && !statusEl.textContent) statusEl.textContent = 'not saved yet'; }

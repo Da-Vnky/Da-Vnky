@@ -6,8 +6,8 @@
    that you haven't read yet. Anyone can take one out, pull the cork and read
    it; visitors then put it back.
 
-   YOU decide what happens next, in the letters manager (tools\letters.bat,
-   "the post office"): pin a bottle to the board, put it on the pile, or leave
+   YOU decide what happens next, in the content manager (tools\content.bat,
+   "visitors"): pin a bottle to the board, put it on the pile, or leave
    it in the crate. That writes content/living/bottles/board.json, which is
    what every visitor sees once you publish.
    (There's also an OWNER MODE on the page itself, ?owner on the address, for
@@ -42,7 +42,7 @@
     function put(store, k, v) { try { if (v === null) store.removeItem(k); else store.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
     // owner mode: pinning from the page itself (?owner turns it on in a browser, ?owner=off off).
-    // switched off: pins are set in the letters manager instead. true brings it back.
+    // switched off: pins are set in the content manager instead. true brings it back.
     var OWNER_MODE = false;
     var q = /[?&]owner(?:=(\w+))?/.exec(location.search);
     if (q && OWNER_MODE) put(localStorage, OWNER, q[1] === 'off' ? null : true);

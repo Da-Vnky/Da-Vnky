@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>your things · content manager · DaV-nky</title>
+<!-- your own things: part of the content manager. open it with tools\content.bat. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+    :root { --ink: #3a2716; --faded: #6e5236; --red: #9a3b1f; --card: #efe3c6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #2a1d14; color: #f3e6c2; font: 1.05rem/1.5 "IM Fell English", Georgia, serif; }
+    button, input { font: inherit; }
+    header { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 22px;
+        background: #3a2a1d; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+    header h1 { margin: 0 auto 0 12px; font: normal 1.6rem "IM Fell English SC", Georgia, serif; }
+    header a { color: #f3e6c2; font-style: italic; }
+    .btn { padding: 8px 16px; border: 1px solid rgba(243,230,194,.35); border-radius: 999px; background: none; color: #f3e6c2; cursor: pointer; font-style: italic; }
+    .btn:hover { background: rgba(243,230,194,.1); }
+    .btn.main { background: var(--red); border-color: var(--red); }
+    .btn.main:hover { background: #b24a28; }
+    .status { width: 100%; margin: 0; font-style: italic; font-size: .92rem; color: rgba(243,230,194,.75); }
+    .status.bad { color: #f0b08a; }
+    main { max-width: 1200px; margin: 0 auto; padding: 18px 22px 60px; }
+    h2 { margin: 26px 0 4px; font: normal 1.35rem "IM Fell English SC", Georgia, serif; }
+    .sub { margin: 0 0 14px; font-style: italic; color: rgba(243,230,194,.65); font-size: .92rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+    .card { display: flex; flex-direction: column; background: var(--card); color: var(--ink); box-shadow: 0 8px 18px rgba(0,0,0,.4), inset 0 0 26px rgba(120,80,30,.2); }
+    .card .look { height: 220px; overflow: hidden; display: grid; place-items: center; background: rgba(110,82,54,.07); }
+    .card .look img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .card .look .words { align-self: start; width: 100%; height: 100%; padding: 14px 16px; overflow: hidden; white-space: pre-wrap; font-size: .95rem;
+        -webkit-mask-image: linear-gradient(#000 75%, transparent); mask-image: linear-gradient(#000 75%, transparent); }
+    .card .look .words b { display: block; font-weight: normal; font-size: 1.1rem; margin-bottom: 4px; }
+    .card .meta { padding: 8px 14px 4px; font-style: italic; color: var(--faded); font-size: .9rem; }
+    .card .meta b { color: var(--ink); font-weight: normal; }
+    .card .warn { margin: 0 14px 6px; font-size: .82rem; font-style: italic; color: var(--red); }
+    .card .acts { display: flex; gap: 6px; padding: 6px 12px 12px; margin-top: auto; }
+    .card .acts button { flex: 1; padding: 6px 10px; border-radius: 999px; cursor: pointer; font-style: italic; border: 1px solid rgba(110,82,54,.35); background: #f8f0dc; color: var(--ink); }
+    .card .acts button:hover { background: #fff8e6; }
+    .card .acts .yes { background: var(--ink); color: #f3e6c2; border-color: var(--ink); }
+    .card .acts .yes:hover { background: var(--red); }
+    .card .acts .no { color: var(--red); }
+    .card .acts button[aria-pressed=true] { background: var(--red); color: #f3e6c2; border-color: var(--red); }
+    .card .acts.hang { align-items: center; }
+    .card .acts.hang .hl { font-style: italic; color: var(--faded); font-size: .88rem; margin-right: 2px; }
+    .card .acts.hang button { flex: 0 0 auto; min-width: 34px; }
+    .card .where { display: inline-block; margin-left: 4px; padding: 0 8px; border-radius: 999px; background: rgba(154,59,31,.12); color: var(--red); font-size: .82rem; }
+    .empty { font-style: italic; color: rgba(243,230,194,.55); }
+    .setup { max-width: 720px; padding: 16px 20px; border-radius: 12px; background: rgba(243,230,194,.08); }
+    .setup ol { margin: 6px 0 10px; padding-left: 1.3em; }
+    .setup code { background: rgba(243,230,194,.12); padding: 1px 6px; border-radius: 4px; font-size: .9rem; word-break: break-all; }
+    .setup input { width: min(420px, 100%); padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(243,230,194,.35); background: rgba(0,0,0,.25); color: #f3e6c2; }
+    .cm-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: .92rem; }
+    .cm-nav span { font: normal 1rem "IM Fell English SC", Georgia, serif; color: #e0b070; margin-right: 6px; }
+    .cm-nav a { padding: 3px 10px; border-radius: 999px; color: #f3e6c2; text-decoration: none; font-style: italic; }
+    .cm-nav a:hover { background: rgba(243,230,194,.1); }
+    .cm-nav a.on { background: #f3e6c2; color: #3a2716; }
+    [hidden] { display: none !important; }
+    .card .look audio { width: 90%; }
+    .card .acts button { white-space: nowrap; padding: 6px 8px; }
+    .card .look .sleeve { position: relative; width: 150px; height: 150px; }
+    .card .look .sleeve img { width: 100%; height: 100%; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,.35); }
+    .card .look .sleeve .nos { width: 100%; height: 100%; display: grid; place-items: center; background: #2a1d14; color: #cdbb96; font-style: italic; font-size: .85rem; text-align: center; padding: 10px; }
+    .card .look.music { grid-template-rows: 1fr auto; gap: 8px; padding: 12px 0; }
+    .card .cap { margin: 0 14px 4px; font-size: .9rem; white-space: pre-wrap; color: var(--ink); }
+    .card .look iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+    h2 .add { margin-left: 10px; vertical-align: middle; font: italic .95rem "IM Fell English", Georgia, serif; }
+</style>
+</head>
+<body>
+<header>
+    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html" class="on">your things</a><a href="post.html">visitors</a></nav>
+    <h1>your things</h1>
+    <button type="button" class="btn publish">publish to the live site</button>
+    <p class="status"></p>
+</header>
+<main>
+    <h2>paintings on the easel <button type="button" class="btn main add" data-add="easel">+ add</button></h2>
+    <p class="sub">the workshop's easel (content/workshop/): pictures or short videos. names that start with a date go newest first. a caption shows under each; hang one in a frame in the living space with its number.</p>
+    <div class="grid" data-shelf="easel"></div>
+
+    <h2>window scenes in the city <button type="button" class="btn main add" data-add="city">+ add</button></h2>
+    <p class="sub">the lit windows you find with the telescope (content/city/): one file = one window. landscape pictures (about 4:3) fit best.</p>
+    <div class="grid" data-shelf="city"></div>
+
+    <h2>records <button type="button" class="btn main add" data-add="music">+ add</button></h2>
+    <p class="sub">the record player in the living space (content/living/): .mp3 or .ogg. start names with 01-, 02-, … to set the order. a sleeve is the record's cover (tools\sleeve.bat fetches one from Spotify).</p>
+    <div class="grid" data-shelf="music"></div>
+    <input type="file" class="file-in" multiple hidden>
+</main>
+
+<script>
+(function () {
+    var $ = function (s) { return document.querySelector(s); };
+    var statusEl = $('.status'), fileIn = $('.file-in');
+    var ACCEPT = { easel: 'image/*,video/mp4,video/webm', city: 'image/*,video/mp4,video/webm,.html', music: 'audio/mpeg,audio/ogg,.mp3,.ogg' };
+    function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
+    var OLD = { error: 'the content manager window that\u2019s open is an older version. close its black window, then double-click tools\\content.bat again' };
+    function api(path, body) {
+        var opt = body === undefined ? {} : { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } };
+        return fetch(path, opt).then(function (r) {
+            return r.json().then(function (j) { return j && j.error === 'unknown' ? OLD : j; }, function () { return OLD; });
+        }, function () { return { error: 'the manager isn\u2019t running. open it with tools\\content.bat' }; });
+    }
+    function upload(which, file, sleeveFor) {
+        var h = { 'Content-Type': 'application/octet-stream', 'X-Which': which, 'X-Name': encodeURIComponent(file.name) };
+        if (sleeveFor) h['X-Sleeve-For'] = encodeURIComponent(sleeveFor);
+        return fetch('/__shelf/add', { method: 'POST', body: file, headers: h }).then(function (r) { return r.json(); }, function () { return { error: 'couldn\u2019t reach the manager' }; });
+    }
+    function nice(d) {
+        if (!d) return '';
+        var p = d.split('-');
+        return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).toLowerCase();
+    }
+    function esc(t) { var d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+    function button(label, fn, cls) { var b = document.createElement('button'); b.type = 'button'; b.textContent = label; if (cls) b.className = cls; b.addEventListener('click', fn); return b; }
+
+    function look(which, it) {
+        var d = document.createElement('div');
+        d.className = 'look' + (which === 'music' ? ' music' : '');
+        if (which === 'music') {
+            d.innerHTML = '<div class="sleeve">' + (it.sleeve ? '<img alt="">' : '<div class="nos">no sleeve yet</div>') + '</div><audio controls preload="none"></audio>';
+            if (it.sleeve) d.querySelector('img').src = it.sleeve;
+            d.querySelector('audio').src = it.url;
+        } else if (it.kind === 'mp4' || it.kind === 'webm') {
+            d.innerHTML = '<video muted loop autoplay playsinline style="max-width:100%;max-height:100%"></video>';
+            d.querySelector('video').src = it.url;
+        } else if (it.kind === 'html') {
+            d.innerHTML = '<iframe sandbox></iframe>';
+            d.querySelector('iframe').src = it.url;
+        } else {
+            d.innerHTML = '<img alt="" loading="lazy">';
+            d.querySelector('img').src = it.url;
+        }
+        return d;
+    }
+
+    function draw(which, r) {
+        var grid = document.querySelector('[data-shelf="' + which + '"]');
+        grid.innerHTML = '';
+        var map = r.frames || {}, nums = r.frameNumbers || [];
+        r.items.forEach(function (it) {
+            var c = document.createElement('div');
+            c.className = 'card';
+            c.appendChild(look(which, it));
+            var meta = document.createElement('div');
+            meta.className = 'meta';
+            meta.innerHTML = esc(it.name) + (it.date ? '<br>' + nice(it.date) : '');
+            c.appendChild(meta);
+            if (it.caption) { var cap = document.createElement('p'); cap.className = 'cap'; cap.textContent = it.caption; c.appendChild(cap); }
+            if (which === 'easel' && nums.length) {                    // hang it in a frame in the living space
+                var inFrame = '';
+                Object.keys(map).forEach(function (k) { if (map[k] === it.hang) inFrame = k; });
+                if (inFrame) meta.insertAdjacentHTML('beforeend', '<br><span class="where">hanging in frame ' + inFrame + '</span>');
+                var row = document.createElement('div');
+                row.className = 'acts hang';
+                row.innerHTML = '<span class="hl">hang in:</span>';
+                nums.forEach(function (n) {
+                    var b = button(String(n), function () {
+                        var to = inFrame === String(n) ? '' : n;
+                        api('/__post/hang', { what: it.hang, frame: to }).then(function (x) {
+                            if (x.error) say(x.error, true); else { say(to ? 'hung in frame ' + to + '. publish to show everyone.' : 'taken down from its frame.'); loadAll(); }
+                        });
+                    });
+                    b.setAttribute('aria-pressed', String(inFrame === String(n)));
+                    row.appendChild(b);
+                });
+                c.appendChild(row);
+            }
+            var acts = document.createElement('div');
+            acts.className = 'acts';
+            acts.appendChild(button('open', function () { window.open(it.url, '_blank'); }));
+            if (which === 'music') {
+                acts.appendChild(button(it.sleeve ? 'new sleeve' : 'add a sleeve', function () {
+                    pick('image/png,image/jpeg,image/webp,image/gif', false, function (files) {
+                        upload('music', files[0], it.name).then(function (x) { if (x.error) say(x.error, true); else { say('sleeve saved.'); loadAll(); } });
+                    });
+                }));
+            } else {
+                acts.appendChild(button(it.caption ? 'caption' : '+ caption', function () {
+                    var t = prompt('a caption for ' + it.name + ' (the first line is its title; leave it empty to remove it):', it.caption || '');
+                    if (t === null) return;
+                    api('/__shelf/caption', { which: which, name: it.name, text: t }).then(function (x) { if (x.error) say(x.error, true); else { say('caption saved.'); loadAll(); } });
+                }));
+            }
+            acts.appendChild(button('delete', function () {
+                if (!confirm('delete ' + it.name + (which === 'music' ? ' (and its sleeve)' : ' (and its caption)') + '? it goes from your folder now, and from the live site when you next publish.')) return;
+                api('/__shelf/delete', { which: which, name: it.name }).then(function (x) { if (x.error) say(x.error, true); else { say('deleted ' + it.name + '.'); loadAll(); } });
+            }, 'no'));
+            c.appendChild(acts);
+            grid.appendChild(c);
+        });
+        if (!r.items.length) grid.innerHTML = '<p class="empty">nothing here yet.</p>';
+    }
+    function load(which) {
+        return api('/__shelf/list?which=' + which).then(function (r) { if (r.error) { say(r.error, true); return; } draw(which, r); });
+    }
+    function loadAll() { return Promise.all(['easel', 'city', 'music'].map(load)); }
+
+    var picked = null;
+    function pick(accept, multiple, fn) { fileIn.accept = accept; fileIn.multiple = multiple; picked = fn; fileIn.click(); }
+    fileIn.addEventListener('change', function () {
+        var files = Array.prototype.slice.call(fileIn.files);
+        fileIn.value = '';
+        if (files.length && picked) picked(files);
+    });
+    document.querySelectorAll('[data-add]').forEach(function (b) {
+        b.addEventListener('click', function () {
+            var which = b.dataset.add;
+            pick(ACCEPT[which], true, function (files) {
+                say('adding ' + files.length + (files.length === 1 ? ' file…' : ' files…'));
+                var added = [], errs = [];
+                files.reduce(function (p, f) {
+                    return p.then(function () { return upload(which, f).then(function (x) { if (x.error) errs.push(f.name + ': ' + x.error); else added.push(x.name); }); });
+                }, Promise.resolve()).then(function () {
+                    say((added.length ? 'added ' + added.join(', ') + '. publish when you\u2019re ready.' : '') + (errs.length ? ' ' + errs.join('; ') : ''), errs.length && !added.length);
+                    loadAll();
+                });
+            });
+        });
+    });
+    $('.publish').addEventListener('click', function () {
+        api('/__letters/publish', {}).then(function (r) { alert(r.error || 'the publish window is open: type a few words about what changed, then press Enter.'); });
+    });
+    loadAll();
+})();
+</script>
+</body>
+</html>

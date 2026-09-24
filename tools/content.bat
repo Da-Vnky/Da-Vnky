@@ -1,9 +1,9 @@
 @echo off
 rem =====================================================================
-rem  (the old name: this now opens the content manager, same as content.bat)
-rem  the letters manager: double-click this (it's in the tools folder) to
-rem  write, edit and delete the letters on your homepage (content/sea/)
-rem  in your browser. close this window to stop it.
+rem  the content manager: double-click this (it's in the tools folder) to
+rem  manage everything on your site in your browser: your letters, your
+rem  paintings, window scenes and records, and visitors' bottles and art.
+rem  close this window to stop it.
 rem  needs Python (python.org, tick "Add python.exe to PATH").
 rem =====================================================================
 cd /d "%~dp0.."

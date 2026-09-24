@@ -8,3 +8,4 @@
 03-Aerie.ogg
 04-Frame of Mind.jpg
 04-Frame of Mind.ogg
+frames.json

@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>the post office · DaV-nky</title>
-<!-- the post office: part of the letters manager. open it with tools\letters.bat. -->
+<title>visitors · content manager · DaV-nky</title>
+<!-- visitors' post: part of the content manager. open it with tools\content.bat. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
     button, input { font: inherit; }
     header { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 22px;
         background: #3a2a1d; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
-    header h1 { margin: 0 auto 0 0; font: normal 1.6rem "IM Fell English SC", Georgia, serif; }
+    header h1 { margin: 0 auto 0 12px; font: normal 1.6rem "IM Fell English SC", Georgia, serif; }
     header a { color: #f3e6c2; font-style: italic; }
     .btn { padding: 8px 16px; border: 1px solid rgba(243,230,194,.35); border-radius: 999px; background: none; color: #f3e6c2; cursor: pointer; font-style: italic; }
     .btn:hover { background: rgba(243,230,194,.1); }
@@ -44,19 +44,29 @@
     .card .acts .yes:hover { background: var(--red); }
     .card .acts .no { color: var(--red); }
     .card .acts button[aria-pressed=true] { background: var(--red); color: #f3e6c2; border-color: var(--red); }
+    .card .acts.paste input { flex: 1; min-width: 0; padding: 5px 8px; border-radius: 8px; border: 1px solid rgba(110,82,54,.35); background: #fff8e6; color: var(--ink); font-size: .85rem; }
+    .card .acts.paste button { flex: 0 0 auto; }
+    .card .acts.hang { align-items: center; }
+    .card .acts.hang .hl { font-style: italic; color: var(--faded); font-size: .88rem; margin-right: 2px; }
+    .card .acts.hang button { flex: 0 0 auto; min-width: 34px; }
     .card .where { display: inline-block; margin-left: 4px; padding: 0 8px; border-radius: 999px; background: rgba(154,59,31,.12); color: var(--red); font-size: .82rem; }
     .empty { font-style: italic; color: rgba(243,230,194,.55); }
     .setup { max-width: 720px; padding: 16px 20px; border-radius: 12px; background: rgba(243,230,194,.08); }
     .setup ol { margin: 6px 0 10px; padding-left: 1.3em; }
     .setup code { background: rgba(243,230,194,.12); padding: 1px 6px; border-radius: 4px; font-size: .9rem; word-break: break-all; }
     .setup input { width: min(420px, 100%); padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(243,230,194,.35); background: rgba(0,0,0,.25); color: #f3e6c2; }
+    .cm-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: .92rem; }
+    .cm-nav span { font: normal 1rem "IM Fell English SC", Georgia, serif; color: #e0b070; margin-right: 6px; }
+    .cm-nav a { padding: 3px 10px; border-radius: 999px; color: #f3e6c2; text-decoration: none; font-style: italic; }
+    .cm-nav a:hover { background: rgba(243,230,194,.1); }
+    .cm-nav a.on { background: #f3e6c2; color: #3a2716; }
     [hidden] { display: none !important; }
 </style>
 </head>
 <body>
 <header>
+    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html">your things</a><a href="post.html" class="on">visitors</a></nav>
     <h1>the post office</h1>
-    <a href="letters.html">← your letters</a>
     <button type="button" class="btn main fetch">check for new post</button>
     <button type="button" class="btn publish">publish to the live site</button>
     <p class="status"></p>
@@ -83,7 +93,7 @@
     <div class="grid bottles"></div>
 
     <h2>visitors' art on your site</h2>
-    <p class="sub">in the portfolio in the workshop (content/workshop/visitors/).</p>
+    <p class="sub">in the portfolio in the workshop (content/workshop/visitors/). hang one in a frame in the living space with its number (click it again to take it down).</p>
     <div class="grid art"></div>
 </main>
 
@@ -94,10 +104,10 @@
     function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
     function api(path, body) {
         var opt = body === undefined ? {} : { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } };
-        var OLD = { error: 'the letters manager window that’s open is an older version. close its black window, then double-click tools\\letters.bat again' };
+        var OLD = { error: 'the content manager window that’s open is an older version. close its black window, then double-click tools\\content.bat again' };
         return fetch(path, opt).then(function (r) {
             return r.json().then(function (j) { return j && j.error === 'unknown' ? OLD : j; }, function () { return OLD; });
-        }, function () { return { error: 'the manager isn’t running. open it with tools\\letters.bat' }; });
+        }, function () { return { error: 'the manager isn’t running. open it with tools\\content.bat' }; });
     }
     function nice(d) {
         if (!d) return '';
@@ -145,7 +155,21 @@
                                                           : 'this one was a drawing or picture, which only came by email: save the .jpg from there into content/living/bottles/') : '';
             var toss = function (msg) { return function () { api('/__post/toss', { id: it.id }).then(function (r) { if (r.error) say(r.error, true); else { say(msg); refresh(); } }); }; };
             if (it.only_email) {
-                inbox.appendChild(card(look, meta, warn, [['done, I saved it', toss('marked as done.'), 'yes'], ['throw it back', toss('thrown back.'), 'no']]));
+                var c = card(look, meta, 'the picture came by email. in that email, right-click the picture (or its link) and "copy link", then paste it here:',
+                    [['done, I saved it', toss('marked as done.')], ['throw it back', toss('thrown back.'), 'no']]);
+                var row = document.createElement('div');
+                row.className = 'acts paste';
+                row.innerHTML = '<input type="url" placeholder="paste the picture\u2019s link"><button type="button" class="yes">fetch it</button>';
+                row.querySelector('button').addEventListener('click', function () {
+                    var u = row.querySelector('input').value.trim();
+                    if (!u) return;
+                    say('fetching the picture…');
+                    api('/__post/link', { id: it.id, url: u }).then(function (r) {
+                        if (r.error) say(r.error, true); else { say('got it. now \u201ckeep it\u201d puts it on the site.'); refresh(); }
+                    });
+                });
+                c.insertBefore(row, c.querySelector('.acts'));
+                inbox.appendChild(c);
                 return;
             }
             inbox.appendChild(card(look, meta, warn, [
@@ -179,6 +203,7 @@
                         api('/__post/delete', { which: which, name: f.name }).then(function (r) { if (r.error) say(r.error, true); else { say('deleted ' + f.name + '. publish to take it off the live site.'); refresh(); } });
                     }, 'no']
                 ]);
+                if (which === 'art') addHang(c, f.name, st);
                 if (which === 'bottles') {                     // where it sits in the living space: the board, the pile, or the crate
                     var row = document.createElement('div');
                     row.className = 'acts';
@@ -198,6 +223,31 @@
         }
         shelf(bottles, 'bottles', st.bottles);
         shelf(art, 'art', st.art);
+    }
+    // hang a picture in one of the living space's frames (content/living/frames.json)
+    function addHang(c, what, st) {
+        var nums = st.frameNumbers || [], map = st.frames || {}, inFrame = '';
+        Object.keys(map).forEach(function (k) { if (map[k] === what) inFrame = k; });
+        if (!nums.length) return;
+        var row = document.createElement('div');
+        row.className = 'acts hang';
+        row.innerHTML = '<span class="hl">hang in:</span>';
+        nums.forEach(function (n) {
+            var b = document.createElement('button');
+            b.type = 'button'; b.textContent = n; b.title = 'frame ' + n + (map[n] && map[n] !== what ? ' (instead of what hangs there now)' : '');
+            b.setAttribute('aria-pressed', String(inFrame === String(n)));
+            b.addEventListener('click', function () { hangIt(what, inFrame === String(n) ? '' : n); });
+            row.appendChild(b);
+        });
+        c.querySelector('.meta').insertAdjacentHTML('beforeend', inFrame ? '<br><span class="where">hanging in frame ' + inFrame + '</span>' : '');
+        c.insertBefore(row, c.querySelector('.acts'));
+    }
+    function hangIt(what, frame) {
+        api('/__post/hang', { what: what, frame: frame }).then(function (r) {
+            if (r.error) { say(r.error, true); return; }
+            say(frame ? 'hung in frame ' + frame + ' in the living space. publish to show everyone.' : 'taken down from its frame.');
+            refresh();
+        });
     }
     function refresh() { return api('/__post/state').then(function (st) { if (st.error) { say(st.error, true); $('.fetch').hidden = true; return; } draw(st); }); }
 
@@ -220,7 +270,14 @@
     $('.publish').addEventListener('click', function () {
         api('/__letters/publish', {}).then(function (r) { alert(r.error || 'the publish window is open: type a few words about what changed, then press Enter.'); });
     });
-    refresh().then(function () { if (!$('.fetch').hidden) check(); });   // look for post as soon as it opens
+    // look for post as it opens, if FormSubmit allows (it only lets you check a few times a day): at most every 8 hours
+    api('/__post/state').then(function (st) {
+        if (st.error) { say(st.error, true); $('.fetch').hidden = true; return; }
+        draw(st);
+        var now = Date.now() / 1000;
+        if (st.hasKey && (!st.nextOk || st.nextOk < now) && now - (st.lastCheck || 0) > 8 * 3600) check();
+        else if (st.hasKey && st.lastCheck) say('last checked ' + new Date(st.lastCheck * 1000).toLocaleString().toLowerCase() + '. (FormSubmit only allows a few checks a day)');
+    });
 })();
 </script>
 </body>

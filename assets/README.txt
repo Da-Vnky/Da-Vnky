@@ -216,6 +216,16 @@ workshop                          living space
        drawn one is: 17%-83% across,    assets/living/turntable-playing
        6%-56% down; the painting          (shown while music plays; a GIF
        is laid on that spot)              can spin the record; with your own
+    assets/living/frame
+      (a picture frame on the wall,
+       every one, 4:5, see-through in
+       the middle; or frame-1, frame-2 …
+       for each. the painting fills the
+       middle 76%: set --inset on the
+       frame in living.html to change it.
+       no art? the frames are drawn:
+       data-look gilt / wood / dark /
+       white / plain, or your colours)
     assets/workshop/portfolio
       (the visitors' portfolio by the
        bench, about 5:4; its count

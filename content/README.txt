@@ -13,7 +13,7 @@ Take a file out, and it's gone. That's the whole job.
                       the dock, where every letter can be read, newest first (the
                       "letters" button in the top left corner opens it too).
                       A date in the future stays hidden until that day.
-                      THE EASY WAY: double-click tools\letters.bat. The letters
+                      THE EASY WAY: double-click tools\content.bat. The content
                       manager opens in your browser: write new letters, edit or
                       delete old ones, add pictures, see each one on the site's
                       paper as you type, and publish, without touching the files.
@@ -24,6 +24,18 @@ Take a file out, and it's gone. That's the whole job.
                         ~ bye    on its own = a sign-off (right-aligned)
                       .html letters: anything that goes inside a letter
                         (<h2>, <p>, <p class="lede">, <img>, <p class="signoff"> …)
+
+  THE CONTENT MANAGER: double-click tools\content.bat and everything below can be
+  done in your browser: your letters; your easel paintings, city windows and
+  records (add, caption, sleeves, delete); visitors' bottles and art (keep, pin,
+  hang in the living space's frames, delete). Then "publish to the live site".
+
+  content/living/frames.json
+                      WHAT HANGS IN THE LIVING SPACE'S PICTURE FRAMES, frame by
+                      number: { "1": "a-visitor-picture.png", "2": "", "3": "" }.
+                      A name alone is from content/workshop/visitors/; a path works
+                      too (content/workshop/cat.png). Set it with the "hang in"
+                      buttons in the content manager.
 
   content/workshop/   PAINTINGS & DRAWINGS (the easel)
                       .png .jpg .jpeg .webp .gif .svg  (.mp4 .webm also work)
@@ -125,8 +137,8 @@ Nothing reaches the site by itself: every bottle comes to YOU first.
     Until BOTTLE_INBOX is filled in, the button still works and the bottle
     still gets thrown, but it tells the visitor the post office isn't open.
 
-  • THE EASY WAY: the post office in the letters manager (tools\letters.bat,
-      then "the post office"). It fetches new bottles and visitors' art straight
+  • THE EASY WAY: the post office in the content manager (tools\content.bat,
+      then "visitors"). It fetches new bottles and visitors' art straight
       from FormSubmit (one-time setup: an API key, explained on the page), and
       you keep or throw back each one. It also lists the bottles and art already
       on the site, to delete any. Drawn or picture bottles may only come by
@@ -148,7 +160,7 @@ the crate counts only the ones new to them.
   • THE BOARD AND THE PILE (only you decide)
       What's pinned and what's on the pile is kept in one small file,
       content/living/bottles/board.json, the same for every visitor.
-      Change it in the letters manager: tools\letters.bat, "the post office",
+      Change it in the content manager: tools\content.bat, "visitors",
       then pin / pile / crate on any bottle, and publish.
 
 
