@@ -13,6 +13,10 @@ Take a file out, and it's gone. That's the whole job.
                       the dock, where every letter can be read, newest first (the
                       "letters" button in the top left corner opens it too).
                       A date in the future stays hidden until that day.
+                      THE EASY WAY: double-click tools\letters.bat. The letters
+                      manager opens in your browser: write new letters, edit or
+                      delete old ones, add pictures, see each one on the site's
+                      paper as you type, and publish, without touching the files.
 
                       .txt letters: first line = title, blank line = new paragraph,
                         *italic*  **bold**  [a link](https://…)  ![a picture](content/sea/pic.jpg)

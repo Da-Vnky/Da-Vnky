@@ -96,7 +96,7 @@
     var forced = (/[?&]weather=(\w+)/.exec(location.search) || [])[1];
     if (forced && !KINDS[forced]) forced = null;
     var choice = MODE === 'off' ? 'clear' : (localStorage && get(localStorage, CHOICE)) || MODE;
-    if (choice !== 'live' && choice !== 'random' && !KINDS[choice]) choice = 'live';
+    if (choice !== 'live' && choice !== 'random' && choice !== 'off' && !KINDS[choice]) choice = 'live';
     var state = { kind: 'clear', source: 'pick', place: '' };
 
     function pick(except) {
@@ -114,6 +114,7 @@
     }
     function decide() {
         if (forced) { state = { kind: forced, source: 'pick', place: '' }; return; }
+        if (choice === 'off') { state = { kind: 'clear', source: 'off', place: '' }; return; }   // no weather: the plain sky
         if (choice === 'random') { state = { kind: randomNow().kind, source: 'random', place: '' }; return; }
         if (choice === 'live') {
             var l = get(sessionStorage, LIVE);
@@ -247,6 +248,7 @@
         if (state.source === 'live') return state.place ? k + ' in ' + state.place + ', right now' : k + ' (finding your weather…)';
         if (state.source === 'guess') return k + ' (couldn\'t reach the weather)';
         if (state.source === 'random') return k + ' (it changes now and then)';
+        if (state.source === 'off') return 'off (the plain sky)';
         return k + ' (your pick)';
     }
     if (Sky.panel) Sky.panel.add({
@@ -270,21 +272,22 @@
             ui.vol.addEventListener('input', function () { volume = ui.vol.value / 100; put(localStorage, VOL, volume); });
             body.addEventListener('click', function (e) {
                 var b = e.target.closest('[data-choice]');
-                if (b) setChoice(b.dataset.choice);
+                // clicking your choice again turns the weather off (the plain sky, as it is without weather)
+                if (b) setChoice(b.getAttribute('aria-pressed') === 'true' ? 'off' : b.dataset.choice);
                 if (e.target.closest('.wx-exact')) useExactSpot();
                 if (e.target.closest('.wx-zone')) useZone();
             });
             drawLayer();
         },
         status: statusText,
-        active: function () { return state.kind !== 'clear'; },
+        active: function () { return state.source !== 'off' && state.kind !== 'clear'; },
         badge: function () { return ICONS[state.kind]; }
     });
     function drawLayer() {
         if (Sky.panel) Sky.panel.refresh('weather');
         if (!ui.body) return;
         ui.body.querySelector('.wx-ic').innerHTML = ICONS[state.kind];
-        ui.body.querySelector('.wx-now b').textContent = KINDS[state.kind].label;
+        ui.body.querySelector('.wx-now b').textContent = state.source === 'off' ? 'no weather' : KINDS[state.kind].label;
         ui.body.querySelector('.wx-now i').textContent = statusText().replace(KINDS[state.kind].label, '').replace(/^\s*/, '') || '';
         ui.body.querySelectorAll('[data-choice]').forEach(function (b) { b.setAttribute('aria-pressed', String(!forced && b.dataset.choice === choice)); });
         var p = get(localStorage, PLACE), where = ui.body.querySelector('.wx-where');
@@ -292,7 +295,7 @@
             where.innerHTML = (p && p.exact ? 'using your exact spot. <button type="button" class="cp-link wx-zone">use your time zone\'s city instead</button>'
                                             : 'going by your time zone' + (p ? ' (' + p.name + ')' : '') + '. <button type="button" class="cp-link wx-exact">use my exact spot</button> (your browser will ask)') +
                               '<br>weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a>';
-        } else where.textContent = '';
+        } else where.textContent = state.source === 'off' ? 'the weather is off. pick one to bring it back.' : 'click it again to turn the weather off.';
     }
 
     /* ---------------- lightning ---------------- */
@@ -320,6 +323,7 @@
     var now = {}, goal = KINDS[state.kind];
     for (var k in goal) if (typeof goal[k] === 'number') now[k] = goal[k];    // a new page starts where it was
     var last = performance.now(), drift = 0;
+    var fairShown = MODE === 'off' || state.source === 'off' ? 1 : (now.fair || 0);
     function frame(t) {
         var dt = Math.min(0.1, (t - last) / 1000);
         last = t;
@@ -329,7 +333,9 @@
         for (var key in now) now[key] += ((goal[key] || 0) - now[key]) * Math.min(1, dt / tau);
 
         cloudBox.style.opacity = now.cloud.toFixed(3);
-        if (Sky.setCloudiness) Sky.setCloudiness(MODE === 'off' ? 1 : now.fair);   // the white clouds only when the weather has them ('off': the plain sky keeps them)
+        // the white clouds only when the weather has them; with the weather off, the plain sky keeps them
+        fairShown += ((MODE === 'off' || state.source === 'off' ? 1 : now.fair) - fairShown) * Math.min(1, dt / tau);
+        if (Sky.setCloudiness) Sky.setCloudiness(fairShown);
         tint.style.opacity = now.tint.toFixed(3);
         fog.style.opacity = now.fog.toFixed(3);
         drift += dt * (10 + now.wind * 50);

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>letters manager · DaV-nky</title>
+<!-- the letters manager: open it with tools\letters.bat (it only works through that). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../sky/paper.css">
+<style>
+    :root { --ink: #3a2716; --ink-faded: #6e5236; --sanguine: #9a3b1f; --desk: #2a1d14; --card: #eadcb9; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body { display: grid; grid-template-columns: 290px 1fr; background: var(--desk); color: var(--ink);
+           font: 1.05rem/1.5 "IM Fell English", Georgia, serif; }
+    button, input, textarea { font: inherit; color: inherit; }
+
+    /* ---------- the list ---------- */
+    .side { display: flex; flex-direction: column; min-height: 0; background: #3a2a1d; color: #f3e6c2; box-shadow: inset -8px 0 18px rgba(0,0,0,.25); }
+    .side h1 { margin: 0; padding: 18px 18px 4px; font: normal 1.5rem "IM Fell English SC", Georgia, serif; }
+    .side .sub { margin: 0 18px 12px; font-style: italic; font-size: .9rem; color: rgba(243,230,194,.7); }
+    .new { margin: 0 14px 12px; padding: 10px 14px; border: 0; border-radius: 999px; cursor: pointer; background: var(--sanguine); color: #f3e6c2; font-style: italic; }
+    .new:hover { background: #b24a28; }
+    .list { flex: 1; overflow-y: auto; padding: 0 10px 14px; }
+    .item { display: block; width: 100%; margin: 0 0 6px; padding: 9px 12px; border: 0; border-radius: 10px; cursor: pointer; text-align: left; background: rgba(243,230,194,.07); }
+    .item:hover { background: rgba(243,230,194,.14); }
+    .item.on { background: var(--card); color: var(--ink); }
+    .item b { display: block; font-weight: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item small { display: block; font-style: italic; opacity: .75; font-size: .82rem; }
+    .item .later { color: #e8b33c; }
+    .item.on .later { color: var(--sanguine); }
+    .side .foot { padding: 10px 14px 14px; border-top: 1px solid rgba(243,230,194,.12); display: grid; gap: 8px; }
+    .side .foot a, .side .foot button { display: block; text-align: center; padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(243,230,194,.35);
+        background: none; color: #f3e6c2; text-decoration: none; font-style: italic; cursor: pointer; }
+    .side .foot a:hover, .side .foot button:hover { background: rgba(243,230,194,.1); }
+
+    /* ---------- the desk ---------- */
+    main { display: grid; grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr); min-height: 0; }
+    .edit { display: flex; flex-direction: column; gap: 10px; padding: 18px; min-height: 0; overflow-y: auto; background: #efe3c6; }
+    .edit label { display: block; font-size: .85rem; font-style: italic; color: var(--ink-faded); }
+    .edit input[type=text], .edit input[type=date] { width: 100%; padding: 7px 10px; border: 1px solid rgba(110,82,54,.3); border-radius: 8px; background: #f8f0dc; outline: none; }
+    .edit input.big { font-size: 1.4rem; }
+    .row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; }
+    .tools { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tools button { padding: 4px 10px; border: 1px solid rgba(110,82,54,.3); border-radius: 999px; background: #f8f0dc; cursor: pointer; font-size: .92rem; }
+    .tools button:hover { background: #fff8e6; }
+    textarea { flex: 1; min-height: 320px; width: 100%; padding: 12px; border: 1px solid rgba(110,82,54,.3); border-radius: 8px; background: #f8f0dc;
+        resize: none; outline: none; font-size: 1.08rem; line-height: 1.6; }
+    textarea.code { font: .92rem/1.5 Consolas, Menlo, monospace; }
+    .hint { margin: 0; font-size: .85rem; font-style: italic; color: var(--ink-faded); }
+    .hint code { font-style: normal; background: rgba(110,82,54,.1); padding: 0 4px; border-radius: 4px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .actions button { padding: 9px 18px; border: 0; border-radius: 999px; cursor: pointer; font-style: italic; }
+    .save { background: var(--ink); color: #f3e6c2; }
+    .save:hover { background: var(--sanguine); }
+    .del { background: none; color: var(--sanguine); border: 1px solid rgba(154,59,31,.4) !important; }
+    .del:hover { background: rgba(154,59,31,.08); }
+    .status { flex: 1; min-width: 160px; font-style: italic; font-size: .9rem; color: var(--ink-faded); }
+    .status.bad { color: var(--sanguine); }
+    .status.dirty::before { content: "● "; color: var(--sanguine); }
+
+    .preview { overflow-y: auto; padding: 50px 26px 40px; background: radial-gradient(ellipse at 50% 30%, #4b6d8c, #1e2c40 80%); }
+    .preview .letter { margin: 0 auto 30px; }
+    .preview .note { text-align: center; color: rgba(243,230,194,.8); font-style: italic; margin: 0 0 20px; }
+    .empty { display: grid; place-items: center; height: 100%; color: rgba(243,230,194,.7); font-style: italic; text-align: center; padding: 30px; }
+    [hidden] { display: none !important; }
+    @media (max-width: 1000px) { body { grid-template-columns: 1fr; height: auto; } main { grid-template-columns: 1fr; } .side { max-height: 45vh; } }
+</style>
+</head>
+<body>
+    <aside class="side">
+        <h1>letters</h1>
+        <p class="sub">the letters on your homepage (content/sea/)</p>
+        <button type="button" class="new">+ write a new letter</button>
+        <div class="list"></div>
+        <div class="foot">
+            <a href="/index.html#bottle" target="_blank">see the homepage ↗</a>
+            <button type="button" class="publish">publish to the live site</button>
+        </div>
+    </aside>
+
+    <main>
+        <section class="edit" hidden>
+            <div>
+                <label for="title">title (the first line of the letter)</label>
+                <input type="text" id="title" class="big" maxlength="120" placeholder="a message in a bottle">
+            </div>
+            <div class="row">
+                <div>
+                    <label for="subtitle">a line under the title (optional)</label>
+                    <input type="text" id="subtitle" maxlength="200" placeholder="">
+                </div>
+                <div>
+                    <label for="date">date</label>
+                    <input type="date" id="date">
+                </div>
+            </div>
+            <p class="hint later-note" hidden>this date is in the future: the letter stays hidden until that day, then arrives in a bottle.</p>
+            <div class="tools txt-only">
+                <button type="button" data-wrap="*" title="select some words first">italic</button>
+                <button type="button" data-wrap="**" title="select some words first"><b>bold</b></button>
+                <button type="button" data-do="link">link</button>
+                <button type="button" data-do="picture">picture…</button>
+                <button type="button" data-do="line">a line ———</button>
+                <button type="button" data-do="signoff">sign-off</button>
+                <input type="file" class="pic-in" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" hidden>
+            </div>
+            <textarea id="body" spellcheck="true" placeholder="write your letter here.
+
+a blank line starts a new paragraph."></textarea>
+            <p class="hint txt-only">a blank line = a new paragraph · <code>*italics*</code> · <code>**bold**</code> · <code>[words](https://…)</code> a link ·
+                <code>---</code> on its own line = a drawn line · <code>~ bye</code> on its own = a sign-off</p>
+            <p class="hint html-only" hidden>this letter is written in HTML (a .html file): edit the code as it is.</p>
+            <div class="actions">
+                <button type="button" class="save">save <small>(ctrl+s)</small></button>
+                <button type="button" class="del">delete</button>
+                <span class="status"></span>
+            </div>
+        </section>
+        <section class="preview">
+            <div class="empty">pick a letter on the left, or write a new one.</div>
+        </section>
+    </main>
+
+<script>
+(function () {
+    var $ = function (s) { return document.querySelector(s); };
+    var list = $('.list'), edit = $('.edit'), prev = $('.preview'), statusEl = $('.status');
+    var titleIn = $('#title'), subIn = $('#subtitle'), dateIn = $('#date'), bodyIn = $('#body');
+    var cur = null, kind = 'txt', dirty = false, today = '', all = [];
+
+    function api(path, body, type) {
+        var opt = body === undefined ? {} : { method: 'POST', body: type ? body : JSON.stringify(body), headers: { 'Content-Type': type || 'application/json' } };
+        return fetch('/__letters/' + path, opt).then(function (r) {
+            return r.json().catch(function () { return { error: 'the manager isn’t answering (is its window still open?)' }; });
+        }, function () { return { error: 'the manager isn’t running. open it with tools\\letters.bat' }; });
+    }
+    function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
+    function setDirty(d) { dirty = d; statusEl.classList.toggle('dirty', d); if (d && !statusEl.textContent) statusEl.textContent = 'not saved yet'; }
+
+    /* ---------- the list ---------- */
+    function niceDate(d) {
+        if (!d) return 'no date';
+        var p = d.split('-'), t = new Date(+p[0], +p[1] - 1, +p[2]);
+        return t.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).toLowerCase();
+    }
+    function load(select) {
+        return api('list').then(function (r) {
+            if (r.error) { list.innerHTML = '<p class="sub">' + r.error + '</p>'; return; }
+            today = r.today; all = r.letters;
+            list.innerHTML = '';
+            all.forEach(function (l) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'item' + (l.name === (select || cur) ? ' on' : '');
+                b.innerHTML = '<b></b><small></small>';
+                b.querySelector('b').textContent = l.title;
+                b.querySelector('small').innerHTML = niceDate(l.date) + (l.later ? ' · <span class="later">waiting for its day</span>' : '') + (l.kind === 'html' ? ' · html' : '');
+                b.addEventListener('click', function () { open(l.name); });
+                list.appendChild(b);
+            });
+            if (!all.length) list.innerHTML = '<p class="sub">no letters yet.</p>';
+        });
+    }
+
+    /* ---------- one letter ---------- */
+    function leaveOk() { return !dirty || confirm('this letter has changes that aren’t saved. leave it anyway?'); }
+    function show(k) {
+        kind = k;
+        edit.hidden = false;
+        document.querySelectorAll('.txt-only').forEach(function (e) { e.hidden = k !== 'txt'; });
+        document.querySelector('.html-only').hidden = k !== 'html';
+        subIn.parentNode.hidden = k !== 'txt';
+        titleIn.parentNode.hidden = k !== 'txt';                  // an html letter's title is its <h2>, in the code
+        bodyIn.classList.toggle('code', k === 'html');
+        $('.del').hidden = !cur;
+    }
+    function open(name) {
+        if (name === cur || !leaveOk()) return;
+        api('read?name=' + encodeURIComponent(name)).then(function (r) {
+            if (r.error) { say(r.error, true); return; }
+            cur = name;
+            var k = /\.html$/i.test(name) ? 'html' : 'txt', t = r.text.replace(/\r/g, '');
+            dateIn.value = (/^(\d{4}-\d{2}-\d{2})/.exec(name) || [])[1] || '';
+            if (k === 'txt') {
+                var blocks = t.replace(/^\s+/, '').split(/\n\s*\n/), first = blocks.shift().split('\n');
+                titleIn.value = first.shift().replace(/^#+\s*/, '');
+                subIn.value = first.join(' ');
+                bodyIn.value = blocks.join('\n\n').replace(/\s+$/, '');
+            } else {
+                var m = /<h[12][^>]*>([\s\S]*?)<\/h[12]>/i.exec(t);
+                titleIn.value = m ? m[1].replace(/<[^>]+>/g, '').trim() : name.replace(/^\d{4}-\d{2}-\d{2}-?/, '').replace(/\.html$/i, '').replace(/-/g, ' ');
+                subIn.value = '';
+                bodyIn.value = t.replace(/\s+$/, '');
+            }
+            show(k);
+            setDirty(false); say('');
+            render();
+            load();
+        });
+    }
+    function fresh() {
+        if (!leaveOk()) return;
+        cur = null;
+        titleIn.value = ''; subIn.value = ''; bodyIn.value = '';
+        dateIn.value = today || new Date().toISOString().slice(0, 10);
+        show('txt');
+        setDirty(false); say('a new letter: it’s saved as a file once you press save.');
+        render();
+        load();
+        titleIn.focus();
+    }
+
+    /* ---------- the preview, on the site's own paper ---------- */
+    function esc(x) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function inline(x) {
+        return esc(x)
+            .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function (m, alt, src) { return '<img src="' + (/^(https?:|\/)/.test(src) ? src : '/' + src) + '" alt="' + alt + '">'; })
+            .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    }
+    function txtToHtml(title, sub, body) {                       // the same rules as the site (Sky.txtToHtml in sky/sky.js)
+        var out = '<h2>' + inline(title || 'untitled') + '</h2>' + (sub ? '<p class="subtitle">' + inline(sub) + '</p>' : '');
+        body.replace(/\r/g, '').trim().split(/\n\s*\n/).forEach(function (b, i) {
+            b = b.trim();
+            if (!b) return;
+            if (/^-{3,}$/.test(b)) { out += '<hr>'; return; }
+            if (/^~\s/.test(b)) { out += '<p class="signoff">' + inline(b.replace(/^~\s*/, '')) + '</p>'; return; }
+            out += '<p' + (i === 0 ? ' class="lede"' : '') + '>' + inline(b).replace(/\n/g, '<br>') + '</p>';
+        });
+        return out;
+    }
+    function dateLabel(s) {
+        var p = (s || '').split('-');
+        if (p.length !== 3) return '';
+        return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toLowerCase();
+    }
+    function render() {
+        if (edit.hidden) return;
+        var html = kind === 'txt' ? txtToHtml(titleIn.value, subIn.value, bodyIn.value)
+                                  : bodyIn.value.replace(/(<img[^>]+src=")(?!https?:|\/)/gi, '$1/');
+        var label = dateLabel(dateIn.value);
+        prev.innerHTML = '<p class="note">how it looks on the site</p><article class="letter"><div class="curl curl-top"></div><div class="sheet"><div class="content">' +
+            (label ? '<p class="date">' + label + '</p>' : '') + html + '</div></div><div class="curl curl-bottom"></div></article>';
+        document.querySelector('.later-note').hidden = !(dateIn.value && today && dateIn.value > today);
+    }
+    [titleIn, subIn, dateIn, bodyIn].forEach(function (el) { el.addEventListener('input', function () { setDirty(true); render(); }); });
+
+    /* ---------- the little formatting buttons ---------- */
+    function insert(before, after, placeholder) {
+        var s = bodyIn.selectionStart, e = bodyIn.selectionEnd, v = bodyIn.value, mid = v.slice(s, e) || placeholder || '';
+        bodyIn.value = v.slice(0, s) + before + mid + after + v.slice(e);
+        bodyIn.focus();
+        bodyIn.setSelectionRange(s + before.length, s + before.length + mid.length);
+        setDirty(true); render();
+    }
+    function block(text) {                                        // on its own, after the paragraph you're in
+        var v = bodyIn.value, end = v.indexOf('\n\n', bodyIn.selectionEnd), s = end === -1 ? v.length : end;
+        var pre = v.slice(0, s).replace(/\s*$/, ''), post = v.slice(s).replace(/^\s*/, '');
+        bodyIn.value = pre + (pre ? '\n\n' : '') + text + (post ? '\n\n' + post : '');
+        var at = pre.length + (pre ? 2 : 0) + text.length;
+        bodyIn.focus(); bodyIn.setSelectionRange(at, at);
+        setDirty(true); render();
+    }
+    document.querySelectorAll('[data-wrap]').forEach(function (b) {
+        b.addEventListener('click', function () { insert(b.dataset.wrap, b.dataset.wrap, 'these words'); });
+    });
+    var picIn = $('.pic-in');
+    document.querySelectorAll('[data-do]').forEach(function (b) {
+        b.addEventListener('click', function () {
+            var d = b.dataset.do;
+            if (d === 'link') { var u = prompt('the web address to link to:', 'https://'); if (u && u !== 'https://') insert('[', '](' + u.trim() + ')', 'these words'); }
+            if (d === 'line') block('---');
+            if (d === 'signoff') block('~ ' + (prompt('sign off with:', 'more soon') || 'more soon'));
+            if (d === 'picture') picIn.click();
+        });
+    });
+    picIn.addEventListener('change', function () {
+        var f = picIn.files[0];
+        picIn.value = '';
+        if (!f) return;
+        say('adding the picture…');
+        fetch('/__letters/picture', { method: 'POST', body: f, headers: { 'Content-Type': f.type, 'X-Name': encodeURIComponent(f.name) } })
+            .then(function (r) { return r.json(); })
+            .then(function (r) {
+                if (r.error) { say(r.error, true); return; }
+                say('the picture is saved in content/sea/ (publish takes it along).');
+                block('![' + (f.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ')) + '](' + r.path + ')');
+            }, function () { say('couldn’t add the picture', true); });
+    });
+
+    /* ---------- save, delete, publish ---------- */
+    function saveNow() {
+        if (edit.hidden) return;
+        if (kind === 'txt' && !titleIn.value.trim()) { say('give the letter a title first', true); titleIn.focus(); return; }
+        api('save', { old: cur, kind: kind, date: dateIn.value, title: titleIn.value, subtitle: subIn.value, body: bodyIn.value }).then(function (r) {
+            if (r.error) { say(r.error, true); return; }
+            var renamed = cur && r.name !== cur;
+            cur = r.name;
+            setDirty(false);
+            say('saved as ' + r.name + (renamed ? ' (its date changed, so its name did too)' : '') + '. publish when you’re ready.');
+            $('.del').hidden = false;
+            load(r.name);
+        });
+    }
+    $('.save').addEventListener('click', saveNow);
+    document.addEventListener('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); saveNow(); }
+    });
+    $('.del').addEventListener('click', function () {
+        if (!cur || !confirm('delete “' + (titleIn.value || cur) + '”? it goes from your folder now, and from the live site when you next publish.')) return;
+        api('delete', { name: cur }).then(function (r) {
+            if (r.error) { say(r.error, true); return; }
+            cur = null; dirty = false;
+            edit.hidden = true;
+            prev.innerHTML = '<div class="empty">deleted. pick another letter, or write a new one.</div>';
+            load();
+        });
+    });
+    $('.new').addEventListener('click', fresh);
+    $('.publish').addEventListener('click', function () {
+        if (dirty && !confirm('the letter you’re on isn’t saved. publish without it?')) return;
+        api('publish', {}).then(function (r) { alert(r.error || 'the publish window is open: type a few words about what changed, then press Enter.'); });
+    });
+    window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+    load();
+})();
+</script>
+</body>
+</html>

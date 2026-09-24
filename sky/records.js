@@ -291,29 +291,54 @@
         }, 300);
     }
 
-    /* ---------------- spinning: like a real turntable, it winds up and runs down ---------------- */
+    /* ---------------- spinning: the needle drops and the record winds up; it lifts and the record runs down ----------------
+       press play and the arm swings over; the moment the needle touches the record it starts to
+       turn, and the music comes in with it, sliding up to pitch like a real turntable getting up
+       to speed. pause or stop: the needle lifts, the music stops, and the record coasts to a halt. */
     var SPEED = 80;                        // degrees a second at full speed (a gentle 4.5 seconds a turn)
-    var spin = { angle: 0, speed: 0, on: false, t: 0 };
+    var WIND_UP = 1.2;                     // seconds from still to full speed, once the needle's down
+    var RUN_DOWN = 2.8;                    // seconds to coast to a stop, once it lifts
+    var NEEDLE = 1000;                     // ms for the arm to swing over and set the needle down (the .tt-arm swing above)
+    var calmSpin = window.matchMedia('(prefers-reduced-motion: reduce)'), pageStart = performance.now();
+    var spin = { angle: 0, speed: M.playing() ? SPEED : 0, on: false, t: 0, landsAt: 0, was: M.playing() };
+    try { audio.preservesPitch = false; audio.mozPreservesPitch = false; audio.webkitPreservesPitch = false; } catch (e) {}
     function spinFrame(t) {
         var dt = Math.min(0.1, (t - spin.t) / 1000);
         spin.t = t;
-        var target = M.playing() ? SPEED : 0;
-        spin.speed += (target - spin.speed) * Math.min(1, dt * (target > spin.speed ? 0.9 : 0.55));
+        var playing = M.playing(), down = playing && t >= spin.landsAt;
+        if (down) spin.speed = Math.min(SPEED, spin.speed + SPEED / WIND_UP * dt);
+        else spin.speed = Math.max(0, spin.speed - SPEED / RUN_DOWN * dt);
+        // the sound: silent while the needle's still in the air, then up to pitch with the record
+        if (playing) {
+            audio.muted = !down;
+            var rate = down ? 0.55 + 0.45 * spin.speed / SPEED : 1;
+            if (Math.abs(audio.playbackRate - rate) > 0.004) audio.playbackRate = rate;
+        }
         spin.angle = (spin.angle + spin.speed * dt) % 360;
         var r = 'rotate(' + spin.angle.toFixed(2) + 'deg)';
         var a = deck.querySelector('.tt-disc'), b = ttRecord.querySelector('svg'), c = nowDisc.querySelector('svg');
         if (a) a.style.transform = r;
         if (b) b.style.transform = r;
         if (c) c.style.transform = r;
-        if (target === 0 && spin.speed < 0.3) { spin.speed = 0; spin.on = false; return; }
+        if (!playing && spin.speed === 0) { spin.on = false; audio.muted = false; audio.playbackRate = 1; return; }
         requestAnimationFrame(spinFrame);
     }
     function spinUp() {
-        if (spin.on || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (spin.on || calmSpin.matches) return;
         spin.on = true; spin.t = performance.now();
         requestAnimationFrame(spinFrame);
     }
-    M.on(function (what) { if (what === 'play' || what === 'pause') spinUp(); });
+    M.on(function (what) {
+        if (what === 'play' || what === 'pause' || what === 'stop' || what === 'track') {
+            var now = M.playing();
+            if (now && !spin.was && !calmSpin.matches) {
+                if (performance.now() - pageStart < 2500) spin.speed = SPEED;     // music carried over from another page: already going
+                else spin.landsAt = performance.now() + NEEDLE;                    // the arm swings over first
+            }
+            spin.was = now;
+            spinUp();
+        }
+    });
     if (M.playing()) spinUp();
 
     /* ---------------- the controls ---------------- */
