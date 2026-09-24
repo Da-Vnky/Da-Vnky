@@ -158,6 +158,9 @@ SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
     assets/sounds/step           a footstep (the walk to the bathroom)
     assets/sounds/chime          the pomodoro timer ringing, time's up
     assets/sounds/shimmer        looking into the bathroom mirror
+    assets/sounds/angry          the traveller's furious chittering while held up, like an
+                                 angry squirrel (one clip; it's played faster and higher
+                                 the angrier they get)
     assets/sounds/scream         the traveller screaming (a long fall, the toaster)
     assets/sounds/splat          the splat, with giblets landing
     assets/sounds/zap            the electrocution

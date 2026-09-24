@@ -689,13 +689,17 @@
         putMate(e.clientX - r.left - pick.dx, r.bottom - e.clientY - pick.db);
     });
     // while held: "put me down!" ... and after BREAK_FREE_MS they wriggle loose and drop
+    // with each line, an angry chitter (assets/sounds/angry), wilder as they get angrier
+    function chitter(anger) { sfx('angry', { size: anger / 4 }); }
     function complain(p) {
         var i = 0;
         shout(HELD_LINES[0][0], HELD_LINES[0][1]);
+        chitter(HELD_LINES[0][1]);
         p.lines = setInterval(function () {
             if (pick !== p) { clearInterval(p.lines); return; }
             i = Math.min(i + 1, HELD_LINES.length - 1);
             shout(HELD_LINES[i][0], HELD_LINES[i][1]);
+            chitter(HELD_LINES[i][1]);
             if (i === HELD_LINES.length - 1) clearInterval(p.lines);
         }, HELD_LINE_MS);
         p.free = setTimeout(function () {

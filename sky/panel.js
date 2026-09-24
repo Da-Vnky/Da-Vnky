@@ -252,7 +252,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'angry'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {
@@ -393,6 +393,32 @@
             n.start(t); n.stop(t + len + 0.05);
             tone(out, t, 'triangle', 700, 900, 0.08, 0.1);                 // the squeak of the handle
         },
+        'angry': function (out, t, size) {                             // picked up and furious: squirrelly chittering, a gremlin growl when it's bad
+            var anger = Math.max(0, Math.min(1, size === undefined ? 0.3 : size));
+            if (anger > 0.45) {                                         // the growl underneath
+                var gl = 0.22 + anger * 0.3, g = ctx.createOscillator(), trem = ctx.createOscillator(), tg = gain(0.6), gg = gain(0);
+                g.type = 'sawtooth'; g.frequency.setValueAtTime(150 + anger * 60, t); g.frequency.linearRampToValueAtTime(110, t + gl);
+                trem.frequency.value = 28; trem.connect(tg); tg.connect(gg.gain);
+                var gf = filter('lowpass', 900, 3);
+                chain(g, gf, gg, out);
+                gg.gain.setValueAtTime(0.0001, t); gg.gain.exponentialRampToValueAtTime(0.35, t + 0.03); gg.gain.exponentialRampToValueAtTime(0.0001, t + gl);
+                g.start(t); trem.start(t); g.stop(t + gl + 0.05); trem.stop(t + gl + 0.05);
+            }
+            var n = 5 + Math.round(anger * 9), at = t + (anger > 0.45 ? 0.12 : 0), base = 750 + anger * 650;
+            for (var i = 0; i < n; i++) {                               // chk-chk-chkkk: little rising-and-falling chirps
+                var len = 0.035 + Math.random() * 0.04, f0 = base * (0.8 + Math.random() * 0.5), o = ctx.createOscillator(), og = gain(0);
+                o.type = Math.random() < 0.5 ? 'square' : 'sawtooth';
+                o.frequency.setValueAtTime(f0, at);
+                o.frequency.exponentialRampToValueAtTime(f0 * (1.4 + Math.random() * 0.5), at + len * 0.4);
+                o.frequency.exponentialRampToValueAtTime(f0 * 0.7, at + len);
+                var bf = filter('bandpass', 2200 + Math.random() * 1200, 2.5);
+                chain(o, bf, og, out);
+                env(og, at, 0.28 + anger * 0.18, 0.004, len);
+                o.start(at); o.stop(at + len + 0.05);
+                noiseHit(out, at, len * 0.6, 'highpass', 4000, 0, 0.05 + anger * 0.06, 0.002);   // the rasp
+                at += len + 0.02 + Math.random() * (0.06 - anger * 0.03);
+            }
+        },
         'door': function (out, t) {                                    // a door: the latch, a creak, and it swings
             noiseHit(out, t, 0.04, 'bandpass', 2200, 2, 0.35, 0.002);
             tone(out, t + 0.05, 'sawtooth', 190, 260, 0.45, 0.05);
@@ -467,6 +493,7 @@
                 var a = new Audio(sfxFiles[name]);
                 a.volume = sfxVol;
                 if (name === 'splash' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = 1.3 - 0.55 * size; }
+                if (name === 'angry' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = 0.9 + 0.45 * size; }
                 a.play().catch(function () {});
             }, delay * 1000);
             return;

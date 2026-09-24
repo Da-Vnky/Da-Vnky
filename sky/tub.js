@@ -321,7 +321,12 @@
             pick.db = mr.bottom - e.clientY;
             var i = 0;
             shout(HELD_LINES[0]);
-            pick.lines = setInterval(function () { i = Math.min(i + 1, HELD_LINES.length - 1); shout(HELD_LINES[i]); }, 1300);
+            sfx('angry', { size: 0.2 });                        // chittering like an angry squirrel (assets/sounds/angry)
+            pick.lines = setInterval(function () {
+                i = Math.min(i + 1, HELD_LINES.length - 1);
+                shout(HELD_LINES[i]);
+                sfx('angry', { size: 0.2 + 0.4 * i });
+            }, 1300);
         }
         setPos(e.clientX - r.left - pick.dx, r.bottom - e.clientY - pick.db);
     });

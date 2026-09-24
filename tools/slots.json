@@ -1484,6 +1484,11 @@
        "slot": "assets/sounds/door",
        "what": "a door opening",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/angry",
+       "what": "the traveller’s furious chittering when picked up (played faster and higher the angrier they get)",
+       "kind": "sound"
       }
      ]
     }
