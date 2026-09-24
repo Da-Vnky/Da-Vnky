@@ -39,6 +39,108 @@ THE SKY (every page)                                     canvas to draw on
                              you, so keep the middle fairly plain.
     assets/sky/plank-here    the sign for the page you're on (optional) 464 x 88
 
+THE CONSTELLATIONS (every page, at night). Each is a link to another website
+or an easter egg; set them in CONSTELLATIONS near the top of sky/sky.js.
+    assets/sky/constellation-<id>   its star picture, e.g.        600 x 360 (the same
+                                    constellation-harp.png         shape as 150 x 90)
+      transparent, stars light on dark; the name is written under it for you.
+      The ids now: pleroma, wish, lantern, harp, kite, whale, key.
+
+THE PLACE TABS (on the right edge of every page but the homepage)
+    assets/ui/place-sea        a little picture of each place: a ship,       square,
+    assets/ui/place-workshop   a paintbrush, a telescope, a record player    192 x 192
+    assets/ui/place-city       (a new place gets a door until it has one:
+    assets/ui/place-living      assets/ui/place-<its id>)
+
+THINGS THAT FLY PAST (while you're looking at the sky: out of a window, up
+through the telescope). they cross left to right, so draw them FACING RIGHT.
+    assets/sky/blimp          a steampunk airship, by day (+ blimp-glow: its    920 x 460
+                              lit gondola at dusk)
+    assets/sky/birds          a little flock (a GIF can flap), by day          480 x 240
+    assets/sky/balloon        a hot-air balloon, by day                        300 x 450
+    assets/sky/shooting-star  a streak of light, at night; it's flown down     600 x 160
+                              to the right, head at the right end
+    Want more (a dragon, a kite, a paper crane)? Add a line to FLYERS near the
+    top of sky/sky.js with its name, when it flies (day or night), how often,
+    how fast, how big and how high, and put its picture at assets/sky/<name>.
+
+CURSORS (every page; drawn stand-ins until yours are in)
+    assets/ui/cursor            the everyday pointer                          32 x 32
+    assets/ui/cursor-pointer    over anything you can click                   (64 x 64 at most;
+    assets/ui/cursor-star       over the constellations and Polaris            bigger ones are
+    assets/ui/cursor-grab       over things you can pick up (the traveller,    ignored by
+                                the ship, a cork)                               browsers)
+    assets/ui/cursor-grabbing   while you're holding one
+    assets/ui/cursor-look       over things to look into (the pinboard, a window, the telescope)
+    -> PNG with a transparent background. The "hotspot" (the pixel that does the
+       pointing) is set per cursor in CURSORS near the top of sky/sky.js: for the
+       stand-ins, the arrow's tip is 3, 2 (from the top left), the star's middle 16, 16.
+
+THE CONTROL PANEL (top right, every page: music, weather, the noise machine)
+    assets/ui/panel           the button that opens it                     128 x 128
+    assets/ui/music           each layer's little icon                      96 x 96
+    assets/ui/weather
+    assets/ui/noise
+    assets/ui/effects         (the sound effects' volume)
+    (a new layer added later gets assets/ui/<its id> the same way)
+
+OTHER BUTTONS                                                              96 x 96
+    assets/ui/letters         "letters", top left of the homepage
+    assets/ui/leave-art       "leave some art", in the workshop
+
+WEATHER (see the settings at the top of sky/weather.js)
+    assets/sky/storm-cloud    the heavy grey clouds of rain and storms       800 x 360
+    The fair-weather white clouds (assets/sky/cloud*) follow the weather: they
+    drift by on "a few clouds" days, thin out in fog, and are gone when it's
+    clear, overcast, raining or snowing, so the sky always matches the forecast.
+
+SOUNDS (.mp3 or .ogg; each loops, so make its ends meet)
+    Every sound below is made by the page itself until you add a recording.
+    assets/sounds/rain        the weather's rain, and the noise machine's
+    assets/sounds/wind        the wind of storms and snow, and the machine's
+    assets/sounds/thunder     one roll of thunder (played now and then, not looped)
+    assets/sounds/storm       the machine's thunderstorm
+    assets/sounds/ocean       the machine's waves
+    assets/sounds/fire        the machine's crackling fire
+    assets/sounds/white, pink, brown   the machine's plain noise
+    A new sound for the machine: add a line to SOUNDS at the top of
+    sky/noise.js (a name and a label) and put assets/sounds/<name>.mp3 here.
+
+SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
+    Also made by the page itself until you add a recording.
+    assets/sounds/cork-pop       a bottle uncorked
+    assets/sounds/cork-in        a cork pushed back in
+    assets/sounds/paper-unroll   a letter unrolled
+    assets/sounds/paper-roll     a letter rolled up
+    assets/sounds/throw          a bottle thrown (the whoosh)
+    assets/sounds/splash         something landing in the sea. One recording
+                                 does for all three: it's played higher for a
+                                 bottle, a little lower for the traveller, and
+                                 lowest and slowest for the ship.
+    assets/sounds/surface        the traveller bobbing back up out of the water
+    assets/sounds/climb-out      the traveller hauling out onto the dock or deck, dripping
+    assets/sounds/land           feet landing on wooden boards (softer for a hop aboard)
+    assets/sounds/twinkle        a constellation that's still a placeholder, clicked
+    assets/sounds/wish           the shooting star from "make a wish"
+    assets/sounds/brush          a brush dab in the workshop's painting desk
+    assets/sounds/portfolio      a painting slipped into the visitors' portfolio
+
+THE NOISE MACHINE (in the living space)
+    assets/living/noise-machine      the machine, about 3:2
+    assets/living/noise-machine-on   shown while it plays (a GIF can glow and hum)
+
+THINGS THAT DANCE WHEN MUSIC PLAYS
+    Each has a drawn stand-in that dances by itself. Put your picture in the
+    slot and it joins in as a whole (a gentle bob, sway or hop); or add a
+    -dancing twin (cat-dancing.gif) and that's shown instead while music plays.
+    Every character can have one too: assets/characters/living-dancing.gif …
+    assets/living/cat         on the armchair         assets/living/plant   by the crate
+    assets/workshop/manikin   on the bench            assets/workshop/metronome
+    assets/sea/crab           on the dock             assets/sea/gull       on the bollard
+    assets/city/cat           on the chimney          assets/city/pigeon    (two, on the ledge)
+    The living space's lamp and picture, and the workshop's lantern, sway along
+    too (class="sways" or "wobbles" on anything in a room makes it join in).
+
 THE SEA (the homepage)
 ----------------------
     assets/sea/wave-1 … wave-4   the four rows of waves, back to front.   e.g. 1200 x 800
@@ -55,6 +157,9 @@ THE SEA (the homepage)
                              running off the right edge (the traveller
                              walks along that line). + dock-glow.
                              (the signpost's post is still drawn for you)
+    assets/sea/letter-board  the notice board on the dock that holds the   720 x 860
+                             letters once they're read (click it to read
+                             them all); stands on the deck, feet at the bottom
     the bottle, three pieces on one 2000 x 900 canvas, so they line up:
     assets/sea/bottle          the glass, empty, lying on its side, neck to the RIGHT
     assets/sea/bottle-scroll   the rolled message inside it (slides out when opened)
@@ -110,11 +215,26 @@ workshop                          living space
       (keep its canvas where the        assets/living/turntable
        drawn one is: 17%-83% across,    assets/living/turntable-playing
        6%-56% down; the painting          (shown while music plays; a GIF
-       is laid on that spot)              can spin the record)
+       is laid on that spot)              can spin the record; with your own
+    assets/workshop/portfolio
+      (the visitors' portfolio by the
+       bench, about 5:4; its count
+       badge sits on the top right)
+                                          turntable, the record sits on its
+                                          platter at 40% across, 53% down,
+                                          54% wide: move it with --platter-x,
+                                          --platter-y, --platter-w on .turntable
+                                          in living.html)
                                       assets/living/crate
                                         (the bottle crate, about 4:3;
                                          the bottle necks and the count
                                          sit on top of it by themselves)
+                                      assets/living/letter-shelf
+                                        (the little shelf under the board,
+                                         about 200:24; the letters stand on it)
+                                      assets/living/letter
+                                        (one sheet of paper, portrait; the
+                                         letters on the shelf are made of it)
                                       assets/living/pinboard
                                         (the board, 4:3; notes are pinned
                                          on the middle 88% of it)
