@@ -467,15 +467,19 @@
     function leave(href) {
         if (leaving) return;
         leaving = true;
+        // (the next page knows you walked in from here: the homepage walks the traveller onto the dock)
+        var had = null;
+        try { had = JSON.parse(sessionStorage.getItem('arrive') || 'null'); } catch (e) {}
+        if (!had || had.page !== pageOf(href) || Date.now() - had.t > 30000) setArrival(href, 'edge');
         var waiting = 0, gone = false;
         function go() { if (gone) return; gone = true; location.href = href; }
-        // each send-off gets its own "done"; the page changes once they're all done (or after 2.6 s at most)
+        // each send-off gets its own "done"; the page changes once they're all done (or after 4.2 s at most)
         leaveHooks.forEach(function (fn) {
             var called = false;
             if (fn(function () { if (called) return; called = true; if (--waiting <= 0) go(); })) waiting++;
             else called = true;
         });
-        if (waiting > 0) { body.classList.add('leaving'); setTimeout(go, 2600); } else go();
+        if (waiting > 0) { body.classList.add('leaving'); setTimeout(go, 4200); } else go();
     }
     function onPlaceClick(e) {
         var a = e.target.closest('a[data-place]');
@@ -1314,7 +1318,7 @@
     function doorSound(door) { if (window.Sky && window.Sky.sounds && door && door.dataset.sound) window.Sky.sounds.sfx(door.dataset.sound); }
     function arrive() {
         var a = takeArrival(), ch = document.querySelector('.scene-character');
-        if (!a || !ch) return;
+        if (!a || !ch || a.via === 'edge') return;          // (just passing through: nothing to walk)
         var r = ch.getBoundingClientRect(), rest = r.left + r.width / 2, W = window.innerWidth, dx, door = null;
         if (a.via === 'right') dx = W + r.width * 0.7 - rest;
         else if (a.via === 'left') dx = -(rest + r.width * 0.7);

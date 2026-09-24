@@ -658,8 +658,9 @@
     function tendCrew(p) {
         if (!dockAt || held || crew.state === 'held') return;
         var ashore = crew.state === 'landing' || crew.state === 'ashore';
+        if (p >= 0.965) crew.stay = false;                     // (walked in from another page: they wait on the dock until the ship comes in)
         if (p >= 0.965 && crew.state === 'aboard' && !drag.sx) goAshore();
-        else if (p < 0.94 && ashore) goAboard(false);
+        else if (p < 0.94 && ashore && !crew.stay) goAboard(false);
         placeMateAboard();
     }
 
@@ -678,6 +679,7 @@
             if (Math.hypot(e.clientX - pick.x, e.clientY - pick.y) < 6) return;
             pick.on = true;                                    // it's a drag, not a click
             cancelCrew();
+            crew.stay = false;
             crew.state = 'held';
             mate.classList.remove('talking', 'walking', 'under');
             mate.classList.add('held');
@@ -790,23 +792,68 @@
         tendCrew(p);
     });
 
-    // clicking a sign: the traveller hurries aboard, the waves pick up,
-    // and the ship sails off the right edge before the page changes
+    // leaving for another page (a sign or a tab): the traveller walks off along the dock, off the right-hand edge.
+    // aboard at sea? the ship pulls in to the dock first, and they hop off. (only in the water, or mid-fall,
+    // does the ship still sail off with them, the old way.)
+    var WALK_OFF_SPEED = 300;                                  // px a second: a brisk walk
     function easeInOut(t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
     Sky.onLeave(function (go) {
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
         held = false;
         ship.classList.remove('held');
-        function sail() {
-            var r = ship.getBoundingClientRect();
-            var dist = window.innerWidth - r.left + 60 - drag.x;
-            sailStart = performance.now();
-            tween({ sx: dist, x: 0, y: 0, dip: 0, s: 1 }, 1700, easeInOut, ++tweenId, go);
+        var st = crew.state;
+        function walkOff() {
+            cancelCrew();
+            var run = crew.run, endX = sea.clientWidth + mateW() + 30;
+            crew.state = 'leaving';
+            mate.classList.remove('talking');
+            hush();
+            moveTo(function () { return { x: endX, b: deckB() }; }, Math.max(450, (endX - crew.x) / WALK_OFF_SPEED * 1000), 0, run, go);
         }
-        var onDock = crew.state === 'landing' || crew.state === 'ashore' || crew.state === 'boarding';
-        if (onDock && dockAt) goAboard(true, sail); else sail();
+        if (dockAt && (st === 'ashore' || st === 'landing' || st === 'boarding')) { walkOff(); return true; }
+        if (dockAt && st === 'aboard') {
+            cancelCrew();
+            var run = crew.run, gap = dockAt.x0 - shipBox().r + 12;
+            var hopOff = function () {
+                if (run !== crew.run) return;
+                crew.state = 'landing';
+                moveTo(landSpot, 450, hopH(), run, function () { sfx('land', { size: 0.6 }); walkOff(); });
+            };
+            if (gap > 4) {                                     // pull in alongside
+                sailStart = performance.now();
+                tween({ sx: drag.sx + gap, x: 0, y: 0, s: 1 }, Math.min(1300, 350 + gap * 1.6), easeInOut, ++tweenId, function () {
+                    drag.dip = 7; tween({ dip: 0 }, 500, easeBack, ++tweenId); hopOff();
+                });
+            } else hopOff();
+            return true;
+        }
+        // in the water or in the air: the ship sails off (and they're aboard by the next page)
+        sailStart = performance.now();
+        var r = ship.getBoundingClientRect();
+        tween({ sx: window.innerWidth - r.left + 60 - drag.x, x: 0, y: 0, dip: 0, s: 1 }, 1700, easeInOut, ++tweenId, go);
         return true;
     });
+
+    // coming back from another page: they walk in along the dock from the right-hand edge, and wait there
+    var arrived = Sky.takeArrival ? Sky.takeArrival() : null;
+    if (arrived) {
+        crew.stay = true;
+        mate.style.visibility = 'hidden';
+        (function walkIn() {
+            if (!dockAt) { setTimeout(walkIn, 80); return; }
+            cancelCrew();
+            var run = crew.run, W = sea.clientWidth;
+            crew.state = 'landing';
+            putMate(W + 10, deckB());
+            mate.style.visibility = '';
+            var to = talkSpot();
+            moveTo(talkSpot, Math.max(700, (W + 10 - to.x) / 150 * 1000), 0, run, function () {
+                settle('ashore');
+                mate.classList.add('talking');
+            });
+        })();
+    }
+
     // coming back with the browser's back button: put everyone back where they belong
     window.addEventListener('pageshow', function (e) {
         if (!e.persisted) return;
