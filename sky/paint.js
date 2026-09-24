@@ -24,6 +24,7 @@
         eraser: '<path d="M11.5 3 L18 9.5 L10 17.5 H5.5 L2.5 14.5 Z M5.5 17.5 H18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 9.5 L12 14.5" stroke="currentColor" stroke-width="1.6"/>',
         fill: '<path d="M4 9 L10 3 L17 10 L11 16 Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 9 H17" stroke="currentColor" stroke-width="1.6"/><path d="M17.5 12.5 C17.5 12.5 15.5 15 15.5 16.3 A2 2 0 0 0 19.5 16.3 C19.5 15 17.5 12.5 17.5 12.5 Z"/>',
         picker: '<path d="M14.5 2.5 A2.4 2.4 0 0 1 18 6 L15.5 8.5 L16.5 9.5 L15 11 L9 5 L10.5 3.5 L11.5 4.5 Z"/><path d="M10 7 L3.5 13.5 L3 17 L6.5 16.5 L13 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+        lasso: '<path d="M10 3.5 C15.5 3.5 18.5 6 18.5 8.8 C18.5 11.8 14.6 13.8 10 13.8 C5.4 13.8 1.5 11.8 1.5 8.8 C1.5 6 4.5 3.5 10 3.5 Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.6 1.8"/><path d="M5.5 12.8 C4.6 14.6 5.8 16.2 7.6 16 C8.8 15.8 9 17.4 8 18.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
         undo: '<path d="M7 5 L3 9 L7 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 9 H12 A5 5 0 0 1 12 19 H8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
         redo: '<path d="M13 5 L17 9 L13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.5 9 H8 A5 5 0 0 0 8 19 H12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
         clear: '<path d="M5 6 H15 L14 18 H6 Z M3 6 H17 M8 6 V3.5 H12 V6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
@@ -52,8 +53,16 @@
             'background: #eadcb9; box-shadow: 0 6px 14px rgba(0,0,0,.4), inset 0 0 14px rgba(120,80,30,.2); }' +
         '.pt-side h3 { margin: 2px 0 0; font: normal .95rem "IM Fell English SC", Georgia, serif; color: #6e5236; }' +
         '.pt-colour { display: flex; align-items: center; gap: 8px; }' +
-        '.pt-now { position: relative; width: 38px; height: 38px; border-radius: 50%; box-shadow: 0 0 0 2px #eadcb9, 0 0 0 3px rgba(0,0,0,.35); overflow: hidden; flex: none; }' +
-        '.pt-now input { position: absolute; inset: -10px; width: 60px; height: 60px; opacity: 0; cursor: pointer; }' +
+        '.pt-now { flex: none; width: 42px; height: 42px; padding: 3px; border: 0; border-radius: 50%; cursor: pointer;' +
+            'background: conic-gradient(#f33, #fb3, #ff3, #3d3, #3cf, #33f, #c3f, #f3a, #f33); box-shadow: 0 1px 4px rgba(0,0,0,.35); }' +
+        '.pt-now:hover { transform: scale(1.06); }' +
+        '.pt-now span { display: block; width: 100%; height: 100%; border-radius: 50%; border: 2px solid #eadcb9; }' +
+        '.pt-hexin { width: 6.2em; padding: 3px 6px; border: 1px solid rgba(110,82,54,.35); border-radius: 6px; background: #f8f0dc; font: .85rem ui-monospace, Menlo, monospace; color: #3a2716; }' +
+        '.pt-tri { display: grid; place-items: center; padding: 4px 0; }' +
+        '.pt-tri[hidden] { display: none; }' +
+        '.pt-tri canvas { width: 200px; height: 200px; cursor: crosshair; touch-action: none; }' +
+        '.pt-stage.lassoing canvas { cursor: crosshair; }' +
+        '.pt-stage.lassoing .pt-ring { display: none !important; }' +
         '.pt-hex { font-size: .85rem; color: #6e5236; font-family: ui-monospace, Menlo, monospace; }' +
         '.pt-sw { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }' +
         '.pt-sw button { aspect-ratio: 1; border: 0; border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 1px rgba(0,0,0,.25); padding: 0; }' +
@@ -95,6 +104,7 @@
                     '<button type="button" data-tool="eraser" title="eraser (E)">' + svg('eraser') + '</button>' +
                     '<button type="button" data-tool="fill" title="fill (G)">' + svg('fill') + '</button>' +
                     '<button type="button" data-tool="picker" title="pick a colour from the painting (I, or hold Alt)">' + svg('picker') + '</button>' +
+                    '<button type="button" data-tool="lasso" title="lasso: draw round part of the painting, then drag it to move it, Delete to clear it, Esc to let go (L)">' + svg('lasso') + '</button>' +
                     '<span class="sep"></span>' +
                     '<button type="button" class="undo" title="undo (Ctrl+Z)">' + svg('undo') + '</button>' +
                     '<button type="button" class="redo" title="redo (Ctrl+Shift+Z)">' + svg('redo') + '</button>' +
@@ -102,7 +112,9 @@
                 '</div>' +
                 '<div class="pt-stage" style="--pt-ar:' + W + ' / ' + H + '"><canvas width="' + W + '" height="' + H + '"></canvas><div class="pt-ring"></div></div>' +
                 '<div class="pt-side">' +
-                    '<div class="pt-colour"><label class="pt-now" title="any colour"><input type="color" aria-label="pick any colour"></label><span class="pt-hex"></span></div>' +
+                    '<div class="pt-colour"><button type="button" class="pt-now" title="choose any colour" aria-expanded="false"><span></span></button>' +
+                        '<input class="pt-hexin" maxlength="7" spellcheck="false" aria-label="colour code"><span class="pt-hex" hidden></span></div>' +
+                    '<div class="pt-tri" hidden><canvas width="400" height="400" aria-label="colour triangle: the ring picks the colour, the triangle how light, dark or grey"></canvas></div>' +
                     '<div class="pt-sw pt-swatches">' + SWATCHES.map(function (c) { return '<button type="button" data-c="' + c + '" style="background:' + c + '" title="' + c + '"></button>'; }).join('') + '</div>' +
                     '<div class="pt-sw pt-recent"></div>' +
                     '<label class="pt-slider">size <input type="range" class="s-size" min="1" max="160" step="1"><output></output></label>' +
@@ -117,6 +129,7 @@
                     '<details class="pt-help"><summary>shortcut keys</summary>' +
                         '<p><kbd>B</kbd> brush · <kbd>E</kbd> eraser · <kbd>G</kbd> fill · <kbd>I</kbd> or hold <kbd>Alt</kbd> pick a colour<br>' +
                         '<kbd>[</kbd> <kbd>]</kbd> brush size · <kbd>1</kbd>…<kbd>0</kbd> opacity · <kbd>N</kbd> new layer<br>' +
+                        '<kbd>L</kbd> lasso: drag inside it to move, <kbd>Delete</kbd> clears it, <kbd>Esc</kbd> lets go, <kbd>Ctrl</kbd>+<kbd>A</kbd> all<br>' +
                         '<kbd>Ctrl</kbd>+<kbd>Z</kbd> undo · <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> (or <kbd>Ctrl</kbd>+<kbd>Y</kbd>) redo</p></details>' +
                 '</div>' +
             '</div>';
@@ -155,8 +168,54 @@
                         vg.globalAlpha = L.opacity * state.opacity / 100; vg.filter = blurFor(); vg.drawImage(stroke, 0, 0); vg.filter = 'none';
                     }
                 } else { vg.globalAlpha = L.opacity; vg.drawImage(L.canvas, 0, 0); }
+                if (lift && i === cur) { vg.globalAlpha = L.opacity; vg.drawImage(lift.canvas, lift.dx, lift.dy); }
             });
             vg.globalAlpha = 1;
+            if (lassoPts) {                                             // the lasso being drawn
+                var k = W / Math.max(1, view.getBoundingClientRect().width);
+                vg.save(); vg.lineWidth = 1.5 * k; vg.setLineDash([5 * k, 4 * k]); vg.strokeStyle = '#1c140e';
+                vg.beginPath(); lassoPts.forEach(function (q, j) { if (j) vg.lineTo(q.x, q.y); else vg.moveTo(q.x, q.y); }); vg.stroke(); vg.restore();
+            }
+            drawSelection();
+        }
+        // the lasso: a selection that keeps painting inside it, can be moved, or cleared
+        var sel = null, lassoPts = null, lift = null, antsT = 0;
+        function makeSel(pts) {
+            var path = new Path2D();
+            pts.forEach(function (q, j) { if (j) path.lineTo(q.x, q.y); else path.moveTo(q.x, q.y); });
+            path.closePath();
+            var mask = makeCanvas(), mg = mask.getContext('2d', { willReadFrequently: true });
+            mg.fillStyle = '#000'; mg.fill(path);
+            return { path: path, pts: pts, mask: mask };
+        }
+        function inSel(p) {
+            if (!sel) return false;
+            var x = Math.floor(p.x), y = Math.floor(p.y);
+            return x >= 0 && y >= 0 && x < W && y < H && sel.mask.getContext('2d').getImageData(x, y, 1, 1).data[3] > 0;
+        }
+        function shiftSel(s0, dx, dy) { return s0 ? makeSel(s0.pts.map(function (q) { return { x: q.x + dx, y: q.y + dy }; })) : null; }
+        function deselect() { if (!sel) return; sel = null; render(); }
+        function clipToSel() {                                        // keep a stroke inside the lasso
+            if (!sel) return;
+            sg.save(); sg.globalCompositeOperation = 'destination-in'; sg.drawImage(sel.mask, 0, 0); sg.restore();
+        }
+        function clearSel() {
+            if (!sel) return;
+            var L = layers[cur], before = L.ctx.getImageData(0, 0, W, H);
+            L.ctx.save(); L.ctx.globalCompositeOperation = 'destination-out'; L.ctx.drawImage(sel.mask, 0, 0); L.ctx.restore();
+            push(paintEntry(L, { x: 0, y: 0, w: W, h: H }, before));
+            after();
+        }
+        setInterval(function () { if (sel && api.active) { antsT = (antsT + 1) % 22; render(); } }, 120);
+        function drawSelection() {                                    // marching ants round the lasso
+            if (!sel) return;
+            var k = W / Math.max(1, view.getBoundingClientRect().width), o = lift ? lift : { dx: 0, dy: 0 };
+            vg.save();
+            vg.translate(o.dx, o.dy);
+            vg.lineWidth = 1.5 * k;
+            vg.setLineDash([]); vg.strokeStyle = 'rgba(255,255,255,.95)'; vg.stroke(sel.path);
+            vg.setLineDash([6 * k, 5 * k]); vg.lineDashOffset = -antsT; vg.strokeStyle = '#1c140e'; vg.stroke(sel.path);
+            vg.restore();
         }
         function blurFor() { return state.soft > 0 ? 'blur(' + (state.soft / 100 * state.size * 0.35).toFixed(1) + 'px)' : 'none'; }
 
@@ -235,6 +294,18 @@
             e.preventDefault();
             var p = at(e), tool = e.altKey ? 'picker' : state.tool, L = layers[cur];
             if (tool === 'picker') { pick(p); return; }
+            if (tool === 'lasso') {
+                view.setPointerCapture(e.pointerId);
+                if (inSel(p)) {                                         // drag what's inside the lasso
+                    var fl = makeCanvas(), fg = fl.getContext('2d');
+                    fg.drawImage(L.canvas, 0, 0);
+                    fg.globalCompositeOperation = 'destination-in'; fg.drawImage(sel.mask, 0, 0);
+                    lift = { canvas: fl, from: p, dx: 0, dy: 0, before: L.ctx.getImageData(0, 0, W, H), sel0: sel };
+                    L.ctx.save(); L.ctx.globalCompositeOperation = 'destination-out'; L.ctx.drawImage(sel.mask, 0, 0); L.ctx.restore();
+                } else { sel = null; lassoPts = [p]; }
+                render();
+                return;
+            }
             if (!L.visible) { flash('that layer is hidden: show it (the eye) to paint on it'); return; }
             if (tool === 'fill') { fill(p); return; }
             view.setPointerCapture(e.pointerId);
@@ -243,11 +314,17 @@
             drawing = { last: p, box: { x0: p.x, y0: p.y, x1: p.x, y1: p.y }, pad: pad };
             grow(drawing.box, p.x, p.y, pad);
             dab(p, p);
+            clipToSel();
             render(true);
             if (state.tool === 'brush') use(state.colour);
         });
         view.addEventListener('pointermove', function (e) {
             moveRing(e);
+            if (lassoPts) {
+                (e.getCoalescedEvents ? e.getCoalescedEvents() : [e]).forEach(function (ev) { lassoPts.push(at(ev)); });
+                render(); return;
+            }
+            if (lift) { var q = at(e); lift.dx = q.x - lift.from.x; lift.dy = q.y - lift.from.y; render(); return; }
             if (!drawing) return;
             (e.getCoalescedEvents ? e.getCoalescedEvents() : [e]).forEach(function (ev) {
                 var p = at(ev);
@@ -255,9 +332,26 @@
                 grow(drawing.box, p.x, p.y, drawing.pad);
                 drawing.last = p;
             });
+            clipToSel();
             render(true);
         });
         function endStroke() {
+            if (lassoPts) {                                             // close the lasso
+                var pts = lassoPts;
+                lassoPts = null;
+                var xs = pts.map(function (q) { return q.x; }), ys = pts.map(function (q) { return q.y; });
+                sel = pts.length > 2 && Math.max.apply(null, xs) - Math.min.apply(null, xs) + Math.max.apply(null, ys) - Math.min.apply(null, ys) > 6 ? makeSel(pts) : null;
+                render(); return;
+            }
+            if (lift) {                                                 // put down what was moved
+                var Lm = layers[cur], m = lift, s0 = m.sel0, s1 = shiftSel(s0, m.dx, m.dy);
+                Lm.ctx.drawImage(m.canvas, m.dx, m.dy);
+                var afterM = Lm.ctx.getImageData(0, 0, W, H);
+                lift = null; sel = s1;
+                push({ undo: function () { Lm.ctx.putImageData(m.before, 0, 0); sel = s0; thumb(Lm); },
+                       redo: function () { Lm.ctx.putImageData(afterM, 0, 0); sel = s1; thumb(Lm); } });
+                dirty = true; render(); thumb(Lm); onChange(); return;
+            }
             if (!drawing) return;
             var L = layers[cur], box = boxOf(drawing.box), before = L.ctx.getImageData(box.x, box.y, box.w, box.h);
             L.ctx.save();
@@ -302,11 +396,13 @@
                     if (py < H - 1) { if (same(k + W)) { if (!dn) { stack.push(px, py + 1); dn = true; } } else dn = false; }
                 }
             }
+            if (sel) { var md = sel.mask.getContext('2d').getImageData(0, 0, W, H).data; for (var mi = 0; mi < W * H; mi++) if (!md[mi * 4 + 3]) mask[mi] = 0; }
             var L = layers[cur], before = L.ctx.getImageData(0, 0, W, H), out = L.ctx.getImageData(0, 0, W, H), o = out.data;
             var c = [parseInt(state.colour.slice(1, 3), 16), parseInt(state.colour.slice(3, 5), 16), parseInt(state.colour.slice(5, 7), 16)], a = state.opacity / 100;
             for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
                 var m = y * W + x;                                     // the area, grown by a pixel to tuck under soft edges
                 if (!(mask[m] || (x > 0 && mask[m - 1]) || (x < W - 1 && mask[m + 1]) || (y > 0 && mask[m - W]) || (y < H - 1 && mask[m + W]))) continue;
+                if (sel && !md[m * 4 + 3]) continue;
                 var j = m * 4, da = o[j + 3] / 255, na = a + da * (1 - a);
                 o[j] = Math.round((c[0] * a + o[j] * da * (1 - a)) / na);
                 o[j + 1] = Math.round((c[1] * a + o[j + 1] * da * (1 - a)) / na);
@@ -328,9 +424,10 @@
         }
         function setColour(c) {
             state.colour = c;
-            $('.pt-now').style.background = c;
-            $('.pt-now input').value = c;
+            $('.pt-now span').style.background = c;
+            if (document.activeElement !== $('.pt-hexin')) $('.pt-hexin').value = c;
             $('.pt-hex').textContent = c;
+            if (!triDragging) { hsv = toHsv(c, hsv.h); drawTri(); }
             if (state.tool === 'eraser' || state.tool === 'picker') setTool('brush');
             keep();
         }
@@ -357,7 +454,104 @@
         });
         host.querySelectorAll('[data-tool]').forEach(function (b) { b.addEventListener('click', function () { setTool(b.dataset.tool); }); });
         host.addEventListener('click', function (e) { var c = e.target.closest('.pt-sw button[data-c]'); if (c) setColour(c.dataset.c); });
-        $('.pt-now input').addEventListener('input', function () { setColour(this.value); });
+        /* ---------------- the colour triangle: the ring picks the colour, the triangle how light, dark or grey ---------------- */
+        var tri = $('.pt-tri'), tc = tri.querySelector('canvas'), tx = tc.getContext('2d'), TS = 400, CX = 200, CY = 200, R1 = 196, R0 = 160, RT = 152;
+        var triOff = document.createElement('canvas'); triOff.width = triOff.height = TS;
+        var hsv = { h: 0, s: 0, v: 0 }, triDragging = null;
+        function rgbOf(hx) { return [parseInt(hx.slice(1, 3), 16), parseInt(hx.slice(3, 5), 16), parseInt(hx.slice(5, 7), 16)]; }
+        function toHsv(hx, keepH) {
+            var c = rgbOf(hx).map(function (v) { return v / 255; }), mx = Math.max.apply(null, c), mn = Math.min.apply(null, c), d = mx - mn, h = keepH || 0;
+            if (d > 0.0001) {
+                if (mx === c[0]) h = 60 * (((c[1] - c[2]) / d) % 6); else if (mx === c[1]) h = 60 * ((c[2] - c[0]) / d + 2); else h = 60 * ((c[0] - c[1]) / d + 4);
+                if (h < 0) h += 360;
+            }
+            return { h: h, s: mx ? d / mx : 0, v: mx };
+        }
+        function hueRgb(h) {
+            var k = function (n) { var t = (n + h / 60) % 6; return 255 * (1 - Math.max(0, Math.min(t, 4 - t, 1))); };
+            return [k(5), k(3), k(1)];
+        }
+        function fromHsv(o) {
+            var c = hueRgb(o.h);
+            return '#' + c.map(function (x) { return ('0' + Math.round(o.v * (255 - o.s * (255 - x))).toString(16)).slice(-2); }).join('');
+        }
+        function corners() {                                          // the pure colour, white and black corners, turned to the hue
+            var a = o2r(hsv.h);
+            function at(t) { return [CX + RT * Math.cos(t), CY + RT * Math.sin(t)]; }
+            return [at(a), at(a + 2.0944), at(a + 4.1888)];
+        }
+        function o2r(h) { return h * Math.PI / 180 - Math.PI / 2; }
+        function bary(px, py, P) {
+            var x1 = P[0][0], y1 = P[0][1], x2 = P[1][0], y2 = P[1][1], x3 = P[2][0], y3 = P[2][1];
+            var den = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
+            var u = ((y2 - y3) * (px - x3) + (x3 - x2) * (py - y3)) / den, v = ((y3 - y1) * (px - x3) + (x1 - x3) * (py - y3)) / den;
+            return [u, v, 1 - u - v];
+        }
+        function drawTri() {
+            if (tri.hidden) return;
+            tx.clearRect(0, 0, TS, TS);
+            if (tx.createConicGradient) {                             // the ring of colours
+                var cg = tx.createConicGradient(-Math.PI / 2, CX, CY);
+                for (var i = 0; i <= 12; i++) { var q = hueRgb(i * 30); cg.addColorStop(i / 12, 'rgb(' + q.map(Math.round).join(',') + ')'); }
+                tx.fillStyle = cg;
+            } else tx.fillStyle = '#c96';
+            tx.beginPath(); tx.arc(CX, CY, R1, 0, 7); tx.arc(CX, CY, R0, 0, 7, true); tx.fill();
+            var P = corners(), og = triOff.getContext('2d'), img = og.createImageData(TS, TS), d = img.data, C = hueRgb(hsv.h);
+            var x0 = Math.floor(Math.min(P[0][0], P[1][0], P[2][0])), x1 = Math.ceil(Math.max(P[0][0], P[1][0], P[2][0]));
+            var y0 = Math.floor(Math.min(P[0][1], P[1][1], P[2][1])), y1 = Math.ceil(Math.max(P[0][1], P[1][1], P[2][1]));
+            for (var y = y0; y <= y1; y++) for (var x = x0; x <= x1; x++) {
+                var b = bary(x, y, P);
+                if (b[0] < -0.01 || b[1] < -0.01 || b[2] < -0.01) continue;
+                var j = (y * TS + x) * 4;
+                d[j] = C[0] * b[0] + 255 * b[1]; d[j + 1] = C[1] * b[0] + 255 * b[1]; d[j + 2] = C[2] * b[0] + 255 * b[1]; d[j + 3] = 255;
+            }
+            og.putImageData(img, 0, 0);
+            tx.drawImage(triOff, 0, 0);
+            var ha = o2r(hsv.h), rm = (R0 + R1) / 2;                  // where you are: on the ring, and in the triangle
+            ring2(CX + rm * Math.cos(ha), CY + rm * Math.sin(ha), 12);
+            var u = hsv.s * hsv.v, w = hsv.v * (1 - hsv.s), k = 1 - hsv.v;
+            ring2(u * P[0][0] + w * P[1][0] + k * P[2][0], u * P[0][1] + w * P[1][1] + k * P[2][1], 10);
+        }
+        function ring2(x, y, r) {
+            tx.lineWidth = 4; tx.strokeStyle = '#fff'; tx.beginPath(); tx.arc(x, y, r, 0, 7); tx.stroke();
+            tx.lineWidth = 2; tx.strokeStyle = '#1c140e'; tx.beginPath(); tx.arc(x, y, r + 3, 0, 7); tx.stroke();
+        }
+        function triAt(e) {
+            var r = tc.getBoundingClientRect();
+            return [(e.clientX - r.left) * TS / r.width, (e.clientY - r.top) * TS / r.height];
+        }
+        function triMove(e) {
+            var q = triAt(e);
+            if (triDragging === 'hue') {
+                hsv.h = (Math.atan2(q[1] - CY, q[0] - CX) + Math.PI / 2) * 180 / Math.PI;
+                if (hsv.h < 0) hsv.h += 360;
+            } else {
+                var b = bary(q[0], q[1], corners()).map(function (v) { return Math.max(0, v); }), t = b[0] + b[1] + b[2];
+                b = b.map(function (v) { return v / t; });
+                hsv.v = Math.min(1, b[0] + b[1]);
+                hsv.s = hsv.v > 0.001 ? Math.min(1, b[0] / hsv.v) : 0;
+            }
+            setColour(fromHsv(hsv));
+            drawTri();
+        }
+        tc.addEventListener('pointerdown', function (e) {
+            var q = triAt(e), dist = Math.hypot(q[0] - CX, q[1] - CY);
+            triDragging = dist > R0 - 10 ? 'hue' : 'sv';
+            tc.setPointerCapture(e.pointerId);
+            triMove(e);
+        });
+        tc.addEventListener('pointermove', function (e) { if (triDragging) triMove(e); });
+        tc.addEventListener('pointerup', function () { if (triDragging) { triDragging = null; use(state.colour); } });
+        $('.pt-now').addEventListener('click', function () {
+            tri.hidden = !tri.hidden;
+            this.setAttribute('aria-expanded', String(!tri.hidden));
+            hsv = toHsv(state.colour, hsv.h);
+            drawTri();
+        });
+        $('.pt-hexin').addEventListener('input', function () {
+            var v = this.value.trim().replace(/^([0-9a-f]{6})$/i, '#$1');
+            if (/^#[0-9a-f]{6}$/i.test(v)) setColour(v.toLowerCase());
+        });
         $('.undo').addEventListener('click', undo);
         $('.redo').addEventListener('click', redo);
         $('.wipe').addEventListener('click', function () {
@@ -421,6 +615,7 @@
         /* ---------------- the brush-sized ring that follows the pointer ---------------- */
         function scale() { return view.getBoundingClientRect().width / W; }
         function ringLook() {
+            stage.classList.toggle('lassoing', state.tool === 'lasso');
             var d = state.tool === 'fill' || state.tool === 'picker' ? 14 : Math.max(4, state.size * scale());
             ring.style.width = ring.style.height = d + 'px';
             ring.classList.toggle('dot', state.tool === 'fill' || state.tool === 'picker' || d < 8);
@@ -435,8 +630,12 @@
         /* ---------------- shortcut keys (only while the painting desk is showing) ---------------- */
         document.addEventListener('keydown', function (e) {
             if (!api.active) return;
-            if (e.target.closest && e.target.closest('input[type=text], input[type=url], textarea')) return;
+            if (e.target.closest && e.target.closest('input[type=text], input[type=url], input:not([type]), textarea')) return;
             var k = e.key.toLowerCase(), mod = e.ctrlKey || e.metaKey;
+            if (k === 'escape' && sel) { e.preventDefault(); e.stopImmediatePropagation(); deselect(); return; }
+            if ((k === 'delete' || k === 'backspace') && sel) { e.preventDefault(); clearSel(); return; }
+            if (mod && k === 'd') { e.preventDefault(); deselect(); return; }
+            if (mod && k === 'a') { e.preventDefault(); sel = makeSel([{ x: 0, y: 0 }, { x: W, y: 0 }, { x: W, y: H }, { x: 0, y: H }]); setTool('lasso'); render(); return; }
             if (mod && k === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
             if (mod && k === 'y') { e.preventDefault(); redo(); return; }
             if (mod || e.altKey) return;
@@ -444,20 +643,21 @@
             else if (k === 'e') setTool('eraser');
             else if (k === 'g') setTool('fill');
             else if (k === 'i') setTool('picker');
+            else if (k === 'l') setTool('lasso');
             else if (k === '[') setSize(Math.round(state.size * 0.85) - (state.size < 8 ? 1 : 0));
             else if (k === ']') setSize(Math.round(state.size * 1.18) + (state.size < 8 ? 1 : 0));
             else if (k === 'n') { if (layers.length < MAX_LAYERS) addLayer(newLayer()); }
             else if (/^[0-9]$/.test(k)) setOpacity(k === '0' ? 100 : +k * 10);
             else return;
             e.preventDefault();
-        });
+        }, true);
 
         var toastT = 0;
         function flash(t) { if (opts.say) { opts.say(t); clearTimeout(toastT); toastT = setTimeout(function () { opts.say(''); }, 3000); } }
 
         /* ---------------- start, reset, export ---------------- */
         function reset() {
-            layers = [newLayer('layer 1')]; nextId = 2; cur = 0; past = []; future = []; dirty = false;
+            layers = [newLayer('layer 1')]; nextId = 2; cur = 0; past = []; future = []; dirty = false; sel = null; lift = null; lassoPts = null;
             render(); drawLayers(); buttons(); onChange();
         }
         setTool('brush'); setColour(state.colour); reset();

@@ -202,7 +202,8 @@
         '</symbol></defs></svg>' +
         '<div class="stars"></div>' +
         // Ursa Minor, rotated so it hangs below Polaris (Polaris itself is the link drawn on top)
-        '<svg class="ursa" viewBox="-86 12 240 228">' +
+        // Ursa Minor (slot: assets/sky/ursa-minor, 240 x 228, transparent: Polaris sits just above the top edge, 36% across)
+        '<svg class="ursa" data-asset="assets/sky/ursa-minor" viewBox="-86 12 240 228">' +
             '<g transform="rotate(55 34 40)">' +
                 '<g fill="none" stroke="rgba(225,232,255,.45)" stroke-width="1" stroke-dasharray="3 4" stroke-linecap="round">' +
                     '<path d="M34 40 L78 50 L114 66 L146 80"/><path d="M146 80 L198 60 L222 94 L168 110 Z"/>' +
@@ -223,6 +224,53 @@
                    '<svg class="placeholder" viewBox="0 0 200 90"><use href="#sky-cloud"/></svg></div>';
         }).join('');
     body.insertBefore(backdrop, body.firstChild);
+
+    /* ---------------- a painted sky of your own (optional) ----------------
+       paint the sky at a few times of day and the site crossfades between them as the day turns
+       (sun, moon, stars, clouds and weather still move on top). any you leave out are skipped:
+         assets/sky/skybox-day      noon                     assets/sky/skybox-golden   late afternoon
+         assets/sky/skybox-sunset   sunset                   assets/sky/skybox-dusk     after sunset
+         assets/sky/skybox-night    midnight
+       or just one, assets/sky/skybox: it's tinted toward evening and night by itself.
+       wide pictures (1920 x 1080 or bigger) that can be cropped at the sides; horizon low. */
+    var SKYBOX = [['day', 0], ['golden', 0.33], ['sunset', 0.45], ['dusk', 0.62], ['night', 0.9]];
+    var skybox = document.createElement('div');
+    skybox.className = 'skybox';
+    skybox.innerHTML = SKYBOX.map(function (k) { return '<div data-sky="' + k[0] + '"></div>'; }).join('') + '<div data-sky="one"></div><div class="skybox-tint"></div>';
+    backdrop.insertBefore(skybox, backdrop.firstChild);
+    var skyLayers = [], skyOne = null;
+    SKYBOX.forEach(function (k) {
+        findAsset('assets/sky/skybox-' + k[0], function (url) {
+            if (!url) return;
+            var el = skybox.querySelector('[data-sky="' + k[0] + '"]');
+            el.style.backgroundImage = 'url("' + new URL(url, location.href).href + '")';
+            skyLayers.push({ el: el, at: k[1] });
+            skyLayers.sort(function (a, b) { return a.at - b.at; });
+            body.classList.add('has-skybox');
+            kick();
+        });
+    });
+    findAsset('assets/sky/skybox', function (url) {
+        if (!url) return;
+        skyOne = skybox.querySelector('[data-sky="one"]');
+        skyOne.style.backgroundImage = 'url("' + new URL(url, location.href).href + '")';
+        body.classList.add('has-skybox');
+        kick();
+    });
+    function paintSkybox(p) {
+        if (skyLayers.length) {                                       // the two nearest times of day, blended
+            var lo = skyLayers[0], hi = null;
+            for (var i = 0; i < skyLayers.length; i++) if (skyLayers[i].at <= p) lo = skyLayers[i];
+            for (i = skyLayers.length - 1; i >= 0; i--) if (skyLayers[i].at >= p) hi = skyLayers[i];
+            skyLayers.forEach(function (L) { L.el.style.opacity = 0; });
+            lo.el.style.opacity = 1;
+            if (hi && hi !== lo) hi.el.style.opacity = smooth(clamp((p - lo.at) / (hi.at - lo.at))).toFixed(3);
+            skybox.querySelector('.skybox-tint').style.opacity = 0;
+        } else if (skyOne) {                                          // one picture, tinted as the day goes
+            skyOne.style.opacity = 1;
+            skybox.querySelector('.skybox-tint').style.opacity = (smooth(ramp(p, 0.3, 0.95)) * 0.85).toFixed(3);
+        }
+    }
 
     /* ---------------- Polaris ----------------
        the north star, at the top of Ursa Minor. it comes out at night like the constellations,
@@ -479,6 +527,7 @@
     }
 
     function render(p) {
+        if (!ursa.isConnected) ursa = backdrop.querySelector('.ursa');      // (your own Ursa Minor took its place)
         var sky = skyAt(p);
         root.style.setProperty('--sky-top', sky[0]);
         root.style.setProperty('--sky-bottom', sky[1]);
@@ -486,6 +535,7 @@
         root.style.setProperty('--night', smooth(ramp(p, 0.8, 0.97)).toFixed(3));
         root.style.background = sky[0];
 
+        paintSkybox(p);
         stars.style.opacity = smooth(ramp(p, 0.66, 0.9));
         ursa.style.opacity  = smooth(ramp(p, 0.82, 0.97));
 
@@ -710,7 +760,7 @@
     exitBtn.className = 'back-inside';
     exitBtn.type = 'button';
     exitBtn.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 21V4.5L14 2v19H5zm10 0V4h4v17h-4zM11 12.2a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>' +
+        '<span class="bi-ic" data-asset="assets/ui/back-inside"><svg class="placeholder" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5 21V4.5L14 2v19H5zm10 0V4h4v17h-4zM11 12.2a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg></span>' +
         '<span>back inside</span>';
     body.appendChild(exitBtn);
 
@@ -922,7 +972,7 @@
             var list = [];
             base.split('|').forEach(function (b) {
                 b = b.trim();
-                if (/\.(svg|gif|webp|png|jpe?g|json|mp3|ogg)$/i.test(b)) list.push(b);
+                if (/\.(svg|gif|webp|png|jpe?g|json|mp3|ogg|webm|mp4)$/i.test(b)) list.push(b);
                 else EXTS.forEach(function (x) { list.push(b + '.' + x); });
             });
             var dirs = {};
@@ -939,7 +989,7 @@
                 (function next() {
                     if (i >= list.length) return done(null);
                     var url = list[i++];
-                    if (/\.(mp3|ogg)$/i.test(url)) {                  // a sound: just check it's there
+                    if (/\.(mp3|ogg|webm|mp4)$/i.test(url)) {        // a sound or a video: just check it's there
                         fetch(url, { method: 'HEAD', cache: 'no-cache' }).then(function (r) { r.ok ? done({ url: url }) : next(); }, next);
                         return;
                     }
@@ -1214,7 +1264,20 @@
     }
 
     // run once every script on the page (grounds included) has built its pieces
-    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); fillAssets(); showSlots(); setupCursors(); });
+    // the paper note pinned up in a room: assets/<room>/note (a sheet of paper, stretched behind the words)
+    function dressNotes() {
+        document.querySelectorAll('.furnish.pinned').forEach(function (n) {
+            var room = body.dataset.place || 'room';
+            n.dataset.slot = 'assets/' + room + '/note';
+            findAsset('assets/' + room + '/note', function (url) {
+                if (!url) return;
+                n.style.background = 'url("' + new URL(url, location.href).href + '") center / 100% 100% no-repeat';
+                n.style.boxShadow = 'none';
+                n.classList.add('has-art');
+            });
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); fillAssets(); showSlots(); setupCursors(); dressNotes(); });
     startAmbient();
 
     render(shown);

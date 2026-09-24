@@ -1,11 +1,13 @@
 /* =====================================================================
-   frames.js — picture frames on the wall, holding art from the visitors'
-   portfolio (content/workshop/visitors/). Which piece hangs in which frame
-   is kept in content/living/frames.json, set from the content manager's
-   "hang in" buttons (tools\content.bat):
+   frames.js — picture frames on the walls. Each room keeps its own list of
+   what hangs where, set from the content manager's "hang in" buttons
+   (tools\content.bat):
+       the living space: content/living/frames.json   (visitors' art)
+       the workshop:     content/workshop/frames.json (your own paintings)
        { "1": "2026-09-24-sunny-pond-by-bo.png", "2": "", "3": "" }
-   (a name alone is from the visitors' folder; a path like content/workshop/cat.png
-   works too). An empty frame shows its stand-in painting.
+   A name alone is from the room's own art folder (visitors' art for the living
+   space, content/workshop/ for the workshop); a path like content/city/x.png
+   works anywhere. An empty frame shows its stand-in painting.
 
    Each frame is one line in the page, placed like any furniture:
        <div class="furnish gallery-frame" data-frame="1" data-look="gilt"
@@ -14,16 +16,21 @@
    or your own colours:  style="--frame:#6e4a30; --frame-w:10%; --mat:#efe3c6; --mat-w:6%"
    --frame-w / --mat-w are the border and the mat, as a share of the frame's width;
    aspect-ratio: 1 (square) or 5 / 4 (landscape) changes its shape (4 / 5 is the default).
-   Your own frame art: assets/living/frame (every frame) or assets/living/frame-1, frame-2 …
-   (a PNG with a see-through middle; the painting sits in the middle 76% unless you set
-   --inset on the frame, e.g. --inset: 14%). A frame of your own replaces the drawn border.
+   Your own frame art: assets/<room>/frame (every frame in that room) or
+   assets/<room>/frame-1, frame-2 … (a PNG with a see-through middle; the painting
+   sits in the middle 76% unless you set --inset on the frame, e.g. --inset: 14%).
+   They swing gently to the music.
    ===================================================================== */
 
 (function () {
     var Sky = window.Sky;
     var frames = Array.prototype.slice.call(document.querySelectorAll('.gallery-frame[data-frame]'));
     if (!Sky || !frames.length) return;
-    var FILE = 'content/living/frames.json', ART = 'content/workshop/visitors/';
+    // each room keeps its own list: content/<room>/frames.json. a name alone is from the room's
+    // own art folder (the living space: visitors' art; the workshop: your paintings); a path works anywhere
+    var ROOM = document.body.dataset.place || 'living';
+    var FILE = frames[0].dataset.list || 'content/' + ROOM + '/frames.json';
+    var ART = frames[0].dataset.folder || (ROOM === 'living' ? 'content/workshop/visitors/' : 'content/' + ROOM + '/');
 
     Sky.css(
         '.gallery-frame * { box-sizing: border-box; }' +
@@ -54,7 +61,11 @@
         '.frame-zoom.open { visibility: visible; opacity: 1; transition: opacity .35s; }' +
         '.frame-zoom figure { margin: 0; text-align: center; color: #f3e6c2; font-style: italic; }' +
         '.frame-zoom img { display: block; max-width: 90vw; max-height: 78vh; margin: 0 auto 12px; background: #efe3c6; box-shadow: 0 16px 40px rgba(0,0,0,.6); }' +
-        'body.frame-open .place-tabs, body.frame-open .cp { opacity: 0; pointer-events: none; }'
+        'body.frame-open .place-tabs, body.frame-open .cp { opacity: 0; pointer-events: none; }' +
+        // with music on, they swing gently from their nails (in time with the song: see sky/music.js)
+        'body.music-playing .gallery-frame { animation: frame-swing 1s ease-in-out infinite alternate; transform-origin: 50% -3%; }' +
+        '@keyframes frame-swing { from { rotate: -1.6deg; } to { rotate: 1.6deg; } }' +
+        '@media (prefers-reduced-motion: reduce) { body.music-playing .gallery-frame { animation: none; } }'
     );
 
     // the stand-in painting for an empty frame: a little landscape
@@ -69,17 +80,18 @@
         return { title: ((m ? m[1] : base).replace(/[-_]+/g, ' ').trim()) || 'untitled', by: m ? m[2].replace(/[-_]+/g, ' ').trim() : '' };
     }
 
-    frames.forEach(function (f) {
+    frames.forEach(function (f, i) {
         var n = f.dataset.frame;
+        f.style.animationDelay = (-i * 0.37).toFixed(2) + 's';      // each one swings a little out of step
         f.innerHTML = '<div class="gf-border"><div class="gf-mat"><div class="gf-pic">' + STAND_IN + '</div></div></div><span class="gf-hint"></span>';
         f.setAttribute('role', 'button');
         f.setAttribute('tabindex', '0');
         f.setAttribute('aria-label', 'a painting on the wall');
         f.querySelector('.gf-hint').textContent = 'an empty frame';
         // your own frame art: frame-<n> for this one, or frame for all of them
-        Sky.findAsset('assets/living/frame-' + n, function (url) {
+        Sky.findAsset('assets/' + ROOM + '/frame-' + n, function (url) {
             if (url) return dress(url);
-            Sky.findAsset('assets/living/frame', function (u2) { if (u2) dress(u2); });
+            Sky.findAsset('assets/' + ROOM + '/frame', function (u2) { if (u2) dress(u2); });
         });
         function dress(url) {
             var im = document.createElement('img');

@@ -75,6 +75,7 @@
         '.storm-cloud > .art:not(.glow-layer) { filter: brightness(calc(1 - .55 * var(--dusk))); }' +
         '.weather-tint { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(#4e5663, #7d8591 70%, #8f969f); }' +
         '.weather-bolt { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; }' +
+        '.weather-bolt-art { position: absolute; top: 0; height: 55vh; width: auto; pointer-events: none; opacity: 0; filter: drop-shadow(0 0 8px #cfe0ff); }' +
         '.weather-rain { position: fixed; inset: 0; z-index: 2; pointer-events: none; width: 100vw; height: 100vh; }' +
         '.weather-flash { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; background: rgba(232,238,255,.9); }' +
         '.weather-fog { position: fixed; left: -10%; right: -10%; bottom: 0; height: 70vh; z-index: 2; pointer-events: none; opacity: 0;' +
@@ -219,6 +220,7 @@
     tint.className = 'weather-tint';
     var bolt = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     bolt.setAttribute('class', 'weather-bolt');
+    bolt.setAttribute('data-slot', 'assets/sky/lightning');
     bolt.innerHTML = '<path fill="none" stroke="#f4f6ff" stroke-width="3" stroke-linejoin="bevel" style="filter: drop-shadow(0 0 6px #cfe0ff)"/>';
     if (backdrop) { backdrop.appendChild(cloudBox); backdrop.appendChild(tint); backdrop.appendChild(bolt); }
     var cloudEls = Array.prototype.slice.call(cloudBox.children);
@@ -301,14 +303,28 @@
     /* ---------------- lightning ---------------- */
     var calm = window.matchMedia('(prefers-reduced-motion: reduce)');
     var nextBolt = performance.now() + 4000 + Math.random() * 6000;
+    // your own lightning: assets/sky/lightning (a tall picture of one bolt, top at the top, see-through around it)
+    var boltArt = null;
+    Sky.findAsset('assets/sky/lightning', function (url) {
+        if (!url) return;
+        boltArt = document.createElement('img');
+        boltArt.className = 'weather-bolt-art';
+        boltArt.src = url; boltArt.alt = '';
+        if (backdrop) backdrop.appendChild(boltArt);
+    });
     function strike() {
         var W = window.innerWidth, H = window.innerHeight, x = W * (0.15 + Math.random() * 0.7), y = 0, d = 'M' + x + ' 0';
+        if (boltArt) {
+            boltArt.style.left = x + 'px';
+            boltArt.style.transform = 'translateX(-50%)' + (Math.random() < 0.5 ? ' scaleX(-1)' : '');
+            if (!calm.matches) boltArt.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0.2 }, { opacity: 0.9 }, { opacity: 0 }], { duration: 480, easing: 'ease-out' });
+        }
         while (y < H * (0.35 + Math.random() * 0.2)) { y += 18 + Math.random() * 30; x += (Math.random() - 0.5) * 50; d += ' L' + x.toFixed(0) + ' ' + y.toFixed(0); }
         bolt.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
         bolt.querySelector('path').setAttribute('d', d);
         if (!calm.matches) {
             flash.animate([{ opacity: 0 }, { opacity: 0.55 }, { opacity: 0.1 }, { opacity: 0.35 }, { opacity: 0 }], { duration: 520, easing: 'ease-out' });
-            bolt.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0.2 }, { opacity: 0.9 }, { opacity: 0 }], { duration: 480, easing: 'ease-out' });
+            if (!boltArt) bolt.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0.2 }, { opacity: 0.9 }, { opacity: 0 }], { duration: 480, easing: 'ease-out' });
         }
         if (Sky.sounds && volume > 0) Sky.sounds.thunder(volume * (0.5 + Math.random() * 0.5), 0.3 + Math.random() * 2.2, null, indoors());
     }

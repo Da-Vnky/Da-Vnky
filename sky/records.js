@@ -409,6 +409,7 @@
                 if (!tags) return;
                 if (tags.title) t.title = tags.title;
                 if (tags.artist) t.artist = tags.artist;
+                if (tags.bpm) t.tagBpm = tags.bpm;
                 if (tags.picture && !t.pic) t.pic = tags.picture;
                 drawSleeves();
             });

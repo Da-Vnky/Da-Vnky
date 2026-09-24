@@ -77,6 +77,22 @@
     letters.sort(function (a, b) { return (b.dataset.date || '').localeCompare(a.dataset.date || ''); });
     letters.forEach(function (a) { section.appendChild(a); });
 
+    // your own letter paper and ink marks (slots): assets/sea/letter-paper (one sheet, stretched to fit;
+    // portrait, e.g. 1560 x 2000), assets/sea/ink-blot and assets/sea/ink-star (see-through around them)
+    [['letter-paper', 'has-letter-paper'], ['ink-blot', 'has-ink-blot'], ['ink-star', 'has-ink-star']].forEach(function (k) {
+        Sky.findAsset('assets/sea/' + k[0], function (url) {
+            if (!url) return;
+            document.documentElement.style.setProperty('--' + k[0], 'url("' + new URL(url, location.href).href + '")');
+            document.body.classList.add(k[1]);
+        });
+    });
+    Sky.css(
+        'body.has-letter-paper .sheet { background: var(--letter-paper) center / 100% 100% no-repeat; }' +
+        'body.has-ink-blot .marks .blot, body.has-ink-star .marks .star { background: center / contain no-repeat; }' +
+        'body.has-ink-blot .marks .blot { background-image: var(--ink-blot); } body.has-ink-blot .marks .blot use { display: none; }' +
+        'body.has-ink-star .marks .star { background-image: var(--ink-star); } body.has-ink-star .marks .star use { display: none; }'
+    );
+
     var MARKS = ['blot-a', 'blot-b', 'splatter', 'star-pen', 'star-twinkle', 'star-asterisk', 'star-pen', 'star-twinkle'];
 
     function dateLabel(s) {

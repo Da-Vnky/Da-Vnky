@@ -30,9 +30,11 @@ Take a file out, and it's gone. That's the whole job.
   records (add, caption, sleeves, delete); visitors' bottles and art (keep, pin,
   hang in the living space's frames, delete). Then "publish to the live site".
 
-  content/living/frames.json
-                      WHAT HANGS IN THE LIVING SPACE'S PICTURE FRAMES, frame by
-                      number: { "1": "a-visitor-picture.png", "2": "", "3": "" }.
+  content/living/frames.json   and   content/workshop/frames.json
+                      WHAT HANGS IN EACH ROOM'S PICTURE FRAMES, frame by number
+                      (1 is the largest): { "1": "a-picture.png", "2": "", "3": "" }.
+                      In the workshop a name alone is one of your paintings
+                      (content/workshop/); in the living space, a visitor's.
                       A name alone is from content/workshop/visitors/; a path works
                       too (content/workshop/cat.png). Set it with the "hang in"
                       buttons in the content manager.
@@ -70,6 +72,10 @@ Take a file out, and it's gone. That's the whole job.
                       otherwise the file name. Start names with 01-, 02-, … to set
                       the order. Once a record's on, it keeps playing as visitors
                       wander the site (a little player in the corner; ✕ stops it).
+                      Everything that dances (the cat, the manikin, the frames, the
+                      traveller) keeps time with the song: its tempo is worked out
+                      the first time it plays. A song whose tags give its tempo
+                      (BPM, e.g. set in a music player) is taken at its word.
 
   content/city/       WINDOW SCENES (the telescope)
                       .png .jpg .jpeg .webp .gif .svg .mp4 .webm, or an .html bit.

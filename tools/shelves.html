@@ -79,7 +79,7 @@
 </header>
 <main>
     <h2>paintings on the easel <button type="button" class="btn main add" data-add="easel">+ add</button></h2>
-    <p class="sub">the workshop's easel (content/workshop/): pictures or short videos. names that start with a date go newest first. a caption shows under each; hang one in a frame in the living space with its number.</p>
+    <p class="sub">the workshop's easel (content/workshop/): pictures or short videos. names that start with a date go newest first. a caption shows under each; hang one in a frame in the workshop or the living space with its number (click it again to take it down).</p>
     <div class="grid" data-shelf="easel"></div>
 
     <h2>window scenes in the city <button type="button" class="btn main add" data-add="city">+ add</button></h2>
@@ -151,24 +151,28 @@
             meta.innerHTML = esc(it.name) + (it.date ? '<br>' + nice(it.date) : '');
             c.appendChild(meta);
             if (it.caption) { var cap = document.createElement('p'); cap.className = 'cap'; cap.textContent = it.caption; c.appendChild(cap); }
-            if (which === 'easel' && nums.length) {                    // hang it in a frame in the living space
-                var inFrame = '';
-                Object.keys(map).forEach(function (k) { if (map[k] === it.hang) inFrame = k; });
-                if (inFrame) meta.insertAdjacentHTML('beforeend', '<br><span class="where">hanging in frame ' + inFrame + '</span>');
-                var row = document.createElement('div');
-                row.className = 'acts hang';
-                row.innerHTML = '<span class="hl">hang in:</span>';
-                nums.forEach(function (n) {
-                    var b = button(String(n), function () {
-                        var to = inFrame === String(n) ? '' : n;
-                        api('/__post/hang', { what: it.hang, frame: to }).then(function (x) {
-                            if (x.error) say(x.error, true); else { say(to ? 'hung in frame ' + to + '. publish to show everyone.' : 'taken down from its frame.'); loadAll(); }
+            if (which === 'easel') {                                      // hang it in a frame: in the workshop, or the living space
+                [['workshop', it.hangHere, r.workshopFrames || {}, r.workshopFrameNumbers || []], ['living space', it.hang, map, nums]].forEach(function (room) {
+                    var label = room[0], what = room[1], rmap = room[2], rnums = room[3], key = label === 'workshop' ? 'workshop' : 'living';
+                    if (!rnums.length) return;
+                    var inFrame = '';
+                    Object.keys(rmap).forEach(function (k) { if (rmap[k] === what) inFrame = k; });
+                    if (inFrame) meta.insertAdjacentHTML('beforeend', '<br><span class="where">in frame ' + inFrame + ' in the ' + label + '</span>');
+                    var row = document.createElement('div');
+                    row.className = 'acts hang';
+                    row.innerHTML = '<span class="hl">' + label + ':</span>';
+                    rnums.forEach(function (n) {
+                        var b = button(String(n), function () {
+                            var to = inFrame === String(n) ? '' : n;
+                            api('/__post/hang', { what: what, frame: to, room: key }).then(function (x) {
+                                if (x.error) say(x.error, true); else { say(to ? 'hung in frame ' + to + ' in the ' + label + '. publish to show everyone.' : 'taken down from its frame.'); loadAll(); }
+                            });
                         });
+                        b.setAttribute('aria-pressed', String(inFrame === String(n)));
+                        row.appendChild(b);
                     });
-                    b.setAttribute('aria-pressed', String(inFrame === String(n)));
-                    row.appendChild(b);
+                    c.appendChild(row);
                 });
-                c.appendChild(row);
             }
             var acts = document.createElement('div');
             acts.className = 'acts';

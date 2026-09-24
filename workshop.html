@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260924h">
+    <link rel="stylesheet" href="sky/sky.css?v=20260924j">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -29,6 +29,7 @@
         .easel   { left: 13%; bottom: 1vh; height: 56vh; aspect-ratio: 62 / 100; z-index: 3; filter: drop-shadow(0 6px 8px rgba(0,0,0,.4)); }
         .easel > .art { position: absolute; inset: 0; width: 100%; height: 100%; }
         .portfolio { left: 76%; bottom: 0; height: 21vh; aspect-ratio: 125 / 100; z-index: 3; }
+        .model-shelf { left: 36%; top: 43%; width: 13%; height: 9%; }
         .paint-easel { left: 55%; bottom: 1vh; height: 42vh; aspect-ratio: 62 / 100; z-index: 3; filter: drop-shadow(0 6px 8px rgba(0,0,0,.4)); }
 
         .pinned {
@@ -72,6 +73,7 @@
             .easel { left: 8%; height: 38vh; }
             .portfolio { left: auto; right: 4%; height: 11vh; }
             .paint-easel { left: 41%; height: 27vh; z-index: 4; }
+            .gallery-frame, .model-shelf { display: none; }
         }
     </style>
 </head>
@@ -162,6 +164,22 @@
             </svg>
         </div>
 
+        <!-- your picture frames: your own paintings (content/workshop/), hung from the content manager
+             (tools\content.bat → your things → "hang in workshop"). numbered largest (1) to smallest.
+             move / restyle them like the living space's (see sky/frames.js). your own frame art:
+             assets/workshop/frame, or frame-1, frame-2, frame-3 -->
+        <div class="furnish gallery-frame" data-frame="1" data-look="wood" style="left:84.5%; top:12%; width:8%; --tilt:-.8deg"></div>
+        <div class="furnish gallery-frame" data-frame="2" data-look="dark" style="left:85.5%; top:34%; width:6.5%; aspect-ratio:5 / 4; --tilt:1deg"></div>
+        <div class="furnish gallery-frame" data-frame="3" data-look="gilt" style="left:31.5%; top:15%; width:4.5%; --tilt:1.5deg"></div>
+
+        <!-- a shelf of models: assets/workshop/model-1, model-2, model-3 (a looping .webm of it turning,
+             a .gif, or a picture; see sky/models.js). the title is what shows when you hover. -->
+        <div class="furnish model-shelf">
+            <div class="model" data-model="1" title="a model"></div>
+            <div class="model" data-model="2" title="a model"></div>
+            <div class="model" data-model="3" title="a model"></div>
+        </div>
+
         <!-- the easel visitors paint on: click it and the painting desk opens (sky/paint.js).
              your own easel: assets/workshop/paint-easel (the same shape as the drawn one) -->
         <div class="furnish paint-easel" data-paint data-asset="assets/workshop/paint-easel">
@@ -220,14 +238,16 @@
              style="left: 36%; bottom: 3vh; height: 27vh;"></div>
     </div>
 
-    <script src="sky/sky.js?v=20260924h"></script>
-    <script src="sky/ground-countryside.js?v=20260924h"></script>
-    <script src="sky/gallery.js?v=20260924h"></script>
-    <script src="sky/paint.js?v=20260924h"></script>
-    <script src="sky/studio.js?v=20260924h"></script>
-    <script src="sky/panel.js?v=20260924h"></script>
-    <script src="sky/music.js?v=20260924h"></script>
-    <script src="sky/weather.js?v=20260924h"></script>
-    <script src="sky/noise.js?v=20260924h"></script>
+    <script src="sky/sky.js?v=20260924j"></script>
+    <script src="sky/ground-countryside.js?v=20260924j"></script>
+    <script src="sky/gallery.js?v=20260924j"></script>
+    <script src="sky/frames.js?v=20260924j"></script>
+    <script src="sky/models.js?v=20260924j"></script>
+    <script src="sky/paint.js?v=20260924j"></script>
+    <script src="sky/studio.js?v=20260924j"></script>
+    <script src="sky/panel.js?v=20260924j"></script>
+    <script src="sky/music.js?v=20260924j"></script>
+    <script src="sky/weather.js?v=20260924j"></script>
+    <script src="sky/noise.js?v=20260924j"></script>
 </body>
 </html>

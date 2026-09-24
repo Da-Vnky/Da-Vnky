@@ -33,11 +33,26 @@ THE SKY (every page)                                     canvas to draw on
     assets/sky/cloud         every cloud ... or give each its own:     800 x 360
     assets/sky/cloud-1 … cloud-5
     assets/sky/polaris       the north star, top centre at night       200 x 200, centred
+    assets/sky/ursa-minor    the Little Dipper under Polaris, stars    240 x 228 (or 960 x 912)
+                             light on see-through; Polaris itself sits
+                             just above the top edge, 36% across
+    assets/sky/lightning     one bolt, tall, top at the top, see-      e.g. 300 x 900
+                             through around it (it flashes at a random
+                             spot, sometimes flipped)
                              (an easter egg: EGGS.polaris in sky/sky.js)
     assets/sky/plank         each signpost sign, pointing RIGHT; the    464 x 88
                              place's name is written across it for
                              you, so keep the middle fairly plain.
     assets/sky/plank-here    the sign for the page you're on (optional) 464 x 88
+
+A PAINTED SKY OF YOUR OWN (optional; the site crossfades them as the day turns;
+sun, moon, stars, clouds and weather still move on top)       1920 x 1080 or bigger
+    assets/sky/skybox-day      noon              assets/sky/skybox-golden   late afternoon
+    assets/sky/skybox-sunset   sunset            assets/sky/skybox-dusk     after sunset
+    assets/sky/skybox-night    midnight
+    Any you leave out are skipped (day + sunset + night is plenty). Or just
+    assets/sky/skybox, one picture, tinted toward evening and night by itself.
+    Keep the horizon low and the sides croppable (it's cut to fit every screen).
 
 THE CONSTELLATIONS (every page, at night). Each is a link to another website
 or an easter egg; set them in CONSTELLATIONS near the top of sky/sky.js.
@@ -86,6 +101,7 @@ THE CONTROL PANEL (top right, every page: music, weather, the noise machine)
     (a new layer added later gets assets/ui/<its id> the same way)
 
 OTHER BUTTONS                                                              96 x 96
+    assets/ui/back-inside     the little door on "back inside" (after stepping out a window)
     assets/ui/letters         "letters", top left of the homepage
     assets/ui/leave-art       "leave some art", in the workshop
 
@@ -161,6 +177,10 @@ THE SEA (the homepage)
     assets/sea/letter-board  the notice board on the dock that holds the   720 x 860
                              letters once they're read (click it to read
                              them all); stands on the deck, feet at the bottom
+    assets/sea/letter-paper  one sheet of your letters' paper, stretched   e.g. 1560 x 2000
+                             to fit each letter (portrait)
+    assets/sea/ink-blot      the ink blots scattered on letters, and      300 x 300
+    assets/sea/ink-star      the little inked stars (see-through round them)
     the bottle, three pieces on one 2000 x 900 canvas, so they line up:
     assets/sea/bottle          the glass, empty, lying on its side, neck to the RIGHT
     assets/sea/bottle-scroll   the rolled message inside it (slides out when opened)
@@ -210,6 +230,9 @@ ROOMS (the workshop and the living space)
     assets/living/window     glass; stretched to fit the window
     (the view out of the window: see WINDOW VIEWS below)
 
+every room: assets/<room>/note, the paper note pinned up with the room's name
+(e.g. assets/workshop/note), stretched behind the words, about 5:4.
+
 workshop                          living space
     assets/workshop/lantern           assets/living/lamp
     assets/workshop/shelf             assets/living/picture
@@ -230,6 +253,19 @@ workshop                          living space
        no art? the frames are drawn:
        data-look gilt / wood / dark /
        white / plain, or your colours)
+    assets/workshop/frame
+      (the workshop's picture frames:
+       frame, or frame-1 … frame-3;
+       like the living space's, below)
+    assets/workshop/model-1 … model-3
+      (the models on the little shelf:
+       a looping .webm of it turning
+       (see-through, VP9 + alpha, from
+       Blender: a turntable render), a
+       .gif, or a picture, about 400 x 400;
+       click one to see it up close)
+    assets/workshop/model-shelf
+      (the shelf board, about 300:16)
     assets/workshop/paint-easel
       (the "paint here" easel visitors
        paint on, 62:100 like the other)
@@ -252,6 +288,10 @@ workshop                          living space
                                       assets/living/letter
                                         (one sheet of paper, portrait; the
                                          letters on the shelf are made of it)
+                                      assets/living/record
+                                        (the vinyl, square, see-through
+                                         outside the disc; each song's
+                                         sleeve goes on its label)
                                       assets/living/pinboard
                                         (the board, 4:3; notes are pinned
                                          on the middle 88% of it)

@@ -49,6 +49,9 @@ a:hover {
 }
 
 /* ================= backdrop ================= */
+.skybox, .skybox > div { position: absolute; inset: 0; }
+.skybox > div { opacity: 0; background-size: cover; background-position: center bottom; }
+.skybox .skybox-tint { background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom)); mix-blend-mode: multiply; }
 .backdrop {
     position: fixed;
     inset: 0;
@@ -517,7 +520,8 @@ body.has-room:not(.is-outside) .ground {
     transform: translateY(-8px);
     transition: opacity .4s .6s, transform .4s .6s, visibility 0s 1s, background .2s;
 }
-.back-inside svg { width: 22px; height: 22px; }
+.back-inside .bi-ic { display: inline-block; width: 22px; height: 22px; }
+.back-inside svg, .back-inside .bi-ic > .art { width: 22px; height: 22px; display: block; object-fit: contain; }
 .back-inside:hover { background: rgba(40, 28, 18, .9); }
 body.sky-view .back-inside {
     opacity: 1;

@@ -41,9 +41,18 @@
 
     /* ---------------- a record, drawn: grooves, a label (your sleeve's picture), spindle hole ---------------- */
     var uid = 0;
+    // your own record: assets/living/record (a square picture of the vinyl, see-through outside it;
+    // the sleeve's picture is laid on its label, the middle third)
+    var recordArt = null;
+    Sky.findAsset('assets/living/record', function (url) { if (url) { recordArt = url; emit('track'); } });
     function disc(color, pic, cls) {
         var id = 'mdisc' + (++uid);
-        return '<svg class="rp-disc ' + (cls || '') + '" viewBox="0 0 100 100" aria-hidden="true">' +
+        if (recordArt) return '<svg class="rp-disc ' + (cls || '') + '" viewBox="0 0 100 100" aria-hidden="true" data-slot="assets/living/record">' +
+            '<defs><clipPath id="' + id + '"><circle cx="50" cy="50" r="17"/></clipPath></defs>' +
+            '<image href="' + recordArt + '" x="0" y="0" width="100" height="100"/>' +
+            (pic ? '<image href="' + pic + '" x="33" y="33" width="34" height="34" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/>' : '') +
+            '</svg>';
+        return '<svg class="rp-disc ' + (cls || '') + '" viewBox="0 0 100 100" aria-hidden="true" data-slot="assets/living/record">' +
             '<defs><clipPath id="' + id + '"><circle cx="50" cy="50" r="17"/></clipPath>' +
             '<radialGradient id="' + id + 's" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#3a3a3f"/><stop offset=".6" stop-color="#151518"/><stop offset="1" stop-color="#0c0c0e"/></radialGradient></defs>' +
             '<circle cx="50" cy="50" r="49" fill="url(#' + id + 's)"/>' +
@@ -113,6 +122,7 @@
             var s = p + h, e = Math.min(end, s + size), enc = b[s];
             if (id === 'TIT2' || id === 'TT2') out.title = text(enc, s + 1, e);
             else if (id === 'TPE1' || id === 'TP1') out.artist = text(enc, s + 1, e);
+            else if (id === 'TBPM' || id === 'TBP') { var bp = parseFloat(text(enc, s + 1, e)); if (bp > 30 && bp < 300) out.bpm = bp; }
             else if ((id === 'APIC' || id === 'PIC') && !out.picture) {
                 var q = s + 1, mime;
                 if (id === 'PIC') { mime = 'image/' + String.fromCharCode(b[q], b[q + 1], b[q + 2]).toLowerCase().replace('jpg', 'jpeg'); q += 3; }
@@ -252,6 +262,93 @@
         return true;
     });
     window.addEventListener('pageshow', function (e) { if (e.persisted) audio.volume = wanted(); });   // back with the browser's back button
+
+    /* ---------------- in time with the song: everything that dances follows its beat ----------------
+       each song is listened to once (the first minute or so), its tempo (BPM) and where its beats
+       fall are worked out, and remembered in this browser. then every dance on the page (the cat,
+       the manikin, the frames, the traveller …) is timed to those beats. the dances are drawn at
+       120 BPM, so a song at 90 BPM slows them to 3/4 speed, one at 140 speeds them up.
+       a song that says its own tempo in its tags (TBPM) is taken at its word. */
+    var DANCES = /^(g-|char-groove|frame-swing)/;
+    var beat = { bpm: 0, phase: 0, url: '' };
+    function beatKey(u) { return 'beat:' + absolute(u).replace(/^https?:\/\/[^/]+/, ''); }
+    function analyse(url) {
+        return fetch(url, { headers: { Range: 'bytes=0-2500000' } })     // the first minute or two is plenty
+            .then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+            .then(function (buf) {
+                var Ctx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+                if (!Ctx) throw new Error('no audio');
+                var oc = new Ctx(1, 1, 22050);
+                return new Promise(function (res, rej) { oc.decodeAudioData(buf, res, rej); });
+            })
+            .then(function (ab) {
+                var x = ab.getChannelData(0), sr = ab.sampleRate, hop = Math.round(sr / 100);
+                var n = Math.floor(x.length / hop), env = new Float32Array(n), on = new Float32Array(n);
+                for (var i = 0; i < n; i++) { var e = 0; for (var j = i * hop, k = j + hop; j < k; j++) e += x[j] * x[j]; env[i] = Math.log(1e-6 + e / hop); }
+                for (i = 1; i < n; i++) on[i] = Math.max(0, env[i] - env[i - 1]);   // how suddenly it got louder: the onsets
+                var from = Math.min(Math.floor(n / 5), 800), to = Math.min(n, from + 6000);
+                if (to - from < 1000) { from = 0; to = n; }
+                var best = 0, bestLag = 50, score = {};
+                for (var lag = 33; lag <= 100; lag++) {                        // 60 … 180 BPM
+                    var sum = 0;
+                    for (i = from; i < to - lag; i++) sum += on[i] * on[i + lag];
+                    var bpm = 6000 / lag, w = Math.exp(-0.5 * Math.pow(Math.log2(bpm / 120) / 0.8, 2));   // lean toward a comfortable tempo
+                    score[lag] = sum;
+                    if (sum * w > best) { best = sum * w; bestLag = lag; }
+                }
+                var a = score[bestLag - 1] || 0, b = score[bestLag], c = score[bestLag + 1] || 0, d = (a - 2 * b + c);
+                var exact = bestLag + (d ? 0.5 * (a - c) / d : 0);          // between two frames
+                var bestP = 0, pScore = -1, per = exact;
+                for (var p = 0; p < Math.round(per); p++) {                    // where the beats fall
+                    var t = 0;
+                    for (var q = from + p; q < to; q += per) t += on[Math.round(q)] || 0;
+                    if (t > pScore) { pScore = t; bestP = p; }
+                }
+                var bpmFound = 6000 / exact;
+                return { bpm: bpmFound, phase: ((from + bestP) / 100) % (60 / bpmFound) };
+            });
+    }
+    function tempoOf(t) {
+        if (!t) return Promise.resolve(null);
+        var key = beatKey(t.url);
+        try { var c = JSON.parse(localStorage.getItem(key)); if (c && c.bpm) return Promise.resolve(c); } catch (e) {}
+        if (navigator.deviceMemory && navigator.deviceMemory < 2) return Promise.resolve(null);   // a small phone: skip it
+        return analyse(t.url).then(function (r) {
+            if (t.tagBpm) r.bpm = t.tagBpm;
+            try { localStorage.setItem(key, JSON.stringify(r)); } catch (e) {}
+            return r;
+        }).catch(function () { return null; });
+    }
+    function danceBpm() {                                         // the dance steps take a comfortable speed: halve a frantic song, double a slow one
+        var b = beat.bpm;
+        while (b > 150) b /= 2;
+        while (b && b < 70) b *= 2;
+        return b;
+    }
+    function syncDances() {
+        if (!beat.bpm || !playing() || !document.getAnimations) return;
+        var b = danceBpm(), rate = b / 120, beats = (audio.currentTime - beat.phase) / (60 / b);
+        document.getAnimations().forEach(function (an) {
+            if (!an.animationName || !DANCES.test(an.animationName)) return;
+            if (Math.abs(an.playbackRate - rate) > 0.001) an.playbackRate = rate;
+            var want = beats * 500, now = an.currentTime || 0, cycle = 2000;
+            var off = ((want - now) % cycle + cycle) % cycle;             // only nudge when it's drifted
+            if (off > 40 && off < cycle - 40) an.currentTime = want;
+        });
+    }
+    function onTrack() {
+        var t = current();
+        if (!t || beat.url === t.url) return;
+        beat = { bpm: 0, phase: 0, url: t.url };
+        tempoOf(t).then(function (r) { if (r && current() === t) { beat.bpm = r.bpm; beat.phase = r.phase; requestAnimationFrame(syncDances); } });
+    }
+    listeners.push(function (what) {
+        if (what === 'track') onTrack();
+        if (what === 'play') { onTrack(); requestAnimationFrame(function () { requestAnimationFrame(syncDances); }); }
+    });
+    audio.addEventListener('seeked', function () { requestAnimationFrame(syncDances); });
+    setInterval(syncDances, 3000);                                // keep them on the beat (and catch any that just started)
+    Sky.beat = function () { return { bpm: beat.bpm, dance: danceBpm(), phase: beat.phase }; };
     var fadeIn = false;
     audio.addEventListener('playing', function () {
         if (!fadeIn) return;

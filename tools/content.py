@@ -31,7 +31,7 @@ ART = os.path.join(ROOT, 'content', 'workshop', 'visitors')
 INBOX = os.path.join(ROOT, '.inbox')
 FOLDERS = {'bottles': BOTTLES, 'art': ART}
 SHOWN = re.compile(r'\.(txt|html|png|jpe?g|gif|webp|svg)$', re.I)
-FRAMES_JSON = os.path.join(ROOT, 'content', 'living', 'frames.json')
+ROOMS = ('living', 'workshop')                      # rooms with picture frames: content/<room>/frames.json
 
 # your own things: folder, the kinds of file it holds
 SHELVES = {
@@ -506,28 +506,36 @@ def delete_site_file(which, name):
 
 
 # ---------------- the frames in the living space ----------------
-def frame_numbers():
+def frame_numbers(room='living'):
     try:
-        with open(os.path.join(ROOT, 'living.html'), encoding='utf-8') as f:
+        with open(os.path.join(ROOT, room + '.html'), encoding='utf-8') as f:
             return sorted({int(n) for n in re.findall(r'data-frame="(\d+)"', f.read())})
     except Exception:
         return []
 
 
-def frames():
-    m = load_json(FRAMES_JSON, {})
+def frames_file(room):
+    return os.path.join(ROOT, 'content', room, 'frames.json')
+
+
+def frames(room='living'):
+    m = load_json(frames_file(room), {})
     return {str(k): v for k, v in m.items() if isinstance(v, str)} if isinstance(m, dict) else {}
 
 
-def hang(what, frame):
-    """put a picture in a frame ('' takes a frame's picture down); a picture hangs in one frame at a time"""
-    m = frames()
+def hang(what, frame, room='living'):
+    """put a picture in a frame of a room ('' takes a frame's picture down); a picture hangs in one frame per room"""
+    if room not in ROOMS:
+        raise ValueError('which room?')
+    m = frames(room)
     for k in list(m):
         if m[k] == what:
             m[k] = ''
     if frame:
         m[str(int(frame))] = what
-    with open(FRAMES_JSON, 'w', encoding='utf-8', newline='\n') as f:
+    if not m and not os.path.exists(frames_file(room)):
+        return
+    with open(frames_file(room), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(dict(sorted(m.items(), key=lambda kv: int(kv[0]) if kv[0].isdigit() else 0)), f, indent=2)
 
 
@@ -555,7 +563,8 @@ def shelf(which):
                     item['sleeve'] = rel + urllib.parse.quote(stem + '.' + e)
                     break
         if which == 'easel':
-            item['hang'] = 'content/workshop/' + n
+            item['hang'] = 'content/workshop/' + n            # as the living space names it
+            item['hangHere'] = n                              # as the workshop names it (its own folder)
         out.append(item)
     if which == 'music':
         return sorted(out, key=lambda i: i['name'].lower())
@@ -622,7 +631,8 @@ def shelf_delete(which, name):
         if os.path.exists(p) and (e == 'txt' or which == 'music'):
             os.remove(p)
     if which == 'easel':
-        hang('content/workshop/' + name, None)
+        hang('content/workshop/' + name, None, 'living')
+        hang(name, None, 'workshop')
     write_list(folder)
 
 
@@ -659,7 +669,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 which = q.get('which', [''])[0]
                 if which not in SHELVES:
                     raise ValueError('which shelf?')
-                return self.reply({'items': shelf(which), 'frames': frames(), 'frameNumbers': frame_numbers()})
+                return self.reply({'items': shelf(which), 'frames': frames(), 'frameNumbers': frame_numbers(),
+                                   'workshopFrames': frames('workshop'), 'workshopFrameNumbers': frame_numbers('workshop')})
             if url.path.startswith('/__post/inbox/'):
                 name = os.path.basename(url.path)
                 if not re.match(r'^[a-f0-9]{16}\.(png|jpg|gif|webp)$', name) or not os.path.exists(inbox_path(name)):
@@ -744,8 +755,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 what = (d.get('what') or '').strip()
                 if not what or '..' in what or what.startswith('/'):
                     raise ValueError('which picture?')
-                hang(what, d.get('frame') or None)
-                return self.reply({'frames': frames()})
+                room = d.get('room') or 'living'
+                hang(what, d.get('frame') or None, room)
+                return self.reply({'frames': frames(room)})
             if url.path == '/__shelf/add':
                 which = self.headers.get('X-Which', '')
                 if which not in SHELVES:
