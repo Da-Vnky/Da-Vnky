@@ -388,7 +388,7 @@
     // a splash at a point on screen (size 1 = the ship's own)
     function splashAt(cx, cy, size, spread, sound) {
         // the sound: a bottle's is small and bright, the traveller's deeper, the ship's deepest of all
-        if (Sky.sounds) Sky.sounds.sfx('splash', { size: sound === undefined ? Math.min(1, size) : sound });
+        if (Sky.sounds && sound !== false) Sky.sounds.sfx('splash', { size: sound === undefined ? Math.min(1, size) : sound });
         var ring = document.createElement('div');
         ring.className = 'ring';
         ring.style.left = cx + 'px';
@@ -525,10 +525,11 @@
         var s = aboardSpot();
         putMate(s.x, s.b);
     }
-    function mateSplash(size) {
+    function mateSplash(size, quiet) {                          // quiet: the splash is seen but makes its own sound
         var r = sea.getBoundingClientRect();
-        splashAt(r.left + crew.x + mateW() / 2, r.bottom - (sea.clientHeight * 0.47), size, mateW() * 2.4, 0.5);
+        splashAt(r.left + crew.x + mateW() / 2, r.bottom - (sea.clientHeight * 0.47), size, mateW() * 2.4, quiet ? false : 0.5);
     }
+    function sfx(name, opts) { if (Sky.sounds) Sky.sounds.sfx(name, opts); }
 
     // move to a spot (which may itself be moving, like the bobbing ship): hop, walk or fall
     function moveTo(spot, ms, hop, run, done, fall) {
@@ -604,7 +605,7 @@
         function toEdge(speed, then) { moveTo(landSpot, walkTime(crew.x, landSpot().x) * speed, 0, run, then); }
         function leap() {
             if (!fast && shipGone()) { dive(run, SWIM_AFTER_SHIP); return; }
-            moveTo(aboardSpot, 620 * k, hopH(), run, function () { hush(600); settle('aboard'); if (done) done(); });
+            moveTo(aboardSpot, 620 * k, hopH(), run, function () { sfx('land', { size: 0.8 }); hush(600); settle('aboard'); if (done) done(); });
         }
         // left behind? a double-take and a shout, then a dash to the edge and a dive
         if (!fast && shipGone()) { startle(run, function () { toEdge(0.45, leap); }); return; }
@@ -639,10 +640,12 @@
         mate.classList.remove('under');
         mate.classList.toggle('face-left', false);
         crew.state = 'surfacing';
-        mateSplash(0.4);
+        mateSplash(0.4, true);
+        sfx('surface');
         moveTo(function () { return { x: popX, b: surfaceB() }; }, 520, 0, run, function () {
             setTimeout(function () {                           // a breath, a shake, then climb
                 if (run !== crew.run) return;
+                sfx('climb-out');
                 if (toDock && shipDocked()) {
                     moveTo(landSpot, 700, hopH() * 0.7, run, function () { walkToTalk(run); });
                 } else {
@@ -736,6 +739,7 @@
             crew.state = 'falling';
             var spotX = Math.min(crew.x, dockAt.W - mateW() - 6);
             moveTo(function () { return { x: spotX, b: deckB() }; }, 300 + Math.max(0, crew.b - deckB()) / 2, 0, run, function () {
+                sfx('land', { size: 1 });
                 if (shipDocked()) walkToTalk(run);
                 else settle('ashore');                         // ship's away: they'll go after it
             }, true);
@@ -756,7 +760,7 @@
         tendCrew(p);
     });
 
-    // clicking a sign or a constellation: the traveller hurries aboard, the waves pick up,
+    // clicking a sign: the traveller hurries aboard, the waves pick up,
     // and the ship sails off the right edge before the page changes
     function easeInOut(t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
     Sky.onLeave(function (go) {

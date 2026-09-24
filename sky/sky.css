@@ -203,7 +203,17 @@ a:hover {
     transition: filter .2s, color .2s;
 }
 .sky-links.live .sky-link { pointer-events: auto; }
-.sky-link svg { display: block; width: 100%; overflow: visible; }
+.sky-link .sl-art { display: block; }
+.sky-link svg, .sky-link .sl-art > .art { display: block; width: 100%; overflow: visible; }
+.sky-link .sl-name { display: block; }
+.sky-link .sl-note { display: block; font-size: .8rem; color: rgba(243,230,194,.75); opacity: 0; transition: opacity .25s; }
+.sky-link:hover .sl-note, .sky-link:focus-visible .sl-note, .sky-link.flare .sl-note { opacity: 1; }
+.sky-link.flare { animation: star-flare 2.4s ease-out; }
+.sky-link.flare .st { animation: star-pop .6s ease-out 2 alternate; transform-box: fill-box; transform-origin: 50% 50%; }
+@keyframes star-flare { 0% { filter: drop-shadow(0 0 2px rgba(255,240,200,.6)); } 12% { filter: drop-shadow(0 0 14px rgba(255,240,200,1)); } 100% { filter: none; } }
+@keyframes star-pop { to { transform: scale(1.7); } }
+.egg-star { position: fixed; z-index: 1; width: 300px; pointer-events: none; filter: drop-shadow(0 0 6px rgba(255,245,210,.9)); }
+.egg-star svg { display: block; width: 100%; }
 .sky-link .ln { fill: none; stroke: rgba(225,232,255,.4); stroke-width: 1; stroke-dasharray: 3 4; stroke-linecap: round; }
 .sky-link .st { fill: #e8edff; }
 .sky-link:hover,
@@ -218,9 +228,67 @@ a:hover {
 .sky-link:focus-visible .ln { stroke: rgba(255,246,220,.9); stroke-dasharray: none; }
 
 .sky-link.l1 { left: 5vw;   top: 38vh; }
-.sky-link.l2 { right: 6vw;  top: 8vh; }
+.sky-link.l2 { right: 6vw;  top: 10vh; }
 .sky-link.l3 { right: 21vw; top: 36vh; }
 .sky-link.l4 { left: 24vw;  top: 30vh; }
+.sky-link.l5 { left: 22vw;  top: 8vh; }
+.sky-link.l6 { right: 27vw; top: 14vh; }
+.sky-link.l7 { left: 38vw;  top: 44vh; }
+/* away from the homepage the tabs take the right edge: the constellations there shift in a little */
+body:not([data-page="home"]) .sky-link.l2 { right: 11vw; }
+
+/* ================= the place tabs (every page but the homepage) ================= */
+.place-tabs {
+    position: fixed;
+    right: 0;
+    top: 27vh;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    transition: opacity .4s, visibility 0s;
+}
+.place-tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 64px;
+    height: 56px;
+    padding: 0 0 0 10px;
+    border-radius: 14px 0 0 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    background: #eadcb9;
+    color: #3a2716;
+    text-decoration: none;
+    font-style: italic;
+    font-size: 1.05rem;
+    box-shadow: -4px 5px 12px rgba(0, 0, 0, .38), inset 0 0 16px rgba(120, 80, 30, .22);
+    transition: width .35s cubic-bezier(.3, .7, .3, 1), background .2s, transform .2s;
+}
+.place-tab .pt-pic { flex: none; display: block; width: 40px; height: 40px; }
+.place-tab .pt-pic svg, .place-tab .pt-pic > .art { display: block; width: 100%; height: 100%; object-fit: contain; }
+.place-tab .pt-name { opacity: 0; transition: opacity .2s; padding-right: 16px; }
+a.place-tab:hover, a.place-tab:focus-visible { width: 220px; background: #f3e8cc; outline: none; }
+.place-tab:hover .pt-name, .place-tab:focus-visible .pt-name { opacity: 1; }
+.place-tab.here { width: 74px; background: #3a2716; color: #f3e6c2; box-shadow: -4px 5px 12px rgba(0, 0, 0, .38), inset 4px 0 0 #9a3b1f; }
+.place-tab.here .pt-pic { background: #eadcb9; border-radius: 50%; padding: 3px; box-sizing: border-box; }
+.place-tab.here:hover { width: 280px; }
+/* hidden while something is open over the page */
+body.sky-view .place-tabs, body.gallery-open .place-tabs, body.records-open .place-tabs, body.crate-open .place-tabs,
+body.peep-view .place-tabs, body.peep-close .place-tabs, body.art-open .place-tabs, body.visitors-open .place-tabs, body.leaving .place-tabs {
+    opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .4s, visibility 0s .4s;
+}
+@media (max-width: 620px) {
+    .place-tabs { top: auto; bottom: 88px; gap: 6px; }
+    .place-tab { width: 50px; height: 46px; padding-left: 8px; }
+    .place-tab .pt-pic { width: 34px; height: 34px; }
+    .place-tab.here { width: 58px; }
+    a.place-tab:hover { width: 50px; }
+    .place-tab .pt-name { display: none; }
+}
 
 /* ================= the signpost: wooden arrow planks ================= */
 .signpost {
@@ -461,6 +529,10 @@ body.sky-view .back-inside {
     .sky-link.l2 { right: 16vw; top: 30vh; }
     .sky-link.l3 { left: 36vw; top: 55vh; right: auto; }
     .sky-link.l4 { right: 16vw; top: 45vh; left: auto; }
+    .sky-link.l5 { left: 6vw;   top: 20vh; }
+    .sky-link.l6 { right: 6vw;  top: 17vh; left: auto; }
+    .sky-link.l7 { left: 30vw;  top: 66vh; }
+    body:not([data-page="home"]) .sky-link.l2 { right: 18vw; }
     .signpost { top: 17vh; }
     .room .window { border-width: 9px; }
 }
@@ -604,6 +676,9 @@ body.scope-view .sky-link.l1 { left: calc(50% - 300px); right: auto; top: 44vh; 
 body.scope-view .sky-link.l2 { left: calc(50% + 120px); right: auto; top: 24vh; }
 body.scope-view .sky-link.l3 { left: calc(50% + 110px); right: auto; top: 56vh; }
 body.scope-view .sky-link.l4 { left: calc(50% - 250px); right: auto; top: 66vh; }
+body.scope-view .sky-link.l5 { left: calc(50% - 230px); right: auto; top: 18vh; }
+body.scope-view .sky-link.l6 { left: calc(50% + 150px); right: auto; top: 40vh; }
+body.scope-view .sky-link.l7 { left: calc(50% - 70px);  right: auto; top: 76vh; }
 
 /* ---------- the telescope itself (city) ---------- */
 .telescope {
@@ -698,6 +773,9 @@ img.furnish { object-fit: contain; object-position: 50% 100%; }
     body.scope-view .sky-link.l2 { left: calc(50% + 30px);  top: 34vh; }
     body.scope-view .sky-link.l3 { left: calc(50% + 10px);  top: 50vh; }
     body.scope-view .sky-link.l4 { left: calc(50% - 130px); top: 56vh; }
+    body.scope-view .sky-link.l5 { left: calc(50% - 120px); top: 26vh; }
+    body.scope-view .sky-link.l6 { left: calc(50% + 20px);  top: 22vh; }
+    body.scope-view .sky-link.l7 { left: calc(50% - 50px);  top: 64vh; }
 }
 
 /* characters on the move: facing and a little walking bob */
@@ -844,4 +922,3 @@ svg[data-bottle] .b-cork.has-art { transform-box: view-box; transform-origin: 17
 .flyer-shooting-star { filter: drop-shadow(0 0 6px rgba(255,245,210,.9)); }
 @media (prefers-reduced-motion: reduce) { .flyer-blimp .prop, .flyer-birds .wing { animation: none; } }
 
-/* away from the homepage there's no signpost; the constellations take you places */

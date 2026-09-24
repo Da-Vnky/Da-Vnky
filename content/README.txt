@@ -10,7 +10,8 @@ Take a file out, and it's gone. That's the whole job.
                       A letter the visitor hasn't seen before arrives corked in
                       a bottle, and is read right there over the sea (the time of
                       day stays put). Once read, it goes onto the letters board on
-                      the dock, where every letter can be read, newest first.
+                      the dock, where every letter can be read, newest first (the
+                      "letters" button in the top left corner opens it too).
                       A date in the future stays hidden until that day.
 
                       .txt letters: first line = title, blank line = new paragraph,
@@ -26,6 +27,18 @@ Take a file out, and it's gone. That's the whole job.
                       newest first. Caption = the file name, or a .txt with the
                       same name (first line title, the rest a note).
                       Tip: export around 2000 px on the long side.
+
+  content/workshop/visitors/
+                      ART LEFT BY VISITORS (the portfolio by the bench)
+                      .png .jpg .jpeg .webp .gif .svg. One file = one piece.
+                      Visitors press "leave some art", then paint something or
+                      upload a picture (under 1 MB). It comes to the same inbox
+                      as the bottles, attached and already named, e.g.
+                        2026-09-24-a-little-boat-by-anna.png
+                      Like it? Save the attachment in here and publish. The title
+                      and the name are read from the file name (the part after
+                      "-by-" is who made it). Don't? Delete the email.
+                      One piece per visitor every 10 minutes.
 
   content/living/     MUSIC (the record player)
                       .mp3 (or .ogg). One file = one record in the crate.

@@ -39,6 +39,19 @@ THE SKY (every page)                                     canvas to draw on
                              you, so keep the middle fairly plain.
     assets/sky/plank-here    the sign for the page you're on (optional) 464 x 88
 
+THE CONSTELLATIONS (every page, at night). Each is a link to another website
+or an easter egg; set them in CONSTELLATIONS near the top of sky/sky.js.
+    assets/sky/constellation-<id>   its star picture, e.g.        600 x 360 (the same
+                                    constellation-harp.png         shape as 150 x 90)
+      transparent, stars light on dark; the name is written under it for you.
+      The ids now: pleroma, wish, lantern, harp, kite, whale, key.
+
+THE PLACE TABS (on the right edge of every page but the homepage)
+    assets/ui/place-sea        a little picture of each place: a ship,       square,
+    assets/ui/place-workshop   a paintbrush, a telescope, a record player    192 x 192
+    assets/ui/place-city       (a new place gets a door until it has one:
+    assets/ui/place-living      assets/ui/place-<its id>)
+
 THINGS THAT FLY PAST (while you're looking at the sky: out of a window, up
 through the telescope). they cross left to right, so draw them FACING RIGHT.
     assets/sky/blimp          a steampunk airship, by day (+ blimp-glow: its    920 x 460
@@ -71,6 +84,10 @@ THE CONTROL PANEL (top right, every page: music, weather, the noise machine)
     assets/ui/effects         (the sound effects' volume)
     (a new layer added later gets assets/ui/<its id> the same way)
 
+OTHER BUTTONS                                                              96 x 96
+    assets/ui/letters         "letters", top left of the homepage
+    assets/ui/leave-art       "leave some art", in the workshop
+
 WEATHER (see the settings at the top of sky/weather.js)
     assets/sky/storm-cloud    the heavy grey clouds of rain and storms       800 x 360
     The fair-weather white clouds (assets/sky/cloud*) follow the weather: they
@@ -100,6 +117,13 @@ SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
                                  does for all three: it's played higher for a
                                  bottle, a little lower for the traveller, and
                                  lowest and slowest for the ship.
+    assets/sounds/surface        the traveller bobbing back up out of the water
+    assets/sounds/climb-out      the traveller hauling out onto the dock or deck, dripping
+    assets/sounds/land           feet landing on wooden boards (softer for a hop aboard)
+    assets/sounds/twinkle        a constellation that's still a placeholder, clicked
+    assets/sounds/wish           the shooting star from "make a wish"
+    assets/sounds/brush          a brush dab in the workshop's painting desk
+    assets/sounds/portfolio      a painting slipped into the visitors' portfolio
 
 THE NOISE MACHINE (in the living space)
     assets/living/noise-machine      the machine, about 3:2
@@ -192,6 +216,10 @@ workshop                          living space
        drawn one is: 17%-83% across,    assets/living/turntable-playing
        6%-56% down; the painting          (shown while music plays; a GIF
        is laid on that spot)              can spin the record; with your own
+    assets/workshop/portfolio
+      (the visitors' portfolio by the
+       bench, about 5:4; its count
+       badge sits on the top right)
                                           turntable, the record sits on its
                                           platter at 40% across, 53% down,
                                           54% wide: move it with --platter-x,

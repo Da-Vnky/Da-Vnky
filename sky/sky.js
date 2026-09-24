@@ -32,15 +32,35 @@
     // previewing on your own computer (tools/preview): home stays on your computer too
     if (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)$/.test(location.hostname)) HOME = 'index.html';
 
-    // every place on the site. each one gets a wooden sign on the signpost
-    // (right side of the screen) and a constellation in the night sky.
-    // to add a place: add a line here, in the order you want the signs.
-    // the first four also get constellations.
+    // every place on the site. on the homepage each gets a wooden sign on the
+    // signpost (right side, on the dock); on every other page it's a tab on the
+    // right edge with a little picture of the place (slot: assets/ui/place-<id>;
+    // a new place without one gets a plain door).
+    // to add a place: add a line here, in the order you want them.
     var PLACES = [
         { id: 'sea',      name: 'the sea',          href: HOME },
         { id: 'workshop', name: 'the workshop',     href: 'workshop.html' },
         { id: 'city',     name: 'the city',         href: 'city.html' },
         { id: 'living',   name: 'the living space', href: 'living.html' }
+    ];
+
+    // the constellations: they come out at night, on every page. each one is a link
+    // to somewhere else on the web, or an easter egg (a little surprise, see EGGS
+    // further down). neither yet? it's a placeholder that just twinkles.
+    //   id     its drawing's slot: assets/sky/constellation-<id> (a transparent PNG or
+    //          SVG, 150 x 80 or the same shape; the stars glow, the rest see-through)
+    //   name   shown under it
+    //   href   a web address (opens in a new tab)      egg   an easter egg's name
+    //   shape  which of the drawn star patterns it uses until you add your own (1–7)
+    // up to seven show at once (in the positions l1…l7 in sky/sky.css).
+    var CONSTELLATIONS = [
+        { id: 'pleroma', name: 'pleroma.nexus',  href: 'https://pleroma.nexus', shape: 1 },
+        { id: 'wish',    name: 'make a wish',    egg: 'shooting-star',          shape: 2 },
+        { id: 'lantern', name: 'the lantern',    egg: 'lantern',                shape: 3 },
+        { id: 'harp',    name: 'the harp',       href: '',                      shape: 4 },
+        { id: 'kite',    name: 'the kite',       href: '',                      shape: 5 },
+        { id: 'whale',   name: 'the whale',      egg: 'whale',                  shape: 6 },
+        { id: 'key',     name: 'the key',        egg: 'key',                    shape: 7 }
     ];
 
     // your Forgejo repo's API address. if Mel's Forgejo allows it, the site asks it
@@ -227,27 +247,75 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    /* ---------------- the night-sky links ---------------- */
+    /* ---------------- the constellations: links and easter eggs in the night sky ---------------- */
     var SHAPES = [
         '<polyline class="ln" points="10,30 40,55 70,30 100,58 135,22"/><g class="st"><circle cx="10" cy="30" r="2.4"/><circle cx="40" cy="55" r="2"/><circle cx="70" cy="30" r="2.8"/><circle cx="100" cy="58" r="2.2"/><circle cx="135" cy="22" r="2.6"/></g>',
         '<path class="ln" d="M75 8 L55 38 L95 38 Z M55 38 L62 70 L90 68 L95 38"/><g class="st"><circle cx="75" cy="8" r="3.2"/><circle cx="55" cy="38" r="2"/><circle cx="95" cy="38" r="2.2"/><circle cx="62" cy="70" r="2"/><circle cx="90" cy="68" r="2.4"/></g>',
         '<path class="ln" d="M45 8 L58 40 L78 45 L98 50 L110 12 M58 40 L50 76 M98 50 L106 78"/><g class="st"><circle cx="45" cy="8" r="3"/><circle cx="110" cy="12" r="2.6"/><circle cx="58" cy="40" r="2"/><circle cx="78" cy="45" r="2"/><circle cx="98" cy="50" r="2"/><circle cx="50" cy="76" r="2.4"/><circle cx="106" cy="78" r="2.8"/></g>',
-        '<path class="ln" d="M12 62 L50 46 L90 32 L134 16 M90 32 L80 12 M90 32 L102 50"/><g class="st"><circle cx="12" cy="62" r="2"/><circle cx="50" cy="46" r="2.2"/><circle cx="90" cy="32" r="2.8"/><circle cx="134" cy="16" r="2.4"/><circle cx="80" cy="12" r="1.8"/><circle cx="102" cy="50" r="1.8"/></g>'
+        '<path class="ln" d="M12 62 L50 46 L90 32 L134 16 M90 32 L80 12 M90 32 L102 50"/><g class="st"><circle cx="12" cy="62" r="2"/><circle cx="50" cy="46" r="2.2"/><circle cx="90" cy="32" r="2.8"/><circle cx="134" cy="16" r="2.4"/><circle cx="80" cy="12" r="1.8"/><circle cx="102" cy="50" r="1.8"/></g>',
+        '<path class="ln" d="M75 6 L108 38 L75 70 L42 38 Z M75 70 Q70 78 80 84"/><g class="st"><circle cx="75" cy="6" r="2.8"/><circle cx="108" cy="38" r="2.2"/><circle cx="75" cy="70" r="2.4"/><circle cx="42" cy="38" r="2"/><circle cx="80" cy="84" r="1.6"/></g>',
+        '<path class="ln" d="M14 44 Q40 22 72 30 Q104 36 120 52 L138 38 M120 52 L136 64 M40 34 L36 22"/><g class="st"><circle cx="14" cy="44" r="2.6"/><circle cx="72" cy="30" r="2.2"/><circle cx="120" cy="52" r="2.8"/><circle cx="138" cy="38" r="1.8"/><circle cx="136" cy="64" r="1.8"/><circle cx="36" cy="22" r="1.6"/></g>',
+        '<path class="ln" d="M22 40 m-12 0 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 M34 40 L128 40 M110 40 L110 54 M124 40 L124 50"/><g class="st"><circle cx="10" cy="40" r="2"/><circle cx="34" cy="40" r="2.6"/><circle cx="80" cy="40" r="2.2"/><circle cx="128" cy="40" r="2.4"/><circle cx="110" cy="54" r="1.8"/><circle cx="124" cy="50" r="1.8"/></g>'
     ];
     var here = body.dataset.place || (isHome ? PLACES[0].id : '');
     var nav = document.createElement('nav');
     nav.className = 'sky-links';
-    nav.setAttribute('aria-label', 'places, among the stars');
-    PLACES.slice(0, 4).forEach(function (pl, i) {
+    nav.setAttribute('aria-label', 'constellations');
+    CONSTELLATIONS.slice(0, 7).forEach(function (c, i) {
         var a = document.createElement('a');
-        a.className = 'sky-link l' + (i + 1);
-        a.href = pl.href;
-        a.dataset.place = pl.id;
-        a.innerHTML = '<svg viewBox="0 0 150 80" aria-hidden="true">' + SHAPES[i] + '</svg><span></span>';
-        a.querySelector('span').textContent = pl.name;
+        a.className = 'sky-link l' + (i + 1) + (c.href || c.egg ? '' : ' unwritten');
+        a.dataset.star = c.id;
+        if (c.href) { a.href = c.href; a.target = '_blank'; a.rel = 'noopener'; }
+        else { a.href = '#'; a.setAttribute('role', 'button'); }
+        var shape = SHAPES[((c.shape || i + 1) - 1) % SHAPES.length];
+        a.innerHTML = '<span class="sl-art" data-asset="assets/sky/constellation-' + c.id + '"><svg class="placeholder" viewBox="0 0 150 90" aria-hidden="true">' + shape + '</svg></span>' +
+            '<span class="sl-name"></span>' + (c.href ? '' : '<span class="sl-note">' + (c.egg ? 'a secret…' : 'a link waits here') + '</span>');
+        a.querySelector('.sl-name').textContent = c.name;
+        if (c.href) a.title = c.href.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        a.addEventListener('click', function (e) {
+            if (c.href) return;                                   // off it goes, in a new tab
+            e.preventDefault();
+            if (c.egg && EGGS[c.egg]) { EGGS[c.egg](a, c); return; }
+            twinkle(a, c.egg ? 'not yet… something will happen here someday' : 'a link will go here someday');
+        });
         nav.appendChild(a);
     });
     body.appendChild(nav);
+
+    // a placeholder's answer: its stars flare, a soft chime, and a whisper under it
+    function twinkle(a, msg) {
+        a.classList.remove('flare'); void a.offsetWidth; a.classList.add('flare');
+        var note = a.querySelector('.sl-note');
+        if (note && msg) note.textContent = msg;
+        if (window.Sky && Sky.sounds) Sky.sounds.sfx('twinkle');
+        clearTimeout(a._tw);
+        a._tw = setTimeout(function () { a.classList.remove('flare'); }, 2400);
+    }
+
+    /* ---------------- easter eggs ----------------
+       a constellation with egg: 'name' runs EGGS[name](the constellation, its settings)
+       when clicked. write your own here, or from any page's script:
+           Sky.egg('lantern', function (star) { … });
+       until one exists, clicking just twinkles. */
+    var EGGS = {
+        // a shooting star streaks away from the constellation: make a wish
+        'shooting-star': function (a) {
+            twinkle(a, 'make a wish…');
+            var r = a.getBoundingClientRect(), el = document.createElement('div');
+            el.className = 'egg-star';
+            el.innerHTML = FLYER_ART['shooting-star'] || '';
+            el.style.left = (r.left + r.width / 2 - 150) + 'px';
+            el.style.top = (r.top + r.height * 0.3) + 'px';
+            body.appendChild(el);
+            var dx = (r.left > window.innerWidth / 2 ? -1 : 1) * window.innerWidth * 0.45;
+            el.animate([
+                { transform: 'translate(0,0) scaleX(' + (dx < 0 ? -1 : 1) + ')', opacity: 0 },
+                { opacity: 1, offset: 0.12 },
+                { transform: 'translate(' + dx + 'px,' + (Math.abs(dx) * 0.3) + 'px) scaleX(' + (dx < 0 ? -1 : 1) + ')', opacity: 0 }
+            ], { duration: 1500, easing: 'cubic-bezier(.3,.1,.7,1)' }).onfinish = function () { el.remove(); };
+            if (window.Sky && Sky.sounds) Sky.sounds.sfx('wish');
+        }
+    };
 
     /* ---------------- the signpost: wooden arrow planks on the right ---------------- */
     var sign = document.createElement('nav');
@@ -270,8 +338,8 @@
         el.firstChild.textContent = pl.name;
         sign.appendChild(el);
     });
-    // the signpost stands on the homepage's dock; everywhere else you find your way
-    // by the constellations (and Polaris, always, takes you home)
+    // the signpost stands on the homepage's dock; everywhere else there are tabs (below)
+    // (and Polaris, always, takes you home)
     if (isHome) body.appendChild(sign);
     // slots: assets/sky/plank (every sign) and assets/sky/plank-here (the one you're standing at)
     sign.dataset.slot = 'assets/sky/plank assets/sky/plank-here';
@@ -281,6 +349,51 @@
         sign.style.setProperty('--plank-art', 'url("' + new URL(url, location.href).href + '")');
         findAsset('assets/sky/plank-here', function (u2) { if (u2) sign.style.setProperty('--plank-here-art', 'url("' + new URL(u2, location.href).href + '")'); });
     });
+
+    /* ---------------- away from the homepage: index tabs on the right edge ----------------
+       like the tabs on a notebook's edge, one per place, each with a little picture of
+       it (slots: assets/ui/place-sea, place-workshop, place-city, place-living … a
+       transparent PNG or SVG, square). hover (or tap) and the tab slides out with its name. */
+    var PLACE_ICONS = {
+        // a little ship on the waves
+        sea: '<path d="M8 34 Q14 30 20 34 T32 34 T44 34" fill="none" stroke="#36526a" stroke-width="2.4" stroke-linecap="round"/>' +
+            '<path d="M11 27 H37 L33 32 H15 Z" fill="#6e4a30"/><path d="M24 8 V27" stroke="#3a2716" stroke-width="2"/>' +
+            '<path d="M25.5 10 Q34 17 33 25 H25.5 Z" fill="#f6ecd2" stroke="#3a2716" stroke-width="1.3"/><path d="M22.5 13 Q16 19 17 25 H22.5 Z" fill="#f6ecd2" stroke="#3a2716" stroke-width="1.3"/>' +
+            '<path d="M24 8 L30 10 L24 12" fill="#9a3b1f"/>',
+        // a paintbrush, red-chalk tip
+        workshop: '<path d="M36 7 L41 12 L22 31 L17 26 Z" fill="#6e4a30" stroke="#3a2716" stroke-width="1.2" stroke-linejoin="round"/>' +
+            '<path d="M17 26 L22 31 L19.5 33.5 L14.5 28.5 Z" fill="#c49a52" stroke="#3a2716" stroke-width="1.2" stroke-linejoin="round"/>' +
+            '<path d="M14.5 28.5 L19.5 33.5 C17 38 12 41 7 41 C7 36 10 31 14.5 28.5 Z" fill="#9a3b1f" stroke="#3a2716" stroke-width="1.2" stroke-linejoin="round"/>' +
+            '<path d="M37 9 L39.5 11.5" stroke="#f3e6c2" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>',
+        // a telescope on its tripod
+        city: '<path d="M8 22 L36 10 L39 17 L11 29 Z" fill="#c49a52" stroke="#3a2716" stroke-width="1.3" stroke-linejoin="round"/>' +
+            '<path d="M36 10 L41 8 L44 15 L39 17 Z" fill="#6e4a30" stroke="#3a2716" stroke-width="1.3" stroke-linejoin="round"/>' +
+            '<path d="M6 23 L9 29" stroke="#3a2716" stroke-width="2.4" stroke-linecap="round"/>' +
+            '<path d="M24 21 L16 42 M24 21 L32 42 M24 21 L24 42" stroke="#3a2716" stroke-width="1.8" stroke-linecap="round"/>' +
+            '<circle cx="24" cy="21" r="2.2" fill="#3a2716"/>',
+        // a record player
+        living: '<rect x="6" y="14" width="36" height="24" rx="3" fill="#6e4a30" stroke="#3a2716" stroke-width="1.3"/>' +
+            '<circle cx="21" cy="26" r="9.5" fill="#2a1d14"/><circle cx="21" cy="26" r="6.5" fill="none" stroke="#5a4535" stroke-width=".7"/>' +
+            '<circle cx="21" cy="26" r="2.6" fill="#9a3b1f"/><circle cx="36.5" cy="18.5" r="2" fill="#c49a52"/>' +
+            '<path d="M36.5 18.5 L35 30 L29 33" fill="none" stroke="#c49a52" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+        // any new place: a door
+        door: '<path d="M14 42 V20 a10 10 0 0 1 20 0 V42 Z" fill="#6e4a30" stroke="#3a2716" stroke-width="1.3"/>' +
+            '<path d="M24 12 V42" stroke="#3a2716" stroke-width="1" opacity=".5"/><circle cx="29" cy="30" r="1.6" fill="#c49a52"/><path d="M10 42 H38" stroke="#3a2716" stroke-width="1.6" stroke-linecap="round"/>'
+    };
+    var tabs = document.createElement('nav');
+    tabs.className = 'place-tabs';
+    tabs.setAttribute('aria-label', 'places');
+    PLACES.forEach(function (pl) {
+        var el = document.createElement(pl.id === here ? 'span' : 'a');
+        el.className = 'place-tab' + (pl.id === here ? ' here' : '');
+        el.dataset.place = pl.id;
+        if (pl.id === here) el.setAttribute('aria-current', 'page'); else el.href = pl.href;
+        el.innerHTML = '<span class="pt-pic" data-asset="assets/ui/place-' + pl.id + '"><svg class="placeholder" viewBox="0 0 48 48" aria-hidden="true">' +
+            (PLACE_ICONS[pl.id] || PLACE_ICONS.door) + '</svg></span><span class="pt-name"></span>';
+        el.querySelector('.pt-name').textContent = pl.name + (pl.id === here ? ' · you are here' : '');
+        tabs.appendChild(el);
+    });
+    if (!isHome) body.appendChild(tabs);
 
     // on narrow screens the signpost tucks mostly off the edge; a tap pulls it out
     var compact = window.matchMedia('(max-width: 1100px)');
@@ -313,7 +426,7 @@
         leave(a.href);
     }
     sign.addEventListener('click', onPlaceClick);
-    nav.addEventListener('click', onPlaceClick);
+    tabs.addEventListener('click', onPlaceClick);
     window.addEventListener('pageshow', function (e) {         // coming back with the browser's back button
         if (e.persisted) { leaving = false; sign.classList.remove('open'); body.classList.remove('leaving'); }
     });
@@ -1285,6 +1398,9 @@
         setupCharacters: setupCharacters,
         figure: FIGURE,
         places: PLACES,
+        constellations: CONSTELLATIONS,
+        egg: function (name, fn) { EGGS[name] = fn; },
+        twinkle: twinkle,
         here: here,
         get progress() { return shown; },
         refresh: kick,

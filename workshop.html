@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css">
+    <link rel="stylesheet" href="sky/sky.css?v=20260924b">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -28,6 +28,7 @@
         .lantern .glow { opacity: calc(.25 + .75 * var(--dusk)); }
         .easel   { left: 13%; bottom: 1vh; height: 56vh; aspect-ratio: 62 / 100; z-index: 3; filter: drop-shadow(0 6px 8px rgba(0,0,0,.4)); }
         .easel > .art { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .portfolio { left: 70%; bottom: 0; height: 21vh; aspect-ratio: 125 / 100; z-index: 3; }
 
         .pinned {
             left: 8%;
@@ -68,6 +69,7 @@
             .groove.metronome { display: none; }
             .room .character { left: 64% !important; height: 20vh !important; }
             .easel { left: 8%; height: 38vh; }
+            .portfolio { left: auto; right: 4%; height: 11vh; }
         }
     </style>
 </head>
@@ -95,7 +97,7 @@
 
         <div class="furnish pinned">
             <h1>the workshop</h1>
-            <p>paintings on the easel. look out the window to let the day go by.</p>
+            <p>paintings on the easel, and art left by visitors in the portfolio. leave some of your own.</p>
         </div>
 
         <!-- hanging lantern: glows brighter as evening comes -->
@@ -158,6 +160,28 @@
             </svg>
         </div>
 
+        <!-- the visitors' portfolio: art people leave with "leave some art" and you keep
+             (save it into content/workshop/visitors/). your own: assets/workshop/portfolio -->
+        <div class="furnish portfolio" data-visitors="content/workshop/visitors/" data-asset="assets/workshop/portfolio">
+            <svg class="placeholder" viewBox="0 0 125 100" aria-hidden="true">
+                <g transform="rotate(-4 62 60)">
+                    <rect x="22" y="6" width="62" height="40" fill="#efe3c6" transform="rotate(-9 53 26)"/>
+                    <path d="M30 22 q10 -10 20 -2 t22 -4" fill="none" stroke="#36526a" stroke-width="2.4" stroke-linecap="round" transform="rotate(-9 53 26)"/>
+                    <rect x="44" y="4" width="56" height="40" fill="#f6ecd4" transform="rotate(7 72 24)"/>
+                    <circle cx="62" cy="20" r="7" fill="#e8b33c" transform="rotate(7 72 24)"/>
+                    <path d="M52 34 L66 24 L78 32 L90 22" fill="none" stroke="#6f8f4e" stroke-width="2.4" transform="rotate(7 72 24)"/>
+                    <rect x="10" y="28" width="106" height="70" rx="4" fill="#5a3a24"/>
+                    <rect x="10" y="28" width="106" height="9" rx="3" fill="#6e4a30"/>
+                    <path d="M14 42 H112" stroke="#3b2618" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>
+                    <path d="M14 93 H112" stroke="#3b2618" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>
+                    <rect x="38" y="54" width="50" height="20" rx="2" fill="#eadcb9"/>
+                    <text x="63" y="68" text-anchor="middle" font-size="10" font-style="italic" font-family="Georgia, serif" fill="#3a2716">visitors</text>
+                    <path d="M63 37 V50 M63 78 V98" stroke="#9a3b1f" stroke-width="2"/>
+                    <path d="M63 78 q-8 8 -12 16 M63 78 q6 9 12 14" stroke="#9a3b1f" stroke-width="1.6" fill="none"/>
+                </g>
+            </svg>
+        </div>
+
         <!-- they dance when music's playing. your own: assets/workshop/manikin, assets/workshop/metronome -->
         <div class="furnish groove manikin" data-groove="manikin" data-asset="assets/workshop/manikin"></div>
         <div class="furnish groove metronome" data-groove="metronome" data-asset="assets/workshop/metronome"></div>
@@ -168,12 +192,13 @@
              style="left: 36%; bottom: 3vh; height: 27vh;"></div>
     </div>
 
-    <script src="sky/sky.js"></script>
-    <script src="sky/ground-countryside.js"></script>
-    <script src="sky/gallery.js"></script>
-    <script src="sky/panel.js"></script>
-    <script src="sky/music.js"></script>
-    <script src="sky/weather.js"></script>
-    <script src="sky/noise.js"></script>
+    <script src="sky/sky.js?v=20260924b"></script>
+    <script src="sky/ground-countryside.js?v=20260924b"></script>
+    <script src="sky/gallery.js?v=20260924b"></script>
+    <script src="sky/studio.js?v=20260924b"></script>
+    <script src="sky/panel.js?v=20260924b"></script>
+    <script src="sky/music.js?v=20260924b"></script>
+    <script src="sky/weather.js?v=20260924b"></script>
+    <script src="sky/noise.js?v=20260924b"></script>
 </body>
 </html>

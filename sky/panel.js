@@ -218,7 +218,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {
@@ -263,6 +263,38 @@
             f.frequency.exponentialRampToValueAtTime(1900, t + 0.25);
             f.frequency.exponentialRampToValueAtTime(600, t + 0.7);
         },
+        'surface': function (out, t) {                                 // bobbing up: a soft slosh, a gasp of air, a few drips
+            var f = noiseHit(out, t, 0.5, 'lowpass', 700, 0.6, 0.28, 0.12);
+            f.frequency.setValueAtTime(350, t); f.frequency.linearRampToValueAtTime(900, t + 0.25); f.frequency.linearRampToValueAtTime(400, t + 0.6);
+            tone(out, t + 0.05, 'sine', 260, 520, 0.12, 0.12);         // the bubble breaking the surface
+            noiseHit(out, t + 0.32, 0.18, 'bandpass', 1600, 1.5, 0.1, 0.06);   // the breath
+            drips(out, t + 0.45, 3, 0.7);
+        },
+        'climb-out': function (out, t) {                               // hauling out: water pouring off, then dripping onto the boards
+            var f = noiseHit(out, t, 0.7, 'lowpass', 2200, 0.4, 0.3, 0.05);
+            f.frequency.exponentialRampToValueAtTime(500, t + 0.7);
+            knock(out, t + 0.55, 0.8);
+            drips(out, t + 0.7, 6, 1.4);
+        },
+        'land': function (out, t, size) {                              // feet on wooden boards: a hollow thump
+            knock(out, t, size === undefined ? 1 : size);
+        },
+        'twinkle': function (out, t) {                                 // a star's soft chime
+            [1568, 2093, 2637].forEach(function (f, i) { tone(out, t + i * 0.09, 'sine', f, f * 0.998, 0.9, 0.12); });
+        },
+        'wish': function (out, t) {                                    // a shooting star: a rising sparkle
+            for (var i = 0; i < 9; i++) tone(out, t + i * 0.06, 'sine', 1200 + i * 190, 1200 + i * 190, 0.5, 0.07);
+            var f = noiseHit(out, t, 1.1, 'highpass', 5000, 0, 0.06, 0.2);
+            f.frequency.setValueAtTime(3000, t); f.frequency.exponentialRampToValueAtTime(9000, t + 1);
+        },
+        'portfolio': function (out, t) {                               // a sheet slipped into the portfolio: a papery slide, a soft flap
+            rustle(out, t, 0.35, 1400);
+            knock(out, t + 0.36, 0.3);
+        },
+        'brush': function (out, t) {                                   // a brush dabbed in paint
+            var f = noiseHit(out, t, 0.18, 'bandpass', 1200, 0.9, 0.12, 0.03);
+            f.frequency.exponentialRampToValueAtTime(700, t + 0.18);
+        },
         'splash': function (out, t, size) {                           // a plop and a spray: bigger = deeper and longer
             size = Math.max(0, Math.min(1, size === undefined ? 0.5 : size));
             var deep = 1 - size;
@@ -275,6 +307,17 @@
             }
         }
     };
+    function knock(out, t, loud) {                                  // a hollow knock on wood
+        tone(out, t, 'sine', 150, 80, 0.16, 0.7 * loud);
+        tone(out, t, 'triangle', 330, 210, 0.07, 0.25 * loud);
+        noiseHit(out, t, 0.06, 'bandpass', 1100, 1.2, 0.35 * loud);
+    }
+    function drips(out, t, n, over) {                                // water drops falling one by one
+        for (var i = 0; i < n; i++) {
+            var d = t + Math.random() * over;
+            tone(out, d, 'sine', 1300 + Math.random() * 900, 700 + Math.random() * 300, 0.035, 0.06 + 0.06 * Math.random());
+        }
+    }
     function rustle(out, t, len, band) {                              // paper: a crackly bandpassed hiss, in little bursts
         var n = ctx.createBufferSource(); n.buffer = noiseBuf('white', 3);
         var f = filter('bandpass', band, 0.8), f2 = filter('highpass', 900), g = gain(0);

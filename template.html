@@ -16,8 +16,8 @@
     <!-- when you copy this page, change the title and the two addresses above to the new file's name -->
 
     <!-- 1. the sky (every page). add paper.css if you want the paper letters. -->
-    <link rel="stylesheet" href="sky/sky.css">
-    <link rel="stylesheet" href="sky/paper.css">
+    <link rel="stylesheet" href="sky/sky.css?v=20260924b">
+    <link rel="stylesheet" href="sky/paper.css?v=20260924b">
 </head>
 
 <!-- =========================================================================
@@ -28,9 +28,10 @@
          from day to midnight as you scroll, like the homepage)
        - sun, moon, clouds, stars, Ursa Minor
        - Polaris at top centre, always visible, always links home
-       - the night-sky constellations, which take you to the other places
-         (edit them once, at the top of sky/sky.js). the wooden signpost is
-         only on the homepage.
+       - the night-sky constellations: links to other sites and easter eggs
+         (edit them once, at the top of sky/sky.js)
+       - tabs on the right edge to every place (the wooden signpost is
+         only on the homepage)
 
      Pick ONE ground at the bottom of the page:
        sky/ground-sea.js           waves, the ship (and the bottle, on the homepage)
@@ -40,7 +41,7 @@
      Options on <body>:
        data-place="…"      which place this page is (see PLACES at the top of
                            sky/sky.js). add your new page to PLACES to give it
-                           a sign on the homepage and a constellation.
+                           a sign on the homepage and a tab everywhere else.
        data-time="0"       the hour the page stays at: 0 midday, .5 sunset, 1 midnight
        data-scroll-time    turn the day by scrolling instead (as this starter does)
        data-voyage="110"   with data-scroll-time: how much empty sky to scroll after
@@ -48,7 +49,7 @@
        data-page="home"    only on the homepage
 
        sky/ground-view.js          YOUR picture as the ground:
-                                   <script src="sky/ground-view.js" data-view="assets/…/view"></script>
+                                   <script src="sky/ground-view.js?v=20260924b" data-view="assets/…/view"></script>
 
      Want an interior instead (workshop, living space)? see workshop.html:
      a .room with a .window you can look through and step out of.
@@ -87,13 +88,13 @@
     </section>
 
     <!-- 2. the sky, 3. one ground, 4. letters (only if you use them) -->
-    <script src="sky/sky.js"></script>
-    <script src="sky/ground-city.js"></script>
-    <script src="sky/letters.js"></script>
+    <script src="sky/sky.js?v=20260924b"></script>
+    <script src="sky/ground-city.js?v=20260924b"></script>
+    <script src="sky/letters.js?v=20260924b"></script>
     <!-- the control panel (top right) and its layers: music, weather, the noise machine. every page. -->
-    <script src="sky/panel.js"></script>
-    <script src="sky/music.js"></script>
-    <script src="sky/weather.js"></script>
-    <script src="sky/noise.js"></script>
+    <script src="sky/panel.js?v=20260924b"></script>
+    <script src="sky/music.js?v=20260924b"></script>
+    <script src="sky/weather.js?v=20260924b"></script>
+    <script src="sky/noise.js?v=20260924b"></script>
 </body>
 </html>

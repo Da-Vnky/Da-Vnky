@@ -160,7 +160,9 @@
         '.lv-title { text-align: center; margin: 0 0 34px; font: normal 1.8rem "IM Fell English SC", Georgia, serif; color: #f3e6c2; text-shadow: 0 2px 6px rgba(0,0,0,.6); }' +
         'body.letter-reading .signpost, body.letter-reading .post-btn, body.letter-reading .cp { opacity: 0; pointer-events: none; transition: opacity .3s; }' +
         '.flying-scroll { z-index: 9 !important; }' +
-        '.letters[hidden] { display: none; }'
+        '.letters[hidden] { display: none; }' +
+        '.letters-btn { left: 18px; top: 18px; bottom: auto; }' +
+        'body.letter-reading .letters-btn, body.post-open .letters-btn, body.sky-view .letters-btn { opacity: 0; visibility: hidden; pointer-events: none; }'
     );
     section.hidden = true;
 
@@ -198,6 +200,21 @@
     }
     function closeAll() { lv.classList.remove('open'); document.body.classList.remove('letter-reading'); }
     board.addEventListener('click', openAll);
+
+    // and a button in the corner, so the letters are one click away wherever you are on the voyage
+    // (icon slot: assets/ui/letters)
+    var lbtn = document.createElement('button');
+    lbtn.type = 'button';
+    lbtn.className = 'ui-button letters-btn';
+    lbtn.innerHTML = '<span class="ui-icon" data-asset="assets/ui/letters"><svg class="placeholder" viewBox="0 0 32 32" aria-hidden="true">' +
+        '<rect x="5" y="9" width="20" height="15" rx="1.5" fill="#efe3c6" transform="rotate(-8 15 16)"/>' +
+        '<rect x="7" y="8" width="20" height="15" rx="1.5" fill="#f6ecd4" stroke="#6e5236" stroke-width=".8"/>' +
+        '<path d="M10 12.5 H24 M10 15.5 H24 M10 18.5 H19" stroke="#6e5236" stroke-width="1" stroke-linecap="round"/>' +
+        '<circle cx="24" cy="21" r="2.4" fill="#9a3b1f"/></svg></span><span class="lb-label"></span>';
+    document.body.appendChild(lbtn);
+    function labelBtn() { lbtn.querySelector('.lb-label').textContent = 'letters (' + shown.length + ')'; }
+    labelBtn();
+    lbtn.addEventListener('click', openAll);
     board.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAll(); } });
     lv.querySelector('.lv-close').addEventListener('click', closeAll);
     lv.addEventListener('click', function (e) { if (e.target === lv || e.target === list) closeAll(); });
