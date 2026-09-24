@@ -1,6 +1,10 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
+01-where heaven and earth meet.jpg
 01-where heaven and earth meet.ogg
+02-Song on the Beach.jpg
 02-Song on the Beach.ogg
+03-Aerie.jpg
 03-Aerie.ogg
+04-Frame of Mind.jpg
 04-Frame of Mind.ogg
