@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>the post office · DaV-nky</title>
+<!-- the post office: part of the letters manager. open it with tools\letters.bat. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+    :root { --ink: #3a2716; --faded: #6e5236; --red: #9a3b1f; --card: #efe3c6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #2a1d14; color: #f3e6c2; font: 1.05rem/1.5 "IM Fell English", Georgia, serif; }
+    button, input { font: inherit; }
+    header { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 22px;
+        background: #3a2a1d; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+    header h1 { margin: 0 auto 0 0; font: normal 1.6rem "IM Fell English SC", Georgia, serif; }
+    header a { color: #f3e6c2; font-style: italic; }
+    .btn { padding: 8px 16px; border: 1px solid rgba(243,230,194,.35); border-radius: 999px; background: none; color: #f3e6c2; cursor: pointer; font-style: italic; }
+    .btn:hover { background: rgba(243,230,194,.1); }
+    .btn.main { background: var(--red); border-color: var(--red); }
+    .btn.main:hover { background: #b24a28; }
+    .status { width: 100%; margin: 0; font-style: italic; font-size: .92rem; color: rgba(243,230,194,.75); }
+    .status.bad { color: #f0b08a; }
+    main { max-width: 1200px; margin: 0 auto; padding: 18px 22px 60px; }
+    h2 { margin: 26px 0 4px; font: normal 1.35rem "IM Fell English SC", Georgia, serif; }
+    .sub { margin: 0 0 14px; font-style: italic; color: rgba(243,230,194,.65); font-size: .92rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+    .card { display: flex; flex-direction: column; background: var(--card); color: var(--ink); box-shadow: 0 8px 18px rgba(0,0,0,.4), inset 0 0 26px rgba(120,80,30,.2); }
+    .card .look { height: 220px; overflow: hidden; display: grid; place-items: center; background: rgba(110,82,54,.07); }
+    .card .look img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .card .look .words { align-self: start; width: 100%; height: 100%; padding: 14px 16px; overflow: hidden; white-space: pre-wrap; font-size: .95rem;
+        -webkit-mask-image: linear-gradient(#000 75%, transparent); mask-image: linear-gradient(#000 75%, transparent); }
+    .card .look .words b { display: block; font-weight: normal; font-size: 1.1rem; margin-bottom: 4px; }
+    .card .meta { padding: 8px 14px 4px; font-style: italic; color: var(--faded); font-size: .9rem; }
+    .card .meta b { color: var(--ink); font-weight: normal; }
+    .card .warn { margin: 0 14px 6px; font-size: .82rem; font-style: italic; color: var(--red); }
+    .card .acts { display: flex; gap: 6px; padding: 6px 12px 12px; margin-top: auto; }
+    .card .acts button { flex: 1; padding: 6px 10px; border-radius: 999px; cursor: pointer; font-style: italic; border: 1px solid rgba(110,82,54,.35); background: #f8f0dc; color: var(--ink); }
+    .card .acts button:hover { background: #fff8e6; }
+    .card .acts .yes { background: var(--ink); color: #f3e6c2; border-color: var(--ink); }
+    .card .acts .yes:hover { background: var(--red); }
+    .card .acts .no { color: var(--red); }
+    .card .acts button[aria-pressed=true] { background: var(--red); color: #f3e6c2; border-color: var(--red); }
+    .card .where { display: inline-block; margin-left: 4px; padding: 0 8px; border-radius: 999px; background: rgba(154,59,31,.12); color: var(--red); font-size: .82rem; }
+    .empty { font-style: italic; color: rgba(243,230,194,.55); }
+    .setup { max-width: 720px; padding: 16px 20px; border-radius: 12px; background: rgba(243,230,194,.08); }
+    .setup ol { margin: 6px 0 10px; padding-left: 1.3em; }
+    .setup code { background: rgba(243,230,194,.12); padding: 1px 6px; border-radius: 4px; font-size: .9rem; word-break: break-all; }
+    .setup input { width: min(420px, 100%); padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(243,230,194,.35); background: rgba(0,0,0,.25); color: #f3e6c2; }
+    [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+    <h1>the post office</h1>
+    <a href="letters.html">← your letters</a>
+    <button type="button" class="btn main fetch">check for new post</button>
+    <button type="button" class="btn publish">publish to the live site</button>
+    <p class="status"></p>
+</header>
+<main>
+    <section class="setup" hidden>
+        <h2 style="margin-top:0">one-time setup</h2>
+        <ol>
+            <li>Open this address in your browser, with the email your bottles arrive at in place of YOUR-EMAIL:<br>
+                <code>https://formsubmit.co/api/get-apikey/YOUR-EMAIL</code></li>
+            <li>FormSubmit emails you an API key (a long string of letters and numbers).</li>
+            <li>Paste it here. It stays on this computer only (in the .inbox folder, which is never published).</li>
+        </ol>
+        <input type="text" class="key" placeholder="your FormSubmit API key" autocomplete="off" spellcheck="false">
+        <button type="button" class="btn main save-key">save it</button>
+    </section>
+
+    <h2>just arrived</h2>
+    <p class="sub">new bottles and art from visitors. only you can see these; keep one and it goes on the site (after you publish).</p>
+    <div class="grid inbox"></div>
+
+    <h2>bottles on your site</h2>
+    <p class="sub">in the living space (content/living/bottles/): pin one to the board, put it on the pile of letters, or leave it in the crate for anyone to uncork. deleting one also takes it off the board and the pile.</p>
+    <div class="grid bottles"></div>
+
+    <h2>visitors' art on your site</h2>
+    <p class="sub">in the portfolio in the workshop (content/workshop/visitors/).</p>
+    <div class="grid art"></div>
+</main>
+
+<script>
+(function () {
+    var $ = function (s) { return document.querySelector(s); };
+    var statusEl = $('.status');
+    function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
+    function api(path, body) {
+        var opt = body === undefined ? {} : { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } };
+        return fetch(path, opt).then(function (r) { return r.json(); }, function () { return { error: 'the manager isn’t running. open it with tools\\letters.bat' }; });
+    }
+    function nice(d) {
+        if (!d) return '';
+        var p = d.split('-');
+        return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).toLowerCase();
+    }
+    function card(look, meta, warn, acts) {
+        var c = document.createElement('div');
+        c.className = 'card';
+        c.innerHTML = '<div class="look"></div><div class="meta"></div>' + (warn ? '<p class="warn"></p>' : '') + '<div class="acts"></div>';
+        c.querySelector('.look').appendChild(look);
+        c.querySelector('.meta').innerHTML = meta;
+        if (warn) c.querySelector('.warn').textContent = warn;
+        acts.forEach(function (a) {
+            var b = document.createElement('button');
+            b.type = 'button'; b.className = a[2] || ''; b.textContent = a[0];
+            b.addEventListener('click', a[1]);
+            c.querySelector('.acts').appendChild(b);
+        });
+        return c;
+    }
+    function picture(url) { var i = document.createElement('img'); i.src = url; i.loading = 'lazy'; return i; }
+    function words(title, text) {
+        var w = document.createElement('div');
+        w.className = 'words';
+        w.innerHTML = '<b></b><span></span>';
+        w.querySelector('b').textContent = title || '';
+        w.querySelector('span').textContent = text || '';
+        return w;
+    }
+    function esc(t) { var d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+
+    function draw(st) {
+        $('.setup').hidden = st.hasKey;
+        $('.fetch').hidden = !st.hasKey;
+        var inbox = $('.inbox'), bottles = $('.bottles'), art = $('.art');
+        inbox.innerHTML = bottles.innerHTML = art.innerHTML = '';
+
+        st.inbox.forEach(function (it) {
+            var look = it.picture ? picture('/__post/inbox/' + it.picture)
+                                  : words(it.kind === 'art' ? (it.title || 'untitled') : 'a message in a bottle', it.kind === 'art' ? '(a picture)' : it.text);
+            var meta = (it.kind === 'art' ? 'art: <b>' + esc(it.title || 'untitled') + '</b>' : 'a bottle') +
+                       (it.from ? ' from <b>' + esc(it.from) + '</b>' : '') + '<br>' + nice(it.date);
+            var warn = it.only_email ? (it.kind === 'art' ? 'the picture only came by email: save it from there into content/workshop/visitors/'
+                                                          : 'this one was a drawing or picture, which only came by email: save the .jpg from there into content/living/bottles/') : '';
+            var toss = function (msg) { return function () { api('/__post/toss', { id: it.id }).then(function (r) { if (r.error) say(r.error, true); else { say(msg); refresh(); } }); }; };
+            if (it.only_email) {
+                inbox.appendChild(card(look, meta, warn, [['done, I saved it', toss('marked as done.'), 'yes'], ['throw it back', toss('thrown back.'), 'no']]));
+                return;
+            }
+            inbox.appendChild(card(look, meta, warn, [
+                ['keep it', function () { api('/__post/keep', { id: it.id }).then(function (r) { if (r.error) say(r.error, true); else { say('kept: ' + r.name + '. publish when you’re ready.'); refresh(); } }); }, 'yes'],
+                ['throw it back', function () { api('/__post/toss', { id: it.id }).then(function (r) { if (r.error) say(r.error, true); else { say('thrown back.'); refresh(); } }); }, 'no']
+            ]));
+        });
+        if (!st.inbox.length) inbox.innerHTML = '<p class="empty">' + (st.hasKey ? 'nothing new. press “check for new post” to look.' : 'set up the key above, then check for new post.') + '</p>';
+
+        var pinned = (st.board && st.board.pinned) || [], pile = (st.board && st.board.pile) || [];
+        function whereIs(name) { return pinned.indexOf(name) !== -1 ? 'pinned' : pile.indexOf(name) !== -1 ? 'pile' : 'crate'; }
+        var LABEL = { pinned: 'pinned on the board', pile: 'on the pile', crate: 'in the crate' };
+        function place(name, where) {
+            api('/__post/place', { name: name, where: where }).then(function (r) {
+                if (r.error) say(r.error, true); else { say(name + ': ' + LABEL[where] + '. publish to show everyone.'); refresh(); }
+            });
+        }
+        function shelf(el, which, files, label) {
+            files.forEach(function (f) {
+                var look = /\.(txt|html)$/i.test(f.name) ? words('', '') : picture(f.url);
+                if (/\.(txt|html)$/i.test(f.name)) fetch(f.url, { cache: 'no-cache' }).then(function (r) { return r.text(); }).then(function (t) {
+                    var lines = t.replace(/\r/g, '').split('\n');
+                    look.querySelector('b').textContent = lines.shift();
+                    look.querySelector('span').textContent = lines.join('\n').trim();
+                });
+                var w = which === 'bottles' ? whereIs(f.name) : '';
+                var c = card(look, esc(f.name) + (f.date ? '<br>' + nice(f.date) : '') + (w ? '<br><span class="where">' + LABEL[w] + '</span>' : ''), '', [
+                    ['open', function () { window.open(f.url, '_blank'); }],
+                    ['delete', function () {
+                        if (!confirm('delete ' + f.name + '? it goes from your folder now, and from the live site when you next publish.')) return;
+                        api('/__post/delete', { which: which, name: f.name }).then(function (r) { if (r.error) say(r.error, true); else { say('deleted ' + f.name + '. publish to take it off the live site.'); refresh(); } });
+                    }, 'no']
+                ]);
+                if (which === 'bottles') {                     // where it sits in the living space: the board, the pile, or the crate
+                    var row = document.createElement('div');
+                    row.className = 'acts';
+                    [['pin', 'pinned'], ['pile', 'pile'], ['crate', 'crate']].forEach(function (p) {
+                        var b = document.createElement('button');
+                        b.type = 'button'; b.textContent = p[0];
+                        b.setAttribute('aria-pressed', String(w === p[1]));
+                        b.title = LABEL[p[1]];
+                        b.addEventListener('click', function () { if (w !== p[1]) place(f.name, p[1]); });
+                        row.appendChild(b);
+                    });
+                    c.insertBefore(row, c.querySelector('.acts'));
+                }
+                el.appendChild(c);
+            });
+            if (!files.length) el.innerHTML = '<p class="empty">none yet.</p>';
+        }
+        shelf(bottles, 'bottles', st.bottles);
+        shelf(art, 'art', st.art);
+    }
+    function refresh() { return api('/__post/state').then(function (st) { if (st.error) { say(st.error, true); return; } draw(st); }); }
+
+    $('.save-key').addEventListener('click', function () {
+        api('/__post/key', { key: $('.key').value }).then(function (r) {
+            if (r.error) { say(r.error, true); return; }
+            say('key saved. checking for post…');
+            refresh().then(check);
+        });
+    });
+    function check() {
+        say('checking for new post…');
+        api('/__post/fetch', {}).then(function (r) {
+            if (r.error) { say('couldn’t check: ' + r.error, true); return; }
+            say(r.new ? r.new + ' new ' + (r.new === 1 ? 'thing' : 'things') + ' arrived.' : 'nothing new since last time.');
+            refresh();
+        });
+    }
+    $('.fetch').addEventListener('click', check);
+    $('.publish').addEventListener('click', function () {
+        api('/__letters/publish', {}).then(function (r) { alert(r.error || 'the publish window is open: type a few words about what changed, then press Enter.'); });
+    });
+    refresh().then(function () { if (!$('.fetch').hidden) check(); });   // look for post as soon as it opens
+})();
+</script>
+</body>
+</html>

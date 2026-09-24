@@ -125,6 +125,13 @@ Nothing reaches the site by itself: every bottle comes to YOU first.
     Until BOTTLE_INBOX is filled in, the button still works and the bottle
     still gets thrown, but it tells the visitor the post office isn't open.
 
+  • THE EASY WAY: the post office in the letters manager (tools\letters.bat,
+      then "the post office"). It fetches new bottles and visitors' art straight
+      from FormSubmit (one-time setup: an API key, explained on the page), and
+      you keep or throw back each one. It also lists the bottles and art already
+      on the site, to delete any. Drawn or picture bottles may only come by
+      email (FormSubmit doesn't always pass pictures on); the page says so.
+
   • EACH BOTTLE THAT ARRIVES
       The email has the message, the name, and the note as a .jpg attached.
       Like it?  Save the .jpg into content/living/bottles/ and commit.
