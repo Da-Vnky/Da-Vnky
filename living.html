@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260924j">
+    <link rel="stylesheet" href="sky/sky.css?v=20260924k">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -78,7 +78,22 @@
         .pinned h1 { margin: 0 0 6px; font: normal 1.4rem "IM Fell English SC", Georgia, serif; }
         .pinned p  { margin: 0; font-style: italic; color: var(--ink-faded); }
 
+        /* ---------- the bathroom (through the arrow under the tabs; see sky/bathroom.js) ---------- */
+        .bath-mirror { left: 41%; top: 13%; width: 13%; aspect-ratio: 3 / 4; z-index: 3; }
+        .bath-sink   { left: 40.5%; bottom: 4vh; width: 14%; aspect-ratio: 140 / 200; }
+        .bath-tub    { left: 62%; bottom: 3vh; width: 31%; aspect-ratio: 300 / 140; }
+        .bath-towel  { left: 16%; top: 38%; width: 8%; aspect-ratio: 100 / 130; }
+        .bath-shelf  { left: 60%; top: 30%; width: 12%; aspect-ratio: 140 / 70; }
+        .bath-mat    { left: 36%; right: 42%; bottom: 2vh; height: 4vh; pointer-events: none; }
+        .bath-character { left: 28%; bottom: 3vh; height: 25vh; }
+
         @media (max-width: 620px) {
+            .bath-mirror { left: 34%; top: 20%; width: 32%; }
+            .bath-sink { left: 34%; width: 32%; }
+            .bath-tub { left: 62%; width: 40%; }
+            .bath-towel, .bath-shelf { display: none; }
+            .bath-mat { left: 28%; right: 30%; }
+            .bath-character { left: 6%; height: 14vh; }
             .room .window { left: 12% !important; width: 76% !important; top: 34% !important; height: 28% !important; }
             .shelf, .lamp, .gallery-frame { display: none; }
             .pinned { left: 50%; top: 11%; width: 220px; margin-left: -110px; }
@@ -223,15 +238,84 @@
              style="left: 34%; bottom: 3vh; height: 25vh;"></div>
     </div>
 
-    <script src="sky/sky.js?v=20260924j"></script>
+    <!-- the arrow under the tabs: the traveller walks off to the bathroom. your own: assets/living/arrow
+         (drawn pointing right; the one back is the same picture, flipped) -->
+    <a class="room-arrow to-bath" href="#bathroom" aria-label="go to the bathroom" data-asset="assets/living/arrow"></a>
+
+    <!-- the bathroom (sky/bathroom.js). everything in it is a slot in assets/living/:
+         bath-wall, bath-floor, bath-mirror, bath-sink, bath-tub, bath-towel, bath-shelf, bath-mat.
+         the traveller in here: assets/characters/bathroom (+ bathroom-walking).
+         the mirror, up close: your reflection is assets/characters/reflection, the frame around it
+         assets/living/mirror-close (a PNG with a see-through middle), the words are data-say below. -->
+    <div class="bathroom" aria-hidden="true" data-asset="assets/living/bath-wall">
+        <div class="room-floor" data-asset="assets/living/bath-floor"><div class="placeholder"></div></div>
+
+        <div class="furnish bath-mirror" data-asset="assets/living/bath-mirror" data-say="Despite everything, it's still you.">
+            <svg class="placeholder" viewBox="0 0 120 160" aria-hidden="true">
+                <defs><linearGradient id="bm-glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9e9ea"/><stop offset="1" stop-color="#86a6ad"/></linearGradient></defs>
+                <path d="M6 156 V60 A54 54 0 0 1 114 60 V156 Z" fill="#b8862e"/>
+                <path d="M6 156 V60 A54 54 0 0 1 114 60 V156 Z" fill="none" stroke="#7a5418" stroke-width="2"/>
+                <path d="M16 148 V62 A44 44 0 0 1 104 62 V148 Z" fill="url(#bm-glass)"/>
+                <path d="M30 60 L52 36 M30 78 L64 42" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+            </svg>
+        </div>
+
+        <svg class="furnish bath-shelf" data-asset="assets/living/bath-shelf" viewBox="0 0 140 70" aria-hidden="true">
+            <rect x="0" y="56" width="140" height="8" rx="2" fill="#6e4a30"/>
+            <path d="M14 64 L22 70 H30 L22 64 Z M110 64 L118 70 H126 L118 64 Z" fill="#5a3a24"/>
+            <rect x="14" y="30" width="16" height="26" rx="3" fill="#9a3b1f"/><rect x="18" y="24" width="8" height="7" fill="#e7d6ae"/>
+            <rect x="40" y="36" width="20" height="20" rx="3" fill="#dfe8e3"/><path d="M46 36 L42 14 M52 36 L56 16" stroke="#6ea0a8" stroke-width="3" stroke-linecap="round"/>
+            <ellipse cx="84" cy="52" rx="14" ry="5" fill="#e8c9a0"/>
+            <rect x="104" y="22" width="14" height="34" rx="6" fill="#86a6ad"/><rect x="108" y="16" width="6" height="7" fill="#3b2618"/>
+        </svg>
+
+        <svg class="furnish bath-towel" data-asset="assets/living/bath-towel" viewBox="0 0 100 130" aria-hidden="true">
+            <rect x="0" y="8" width="100" height="6" rx="3" fill="#c49a52"/><circle cx="4" cy="11" r="5" fill="#a07a3a"/><circle cx="96" cy="11" r="5" fill="#a07a3a"/>
+            <path d="M16 11 H84 V118 Q50 126 16 118 Z" fill="#e9dcc2"/>
+            <path d="M16 96 H84 M16 104 H84" stroke="#9a3b1f" stroke-width="4"/>
+            <path d="M16 11 H84 V26 H16 Z" fill="#d9c9aa"/>
+        </svg>
+
+        <svg class="furnish bath-mat" data-asset="assets/living/bath-mat" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M14 3 H286 L300 27 H0 Z" fill="#86a6ad"/>
+            <path d="M34 8 H266 L276 22 H24 Z" fill="none" stroke="#e9f0ee" stroke-width="2" opacity=".6" stroke-dasharray="6 4"/>
+        </svg>
+
+        <svg class="furnish bath-sink" data-asset="assets/living/bath-sink" viewBox="0 0 140 200" aria-hidden="true">
+            <path d="M58 26 V10 H84" stroke="#b9bdc2" stroke-width="6" fill="none" stroke-linecap="round"/>
+            <circle cx="46" cy="22" r="5" fill="#b9bdc2"/><circle cx="94" cy="22" r="5" fill="#b9bdc2"/>
+            <path d="M6 32 H134 Q132 74 70 78 Q8 74 6 32 Z" fill="#eef0ec"/>
+            <rect x="2" y="26" width="136" height="11" rx="5.5" fill="#fafbf8"/>
+            <path d="M54 76 L48 196 H92 L86 76 Z" fill="#e1e4e0"/>
+            <path d="M54 76 L48 196 H58 L62 76 Z" fill="#fff" opacity=".5"/>
+            <ellipse cx="70" cy="196" rx="30" ry="4" fill="#c9cdc8"/>
+        </svg>
+
+        <svg class="furnish bath-tub" data-asset="assets/living/bath-tub" viewBox="0 0 300 140" aria-hidden="true">
+            <path d="M268 26 V8 H248" stroke="#b9bdc2" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M12 32 H288 Q284 112 218 118 H82 Q16 112 12 32 Z" fill="#f2f3ef"/>
+            <path d="M12 32 H60 Q58 100 96 118 H82 Q16 112 12 32 Z" fill="#fff" opacity=".55"/>
+            <rect x="4" y="24" width="292" height="13" rx="6.5" fill="#fbfbf8"/>
+            <path d="M64 112 L52 138 H68 L76 114 Z M236 112 L248 138 H232 L224 114 Z" fill="#c49a52"/>
+        </svg>
+
+        <!-- the traveller, in here. your own: assets/characters/bathroom (+ bathroom-walking) -->
+        <div class="furnish character scene-character bath-character" data-asset="assets/characters/bathroom" aria-label="the traveller"></div>
+
+        <!-- back to the living space: the same arrow, flipped -->
+        <a class="room-arrow to-living" href="#living" aria-label="back to the living space" data-asset="assets/living/arrow"></a>
+    </div>
+
+    <script src="sky/sky.js?v=20260924k"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
-    <script src="sky/ground-view.js?v=20260924j" data-view="assets/living/view"></script>
-    <script src="sky/panel.js?v=20260924j"></script>
-    <script src="sky/music.js?v=20260924j"></script>
-    <script src="sky/weather.js?v=20260924j"></script>
-    <script src="sky/noise.js?v=20260924j"></script>
-    <script src="sky/records.js?v=20260924j"></script>
-    <script src="sky/crate.js?v=20260924j"></script>
-    <script src="sky/frames.js?v=20260924j"></script>
+    <script src="sky/ground-view.js?v=20260924k" data-view="assets/living/view"></script>
+    <script src="sky/panel.js?v=20260924k"></script>
+    <script src="sky/music.js?v=20260924k"></script>
+    <script src="sky/weather.js?v=20260924k"></script>
+    <script src="sky/noise.js?v=20260924k"></script>
+    <script src="sky/records.js?v=20260924k"></script>
+    <script src="sky/crate.js?v=20260924k"></script>
+    <script src="sky/frames.js?v=20260924k"></script>
+    <script src="sky/bathroom.js?v=20260924k"></script>
 </body>
 </html>

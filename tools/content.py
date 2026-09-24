@@ -7,6 +7,8 @@ change, in your browser:
     (content/city/) and records (content/living/): add, caption, delete
   - visitors' post: bottles and art from FormSubmit to keep or throw back,
     bottles to pin / pile / put back, art to hang in the living space's frames
+  - notes: the to-do list and notes on the workshop's clipboard
+  - assets: every picture and sound slot on the site, to fill, replace or clear
 
     on Windows: double-click tools\\content.bat
     anywhere:   python tools/content.py
@@ -636,6 +638,280 @@ def shelf_delete(which, name):
     write_list(folder)
 
 
+# the workshop's clipboard: your to-do list and notes
+NOTES = os.path.join(ROOT, 'content', 'workshop', 'notes.json')
+
+
+def notes():
+    d = load_json(NOTES, {})
+    if not isinstance(d, dict):
+        d = {}
+    return {'title': d.get('title') or 'to do',
+            'todo': [t for t in d.get('todo', []) if isinstance(t, dict)],
+            'notes': [n for n in d.get('notes', []) if isinstance(n, dict)]}
+
+
+def save_notes(d):
+    def text(v, n=500):
+        return re.sub(r'\s+$', '', str(v or ''))[:n]
+    out = {'title': text(d.get('title'), 60).strip() or 'to do',
+           'todo': [{'text': text(t.get('text')), 'done': bool(t.get('done'))} for t in d.get('todo', []) if isinstance(t, dict) and str(t.get('text') or '').strip()],
+           'notes': [{'text': text(n.get('text'), 4000), 'date': text(n.get('date'), 10)} for n in d.get('notes', []) if isinstance(n, dict) and str(n.get('text') or '').strip()]}
+    os.makedirs(os.path.dirname(NOTES), exist_ok=True)
+    with open(NOTES, 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(out, f, indent=2, ensure_ascii=False)
+        f.write('\n')
+    write_list(os.path.dirname(NOTES))
+    return out
+
+
+# ---------------- the asset manager: every slot on the site (tools/slots.json) ----------------
+ASSETS = os.path.join(ROOT, 'assets')
+SLOTS_FILE = os.path.join(HERE, 'slots.json')
+MEDIA = ('svg', 'gif', 'webp', 'png', 'jpg', 'jpeg', 'mp3', 'ogg', 'webm', 'mp4', 'json', 'woff2', 'woff', 'ttf', 'otf')
+SLOT = re.compile(r'^assets/([a-z0-9-]+)/([a-z0-9-]+)$')
+SOUNDS_DIR = os.path.join(ASSETS, 'sounds')
+NOISE_FILE = os.path.join(SOUNDS_DIR, 'noise.json')
+SONGS = SHELVES['music'][0]
+NUMBERED = re.compile(r'^(\d{1,3})[-_. ]+(.*)$')
+
+
+def kinds():
+    return load_json(SLOTS_FILE, {}).get('kinds') or {'image': ['svg', 'png', 'webp', 'gif', 'jpg', 'jpeg'], 'sound': ['mp3', 'ogg']}
+
+
+def slot_where(slot):
+    m = SLOT.match(slot or '')
+    if not m:
+        raise ValueError('which slot?')
+    return os.path.join(ASSETS, m.group(1)), m.group(2)
+
+
+def asset_files():
+    """every art/sound file in assets/<folder>/, by folder"""
+    out = {}
+    if not os.path.isdir(ASSETS):
+        return out
+    for d in sorted(os.listdir(ASSETS)):
+        p = os.path.join(ASSETS, d)
+        if not os.path.isdir(p) or d == 'templates':
+            continue
+        out[d] = [{'name': n, 'size': os.path.getsize(os.path.join(p, n)), 'time': int(os.path.getmtime(os.path.join(p, n)))}
+                  for n in sorted(os.listdir(p))
+                  if os.path.isfile(os.path.join(p, n)) and os.path.splitext(n)[1][1:].lower() in MEDIA and not n.startswith(('.', '_'))]
+    return out
+
+
+def clear_slot(folder, stem):
+    """remove every version of one slot (sun.png, sun.svg …), never its twins (sun-glow.png)"""
+    gone = []
+    if os.path.isdir(folder):
+        for n in os.listdir(folder):
+            st, ext = os.path.splitext(n)
+            if st == stem and ext[1:].lower() in MEDIA:
+                os.remove(os.path.join(folder, n))
+                gone.append(n)
+    return gone
+
+
+def asset_put(slot, name, raw, kind='image'):
+    folder, stem = slot_where(slot)
+    ext = os.path.splitext(name or '')[1][1:].lower()
+    allowed = kinds().get(kind) or kinds()['image']
+    if ext not in allowed:
+        raise ValueError('that slot takes ' + ', '.join('.' + e for e in allowed if e != 'jpeg'))
+    if ext == 'jpeg':
+        ext = 'jpg'                                   # (the site looks for .jpg)
+    if len(raw) > UPLOAD_LIMIT:
+        raise ValueError('that file is over 30 MB')
+    if kind == 'json':
+        json.loads(raw.decode('utf-8'))               # (it has to be real JSON)
+    os.makedirs(folder, exist_ok=True)
+    clear_slot(folder, stem)
+    with open(os.path.join(folder, stem + '.' + ext), 'wb') as f:
+        f.write(raw)
+    write_list(folder)
+    return stem + '.' + ext
+
+
+def asset_clear(slot):
+    folder, stem = slot_where(slot)
+    gone = clear_slot(folder, stem)
+    if os.path.isdir(folder):
+        write_list(folder)
+    return gone
+
+
+# ---------------- the record player: content/living/, numbered 01-name.mp3, 02-name.mp3 … ----------------
+def tracks():
+    if not os.path.isdir(SONGS):
+        return []
+    files = [n for n in os.listdir(SONGS) if os.path.isfile(os.path.join(SONGS, n))]
+    songs = sorted((n for n in files if n.lower().endswith(('.mp3', '.ogg'))), key=lambda n: n.lower())
+    out = []
+    for n in songs:
+        stem = os.path.splitext(n)[0]
+        m = NUMBERED.match(stem)
+        item = {'name': n, 'url': '/content/living/' + urllib.parse.quote(n), 'number': int(m.group(1)) if m else None,
+                'title': (m.group(2) if m else stem), 'size': os.path.getsize(os.path.join(SONGS, n))}
+        for e in PICS:
+            if stem + '.' + e in files:
+                item['sleeve'] = '/content/living/' + urllib.parse.quote(stem + '.' + e)
+                break
+        out.append(item)
+    return out
+
+
+def song_stem(number, title, width=2):
+    title = re.sub(r'[\\/:*?"<>|]+', '', title or '').strip().strip('.') or 'untitled'
+    return str(number).zfill(width) + '-' + title[:80]
+
+
+def rename_song(old, new_stem):
+    """rename a song and everything that goes with it (its sleeve)"""
+    old_stem, ext = os.path.splitext(old)
+    if old_stem == new_stem:
+        return old
+    for n in os.listdir(SONGS):
+        st, e = os.path.splitext(n)
+        if st == old_stem:
+            os.replace(os.path.join(SONGS, n), os.path.join(SONGS, '~' + new_stem + e + '.tmp'))
+    return new_stem + ext
+
+
+def finish_renames():
+    for n in os.listdir(SONGS):
+        if n.startswith('~') and n.endswith('.tmp'):
+            os.replace(os.path.join(SONGS, n), os.path.join(SONGS, n[1:-4]))
+
+
+def renumber(order):
+    """number the songs 01, 02 … in this order (a list of file names)"""
+    width = max(2, len(str(len(order))))
+    names = []
+    for i, n in enumerate(order):
+        title = NUMBERED.match(os.path.splitext(n)[0])
+        title = title.group(2) if title else os.path.splitext(n)[0]
+        names.append(rename_song(n, song_stem(i + 1, title, width)))
+    finish_renames()
+    write_list(SONGS)
+    return names
+
+
+def track_add(name, raw):
+    stem, ext = clean_name(name, ['mp3', 'ogg'])
+    if len(raw) > UPLOAD_LIMIT:
+        raise ValueError('that file is over 30 MB')
+    m = NUMBERED.match(stem)
+    title = m.group(2) if m else stem
+    have = tracks()
+    if any(t['number'] is None for t in have):          # number the ones that aren't yet, in the order they play now
+        renumber([t['name'] for t in have])
+        have = tracks()
+    nxt = max([t['number'] or 0 for t in have] + [len(have)]) + 1
+    width = max(2, len(str(nxt)), max([len(re.match(r'\d*', t['name']).group(0)) for t in have if t['number']] + [0]))
+    final = song_stem(nxt, title, width) + ext
+    if os.path.exists(os.path.join(SONGS, final)):
+        raise ValueError(final + ' is already there')
+    os.makedirs(SONGS, exist_ok=True)
+    with open(os.path.join(SONGS, final), 'wb') as f:
+        f.write(raw)
+    write_list(SONGS)
+    return final
+
+
+def track_move(name, by):
+    order = [t['name'] for t in tracks()]
+    if name not in order:
+        raise ValueError('that song isn\'t there')
+    i = order.index(name)
+    j = max(0, min(len(order) - 1, i + (1 if by > 0 else -1)))
+    order[i], order[j] = order[j], order[i]
+    return renumber(order)
+
+
+def track_rename(name, title):
+    have = {t['name']: t for t in tracks()}
+    if name not in have:
+        raise ValueError('that song isn\'t there')
+    t = have[name]
+    num = t['number'] if t['number'] is not None else len(have)
+    width = max(2, len(re.match(r'\d*', name).group(0)))
+    new = rename_song(name, song_stem(num, title, width))
+    finish_renames()
+    write_list(SONGS)
+    return new
+
+
+def track_delete(name):
+    shelf_delete('music', name)
+    return renumber([t['name'] for t in tracks()])
+
+
+def track_sleeve_link(name, link):
+    import sleeve                                     # tools/sleeve.py does the Spotify part
+    if name not in [t['name'] for t in tracks()]:
+        raise ValueError('that song isn\'t there')
+    data, ext, title = sleeve.fetch_cover((link or '').strip())
+    stem = os.path.splitext(name)[0]
+    for e in PICS:
+        p = os.path.join(SONGS, stem + '.' + e)
+        if os.path.exists(p):
+            os.remove(p)
+    with open(os.path.join(SONGS, stem + ext), 'wb') as f:
+        f.write(data)
+    write_list(SONGS)
+    return {'sleeve': stem + ext, 'title': title, 'bytes': len(data)}
+
+
+# ---------------- the noise machine: its own sounds, plus yours (assets/sounds/noise.json) ----------------
+def noise_extra():
+    d = load_json(NOISE_FILE, [])
+    return [x for x in d if isinstance(x, dict) and re.match(r'^[a-z0-9-]+$', x.get('name') or '')] if isinstance(d, list) else []
+
+
+def save_noise(lst):
+    os.makedirs(SOUNDS_DIR, exist_ok=True)
+    with open(NOISE_FILE, 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(lst, f, indent=2, ensure_ascii=False)
+        f.write('\n')
+    write_list(SOUNDS_DIR)
+
+
+def noise_add(label, name, raw):
+    label = (label or '').strip()[:40]
+    if not label:
+        raise ValueError('give it a name first')
+    ext = os.path.splitext(name or '')[1][1:].lower()
+    if ext not in ('mp3', 'ogg'):
+        raise ValueError('a sound is an .mp3 or an .ogg')
+    base = slug(label)
+    taken = set(x['name'] for x in load_json(SLOTS_FILE, {}).get('noise', [])) | set(x['name'] for x in noise_extra()) | \
+        {'rain', 'windowrain', 'wind', 'thunder', 'storm', 'ocean', 'fire', 'white', 'pink', 'brown', 'noise'}
+    n, i = base, 2
+    while n in taken or any(os.path.splitext(f)[0] == n for f in (os.listdir(SOUNDS_DIR) if os.path.isdir(SOUNDS_DIR) else [])):
+        n, i = base + '-' + str(i), i + 1
+    asset_put('assets/sounds/' + n, name, raw, 'sound')
+    save_noise(noise_extra() + [{'name': n, 'label': label}])
+    return n
+
+
+def noise_remove(name):
+    lst = noise_extra()
+    if name not in [x['name'] for x in lst]:
+        raise ValueError('that\'s not one of yours')
+    clear_slot(SOUNDS_DIR, name)
+    save_noise([x for x in lst if x['name'] != name])
+
+
+def noise_label(name, label):
+    lst = noise_extra()
+    for x in lst:
+        if x['name'] == name:
+            x['label'] = (label or '').strip()[:40] or x['label']
+    save_noise(lst)
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **k):
         super().__init__(*a, directory=ROOT, **k)
@@ -683,6 +959,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(raw)
                 return
+            if url.path == '/__assets/state':
+                return self.reply({'files': asset_files(), 'tracks': tracks(), 'noise': noise_extra()})
+            if url.path == '/__notes':
+                return self.reply(dict(notes(), today=datetime.date.today().isoformat()))
             if url.path == '/__letters/read':
                 name = safe(q.get('name', [''])[0])
                 return self.reply({'name': name, 'text': read(name)})
@@ -783,6 +1063,43 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     raise ValueError('which folder?')
                 delete_site_file(d['which'], d.get('name'))
                 return self.reply({'ok': True})
+            if url.path == '/__assets/put':
+                slot = urllib.parse.unquote(self.headers.get('X-Slot', ''))
+                name = urllib.parse.unquote(self.headers.get('X-Name', ''))
+                return self.reply({'name': asset_put(slot, name, raw, self.headers.get('X-Kind') or 'image')})
+            if url.path == '/__assets/clear':
+                return self.reply({'removed': asset_clear(json.loads(raw or b'{}').get('slot'))})
+            if url.path == '/__records/add':
+                return self.reply({'name': track_add(urllib.parse.unquote(self.headers.get('X-Name', '')), raw)})
+            if url.path == '/__records/sleeve':
+                song = urllib.parse.unquote(self.headers.get('X-Song', ''))
+                if song not in [t['name'] for t in tracks()]:
+                    raise ValueError('that song isn\'t there')
+                if len(raw) > 1024 * 1024:
+                    raise ValueError('a sleeve has to be under 1 MB (the "from Spotify" button shrinks them for you)')
+                return self.reply({'name': shelf_add('music', urllib.parse.unquote(self.headers.get('X-Name', '')), raw, song)})
+            if url.path == '/__records/move':
+                d = json.loads(raw or b'{}')
+                return self.reply({'names': track_move(d.get('name'), int(d.get('by') or 1))})
+            if url.path == '/__records/rename':
+                d = json.loads(raw or b'{}')
+                return self.reply({'name': track_rename(d.get('name'), d.get('title'))})
+            if url.path == '/__records/delete':
+                return self.reply({'names': track_delete(json.loads(raw or b'{}').get('name'))})
+            if url.path == '/__records/sleeve-link':
+                d = json.loads(raw or b'{}')
+                return self.reply(track_sleeve_link(d.get('name'), d.get('link')))
+            if url.path == '/__noise/add':
+                return self.reply({'name': noise_add(urllib.parse.unquote(self.headers.get('X-Label', '')), urllib.parse.unquote(self.headers.get('X-Name', '')), raw)})
+            if url.path == '/__noise/remove':
+                noise_remove(json.loads(raw or b'{}').get('name'))
+                return self.reply({'ok': True})
+            if url.path == '/__noise/label':
+                d = json.loads(raw or b'{}')
+                noise_label(d.get('name'), d.get('label'))
+                return self.reply({'ok': True})
+            if url.path == '/__notes/save':
+                return self.reply(save_notes(json.loads(raw or b'{}')))
             if url.path == '/__letters/publish':
                 bat = os.path.join(HERE, 'publish.bat')
                 if os.name == 'nt' and os.path.exists(bat):

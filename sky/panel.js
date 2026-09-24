@@ -113,6 +113,24 @@
             chain(loop('white', 3), filter('highpass', 400), filter('lowpass', 6000), gain(0.55), out);
             chain(loop('brown', 4), filter('lowpass', 500), gain(0.6), out);
         },
+        // rain heard from inside: drops tapping the glass, a thin wash, now and then a trickle
+        windowrain: function (out) {
+            chain(loop('white', 3), filter('highpass', 1800), filter('lowpass', 5500), gain(0.09), out);
+            chain(loop('pink', 4), filter('bandpass', 700, 0.7), gain(0.12), out);
+            return function (level) {
+                if (level < 0.02 || !ctx) return;
+                var t0 = ctx.currentTime, n = Math.round(6 + level * 46);
+                for (var i = 0; i < n; i++) {                       // taps on the pane
+                    var t = t0 + Math.random(), f = 2200 + Math.random() * 3200;
+                    tone(out, t, 'sine', f, f * 0.7, 0.018 + Math.random() * 0.02, (0.02 + Math.random() * 0.05) * (0.4 + level));
+                    if (Math.random() < 0.3) noiseHit(out, t, 0.015, 'bandpass', 3500 + Math.random() * 2000, 2, 0.05 * level);
+                }
+                if (Math.random() < 0.25 * level) {                 // a trickle running down
+                    var tr = noiseHit(out, t0 + Math.random() * 0.5, 0.6, 'bandpass', 900, 3, 0.05, 0.2);
+                    tr.frequency.exponentialRampToValueAtTime(1600, t0 + 1.1);
+                }
+            };
+        },
         storm: function (out, ch) {
             chain(loop('white', 3), filter('highpass', 350), filter('lowpass', 5200), gain(0.7), out);
             chain(loop('brown', 5), filter('lowpass', 420), gain(1.0), out);
@@ -147,7 +165,13 @@
     function channel(name, opts) {
         opts = opts || {};
         var ch = { name: name, level: 0, file: undefined, built: false, out: null, lp: null, el: null, tick: null };
-        Sky.findAsset('assets/sounds/' + name + '.mp3|assets/sounds/' + name + '.ogg', function (url) { ch.file = url || null; if (ch.level > 0) build(); });
+        Sky.findAsset('assets/sounds/' + name + '.mp3|assets/sounds/' + name + '.ogg', function (url) {
+            if (url || !opts.orFile) { ch.file = url || null; if (ch.level > 0) build(); return; }
+            // no recording of its own: borrow another (a storm = your rain recording, with thunder on top)
+            Sky.findAsset('assets/sounds/' + opts.orFile + '.mp3|assets/sounds/' + opts.orFile + '.ogg', function (u2) {
+                ch.file = u2 || null; ch.borrowed = !!u2; if (ch.level > 0) build();
+            });
+        });
         function build() {
             if (ch.built || ch.file === undefined || !ac()) return;
             ch.built = true;
@@ -159,14 +183,15 @@
                 ch.el.loop = true;
                 ch.el.crossOrigin = 'anonymous';
                 try { ctx.createMediaElementSource(ch.el).connect(ch.lp); } catch (e) { ch.el.volume = 1; }
+                if (ch.borrowed && opts.withThunder) ch.tick = thunderNowAndThen(ch.lp);
             } else if (SYNTHS[name]) ch.tick = SYNTHS[name](ch.lp, ch) || null;
             apply(0.3);
         }
         function apply(ramp) {
             if (!ch.built) return;
             var t = ctx.currentTime, inside = opts.muffled && opts.muffled();
-            ch.out.gain.setTargetAtTime(ch.level * (inside ? 0.55 : 1), t, ramp || 0.25);
-            ch.lp.frequency.setTargetAtTime(inside ? 900 : 20000, t, 0.3);
+            ch.out.gain.setTargetAtTime(ch.level * (inside ? 0.7 : 1), t, ramp || 0.25);
+            ch.lp.frequency.setTargetAtTime(inside ? 2200 : 20000, t, 0.3);
             if (ch.el) {
                 if (ch.level > 0.001 && ch.el.paused && !ch.trying && !ch.blocked) {
                     ch.trying = true;
@@ -186,6 +211,15 @@
         return ch;
     }
     var channels = [];
+    function thunderNowAndThen(out) {
+        var next = 0;
+        return function (level) {
+            if (level < 0.02) return;
+            var t = performance.now();
+            if (!next) next = t + 5000 + Math.random() * 10000;
+            if (t > next) { thunder(level * 0.8, 0.2, out); next = t + 12000 + Math.random() * 22000; }
+        };
+    }
     setInterval(function () { channels.forEach(function (ch) { if (ch.tick && ctx && ctx.state === 'running') ch.tick(ch.level); }); }, 1000);
 
     // one roll of thunder (your own: assets/sounds/thunder.mp3)
@@ -218,7 +252,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {
@@ -290,6 +324,25 @@
         'portfolio': function (out, t) {                               // a sheet slipped into the portfolio: a papery slide, a soft flap
             rustle(out, t, 0.35, 1400);
             knock(out, t + 0.36, 0.3);
+        },
+        'step': function (out, t, size) {                              // a soft footstep on floorboards
+            var loud = size === undefined ? 1 : size;
+            tone(out, t, 'sine', 110, 70, 0.07, 0.22 * loud);
+            noiseHit(out, t, 0.05, 'lowpass', 700, 0.5, 0.12 * loud);
+        },
+        'blip': function (out, t) {                                    // one letter of a text box typing out
+            tone(out, t, 'square', 330, 330, 0.035, 0.05);
+        },
+        'shimmer': function (out, t) {                                 // looking into the mirror: a glassy shimmer
+            [1318, 1760, 2349, 3136].forEach(function (f, i) { tone(out, t + i * 0.07, 'sine', f, f * 1.003, 1.2 - i * 0.15, 0.06); });
+            var f = noiseHit(out, t, 1.0, 'highpass', 6000, 0, 0.03, 0.3);
+            f.frequency.setValueAtTime(4000, t); f.frequency.exponentialRampToValueAtTime(9000, t + 0.9);
+        },
+        'chime': function (out, t) {                                   // the timer's done: a little bell, rung three times
+            for (var r = 0; r < 3; r++) {
+                var at = t + r * 0.55;
+                [[880, 0.22], [1760, 0.08], [2637, 0.05], [3520, 0.03]].forEach(function (h) { tone(out, at, 'sine', h[0], h[0] * 0.997, 1.6, h[1]); });
+            }
         },
         'brush': function (out, t) {                                   // a brush dabbed in paint
             var f = noiseHit(out, t, 0.18, 'bandpass', 1200, 0.9, 0.12, 0.03);

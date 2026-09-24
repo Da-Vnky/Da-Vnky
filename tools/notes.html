@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>notes · content manager · DaV-nky</title>
+<!-- the workshop's clipboard: part of the content manager. open it with tools\content.bat. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+    :root { --ink: #3a2716; --faded: #6e5236; --red: #9a3b1f; --card: #efe3c6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #2a1d14; color: #f3e6c2; font: 1.05rem/1.5 "IM Fell English", Georgia, serif; }
+    button, input, textarea { font: inherit; }
+    header { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 22px;
+        background: #3a2a1d; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+    header h1 { margin: 0 auto 0 12px; font: normal 1.6rem "IM Fell English SC", Georgia, serif; }
+    .btn { padding: 8px 16px; border: 1px solid rgba(243,230,194,.35); border-radius: 999px; background: none; color: #f3e6c2; cursor: pointer; font-style: italic; }
+    .btn:hover { background: rgba(243,230,194,.1); }
+    .status { width: 100%; margin: 0; font-style: italic; font-size: .92rem; color: rgba(243,230,194,.75); }
+    .status.bad { color: #f0b08a; }
+    .cm-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: .92rem; }
+    .cm-nav span { font: normal 1rem "IM Fell English SC", Georgia, serif; color: #e0b070; margin-right: 6px; }
+    .cm-nav a { padding: 3px 10px; border-radius: 999px; color: #f3e6c2; text-decoration: none; font-style: italic; }
+    .cm-nav a:hover { background: rgba(243,230,194,.1); }
+    .cm-nav a.on { background: #f3e6c2; color: #3a2716; }
+    main { max-width: 760px; margin: 0 auto; padding: 22px 22px 80px; }
+    .sheet { background: var(--card); color: var(--ink); padding: 26px 30px 24px; box-shadow: 0 8px 18px rgba(0,0,0,.4), inset 0 0 26px rgba(120,80,30,.2); }
+    .sheet + .sheet { margin-top: 26px; }
+    .sub { margin: 0 0 14px; font-style: italic; color: var(--faded); font-size: .92rem; }
+    h2 { margin: 0 0 4px; font: normal 1.35rem "IM Fell English SC", Georgia, serif; }
+    .title-in { width: 100%; border: 0; border-bottom: 1px dashed rgba(110,82,54,.5); background: none; color: var(--ink); font: normal 1.6rem "IM Fell English SC", Georgia, serif; padding: 2px 0; margin-bottom: 10px; }
+    .title-in:focus { outline: none; border-bottom-color: var(--red); }
+    ul { list-style: none; margin: 0; padding: 0; }
+    li { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px dashed rgba(110,82,54,.3); }
+    li input[type=checkbox] { width: 18px; height: 18px; margin-top: 6px; accent-color: var(--red); flex: none; }
+    li .t { flex: 1; min-width: 0; border: 0; background: none; color: var(--ink); padding: 3px 0; }
+    li .t:focus { outline: none; background: rgba(255,255,255,.35); }
+    li.done .t { text-decoration: line-through; color: #8a7258; }
+    li textarea.t { resize: vertical; min-height: 3.2em; line-height: 1.45; }
+    li .d { flex: none; width: 128px; border: 0; background: none; color: var(--faded); font-style: italic; font-size: .9rem; padding: 4px 0; }
+    li.note { flex-wrap: wrap; }
+    li .mini { flex: none; border: 0; background: none; color: var(--faded); cursor: pointer; padding: 2px 5px; border-radius: 6px; font-size: .95rem; }
+    li .mini:hover { background: rgba(110,82,54,.12); color: var(--ink); }
+    li .mini.x:hover { color: var(--red); }
+    .add { margin-top: 12px; padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(110,82,54,.35); background: #f8f0dc; color: var(--ink); cursor: pointer; font-style: italic; }
+    .add:hover { background: #fff8e6; }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .row .add.clear { color: var(--red); }
+    .empty { font-style: italic; color: #8a7258; padding: 6px 0; }
+</style>
+</head>
+<body>
+<header>
+    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html">your things</a><a href="post.html">visitors</a><a href="notes.html" class="on">notes</a><a href="assets.html">assets</a></nav>
+    <h1>notes</h1>
+    <button type="button" class="btn publish">publish to the live site</button>
+    <p class="status">the clipboard on the workshop wall. changes save by themselves; publish to put them up.</p>
+</header>
+<main>
+    <section class="sheet">
+        <input class="title-in" aria-label="the list's title" maxlength="60" placeholder="to do">
+        <p class="sub">tick things off as you go; press enter in one to start the next. ↑ ↓ move a line, × removes it.</p>
+        <ul class="todo"></ul>
+        <div class="row"><button type="button" class="add add-todo">+ a to-do</button><button type="button" class="add clear clear-done">clear the ticked ones</button></div>
+    </section>
+    <section class="sheet">
+        <h2>notes</h2>
+        <p class="sub">anything else: thoughts, reminders, things to try. newest at the top.</p>
+        <ul class="notes"></ul>
+        <button type="button" class="add add-note">+ a note</button>
+    </section>
+</main>
+
+<script>
+(function () {
+    var $ = function (s) { return document.querySelector(s); };
+    var statusEl = $('.status');
+    var data = { title: 'to do', todo: [], notes: [] }, today = new Date().toISOString().slice(0, 10), ready = false;
+    function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
+    var OLD = { error: 'the content manager window that’s open is an older version. close its black window, then double-click tools\\content.bat again' };
+    function api(path, body) {
+        var opt = body === undefined ? {} : { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } };
+        return fetch(path, opt).then(function (r) {
+            return r.json().then(function (j) { return j && j.error === 'unknown' ? OLD : j; }, function () { return OLD; });
+        }, function () { return { error: 'the manager isn’t running. open it with tools\\content.bat' }; });
+    }
+
+    var timer = null;
+    function changed() {
+        if (!ready) return;
+        say('saving…');
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            api('/__notes/save', data).then(function (r) {
+                if (r.error) say(r.error, true);
+                else say('saved. publish when you’re ready and the workshop’s clipboard shows it.');
+            });
+        }, 600);
+    }
+    function mini(label, title, fn, cls) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'mini' + (cls ? ' ' + cls : ''); b.textContent = label; b.title = title; b.setAttribute('aria-label', title);
+        b.addEventListener('click', fn);
+        return b;
+    }
+    function move(list, i, by) {
+        var j = i + by;
+        if (j < 0 || j >= list.length) return;
+        var t = list[i]; list[i] = list[j]; list[j] = t;
+    }
+
+    function drawTodo(focusAt) {
+        var ul = $('.todo');
+        ul.innerHTML = '';
+        if (!data.todo.length) ul.innerHTML = '<li class="empty">nothing on the list.</li>';
+        data.todo.forEach(function (t, i) {
+            var li = document.createElement('li');
+            li.className = t.done ? 'done' : '';
+            var cb = document.createElement('input');
+            cb.type = 'checkbox'; cb.checked = !!t.done; cb.setAttribute('aria-label', 'done');
+            cb.addEventListener('change', function () { t.done = cb.checked; li.className = t.done ? 'done' : ''; changed(); });
+            var tx = document.createElement('input');
+            tx.className = 't'; tx.value = t.text || ''; tx.placeholder = 'something to do'; tx.maxLength = 500;
+            tx.addEventListener('input', function () { t.text = tx.value; changed(); });
+            tx.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') { e.preventDefault(); data.todo.splice(i + 1, 0, { text: '', done: false }); drawTodo(i + 1); }
+                if (e.key === 'Backspace' && !tx.value && data.todo.length > 1) { e.preventDefault(); data.todo.splice(i, 1); drawTodo(Math.max(0, i - 1)); changed(); }
+            });
+            li.appendChild(cb); li.appendChild(tx);
+            li.appendChild(mini('↑', 'move up', function () { move(data.todo, i, -1); drawTodo(); changed(); }));
+            li.appendChild(mini('↓', 'move down', function () { move(data.todo, i, 1); drawTodo(); changed(); }));
+            li.appendChild(mini('×', 'remove', function () { data.todo.splice(i, 1); drawTodo(); changed(); }, 'x'));
+            ul.appendChild(li);
+        });
+        if (focusAt !== undefined) { var ins = ul.querySelectorAll('.t'); if (ins[focusAt]) ins[focusAt].focus(); }
+    }
+    function drawNotes(focusAt) {
+        var ul = $('.notes');
+        ul.innerHTML = '';
+        if (!data.notes.length) ul.innerHTML = '<li class="empty">no notes yet.</li>';
+        data.notes.forEach(function (n, i) {
+            var li = document.createElement('li');
+            li.className = 'note';
+            var d = document.createElement('input');
+            d.type = 'date'; d.className = 'd'; d.value = n.date || ''; d.setAttribute('aria-label', 'date');
+            d.addEventListener('change', function () { n.date = d.value; changed(); });
+            var tx = document.createElement('textarea');
+            tx.className = 't'; tx.value = n.text || ''; tx.placeholder = 'a note'; tx.rows = 2; tx.maxLength = 4000;
+            tx.addEventListener('input', function () { n.text = tx.value; changed(); });
+            li.appendChild(d); li.appendChild(tx);
+            li.appendChild(mini('↑', 'move up', function () { move(data.notes, i, -1); drawNotes(); changed(); }));
+            li.appendChild(mini('↓', 'move down', function () { move(data.notes, i, 1); drawNotes(); changed(); }));
+            li.appendChild(mini('×', 'remove', function () { if (!n.text || confirm('remove this note?')) { data.notes.splice(i, 1); drawNotes(); changed(); } }, 'x'));
+            ul.appendChild(li);
+        });
+        if (focusAt !== undefined) { var ins = ul.querySelectorAll('textarea'); if (ins[focusAt]) ins[focusAt].focus(); }
+    }
+
+    $('.title-in').addEventListener('input', function () { data.title = this.value; changed(); });
+    $('.add-todo').addEventListener('click', function () { data.todo.push({ text: '', done: false }); drawTodo(data.todo.length - 1); });
+    $('.clear-done').addEventListener('click', function () {
+        var n = data.todo.filter(function (t) { return t.done; }).length;
+        if (!n) return say('nothing’s ticked yet.');
+        data.todo = data.todo.filter(function (t) { return !t.done; }); drawTodo(); changed();
+    });
+    $('.add-note').addEventListener('click', function () { data.notes.unshift({ text: '', date: today }); drawNotes(0); });
+    $('.publish').addEventListener('click', function () {
+        api('/__letters/publish', {}).then(function (r) { alert(r.error || 'publishing! a small window shows it going up, and closes by itself when it’s done. the live site updates a minute or two later.'); });
+    });
+
+    api('/__notes').then(function (r) {
+        if (r.error) { say(r.error, true); return; }
+        data = { title: r.title || 'to do', todo: r.todo || [], notes: r.notes || [] };
+        if (r.today) today = r.today;
+        $('.title-in').value = data.title;
+        drawTodo(); drawNotes();
+        ready = true;
+    });
+})();
+</script>
+</body>
+</html>

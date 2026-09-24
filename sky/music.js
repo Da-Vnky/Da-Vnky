@@ -548,8 +548,8 @@
         '@keyframes char-groove { 0%, 100% { transform: translateY(0) rotate(-3deg); } 25% { transform: translateY(-4%) rotate(0); } 50% { transform: translateY(0) rotate(3deg); } 75% { transform: translateY(-4%) rotate(0); } }' +
         'body.music-playing .character.face-left:not(.has-dancing) > .placeholder { animation-name: char-groove-left; }' +
         '@keyframes char-groove-left { 0%, 100% { transform: scaleX(-1) translateY(0) rotate(-3deg); } 25% { transform: scaleX(-1) translateY(-4%); } 50% { transform: scaleX(-1) rotate(3deg); } 75% { transform: scaleX(-1) translateY(-4%); } }' +
-        'body.music-playing .character.has-dancing > .pose-dancing { display: block; }' +
-        'body.music-playing .character.has-dancing > .placeholder, body.music-playing .character.has-dancing > .art { display: none; }' +
+        'body.music-playing .character.has-dancing:not(.walking) > .pose-dancing { display: block; }' +
+        'body.music-playing .character.has-dancing:not(.walking) > .placeholder, body.music-playing .character.has-dancing:not(.walking) > .art { display: none; }' +
         // anything else in a room can join in: class="sways" or "wobbles"
         'body.music-playing .sways { animation: g-sway 1s ease-in-out infinite alternate; transform-origin: 50% 100%; }' +
         'body.music-playing .wobbles { animation: g-wobble 1s ease-in-out infinite alternate; transform-origin: 50% 0; }' +

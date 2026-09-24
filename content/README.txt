@@ -39,6 +39,10 @@ Take a file out, and it's gone. That's the whole job.
                       too (content/workshop/cat.png). Set it with the "hang in"
                       buttons in the content manager.
 
+  content/workshop/notes.json
+                      THE CLIPBOARD on the workshop wall: your to-do list and notes.
+                      Write them in the content manager -> notes (it saves this file).
+
   content/workshop/   PAINTINGS & DRAWINGS (the easel)
                       .png .jpg .jpeg .webp .gif .svg  (.mp4 .webm also work)
                       One file = one page on the easel's pad. Date-first names go
@@ -62,9 +66,11 @@ Take a file out, and it's gone. That's the whole job.
                       .mp3 (or .ogg). One file = one record in the crate.
                       SLEEVE ART: a picture with the same name, beside it:
                         01-aerie.mp3 + 01-aerie.jpg   (.png .webp .gif too; square)
-                      the easy way: double-click tools\sleeve.bat, paste a song's
-                      Spotify link (Share > Copy Song Link), and it saves the album
-                      cover here with the right name, under 1 MB. No login needed.
+                      the easy way: content manager (tools\content.bat) -> assets ->
+                      record player. "+ add songs" numbers them for you (the next
+                      number on the end); arrows move them; "sleeve from Spotify"
+                      takes a song's Spotify link (Share > Copy Song Link) and saves
+                      the album cover here with the right name, under 1 MB.
                       it's the record's sleeve, and a round crop of it is the label
                       in the middle of the record as it spins. Without one, the
                       cover picture inside the mp3 is used, or a plain sleeve.

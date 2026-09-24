@@ -1,0 +1,1244 @@
+{
+ "note": "made by tools/content.py’s asset manager. each slot is a name: save a picture (or sound) under it in its folder and it replaces the stand-in.",
+ "kinds": {
+  "image": [
+   "svg",
+   "png",
+   "webp",
+   "gif",
+   "jpg",
+   "jpeg"
+  ],
+  "model": [
+   "webm",
+   "mp4",
+   "gif",
+   "webp",
+   "png",
+   "svg",
+   "jpg"
+  ],
+  "sound": [
+   "mp3",
+   "ogg"
+  ],
+  "json": [
+   "json"
+  ],
+  "font": [
+   "woff2",
+   "woff",
+   "ttf",
+   "otf"
+  ]
+ },
+ "noise": [
+  {
+   "name": "rain",
+   "label": "rain"
+  },
+  {
+   "name": "storm",
+   "label": "thunderstorm"
+  },
+  {
+   "name": "ocean",
+   "label": "ocean waves"
+  },
+  {
+   "name": "wind",
+   "label": "wind"
+  },
+  {
+   "name": "fire",
+   "label": "crackling fire"
+  },
+  {
+   "name": "white",
+   "label": "white noise"
+  },
+  {
+   "name": "pink",
+   "label": "pink noise"
+  },
+  {
+   "name": "brown",
+   "label": "brown noise"
+  }
+ ],
+ "scenes": [
+  {
+   "id": "everywhere",
+   "name": "every page",
+   "groups": [
+    {
+     "name": "the sky",
+     "slots": [
+      {
+       "slot": "assets/sky/sun",
+       "what": "the sun. its -glow twin is the setting sun, fading in through sunset",
+       "size": "400 x 400, centred",
+       "glow": true
+      },
+      {
+       "slot": "assets/sky/moon",
+       "what": "the moon",
+       "size": "400 x 400, centred"
+      },
+      {
+       "slot": "assets/sky/cloud",
+       "what": "every fair-weather cloud (or give each its own below)",
+       "size": "800 x 360"
+      },
+      {
+       "slot": "assets/sky/cloud-1",
+       "what": "cloud 1",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/cloud-2",
+       "what": "cloud 2",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/cloud-3",
+       "what": "cloud 3",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/cloud-4",
+       "what": "cloud 4",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/cloud-5",
+       "what": "cloud 5",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/storm-cloud",
+       "what": "the heavy grey clouds of rain and storms",
+       "size": "800 x 360"
+      },
+      {
+       "slot": "assets/sky/lightning",
+       "what": "one bolt, top at the top, see-through around it",
+       "size": "e.g. 300 x 900"
+      },
+      {
+       "slot": "assets/sky/polaris",
+       "what": "the north star, top centre at night",
+       "size": "200 x 200, centred"
+      },
+      {
+       "slot": "assets/sky/ursa-minor",
+       "what": "the Little Dipper under Polaris: light stars on see-through",
+       "size": "240 x 228 (or 960 x 912)"
+      }
+     ]
+    },
+    {
+     "name": "a painted sky of your own (optional; they crossfade as the day turns)",
+     "slots": [
+      {
+       "slot": "assets/sky/skybox",
+       "what": "one picture for all day, tinted toward evening by itself",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/skybox-day",
+       "what": "noon",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/skybox-golden",
+       "what": "late afternoon",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/skybox-sunset",
+       "what": "sunset",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/skybox-dusk",
+       "what": "after sunset",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/skybox-night",
+       "what": "midnight",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "the constellations (links and easter eggs at night)",
+     "slots": [
+      {
+       "slot": "assets/sky/constellation-pleroma",
+       "what": "the pleroma constellation: light stars on see-through; its name is written under it",
+       "size": "600 x 360"
+      },
+      {
+       "slot": "assets/sky/constellation-wish",
+       "what": "the wish constellation: light stars on see-through; its name is written under it",
+       "size": "600 x 360"
+      },
+      {
+       "slot": "assets/sky/constellation-lantern",
+       "what": "the lantern constellation: light stars on see-through; its name is written under it",
+       "size": "600 x 360"
+      },
+      {
+       "slot": "assets/sky/constellation-harp",
+       "what": "the harp constellation: light stars on see-through; its name is written under it",
+       "size": "600 x 360"
+      },
+      {
+       "slot": "assets/sky/constellation-kite",
+       "what": "the kite constellation: light stars on see-through; its name is written under it",
+       "size": "600 x 360"
+      },
+      {
+       "slot": "assets/sky/constellation-whale",
+       "what": "the whale constellation: light stars on see-through; its name is written under it",
+       "size": "600 x 360"
+      },
+      {
+       "slot": "assets/sky/constellation-key",
+       "what": "the key constellation: light stars on see-through; its name is written under it",
+       "size": "600 x 360"
+      }
+     ]
+    },
+    {
+     "name": "things that fly past (draw them facing right)",
+     "slots": [
+      {
+       "slot": "assets/sky/blimp",
+       "what": "a steampunk airship by day (-glow: its lit gondola at dusk)",
+       "size": "920 x 460",
+       "glow": true
+      },
+      {
+       "slot": "assets/sky/birds",
+       "what": "a little flock (a GIF can flap)",
+       "size": "480 x 240"
+      },
+      {
+       "slot": "assets/sky/balloon",
+       "what": "a hot-air balloon",
+       "size": "300 x 450"
+      },
+      {
+       "slot": "assets/sky/shooting-star",
+       "what": "a streak of light at night, head at the right end",
+       "size": "600 x 160"
+      }
+     ]
+    },
+    {
+     "name": "the signpost",
+     "slots": [
+      {
+       "slot": "assets/sky/plank",
+       "what": "each sign, pointing right; the name is written across it",
+       "size": "464 x 88"
+      },
+      {
+       "slot": "assets/sky/plank-here",
+       "what": "the sign for the page you’re on",
+       "size": "464 x 88",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "the place tabs (right edge)",
+     "slots": [
+      {
+       "slot": "assets/ui/place-sea",
+       "what": "the sea’s tab: a ship",
+       "size": "192 x 192"
+      },
+      {
+       "slot": "assets/ui/place-workshop",
+       "what": "the workshop’s tab: a paintbrush",
+       "size": "192 x 192"
+      },
+      {
+       "slot": "assets/ui/place-city",
+       "what": "the city’s tab: a telescope",
+       "size": "192 x 192"
+      },
+      {
+       "slot": "assets/ui/place-living",
+       "what": "the living space’s tab: a record player",
+       "size": "192 x 192"
+      }
+     ]
+    },
+    {
+     "name": "cursors (PNG, see-through; 64 x 64 at most)",
+     "slots": [
+      {
+       "slot": "assets/ui/cursor",
+       "what": "the everyday pointer",
+       "size": "32 x 32"
+      },
+      {
+       "slot": "assets/ui/cursor-pointer",
+       "what": "over anything you can click",
+       "size": "32 x 32"
+      },
+      {
+       "slot": "assets/ui/cursor-star",
+       "what": "over the constellations and Polaris",
+       "size": "32 x 32"
+      },
+      {
+       "slot": "assets/ui/cursor-grab",
+       "what": "over things you can pick up",
+       "size": "32 x 32"
+      },
+      {
+       "slot": "assets/ui/cursor-grabbing",
+       "what": "while you’re holding one",
+       "size": "32 x 32"
+      },
+      {
+       "slot": "assets/ui/cursor-look",
+       "what": "over things to look into",
+       "size": "32 x 32"
+      },
+      {
+       "slot": "assets/ui/cursor-brush",
+       "what": "over the “paint here” easel",
+       "size": "32 x 32"
+      }
+     ]
+    },
+    {
+     "name": "the control panel and buttons",
+     "slots": [
+      {
+       "slot": "assets/ui/panel",
+       "what": "the button that opens the panel (top right)",
+       "size": "128 x 128"
+      },
+      {
+       "slot": "assets/ui/music",
+       "what": "the music layer’s icon",
+       "size": "96 x 96"
+      },
+      {
+       "slot": "assets/ui/weather",
+       "what": "the weather layer’s icon",
+       "size": "96 x 96"
+      },
+      {
+       "slot": "assets/ui/noise",
+       "what": "the noise machine layer’s icon",
+       "size": "96 x 96"
+      },
+      {
+       "slot": "assets/ui/effects",
+       "what": "the sound effects’ icon",
+       "size": "96 x 96"
+      },
+      {
+       "slot": "assets/ui/back-inside",
+       "what": "the little door on “back inside”",
+       "size": "96 x 96"
+      },
+      {
+       "slot": "assets/ui/letters",
+       "what": "“letters”, top left of the homepage",
+       "size": "96 x 96"
+      },
+      {
+       "slot": "assets/ui/leave-art",
+       "what": "“leave some art”, in the workshop",
+       "size": "96 x 96"
+      }
+     ]
+    }
+   ],
+   "page": "city.html"
+  },
+  {
+   "id": "sea",
+   "name": "the sea",
+   "groups": [
+    {
+     "name": "the water and the dock",
+     "slots": [
+      {
+       "slot": "assets/sea/wave-1",
+       "what": "the back row of waves: a strip as tall as the sea that repeats left to right",
+       "size": "e.g. 1200 x 800"
+      },
+      {
+       "slot": "assets/sea/wave-2",
+       "what": "the second row of waves",
+       "size": "e.g. 1200 x 800"
+      },
+      {
+       "slot": "assets/sea/wave-3",
+       "what": "the third row of waves",
+       "size": "e.g. 1200 x 800"
+      },
+      {
+       "slot": "assets/sea/wave-4",
+       "what": "the front row of waves",
+       "size": "e.g. 1200 x 800"
+      },
+      {
+       "slot": "assets/sea/ship",
+       "what": "the ship, facing right, keel about 90% down (-glow: its lamps)",
+       "size": "1200 x 1000",
+       "glow": true
+      },
+      {
+       "slot": "assets/sea/dock",
+       "what": "the dock on the right; top of the deck 30% down (-glow: its lanterns)",
+       "size": "e.g. 1200 x 800",
+       "glow": true
+      },
+      {
+       "slot": "assets/sea/crab",
+       "what": "the crab on the dock (dances to music)",
+       "size": "about 3:2"
+      },
+      {
+       "slot": "assets/sea/gull",
+       "what": "the gull on the bollard (dances to music)",
+       "size": "about 1:1"
+      },
+      {
+       "slot": "assets/sea/crab-dancing",
+       "what": "the crab dancing (a GIF)",
+       "optional": true
+      },
+      {
+       "slot": "assets/sea/gull-dancing",
+       "what": "the gull dancing (a GIF)",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "letters and bottles",
+     "slots": [
+      {
+       "slot": "assets/sea/letter-board",
+       "what": "the notice board on the dock that holds read letters",
+       "size": "720 x 860"
+      },
+      {
+       "slot": "assets/sea/letter-paper",
+       "what": "one sheet of your letters’ paper, stretched to fit",
+       "size": "e.g. 1560 x 2000"
+      },
+      {
+       "slot": "assets/sea/ink-blot",
+       "what": "the ink blots scattered on letters",
+       "size": "300 x 300"
+      },
+      {
+       "slot": "assets/sea/ink-star",
+       "what": "the little inked stars",
+       "size": "300 x 300"
+      },
+      {
+       "slot": "assets/sea/bottle",
+       "what": "the bottle’s glass, empty, on its side, neck to the right (all three pieces share one 2000 x 900 canvas)",
+       "size": "2000 x 900"
+      },
+      {
+       "slot": "assets/sea/bottle-scroll",
+       "what": "the rolled message inside it",
+       "size": "2000 x 900"
+      },
+      {
+       "slot": "assets/sea/bottle-cork",
+       "what": "the cork in the neck, around x 1770 y 450",
+       "size": "2000 x 900"
+      }
+     ]
+    }
+   ],
+   "page": "index.html"
+  },
+  {
+   "id": "workshop",
+   "name": "the workshop",
+   "groups": [
+    {
+     "name": "the room",
+     "slots": [
+      {
+       "slot": "assets/workshop/wall",
+       "what": "the wallpaper (the window is cut out of it for you)",
+       "size": "3840 x 2160"
+      },
+      {
+       "slot": "assets/workshop/floor",
+       "what": "the floor along the bottom, stretched to fit",
+       "size": "3840 x 200"
+      },
+      {
+       "slot": "assets/workshop/window",
+       "what": "the window frame around clear glass, stretched to fit",
+       "size": "1000 x 800"
+      },
+      {
+       "slot": "assets/workshop/note",
+       "what": "the paper note pinned up with the room’s name",
+       "size": "about 5:4"
+      },
+      {
+       "slot": "assets/workshop/lantern",
+       "what": "the hanging lantern (-glow: its light at dusk)",
+       "size": "e.g. 120 x 300",
+       "glow": true
+      },
+      {
+       "slot": "assets/workshop/shelf",
+       "what": "the shelf of jars",
+       "size": "e.g. 600 x 240"
+      },
+      {
+       "slot": "assets/workshop/tools",
+       "what": "the pegboard of tools",
+       "size": "e.g. 240 x 440"
+      },
+      {
+       "slot": "assets/workshop/bench",
+       "what": "the workbench along the bottom",
+       "size": "3200 x 640"
+      }
+     ]
+    },
+    {
+     "name": "on the bench and walls",
+     "slots": [
+      {
+       "slot": "assets/workshop/easel",
+       "what": "the easel your paintings sit on (keep the canvas 17%–83% across, 6%–56% down)",
+       "size": "62:100"
+      },
+      {
+       "slot": "assets/workshop/paint-easel",
+       "what": "the “paint here” easel visitors paint on",
+       "size": "62:100"
+      },
+      {
+       "slot": "assets/workshop/portfolio",
+       "what": "the visitors’ portfolio by the bench",
+       "size": "about 5:4"
+      },
+      {
+       "slot": "assets/workshop/frame",
+       "what": "every picture frame (see-through middle), or one each below",
+       "size": "4:5"
+      },
+      {
+       "slot": "assets/workshop/frame-1",
+       "what": "frame 1",
+       "size": "4:5",
+       "optional": true
+      },
+      {
+       "slot": "assets/workshop/frame-2",
+       "what": "frame 2",
+       "size": "5:4",
+       "optional": true
+      },
+      {
+       "slot": "assets/workshop/frame-3",
+       "what": "frame 3",
+       "size": "4:5",
+       "optional": true
+      },
+      {
+       "slot": "assets/workshop/manikin",
+       "what": "the wooden manikin (dances to music)",
+       "size": "50:110"
+      },
+      {
+       "slot": "assets/workshop/metronome",
+       "what": "the metronome (ticks to music)",
+       "size": "about 1:2"
+      },
+      {
+       "slot": "assets/workshop/manikin-dancing",
+       "what": "the manikin dancing (a GIF)",
+       "optional": true
+      },
+      {
+       "slot": "assets/workshop/metronome-dancing",
+       "what": "the metronome ticking (a GIF)",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "the model shelf",
+     "slots": [
+      {
+       "slot": "assets/workshop/model-shelf",
+       "what": "the shelf board",
+       "size": "about 300:16"
+      },
+      {
+       "slot": "assets/workshop/model-1",
+       "what": "model 1: a looping .webm of it turning, a .gif, or a picture",
+       "size": "400 x 400",
+       "kind": "model"
+      },
+      {
+       "slot": "assets/workshop/model-2",
+       "what": "model 2",
+       "size": "400 x 400",
+       "kind": "model"
+      },
+      {
+       "slot": "assets/workshop/model-3",
+       "what": "model 3",
+       "size": "400 x 400",
+       "kind": "model"
+      }
+     ]
+    },
+    {
+     "name": "the pomodoro timer and the clipboard",
+     "slots": [
+      {
+       "slot": "assets/workshop/timer",
+       "what": "the timer on the bench (a tomato until then)",
+       "size": "1:1, e.g. 240 x 240"
+      },
+      {
+       "slot": "assets/workshop/timer-running",
+       "what": "shown while it runs (a GIF can tick)",
+       "size": "1:1",
+       "optional": true
+      },
+      {
+       "slot": "assets/workshop/timer-panel",
+       "what": "the card its buttons sit on, stretched",
+       "size": "about 300 x 230",
+       "optional": true
+      },
+      {
+       "slot": "assets/workshop/notes-board",
+       "what": "the clipboard with your to-do list (the list is written 16%–84% across, 22%–92% down)",
+       "size": "4:5"
+      },
+      {
+       "slot": "assets/workshop/notes-paper",
+       "what": "the sheet it opens up on, stretched",
+       "size": "portrait",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "the countryside out the window",
+     "slots": [
+      {
+       "slot": "assets/countryside/hills-1",
+       "what": "the back row of hills: see-through sky, bottom-anchored",
+       "size": "3840 x 700",
+       "glow": true
+      },
+      {
+       "slot": "assets/countryside/hills-2",
+       "what": "the second row of hills",
+       "size": "3840 x 700",
+       "glow": true
+      },
+      {
+       "slot": "assets/countryside/hills-3",
+       "what": "the third row of hills",
+       "size": "3840 x 700",
+       "glow": true
+      },
+      {
+       "slot": "assets/countryside/hills-4",
+       "what": "the front row of hills",
+       "size": "3840 x 700",
+       "glow": true
+      },
+      {
+       "slot": "assets/countryside/sheep",
+       "what": "one sheep, facing right, feet at the bottom",
+       "size": "about 3:2, e.g. 360 x 240"
+      },
+      {
+       "slot": "assets/countryside/sheep-jumping",
+       "what": "the same sheep mid-leap",
+       "size": "same canvas",
+       "optional": true
+      }
+     ]
+    }
+   ],
+   "page": "workshop.html"
+  },
+  {
+   "id": "city",
+   "name": "the city",
+   "groups": [
+    {
+     "name": "the rooftop and skyline",
+     "slots": [
+      {
+       "slot": "assets/city/foreground",
+       "what": "the rooftop strip along the bottom; feet stand 55% down it (-glow: string lights)",
+       "size": "3840 x 440",
+       "glow": true
+      },
+      {
+       "slot": "assets/city/skyline-back",
+       "what": "the back row of buildings (-glow: its lit windows)",
+       "size": "3840 x 800",
+       "glow": true
+      },
+      {
+       "slot": "assets/city/skyline-middle",
+       "what": "the middle row of buildings",
+       "size": "3840 x 800",
+       "glow": true
+      },
+      {
+       "slot": "assets/city/skyline-front",
+       "what": "the front row of buildings",
+       "size": "3840 x 800",
+       "glow": true
+      },
+      {
+       "slot": "assets/city/skyline-front-windows",
+       "what": "where the telescope can peek: the windows on your front row, as % of the picture",
+       "size": "{\"windows\": [[12.5, 70], [30, 64]]}",
+       "optional": true,
+       "kind": "json"
+      },
+      {
+       "slot": "assets/city/telescope",
+       "what": "the icon on the telescope button",
+       "size": "128 x 128"
+      },
+      {
+       "slot": "assets/city/cat",
+       "what": "the cat on the chimney (dances to music)",
+       "size": "about 1:1"
+      },
+      {
+       "slot": "assets/city/pigeon",
+       "what": "the pigeons on the ledge (dance to music)",
+       "size": "about 1:1"
+      },
+      {
+       "slot": "assets/city/cat-dancing",
+       "what": "the cat dancing (a GIF)",
+       "optional": true
+      },
+      {
+       "slot": "assets/city/pigeon-dancing",
+       "what": "the pigeons dancing (a GIF)",
+       "optional": true
+      }
+     ]
+    }
+   ],
+   "page": "city.html"
+  },
+  {
+   "id": "living",
+   "name": "the living space",
+   "groups": [
+    {
+     "name": "the room",
+     "slots": [
+      {
+       "slot": "assets/living/wall",
+       "what": "the wallpaper (the window is cut out of it for you)",
+       "size": "3840 x 2160"
+      },
+      {
+       "slot": "assets/living/floor",
+       "what": "the floor along the bottom, stretched to fit",
+       "size": "3840 x 200"
+      },
+      {
+       "slot": "assets/living/window",
+       "what": "the window frame around clear glass, stretched to fit",
+       "size": "1000 x 800"
+      },
+      {
+       "slot": "assets/living/view",
+       "what": "the scene out the window: see-through sky, horizon about 40% down",
+       "size": "3840 x 1600"
+      },
+      {
+       "slot": "assets/living/view-night",
+       "what": "the view at night (crossfades in)",
+       "size": "3840 x 1600",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/note",
+       "what": "the paper note pinned up with the room’s name",
+       "size": "about 5:4"
+      },
+      {
+       "slot": "assets/living/lamp",
+       "what": "the floor lamp (-glow: its light at dusk)",
+       "size": "e.g. 160 x 800",
+       "glow": true
+      },
+      {
+       "slot": "assets/living/armchair",
+       "what": "the armchair",
+       "size": "260:200"
+      },
+      {
+       "slot": "assets/living/bookshelf",
+       "what": "the bookshelf under the window",
+       "size": "360:170"
+      },
+      {
+       "slot": "assets/living/rug",
+       "what": "the rug",
+       "size": "600:40"
+      },
+      {
+       "slot": "assets/living/frame",
+       "what": "every picture frame (see-through middle), or one each below",
+       "size": "4:5"
+      },
+      {
+       "slot": "assets/living/frame-1",
+       "what": "frame 1 (the biggest)",
+       "size": "4:5",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/frame-2",
+       "what": "frame 2",
+       "size": "4:5",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/frame-3",
+       "what": "frame 3",
+       "size": "4:5",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/frame-4",
+       "what": "frame 4",
+       "size": "1:1",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/frame-5",
+       "what": "frame 5 (the smallest)",
+       "size": "5:4",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/arrow",
+       "what": "the see-through arrow to the bathroom (pointing right; flipped for the way back)",
+       "size": "1:1, e.g. 120 x 120"
+      }
+     ]
+    },
+    {
+     "name": "letters and bottles",
+     "slots": [
+      {
+       "slot": "assets/living/pinboard",
+       "what": "the pinboard (notes pinned on its middle 88%)",
+       "size": "4:3"
+      },
+      {
+       "slot": "assets/living/letter-shelf",
+       "what": "the little shelf under the board",
+       "size": "about 200:24"
+      },
+      {
+       "slot": "assets/living/letter",
+       "what": "one sheet of paper; the letters on the shelf are made of it",
+       "size": "portrait"
+      },
+      {
+       "slot": "assets/living/crate",
+       "what": "the bottle crate",
+       "size": "about 4:3"
+      }
+     ]
+    },
+    {
+     "name": "music",
+     "slots": [
+      {
+       "slot": "assets/living/turntable",
+       "what": "the record player (the record sits at 40% across, 53% down, 54% wide)",
+       "size": "200:110"
+      },
+      {
+       "slot": "assets/living/turntable-playing",
+       "what": "shown while music plays (a GIF can spin)",
+       "size": "200:110",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/record",
+       "what": "the vinyl: square, see-through outside the disc; the sleeve goes on its label",
+       "size": "1:1"
+      },
+      {
+       "slot": "assets/living/noise-machine",
+       "what": "the white noise machine",
+       "size": "about 3:2"
+      },
+      {
+       "slot": "assets/living/noise-machine-on",
+       "what": "shown while it plays (a GIF can hum)",
+       "size": "about 3:2",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/cat",
+       "what": "the cat on the armchair (dances to music)",
+       "size": "about 1:1"
+      },
+      {
+       "slot": "assets/living/plant",
+       "what": "the plant by the crate (dances to music)",
+       "size": "about 1:1"
+      },
+      {
+       "slot": "assets/living/cat-dancing",
+       "what": "the cat dancing (a GIF)",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/plant-dancing",
+       "what": "the plant dancing (a GIF)",
+       "optional": true
+      }
+     ]
+    }
+   ],
+   "page": "living.html"
+  },
+  {
+   "id": "bathroom",
+   "name": "the bathroom",
+   "groups": [
+    {
+     "name": "the room",
+     "slots": [
+      {
+       "slot": "assets/living/bath-wall",
+       "what": "the whole back wall (paint and tiles)",
+       "size": "3840 x 2160"
+      },
+      {
+       "slot": "assets/living/bath-floor",
+       "what": "the floor along the bottom, stretched to fit",
+       "size": "3840 x 220"
+      },
+      {
+       "slot": "assets/living/bath-mirror",
+       "what": "the mirror over the sink (click it to look in)",
+       "size": "3:4"
+      },
+      {
+       "slot": "assets/living/bath-sink",
+       "what": "the sink",
+       "size": "140:200"
+      },
+      {
+       "slot": "assets/living/bath-tub",
+       "what": "the bathtub",
+       "size": "300:140"
+      },
+      {
+       "slot": "assets/living/bath-towel",
+       "what": "the towel on its rail",
+       "size": "100:130"
+      },
+      {
+       "slot": "assets/living/bath-shelf",
+       "what": "the little shelf of bottles",
+       "size": "140:70"
+      },
+      {
+       "slot": "assets/living/bath-mat",
+       "what": "the bath mat",
+       "size": "300:30"
+      }
+     ]
+    },
+    {
+     "name": "in the mirror",
+     "slots": [
+      {
+       "slot": "assets/characters/reflection",
+       "what": "what you see in the mirror (“Despite everything, it’s still you.”)",
+       "size": "e.g. 600 x 900"
+      },
+      {
+       "slot": "assets/living/mirror-close",
+       "what": "the mirror’s frame up close: a PNG with a see-through middle",
+       "size": "3:4, e.g. 900 x 1200",
+       "optional": true
+      },
+      {
+       "slot": "assets/fonts/mirror",
+       "what": "the lettering in the text box (a pixel font)",
+       "size": ".woff2 / .woff / .ttf / .otf",
+       "optional": true,
+       "kind": "font"
+      }
+     ]
+    }
+   ],
+   "page": "living.html#bathroom"
+  },
+  {
+   "id": "characters",
+   "name": "characters",
+   "groups": [
+    {
+     "name": "one per scene",
+     "slots": [
+      {
+       "slot": "assets/characters/sea",
+       "what": "the traveller: rides the ship, walks the dock, can be picked up, swims. feet on the bottom edge, facing right",
+       "size": "240–480 px tall"
+      },
+      {
+       "slot": "assets/characters/workshop",
+       "what": "the traveller: stands at the bench. feet on the bottom edge, facing right",
+       "size": "240–480 px tall"
+      },
+      {
+       "slot": "assets/characters/living",
+       "what": "the traveller: at home by the armchair. feet on the bottom edge, facing right",
+       "size": "240–480 px tall"
+      },
+      {
+       "slot": "assets/characters/bathroom",
+       "what": "the traveller: in the bathroom, by the mirror. feet on the bottom edge, facing right",
+       "size": "240–480 px tall"
+      },
+      {
+       "slot": "assets/characters/city",
+       "what": "the traveller: stargazing on the rooftop. feet on the bottom edge, facing right",
+       "size": "240–480 px tall"
+      }
+     ]
+    },
+    {
+     "name": "poses (optional; the same canvas as the main picture)",
+     "slots": [
+      {
+       "slot": "assets/characters/sea-held",
+       "what": "while they’re picked up (a GIF struggling)",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/sea-startled",
+       "what": "the double-take when the ship leaves without them",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/living-walking",
+       "what": "walking to the bathroom (a GIF, facing right)",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/bathroom-walking",
+       "what": "walking in the bathroom (a GIF, facing right)",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/sea-dancing",
+       "what": "dancing while music plays (sea)",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/workshop-dancing",
+       "what": "dancing while music plays (workshop)",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/living-dancing",
+       "what": "dancing while music plays (living)",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/bathroom-dancing",
+       "what": "dancing while music plays (bathroom)",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/city-dancing",
+       "what": "dancing while music plays (city)",
+       "size": "same canvas",
+       "optional": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "sounds",
+   "name": "sounds",
+   "groups": [
+    {
+     "name": "weather (looped)",
+     "slots": [
+      {
+       "slot": "assets/sounds/rain",
+       "what": "the rain outside, and the noise machine’s",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/windowrain",
+       "what": "rain on the window, heard from inside (and in a thunderstorm)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/wind",
+       "what": "the wind of storms and snow",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/thunder",
+       "what": "one roll of thunder (played now and then, not looped)",
+       "kind": "sound"
+      }
+     ]
+    },
+    {
+     "name": "sound effects (played once)",
+     "slots": [
+      {
+       "slot": "assets/sounds/cork-pop",
+       "what": "a bottle uncorked",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/cork-in",
+       "what": "a cork pushed back in",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/paper-unroll",
+       "what": "a letter unrolled (and the clipboard opening)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/paper-roll",
+       "what": "a letter rolled up",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/throw",
+       "what": "a bottle thrown",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/splash",
+       "what": "something landing in the sea (pitched for its size)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/surface",
+       "what": "the traveller bobbing back up",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/climb-out",
+       "what": "hauling out of the water, dripping",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/land",
+       "what": "feet landing on boards",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/step",
+       "what": "a footstep (walking to the bathroom)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/twinkle",
+       "what": "a placeholder constellation, clicked",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/wish",
+       "what": "the shooting star",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/brush",
+       "what": "a brush dab on the painting desk",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/portfolio",
+       "what": "a painting slipped into the portfolio",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/chime",
+       "what": "the pomodoro timer’s ring",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/shimmer",
+       "what": "looking into the mirror",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/blip",
+       "what": "one letter of the mirror’s text typing out (Undertale-style)",
+       "kind": "sound"
+      }
+     ]
+    }
+   ],
+   "note": "the noise machine’s sounds have their own tab."
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+  "title": "to do",
+  "todo": [
+    {
+      "text": "swap the stand-in art for my own (content manager \u2192 assets)",
+      "done": false
+    },
+    {
+      "text": "hang something in the workshop frames",
+      "done": false
+    },
+    {
+      "text": "find a chime I like for the timer",
+      "done": false
+    },
+    {
+      "text": "make the site",
+      "done": true
+    }
+  ],
+  "notes": [
+    {
+      "text": "write things here from the content manager \u2192 notes. publish to put them up.",
+      "date": "2026-09-24"
+    }
+  ]
+}

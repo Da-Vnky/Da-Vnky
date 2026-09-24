@@ -178,7 +178,7 @@
     function assetDir(dir) {
         if (!assetDirs[dir]) assetDirs[dir] = Promise.all([
             fetch(dir + 'list.txt', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; }),
-            new Promise(function (done) { listFolder(dir, EXTS.concat(['jpeg', 'json', 'mp3', 'ogg']), done); })
+            new Promise(function (done) { listFolder(dir, EXTS.concat(['jpeg', 'json', 'mp3', 'ogg', 'webm', 'mp4', 'woff', 'woff2', 'ttf', 'otf']), done); })
         ]).then(function (r) {
             var known = !!r[0] && !/<html/i.test(r[0]), names = {};
             r[1].forEach(function (f) { names[f.name] = 1; });
@@ -924,6 +924,17 @@
             });
             if (win && !win.dataset.asset) win.dataset.asset = 'assets/' + place + '/window';
         }
+        // the floor: runs to the very bottom of the screen, however tall the window is
+        // (a taller window just shows more floor). your own: assets/<place>/floor, stretched
+        // across the bottom. its height: --floor-h on the .room (default 9vh). no floor: <div class="room" data-floor="none">
+        if (room.dataset.floor !== 'none' && !room.querySelector('.room-floor')) {
+            var floor = document.createElement('div');
+            floor.className = 'room-floor';
+            floor.setAttribute('aria-hidden', 'true');
+            floor.innerHTML = '<div class="placeholder"></div>';
+            if (place) floor.dataset.asset = 'assets/' + place + '/floor';
+            room.insertBefore(floor, room.firstChild);
+        }
         var fitWindow = function () {
             if (!win) return;
             if (room.classList.contains('outside')) return;
@@ -938,6 +949,9 @@
         };
         fitWindow();
         window.addEventListener('resize', fitWindow);
+        // (a taskbar that hides itself, fullscreen, a zoom change … the room follows the real screen)
+        if (window.ResizeObserver) new ResizeObserver(function () { fitWindow(); }).observe(room);
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', fitWindow);
 
         // stepping outside lets night fall (so Polaris and the constellations come out)
         // and brings up the day/night player; going back inside returns to the scroll's time
@@ -972,7 +986,7 @@
             var list = [];
             base.split('|').forEach(function (b) {
                 b = b.trim();
-                if (/\.(svg|gif|webp|png|jpe?g|json|mp3|ogg|webm|mp4)$/i.test(b)) list.push(b);
+                if (/\.(svg|gif|webp|png|jpe?g|json|mp3|ogg|webm|mp4|woff2?|ttf|otf)$/i.test(b)) list.push(b);
                 else EXTS.forEach(function (x) { list.push(b + '.' + x); });
             });
             var dirs = {};
@@ -989,7 +1003,7 @@
                 (function next() {
                     if (i >= list.length) return done(null);
                     var url = list[i++];
-                    if (/\.(mp3|ogg|webm|mp4)$/i.test(url)) {        // a sound or a video: just check it's there
+                    if (/\.(mp3|ogg|webm|mp4|woff2?|ttf|otf)$/i.test(url)) {        // a sound, a video or a font: just check it's there
                         fetch(url, { method: 'HEAD', cache: 'no-cache' }).then(function (r) { r.ok ? done({ url: url }) : next(); }, next);
                         return;
                     }
@@ -1105,9 +1119,10 @@
     //   <name>-held       shown while they're picked up (e.g. a struggling GIF)
     //   <name>-startled   the double-take when the ship leaves without them
     //   <name>-dancing    shown while music plays (a GIF of them dancing)
-    // a pose appears whenever the character has the matching class (.held, .startled),
+    //   <name>-walking    shown while they walk somewhere (a GIF of them walking, facing right)
+    // a pose appears whenever the character has the matching class (.held, .startled, .walking),
     // and the dancing one whenever the page has music playing
-    var POSES = ['held', 'startled', 'dancing'];
+    var POSES = ['held', 'startled', 'dancing', 'walking'];
     function addPoses(el, base) {
         POSES.forEach(function (pose) {
             findAsset(base + '-' + pose, function (url) {

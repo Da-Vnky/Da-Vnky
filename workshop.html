@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260924j">
+    <link rel="stylesheet" href="sky/sky.css?v=20260924k">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -31,6 +31,8 @@
         .portfolio { left: 76%; bottom: 0; height: 21vh; aspect-ratio: 125 / 100; z-index: 3; }
         .model-shelf { left: 36%; top: 43%; width: 13%; height: 9%; }
         .paint-easel { left: 55%; bottom: 1vh; height: 42vh; aspect-ratio: 62 / 100; z-index: 3; filter: drop-shadow(0 6px 8px rgba(0,0,0,.4)); }
+        .pomodoro    { left: 71.5%; bottom: calc(30vh * .818 - 4px); width: 3.8vw; min-width: 44px; }
+        .notes-board { left: 83.5%; top: 49%; width: 9.5%; }
 
         .pinned {
             left: 8%;
@@ -74,6 +76,9 @@
             .portfolio { left: auto; right: 4%; height: 11vh; }
             .paint-easel { left: 41%; height: 27vh; z-index: 4; }
             .gallery-frame, .model-shelf { display: none; }
+            .room .model-shelf { display: none; }
+            .pomodoro { left: 70%; bottom: calc(24vh * .818 - 4px); width: 8vw; min-width: 0; }
+            .notes-board { left: 79%; top: 13%; width: 17%; }
         }
     </style>
 </head>
@@ -172,6 +177,15 @@
         <div class="furnish gallery-frame" data-frame="2" data-look="dark" style="left:85.5%; top:34%; width:6.5%; aspect-ratio:5 / 4; --tilt:1deg"></div>
         <div class="furnish gallery-frame" data-frame="3" data-look="gilt" style="left:31.5%; top:15%; width:4.5%; --tilt:1.5deg"></div>
 
+        <!-- a pomodoro timer on the bench (sky/timer.js): 25 minutes of focus, then a break. it rings when time's up.
+             how long: data-focus / data-short / data-long (minutes), a long break every data-rounds.
+             your own: assets/workshop/timer (+ timer-running, timer-panel); the ring: assets/sounds/chime -->
+        <div class="furnish pomodoro" data-asset="assets/workshop/timer" data-focus="25" data-short="5" data-long="15" data-rounds="4"></div>
+
+        <!-- your to-do list and notes (sky/notes.js), written in the content manager (tools\content.bat → notes).
+             your own board: assets/workshop/notes-board; the sheet it opens on: assets/workshop/notes-paper -->
+        <div class="furnish notes-board" data-asset="assets/workshop/notes-board" style="--tilt: 1.5deg"></div>
+
         <!-- a shelf of models: assets/workshop/model-1, model-2, model-3 (a looping .webm of it turning,
              a .gif, or a picture; see sky/models.js). the title is what shows when you hover. -->
         <div class="furnish model-shelf">
@@ -238,16 +252,18 @@
              style="left: 36%; bottom: 3vh; height: 27vh;"></div>
     </div>
 
-    <script src="sky/sky.js?v=20260924j"></script>
-    <script src="sky/ground-countryside.js?v=20260924j"></script>
-    <script src="sky/gallery.js?v=20260924j"></script>
-    <script src="sky/frames.js?v=20260924j"></script>
-    <script src="sky/models.js?v=20260924j"></script>
-    <script src="sky/paint.js?v=20260924j"></script>
-    <script src="sky/studio.js?v=20260924j"></script>
-    <script src="sky/panel.js?v=20260924j"></script>
-    <script src="sky/music.js?v=20260924j"></script>
-    <script src="sky/weather.js?v=20260924j"></script>
-    <script src="sky/noise.js?v=20260924j"></script>
+    <script src="sky/sky.js?v=20260924k"></script>
+    <script src="sky/ground-countryside.js?v=20260924k"></script>
+    <script src="sky/gallery.js?v=20260924k"></script>
+    <script src="sky/frames.js?v=20260924k"></script>
+    <script src="sky/models.js?v=20260924k"></script>
+    <script src="sky/timer.js?v=20260924k"></script>
+    <script src="sky/notes.js?v=20260924k"></script>
+    <script src="sky/paint.js?v=20260924k"></script>
+    <script src="sky/studio.js?v=20260924k"></script>
+    <script src="sky/panel.js?v=20260924k"></script>
+    <script src="sky/music.js?v=20260924k"></script>
+    <script src="sky/weather.js?v=20260924k"></script>
+    <script src="sky/noise.js?v=20260924k"></script>
 </body>
 </html>

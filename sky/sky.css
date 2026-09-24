@@ -480,6 +480,30 @@ body.leaving .credit { opacity: 0; transition: opacity .7s ease; }
 }
 .room .furnish { position: absolute; z-index: 2; }
 
+/* the floor: from the very bottom of the screen up to --floor-h, with a skirting board along the top.
+   your own art: assets/<place>/floor (stretched to fit). */
+.room .room-floor {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: var(--floor-h, 9vh);
+    min-height: 34px;
+    z-index: 2;              /* over the wallpaper, under the furniture (it's the room's first child) */
+    pointer-events: none;
+}
+.room .room-floor .placeholder,
+.room .room-floor > .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: fill; }
+.room .room-floor .placeholder {
+    border-top: 9px solid var(--skirting, var(--frame));
+    box-shadow: 0 -3px 8px rgba(0,0,0,.28);
+    background:
+        linear-gradient(rgba(10, 14, 30, calc(.45 * var(--dusk))), rgba(10, 14, 30, calc(.45 * var(--dusk)))),
+        linear-gradient(rgba(0,0,0,.28), transparent 40%),
+        repeating-linear-gradient(to bottom, transparent 0 13px, rgba(0,0,0,.28) 13px 15px),
+        repeating-linear-gradient(to right, transparent 0 158px, rgba(0,0,0,.2) 158px 160px),
+        var(--floor, #2c1e14);
+}
+.room .room-floor > .art { z-index: 1; }
+
 /* while you're indoors, the constellations you can see through the glass can still be clicked */
 body.has-room:not(.is-outside) .sky-links {
     z-index: 4;
@@ -877,6 +901,10 @@ body.scope-view .ground { transform: translateY(110%); opacity: 0; }
 .character.has-startled.startled > .placeholder,
 .character.has-startled.startled > .art { display: none; }
 .character.has-startled.startled.face-left .pose-startled { transform: scaleX(-1); }
+.character.has-walking.walking .pose-walking { display: block; animation: none !important; }
+.character.has-walking.walking > .placeholder,
+.character.has-walking.walking > .art { display: none; }
+.character.has-walking.walking.face-left .pose-walking { transform: scaleX(-1); }
 
 /* =====================================================================
    your art in the slots (see assets/README.txt)

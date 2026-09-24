@@ -7,3 +7,4 @@ cat.png
 droolers.png
 foot.jpg
 frames.json
+notes.json

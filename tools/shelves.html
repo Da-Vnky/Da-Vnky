@@ -67,12 +67,13 @@
     .card .look.music { grid-template-rows: 1fr auto; gap: 8px; padding: 12px 0; }
     .card .cap { margin: 0 14px 4px; font-size: .9rem; white-space: pre-wrap; color: var(--ink); }
     .card .look iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+    .sub a { color: #e0b070; }
     h2 .add { margin-left: 10px; vertical-align: middle; font: italic .95rem "IM Fell English", Georgia, serif; }
 </style>
 </head>
 <body>
 <header>
-    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html" class="on">your things</a><a href="post.html">visitors</a></nav>
+    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html" class="on">your things</a><a href="post.html">visitors</a><a href="notes.html">notes</a><a href="assets.html">assets</a></nav>
     <h1>your things</h1>
     <button type="button" class="btn publish">publish to the live site</button>
     <p class="status"></p>
@@ -86,9 +87,8 @@
     <p class="sub">the lit windows you find with the telescope (content/city/): one file = one window. landscape pictures (about 4:3) fit best.</p>
     <div class="grid" data-shelf="city"></div>
 
-    <h2>records <button type="button" class="btn main add" data-add="music">+ add</button></h2>
-    <p class="sub">the record player in the living space (content/living/): .mp3 or .ogg. start names with 01-, 02-, … to set the order. a sleeve is the record's cover (tools\sleeve.bat fetches one from Spotify).</p>
-    <div class="grid" data-shelf="music"></div>
+    <h2>records</h2>
+    <p class="sub">the record player's songs and sleeves have moved to <a href="assets.html" onclick="try{sessionStorage.setItem('assets-tab','records')}catch(e){}">assets &rarr; record player</a>: add songs (numbered for you), put them in order, and fetch sleeves from Spotify.</p>
     <input type="file" class="file-in" multiple hidden>
 </main>
 
@@ -202,7 +202,7 @@
     function load(which) {
         return api('/__shelf/list?which=' + which).then(function (r) { if (r.error) { say(r.error, true); return; } draw(which, r); });
     }
-    function loadAll() { return Promise.all(['easel', 'city', 'music'].map(load)); }
+    function loadAll() { return Promise.all(['easel', 'city'].map(load)); }
 
     var picked = null;
     function pick(accept, multiple, fn) { fileIn.accept = accept; fileIn.multiple = multiple; picked = fn; fileIn.click(); }

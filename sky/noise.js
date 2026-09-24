@@ -10,8 +10,10 @@
                                                            (the machine itself, in a room)
 
    YOUR OWN: assets/sounds/<name>.mp3 (or .ogg) replaces any sound below
-   (it loops, so make its ends meet). To add a new sound, add a line to
-   SOUNDS with a new name and put its recording in assets/sounds/.
+   (it loops, so make its ends meet). To add a new sound: the content
+   manager's assets page (noise machine) does it for you, or put the
+   recording in assets/sounds/ and list it in assets/sounds/noise.json:
+       [ { "name": "cafe", "label": "a busy café" } ]
    The machine: assets/living/noise-machine, and noise-machine-on (shown
    while it plays; a GIF can animate). Icon in the panel: assets/ui/noise.
    ===================================================================== */
@@ -86,11 +88,22 @@
         if (machine) machine.classList.toggle('on', anyOn());
         drawLayer();
     }
-    SOUNDS.forEach(function (s) {
+    function addSound(s) {
         avail[s.name] = Sky.sounds.has(s.name);
-        chans[s.name] = Sky.sounds.channel(s.name);
+        chans[s.name] = Sky.sounds.channel(s.name, s.name === 'storm' ? { orFile: 'rain', withThunder: true } : {});   // no storm recording? your rain, with thunder
         if (!avail[s.name]) Sky.findAsset('assets/sounds/' + s.name + '.mp3|assets/sounds/' + s.name + '.ogg', function (url) {
             if (url) { avail[s.name] = true; drawLayer(true); apply(); }
+        });
+    }
+    SOUNDS.forEach(addSound);
+    // your own extra sounds (added from the content manager): assets/sounds/noise.json
+    Sky.findAsset('assets/sounds/noise.json', function (url, data) {
+        var list = url && Array.isArray(data) ? data : [];
+        list.forEach(function (s) {
+            if (!s || !/^[a-z0-9-]+$/.test(s.name || '') || chans[s.name]) return;
+            var extra = { name: s.name, label: String(s.label || s.name).slice(0, 40) };
+            SOUNDS.push(extra);
+            addSound(extra);
         });
     });
 

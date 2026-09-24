@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>assets · content manager · DaV-nky</title>
+<!-- the asset manager: part of the content manager. open it with tools\content.bat.
+     the list of slots comes from tools/slots.json. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+    :root { --ink: #3a2716; --faded: #6e5236; --red: #9a3b1f; --card: #efe3c6; --green: #4f7a3a; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #2a1d14; color: #f3e6c2; font: 1.05rem/1.5 "IM Fell English", Georgia, serif; }
+    button, input { font: inherit; }
+    header { position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 22px 0;
+        background: #3a2a1d; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+    header h1 { margin: 0 auto 0 12px; font: normal 1.6rem "IM Fell English SC", Georgia, serif; }
+    .btn { padding: 8px 16px; border: 1px solid rgba(243,230,194,.35); border-radius: 999px; background: none; color: #f3e6c2; cursor: pointer; font-style: italic; }
+    .btn:hover { background: rgba(243,230,194,.1); }
+    .btn.main { background: var(--red); border-color: var(--red); }
+    .btn.main:hover { background: #b24a28; }
+    .status { width: 100%; margin: 0; font-style: italic; font-size: .92rem; color: rgba(243,230,194,.75); min-height: 1.4em; }
+    .status.bad { color: #f0b08a; }
+    .cm-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: .92rem; }
+    .cm-nav span { font: normal 1rem "IM Fell English SC", Georgia, serif; color: #e0b070; margin-right: 6px; }
+    .cm-nav a { padding: 3px 10px; border-radius: 999px; color: #f3e6c2; text-decoration: none; font-style: italic; }
+    .cm-nav a:hover { background: rgba(243,230,194,.1); }
+    .cm-nav a.on { background: #f3e6c2; color: #3a2716; }
+    .tabs { width: 100%; display: flex; flex-wrap: wrap; gap: 2px; margin: 2px 0 0; }
+    .tabs button { flex: none; border: 0; border-radius: 10px 10px 0 0; padding: 8px 14px 7px; background: rgba(243,230,194,.08); color: #f3e6c2; cursor: pointer; font-style: italic; white-space: nowrap; }
+    .tabs button:hover { background: rgba(243,230,194,.16); }
+    .tabs button[aria-selected=true] { background: #2a1d14; color: #fff3d8; }
+    .tabs button .n { font-size: .78rem; opacity: .7; margin-left: 5px; }
+    .tabs button.special { color: #e0b070; }
+    main { max-width: 1280px; margin: 0 auto; padding: 18px 22px 80px; }
+    .intro { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin: 4px 0 6px; }
+    .intro p { margin: 0; font-style: italic; color: rgba(243,230,194,.72); font-size: .95rem; }
+    .intro a { color: #e0b070; font-style: italic; }
+    .bar { flex: 1 1 200px; max-width: 320px; height: 8px; border-radius: 99px; background: rgba(243,230,194,.12); overflow: hidden; }
+    .bar i { display: block; height: 100%; background: #7fae62; }
+    h2 { margin: 26px 0 10px; font: normal 1.3rem "IM Fell English SC", Georgia, serif; }
+    h2 small { font: italic .9rem "IM Fell English", Georgia, serif; color: rgba(243,230,194,.6); margin-left: 8px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+    .card { position: relative; display: flex; flex-direction: column; background: var(--card); color: var(--ink); box-shadow: 0 8px 18px rgba(0,0,0,.4), inset 0 0 26px rgba(120,80,30,.2); transition: outline-color .15s; outline: 3px dashed transparent; outline-offset: -3px; }
+    .card.drop { outline-color: var(--red); }
+    .card .look { height: 150px; display: grid; place-items: center; overflow: hidden;
+        background: repeating-conic-gradient(#e6d8b6 0 25%, #f3ead2 0 50%) 0 0 / 18px 18px; }
+    .card .look img, .card .look video { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .card .look audio { width: 92%; }
+    .card .look .stock { font-style: italic; color: #8a7258; text-align: center; padding: 10px; background: rgba(243,234,210,.85); border: 1.5px dashed rgba(110,82,54,.45); border-radius: 8px; font-size: .9rem; }
+    .card .look .fontdemo { font-size: 2.2rem; }
+    .card .look pre { margin: 0; padding: 10px; width: 100%; height: 100%; overflow: hidden; font-size: .72rem; white-space: pre-wrap; background: rgba(255,255,255,.6); }
+    .card .tag { position: absolute; top: 8px; right: 8px; padding: 0 9px; border-radius: 999px; font-size: .78rem; font-style: italic; background: rgba(110,82,54,.85); color: #f3e6c2; }
+    .card .tag.yours { background: var(--green); }
+    .card .meta { padding: 9px 13px 4px; }
+    .card .meta b { display: block; font: normal 1rem ui-monospace, Menlo, Consolas, monospace; font-size: .86rem; color: var(--ink); word-break: break-all; }
+    .card .meta .what { font-size: .92rem; }
+    .card .meta .size { font-size: .82rem; font-style: italic; color: var(--faded); }
+    .card .meta .file { font-size: .8rem; color: var(--faded); word-break: break-all; }
+    .card .acts { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 12px 12px; margin-top: auto; }
+    .card .acts button, .row button, .sm { padding: 5px 11px; border-radius: 999px; cursor: pointer; font-style: italic; border: 1px solid rgba(110,82,54,.35); background: #f8f0dc; color: var(--ink); white-space: nowrap; font-size: .92rem; }
+    .card .acts button:hover, .row button:hover, .sm:hover { background: #fff8e6; }
+    .card .acts .yes, .row .yes { background: var(--ink); color: #f3e6c2; border-color: var(--ink); }
+    .card .acts .yes:hover, .row .yes:hover { background: var(--red); }
+    .card .acts .no, .row .no { color: var(--red); }
+    .card .twin { margin: 0 12px 10px; padding: 6px 9px; border-radius: 8px; background: rgba(110,82,54,.08); font-size: .85rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .card .twin img { width: 34px; height: 34px; object-fit: contain; background: repeating-conic-gradient(#e6d8b6 0 25%, #f3ead2 0 50%) 0 0 / 8px 8px; }
+    .card .twin .tl { flex: 1; min-width: 90px; font-style: italic; color: var(--faded); }
+    .card .twin button { padding: 2px 9px; font-size: .82rem; }
+    .card.optional .meta b::after { content: "optional"; margin-left: 6px; padding: 0 6px; border-radius: 99px; background: rgba(110,82,54,.14); font: italic .72rem "IM Fell English", Georgia, serif; color: var(--faded); }
+    /* lists (checklist, records, noise) */
+    .sheet { background: var(--card); color: var(--ink); padding: 8px 16px; box-shadow: 0 8px 18px rgba(0,0,0,.4), inset 0 0 26px rgba(120,80,30,.2); }
+    .row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dashed rgba(110,82,54,.3); flex-wrap: wrap; }
+    .row:last-child { border-bottom: 0; }
+    .row .box { flex: none; width: 17px; height: 17px; border: 1.6px solid var(--faded); border-radius: 3px; }
+    .row .main { flex: 1; min-width: 200px; }
+    .row .main b { font: normal .86rem ui-monospace, Menlo, Consolas, monospace; }
+    .row .main span { display: block; font-size: .9rem; font-style: italic; color: var(--faded); }
+    .row .num { flex: none; width: 38px; font: normal 1.3rem "IM Fell English SC", Georgia, serif; color: var(--faded); text-align: right; }
+    .row .sleeve { flex: none; width: 64px; height: 64px; background: #2a1d14; display: grid; place-items: center; color: #cdbb96; font-size: .7rem; font-style: italic; text-align: center; overflow: hidden; }
+    .row .sleeve img { width: 100%; height: 100%; object-fit: cover; }
+    .row input.title { width: 100%; border: 0; border-bottom: 1px dashed transparent; background: none; color: var(--ink); font-size: 1.05rem; padding: 1px 0; }
+    .row input.title:hover { border-bottom-color: rgba(110,82,54,.4); }
+    .row input.title:focus { outline: none; border-bottom-color: var(--red); background: rgba(255,255,255,.4); }
+    .row audio { height: 32px; width: 240px; max-width: 100%; }
+    .row .btns { display: flex; gap: 5px; flex-wrap: wrap; }
+    .empty { font-style: italic; color: rgba(243,230,194,.55); }
+    .sheet .empty { color: #8a7258; padding: 8px 0; }
+    .opts { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin: 6px 0 4px; font-size: .95rem; font-style: italic; color: rgba(243,230,194,.75); }
+    .opts input { accent-color: var(--red); }
+    .folder-h { margin: 18px 0 6px; font: normal 1.05rem ui-monospace, Menlo, Consolas, monospace; color: #e0b070; }
+    .folder-h small { font: italic .9rem "IM Fell English", Georgia, serif; color: rgba(243,230,194,.6); margin-left: 8px; }
+    [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html">your things</a><a href="post.html">visitors</a><a href="notes.html">notes</a><a href="assets.html" class="on">assets</a></nav>
+    <h1>assets</h1>
+    <button type="button" class="btn publish">publish to the live site</button>
+    <p class="status">every picture and sound on the site is a slot. replace one, and the stand-in steps aside. (you can also drop a file straight onto a card.)</p>
+    <div class="tabs" role="tablist"></div>
+</header>
+<main></main>
+<input type="file" class="file-in" hidden>
+
+<script>
+(function () {
+    var $ = function (s, r) { return (r || document).querySelector(s); };
+    var statusEl = $('.status'), main = $('main'), tabsEl = $('.tabs'), fileIn = $('.file-in');
+    var CAT = null, STATE = { files: {}, tracks: [], noise: [] }, tab = 'everywhere', showOptional = false;
+    try { tab = sessionStorage.getItem('assets-tab') || tab; } catch (e) {}
+    var PICS = /\.(svg|png|webp|gif|jpe?g)$/i, VIDS = /\.(webm|mp4)$/i, SOUNDS = /\.(mp3|ogg)$/i;
+    var ORDER = ['svg', 'gif', 'webp', 'png', 'jpg', 'jpeg', 'webm', 'mp4', 'mp3', 'ogg', 'json', 'woff2', 'woff', 'ttf', 'otf'];
+
+    function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
+    var OLD = { error: 'the content manager window that’s open is an older version. close its black window, then double-click tools\\content.bat again' };
+    function answer(r) { return r.json().then(function (j) { return j && j.error === 'unknown' ? OLD : j; }, function () { return OLD; }); }
+    var DOWN = { error: 'the manager isn’t running. open it with tools\\content.bat' };
+    function api(path, body) {
+        var opt = body === undefined ? {} : { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } };
+        return fetch(path, opt).then(answer, function () { return DOWN; });
+    }
+    function send(path, file, headers) {
+        var h = { 'Content-Type': 'application/octet-stream', 'X-Name': encodeURIComponent(file.name) };
+        Object.keys(headers || {}).forEach(function (k) { h[k] = encodeURIComponent(headers[k]); });
+        return fetch(path, { method: 'POST', body: file, headers: h }).then(answer, function () { return DOWN; });
+    }
+    function esc(t) { var d = document.createElement('div'); d.textContent = t == null ? '' : String(t); return d.innerHTML; }
+    function kb(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+    function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+    function btn(label, fn, cls) { var b = el('button', cls); b.type = 'button'; b.textContent = label; b.addEventListener('click', fn); return b; }
+
+    /* ---------------- which file fills a slot ---------------- */
+    function parts(slot) { var m = /^assets\/([a-z0-9-]+)\/([a-z0-9-]+)$/.exec(slot); return m ? { folder: m[1], stem: m[2] } : null; }
+    function fileFor(slot) {
+        var p = parts(slot);
+        if (!p) return null;
+        var hits = (STATE.files[p.folder] || []).filter(function (f) { return f.name.replace(/\.[^.]+$/, '') === p.stem; });
+        hits.sort(function (a, b) { return ORDER.indexOf(a.name.split('.').pop().toLowerCase()) - ORDER.indexOf(b.name.split('.').pop().toLowerCase()); });
+        return hits[0] ? { name: hits[0].name, size: hits[0].size, time: hits[0].time, url: '/assets/' + p.folder + '/' + encodeURIComponent(hits[0].name) + '?t=' + hits[0].time } : null;
+    }
+    function accept(kind) { return (CAT.kinds[kind] || CAT.kinds.image).map(function (e) { return '.' + e; }).join(','); }
+    function allSlots() {
+        var out = [];
+        CAT.scenes.forEach(function (sc) { sc.groups.forEach(function (g) { g.slots.forEach(function (s) { out.push(s); if (s.glow) out.push({ slot: s.slot + '-glow', what: 'the glow twin of ' + s.slot.split('/').pop(), optional: true, twin: true }); }); }); });
+        CAT.noise.forEach(function (n) { out.push({ slot: 'assets/sounds/' + n.name, what: 'the noise machine’s ' + n.label, kind: 'sound', optional: true }); });
+        var seen = {};
+        return out.filter(function (s) { if (seen[s.slot]) return false; seen[s.slot] = 1; return true; });
+    }
+
+    /* ---------------- picking and dropping files ---------------- */
+    var picked = null;
+    function pick(acc, multiple, fn) { fileIn.accept = acc || ''; fileIn.multiple = !!multiple; picked = fn; fileIn.click(); }
+    fileIn.addEventListener('change', function () {
+        var files = Array.prototype.slice.call(fileIn.files);
+        fileIn.value = '';
+        if (files.length && picked) picked(files);
+    });
+    function droppable(node, fn) {
+        node.addEventListener('dragover', function (e) { if (e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') !== -1) { e.preventDefault(); node.classList.add('drop'); } });
+        node.addEventListener('dragleave', function () { node.classList.remove('drop'); });
+        node.addEventListener('drop', function (e) { e.preventDefault(); node.classList.remove('drop'); var f = e.dataTransfer.files; if (f && f.length) fn(Array.prototype.slice.call(f)); });
+    }
+    document.addEventListener('dragover', function (e) { e.preventDefault(); });
+    document.addEventListener('drop', function (e) { e.preventDefault(); });
+
+    function put(slot, kind, file) {
+        say('putting ' + file.name + ' in ' + slot + '…');
+        return send('/__assets/put', file, { 'X-Slot': slot, 'X-Kind': kind || 'image' }).then(function (r) {
+            if (r.error) say(file.name + ': ' + r.error, true);
+            else say('saved as ' + slot.replace(/[^\/]+$/, '') + r.name + (file.size > 2 * 1048576 ? ' (it’s ' + kb(file.size) + ': big files make the page slow to load)' : '') + '. publish when you’re ready.');
+            return load();
+        });
+    }
+    function clear(slot) {
+        if (!confirm('take your file out of ' + slot + '? the stand-in comes back (on the live site once you publish).')) return;
+        api('/__assets/clear', { slot: slot }).then(function (r) { if (r.error) say(r.error, true); else say('removed ' + (r.removed || []).join(', ') + '. the stand-in is back.'); load(); });
+    }
+
+    /* ---------------- a slot's card ---------------- */
+    function preview(f, kind) {
+        if (!f) return '<div class="stock">the stand-in<br><small>(' + (kind === 'sound' ? 'the page makes this sound itself' : kind === 'font' ? 'the default lettering' : 'the drawing that’s there now') + ')</small></div>';
+        if (PICS.test(f.name)) return '<img alt="" loading="lazy" src="' + f.url + '">';
+        if (VIDS.test(f.name)) return '<video muted loop autoplay playsinline src="' + f.url + '"></video>';
+        if (SOUNDS.test(f.name)) return '<audio controls preload="none" src="' + f.url + '"></audio>';
+        if (/\.json$/i.test(f.name)) return '<pre data-json="' + f.url + '">…</pre>';
+        return '<div class="fontdemo">Aa</div>';
+    }
+    function card(s) {
+        var kind = s.kind || 'image', f = fileFor(s.slot);
+        var c = el('div', 'card' + (s.optional ? ' optional' : ''));
+        c.appendChild(el('div', 'look', preview(f, kind)));
+        c.appendChild(el('span', 'tag' + (f ? ' yours' : ''), f ? 'yours' : 'stand-in'));
+        var pre = c.querySelector('pre[data-json]');
+        if (pre) fetch(pre.dataset.json).then(function (r) { return r.text(); }).then(function (t) { pre.textContent = t; });
+        if (kind === 'font' && f) { try { var ff = new FontFace('slot-' + s.slot.replace(/\W/g, ''), 'url(' + f.url + ')'); ff.load().then(function (x) { document.fonts.add(x); c.querySelector('.fontdemo').style.fontFamily = x.family; }); } catch (e) {} }
+        c.appendChild(el('div', 'meta', '<b>' + esc(s.slot.replace(/^assets\//, '')) + '</b><div class="what">' + esc(s.what) + '</div>' +
+            (s.size ? '<div class="size">' + esc(s.size) + '</div>' : '') +
+            (f ? '<div class="file">' + esc(f.name) + ' · ' + kb(f.size) + '</div>' : '')));
+        if (s.glow) {
+            var g = fileFor(s.slot + '-glow'), tw = el('div', 'twin');
+            tw.innerHTML = (g && PICS.test(g.name) ? '<img alt="" src="' + g.url + '">' : '') + '<span class="tl">' + (g ? 'glow twin: ' + esc(g.name) : 'glow twin (lights up at dusk): none') + '</span>';
+            tw.appendChild(btn(g ? 'replace' : '+ add', function () { pick(accept('image'), false, function (fs) { put(s.slot + '-glow', 'image', fs[0]); }); }));
+            if (g) tw.appendChild(btn('remove', function () { clear(s.slot + '-glow'); }, 'no'));
+            c.appendChild(tw);
+        }
+        var acts = el('div', 'acts');
+        acts.appendChild(btn(f ? 'replace' : 'add yours', function () { pick(accept(kind), false, function (fs) { put(s.slot, kind, fs[0]); }); }, 'yes'));
+        if (f) acts.appendChild(btn('open', function () { window.open(f.url, '_blank'); }));
+        if (f) acts.appendChild(btn('remove', function () { clear(s.slot); }, 'no'));
+        c.appendChild(acts);
+        droppable(c, function (fs) { put(s.slot, kind, fs[0]); });
+        return c;
+    }
+    function counts(slots) {
+        var need = slots.filter(function (s) { return !s.optional; });
+        return { done: need.filter(function (s) { return fileFor(s.slot); }).length, of: need.length };
+    }
+    function intro(text, page, slots) {
+        var d = el('div', 'intro');
+        if (slots) {
+            var n = counts(slots);
+            d.appendChild(el('p', '', n.done + ' of ' + n.of + ' slots have your art' + (n.of ? '' : '')));
+            var bar = el('div', 'bar', '<i style="width:' + (n.of ? Math.round(100 * n.done / n.of) : 0) + '%"></i>');
+            d.appendChild(bar);
+        }
+        if (text) d.appendChild(el('p', '', esc(text)));
+        if (page) { var a = el('a', '', 'see them on the page ↗'); a.href = '/' + page.replace('#', '?slots#').replace(/^([^?#]+)$/, '$1?slots'); a.target = '_blank'; d.appendChild(a); }
+        return d;
+    }
+
+    /* ---------------- the tabs ---------------- */
+    function drawTabs() {
+        tabsEl.innerHTML = '';
+        var list = CAT.scenes.map(function (s) {
+            var slots = []; s.groups.forEach(function (g) { slots = slots.concat(g.slots); });
+            var n = counts(slots);
+            return { id: s.id, name: s.name, n: n.done + '/' + n.of };
+        }).concat([{ id: 'records', name: 'record player', special: true }, { id: 'noise', name: 'noise machine', special: true }]);
+        var todo = allSlots().filter(function (s) { return !s.optional && !fileFor(s.slot); }).length;
+        list.push({ id: 'checklist', name: 'still to do', n: String(todo), special: true });
+        list.forEach(function (t) {
+            var b = el('button', t.special ? 'special' : '', esc(t.name) + (t.n ? '<span class="n">' + t.n + '</span>' : ''));
+            b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(t.id === tab));
+            b.addEventListener('click', function () { tab = t.id; try { sessionStorage.setItem('assets-tab', tab); } catch (e) {} draw(); window.scrollTo(0, 0); });
+            tabsEl.appendChild(b);
+        });
+    }
+
+    function drawScene(sc) {
+        var slots = []; sc.groups.forEach(function (g) { slots = slots.concat(g.slots); });
+        main.appendChild(intro(sc.note, sc.page, slots));
+        sc.groups.forEach(function (g) {
+            main.appendChild(el('h2', '', esc(g.name)));
+            var grid = el('div', 'grid');
+            g.slots.forEach(function (s) { grid.appendChild(card(s)); });
+            main.appendChild(grid);
+        });
+    }
+
+    function drawChecklist() {
+        var slots = allSlots(), known = {};
+        slots.forEach(function (s) { known[s.slot] = 1; });
+        main.appendChild(intro('everything that’s still the stand-in, folder by folder. add yours and it drops off the list.', '', slots.filter(function (s) { return !s.twin; })));
+        var opts = el('label', 'opts', '<input type="checkbox"' + (showOptional ? ' checked' : '') + '> show the optional ones too (glow twins, poses, alternates)');
+        opts.querySelector('input').addEventListener('change', function () { showOptional = this.checked; draw(); });
+        main.appendChild(opts);
+        var byFolder = {};
+        slots.forEach(function (s) {
+            if (fileFor(s.slot) || (s.optional && !showOptional)) return;
+            var p = parts(s.slot); (byFolder[p.folder] = byFolder[p.folder] || []).push(s);
+        });
+        var folders = Object.keys(byFolder).sort();
+        if (!folders.length) main.appendChild(el('p', 'empty', 'nothing left: every slot has your art in it.'));
+        folders.forEach(function (fo) {
+            main.appendChild(el('div', 'folder-h', 'assets/' + fo + '/<small>' + byFolder[fo].length + ' to go</small>'));
+            var sheet = el('div', 'sheet');
+            byFolder[fo].forEach(function (s) {
+                var r = el('div', 'row');
+                r.appendChild(el('span', 'box'));
+                r.appendChild(el('div', 'main', '<b>' + esc(s.slot.split('/').pop()) + '</b><span>' + esc(s.what) + (s.size ? ' · ' + esc(s.size) : '') + '</span>'));
+                var kind = s.kind || 'image';
+                r.appendChild(btn('add yours', function () { pick(accept(kind), false, function (fs) { put(s.slot, kind, fs[0]); }); }, 'yes'));
+                droppable(r, function (fs) { put(s.slot, kind, fs[0]); });
+                sheet.appendChild(r);
+            });
+            main.appendChild(sheet);
+        });
+        // files in the folders that aren't any slot (old names, typos, leftovers)
+        var strays = [];
+        Object.keys(STATE.files).forEach(function (fo) {
+            STATE.files[fo].forEach(function (f) {
+                var stem = f.name.replace(/\.[^.]+$/, ''), slot = 'assets/' + fo + '/' + stem;
+                if (known[slot] || /-(glow|dancing|held|startled|walking)$/.test(stem) || (fo === 'sounds' && (stem === 'noise' || STATE.noise.some(function (n) { return n.name === stem; })))) return;
+                strays.push({ folder: fo, file: f, slot: slot });
+            });
+        });
+        if (strays.length) {
+            main.appendChild(el('h2', '', 'files that aren’t in any slot <small>new pieces you placed yourself, or old names and leftovers</small>'));
+            var sh = el('div', 'sheet');
+            strays.forEach(function (x) {
+                var r = el('div', 'row');
+                r.appendChild(el('div', 'main', '<b>assets/' + esc(x.folder) + '/' + esc(x.file.name) + '</b><span>' + kb(x.file.size) + '</span>'));
+                r.appendChild(btn('open', function () { window.open('/assets/' + x.folder + '/' + encodeURIComponent(x.file.name), '_blank'); }));
+                if (/^[a-z0-9-]+$/.test(x.file.name.replace(/\.[^.]+$/, ''))) r.appendChild(btn('delete', function () { clear(x.slot); }, 'no'));
+                sh.appendChild(r);
+            });
+            main.appendChild(sh);
+        }
+    }
+
+    /* ---------------- the record player ---------------- */
+    function drawRecords() {
+        var d = intro('every song in content/living/ is a record, played in number order: 01-, 02-, … new ones get the next number. ↑ ↓ renumber them all. a sleeve is the record’s cover (under 1 MB).', 'living.html');
+        main.appendChild(d);
+        var h = el('h2', '', 'the records <small>' + STATE.tracks.length + '</small>');
+        main.appendChild(h);
+        var addB = btn('+ add songs', function () { pick('.mp3,.ogg,audio/mpeg,audio/ogg', true, addSongs); }, 'btn main');
+        addB.style.marginLeft = '10px';
+        h.appendChild(addB);
+        var sheet = el('div', 'sheet');
+        droppable(sheet, addSongs);
+        if (!STATE.tracks.length) sheet.appendChild(el('p', 'empty', 'no records yet. add an .mp3 (or drop some here).'));
+        STATE.tracks.forEach(function (t, i) {
+            var r = el('div', 'row');
+            r.appendChild(el('span', 'num', t.number != null ? String(t.number).padStart(2, '0') : '–'));
+            var sl = el('div', 'sleeve', t.sleeve ? '<img alt="" src="' + t.sleeve + '?t=' + Date.now() + '">' : 'no sleeve');
+            r.appendChild(sl);
+            droppable(sl, function (fs) { sleeveUpload(t, fs[0]); });
+            var m = el('div', 'main');
+            var ti = el('input', 'title'); ti.value = t.title; ti.setAttribute('aria-label', 'title'); ti.maxLength = 80;
+            function rename() {
+                var v = ti.value.trim();
+                if (!v || v === t.title) { ti.value = t.title; return; }
+                api('/__records/rename', { name: t.name, title: v }).then(function (x) { if (x.error) say(x.error, true); else say('renamed to ' + x.name + '.'); load(); });
+            }
+            ti.addEventListener('keydown', function (e) { if (e.key === 'Enter') ti.blur(); if (e.key === 'Escape') { ti.value = t.title; ti.blur(); } });
+            ti.addEventListener('blur', rename);
+            m.appendChild(ti);
+            m.appendChild(el('span', '', esc(t.name) + ' · ' + kb(t.size)));
+            r.appendChild(m);
+            var au = el('audio'); au.controls = true; au.preload = 'none'; au.src = t.url; r.appendChild(au);
+            var b = el('div', 'btns');
+            b.appendChild(btn('↑', function () { move(t, -1); })); if (i === 0) b.lastChild.disabled = true;
+            b.appendChild(btn('↓', function () { move(t, 1); })); if (i === STATE.tracks.length - 1) b.lastChild.disabled = true;
+            b.appendChild(btn('sleeve from Spotify', function () {
+                var link = prompt('paste the Spotify link for ' + t.title + ' (in Spotify: Share → Copy Song Link). a link to any picture works too.');
+                if (!link) return;
+                say('fetching the cover…');
+                api('/__records/sleeve-link', { name: t.name, link: link }).then(function (x) {
+                    if (x.error) say(x.error, true); else say('sleeve saved' + (x.title ? ' (' + x.title + ')' : '') + ', ' + kb(x.bytes) + '.');
+                    load();
+                });
+            }, 'yes'));
+            b.appendChild(btn(t.sleeve ? 'new sleeve' : 'upload a sleeve', function () { pick('image/png,image/jpeg,image/webp,image/gif', false, function (fs) { sleeveUpload(t, fs[0]); }); }));
+            b.appendChild(btn('delete', function () {
+                if (!confirm('delete ' + t.name + ' (and its sleeve)? the songs after it move up a number.')) return;
+                api('/__records/delete', { name: t.name }).then(function (x) { if (x.error) say(x.error, true); else say('deleted ' + t.name + '.'); load(); });
+            }, 'no'));
+            r.appendChild(b);
+            sheet.appendChild(r);
+        });
+        main.appendChild(sheet);
+        var slots = [];
+        CAT.scenes.forEach(function (sc) { sc.groups.forEach(function (g) { g.slots.forEach(function (s) { if (/^assets\/living\/(turntable|turntable-playing|record)$/.test(s.slot)) slots.push(s); }); }); });
+        main.appendChild(el('h2', '', 'the record player itself'));
+        var grid = el('div', 'grid');
+        slots.forEach(function (s) { grid.appendChild(card(s)); });
+        main.appendChild(grid);
+    }
+    function addSongs(files) {
+        files = files.filter(function (f) { return /\.(mp3|ogg)$/i.test(f.name); });
+        if (!files.length) return say('songs are .mp3 or .ogg files.', true);
+        var added = [], errs = [];
+        say('adding ' + files.length + (files.length === 1 ? ' song…' : ' songs…'));
+        files.reduce(function (p, f) {
+            return p.then(function () { return send('/__records/add', f).then(function (x) { if (x.error) errs.push(f.name + ': ' + x.error); else added.push(x.name); }); });
+        }, Promise.resolve()).then(function () {
+            say((added.length ? 'added ' + added.join(', ') + '. publish when you’re ready.' : '') + (errs.length ? ' ' + errs.join('; ') : ''), errs.length && !added.length);
+            load();
+        });
+    }
+    function move(t, by) { api('/__records/move', { name: t.name, by: by }).then(function (x) { if (x.error) say(x.error, true); else say('moved. the records are numbered 01 to ' + String(x.names.length).padStart(2, '0') + ' now.'); load(); }); }
+    function sleeveUpload(t, f) {
+        if (!PICS.test(f.name)) return say('a sleeve is a picture (png, jpg, webp, gif).', true);
+        send('/__records/sleeve', f, { 'X-Song': t.name }).then(function (x) { if (x.error) say(x.error, true); else say('sleeve saved for ' + t.title + '.'); load(); });
+    }
+
+    /* ---------------- the noise machine ---------------- */
+    function drawNoise() {
+        main.appendChild(intro('the white noise machine in the living space (and in the panel on every page). its own sounds are made by the page until you add a recording; your own sounds join the list.', 'living.html'));
+        main.appendChild(el('h2', '', 'the machine'));
+        var grid = el('div', 'grid');
+        [{ slot: 'assets/living/noise-machine', what: 'the machine', size: 'about 3:2' }, { slot: 'assets/living/noise-machine-on', what: 'shown while it plays (a GIF can hum)', size: 'about 3:2', optional: true },
+         { slot: 'assets/ui/noise', what: 'its icon in the control panel', size: '96 x 96' }].forEach(function (s) { grid.appendChild(card(s)); });
+        main.appendChild(grid);
+        main.appendChild(el('h2', '', 'its sounds <small>looped, so make the ends meet</small>'));
+        grid = el('div', 'grid');
+        CAT.noise.forEach(function (n) {
+            grid.appendChild(card({ slot: 'assets/sounds/' + n.name, what: n.label + (n.name === 'storm' ? ' (without a recording: your rain, with thunder rolling in)' : ''), kind: 'sound' }));
+        });
+        main.appendChild(grid);
+        var h = el('h2', '', 'your own sounds');
+        var addB = btn('+ add a sound', function () {
+            var label = prompt('what’s it called on the machine? (e.g. “a busy café”)');
+            if (!label || !label.trim()) return;
+            pick('.mp3,.ogg,audio/mpeg,audio/ogg', false, function (fs) {
+                say('adding ' + label + '…');
+                send('/__noise/add', fs[0], { 'X-Label': label.trim() }).then(function (x) { if (x.error) say(x.error, true); else say('added “' + label.trim() + '” to the machine. publish when you’re ready.'); load(); });
+            });
+        }, 'btn main');
+        addB.style.marginLeft = '10px';
+        h.appendChild(addB);
+        main.appendChild(h);
+        var sheet = el('div', 'sheet');
+        if (!STATE.noise.length) sheet.appendChild(el('p', 'empty', 'none yet. “+ add a sound” puts a recording on the machine, with its own slider.'));
+        STATE.noise.forEach(function (n) {
+            var f = fileFor('assets/sounds/' + n.name), r = el('div', 'row');
+            var m = el('div', 'main');
+            var ti = el('input', 'title'); ti.value = n.label; ti.maxLength = 40; ti.setAttribute('aria-label', 'its name on the machine');
+            ti.addEventListener('keydown', function (e) { if (e.key === 'Enter') ti.blur(); });
+            ti.addEventListener('blur', function () { var v = ti.value.trim(); if (!v || v === n.label) { ti.value = n.label; return; } api('/__noise/label', { name: n.name, label: v }).then(function (x) { if (x.error) say(x.error, true); else say('renamed.'); load(); }); });
+            m.appendChild(ti);
+            m.appendChild(el('span', '', 'assets/sounds/' + esc(f ? f.name : n.name + ' (the file is missing!)')));
+            r.appendChild(m);
+            if (f) { var au = el('audio'); au.controls = true; au.preload = 'none'; au.src = f.url; r.appendChild(au); }
+            var b = el('div', 'btns');
+            b.appendChild(btn('replace', function () { pick('.mp3,.ogg', false, function (fs) { put('assets/sounds/' + n.name, 'sound', fs[0]); }); }));
+            b.appendChild(btn('remove', function () {
+                if (!confirm('take “' + n.label + '” off the machine (and delete its recording)?')) return;
+                api('/__noise/remove', { name: n.name }).then(function (x) { if (x.error) say(x.error, true); else say('removed.'); load(); });
+            }, 'no'));
+            r.appendChild(b);
+            sheet.appendChild(r);
+        });
+        main.appendChild(sheet);
+    }
+
+    function draw() {
+        drawTabs();
+        main.innerHTML = '';
+        var sc = CAT.scenes.filter(function (s) { return s.id === tab; })[0];
+        if (sc) drawScene(sc);
+        else if (tab === 'records') drawRecords();
+        else if (tab === 'noise') drawNoise();
+        else if (tab === 'checklist') drawChecklist();
+        else { tab = CAT.scenes[0].id; draw(); }
+    }
+    function load() {
+        return api('/__assets/state').then(function (r) {
+            if (r.error) { say(r.error, true); return; }
+            STATE = r;
+            var y = window.scrollY;
+            draw();
+            window.scrollTo(0, y);
+        });
+    }
+    $('.publish').addEventListener('click', function () {
+        api('/__letters/publish', {}).then(function (r) { alert(r.error || 'publishing! a small window shows it going up, and closes by itself when it’s done. the live site updates a minute or two later.'); });
+    });
+    fetch('slots.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (c) { CAT = c; load(); }, function () { say('couldn’t read tools/slots.json', true); });
+})();
+</script>
+</body>
+</html>

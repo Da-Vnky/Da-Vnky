@@ -241,7 +241,9 @@
     var volume = get(localStorage, VOL);
     if (typeof volume !== 'number') volume = VOLUME;
     function indoors() { return document.body.classList.contains('has-room') && !document.body.classList.contains('is-outside'); }
-    var rainCh = Sky.sounds ? Sky.sounds.channel('rain', { muffled: indoors }) : null;
+    // outside you hear the rain itself; inside, rain on the window (assets/sounds/windowrain, or the drawn one)
+    var rainCh = Sky.sounds ? Sky.sounds.channel('rain') : null;
+    var paneCh = Sky.sounds ? Sky.sounds.channel('windowrain') : null;
     var windCh = Sky.sounds ? Sky.sounds.channel('wind', { muffled: indoors }) : null;
 
     /* ---------------- the weather layer of the control panel ---------------- */
@@ -403,13 +405,15 @@
             strike();
             nextBolt = t + 7000 + Math.random() * 16000;
         }
-        if (rainCh) rainCh.set(now.rain * volume);
+        var inside = indoors();
+        if (rainCh) rainCh.set((inside ? 0 : 1) * now.rain * volume, 0.6);
+        if (paneCh) paneCh.set((inside ? 1 : 0) * now.rain * volume, 0.6);
         if (windCh) windCh.set(Math.max(0, now.wind - 0.2) * 0.9 * volume);
         requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
     // stepping in and out of a room changes how muffled it sounds
-    new MutationObserver(function () { if (rainCh) rainCh.refresh(); if (windCh) windCh.refresh(); })
+    new MutationObserver(function () { if (rainCh) rainCh.refresh(); if (paneCh) paneCh.refresh(); if (windCh) windCh.refresh(); })
         .observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     Sky.weather = {

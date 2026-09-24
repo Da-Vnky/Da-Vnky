@@ -14,6 +14,13 @@ Delete the file and the drawing comes back.
     on top and fades in as the sun goes down: flames, lit windows, lamps
   • a GIF can animate anything (a flickering candle, a spinning record)
 
+THE EASY WAY: the content manager (double-click tools\content.bat) has an
+"assets" page: every slot, scene by scene, with a replace button (or drop a
+file on it). It names the file for you, puts it in the right folder, clears
+out the old one, and keeps list.txt up to date. Its "still to do" tab is a
+checklist of every slot that's still a stand-in. The record player and the
+noise machine have their own tabs there too (add songs and sounds).
+
 SEE THE SLOTS: open any page with ?slots on the end, e.g.
     https://dav-nky.pleroma.nexus/city.html?slots
 Every slot gets a dashed outline (green = your art is in) and a list of the
@@ -120,8 +127,15 @@ SOUNDS (.mp3 or .ogg; each loops, so make its ends meet)
     assets/sounds/ocean       the machine's waves
     assets/sounds/fire        the machine's crackling fire
     assets/sounds/white, pink, brown   the machine's plain noise
-    A new sound for the machine: add a line to SOUNDS at the top of
-    sky/noise.js (a name and a label) and put assets/sounds/<name>.mp3 here.
+    assets/sounds/windowrain  rain against the window, heard from inside (the
+                              rooms play this instead of the rain when it rains;
+                              softer, with drops tapping the glass)
+    The thunderstorm (weather, and the machine's) is two sounds together:
+    storm.mp3 if you have one, or else your rain.mp3 with thunder.mp3 rolling
+    in now and then. Indoors it's windowrain + thunder.
+    A new sound for the machine: content manager -> assets -> noise machine ->
+    "+ add a sound". (By hand: put assets/sounds/<name>.mp3 here and list it in
+    assets/sounds/noise.json: [ { "name": "cafe", "label": "a busy cafe" } ].)
 
 SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
     Also made by the page itself until you add a recording.
@@ -141,6 +155,11 @@ SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
     assets/sounds/wish           the shooting star from "make a wish"
     assets/sounds/brush          a brush dab in the workshop's painting desk
     assets/sounds/portfolio      a painting slipped into the visitors' portfolio
+    assets/sounds/step           a footstep (the walk to the bathroom)
+    assets/sounds/chime          the pomodoro timer ringing, time's up
+    assets/sounds/shimmer        looking into the bathroom mirror
+    assets/sounds/blip           one letter of the mirror's words typing out
+                                 (Undertale-style; it plays every other letter)
 
 THE NOISE MACHINE (in the living space)
     assets/living/noise-machine      the machine, about 3:2
@@ -232,6 +251,10 @@ ROOMS (the workshop and the living space)
 
 every room: assets/<room>/note, the paper note pinned up with the room's name
 (e.g. assets/workshop/note), stretched behind the words, about 5:4.
+every room: assets/<room>/floor, the floor along the bottom of the screen,
+stretched to fit (e.g. 3840 x 200). It always reaches the very bottom, however
+tall the window is (a hidden taskbar just shows a little more floor). Its height
+is --floor-h on the .room (9vh); data-floor="none" on the .room for no floor.
 
 workshop                          living space
     assets/workshop/lantern           assets/living/lamp
@@ -296,12 +319,37 @@ workshop                          living space
                                         (the board, 4:3; notes are pinned
                                          on the middle 88% of it)
 
+THE WORKSHOP'S TIMER AND CLIPBOARD
+    assets/workshop/timer           the pomodoro timer on the bench, 1:1 (a tomato until then)
+    assets/workshop/timer-running   shown while it runs (a GIF can tick)
+    assets/workshop/timer-panel     the card its buttons sit on, stretched (about 300 x 230)
+    assets/workshop/notes-board     the clipboard on the wall, 4:5; your to-do list is written
+                                    on it from 16% to 84% across, 22% to 92% down
+    assets/workshop/notes-paper     the sheet it opens up on, stretched (portrait)
+    (the timer's lengths: data-focus / data-short / data-long in workshop.html;
+     the list itself: content manager -> notes)
+
+THE BATHROOM (off the living space: the see-through arrow under the tabs)
+    assets/living/arrow        the arrow, pointing right (flipped for the way back), 1:1
+    assets/living/bath-wall    the whole back wall                       3840 x 2160
+    assets/living/bath-floor   the floor along the bottom, stretched      3840 x 220
+    assets/living/bath-mirror  the mirror over the sink (click it)        3:4
+    assets/living/bath-sink    140:200      assets/living/bath-tub     300:140
+    assets/living/bath-towel   100:130      assets/living/bath-shelf   140:70
+    assets/living/bath-mat     300:30
+    in the mirror:
+    assets/characters/reflection   what you see: "Despite everything, it's still you."
+    assets/living/mirror-close     the mirror's frame up close (PNG, see-through middle)
+    assets/fonts/mirror.woff2      the text box's lettering (a pixel font; .woff/.ttf/.otf too)
+    (the words are data-say on the mirror in living.html)
+
 CHARACTERS (one per scene; a GIF can loop an idle animation)
     assets/characters/sea         rides the ship, steps onto the dock at night,
                                   can be picked up, swims (the head shows when surfacing)
     assets/characters/workshop    stands at the bench
     assets/characters/living      at home by the armchair
     assets/characters/city        stargazing on the rooftop
+    assets/characters/bathroom    in the bathroom, by the mirror
     -> feet on the bottom edge, facing RIGHT, transparent background,
        about 240-480 px tall. The site sizes it; it's flipped when walking left.
 
@@ -315,6 +363,10 @@ CHARACTERS (one per scene; a GIF can loop an idle animation)
                                   without them (about 1.4 seconds, then they
                                   run and dive). Without it, the normal picture
                                   jumps and shivers.
+    assets/characters/living-walking, bathroom-walking
+                                  walking to and from the bathroom (a GIF, facing
+                                  RIGHT; it's flipped for walking left). Without
+                                  it, the normal picture bobs along.
     -> draw it on the SAME canvas size as the main picture, feet (or where the
        feet would be) near the bottom edge, so it doesn't jump when it swaps.
 
