@@ -1,22 +1,29 @@
 /* =====================================================================
    records.js — the living space's record player. Every .mp3 (or .ogg)
-   in the folder becomes a record in the crate. Click the turntable to
-   open the player: pick a record, play, pause, skip, seek, set the volume.
+   in the folder is a record, in its own sleeve. Click the turntable to
+   open the crate: the sleeves lean on each other; hover one and it lifts,
+   click it and it floats up, the record slides out and is set down on
+   the turntable, and the needle drops.
 
        <div class="furnish turntable" data-folder="content/living/"> … </div>
-       <script src="sky/records.js"></script>          (after sky/sky.js)
+       <script src="sky/music.js"></script>            (after sky/sky.js)
+       <script src="sky/records.js"></script>
 
-   title & artist: read from the file's own tags (ID3) when it has them,
-   otherwise from the file name ("01-my-song.mp3" → "my song").
-   the record's label shows the file's cover art if it has one, or a
-   picture with the same name (my-song.jpg / .png / .webp) beside it.
-   order: by file name, so 01-, 02-, … sets the running order.
+   SLEEVE ART: a picture with the same name as the song, beside it:
+       01-aerie.mp3  +  01-aerie.jpg   (or .png .webp .gif; square is best)
+   Without one, the cover picture inside the mp3 is used; without that,
+   a plain paper sleeve with the title on it. The middle of the record
+   (its label) shows a round crop of the same picture.
+
+   title & artist: from the song's own tags when it has them, otherwise
+   the file name ("01-my-song.mp3" → "my song"). order: by file name.
    ===================================================================== */
 
 (function () {
     var Sky = window.Sky;
     var deck = document.querySelector('.turntable[data-folder]');
-    if (!deck) return;
+    if (!deck || !Sky.music) return;
+    var M = Sky.music, audio = M.audio;
     var AUDIO = ['mp3', 'ogg'], PICS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
     var LABELS = ['#9a3b1f', '#c49a52', '#3f5a55', '#6e2f24', '#56636f', '#8a3f6e', '#b88c5e', '#28323b'];
 
@@ -29,13 +36,21 @@
         '.turntable .tt-disc { transform-box: fill-box; transform-origin: 50% 50%; }' +
         '.turntable .tt-arm { transform-box: view-box; transform-origin: 83% 22%; transition: transform 1.1s cubic-bezier(.4,.1,.3,1); }' +
         'body.records-playing .turntable .tt-arm { transform: rotate(24deg); }' +
-        'body.records-playing .turntable .tt-disc, body.records-playing .rp-now .rp-disc { animation: rp-spin 1.8s linear infinite; }' +
+        // (the records spin in the script below: slowly, winding up and slowing down like a real turntable)
+        '' +
         '@keyframes rp-spin { to { transform: rotate(360deg); } }' +
+        // the record on a turntable of your own drawing (where its platter is: --platter-x/-y/-w on .turntable)
+        '.turntable .tt-record { position: absolute; left: calc(var(--platter-x, 40%) - var(--platter-w, 54%) / 2); top: var(--platter-y, 52.7%);' +
+            'width: var(--platter-w, 54%); aspect-ratio: 1; transform: translateY(-50%) scaleY(.3); pointer-events: none; display: none; }' +
+        '.turntable.has-art .tt-record.on { display: block; }' +
+        '.turntable .tt-record svg { width: 100%; height: 100%; display: block; }' +
         '.turntable .tt-hint { position: absolute; left: 50%; top: -1.6em; transform: translateX(-50%); white-space: nowrap; font-style: italic;' +
             'font-size: .95rem; color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.6); opacity: 0; transition: opacity .25s; }' +
         '.turntable:hover .tt-hint, .turntable:focus-visible .tt-hint { opacity: 1; }' +
         '.turntable .tt-notes { position: absolute; right: 8%; top: -10%; font-size: 1.1rem; color: #ffd98a; opacity: 0; pointer-events: none; }' +
+        '.turntable .tt-notes.n2 { right: 26%; font-size: .9rem; } .turntable .tt-notes.n3 { right: 44%; font-size: 1.2rem; }' +
         'body.records-playing .turntable .tt-notes { animation: rp-notes 3.2s ease-in-out infinite; }' +
+        'body.records-playing .turntable .tt-notes.n2 { animation-delay: -1.1s; } body.records-playing .turntable .tt-notes.n3 { animation-delay: -2.2s; }' +
         '@keyframes rp-notes { 0% { opacity: 0; transform: translate(0,10px) rotate(-8deg); } 30% { opacity: .9; } 100% { opacity: 0; transform: translate(14px,-34px) rotate(10deg); } }' +
 
         /* the player */
@@ -62,127 +77,82 @@
         '.rp-controls .rp-play { width: 46px; height: 46px; background: #3a2716; color: #f3e6c2; }' +
         '.rp-controls .rp-play:hover { background: #9a3b1f; }' +
         '.rp-controls svg { width: 18px; height: 18px; fill: currentColor; }' +
-        '.rp-controls .i-pause, .records.playing .rp-controls .i-play { display: none; }' +
-        '.records.playing .rp-controls .i-pause { display: block; }' +
+        '.rp-controls .i-pause, body.records-playing .rp-controls .i-play { display: none; }' +
+        'body.records-playing .rp-controls .i-pause { display: block; }' +
+        '.rp-controls .rp-stop { width: auto; height: 32px; padding: 0 12px; border-radius: 999px; font: italic .95rem "IM Fell English", Georgia, serif; color: #6e5236; }' +
         '.rp-vol { display: flex; align-items: center; gap: 6px; margin-left: auto; color: #6e5236; }' +
         '.rp-vol input { width: 96px; }' +
         '.records input[type=range] { accent-color: #9a3b1f; }' +
-        '.rp-crate-title { margin: 20px 0 8px; font-style: italic; color: #6e5236; }' +
-        '.rp-crate { display: flex; gap: 14px; overflow-x: auto; padding: 6px 2px 12px; scroll-snap-type: x proximity; }' +
-        '.rp-rec { flex: none; width: 104px; border: 0; background: none; padding: 0; cursor: pointer; text-align: center; scroll-snap-align: start;' +
-            'font: inherit; color: inherit; }' +
-        '.rp-rec .rp-disc { width: 96px; height: 96px; margin: 0 auto 6px; display: block; transition: transform .25s ease; }' +
-        '.rp-rec:hover .rp-disc { transform: translateY(-6px) rotate(20deg); }' +
-        '.rp-rec .rp-name { display: block; font-size: .92rem; line-height: 1.2; max-height: 2.4em; overflow: hidden; }' +
-        '.rp-rec.on .rp-name { color: #9a3b1f; }' +
-        '.rp-rec.on .rp-disc { filter: drop-shadow(0 0 8px rgba(154,59,31,.55)); }' +
+        '.rp-crate-title { margin: 20px 0 0; font-style: italic; color: #6e5236; }' +
         '.rp-empty { font-style: italic; color: #6e5236; }' +
         'body.records-open .signpost { opacity: 0; pointer-events: none; }' +
-        '@media (max-width: 620px) { .records { padding: 18px 16px 16px; } .rp-now .rp-disc { width: 92px; height: 92px; } .rp-vol { display: none; } }'
+
+        /* the sleeves, leaning on each other */
+        '.rp-sleeves { display: flex; overflow-x: auto; overflow-y: visible; padding: 34px 90px 34px 10px; margin: 0 -8px; scrollbar-width: thin; }' +
+        '.rp-sleeve { position: relative; flex: none; width: 132px; height: 132px; margin-right: -62px; padding: 0; border: 0; background: none;' +
+            'cursor: pointer; transform: rotate(var(--tilt, 0deg)); transition: transform .22s cubic-bezier(.3,.7,.3,1.5), margin .22s; font: inherit; color: inherit; }' +
+        '.rp-sleeve:hover, .rp-sleeve:focus-visible { transform: translateY(-14px) rotate(calc(var(--tilt, 0deg) * .3)); z-index: 60 !important; outline: none; }' +
+        '.rp-sleeve .sl-disc { position: absolute; left: 6%; top: 3%; width: 88%; height: 88%; transition: transform .3s ease; }' +
+        '.rp-sleeve:hover .sl-disc { transform: translateY(-9%); }' +
+        '.rp-sleeve.on .sl-disc { display: none; }' +
+        '.rp-sleeve .sl-cover { position: absolute; inset: 0; overflow: hidden; border-radius: 2px; background: var(--sl, #9a3b1f);' +
+            'box-shadow: 0 6px 12px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.15), inset 0 0 26px rgba(0,0,0,.18); }' +
+        '.rp-sleeve .sl-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }' +
+        '.rp-sleeve .sl-cover .sl-plain { position: absolute; inset: 0; display: grid; place-items: center; padding: 12%; text-align: center;' +
+            'color: #f3e6c2; font-style: italic; font-size: 1rem; line-height: 1.15;' +
+            'background: radial-gradient(circle at 50% 50%, transparent 0 30%, rgba(255,240,210,.14) 30.5% 31.5%, transparent 32% 44%, rgba(255,240,210,.1) 44.5% 45.5%, transparent 46%),' +
+            'linear-gradient(135deg, rgba(255,255,255,.12), rgba(0,0,0,.18)); }' +
+        '.rp-sleeve .sl-name { position: absolute; left: 50%; top: calc(100% + 8px); transform: translateX(-50%); width: max-content; max-width: 180px;' +
+            'white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .92rem; font-style: italic; opacity: 0; transition: opacity .2s; pointer-events: none; }' +
+        '.rp-sleeve:hover .sl-name, .rp-sleeve:focus-visible .sl-name, .rp-sleeve.on .sl-name { opacity: 1; }' +
+        '.rp-sleeve.on .sl-name { color: #9a3b1f; }' +
+        '.rp-sleeve.on .sl-cover::after { content: "♪ on"; position: absolute; right: 6px; top: 6px; padding: 1px 7px; border-radius: 999px;' +
+            'background: rgba(42,29,20,.82); color: #f3e6c2; font-size: .8rem; font-style: italic; }' +
+        '.rp-sleeve.lifted { visibility: hidden; }' +
+        '.rp-fly { position: fixed; inset: 0; z-index: 9; pointer-events: none; }' +
+        '.rp-fly > * { position: absolute; left: 0; top: 0; transform-origin: 50% 50%; }' +
+        '.rp-fly .fly-disc svg { width: 100%; height: 100%; display: block; }' +
+        '@media (max-width: 620px) { .records { padding: 18px 16px 16px; } .rp-now .rp-disc { width: 92px; height: 92px; } .rp-vol { display: none; }' +
+            '.rp-sleeve { width: 104px; height: 104px; margin-right: -50px; } .rp-sleeves { padding: 30px 70px 30px 8px; } }'
     );
-
-    /* ---------------- a record, drawn: grooves, label, spindle hole ---------------- */
-    var uid = 0;
-    function discSVG(color, pic, cls) {
-        var id = 'rp' + (++uid);
-        return '<svg class="rp-disc ' + (cls || '') + '" viewBox="0 0 100 100" aria-hidden="true">' +
-            '<defs><clipPath id="' + id + '"><circle cx="50" cy="50" r="17"/></clipPath>' +
-            '<radialGradient id="' + id + 's" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#3a3a3f"/><stop offset=".6" stop-color="#151518"/><stop offset="1" stop-color="#0c0c0e"/></radialGradient></defs>' +
-            '<circle cx="50" cy="50" r="49" fill="url(#' + id + 's)"/>' +
-            '<g fill="none" stroke="rgba(255,255,255,.07)" stroke-width=".6">' +
-                '<circle cx="50" cy="50" r="44"/><circle cx="50" cy="50" r="39"/><circle cx="50" cy="50" r="34"/><circle cx="50" cy="50" r="29"/><circle cx="50" cy="50" r="24"/>' +
-            '</g>' +
-            '<path d="M22 20 A40 40 0 0 1 58 11" stroke="rgba(255,255,255,.22)" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-            '<circle cx="50" cy="50" r="17" fill="' + color + '"/>' +
-            (pic ? '<image href="' + pic + '" x="33" y="33" width="34" height="34" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/>' : '') +
-            '<circle cx="50" cy="50" r="17" fill="none" stroke="rgba(0,0,0,.25)"/>' +
-            '<circle cx="50" cy="50" r="2" fill="#0c0c0e"/>' +
-            '</svg>';
-    }
-
-    /* ---------------- reading a file's tags (ID3v2): title, artist, cover ---------------- */
-    function readTags(url) {
-        return fetch(url, { cache: 'no-cache' }).then(function (res) {
-            if (!res.ok || !res.body) return null;
-            var reader = res.body.getReader(), chunks = [], got = 0, need = 10, LIMIT = 1 << 20;
-            function pump() {
-                return reader.read().then(function (r) {
-                    if (r.value) { chunks.push(r.value); got += r.value.length; }
-                    if (got >= 10 && need === 10) {
-                        var head = join();
-                        if (head[0] !== 0x49 || head[1] !== 0x44 || head[2] !== 0x33) { reader.cancel(); return null; }   // no "ID3"
-                        need = 10 + ((head[6] & 127) << 21 | (head[7] & 127) << 14 | (head[8] & 127) << 7 | (head[9] & 127));
-                    }
-                    if (r.done || got >= Math.min(need, LIMIT)) { reader.cancel(); return got >= 10 ? join() : null; }
-                    return pump();
-                });
-            }
-            function join() {
-                var out = new Uint8Array(got), o = 0;
-                chunks.forEach(function (c) { out.set(c, o); o += c.length; });
-                return out;
-            }
-            return pump();
-        }).then(function (b) { return b ? parseID3(b) : null; }).catch(function () { return null; });
-    }
-    function parseID3(b) {
-        if (b[0] !== 0x49 || b[1] !== 0x44 || b[2] !== 0x33) return null;
-        var v = b[3], flags = b[5], end = Math.min(b.length, 10 + ((b[6] & 127) << 21 | (b[7] & 127) << 14 | (b[8] & 127) << 7 | (b[9] & 127)));
-        var p = 10, out = {};
-        if (flags & 0x40 && v >= 3) {                                  // skip an extended header
-            var ext = v === 4 ? ((b[p] & 127) << 21 | (b[p + 1] & 127) << 14 | (b[p + 2] & 127) << 7 | (b[p + 3] & 127)) : ((b[p] << 24 | b[p + 1] << 16 | b[p + 2] << 8 | b[p + 3]) + 4);
-            p += ext;
-        }
-        function text(enc, s, e) {
-            var bytes = b.subarray(s, e), label = ['iso-8859-1', 'utf-16', 'utf-16be', 'utf-8'][enc] || 'iso-8859-1';
-            try { return new TextDecoder(label).decode(bytes).replace(/\u0000+$/, '').split('\u0000')[0].trim(); } catch (e2) { return ''; }
-        }
-        function nulEnd(s, enc) {                                      // index just past a null terminator
-            if (enc === 1 || enc === 2) { for (var i = s; i + 1 < end; i += 2) if (!b[i] && !b[i + 1]) return i + 2; }
-            else { for (var j = s; j < end; j++) if (!b[j]) return j + 1; }
-            return end;
-        }
-        while (p + (v === 2 ? 6 : 10) <= end) {
-            var id, size, h;
-            if (v === 2) {
-                id = String.fromCharCode(b[p], b[p + 1], b[p + 2]);
-                size = b[p + 3] << 16 | b[p + 4] << 8 | b[p + 5]; h = 6;
-            } else {
-                id = String.fromCharCode(b[p], b[p + 1], b[p + 2], b[p + 3]);
-                size = v === 4 ? ((b[p + 4] & 127) << 21 | (b[p + 5] & 127) << 14 | (b[p + 6] & 127) << 7 | (b[p + 7] & 127))
-                               : (b[p + 4] << 24 | b[p + 5] << 16 | b[p + 6] << 8 | b[p + 7]);
-                h = 10;
-            }
-            if (!/^[A-Z0-9]{3,4}$/.test(id) || size <= 0) break;
-            var s = p + h, e = Math.min(end, s + size), enc = b[s];
-            if (id === 'TIT2' || id === 'TT2') out.title = text(enc, s + 1, e);
-            else if (id === 'TPE1' || id === 'TP1') out.artist = text(enc, s + 1, e);
-            else if ((id === 'APIC' || id === 'PIC') && !out.picture) {
-                var q = s + 1, mime;
-                if (id === 'PIC') { mime = 'image/' + String.fromCharCode(b[q], b[q + 1], b[q + 2]).toLowerCase().replace('jpg', 'jpeg'); q += 3; }
-                else { var me = nulEnd(q, 0); mime = text(0, q, me - 1) || 'image/jpeg'; q = me; }
-                q += 1;                                                // picture type
-                q = nulEnd(q, enc);                                    // description
-                if (q < e) out.picture = URL.createObjectURL(new Blob([b.slice(q, e)], { type: mime }));
-            }
-            p = e;
-        }
-        return out;
-    }
 
     /* ---------------- the turntable in the room ---------------- */
     deck.setAttribute('role', 'button');
     deck.setAttribute('tabindex', '0');
     deck.setAttribute('aria-label', 'the record player');
-    deck.insertAdjacentHTML('beforeend', '<span class="tt-hint">the record player</span><span class="tt-notes" aria-hidden="true">♪</span>');
+    deck.insertAdjacentHTML('beforeend', '<span class="tt-record" aria-hidden="true"></span><span class="tt-hint">the record player</span>' +
+        '<span class="tt-notes" aria-hidden="true">♪</span><span class="tt-notes n2" aria-hidden="true">♫</span><span class="tt-notes n3" aria-hidden="true">♪</span>');
+    var ttRecord = deck.querySelector('.tt-record');
     // your own art for while it plays (e.g. a spinning GIF): <asset>-playing.(gif|png|webp|svg)
     if (deck.dataset.asset) Sky.findAsset(deck.dataset.asset + '-playing', function (url) {
         if (!url) return;
         var im = document.createElement('img');
         im.src = url; im.alt = ''; im.className = 'tt-playing';
-        deck.insertBefore(im, deck.querySelector('.tt-hint'));
+        deck.insertBefore(im, deck.querySelector('.tt-record'));
         deck.classList.add('has-playing');
     });
+    // the drawn turntable: its record's label gets a round crop of the sleeve's picture
+    var labelArt = null, labelDot = deck.querySelector('.tt-label');
+    if (labelDot) {
+        var NS = 'http://www.w3.org/2000/svg', svg = labelDot.ownerSVGElement;
+        var defs = svg.querySelector('defs') || svg.insertBefore(document.createElementNS(NS, 'defs'), svg.firstChild);
+        var clip = document.createElementNS(NS, 'clipPath');
+        clip.id = 'tt-label-clip';
+        clip.innerHTML = '<circle r="18"/>';
+        defs.appendChild(clip);
+        labelArt = document.createElementNS(NS, 'image');
+        labelArt.setAttribute('x', -18); labelArt.setAttribute('y', -18); labelArt.setAttribute('width', 36); labelArt.setAttribute('height', 36);
+        labelArt.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+        labelArt.setAttribute('clip-path', 'url(#tt-label-clip)');
+        labelDot.after(labelArt);
+    }
+    function drawDeck() {
+        var t = M.current();
+        if (labelDot) labelDot.setAttribute('fill', t ? t.color : '#9a3b1f');
+        if (labelArt) { if (t && t.pic) labelArt.setAttribute('href', t.pic); else labelArt.removeAttribute('href'); }
+        ttRecord.classList.toggle('on', !!t);
+        ttRecord.innerHTML = t ? M.disc(t.color, t.pic) : '';
+    }
 
     /* ---------------- the player ---------------- */
     var box = document.createElement('section');
@@ -198,94 +168,171 @@
                 '<div class="rp-seek"><span class="rp-cur">0:00</span><input type="range" min="0" max="1000" value="0" aria-label="position in the song"><span class="rp-dur">0:00</span></div>' +
                 '<div class="rp-controls">' +
                     '<button type="button" class="rp-prev" aria-label="previous record"><svg viewBox="0 0 20 20"><path d="M4 4h2v12H4zM16 4 L7 10 L16 16 Z"/></svg></button>' +
-                    '<button type="button" class="rp-play" aria-label="play"><svg class="i-play" viewBox="0 0 20 20"><path d="M6 4 L16 10 L6 16 Z"/></svg><svg class="i-pause" viewBox="0 0 20 20"><path d="M5 4h3.5v12H5zM11.5 4H15v12h-3.5z"/></svg></button>' +
+                    '<button type="button" class="rp-play" aria-label="play or pause"><svg class="i-play" viewBox="0 0 20 20"><path d="M6 4 L16 10 L6 16 Z"/></svg><svg class="i-pause" viewBox="0 0 20 20"><path d="M5 4h3.5v12H5zM11.5 4H15v12h-3.5z"/></svg></button>' +
                     '<button type="button" class="rp-next" aria-label="next record"><svg viewBox="0 0 20 20"><path d="M14 4h2v12h-2zM4 4 L13 10 L4 16 Z"/></svg></button>' +
+                    '<button type="button" class="rp-stop" aria-label="take the record off">lift the needle</button>' +
                     '<label class="rp-vol"><svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path d="M3 8h3l5-4v12l-5-4H3z"/><path d="M13.5 7a4 4 0 0 1 0 6" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>' +
                         '<input type="range" min="0" max="100" value="80" aria-label="volume"></label>' +
                 '</div>' +
             '</div>' +
         '</div>' +
         '<div class="rp-crate-title">the crate: pick a record</div>' +
-        '<div class="rp-crate"></div>';
+        '<div class="rp-sleeves"></div>';
     document.body.appendChild(box);
 
-    var audio = new Audio();
-    audio.preload = 'metadata';
-    var tracks = [], at = -1, seeking = false;
+    var tracks = [], seeking = false;
     var nowDisc = box.querySelector('.rp-now-disc'), titleEl = box.querySelector('.rp-title'), artistEl = box.querySelector('.rp-artist');
     var seek = box.querySelector('.rp-seek input'), cur = box.querySelector('.rp-cur'), dur = box.querySelector('.rp-dur');
-    var vol = box.querySelector('.rp-vol input'), crate = box.querySelector('.rp-crate'), playBtn = box.querySelector('.rp-play');
-    var deckDisc = deck.querySelector('.tt-label');
-
-    try { var v0 = localStorage.getItem('records-volume'); if (v0 !== null) vol.value = v0; } catch (e) {}
-    audio.volume = vol.value / 100;
+    var vol = box.querySelector('.rp-vol input'), sleeves = box.querySelector('.rp-sleeves'), playBtn = box.querySelector('.rp-play');
+    vol.value = Math.round(audio.volume * 100);
 
     function mmss(t) { if (!isFinite(t)) return '0:00'; t = Math.floor(t); return Math.floor(t / 60) + ':' + ('0' + t % 60).slice(-2); }
-
     function drawNow() {
-        var t = tracks[at];
-        nowDisc.innerHTML = discSVG(t ? t.color : '#6e5236', t && t.pic);
+        var t = M.current();
+        nowDisc.innerHTML = M.disc(t ? t.color : '#6e5236', t && t.pic);
         titleEl.textContent = t ? t.title : 'no record on';
         artistEl.textContent = t ? (t.artist || '') : (tracks.length ? 'pick one from the crate' : '');
-        if (deckDisc) deckDisc.setAttribute('fill', t ? t.color : '#9a3b1f');
-        crate.querySelectorAll('.rp-rec').forEach(function (r, i) { r.classList.toggle('on', i === at); });
+        sleeves.querySelectorAll('.rp-sleeve').forEach(function (s, i) { s.classList.toggle('on', !!t && tracks[i] === t); });
+        drawDeck();
     }
-    function drawCrate() {
-        crate.innerHTML = '';
+    function coverHTML(t) {
+        return t.pic ? '<img src="' + t.pic + '" alt="">' : '<span class="sl-plain"></span>';
+    }
+    function drawSleeves() {
+        sleeves.innerHTML = '';
         if (!tracks.length) {
-            crate.innerHTML = '<p class="rp-empty">the crate is empty. put .mp3 files in content/living/ and they turn up here as records.</p>';
+            sleeves.innerHTML = '<p class="rp-empty">the crate is empty. put .mp3 files in content/living/ and they turn up here as records.</p>';
             return;
         }
         tracks.forEach(function (t, i) {
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'rp-rec';
-            b.innerHTML = discSVG(t.color, t.pic) + '<span class="rp-name"></span>';
-            b.querySelector('.rp-name').textContent = t.title;
-            b.title = t.artist ? t.title + ' · ' + t.artist : t.title;
-            b.addEventListener('click', function () { load(i, true); });
-            crate.appendChild(b);
+            var s = document.createElement('button');
+            s.type = 'button';
+            s.className = 'rp-sleeve';
+            s.style.zIndex = i + 1;
+            s.style.setProperty('--tilt', (((Sky.hashStr(t.url) % 7) - 3) * 0.8).toFixed(1) + 'deg');
+            s.style.setProperty('--sl', t.color);
+            s.innerHTML = '<span class="sl-disc">' + M.disc(t.color, t.pic) + '</span><span class="sl-cover">' + coverHTML(t) + '</span><span class="sl-name"></span>';
+            var plain = s.querySelector('.sl-plain');
+            if (plain) plain.textContent = t.title;
+            s.querySelector('.sl-name').textContent = t.artist ? t.title + ' · ' + t.artist : t.title;
+            s.setAttribute('aria-label', 'play ' + t.title);
+            s.addEventListener('click', function () { pick(i, s); });
+            sleeves.appendChild(s);
         });
+        sleeves.lastChild.style.marginRight = '0';
         drawNow();
     }
 
-    function load(i, play) {
-        if (!tracks.length) return;
-        at = (i + tracks.length) % tracks.length;
-        audio.src = tracks[at].url;
-        drawNow();
-        if (play) audio.play().catch(function () {});
+    /* ---------------- picking a record: out of the sleeve and onto the turntable ---------------- */
+    var busy = false;
+    function platter() {
+        var el = deck.classList.contains('has-art') ? ttRecord : deck.querySelector('.tt-disc');
+        if (el === ttRecord) { ttRecord.classList.add('on'); }
+        var r = el.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width };
     }
-    function toggle() {
-        if (!tracks.length) return;
-        if (at < 0) return load(0, true);
-        if (audio.paused) audio.play().catch(function () {}); else audio.pause();
+    function pick(i, sleeve) {
+        var t = tracks[i];
+        if (busy) return;
+        if (M.current() === t) { if (!M.playing()) M.play(); return; }
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { M.load(M.tracks.indexOf(t), true); return; }
+        busy = true;
+        var a = sleeve.getBoundingClientRect();
+        var layer = document.createElement('div');
+        layer.className = 'rp-fly';
+        var d = document.createElement('div');
+        d.className = 'fly-disc';
+        d.innerHTML = M.disc(t.color, t.pic);
+        var c = document.createElement('div');
+        c.className = 'rp-sleeve fly-cover';
+        c.style.setProperty('--sl', t.color);
+        c.innerHTML = '<span class="sl-cover">' + coverHTML(t) + '</span>';
+        if (c.querySelector('.sl-plain')) c.querySelector('.sl-plain').textContent = t.title;
+        var w = a.width, dw = w * 0.9;
+        c.style.width = c.style.height = w + 'px';
+        d.style.width = d.style.height = dw + 'px';
+        layer.appendChild(d); layer.appendChild(c);
+        document.body.appendChild(layer);
+        sleeve.classList.add('lifted');
+        var x0 = a.left, y0 = a.top, dx0 = a.left + (w - dw) / 2, dy0 = a.top + (w - dw) / 2;
+        var ease = 'cubic-bezier(.2,.9,.3,1.35)';
+        // 1. the sleeve snaps up
+        c.animate([{ transform: 'translate(' + x0 + 'px,' + y0 + 'px)' }, { transform: 'translate(' + x0 + 'px,' + (y0 - 64) + 'px) scale(1.1)' }],
+            { duration: 280, easing: ease, fill: 'forwards' });
+        d.animate([{ transform: 'translate(' + dx0 + 'px,' + dy0 + 'px)' }, { transform: 'translate(' + dx0 + 'px,' + (dy0 - 64) + 'px) scale(1.1)' }],
+            { duration: 280, easing: ease, fill: 'forwards' });
+        setTimeout(function () {
+            // 2. the record slides out of the top
+            var outY = dy0 - 64 - dw * 0.78;
+            d.animate([{ transform: 'translate(' + dx0 + 'px,' + (dy0 - 64) + 'px) scale(1.1)' }, { transform: 'translate(' + dx0 + 'px,' + outY + 'px) scale(1.1)' }],
+                { duration: 380, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }).onfinish = function () {
+                layer.insertBefore(c, d);                               // the record is out: now it's in front
+                // 3. the crate goes away, the sleeve settles back into it
+                close();
+                c.animate([{ transform: 'translate(' + x0 + 'px,' + (y0 - 64) + 'px) scale(1.1)', opacity: 1 },
+                           { transform: 'translate(' + x0 + 'px,' + (y0 + 260) + 'px) scale(1)', opacity: 0 }],
+                    { duration: 520, easing: 'cubic-bezier(.5,0,.8,.5)', fill: 'forwards' });
+                // 4. the record is carried over and set down on the platter, spinning down flat
+                setTimeout(function () {
+                    var p = platter(), s1 = 1.1, s2 = p.w / dw;
+                    var ex = p.x - dw / 2, ey = p.y - dw / 2;
+                    var mx = (dx0 + ex) / 2, my = Math.min(outY, ey) - 110;
+                    d.animate([
+                        { transform: 'translate(' + dx0 + 'px,' + outY + 'px) scale(' + s1 + ') rotate(0deg)' },
+                        { transform: 'translate(' + mx + 'px,' + my + 'px) scale(' + ((s1 + s2) / 2) + ', ' + ((s1 + s2 * 0.3) / 2) + ') rotate(200deg)', offset: .55 },
+                        { transform: 'translate(' + ex + 'px,' + ey + 'px) scale(' + s2 + ', ' + (s2 * 0.3) + ') rotate(360deg)' }
+                    ], { duration: 950, easing: 'cubic-bezier(.45,.05,.3,1)', fill: 'forwards' }).onfinish = function () {
+                        M.load(M.tracks.indexOf(t), true);
+                        drawNow();
+                        setTimeout(function () { layer.remove(); sleeve.classList.remove('lifted'); busy = false; }, 60);
+                    };
+                }, 280);
+            };
+        }, 300);
     }
-    function setPlaying(on) {
-        box.classList.toggle('playing', on);
-        document.body.classList.toggle('records-playing', on);
-        playBtn.setAttribute('aria-label', on ? 'pause' : 'play');
+
+    /* ---------------- spinning: like a real turntable, it winds up and runs down ---------------- */
+    var SPEED = 80;                        // degrees a second at full speed (a gentle 4.5 seconds a turn)
+    var spin = { angle: 0, speed: 0, on: false, t: 0 };
+    function spinFrame(t) {
+        var dt = Math.min(0.1, (t - spin.t) / 1000);
+        spin.t = t;
+        var target = M.playing() ? SPEED : 0;
+        spin.speed += (target - spin.speed) * Math.min(1, dt * (target > spin.speed ? 0.9 : 0.55));
+        spin.angle = (spin.angle + spin.speed * dt) % 360;
+        var r = 'rotate(' + spin.angle.toFixed(2) + 'deg)';
+        var a = deck.querySelector('.tt-disc'), b = ttRecord.querySelector('svg'), c = nowDisc.querySelector('svg');
+        if (a) a.style.transform = r;
+        if (b) b.style.transform = r;
+        if (c) c.style.transform = r;
+        if (target === 0 && spin.speed < 0.3) { spin.speed = 0; spin.on = false; return; }
+        requestAnimationFrame(spinFrame);
     }
-    audio.addEventListener('play', function () { setPlaying(true); });
-    audio.addEventListener('pause', function () { setPlaying(false); });
-    audio.addEventListener('ended', function () { if (tracks.length > 1 || at < tracks.length - 1) load(at + 1, true); else setPlaying(false); });
-    audio.addEventListener('loadedmetadata', function () { dur.textContent = mmss(audio.duration); });
-    audio.addEventListener('timeupdate', function () {
-        cur.textContent = mmss(audio.currentTime);
-        if (!seeking && audio.duration) seek.value = Math.round(audio.currentTime / audio.duration * 1000);
+    function spinUp() {
+        if (spin.on || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        spin.on = true; spin.t = performance.now();
+        requestAnimationFrame(spinFrame);
+    }
+    M.on(function (what) { if (what === 'play' || what === 'pause') spinUp(); });
+    if (M.playing()) spinUp();
+
+    /* ---------------- the controls ---------------- */
+    M.on(function (what) {
+        if (what === 'time') {
+            cur.textContent = mmss(audio.currentTime);
+            if (!seeking && audio.duration) seek.value = Math.round(audio.currentTime / audio.duration * 1000);
+            return;
+        }
+        if (what === 'track' || what === 'tracks' || what === 'stop') drawNow();
     });
+    audio.addEventListener('loadedmetadata', function () { dur.textContent = mmss(audio.duration); });
     seek.addEventListener('input', function () { seeking = true; cur.textContent = mmss(seek.value / 1000 * (audio.duration || 0)); });
     seek.addEventListener('change', function () { if (audio.duration) audio.currentTime = seek.value / 1000 * audio.duration; seeking = false; });
-    vol.addEventListener('input', function () {
-        audio.volume = vol.value / 100;
-        try { localStorage.setItem('records-volume', vol.value); } catch (e) {}
-    });
-    playBtn.addEventListener('click', toggle);
-    box.querySelector('.rp-prev').addEventListener('click', function () {
-        if (audio.currentTime > 3) { audio.currentTime = 0; return; }       // like a real player: first back to the start
-        load(at - 1, !audio.paused || at < 0);
-    });
-    box.querySelector('.rp-next').addEventListener('click', function () { load(at + 1, !audio.paused || at < 0); });
+    vol.addEventListener('input', function () { M.setVolume(vol.value / 100); });
+    playBtn.addEventListener('click', function () { if (!M.current() && tracks.length) M.load(0, true); else M.toggle(); });
+    box.querySelector('.rp-prev').addEventListener('click', M.prev);
+    box.querySelector('.rp-next').addEventListener('click', M.next);
+    box.querySelector('.rp-stop').addEventListener('click', M.stop);
 
     function open() {
         box.classList.add('open');
@@ -298,17 +345,19 @@
     }
     deck.addEventListener('click', function () { box.classList.contains('open') ? close() : open(); });
     deck.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    deck.addEventListener('asset', drawDeck);
     box.querySelector('.rp-close').addEventListener('click', close);
     document.addEventListener('keydown', function (e) {
         if (!box.classList.contains('open')) return;
         if (e.key === 'Escape') { e.stopPropagation(); close(); }
-        else if (e.key === ' ' && (e.target === document.body || e.target === playBtn)) { e.preventDefault(); if (e.target !== playBtn) toggle(); }
+        else if (e.key === ' ' && (e.target === document.body || e.target === playBtn)) { e.preventDefault(); if (e.target !== playBtn) M.toggle(); }
     }, true);
     document.addEventListener('pointerdown', function (e) {
         if (box.classList.contains('open') && !box.contains(e.target) && !deck.contains(e.target)) close();
     });
 
     /* ---------------- fill the crate from the folder ---------------- */
+    drawNow();
     Sky.listFolder(deck.dataset.folder, AUDIO.concat(PICS), function (files) {
         var pics = {};
         files.forEach(function (f) {
@@ -324,15 +373,19 @@
                 color: LABELS[Sky.hashStr(f.name) % LABELS.length]
             };
         });
-        drawCrate();
+        M.setTracks(tracks.slice());
+        // the song that was already on (from another page) is the same record: use this crate's copy
+        var on = M.current();
+        if (on) tracks.forEach(function (t, i) { if (new URL(t.url, location.href).href === new URL(on.url, location.href).href) { tracks[i] = on; if (!on.pic) on.pic = t.pic; } });
+        drawSleeves();
         tracks.forEach(function (t) {
             if (!/\.mp3$/i.test(t.url)) return;
-            readTags(t.url).then(function (tags) {
+            M.readTags(t.url).then(function (tags) {
                 if (!tags) return;
                 if (tags.title) t.title = tags.title;
                 if (tags.artist) t.artist = tags.artist;
                 if (tags.picture && !t.pic) t.pic = tags.picture;
-                drawCrate();
+                drawSleeves();
             });
         });
     });

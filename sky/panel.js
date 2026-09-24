@@ -1,0 +1,495 @@
+/* =====================================================================
+   panel.js — the control panel in the top-right corner, and the sound
+   engine the weather and the noise machine share.
+
+       <script src="sky/panel.js"></script>     (every page, after sky/sky.js,
+                                                 before music.js / weather.js / noise.js)
+
+   THE PANEL is a stack of LAYERS (music, weather, the noise machine …).
+   Each is its own file that adds itself; to add another one later:
+
+       Sky.panel.add({
+           id: 'lights', title: 'fairy lights', order: 40,
+           icon: '<svg …>…</svg>',                 // drawn icon (slot: assets/ui/lights)
+           build: function (body) { … },           // fill the layer's box once
+           status: function () { return 'on'; },   // the little line under its title
+           active: function () { return true; },   // is it doing something right now?
+           badge: function () { return '<svg …>'; } // shown on the closed panel while active
+       });
+       Sky.panel.refresh('lights');                 // call when its status changes
+       Sky.panel.open('lights');                    // open the panel at this layer
+
+   ART: assets/ui/panel (the button), assets/ui/<layer id> (each layer's icon).
+
+   SOUNDS: Sky.sounds.channel('rain') is a sound you can turn up and down.
+   Each is made right here, unless there's a recording of your own at
+   assets/sounds/<name>.mp3 (or .ogg), which is used instead (looped).
+   ===================================================================== */
+
+(function () {
+    var Sky = window.Sky;
+    if (!Sky || Sky.panel) return;
+
+    /* ======================================================================
+       the sound engine
+       ====================================================================== */
+    var ctx = null, master = null, wanted = false;
+    function ac() {
+        if (ctx) return ctx;
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        ctx = new AC();
+        master = ctx.createGain();
+        master.connect(ctx.destination);
+        ctx.onstatechange = function () { refreshAll(); };
+        return ctx;
+    }
+    // browsers only let sound start once you've clicked or tapped the page
+    var pendingFiles = [];
+    function wake() {
+        if (ctx && ctx.state !== 'running') ctx.resume().then(refreshAll, function () {});
+        pendingFiles.splice(0).forEach(function (a) { a.play().catch(function () {}); });
+        channels.forEach(function (c) { c.blocked = false; });
+    }
+    ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) { document.addEventListener(ev, wake, { capture: true, passive: true }); });
+
+    var bufs = {};
+    function noiseBuf(color, seconds) {
+        var key = color + seconds;
+        if (bufs[key]) return bufs[key];
+        var n = Math.floor(ctx.sampleRate * seconds), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+        var last = 0, b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        for (var i = 0; i < n; i++) {
+            var w = Math.random() * 2 - 1;
+            if (color === 'brown') { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
+            else if (color === 'pink') {
+                b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.969 * b2 + w * 0.153852;
+                b3 = 0.8665 * b3 + w * 0.3104856; b4 = 0.55 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.016898;
+                d[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11; b6 = w * 0.115926;
+            } else if (color === 'crackle') {
+                d[i] = 0;
+            } else d[i] = w;
+        }
+        if (color === 'crackle') {                                  // pops and snaps, scattered
+            for (var c = 0; c < seconds * 9; c++) {
+                var at = Math.floor(Math.random() * (n - 2000)), len = 40 + Math.floor(Math.random() * 500), amp = 0.2 + Math.random() * 0.8;
+                for (var j = 0; j < len; j++) d[at + j] += (Math.random() * 2 - 1) * amp * Math.pow(1 - j / len, 3);
+            }
+        }
+        // soften the loop's seam
+        var fade = Math.min(2000, n / 4);
+        for (var f = 0; f < fade; f++) { var k = f / fade; d[f] *= k; d[n - 1 - f] *= k; }
+        return (bufs[key] = buf);
+    }
+    function loop(color, seconds) {
+        var s = ctx.createBufferSource();
+        s.buffer = noiseBuf(color, seconds);
+        s.loop = true;
+        s.start(ctx.currentTime + Math.random() * 0.05);
+        return s;
+    }
+    function filter(type, freq, q) {
+        var f = ctx.createBiquadFilter();
+        f.type = type; f.frequency.value = freq;
+        if (q) f.Q.value = q;
+        return f;
+    }
+    function gain(v) { var g = ctx.createGain(); g.gain.value = v; return g; }
+    function lfo(hz, depth, target) {                               // a slow wobble on a setting
+        var o = ctx.createOscillator(), g = gain(depth);
+        o.frequency.value = hz;
+        o.connect(g); g.connect(target);
+        o.start();
+        return o;
+    }
+    function chain() { for (var i = 0; i + 1 < arguments.length; i++) arguments[i].connect(arguments[i + 1]); return arguments[arguments.length - 1]; }
+
+    // each sound, made from noise and filters. out = where it goes. returns an optional tick(level) for timed things
+    var SYNTHS = {
+        white: function (out) { chain(loop('white', 3), gain(0.35), out); },
+        pink:  function (out) { chain(loop('pink', 4), gain(0.9), out); },
+        brown: function (out) { chain(loop('brown', 5), gain(0.9), out); },
+        rain: function (out) {
+            chain(loop('white', 3), filter('highpass', 400), filter('lowpass', 6000), gain(0.55), out);
+            chain(loop('brown', 4), filter('lowpass', 500), gain(0.6), out);
+        },
+        storm: function (out, ch) {
+            chain(loop('white', 3), filter('highpass', 350), filter('lowpass', 5200), gain(0.7), out);
+            chain(loop('brown', 5), filter('lowpass', 420), gain(1.0), out);
+            var next = 0;
+            return function (level) {                                // thunder now and then
+                if (level < 0.02) return;
+                var t = performance.now();
+                if (!next) next = t + 5000 + Math.random() * 10000;
+                if (t > next) { thunder(level * 0.8, 0.2, out); next = t + 12000 + Math.random() * 22000; }
+            };
+        },
+        ocean: function (out) {
+            var body = gain(0.5), foam = gain(0.18);
+            chain(loop('brown', 6), filter('lowpass', 650), body, out);
+            chain(loop('white', 3), filter('bandpass', 1400, 0.6), foam, out);
+            lfo(0.085, 0.45, body.gain);                             // the swell rolling in and out
+            lfo(0.085, 0.16, foam.gain);
+        },
+        wind: function (out) {
+            var bp = filter('bandpass', 480, 0.9), g = gain(1.1);
+            chain(loop('pink', 5), bp, g, out);
+            lfo(0.06, 260, bp.frequency);
+            lfo(0.13, 0.45, g.gain);
+        },
+        fire: function (out) {
+            chain(loop('brown', 5), filter('lowpass', 260), gain(0.55), out);
+            chain(loop('crackle', 6), filter('highpass', 1300), gain(0.9), out);
+        }
+    };
+
+    // a sound you can turn up and down. opts.muffled: a function that says "we're indoors"
+    function channel(name, opts) {
+        opts = opts || {};
+        var ch = { name: name, level: 0, file: undefined, built: false, out: null, lp: null, el: null, tick: null };
+        Sky.findAsset('assets/sounds/' + name + '.mp3|assets/sounds/' + name + '.ogg', function (url) { ch.file = url || null; if (ch.level > 0) build(); });
+        function build() {
+            if (ch.built || ch.file === undefined || !ac()) return;
+            ch.built = true;
+            ch.lp = filter('lowpass', 20000);
+            ch.out = gain(0);
+            ch.lp.connect(ch.out); ch.out.connect(master);
+            if (ch.file) {                                           // your recording
+                ch.el = new Audio(ch.file);
+                ch.el.loop = true;
+                ch.el.crossOrigin = 'anonymous';
+                try { ctx.createMediaElementSource(ch.el).connect(ch.lp); } catch (e) { ch.el.volume = 1; }
+            } else if (SYNTHS[name]) ch.tick = SYNTHS[name](ch.lp, ch) || null;
+            apply(0.3);
+        }
+        function apply(ramp) {
+            if (!ch.built) return;
+            var t = ctx.currentTime, inside = opts.muffled && opts.muffled();
+            ch.out.gain.setTargetAtTime(ch.level * (inside ? 0.55 : 1), t, ramp || 0.25);
+            ch.lp.frequency.setTargetAtTime(inside ? 900 : 20000, t, 0.3);
+            if (ch.el) {
+                if (ch.level > 0.001 && ch.el.paused && !ch.trying && !ch.blocked) {
+                    ch.trying = true;
+                    ch.el.play().then(function () { ch.trying = false; }, function () { ch.trying = false; ch.blocked = true; if (pendingFiles.indexOf(ch.el) === -1) pendingFiles.push(ch.el); });
+                }
+                if (ch.level <= 0.001 && !ch.el.paused) ch.el.pause();
+            }
+        }
+        ch.set = function (v, ramp) {
+            ch.level = Math.max(0, Math.min(1, v));
+            if (ch.level > 0) { wanted = true; build(); }
+            apply(ramp);
+            if (ch.tick && ctx && ctx.state === 'running') ch.tick(ch.level);
+        };
+        ch.refresh = function () { apply(); };
+        channels.push(ch);
+        return ch;
+    }
+    var channels = [];
+    setInterval(function () { channels.forEach(function (ch) { if (ch.tick && ctx && ctx.state === 'running') ch.tick(ch.level); }); }, 1000);
+
+    // one roll of thunder (your own: assets/sounds/thunder.mp3)
+    var thunderFile;
+    Sky.findAsset('assets/sounds/thunder.mp3|assets/sounds/thunder.ogg', function (url) { thunderFile = url || null; });
+    function thunder(loud, delay, out, muffled) {
+        if (!ac() || ctx.state !== 'running') return;
+        loud = Math.max(0, Math.min(1, loud)) * (muffled ? 0.6 : 1);
+        if (thunderFile) {
+            setTimeout(function () { var a = new Audio(thunderFile); a.volume = loud; a.play().catch(function () {}); }, (delay || 0) * 1000);
+            return;
+        }
+        var dest = out || master, t = ctx.currentTime + (delay || 0), len = 3 + Math.random() * 2.5;
+        var c = ctx.createBufferSource(); c.buffer = noiseBuf('white', 3);
+        var cg = gain(0); cg.gain.setValueAtTime(0, t); cg.gain.linearRampToValueAtTime(0.25 * loud * (delay < 1 ? 1 : 0.3), t + 0.01); cg.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        chain(c, filter('highpass', 1200), cg, dest); c.start(t); c.stop(t + 0.4);
+        var r = ctx.createBufferSource(); r.buffer = noiseBuf('brown', 5);
+        var rl = filter('lowpass', 260); rl.frequency.setValueAtTime(260, t); rl.frequency.linearRampToValueAtTime(90, t + len);
+        var rg = gain(0); rg.gain.setValueAtTime(0, t);
+        rg.gain.linearRampToValueAtTime(1.4 * loud, t + 0.15); rg.gain.linearRampToValueAtTime(0.9 * loud, t + 0.8);
+        rg.gain.linearRampToValueAtTime(1.1 * loud, t + 1.3); rg.gain.exponentialRampToValueAtTime(0.001, t + len);
+        chain(r, rl, rg, dest); r.start(t); r.stop(t + len + 0.2);
+    }
+
+    /* ---------------- little sound effects ----------------
+       Sky.sounds.sfx('cork-pop') … each made here, or your recording at
+       assets/sounds/<name>.mp3. splashes take a size (0 small … 1 big): the
+       bigger the thing, the deeper and longer the splash (your splash.mp3 is
+       played slower for big ones). */
+    var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
+    try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
+    var sfxFiles = {};
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash'].forEach(function (n) {
+        Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
+    });
+    function env(g, t, peak, attack, decay) {
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(peak, t + attack);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + attack + decay);
+    }
+    function noiseHit(dest, t, len, type, freq, q, peak, attack) {
+        var n = ctx.createBufferSource(); n.buffer = noiseBuf('white', 3);
+        var f = filter(type, freq, q), g = gain(0);
+        chain(n, f, g, dest);
+        env(g, t, peak, attack || 0.005, len);
+        n.start(t, Math.random() * 2); n.stop(t + (attack || 0.005) + len + 0.05);
+        return f;
+    }
+    function tone(dest, t, type, f0, f1, len, peak) {
+        var o = ctx.createOscillator(), g = gain(0);
+        o.type = type;
+        o.frequency.setValueAtTime(f0, t);
+        o.frequency.exponentialRampToValueAtTime(f1, t + len);
+        chain(o, g, dest);
+        env(g, t, peak, 0.004, len);
+        o.start(t); o.stop(t + len + 0.05);
+    }
+    var SFX = {
+        'cork-pop': function (out, t) {                                // a hollow pop, and a little squeak before it
+            tone(out, t, 'triangle', 520, 780, 0.07, 0.12);
+            tone(out, t + 0.08, 'sine', 900, 260, 0.09, 0.8);
+            noiseHit(out, t + 0.08, 0.05, 'highpass', 2500, 0, 0.35);
+        },
+        'cork-in': function (out, t) {                                 // squeak, squeak, thunk
+            tone(out, t, 'triangle', 480, 620, 0.09, 0.14);
+            tone(out, t + 0.12, 'triangle', 540, 700, 0.08, 0.12);
+            tone(out, t + 0.24, 'sine', 180, 90, 0.08, 0.5);
+            noiseHit(out, t + 0.24, 0.05, 'lowpass', 900, 0, 0.3);
+        },
+        'paper-unroll': function (out, t) { rustle(out, t, 1.1, 2400); },
+        'paper-roll': function (out, t) { rustle(out, t, 0.8, 1800); },
+        'throw': function (out, t) {                                   // a whoosh through the air
+            var f = noiseHit(out, t, 0.55, 'bandpass', 500, 1.2, 0.5, 0.18);
+            f.frequency.setValueAtTime(400, t);
+            f.frequency.exponentialRampToValueAtTime(1900, t + 0.25);
+            f.frequency.exponentialRampToValueAtTime(600, t + 0.7);
+        },
+        'splash': function (out, t, size) {                           // a plop and a spray: bigger = deeper and longer
+            size = Math.max(0, Math.min(1, size === undefined ? 0.5 : size));
+            var deep = 1 - size;
+            tone(out, t, 'sine', 140 + 380 * deep, 50 + 140 * deep, 0.12 + 0.25 * size, 0.45 + 0.4 * size);
+            var f = noiseHit(out, t + 0.01, 0.25 + 0.9 * size, 'lowpass', 1400 + 4200 * deep, 0.3, 0.35 + 0.5 * size, 0.012);
+            f.frequency.exponentialRampToValueAtTime(300 + 900 * deep, t + 0.3 + 0.8 * size);
+            for (var i = 0; i < 3 + Math.round(4 * size); i++) {        // droplets falling back
+                var d = t + 0.15 + Math.random() * (0.35 + 0.5 * size);
+                tone(out, d, 'sine', 900 + Math.random() * 1400 * (0.6 + deep), 500 + Math.random() * 500, 0.04, 0.05 + 0.05 * Math.random());
+            }
+        }
+    };
+    function rustle(out, t, len, band) {                              // paper: a crackly bandpassed hiss, in little bursts
+        var n = ctx.createBufferSource(); n.buffer = noiseBuf('white', 3);
+        var f = filter('bandpass', band, 0.8), f2 = filter('highpass', 900), g = gain(0);
+        chain(n, f, f2, g, out);
+        g.gain.setValueAtTime(0.0001, t);
+        var steps = Math.round(len * 26);
+        for (var i = 0; i <= steps; i++) {
+            var at = t + len * i / steps, shape = Math.sin(Math.PI * i / steps);
+            g.gain.linearRampToValueAtTime(0.05 + shape * (0.25 + Math.random() * 0.45), at);
+        }
+        g.gain.linearRampToValueAtTime(0.0001, t + len + 0.05);
+        n.start(t, Math.random() * 2); n.stop(t + len + 0.1);
+    }
+    function sfx(name, opts) {
+        opts = opts || {};
+        if (sfxVol <= 0) return;
+        var size = opts.size, delay = opts.delay || 0;
+        if (sfxFiles[name]) {                                          // your recording
+            setTimeout(function () {
+                var a = new Audio(sfxFiles[name]);
+                a.volume = sfxVol;
+                if (name === 'splash' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = 1.3 - 0.55 * size; }
+                a.play().catch(function () {});
+            }, delay * 1000);
+            return;
+        }
+        if (!SFX[name] || !ac()) return;
+        var play = function () {
+            var out = gain(sfxVol);
+            out.connect(master);
+            SFX[name](out, ctx.currentTime + delay + 0.01, size);
+        };
+        if (ctx.state === 'running') play();
+        else ctx.resume().then(play, function () {});                   // (a click just woke it)
+    }
+
+    Sky.sounds = {
+        channel: channel,
+        thunder: thunder,
+        sfx: sfx,
+        get sfxVolume() { return sfxVol; },
+        set sfxVolume(v) { sfxVol = Math.max(0, Math.min(1, v)); try { localStorage.setItem(SFX_KEY, sfxVol); } catch (e) {} },
+        has: function (name) { return !!SYNTHS[name]; },
+        // true when something wants to be heard but the browser is waiting for a tap
+        get waiting() { return wanted && channels.some(function (c) { return c.level > 0; }) && (!ctx || ctx.state !== 'running'); }
+    };
+
+    /* ======================================================================
+       the panel
+       ====================================================================== */
+    Sky.css(
+        '.cp { position: fixed; right: 14px; top: 14px; z-index: 7; font-family: "IM Fell English", Georgia, serif; color: #3a2716; }' +
+        '.cp-toggle { display: flex; align-items: center; gap: 4px; height: 44px; padding: 0 12px 0 6px; border: 0; border-radius: 999px; cursor: pointer;' +
+            'background: #eadcb9; color: #3a2716; box-shadow: 0 6px 16px rgba(0,0,0,.35), inset 0 0 16px rgba(120,80,30,.2); font: inherit; }' +
+        '.cp-toggle:hover { background: #f1e5c6; }' +
+        '.cp-toggle .cp-ic { width: 32px; height: 32px; }' +
+        '.cp-ic { display: inline-block; flex: none; width: 24px; height: 24px; }' +
+        '.cp-ic .placeholder, .cp-ic > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
+        '.cp-badges { display: flex; gap: 3px; align-items: center; }' +
+        '.cp-badges:empty { display: none; }' +
+        '.cp-badges svg { width: 20px; height: 20px; display: block; }' +
+        '.cp .spin { animation: rp-spin 4.5s linear infinite; }' +
+        '@keyframes rp-spin { to { transform: rotate(360deg); } }' +
+        '.cp-wait { position: absolute; right: 0; top: calc(100% + 6px); white-space: nowrap; padding: 3px 10px; border-radius: 999px; font-size: .85rem; font-style: italic;' +
+            'background: rgba(42,29,20,.85); color: #f3e6c2; display: none; pointer-events: none; }' +
+        '.cp.waiting:not(.open) .cp-wait { display: block; animation: cp-nudge 1.6s ease-in-out infinite; }' +
+        '@keyframes cp-nudge { 50% { transform: translateY(2px); opacity: .75; } }' +
+        '.cp-box { position: absolute; right: 0; top: calc(100% + 10px); width: min(350px, calc(100vw - 28px)); max-height: calc(100vh - 90px); overflow: auto;' +
+            'border-radius: 16px; background: #eadcb9; box-shadow: 0 14px 34px rgba(0,0,0,.45), inset 0 0 30px rgba(120,80,30,.22);' +
+            'transform-origin: 100% 0; transform: scale(.9); opacity: 0; visibility: hidden; transition: transform .25s cubic-bezier(.3,.7,.3,1.2), opacity .2s, visibility 0s .25s; overscroll-behavior: contain; }' +
+        '.cp.open .cp-box { transform: none; opacity: 1; visibility: visible; transition: transform .3s cubic-bezier(.3,.7,.3,1.2), opacity .2s; }' +
+        '.cp-head { display: flex; align-items: center; gap: 8px; padding: 12px 12px 6px 16px; }' +
+        '.cp-head h2 { flex: 1; margin: 0; font: normal 1.2rem "IM Fell English SC", Georgia, serif; }' +
+        '.cp button.cp-x { border: 0; background: none; cursor: pointer; color: #6e5236; font: italic .95rem "IM Fell English", Georgia, serif; padding: 4px 8px; border-radius: 999px; }' +
+        '.cp button.cp-x:hover { background: rgba(110,82,54,.14); }' +
+        '.cp-layer { margin: 0 8px 8px; border-radius: 12px; background: rgba(255,250,235,.45); box-shadow: inset 0 0 0 1px rgba(110,82,54,.15); }' +
+        '.cp-lh { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 0; background: none; cursor: pointer; text-align: left; font: inherit; color: inherit; border-radius: 12px; }' +
+        '.cp-lh:hover { background: rgba(110,82,54,.08); }' +
+        '.cp-lt { flex: 1; min-width: 0; }' +
+        '.cp-lt b { display: block; font-weight: normal; font-size: 1.05rem; }' +
+        '.cp-lt i { display: block; font-size: .85rem; color: #6e5236; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
+        '.cp-layer.on .cp-lt b::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 7px; border-radius: 50%; background: #9a3b1f; vertical-align: middle; }' +
+        '.cp-chev { flex: none; width: 14px; height: 14px; transition: transform .25s; color: #6e5236; }' +
+        '.cp-layer.open .cp-chev { transform: rotate(180deg); }' +
+        '.cp-lb { display: none; padding: 2px 12px 12px; }' +
+        '.cp-layer.open .cp-lb { display: block; }' +
+        // bits the layers share
+        '.cp .cp-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }' +
+        '.cp .cp-range { display: flex; align-items: center; gap: 8px; margin: 8px 0 2px; font-size: .9rem; color: #6e5236; }' +
+        '.cp input[type=range] { flex: 1; accent-color: #9a3b1f; min-width: 0; }' +
+        '.cp .cp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }' +
+        '.cp .cp-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border: 0; border-radius: 999px; cursor: pointer;' +
+            'background: rgba(110,82,54,.12); color: #3a2716; font: italic .92rem "IM Fell English", Georgia, serif; }' +
+        '.cp .cp-chip:hover { background: rgba(110,82,54,.22); }' +
+        '.cp .cp-chip[aria-pressed="true"] { background: #3a2716; color: #f3e6c2; }' +
+        '.cp .cp-chip svg { width: 16px; height: 16px; }' +
+        '.cp .cp-btn { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; color: #3a2716; }' +
+        '.cp .cp-btn:hover { background: rgba(110,82,54,.14); }' +
+        '.cp .cp-btn.big { width: 42px; height: 42px; background: #3a2716; color: #f3e6c2; }' +
+        '.cp .cp-btn.big:hover { background: #9a3b1f; }' +
+        '.cp .cp-btn svg { width: 16px; height: 16px; fill: currentColor; }' +
+        '.cp .cp-note { font-size: .85rem; font-style: italic; color: #6e5236; margin: 6px 0 0; }' +
+        '.cp .cp-note a { color: #9a3b1f; }' +
+        '.cp .cp-link { border: 0; background: none; padding: 0; cursor: pointer; color: #9a3b1f; font: italic .85rem "IM Fell English", Georgia, serif; text-decoration: underline; }' +
+        'body.sky-view .cp { top: 14px; }' +
+        '@media (max-width: 620px) { .cp { right: 10px; top: 10px; } .cp-toggle { height: 40px; } .cp-toggle .cp-ic { width: 28px; height: 28px; } .cp-badges svg { width: 17px; height: 17px; } }' +
+        '@media (prefers-reduced-motion: reduce) { .cp .spin { animation: none; } }'
+    );
+
+    var PANEL_ICON = '<svg class="placeholder" viewBox="0 0 32 32" aria-hidden="true">' +
+        '<circle cx="16" cy="16" r="14" fill="#3a2716"/><circle cx="16" cy="16" r="10.5" fill="none" stroke="#c49a52" stroke-width="1.2" stroke-dasharray="1.5 2.2"/>' +
+        '<path d="M16 16 L16 7.5" stroke="#f3e6c2" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="16" r="3" fill="#9a3b1f"/>' +
+        '<path d="M8 23 h16" stroke="#c49a52" stroke-width="1.4" stroke-linecap="round" opacity=".6"/></svg>';
+    var CHEV = '<svg class="cp-chev" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 5 L7 9 L11 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+    var root = document.createElement('div');
+    root.className = 'cp';
+    root.innerHTML =
+        '<button type="button" class="cp-toggle" aria-expanded="false" aria-label="sounds and weather">' +
+            '<span class="cp-ic" data-asset="assets/ui/panel">' + PANEL_ICON + '</span><span class="cp-badges"></span></button>' +
+        '<span class="cp-wait">tap anywhere to hear it</span>' +
+        '<div class="cp-box" role="dialog" aria-label="sounds and weather">' +
+            '<div class="cp-head"><h2>sounds &amp; sky</h2><button type="button" class="cp-x">close ✕</button></div>' +
+            '<div class="cp-layers"></div>' +
+        '</div>';
+    document.body.appendChild(root);
+    var toggleBtn = root.querySelector('.cp-toggle'), layersEl = root.querySelector('.cp-layers'), badgesEl = root.querySelector('.cp-badges');
+
+    var layers = [], openIds = [], lastBadges = null;
+    try { openIds = JSON.parse(sessionStorage.getItem('panel-layers')) || []; } catch (e) {}
+    function saveOpen() { try { sessionStorage.setItem('panel-layers', JSON.stringify(openIds)); } catch (e) {} }
+
+    function add(L) {
+        var el = document.createElement('section');
+        el.className = 'cp-layer';
+        el.dataset.layer = L.id;
+        el.innerHTML = '<button type="button" class="cp-lh" aria-expanded="false">' +
+            '<span class="cp-ic" data-asset="assets/ui/' + L.id + '">' + (L.icon || '') + '</span>' +
+            '<span class="cp-lt"><b></b><i></i></span>' + CHEV + '</button><div class="cp-lb"></div>';
+        el.querySelector('b').textContent = L.title;
+        L.el = el;
+        L.body = el.querySelector('.cp-lb');
+        L.order = L.order || 50;
+        layers.push(L);
+        layers.sort(function (a, b) { return a.order - b.order; });
+        layers.forEach(function (x) { layersEl.appendChild(x.el); });
+        if (L.build) L.build(L.body);
+        el.querySelector('.cp-lh').addEventListener('click', function () { expand(L.id, !el.classList.contains('open')); });
+        if (openIds.indexOf(L.id) !== -1) expand(L.id, true, true);
+        refresh(L.id);
+        return L;
+    }
+    function find(id) { for (var i = 0; i < layers.length; i++) if (layers[i].id === id) return layers[i]; return null; }
+    function expand(id, on, quiet) {
+        var L = find(id);
+        if (!L) return;
+        L.el.classList.toggle('open', on);
+        L.el.querySelector('.cp-lh').setAttribute('aria-expanded', String(on));
+        var i = openIds.indexOf(id);
+        if (on && i === -1) openIds.push(id);
+        if (!on && i !== -1) openIds.splice(i, 1);
+        if (!quiet) saveOpen();
+        if (on && L.onOpen) L.onOpen();
+    }
+    function refresh(id) {
+        (id ? [find(id)] : layers).forEach(function (L) {
+            if (!L) return;
+            var hidden = L.visible && !L.visible();
+            L.el.style.display = hidden ? 'none' : '';
+            L.el.querySelector('i').textContent = L.status ? L.status() : '';
+            L.el.classList.toggle('on', !!(L.active && L.active()));
+        });
+        var b = layers.filter(function (L) { return L.active && L.active() && L.badge && !(L.visible && !L.visible()); }).map(function (L) { return L.badge(); }).join('');
+        if (b !== lastBadges) { badgesEl.innerHTML = b; lastBadges = b; }
+        root.classList.toggle('waiting', Sky.sounds.waiting || document.body.classList.contains('music-waiting'));
+    }
+    function refreshAll() { refresh(); }
+    function setOpen(on) {
+        root.classList.toggle('open', on);
+        toggleBtn.setAttribute('aria-expanded', String(on));
+        if (on) refresh();
+    }
+    function open(id) {
+        setOpen(true);
+        if (id) {
+            expand(id, true);
+            var L = find(id);
+            if (L) setTimeout(function () { L.el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 60);
+        }
+    }
+    toggleBtn.addEventListener('click', function () { setOpen(!root.classList.contains('open')); });
+    root.querySelector('.cp-x').addEventListener('click', function () { setOpen(false); });
+    document.addEventListener('pointerdown', function (e) { if (root.classList.contains('open') && !root.contains(e.target) && !e.target.closest('[data-opens-panel]')) setOpen(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('open')) { e.stopPropagation(); setOpen(false); } }, true);
+    setInterval(refreshAll, 2000);
+
+    // the sound effects (corks, paper, splashes): just a volume
+    add({
+        id: 'effects', title: 'sound effects', order: 40,
+        icon: '<svg class="placeholder" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3z" fill="#3a2716"/>' +
+            '<path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#9a3b1f" stroke-width="1.8" stroke-linecap="round"/></svg>',
+        build: function (body) {
+            body.innerHTML = '<label class="cp-range">volume <input type="range" min="0" max="100" aria-label="sound effects volume"></label>' +
+                '<p class="cp-note">corks, paper, throws and splashes.</p>';
+            var r = body.querySelector('input');
+            r.value = Math.round(Sky.sounds.sfxVolume * 100);
+            r.addEventListener('input', function () { Sky.sounds.sfxVolume = r.value / 100; refresh('effects'); });
+            r.addEventListener('change', function () { Sky.sounds.sfx('cork-pop'); });
+        },
+        status: function () { var v = Math.round(Sky.sounds.sfxVolume * 100); return v ? 'on, at ' + v + '%' : 'off'; }
+    });
+
+    Sky.panel = {
+        add: add, refresh: refresh, open: open, expand: expand,
+        close: function () { setOpen(false); },
+        get el() { return root; }
+    };
+})();

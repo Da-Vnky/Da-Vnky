@@ -1,0 +1,9 @@
+a bottle still in the crate
+
+this one hasn't been read by the keeper of this place yet, so anyone who
+comes by can uncork it, read it, and roll it back up.
+
+when you read it with ?owner on the end of the address, you can pin it to
+the board or put it on the pile, and after you publish, everyone sees it there.
+
+~ an example

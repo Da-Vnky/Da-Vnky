@@ -27,6 +27,9 @@
         '.city-roof > .art:not(.glow-layer) { filter: brightness(calc(1 - .55 * var(--dusk))) saturate(calc(1 - .3 * var(--dusk))); }' +
         '.city-roof > .glow-layer { opacity: var(--dusk); }' +
         '.city-roof .r-bulb { fill: #fff0c4; }' +
+        '.city-roof .groove { width: 46px; } .city-roof .roof-pigeon { width: 30px; } .city-roof .roof-pigeon.two { width: 26px; }' +
+        '.city-roof .groove > .art:not(.glow-layer), .city-roof .groove > .placeholder { filter: brightness(calc(1 - .5 * var(--dusk))); }' +
+        '@media (max-width: 620px) { .city-roof .groove { width: 34px; } .city-roof .roof-pigeon { width: 22px; } .city-roof .roof-pigeon.two { width: 19px; } }' +
         '.city-roof .r-halo { fill: url(#roof-glow); }' +
         'body.peep-view .city-roof, body.peep-close .city-roof, body.sky-view .city-roof, body.scope-view .city-roof { transform: translateY(110%); opacity: 0; }' +
         '@media (max-width: 620px) { .city-roof { height: 17vh; min-height: 110px; } }'
@@ -64,7 +67,11 @@
         '<defs><radialGradient id="roof-glow"><stop offset="0" stop-color="rgba(255,214,140,.75)"/><stop offset="1" stop-color="rgba(255,214,140,0)"/></radialGradient></defs>' +
         '<path class="r-far"/><path class="r-top"/><path class="r-cap"/><path class="r-face"/><path class="r-mortar"/>' +
         '<path class="r-metal"/><path class="r-glass"/><path class="r-warm"/><path class="r-pot"/><path class="r-leaf"/><path class="r-wire"/>' +
-        '<g class="r-lights"></g></svg>';
+        '<g class="r-lights"></g></svg>' +
+        // rooftop friends who dance when music plays: assets/city/cat, assets/city/pigeon
+        '<div class="groove roof-cat" data-groove="cat" data-asset="assets/city/cat"></div>' +
+        '<div class="groove roof-pigeon" data-groove="pigeon" data-asset="assets/city/pigeon"></div>' +
+        '<div class="groove roof-pigeon two" data-groove="pigeon" data-asset="assets/city/pigeon"></div>';
     document.body.appendChild(roof);
     var ROOF = {
         'r-far':   ['#8e7f78', '#26222c'],   // the back of the roof, a shade darker
@@ -79,11 +86,16 @@
         'r-wire':  ['#3a302a', '#141014']
     };
     function buildRoof() {
-        var svg = roof.querySelector('.placeholder');
-        if (!svg) return;
         var W = roof.clientWidth, H = roof.clientHeight, k = W < 620 ? .72 : 1;
         var top = H * 0.44, feet = H * 0.55;              // the roof's back edge, and where feet stand
         var cap = H * 0.62, face = cap + 9 * k;
+        // the cat sits on the chimney, the pigeons on the ledge
+        var cat = roof.querySelector('.roof-cat'), pg = roof.querySelectorAll('.roof-pigeon');
+        cat.style.left = (W * 0.07 + 4 * k) + 'px'; cat.style.bottom = (H - (feet - 96 * k - 8 * k)) + 'px';
+        pg[0].style.left = (W * 0.38) + 'px'; pg[0].style.bottom = (H - cap - 1) + 'px';
+        pg[1].style.left = (W * 0.38 + 34 * k) + 'px'; pg[1].style.bottom = (H - cap - 1) + 'px';
+        var svg = roof.querySelector('svg.placeholder');
+        if (!svg) return;
         var d = {}; for (var c in ROOF) d[c] = '';
         function R(x, y, w, h) { return 'M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'h' + w.toFixed(1) + 'v' + h.toFixed(1) + 'h' + (-w).toFixed(1) + 'Z'; }
         d['r-far'] += R(0, top, W, 5 * k);
@@ -141,7 +153,7 @@
     buildRoof();
     window.addEventListener('resize', buildRoof);
     function paintRoof(p) {
-        var svg = roof.querySelector('.placeholder');
+        var svg = roof.querySelector('svg.placeholder');
         if (!svg) return;
         var dusk = Sky.smooth(Sky.ramp(p, 0.3, 0.85)), lit = Sky.smooth(Sky.ramp(p, 0.4, 0.55));
         for (var c in ROOF) {

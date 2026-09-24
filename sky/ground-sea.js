@@ -21,6 +21,20 @@
         '.ground-sea .dock { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 -3px 5px rgba(0,0,0,.3)); }' +
         '.ground-sea .d-rope  { fill: none; stroke: #c9b184; stroke-width: 2.4; stroke-linecap: round; }' +
         '.ground-sea .d-flame { fill: #ffd98a; }' +
+        '.ground-sea .groove { z-index: auto; }' +
+        '.ground-sea .dock-board { position: absolute; width: 64px; display: none; pointer-events: auto; cursor: pointer; filter: drop-shadow(0 4px 5px rgba(0,0,0,.35)); }' +
+        '.ground-sea .dock-board.show { display: block; }' +
+        '.ground-sea .dock-board .placeholder, .ground-sea .dock-board > .art { display: block; width: 100%; height: auto; }' +
+        '.ground-sea .dock-board > .art:not(.glow-layer) { filter: brightness(calc(1 - .45 * var(--dusk))); }' +
+        '.ground-sea .dock-board:hover { filter: drop-shadow(0 4px 5px rgba(0,0,0,.35)) drop-shadow(0 0 8px rgba(255,230,160,.8)); }' +
+        '.ground-sea .dock-board .db-count { position: absolute; right: -6px; top: -6px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px;' +
+            'background: #3a2716; color: #f3e6c2; font: 12px/20px Georgia, serif; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,.4); }' +
+        '.ground-sea .dock-board .db-hint { position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); white-space: nowrap;' +
+            'font-style: italic; font-size: .95rem; color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.7); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
+        '.ground-sea .dock-board:hover .db-hint, .ground-sea .dock-board:focus-visible .db-hint { opacity: 1; }' +
+        '@media (max-width: 620px) { .ground-sea .dock-board { width: 46px; } }' +
+        '.ground-sea .dock-crab { width: 44px; } .ground-sea .dock-gull { width: 36px; }' +
+        '@media (max-width: 620px) { .ground-sea .dock-crab { width: 32px; } .ground-sea .dock-gull { width: 27px; } }' +
         // your own waves: a strip as tall as the sea that repeats sideways
         '.ground-sea .wave.has-art { background-repeat: repeat-x; background-position: left bottom; background-size: auto 100%; }' +
         '.ground-sea .wave.has-art path { display: none; }' +
@@ -44,7 +58,18 @@
         '.ground-sea .sea-char.startled > .placeholder, .ground-sea .sea-char.startled > .art, .ground-sea .sea-char.startled > .pose { animation: mate-startle 1.3s ease-out both; }' +
         '@keyframes mate-startle { 0% { translate: 0 0; rotate: 0deg; } 14% { translate: 0 -24px; rotate: 9deg; } 30% { translate: 0 0; rotate: 0deg; }' +
             ' 40% { translate: -4px 0; } 48% { translate: 4px 0; } 56% { translate: -4px 0; } 64% { translate: 4px 0; } 72%, 100% { translate: 0 0; rotate: 0deg; } }' +
-        '.ground-sea .sea-char .bubble.shout { font-style: normal; font-weight: bold; color: #9a3b1f; white-space: nowrap; max-width: none; }' +
+        '.ground-sea .sea-char .bubble.shout { --bub: #f3e8cc; background: var(--bub); font-style: normal; font-weight: bold; color: #9a3b1f; white-space: nowrap; max-width: none;' +
+            'transition: opacity .25s ease, transform .25s ease, background-color .3s, color .3s, font-size .2s; }' +
+        '.ground-sea .sea-char .bubble.shout::after { border-top-color: var(--bub); }' +
+        // angrier and angrier: the bubble reddens and shakes harder
+        '.ground-sea .sea-char .bubble.shout[data-anger="1"] { --bub: #f2d6bd; --amp: .6px; animation: bubble-rage .2s linear infinite; }' +
+        '.ground-sea .sea-char .bubble.shout[data-anger="2"] { --bub: #efb89c; color: #7a200e; --amp: 1.3px; animation: bubble-rage .14s linear infinite; letter-spacing: .03em; }' +
+        '.ground-sea .sea-char .bubble.shout[data-anger="3"] { --bub: #e0785c; color: #3f0a04; --amp: 2.2px; animation: bubble-rage .1s linear infinite; font-size: 1.08rem; }' +
+        '.ground-sea .sea-char .bubble.shout[data-anger="4"] { --bub: #c2311d; color: #fff1dc; --amp: 3.4px; animation: bubble-rage .07s linear infinite; font-size: 1.16rem;' +
+            'box-shadow: 0 5px 10px rgba(0,0,0,.3), 0 0 14px rgba(220,60,30,.55); }' +
+        '@keyframes bubble-rage { 0% { translate: 0 0; } 25% { translate: calc(var(--amp) * -1) calc(var(--amp) * .6); } 50% { translate: var(--amp) calc(var(--amp) * -.4); }' +
+            ' 75% { translate: calc(var(--amp) * -.5) calc(var(--amp) * -.8); } 100% { translate: 0 0; } }' +
+        '@media (prefers-reduced-motion: reduce) { .ground-sea .sea-char .bubble.shout { animation: none !important; } }' +
         '.ground-sea .sea-char.talking .bubble.pop { animation: bubble-pop .32s ease-out; }' +
         '@keyframes bubble-pop { 0% { transform: translate(-50%, 4px) scale(.7); } 60% { transform: translate(-50%, 0) scale(1.1); } 100% { transform: translate(-50%, 0) scale(1); } }' +
         '@media (prefers-reduced-motion: reduce) { .ground-sea .sea-char.startled > *, .ground-sea .sea-char .bubble.pop { animation: none; } }' +
@@ -73,10 +98,26 @@
             '<defs><radialGradient id="dock-glow"><stop offset="0" stop-color="rgba(255,205,120,.6)"/><stop offset="1" stop-color="rgba(255,205,120,0)"/></radialGradient></defs>' +
             '<circle class="d-glow" fill="url(#dock-glow)"/><path class="d-flame"/>' +
         '</svg>' +
-        // the traveller: rides in the ship, steps onto the dock at nightfall.
+        // the letters board on the dock (sky/letters.js fills it): assets/sea/letter-board
+        '<div class="dock-board" data-asset="assets/sea/letter-board" role="button" tabindex="0" aria-label="the letters board">' +
+            '<svg class="placeholder" viewBox="0 0 72 86" aria-hidden="true">' +
+                '<rect x="9" y="34" width="6" height="52" fill="#4a2f1c"/><rect x="57" y="34" width="6" height="52" fill="#4a2f1c"/>' +
+                '<path d="M0 14 L36 2 L72 14 L72 18 L0 18 Z" fill="#5a3a24"/>' +
+                '<rect x="3" y="16" width="66" height="42" rx="2" fill="#6e4a30"/><rect x="7" y="20" width="58" height="34" fill="#b8875a"/>' +
+                '<g fill="#efe3c6"><rect x="12" y="23" width="15" height="20" transform="rotate(-6 19 33)"/><rect x="30" y="22" width="14" height="19" transform="rotate(4 37 31)"/>' +
+                    '<rect x="47" y="25" width="14" height="19" transform="rotate(-3 54 34)"/></g>' +
+                '<g fill="#9a3b1f"><circle cx="19" cy="24" r="1.6"/><circle cx="37" cy="23" r="1.6"/><circle cx="54" cy="26" r="1.6"/></g>' +
+                '<g stroke="#8a7550" stroke-width=".8"><path d="M14 30h10M14 33h9M14 36h10M32 28h9M32 31h10M32 34h8M49 31h10M49 34h9M49 37h10"/></g>' +
+            '</svg><span class="db-count"></span><span class="db-hint">the letters</span></div>' +
+        // friends on the dock who dance when music plays: assets/sea/crab, assets/sea/gull
+        '<div class="groove dock-crab" data-groove="crab" data-asset="assets/sea/crab"></div>' +
+        '<div class="groove dock-gull" data-groove="gull" data-asset="assets/sea/gull"></div>' +
+        wave(2, .53, .15, 155, 110) +
+        // the traveller: rides in the ship, steps onto the dock at nightfall. they sit in front of
+        // the second row of waves (so they're never lost behind it climbing aboard) and behind the
+        // ship's hull (so it hides their legs when they're aboard).
         // put your own at assets/characters/sea.(gif|png|webp|svg)
         '<div class="character sea-char" data-asset="assets/characters/sea" data-say="ahoy! where to?" aria-label="the traveller"></div>' +
-        wave(2, .53, .15, 155, 110) +
         // slot: assets/sea/ship (a 1200 x 1000 canvas, facing right, keel about 90% down; ship-glow = lit at night)
         '<svg class="ship" viewBox="0 0 120 100" data-slot="assets/sea/ship"><g class="hull" fill="currentColor">' +
             '<path d="M8 72 L112 72 L98 90 L22 90 Z"/><rect x="58" y="10" width="3" height="62"/>' +
@@ -238,6 +279,14 @@
         }
 
         dockAt = { W: W, S: S, x0: x0, dw: dw, deck: y, small: small, post: W > 1100 ? W - 68 : null };
+        // the letters board stands on the deck
+        var lb = sea.querySelector('.dock-board');
+        lb.style.left = (x0 + dw * (small ? 0.3 : 0.34)) + 'px'; lb.style.bottom = (S - y - 1) + 'px';
+        // the crab strolls the deck; the gull sits on the bollard (or the deck, on a dock of your own)
+        var crab = sea.querySelector('.dock-crab'), gull = sea.querySelector('.dock-gull');
+        crab.style.left = (x0 + dw * 0.58) + 'px'; crab.style.bottom = (S - y - 2) + 'px';
+        if (dockArt) { gull.style.left = (x0 + dw * 0.3) + 'px'; gull.style.bottom = (S - y - 2) + 'px'; }
+        else { gull.style.left = (x0 + (small ? 28 : 40) - 12) + 'px'; gull.style.bottom = (S - y + (small ? 14 : 20) + 3) + 'px'; }
         dock.setAttribute('viewBox', '0 0 ' + W + ' ' + S);
         dock.querySelector('.d-wood').setAttribute('d', wood);
         dock.querySelector('.d-shade').setAttribute('d', shade);
@@ -328,7 +377,7 @@
         ship.classList.remove('held');
         var dist = Math.hypot(drag.x, drag.y), id = ++tweenId;
         tween({ x: 0, y: 0, s: 1 }, Math.min(520, 220 + dist * 0.6), easeIn, id, function () {
-            splash(ship);
+            splash(ship, 1);
             drag.dip = 16;
             tween({ dip: 0 }, 650, easeBack, id);
         });
@@ -337,7 +386,9 @@
     ship.addEventListener('pointercancel', release);
 
     // a splash at a point on screen (size 1 = the ship's own)
-    function splashAt(cx, cy, size, spread) {
+    function splashAt(cx, cy, size, spread, sound) {
+        // the sound: a bottle's is small and bright, the traveller's deeper, the ship's deepest of all
+        if (Sky.sounds) Sky.sounds.sfx('splash', { size: sound === undefined ? Math.min(1, size) : sound });
         var ring = document.createElement('div');
         ring.className = 'ring';
         ring.style.left = cx + 'px';
@@ -370,9 +421,9 @@
              .onfinish = (function (el) { return function () { el.remove(); }; })(d);
         }
     }
-    function splash(el) {
+    function splash(el, sound) {
         var b = el.getBoundingClientRect();
-        splashAt(b.left + b.width / 2, b.top + b.height * 0.86, b.width / 230, b.width);
+        splashAt(b.left + b.width / 2, b.top + b.height * 0.86, b.width / 230, b.width, sound);
     }
 
     /* ---------------- the waves (by scroll, and rolling by the clock while under way) ---------------- */
@@ -398,21 +449,31 @@
 
     // what they say (the words are all here, easy to change)
     var LEFT_BEHIND = 'Hey?! Wait for me!';
-    var HELD_LINES = ['Hey! Put me down!', "I'm serious!!", 'F$#K You!'];
-    var HELD_LINE_MS = 1700;          // each complaint shows this long
-    var BREAK_FREE_MS = 5000;         // held this long, they wriggle loose and fall
+    // held up in the air, they get angrier: [what they say, how angry (0 to 4)]
+    var HELD_LINES = [
+        ['Hey! Put me down!', 0],
+        ["I'm serious!!", 1],
+        ['PUT. ME. DOWN.', 2],
+        ['F$#K YOU!!', 3],
+        ['LET GO OF ME, YOU &%$#@ING %$#@!!', 4]
+    ];
+    var HELD_LINE_MS = 1100;          // each complaint shows this long
+    var BREAK_FREE_MS = 5600;         // held this long, they wriggle loose and fall
     var STARTLE_MS = 1400;            // the double-take before they chase the ship
 
     // speech: shout(text) shows a line in their bubble; hush() puts it away again
     var sayId = 0;
     function bubble() { return mate.querySelector('.bubble'); }
-    function shout(text) {
+    function shout(text, anger) {
         var b = bubble();
         if (!b) return;
         sayId++;
         b.textContent = text;
+        b.dataset.anger = anger || 0;
         b.classList.add('shout');
         b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+        clearTimeout(b.popTimer);
+        b.popTimer = setTimeout(function () { b.classList.remove('pop'); }, 340);   // then it can shake
         mate.classList.add('talking');
     }
     function hush(after) {
@@ -425,6 +486,7 @@
             setTimeout(function () {                           // once it's faded, back to their usual line
                 if (id !== sayId) return;
                 b.classList.remove('shout', 'pop');
+                b.dataset.anger = 0;
                 b.textContent = mate.dataset.say || '';
             }, 300);
         }, after || 0);
@@ -465,7 +527,7 @@
     }
     function mateSplash(size) {
         var r = sea.getBoundingClientRect();
-        splashAt(r.left + crew.x + mateW() / 2, r.bottom - (sea.clientHeight * 0.47), size, mateW() * 2.4);
+        splashAt(r.left + crew.x + mateW() / 2, r.bottom - (sea.clientHeight * 0.47), size, mateW() * 2.4, 0.5);
     }
 
     // move to a spot (which may itself be moving, like the bobbing ship): hop, walk or fall
@@ -505,7 +567,7 @@
         mate.classList.add('face-left');
         void mate.offsetWidth;
         mate.classList.add('startled');
-        shout(LEFT_BEHIND);
+        shout(LEFT_BEHIND, 1);
         crew.timer = setTimeout(function () {
             if (run !== crew.run) return;
             mate.classList.remove('startled');
@@ -626,11 +688,11 @@
     // while held: "put me down!" ... and after BREAK_FREE_MS they wriggle loose and drop
     function complain(p) {
         var i = 0;
-        shout(HELD_LINES[0]);
+        shout(HELD_LINES[0][0], HELD_LINES[0][1]);
         p.lines = setInterval(function () {
             if (pick !== p) { clearInterval(p.lines); return; }
             i = Math.min(i + 1, HELD_LINES.length - 1);
-            shout(HELD_LINES[i]);
+            shout(HELD_LINES[i][0], HELD_LINES[i][1]);
             if (i === HELD_LINES.length - 1) clearInterval(p.lines);
         }, HELD_LINE_MS);
         p.free = setTimeout(function () {

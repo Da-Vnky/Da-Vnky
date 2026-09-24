@@ -1,0 +1,5 @@
+# keep the little shell scripts in unix line endings, even on windows
+# (with windows line endings they quietly stop working)
+*.sh            text eol=lf
+tools/hooks/*   text eol=lf
+*.bat           text eol=crlf

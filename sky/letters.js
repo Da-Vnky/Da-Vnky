@@ -128,31 +128,138 @@
     });
     var ids = shown.map(function (a) { return a.dataset.id; });
     function markAllSeen() { try { localStorage.setItem(SEEN, JSON.stringify(ids)); } catch (e) {} }
+    var board = Sky.sea && Sky.sea.el.querySelector('.dock-board');
     if (Sky.sea && shown.length) {
         if (location.hash === '#bottle' || !Array.isArray(seen)) bottled = shown[0];     // first visit (or #bottle): the newest
         else for (var si = 0; si < shown.length; si++) if (seen.indexOf(ids[si]) === -1) { bottled = shown[si]; break; }
     }
-    if (bottled && bottled !== shown[0]) section.insertBefore(bottled, shown[0]);      // the new one goes on top
-    Sky.refresh();
+    if (bottled && bottled !== shown[0]) { shown.splice(shown.indexOf(bottled), 1); shown.unshift(bottled); }   // the new one goes on top
+    if (!board) {                                                                       // no sea: the letters simply sit on the page
+        shown.forEach(function (a) { section.appendChild(a); });
+        Sky.refresh();
+        markAllSeen();
+        return;
+    }
+
+    /* ======================================================================
+       by the sea, the letters aren't on the page: a new one arrives in a bottle
+       and is read right there (the day and the ship stay just where they are).
+       read, it goes onto the board on the dock, where all of them can be read.
+       ====================================================================== */
+    Sky.css(
+        '.letter-open, .letters-view { position: fixed; inset: 0; z-index: 8; overflow-y: auto; overscroll-behavior: contain; visibility: hidden; opacity: 0;' +
+            'transition: opacity .45s, visibility 0s .45s; }' +
+        '.letter-open.open, .letters-view.open { visibility: visible; opacity: 1; transition: opacity .45s; }' +
+        '.letter-open { background: radial-gradient(ellipse at 50% 42%, rgba(18,22,32,.3), rgba(8,10,16,.72) 80%); }' +
+        '.letters-view { background: rgba(12,16,24,.84); }' +
+        '.lo-inner, .lv-list { padding: 74px 16px 60px; }' +
+        '.letter-open .letter, .letters-view .letter { margin: 0 auto 70px; }' +
+        '.lo-close, .lv-close { position: fixed; top: 16px; left: 16px; z-index: 3; border: 0; cursor: pointer; padding: 8px 18px;' +
+            'border-radius: 999px; font: italic 1.05rem "IM Fell English", Georgia, serif; background: #3a2716; color: #f3e6c2; box-shadow: 0 4px 12px rgba(0,0,0,.45); }' +
+        '.lo-close:hover, .lv-close:hover { background: #9a3b1f; }' +
+        '.lv-title { text-align: center; margin: 0 0 34px; font: normal 1.8rem "IM Fell English SC", Georgia, serif; color: #f3e6c2; text-shadow: 0 2px 6px rgba(0,0,0,.6); }' +
+        'body.letter-reading .signpost, body.letter-reading .post-btn, body.letter-reading .cp { opacity: 0; pointer-events: none; transition: opacity .3s; }' +
+        '.flying-scroll { z-index: 9 !important; }' +
+        '.letters[hidden] { display: none; }'
+    );
+    section.hidden = true;
+
+    // the credit goes to the very end of the voyage (and at the foot of the letters)
+    var credit = document.querySelector('.credit');
+    if (credit) document.body.appendChild(credit);
+
+    var lo = document.createElement('div');
+    lo.className = 'letter-open';
+    lo.setAttribute('role', 'dialog');
+    lo.setAttribute('aria-label', 'a letter');
+    lo.innerHTML = '<button type="button" class="lo-close">roll it back up</button><div class="lo-inner"></div>';
+    var lv = document.createElement('div');
+    lv.className = 'letters-view';
+    lv.setAttribute('role', 'dialog');
+    lv.setAttribute('aria-label', 'every letter');
+    lv.innerHTML = '<button type="button" class="lv-close">back to the sea</button><div class="lv-list"><h2 class="lv-title">letters from the sea</h2></div>';
+    document.body.appendChild(lo);
+    document.body.appendChild(lv);
+    var list = lv.querySelector('.lv-list'), inner = lo.querySelector('.lo-inner');
+    shown.forEach(function (a) { list.appendChild(a); });                               // they live on the board
+    if (credit) list.appendChild(credit.cloneNode(true));
+
+    function drawBoard() {
+        board.querySelector('.db-count').textContent = shown.length;
+        board.setAttribute('aria-label', 'the letters board: ' + shown.length + (shown.length === 1 ? ' letter' : ' letters'));
+    }
+    drawBoard();
+    board.classList.toggle('show', !bottled);
+    function openAll() {
+        lv.scrollTop = 0;
+        lv.classList.add('open');
+        document.body.classList.add('letter-reading');
+        lv.querySelector('.lv-close').focus({ preventScroll: true });
+    }
+    function closeAll() { lv.classList.remove('open'); document.body.classList.remove('letter-reading'); }
+    board.addEventListener('click', openAll);
+    board.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAll(); } });
+    lv.querySelector('.lv-close').addEventListener('click', closeAll);
+    lv.addEventListener('click', function (e) { if (e.target === lv || e.target === list) closeAll(); });
+
+    var reading = null;
+    // read one letter over the sea
+    function openLetter(a, from) {
+        reading = a;
+        inner.appendChild(a);
+        lo.scrollTop = 0;
+        lo.classList.add('open');
+        document.body.classList.add('letter-reading');
+        lo.querySelector('.lo-close').focus({ preventScroll: true });
+        if (from) requestAnimationFrame(function () { from(a); });
+    }
+    // roll it back up: it flies to the board on the dock, which (if it wasn't there yet) pops up
+    function closeLetter() {
+        var a = reading;
+        if (!a) return;
+        reading = null;
+        if (Sky.sounds) Sky.sounds.sfx('paper-roll');
+        markAllSeen();
+        var wasHidden = !board.classList.contains('show');
+        board.classList.add('show');
+        var r = a.getBoundingClientRect(), b = board.getBoundingClientRect();
+        var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function done() {
+            a.getAnimations().forEach(function (x) { x.cancel(); });
+            list.insertBefore(a, list.children[1] || null);
+            lo.classList.remove('open');
+            document.body.classList.remove('letter-reading');
+            if (wasHidden && !calm) board.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.15)', opacity: 1, offset: .7 }, { transform: 'scale(1)' }],
+                { duration: 500, easing: 'cubic-bezier(.3,.7,.4,1.3)' });
+            else if (!calm) board.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }, { transform: 'scale(1)' }], { duration: 380 });
+        }
+        if (calm) { done(); return; }
+        lo.style.transition = 'opacity .5s .25s, visibility 0s .75s';
+        lo.classList.remove('open');
+        lo.style.visibility = 'visible';
+        var k = Math.max(0.03, b.width / r.width * 0.5);
+        a.animate([
+            { transform: 'rotate(' + (+a.dataset.rot || 0) + 'deg)', opacity: 1 },
+            { transform: 'translate(' + (b.left + b.width / 2 - (r.left + r.width / 2)) + 'px,' + (b.top + b.height * 0.35 - (r.top + r.height / 2)) + 'px) scale(' + k + ') rotate(-8deg)', opacity: 0.7 }
+        ], { duration: 800, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' }).onfinish = function () {
+            lo.style.transition = ''; lo.style.visibility = '';
+            done();
+        };
+    }
+    lo.querySelector('.lo-close').addEventListener('click', closeLetter);
+    lo.addEventListener('click', function (e) { if (e.target === lo || e.target === inner) closeLetter(); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        if (lo.classList.contains('open')) { e.stopImmediatePropagation(); closeLetter(); }
+        else if (lv.classList.contains('open')) { e.stopImmediatePropagation(); closeAll(); }
+    }, true);
 
     if (!bottled) { markAllSeen(); return; }
 
     /* ---------------- today's bottle ---------------- */
-    bottled.classList.add('corked');
-
     var hint = document.createElement('p');
     hint.className = 'bottle-hint';
     hint.innerHTML = 'a bottle washed in<small>pull its cork, or just click it</small>';
-
-    // while it's corked, keep the older letters below the fold so the sea stays clear
-    function reserveSea() {
-        if (!bottled.classList.contains('corked')) return;
-        bottled.style.marginBottom = '';
-        var bottom = bottled.getBoundingClientRect().bottom + window.scrollY;
-        bottled.style.marginBottom = Math.max(110, window.innerHeight + 40 - bottom) + 'px';
-    }
-    reserveSea();
-    window.addEventListener('resize', reserveSea);
 
     var bottleWrap = document.createElement('div');
     bottleWrap.className = 'bottle-wrap';
@@ -194,39 +301,28 @@
     cork.addEventListener('pointerup', function () { if (corkDrag) uncork(); });
     bottleWrap.addEventListener('click', function () { uncork(); });
 
-    function whenAtTop(cb) {
-        if (window.scrollY < 4) return cb();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        var t0 = performance.now();
-        (function check() {
-            if (window.scrollY < 4 || performance.now() - t0 > 1800) cb();
-            else requestAnimationFrame(check);
-        })();
-    }
-
     function uncork() {
         if (opening) return;
         opening = true;
-        markAllSeen();
         var fx = corkDrag ? corkDrag.dx : 0, fy = corkDrag ? corkDrag.dy : 0;
         corkDrag = null;
-
         // 1. the cork pops off and tumbles away
         cork.animate([
             { transform: 'translate(' + fx + 'px, ' + fy + 'px) rotate(0deg)', opacity: 1 },
             { transform: 'translate(' + (fx + 70) + 'px, ' + (fy - 110) + 'px) rotate(460deg)', opacity: 0 }
         ], { duration: 800, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' });
         hint.style.opacity = 0;
-
-        // 2. the rolled letter slides out of the neck
-        whenAtTop(function () {
-            rolled.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(120px)' }],
-                { duration: 650, easing: 'ease-in', fill: 'forwards' }).onfinish = fly;
-        });
+        if (Sky.sounds) Sky.sounds.sfx('cork-pop');
+        // 2. the rolled letter slides out of the neck (right where you are: the day doesn't change)
+        rolled.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(120px)' }],
+            { duration: 650, easing: 'ease-in', fill: 'forwards' }).onfinish = function () {
+            bottled.classList.add('corked');
+            openLetter(bottled, fly);
+        };
     }
 
     // 3. the roll flies up and becomes the letter's top edge; the empty bottle sinks
-    function fly() {
+    function fly(letter) {
         var s = bottleScale();
         var r = rolled.getBoundingClientRect();
         var L = 100 * s, T = Math.max(10, 16 * s);
@@ -237,41 +333,39 @@
         bar.className = 'flying-scroll';
         document.body.appendChild(bar);
 
-        var lr = bottled.getBoundingClientRect();
-        var rot = +bottled.dataset.rot || 0;
+        var lr = letter.getBoundingClientRect();
+        var rot = +letter.dataset.rot || 0;
         bar.animate([
             { left: (cx - L / 2) + 'px', top: (cy - T / 2) + 'px', width: L + 'px', height: T + 'px', transform: 'rotate(' + bottleAngle + 'deg)' },
             { left: ((cx - L * 0.75) + (lr.left - 12)) / 2 + 'px', top: Math.min(cy, lr.top) - 90 + 'px', width: (L * 1.5) + 'px', height: '20px', transform: 'rotate(' + (bottleAngle / 3) + 'deg)', offset: 0.45 },
             { left: (lr.left - 12) + 'px', top: (lr.top - 12) + 'px', width: (lr.width + 24) + 'px', height: '24px', transform: 'rotate(' + rot + 'deg)' }
         ], { duration: 1050, easing: 'cubic-bezier(.45,0,.25,1)', fill: 'forwards' })
-           .onfinish = function () { unroll(bar, lr); };
+           .onfinish = function () { unroll(letter, bar, lr); };
         setTimeout(function () { bar.classList.add('untied'); }, 450);
 
         bottleSvg.animate([
             { transform: 'translateY(0px) rotate(0deg)', opacity: 1 },
             { transform: 'translateY(70px) rotate(28deg)', opacity: 0 }
         ], { duration: 1600, delay: 300, easing: 'ease-in', fill: 'forwards' })
-         .onfinish = function () { bottleWrap.remove(); bottleWrap = null; };
+         .onfinish = function () { bottleWrap.remove(); bottleWrap = null; hint.remove(); };
     }
 
     // 4. the letter unrolls downward (the roll and the reveal move together)
-    function unroll(bar, lr) {
+    function unroll(letter, bar, lr) {
+        var bottom = Math.min(lr.bottom, window.innerHeight + 40);
         var dur = 1150, ease = 'cubic-bezier(.45,.05,.35,1)';
-        var reveal = bottled.animate([
+        if (Sky.sounds) Sky.sounds.sfx('paper-unroll');
+        var reveal = letter.animate([
             { clipPath: 'inset(-40px -100px 100% -100px)' },
             { clipPath: 'inset(-40px -100px 0% -100px)' }
         ], { duration: dur, easing: ease, fill: 'forwards' });
-        bar.animate([{ top: (lr.top - 12) + 'px' }, { top: (lr.bottom - 12) + 'px' }],
+        bar.animate([{ top: (lr.top - 12) + 'px' }, { top: (bottom - 12) + 'px' }],
             { duration: dur, easing: ease, fill: 'forwards' });
         reveal.onfinish = function () {
-            bottled.classList.remove('corked');
+            letter.classList.remove('corked');
             reveal.cancel();
             bar.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, fill: 'forwards' })
                .onfinish = function () { bar.remove(); };
-            hint.remove();
-            bottled.style.transition = 'margin-bottom 1s ease';
-            bottled.style.marginBottom = '110px';
-            setTimeout(Sky.refresh, 1050);
         };
     }
     }   // begin()

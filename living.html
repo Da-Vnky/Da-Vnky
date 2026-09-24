@@ -23,6 +23,10 @@
         .shelf    { left: 44%; bottom: 0;  width: 26%; }
         .frame    { left: 33%; top: 38%;  width: 8%; }
         .pinboard { left: 4%;  top: 11%;  width: 22%; }
+        .letter-pile { left: 11%; top: calc(11% + 22vw * .75 + 24px); width: 13%; min-width: 120px; z-index: 3; filter: drop-shadow(0 4px 5px rgba(0,0,0,.35)); }
+        .noise-machine { left: 63%; bottom: calc(26vw * 170 / 360 - 3px); width: 5.6vw; min-width: 64px; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
+        .groove.cat   { left: 21%; bottom: calc(4vh + min(20vw, 260px) * .77 * .47); width: 5.5vw; min-width: 56px; z-index: 3; }
+        .groove.plant { left: 83%; bottom: 3vh; width: 5.5vw; min-width: 58px; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
         .bottle-crate { left: 72%; bottom: 3vh; width: 8.5vw; min-width: 90px; aspect-ratio: 120 / 90; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
         .bottle-crate > .art { position: absolute; inset: 0; width: 100%; height: 100%; }
 
@@ -80,16 +84,20 @@
             .frame, .shelf, .lamp { display: none; }
             .pinned { left: 50%; top: 11%; width: 220px; margin-left: -110px; }
             .pinboard { left: 8%; top: 66%; width: 42%; border-width: 7px; }
+            .letter-pile { left: 54%; top: 66%; width: 28%; min-width: 0; }
             .armchair { left: 20%; width: 34%; }
             .rug { left: 8%; right: 8%; }
             .room .character { left: 3% !important; height: 14vh !important; }
             .bottle-crate { left: 54%; width: 18vw; min-width: 0; }
+            .groove.cat { left: 31%; bottom: calc(4vh + 34vw * .77 * .47); width: 11vw; min-width: 0; }
+            .groove.plant { display: none; }
+            .noise-machine { left: auto; right: 4%; bottom: auto; top: calc(62% + 14px - 15vw * 76 / 110); width: 15vw; min-width: 0; }
             body .pinboard .empty { font-size: 11px; padding: 6%; }
             .turntable { left: auto; right: 2%; bottom: 3vh; width: 26vw; min-width: 0; }
         }
     </style>
 </head>
-<body data-place="living" data-voyage="300">
+<body data-place="living">
 
     <!-- a room (see workshop.html for how rooms work and how the asset slots fill in). -->
     <div class="room" style="--lamp-x:8%; --lamp-y:40%">
@@ -105,6 +113,10 @@
         <!-- the pinboard: every message from a bottle you've opened gets pinned here. click to read them all. -->
         <div class="furnish pinboard" data-asset="assets/living/pinboard"></div>
 
+        <!-- the pile of letters on a little shelf under the board: bottles you've read and not pinned.
+             anyone can flip through them. your own shelf: assets/living/letter-shelf; paper: assets/living/letter -->
+        <div class="furnish letter-pile" data-asset="assets/living/letter-shelf"></div>
+
         <!-- the crate: approved bottles (files in content/living/bottles/) wait in here to be opened -->
         <div class="furnish bottle-crate" data-folder="content/living/bottles/" data-asset="assets/living/crate">
             <svg class="placeholder crate-art" viewBox="0 0 120 90" aria-hidden="true">
@@ -117,7 +129,7 @@
         </div>
 
         <!-- framed picture -->
-        <svg class="furnish frame" data-asset="assets/living/picture" viewBox="0 0 140 110" aria-hidden="true" style="filter: drop-shadow(0 5px 6px rgba(0,0,0,.4))">
+        <svg class="furnish frame wobbles" data-asset="assets/living/picture" viewBox="0 0 140 110" aria-hidden="true" style="filter: drop-shadow(0 5px 6px rgba(0,0,0,.4))">
             <rect x="0" y="0" width="140" height="110" fill="#2a1d14"/>
             <rect x="10" y="10" width="120" height="90" fill="#e9dbb8"/>
             <path d="M10 80 C40 60 60 70 80 58 C100 48 115 55 130 50 V100 H10 Z" fill="#6e5236" opacity=".5"/>
@@ -125,7 +137,7 @@
         </svg>
 
         <!-- floor lamp: glows brighter as evening comes -->
-        <svg class="furnish lamp" data-asset="assets/living/lamp" viewBox="0 0 80 400" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+        <svg class="furnish lamp sways" data-asset="assets/living/lamp" viewBox="0 0 80 400" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
             <ellipse class="glow" cx="40" cy="70" rx="40" ry="46" fill="rgba(255,200,110,.3)"/>
             <path class="glow" d="M16 40 H64 L74 96 H6 Z" fill="#ffd98a"/>
             <path d="M14 36 H66 L76 98 H4 Z M18 42 L10 92 M62 42 L70 92" fill="none" stroke="#1f1610" stroke-width="3"/>
@@ -195,6 +207,13 @@
             </svg>
         </div>
 
+        <!-- they dance when a record's on. your own: assets/living/cat, assets/living/plant
+             (+ cat-dancing.gif etc. to replace the moves). see assets/README.txt -->
+        <!-- the white noise machine: click it to mix rain, sea, fire … (sky/noise.js). your own: assets/living/noise-machine (+ noise-machine-on) -->
+        <div class="furnish noise-machine" data-asset="assets/living/noise-machine"></div>
+        <div class="furnish groove cat" data-groove="cat" data-asset="assets/living/cat"></div>
+        <div class="furnish groove plant" data-groove="plant" data-asset="assets/living/plant"></div>
+
         <!-- the traveller, at home. your own: assets/characters/living.(gif|png|webp|svg) -->
         <div class="furnish character scene-character" data-asset="assets/characters/living"
              data-say="make yourself at home" aria-label="the traveller"
@@ -204,6 +223,10 @@
     <script src="sky/sky.js"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
     <script src="sky/ground-view.js" data-view="assets/living/view"></script>
+    <script src="sky/panel.js"></script>
+    <script src="sky/music.js"></script>
+    <script src="sky/weather.js"></script>
+    <script src="sky/noise.js"></script>
     <script src="sky/records.js"></script>
     <script src="sky/crate.js"></script>
 </body>

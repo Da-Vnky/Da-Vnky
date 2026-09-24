@@ -3,7 +3,8 @@
 # so the site knows what's there. Run it from the top of the site:
 #     sh tools/update-lists.sh
 # (the git hook in tools/hooks runs it for you on every commit)
-cd "$(dirname "$0")/.." || exit 1
+# run from the top of the site (or from anywhere: it finds its way there)
+[ -f tools/update-lists.sh ] || cd "$(dirname "$0")/.." || exit 1
 for dir in content/*/ content/*/*/; do
     [ -d "$dir" ] || continue
     list="${dir}list.txt"

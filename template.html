@@ -24,10 +24,13 @@
      STARTER PAGE: copy this file, rename it, and build from here.
 
      Every page gets, for free:
-       - the day → sunset → midnight sky driven by scrolling
+       - the sky, holding still at one hour (or, with data-scroll-time, turning
+         from day to midnight as you scroll, like the homepage)
        - sun, moon, clouds, stars, Ursa Minor
        - Polaris at top centre, always visible, always links home
-       - the four night-sky links (edit them once, at the top of sky/sky.js)
+       - the night-sky constellations, which take you to the other places
+         (edit them once, at the top of sky/sky.js). the wooden signpost is
+         only on the homepage.
 
      Pick ONE ground at the bottom of the page:
        sky/ground-sea.js           waves, the ship (and the bottle, on the homepage)
@@ -36,11 +39,12 @@
 
      Options on <body>:
        data-place="…"      which place this page is (see PLACES at the top of
-                           sky/sky.js); its sign then reads "you are here".
-                           add your new page to PLACES to give it a sign
-                           and a constellation.
-       data-voyage="110"   how much empty sky to scroll after your content
-                           (in % of screen height; bigger = slower sunset)
+                           sky/sky.js). add your new page to PLACES to give it
+                           a sign on the homepage and a constellation.
+       data-time="0"       the hour the page stays at: 0 midday, .5 sunset, 1 midnight
+       data-scroll-time    turn the day by scrolling instead (as this starter does)
+       data-voyage="110"   with data-scroll-time: how much empty sky to scroll after
+                           your content (in % of screen height; bigger = slower sunset)
        data-page="home"    only on the homepage
 
        sky/ground-view.js          YOUR picture as the ground:
@@ -69,7 +73,7 @@
        - helpers: Sky.mix(dayColour, nightColour, t), Sky.ramp(p, from, to),
          Sky.smooth(t), Sky.seeded(n) (repeatable random numbers), Sky.css(text)
      ========================================================================= -->
-<body data-voyage="160">
+<body data-scroll-time data-voyage="160">
 
     <section class="letters">
         <article class="letter" data-nodate>
@@ -86,5 +90,10 @@
     <script src="sky/sky.js"></script>
     <script src="sky/ground-city.js"></script>
     <script src="sky/letters.js"></script>
+    <!-- the control panel (top right) and its layers: music, weather, the noise machine. every page. -->
+    <script src="sky/panel.js"></script>
+    <script src="sky/music.js"></script>
+    <script src="sky/weather.js"></script>
+    <script src="sky/noise.js"></script>
 </body>
 </html>

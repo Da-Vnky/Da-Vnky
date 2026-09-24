@@ -12,8 +12,15 @@
                              to daylight instead of reloading)
        data-place="workshop" which of the PLACES below this page is, so its
                              sign reads "you are here"
-       data-voyage="110"     how much empty sky to scroll through after your
-                             content, in % of the screen height. more = slower sunset.
+       data-voyage="110"     (homepage) how much empty sky to scroll through after
+                             your content, in % of the screen height. more = slower sunset.
+       data-time="0"         (every other page) the hour it stays at: 0 = midday,
+                             0.5 = sunset, 1 = midnight. without it, the page follows
+                             the visitor's own clock (see CLOCK below). only the
+                             homepage's scroll turns the day; elsewhere the sky view
+                             (a window, a telescope) does, and a page can set it
+                             (Sky.setTime).
+       data-scroll-time      give any page the homepage's scroll-driven day instead
    ===================================================================== */
 
 (function () {
@@ -22,6 +29,8 @@
 
     // where Polaris takes you
     var HOME = 'https://dav-nky.pleroma.nexus/';
+    // previewing on your own computer (tools/preview): home stays on your computer too
+    if (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)$/.test(location.hostname)) HOME = 'index.html';
 
     // every place on the site. each one gets a wooden sign on the signpost
     // (right side of the screen) and a constellation in the night sky.
@@ -42,7 +51,34 @@
     // a FormSubmit address (see content/README.txt, "your post office"), e.g.
     //   'https://formsubmit.co/1a2b3c4d5e6f…'
     // leave it '' and bottles still get tossed, but nothing is delivered.
-    var BOTTLE_INBOX = 'https://formsubmit.co/pneumatichylic@proton.me';
+    var BOTTLE_INBOX = 'https://formsubmit.co/2c5dbeae55bf1f0a6f5f746a90c805ac';
+
+    // every page but the homepage shows the sky as it is right now for the visitor
+    // (the sun and moon where they'd really be, by their own clock). false = midday,
+    // or whatever hour a page sets with data-time="…".
+    var CLOCK = true;
+
+    // the site's own mouse cursors. each is a slot, assets/ui/<name> (a 32 x 32 PNG is best,
+    // 64 at most); the numbers are its hotspot: the pixel that does the pointing, from the top left.
+    //   cursor           everywhere                     cursor-pointer   over things you can click
+    //   cursor-star      over the constellations        cursor-grab      over things you can pick up
+    //   cursor-grabbing  while holding something        cursor-look      over things to look into
+    // set CURSORS = null to keep the computer's usual cursors.
+    var CURSORS = {
+        'cursor': [3, 2], 'cursor-pointer': [4, 3], 'cursor-star': [16, 16],
+        'cursor-grab': [16, 14], 'cursor-grabbing': [16, 14], 'cursor-look': [12, 12]
+    };
+
+    // things that cross the sky while you're looking at it (the sky view):
+    // each is a slot, assets/sky/<name>, drawn for now as a placeholder.
+    //   when: 'day' or 'night'   every: about how many seconds apart
+    //   speed: px per second     size: px wide   high: [top, bottom] of its path, % down the screen
+    var FLYERS = [
+        { name: 'blimp',         when: 'day',   every: 45, speed: 26,  size: 230, high: [12, 30] },
+        { name: 'birds',         when: 'day',   every: 20, speed: 70,  size: 120, high: [10, 42] },
+        { name: 'balloon',       when: 'day',   every: 60, speed: 16,  size: 74,  high: [18, 46] },
+        { name: 'shooting-star', when: 'night', every: 14, speed: 950, size: 150, high: [6, 34] }
+    ];
 
     // sky colours along the scroll: [position 0–1, top of sky, horizon]
     var SKY = [
@@ -110,7 +146,7 @@
     function assetDir(dir) {
         if (!assetDirs[dir]) assetDirs[dir] = Promise.all([
             fetch(dir + 'list.txt', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; }),
-            new Promise(function (done) { listFolder(dir, EXTS.concat(['jpeg', 'json']), done); })
+            new Promise(function (done) { listFolder(dir, EXTS.concat(['jpeg', 'json', 'mp3', 'ogg']), done); })
         ]).then(function (r) {
             var known = !!r[0] && !/<html/i.test(r[0]), names = {};
             r[1].forEach(function (f) { names[f.name] = 1; });
@@ -234,7 +270,9 @@
         el.firstChild.textContent = pl.name;
         sign.appendChild(el);
     });
-    body.appendChild(sign);
+    // the signpost stands on the homepage's dock; everywhere else you find your way
+    // by the constellations (and Polaris, always, takes you home)
+    if (isHome) body.appendChild(sign);
     // slots: assets/sky/plank (every sign) and assets/sky/plank-here (the one you're standing at)
     sign.dataset.slot = 'assets/sky/plank assets/sky/plank-here';
     findAsset('assets/sky/plank', function (url) {
@@ -281,11 +319,22 @@
     });
 
     /* ---------------- the stretch of sky after the content ---------------- */
+    // only the homepage (or a page with data-scroll-time) turns the day as you scroll;
+    // every other page stays at its own hour (data-time) until the sky view changes it
+    var still = !isHome && !body.hasAttribute('data-scroll-time');
+    var baseTime = still ? (parseFloat(body.dataset.time) || 0) : 0;
+    // the visitor's clock: angle 0 = noon, π/2 = 6pm (setting, right), π = midnight, 3π/2 = 6am (rising, left)
+    var clockMode = still && CLOCK && !body.hasAttribute('data-time');
+    function clockTheta() {
+        var d = new Date(), h = d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600;
+        return ((h - 12) / 24 * 2 * Math.PI + 2 * Math.PI) % (2 * Math.PI);
+    }
+    if (still) body.classList.add('still-time');
     var voyage = document.createElement('div');
     voyage.className = 'voyage';
     voyage.setAttribute('aria-hidden', 'true');
     if (body.dataset.voyage) voyage.style.height = (+body.dataset.voyage) + 'vh';
-    body.appendChild(voyage);
+    if (!still) body.appendChild(voyage);
 
     /* ---------------- the scroll engine (with a time override for the sky view) ---------------- */
     var stars = backdrop.querySelector('.stars');
@@ -299,6 +348,7 @@
 
     function progress() {
         if (override !== null) return override;
+        if (still) return baseTime;
         var max = root.scrollHeight - window.innerHeight;
         return max > 0 ? clamp(window.scrollY / max) : 1;
     }
@@ -336,11 +386,13 @@
         moon.style.left = moonA[0] + 'vw';
         moon.style.top  = moonA[1] + 'vh';
 
-        // clouds drift apart and fade out through sunset
+        // clouds fade out through sunset. on the homepage's scroll they drift apart;
+        // anywhere the day turns by itself they sail steadily left to right, round and round
         var cf = ramp(p, 0.3, 0.6);
         clouds.forEach(function (c) {
-            c.style.opacity = 1 - cf;
-            c.style.transform = 'translateX(' + (+c.dataset.dir * p * 160) + 'px)';
+            c.dataset.base = 1 - cf;
+            c.style.opacity = (1 - cf) * cloudiness;
+            if (!sailing()) c.style.transform = 'translateX(' + (+c.dataset.dir * p * 160) + 'px)';
         });
 
         // links fade in with Ursa Minor and only become clickable once visible
@@ -381,6 +433,14 @@
         return [50 + amp * Math.sin(a), low - (low - zenith) * Math.cos(a)];
     }
     var celest = { w: 0, theta: null };
+    function followClock() {
+        if (!clockMode || view) return;
+        celest.theta = clockTheta();
+        celest.w = 1;
+        baseTime = dayPart(celest.theta);
+        kick();
+    }
+    if (clockMode) { followClock(); target = shown = progress(); setInterval(followClock, 20000); }
 
     function timeName(p, theta) {
         var rising = theta !== null && theta !== undefined && ((theta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) > Math.PI;
@@ -390,6 +450,123 @@
         }
         return p < .18 ? 'midday' : p < .3 ? 'afternoon' : p < .38 ? 'golden hour' : p < .5 ? 'sunset'
              : p < .64 ? 'dusk' : p < .82 ? 'twilight' : p < .95 ? 'night' : 'midnight';
+    }
+
+    /* the placeholder flyers (your own art replaces each: assets/sky/blimp.png …) */
+    var FLYER_ART = {
+        // a steampunk airship: riveted envelope, brass bands, a gondola and a spinning propeller
+        blimp: '<svg class="placeholder" viewBox="0 0 240 120">' +
+            '<path d="M22 44 L4 22 L30 30 Z M22 52 L4 74 L30 64 Z" fill="#8a5a36"/>' +
+            '<ellipse cx="116" cy="47" rx="96" ry="33" fill="#cdb68c"/>' +
+            '<path d="M36 47 H206" stroke="#a88a58" stroke-width="2"/>' +
+            '<g fill="none" stroke="#8f7446" stroke-width="1.6"><path d="M60 19 Q52 47 60 75"/><path d="M90 15 Q84 47 90 79"/><path d="M122 14 Q118 47 122 80"/><path d="M154 16 Q150 47 154 78"/><path d="M184 24 Q180 47 184 70"/></g>' +
+            '<path d="M204 34 Q222 47 204 60" fill="#c49a52"/><circle cx="213" cy="47" r="3" fill="#8a6a30"/>' +
+            '<rect x="52" y="30" width="6" height="34" rx="2" fill="#c49a52"/><rect x="170" y="27" width="6" height="40" rx="2" fill="#c49a52"/>' +
+            '<g stroke="#5a3f2a" stroke-width="1.3"><path d="M88 78 L94 94 M144 78 L138 94 M116 80 V94"/></g>' +
+            '<rect x="84" y="93" width="64" height="18" rx="4" fill="#6e4a30"/><rect x="84" y="93" width="64" height="4" fill="#c49a52"/>' +
+            '<g class="glow-bits" fill="#ffe0a0"><rect x="92" y="100" width="8" height="6" rx="1"/><rect x="106" y="100" width="8" height="6" rx="1"/><rect x="120" y="100" width="8" height="6" rx="1"/><rect x="134" y="100" width="8" height="6" rx="1"/></g>' +
+            '<path d="M84 102 H70" stroke="#5a3f2a" stroke-width="2.4"/>' +
+            '<g class="prop" style="transform-origin: 68px 102px"><ellipse cx="68" cy="102" rx="3" ry="13" fill="#3a2716"/></g>' +
+            '<path d="M148 99 L156 96 L156 106 L148 104 Z" fill="#9a3b1f"/>' +
+            '</svg>',
+        // a little flock, flapping
+        birds: '<svg class="placeholder" viewBox="0 0 120 60">' +
+            ['18,30,1', '52,16,.8', '70,40,.9', '98,26,.7'].map(function (b, i) {
+                var v = b.split(','), x = +v[0], y = +v[1], k = +v[2];
+                return '<g transform="translate(' + x + ' ' + y + ') scale(' + k + ')"><g class="wing" style="animation-delay:' + (-i * .17) + 's">' +
+                       '<path d="M-14 -2 Q-7 -9 0 0 Q7 -9 14 -2 Q7 -5 0 3 Q-7 -5 -14 -2 Z" fill="#3a2716"/></g></g>';
+            }).join('') + '</svg>',
+        // a patched hot-air balloon
+        balloon: '<svg class="placeholder" viewBox="0 0 80 120">' +
+            '<path d="M40 4 C12 4 4 30 10 50 C15 66 30 74 33 84 H47 C50 74 65 66 70 50 C76 30 68 4 40 4 Z" fill="#eadcb9"/>' +
+            '<path d="M40 4 C28 6 24 30 28 52 C30 66 34 76 36 84 H44 C46 76 50 66 52 52 C56 30 52 6 40 4 Z" fill="#9a3b1f"/>' +
+            '<path d="M11 40 H69" stroke="#c49a52" stroke-width="3"/>' +
+            '<g stroke="#5a3f2a" stroke-width="1.2"><path d="M34 84 L35 100 M46 84 L45 100"/></g>' +
+            '<rect x="31" y="99" width="18" height="13" rx="2" fill="#6e4a30"/><rect x="31" y="99" width="18" height="3" fill="#8a5a36"/>' +
+            '</svg>',
+        // a streak of light, falling down to the right
+        'shooting-star': '<svg class="placeholder" viewBox="0 0 150 40">' +
+            '<defs><linearGradient id="ss-tail" x1="0" x2="1"><stop offset="0" stop-color="rgba(255,248,220,0)"/><stop offset="1" stop-color="rgba(255,248,220,.95)"/></linearGradient></defs>' +
+            '<g transform="rotate(16 140 20)"><path d="M0 20 L140 17 L140 23 Z" fill="url(#ss-tail)"/><circle cx="140" cy="20" r="4" fill="#fffbe8"/></g>' +
+            '</svg>'
+    };
+
+    // how many of the fair-weather clouds are out (the weather sets this: none on a clear day)
+    var cloudiness = 1;
+    function setCloudiness(v) {
+        if (Math.abs(v - cloudiness) < 0.002) return;
+        cloudiness = v;
+        clouds.forEach(function (c) { c.style.opacity = (c.dataset.base === undefined ? 1 : +c.dataset.base) * v; });
+    }
+
+    /* ---------------- clouds that sail round, and things that fly past ---------------- */
+    var drift = 0, ambientOn = false, ambientLast = 0;
+    function sailing() { return still || !!view; }
+    function sailClouds() {
+        var W = window.innerWidth;
+        clouds.forEach(function (c) {
+            if (!c.offsetWidth) return;
+            var cw = c.offsetWidth, home = c.offsetLeft;
+            var k = 0.55 + cw / 340;                               // bigger clouds are nearer, so faster
+            var span = W + cw * 2;
+            var x = ((home + cw + drift * k) % span + span) % span - cw;
+            c.style.transform = 'translateX(' + (x - home).toFixed(1) + 'px)';
+        });
+    }
+    var flyLayer = document.createElement('div');
+    flyLayer.className = 'flyers';
+    flyLayer.setAttribute('aria-hidden', 'true');
+    backdrop.appendChild(flyLayer);
+    var flyers = FLYERS.map(function (f) {
+        var el = document.createElement('div');
+        el.className = 'flyer flyer-' + f.name;
+        el.dataset.asset = 'assets/sky/' + f.name;
+        el.style.width = f.size + 'px';
+        el.innerHTML = FLYER_ART[f.name] || '';                 // a new flyer waits for its picture
+        flyLayer.appendChild(el);
+        return { cfg: f, el: el, x: 0, y: 0, on: false, next: 0 };
+    });
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    function ambient(now) {
+        if (!sailing()) { ambientOn = false; flyers.forEach(function (f) { f.on = false; f.el.classList.remove('flying'); }); return; }
+        var dt = Math.min(0.1, (now - ambientLast) / 1000);
+        ambientLast = now;
+        // clouds sail faster while the day is being played
+        drift += dt * (clock.playing ? 60 * 60 / SPEEDS[clock.speed].half : 7);
+        sailClouds();
+        var p = override !== null ? override : baseTime, W = window.innerWidth, H = window.innerHeight, t = now / 1000;
+        flyers.forEach(function (f) {
+            var c = f.cfg, day = p < 0.42, night = p > 0.8;
+            if (!f.on) {
+                if (!view || reduceMotion.matches || !(c.when === 'night' ? night : day)) return;
+                if (!FLYER_ART[c.name] && !f.el.classList.contains('has-art')) return;
+                if (!f.next) f.next = t + 2 + Math.random() * Math.min(12, c.every * 0.4);   // soon after you look up
+                if (t < f.next) return;
+                f.on = true;
+                f.x = c.name === 'shooting-star' ? W * (0.05 + Math.random() * 0.55) : -c.size - 20;
+                f.x0 = f.x;
+                f.y = H * (c.high[0] + Math.random() * (c.high[1] - c.high[0])) / 100;
+                f.born = t;
+                f.el.classList.add('flying');
+            }
+            f.x += c.speed * dt;
+            var bob = c.name === 'shooting-star' ? (f.x - f.x0) * 0.28 : Math.sin(t * 0.9 + f.born) * 6;
+            f.el.style.transform = 'translate(' + f.x.toFixed(1) + 'px,' + (f.y + bob).toFixed(1) + 'px)';
+            if (c.name === 'shooting-star') f.el.style.opacity = Math.max(0, 1 - (t - f.born) / 1.6);
+            if (f.x > W + 40 || (c.name === 'shooting-star' && t - f.born > 1.6)) {
+                f.on = false;
+                f.el.classList.remove('flying');
+                f.el.style.opacity = '';
+                f.next = t + c.every * (0.6 + Math.random() * 0.8);
+            }
+        });
+        requestAnimationFrame(ambient);
+    }
+    function startAmbient() {
+        if (ambientOn || !sailing()) return;
+        ambientOn = true;
+        ambientLast = performance.now();
+        requestAnimationFrame(ambient);
     }
 
     /* ---------------- the sky view: look at the sky, let the day turn ---------------- */
@@ -486,7 +663,10 @@
         if (view && clock.fade) {                             // the opening nightfall
             var f = clock.fade, t = Math.min(1, (now - f.t0) / f.ms);
             var e = t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-            override = f.from + (f.to - f.from) * e;
+            if (f.th0 !== undefined) {                        // on the clock: the sun and moon turn on to midnight
+                celest.theta = f.th0 + (f.th1 - f.th0) * e;
+                override = dayPart(celest.theta);
+            } else override = f.from + (f.to - f.from) * e;
             kick();
             if (t >= 1) { clock.fade = null; celest.theta = Math.PI; }
         } else if (view && clock.playing) {
@@ -511,11 +691,14 @@
         setPlaying(false);
         var from = override === null ? shown : override;
         override = from;
-        celest.theta = null;
+        var th0 = clockMode ? celest.theta : undefined;
+        celest.theta = clockMode ? th0 : null;
         var ms = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 2400;
-        clock.fade = { from: from, to: 1, t0: performance.now(), ms: ms };
+        clock.fade = { from: from, to: 1, t0: performance.now(), ms: ms, th0: th0, th1: th0 !== undefined ? (th0 <= Math.PI ? Math.PI : 3 * Math.PI) : undefined };
         blendCelest(1, ms);
         ensureLoop();
+        flyers.forEach(function (f) { f.next = 0; });
+        startAmbient();
     }
     function closeSkyView() {
         if (!view) return;
@@ -527,8 +710,10 @@
         body.classList.remove('sky-view', 'sky-playing');
         celest.theta = null;
         blendCelest(0, 1400);
+        if (clockMode) { celest.blend = null; celest.w = 1; followClock(); }
+        else if (still && celest.frozen !== undefined) { celest.theta = celest.frozen; celest.blend = null; celest.w = 1; }
         if (v.mode) body.classList.remove(v.mode + '-view');
-        override = null;                                      // back to the time the scroll says
+        override = null;                                      // back to the time the scroll (or the page) says
         kick();
         if (v.onClose) v.onClose();
     }
@@ -611,7 +796,7 @@
             var list = [];
             base.split('|').forEach(function (b) {
                 b = b.trim();
-                if (/\.(svg|gif|webp|png|jpe?g|json)$/i.test(b)) list.push(b);
+                if (/\.(svg|gif|webp|png|jpe?g|json|mp3|ogg)$/i.test(b)) list.push(b);
                 else EXTS.forEach(function (x) { list.push(b + '.' + x); });
             });
             var dirs = {};
@@ -628,6 +813,10 @@
                 (function next() {
                     if (i >= list.length) return done(null);
                     var url = list[i++];
+                    if (/\.(mp3|ogg)$/i.test(url)) {                  // a sound: just check it's there
+                        fetch(url, { method: 'HEAD', cache: 'no-cache' }).then(function (r) { r.ok ? done({ url: url }) : next(); }, next);
+                        return;
+                    }
                     if (/\.json$/i.test(url)) {
                         fetch(url, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : Promise.reject(); })
                             .then(function (j) { done({ url: url, data: j }); }, next);
@@ -700,7 +889,7 @@
         var base = el.dataset.asset;
         if (!base || el.dataset.assetDone) return;
         el.dataset.assetDone = '1';
-        if (el.classList.contains('character')) addPoses(el, base.split('|')[0]);
+        if (el.classList.contains('character') || el.classList.contains('groove')) addPoses(el, base.split('|')[0]);
         findAsset(base, function (url) {
             if (!url) return;                                         // keep the placeholder
             var img = document.createElement('img');
@@ -739,8 +928,10 @@
     // extra poses for a character, each its own optional file next to the main one:
     //   <name>-held       shown while they're picked up (e.g. a struggling GIF)
     //   <name>-startled   the double-take when the ship leaves without them
-    // a pose appears whenever the character has the matching class (.held, .startled)
-    var POSES = ['held', 'startled'];
+    //   <name>-dancing    shown while music plays (a GIF of them dancing)
+    // a pose appears whenever the character has the matching class (.held, .startled),
+    // and the dancing one whenever the page has music playing
+    var POSES = ['held', 'startled', 'dancing'];
     function addPoses(el, base) {
         POSES.forEach(function (pose) {
             findAsset(base + '-' + pose, function (url) {
@@ -751,6 +942,7 @@
                 img.className = 'pose pose-' + pose;
                 img.setAttribute('aria-hidden', 'true');
                 el.insertBefore(img, el.querySelector('.bubble'));
+                if (pose === 'dancing' && el.classList.contains('groove')) img.style.display = '';
                 el.classList.add('has-' + pose);
             });
         });
@@ -782,6 +974,46 @@
             });
         });
     }).observe(document.documentElement, { childList: true, subtree: true });
+
+    /* ---------------- the cursors ---------------- */
+    var CURSOR_ART = {
+        'cursor': '<path d="M3 2 L3 24 L9 18.5 L13 28 L17.5 26 L13.5 16.8 L21.5 16.8 Z" fill="#2a1d14" stroke="#f3e6c2" stroke-width="1.6" stroke-linejoin="round"/>',
+        'cursor-pointer': '<path d="M4 3 L16 7 L26 17 L21 22 L17 26 L7 16 Z" fill="#c49a52" stroke="#2a1d14" stroke-width="1.6" stroke-linejoin="round"/>' +
+            '<path d="M4 3 L14 13" stroke="#2a1d14" stroke-width="1.4"/><circle cx="14.5" cy="13.5" r="1.8" fill="#2a1d14"/>' +
+            '<path d="M21 22 L26 27" stroke="#9a3b1f" stroke-width="3" stroke-linecap="round"/>',
+        'cursor-star': '<path d="M16 2 C17 11 21 15 30 16 C21 17 17 21 16 30 C15 21 11 17 2 16 C11 15 15 11 16 2 Z" fill="#fff0bf" stroke="#2a1d14" stroke-width="1.3" stroke-linejoin="round"/>' +
+            '<circle cx="16" cy="16" r="2" fill="#e8b33c"/><circle cx="26" cy="6" r="1.4" fill="#fff0bf" stroke="#2a1d14" stroke-width=".8"/>',
+        'cursor-grab': '<path d="M9 17 V9 a2 2 0 0 1 4 0 V15 V6.5 a2 2 0 0 1 4 0 V15 V7.5 a2 2 0 0 1 4 0 V16 V10.5 a2 2 0 0 1 4 0 V20 c0 5-3.5 9-8.5 9 h-1.5 c-3 0-5-1.5-6.5-4 l-3.5-6 a2 2 0 0 1 3.4-2.1 Z" fill="#f3e6c2" stroke="#2a1d14" stroke-width="1.5" stroke-linejoin="round"/>',
+        'cursor-grabbing': '<path d="M9 14 a2.2 2.2 0 0 1 4-1 a2.2 2.2 0 0 1 4-.6 a2.2 2.2 0 0 1 4 0 a2.2 2.2 0 0 1 4 1.3 V20 c0 5-3.5 9-8.5 9 h-1.5 c-4 0-7-3-7-7 Z" fill="#f3e6c2" stroke="#2a1d14" stroke-width="1.5" stroke-linejoin="round"/>' +
+            '<path d="M13 13 v3 M17 12.5 v3 M21 13 v3" stroke="#2a1d14" stroke-width="1.1" stroke-linecap="round"/>',
+        'cursor-look': '<path d="M18.5 18.5 L28 28" stroke="#2a1d14" stroke-width="4.5" stroke-linecap="round"/><path d="M19 19 L27 27" stroke="#6e4a30" stroke-width="2.2" stroke-linecap="round"/>' +
+            '<circle cx="12" cy="12" r="8.5" fill="rgba(220,235,245,.45)" stroke="#c49a52" stroke-width="3"/><circle cx="12" cy="12" r="8.5" fill="none" stroke="#2a1d14" stroke-width="1" opacity=".6"/>' +
+            '<path d="M8 9 a5 5 0 0 1 4 -3" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/>'
+    };
+    var CURSOR_FALLBACK = { 'cursor': 'auto', 'cursor-pointer': 'pointer', 'cursor-star': 'pointer', 'cursor-grab': 'grab', 'cursor-grabbing': 'grabbing', 'cursor-look': 'zoom-in' };
+    function setupCursors() {
+        if (!CURSORS) return;
+        Object.keys(CURSORS).forEach(function (name) {
+            var h = CURSORS[name], svg = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">' + (CURSOR_ART[name] || CURSOR_ART.cursor) + '</svg>';
+            root.style.setProperty('--' + name, 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '") ' + h[0] + ' ' + h[1] + ', ' + CURSOR_FALLBACK[name]);
+            findAsset('assets/ui/' + name, function (url) {
+                if (url) root.style.setProperty('--' + name, 'url("' + new URL(url, location.href).href + '") ' + h[0] + ' ' + h[1] + ', ' + CURSOR_FALLBACK[name]);
+            });
+        });
+        var st = document.createElement('style');                  // last in line, so it wins
+        st.textContent =
+            'html, body { cursor: var(--cursor) !important; }' +
+            'a, button, summary, label, select, input[type=range], input[type=checkbox], [role=button], .plank, .character, .bottle-wrap, .easel, .peep-spot, .dock-board,' +
+            ' .rp-sleeve, .letter-pile, .noise-machine, .turntable, .bottle-crate { cursor: var(--cursor-pointer) !important; }' +
+            'input[type=text], input[type=password], textarea { cursor: text !important; }' +
+            '.sky-link, .sky-link *, .polaris, .polaris * { cursor: var(--cursor-star) !important; }' +
+            '.sea-char, .sea-char *, .ship .hull, .ship .hull *, .b-cork, .b-cork * { cursor: var(--cursor-grab) !important; }' +
+            '.sea-char.held, .sea-char.held *, .ship.held .hull, .ship.held .hull *, body.peep-dragging, body.peep-dragging * { cursor: var(--cursor-grabbing) !important; }' +
+            '.pinboard, .room .window, body.peep-view, body.peep-view .ground, body.peep-view .ground * { cursor: var(--cursor-look) !important; }' +
+            'body.peep-view .peep-spot { cursor: var(--cursor-pointer) !important; }' +
+            '.note-draw { cursor: crosshair !important; }';
+        document.head.appendChild(st);
+    }
 
     /* ---------------- ?slots: see every slot on the page and whether it has art yet ---------------- */
     // open any page with ?slots on the end (…/city.html?slots) to get a list of its slots
@@ -851,7 +1083,8 @@
     }
 
     // run once every script on the page (grounds included) has built its pieces
-    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); fillAssets(); showSlots(); });
+    document.addEventListener('DOMContentLoaded', function () { setupCharacters(); fillAssets(); showSlots(); setupCursors(); });
+    startAmbient();
 
     render(shown);
 
@@ -989,6 +1222,27 @@
         })(t0);
     }
     function releaseTime() { holdId++; override = null; kick(); }
+    // a still page's own hour: glide to it and stay there (the city's telescope turns it to night).
+    // on the homepage (whose hour belongs to the scroll) it holds the time instead.
+    var baseId = 0;
+    function setTime(to, ms) {
+        if (!still) return holdTime(to, ms);
+        var id = ++baseId, from = override === null ? shown : baseTime, t0 = performance.now();
+        var th0 = celest.theta, th1 = null;
+        if (celest.w > 0 && th0 !== null) {                   // the sun and moon are on their circles: turn them there
+            clockMode = false;
+            var a = to * Math.PI, b = 2 * Math.PI - to * Math.PI;
+            th1 = Math.abs(th0 - a) <= Math.abs(th0 - b) ? a : b;
+        }
+        (function frame(now) {
+            if (id !== baseId) return;
+            var t = Math.min(1, (now - t0) / (ms || 1)), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            baseTime = from + (to - from) * e;
+            if (th1 !== null && !view) { celest.theta = th0 + (th1 - th0) * e; celest.frozen = th1; }
+            kick();
+            if (t < 1) requestAnimationFrame(frame);
+        })(t0);
+    }
 
     /* ---------------- what grounds and page scripts can use ---------------- */
     window.Sky = {
@@ -1022,9 +1276,11 @@
         fileDate: fileDate, fileTitle: fileTitle,
         sortNewest: sortNewest, sortByName: sortByName,
         makeMedia: makeMedia, txtToHtml: txtToHtml,
-        holdTime: holdTime, releaseTime: releaseTime,
+        holdTime: holdTime, releaseTime: releaseTime, setTime: setTime,
+        get still() { return still; },
         fillAssets: fillAssets,
-        svgArt: svgArt, layerArt: layerArt, fitLayerArt: fitLayerArt,
+        svgArt: svgArt, layerArt: layerArt, fitLayerArt: fitLayerArt, setCloudiness: setCloudiness,
+        repoApi: REPO_API,
         findAsset: findAsset,
         setupCharacters: setupCharacters,
         figure: FIGURE,

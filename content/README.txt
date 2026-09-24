@@ -8,7 +8,9 @@ Take a file out, and it's gone. That's the whole job.
                       .html or .txt, one letter per file.
                       Name them with the date first:  2026-09-24-hello.txt
                       A letter the visitor hasn't seen before arrives corked in
-                      a bottle; the rest are already open, newest first.
+                      a bottle, and is read right there over the sea (the time of
+                      day stays put). Once read, it goes onto the letters board on
+                      the dock, where every letter can be read, newest first.
                       A date in the future stays hidden until that day.
 
                       .txt letters: first line = title, blank line = new paragraph,
@@ -27,11 +29,18 @@ Take a file out, and it's gone. That's the whole job.
 
   content/living/     MUSIC (the record player)
                       .mp3 (or .ogg). One file = one record in the crate.
+                      SLEEVE ART: a picture with the same name, beside it:
+                        01-aerie.mp3 + 01-aerie.jpg   (.png .webp .gif too; square)
+                      the easy way: double-click tools\sleeve.bat, paste a song's
+                      Spotify link (Share > Copy Song Link), and it saves the album
+                      cover here with the right name, under 1 MB. No login needed.
+                      it's the record's sleeve, and a round crop of it is the label
+                      in the middle of the record as it spins. Without one, the
+                      cover picture inside the mp3 is used, or a plain sleeve.
                       Title & artist come from the song's own tags if it has them,
-                      otherwise the file name. Cover art in the file shows on the
-                      record's label, or put a picture with the same name beside
-                      it (my-song.mp3 + my-song.jpg). Start names with 01-, 02-, …
-                      to set the order.
+                      otherwise the file name. Start names with 01-, 02-, … to set
+                      the order. Once a record's on, it keeps playing as visitors
+                      wander the site (a little player in the corner; ✕ stops it).
 
   content/city/       WINDOW SCENES (the telescope)
                       .png .jpg .jpeg .webp .gif .svg .mp4 .webm, or an .html bit.
@@ -42,11 +51,13 @@ Take a file out, and it's gone. That's the whole job.
   content/living/bottles/
                       MESSAGES IN BOTTLES FROM VISITORS (the crate)
                       .jpg / .png / .webp / .gif / .svg, or a .txt.
-                      One file = one bottle in the crate. A visitor uncorks it,
-                      reads it, and it gets pinned to the board on the wall.
-                      Bottles you approve arrive by email as a .jpg; just drop that
-                      file in here. Its name, the writer's name and the date are
-                      tucked inside the picture, so there's nothing else to add.
+                      One file = one bottle. Bottles you approve arrive by email as
+                      a .jpg; just drop that file in here. Its name, the writer's
+                      name and the date are tucked inside the picture.
+                      A new bottle waits in the CRATE: anyone can uncork it and read
+                      it, then it goes back in. Only you move it on: to the BOARD
+                      on the wall, or the PILE of letters on the shelf beneath it
+                      (see "the board and the pile" below).
 
 The files already in these folders are examples. Delete them whenever you like.
 
@@ -55,6 +66,10 @@ HOW THE SITE KNOWS WHAT'S IN A FOLDER
 -------------------------------------
 A web page can't look inside a folder on its own, so each folder also has a
 list.txt naming its files. You never need to write it by hand:
+
+  • NOT GETTING THEM? FormSubmit only forwards bottles once you've clicked
+    "Activate Form" in its first email (look in spam, too). Bottles thrown
+    before that are lost, so ask for them again after activating.
 
   • ONE-TIME SETUP (on your computer, from the top of the site):
         git config core.hooksPath tools/hooks
@@ -78,6 +93,10 @@ THE POST OFFICE (the "leave a message" button on the sea page)
 Visitors write, draw or add a picture, roll it into a bottle and throw it.
 Nothing reaches the site by itself: every bottle comes to YOU first.
 
+  • NOT GETTING THEM? FormSubmit only forwards bottles once you've clicked
+    "Activate Form" in its first email (look in spam, too). Bottles thrown
+    before that are lost, so ask for them again after activating.
+
   • ONE-TIME SETUP
       1. Open sky/sky.js and find BOTTLE_INBOX near the top.
       2. Put  'https://formsubmit.co/YOUR-EMAIL'  in it, commit, and throw one
@@ -99,5 +118,36 @@ Nothing reaches the site by itself: every bottle comes to YOU first.
       A hidden trap field catches most spam robots, and each visitor can
       only throw one bottle every 10 minutes.
 
-Visitors' browsers remember which bottles they've opened, so the crate
-counts only the ones new to them, and their pinboard fills as they go.
+Visitors' browsers remember which bottles they've opened, so the number on
+the crate counts only the ones new to them.
+
+  • THE BOARD AND THE PILE (only you decide)
+      What's pinned and what's on the pile is kept in one small file,
+      content/living/bottles/board.json, the same for every visitor.
+      To change it, open  https://dav-nky.pleroma.nexus/living.html?owner
+      (owner mode, remembered by that browser). Now when you read a bottle you
+      can pin it to the board, put it on the pile, or put it back; on the
+      board you can unpin (onto the pile), and in the pile you can pin or put
+      back. A bar in the corner counts your changes; only you see them until
+      you press "publish": download board.json, put it in the bottles folder
+      and push. (Or, if Mel's Forgejo allows it, publish straight from the
+      page with a Forgejo access token.) Works in your local preview too.
+      ?owner=off (or "leave owner mode") turns it off in that browser.
+      Anyone could type ?owner, but it only lets them download a file:
+      nothing changes for anyone else without a push to your repo.
+
+
+PREVIEW BEFORE YOU PUSH
+-----------------------
+See your changes on your own computer first, so nothing half-done goes live:
+
+  • Windows: double-click tools\preview.bat. A window opens and your browser
+    goes to http://localhost:8000 . Close that window to stop.
+  • Mac / Linux / Git Bash:  sh tools/preview.sh , then open http://localhost:8000
+  • Either needs Python (python.org; on Windows tick "Add python.exe to PATH"
+    in the installer) or Node.js.
+
+Edit, save, refresh the browser (Ctrl+F5 if it looks stale). While previewing,
+Polaris and "the sea" take you to your own copy, not the live site, and new
+files show up without list.txt (the preview shows folders). Happy with it?
+Then commit and push as usual.

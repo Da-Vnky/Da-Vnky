@@ -21,6 +21,9 @@
         .shelf   { left: 6%;  top: 40%; width: 30%; }
         .lantern { left: 26%; top: 0;   width: 60px; }
         .tools   { left: 37%; top: 15%; width: 8%; }
+        .groove.manikin   { left: 44%; bottom: calc(30vh * .818 - 2px); height: 12vh; aspect-ratio: 50 / 110; z-index: 3; }
+        .groove.manikin > * { height: 100%; width: auto; }
+        .groove.metronome { left: 53%; bottom: calc(30vh * .818 - 2px); width: 2.6vw; min-width: 28px; z-index: 3; }
 
         .lantern .glow { opacity: calc(.25 + .75 * var(--dusk)); }
         .easel   { left: 13%; bottom: 1vh; height: 56vh; aspect-ratio: 62 / 100; z-index: 3; filter: drop-shadow(0 6px 8px rgba(0,0,0,.4)); }
@@ -61,12 +64,14 @@
             .pinned { left: 50%; top: 11%; width: 220px; margin-left: -110px; }
             .lantern { left: 6%; }
             .bench { height: 24vh; }
+            .groove.manikin { left: 42%; bottom: calc(24vh * .818 - 2px); height: 9vh; }
+            .groove.metronome { display: none; }
             .room .character { left: 64% !important; height: 20vh !important; }
             .easel { left: 8%; height: 38vh; }
         }
     </style>
 </head>
-<body data-place="workshop" data-voyage="300">
+<body data-place="workshop">
 
     <!-- =====================================================================
          A ROOM
@@ -90,11 +95,11 @@
 
         <div class="furnish pinned">
             <h1>the workshop</h1>
-            <p>paintings on the easel. look out the window, or scroll to let the day go by.</p>
+            <p>paintings on the easel. look out the window to let the day go by.</p>
         </div>
 
         <!-- hanging lantern: glows brighter as evening comes -->
-        <svg class="furnish lantern" data-asset="assets/workshop/lantern" viewBox="0 0 60 150" aria-hidden="true">
+        <svg class="furnish lantern wobbles" data-asset="assets/workshop/lantern" viewBox="0 0 60 150" aria-hidden="true">
             <circle class="glow" cx="30" cy="112" r="30" fill="rgba(255,200,110,.35)"/>
             <rect x="29" y="0" width="2" height="72" fill="#2a1a10"/>
             <path d="M18 76 H42 L46 82 H14 Z" fill="#2a1a10"/>
@@ -153,6 +158,10 @@
             </svg>
         </div>
 
+        <!-- they dance when music's playing. your own: assets/workshop/manikin, assets/workshop/metronome -->
+        <div class="furnish groove manikin" data-groove="manikin" data-asset="assets/workshop/manikin"></div>
+        <div class="furnish groove metronome" data-groove="metronome" data-asset="assets/workshop/metronome"></div>
+
         <!-- the traveller, at the bench. your own: assets/characters/workshop.(gif|png|webp|svg) -->
         <div class="furnish character scene-character" data-asset="assets/characters/workshop"
              data-say="mind the sawdust" aria-label="the traveller"
@@ -162,5 +171,9 @@
     <script src="sky/sky.js"></script>
     <script src="sky/ground-countryside.js"></script>
     <script src="sky/gallery.js"></script>
+    <script src="sky/panel.js"></script>
+    <script src="sky/music.js"></script>
+    <script src="sky/weather.js"></script>
+    <script src="sky/noise.js"></script>
 </body>
 </html>

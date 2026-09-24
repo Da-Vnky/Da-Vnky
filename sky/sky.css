@@ -825,3 +825,23 @@ svg[data-bottle] .b-cork.has-art { transform-box: view-box; transform-origin: 17
 .layer.has-art > :not(.layer-art):not(defs) { display: none; }
 .layer .layer-art .art:not(.glow-layer) { filter: brightness(calc(1 - .55 * var(--dusk))) saturate(calc(1 - .3 * var(--dusk))); }
 .layer .layer-art .glow-layer { opacity: var(--dusk); }
+
+/* =====================================================================
+   things that fly across the sky in the sky view (slots: assets/sky/blimp, birds,
+   balloon, shooting-star; see FLYERS near the top of sky.js)
+   ===================================================================== */
+.flyers { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.flyer { position: absolute; left: 0; top: 0; visibility: hidden; will-change: transform; }
+.flyer.flying { visibility: visible; }
+.flyer .placeholder, .flyer > .art { display: block; width: 100%; height: auto; }
+.flyer > .glow-layer { position: absolute; left: 0; top: 0; opacity: var(--dusk); }
+.flyer-blimp, .flyer-balloon, .flyer-birds { filter: brightness(calc(1 - .55 * var(--dusk))) drop-shadow(0 4px 5px rgba(0,0,0,.25)); }
+.flyer-blimp .glow-bits { opacity: calc(.25 + .75 * var(--dusk)); }
+.flyer-blimp .prop { animation: blimp-prop .18s linear infinite; }
+@keyframes blimp-prop { from { transform: scaleY(1); } 50% { transform: scaleY(.15); } to { transform: scaleY(1); } }
+.flyer-birds .wing { transform-box: fill-box; transform-origin: 50% 60%; animation: bird-flap .5s ease-in-out infinite alternate; }
+@keyframes bird-flap { from { transform: scaleY(1); } to { transform: scaleY(-.55); } }
+.flyer-shooting-star { filter: drop-shadow(0 0 6px rgba(255,245,210,.9)); }
+@media (prefers-reduced-motion: reduce) { .flyer-blimp .prop, .flyer-birds .wing { animation: none; } }
+
+/* away from the homepage there's no signpost; the constellations take you places */

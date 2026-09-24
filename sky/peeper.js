@@ -18,7 +18,7 @@
     var btn = document.querySelector('.telescope-btn[data-folder]');
     if (!btn || !Sky.city) return;
     var MEDIA = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'mp4', 'webm', 'html'];
-    var EVENING = 0.84;                        // the hour the telescope shows: dark enough for every window to be lit
+    var EVENING = 0.84;                        // the hour the telescope turns it to: dark enough for every window to be lit
 
     Sky.css(
         '.peep-spots { position: absolute; left: -6%; bottom: -12px; width: 112%; height: calc(100% + 12px); pointer-events: none; visibility: hidden; }' +
@@ -35,6 +35,8 @@
         'body.peep-view .scene-character, body.peep-view .ui-button { opacity: 0; visibility: hidden; pointer-events: none; }' +
         'body.peep-view .signpost, body.peep-close .signpost { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .4s, visibility 0s .4s; }' +
         'body.peep-view { cursor: crosshair; } body.peep-view.peep-pushing { cursor: move; }' +
+        // on a touch screen the whole view belongs to your finger while you look: no page scroll, no zoom
+        'html.peep-touch, html.peep-touch body, html.peep-touch body * { touch-action: none !important; overscroll-behavior: none; }' +
         '@media (hover: none), (pointer: coarse) { body.peep-view { cursor: grab; } body.peep-view.peep-dragging { cursor: grabbing; } }' +
 
         /* things drawn on the telescope's glass */
@@ -148,7 +150,7 @@
 
     function hintText() {
         if (!scenes.length) return 'no windows lit yet. scenes go in content/city/';
-        return (fine.matches ? 'move toward the edge of the lens to look around.' : 'drag to look around.') +
+        return (fine.matches ? 'point where you want to look: the further from the middle, the faster it turns.' : 'drag to look around.') +
             ' the brightest windows have something to see (' + scenes.length + ')';
     }
 
@@ -185,11 +187,12 @@
     }
 
     /* ---------------- moving the view ----------------
-       with a mouse: no clicking needed. move toward the rim of the lens and the telescope
-       follows, as if your pointer were pushing its edge; the further past the rim, the faster.
-       on a touch screen: drag to look around. */
-    var EDGE = 0.72;              // the push starts this far out from the middle (1 = the rim)
-    var PUSH = 1100;              // px per second at full push
+       with a mouse: no clicking needed. point where you want to look: the telescope turns
+       that way, faster the further your pointer is from the middle of the lens (and not
+       at all near the middle, so you can rest there). on a touch screen: drag to look around. */
+    var REST = 0.14;              // this close to the middle (1 = the rim), it stays still
+    var PUSH = 340;               // px per second with the pointer at the rim or beyond
+    var vel = { x: 0, y: 0 };
     var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
     var aimPt = null, pushT = 0, pushing = false;
     function lensR() {
@@ -205,19 +208,27 @@
     document.documentElement.addEventListener('mouseleave', function () { aimPt = null; });
     window.addEventListener('blur', function () { aimPt = null; });
     function push(now) {
-        if (state !== 'looking' || !aimPt) { pushing = false; document.body.classList.remove('peep-pushing'); return; }
-        var dt = Math.min(0.05, (now - pushT) / 1000);
+        if (state !== 'looking') { pushing = false; vel.x = vel.y = 0; document.body.classList.remove('peep-pushing'); return; }
+        var dt = Math.min(0.15, (now - pushT) / 1000);           // (keeps pace on a slow computer too)
         pushT = now;
-        var cx = vw() / 2, cy = vh() * 0.48, R = lensR();
-        var dx = aimPt.x - cx, dy = aimPt.y - cy, dist = Math.hypot(dx, dy);
-        var k = Math.max(0, Math.min(1, (dist - R * EDGE) / (R * (1.25 - EDGE))));
-        k = k * k * (3 - 2 * k);                             // gentle at first, then firmer
-        document.body.classList.toggle('peep-pushing', k > 0.02);
-        if (k > 0 && now > holdUntil) {
-            var v = PUSH * k * dt;
-            var next = clampPan({ x: pan.x - dx / dist * v, y: pan.y - dy / dist * v });
+        var tx = 0, ty = 0;
+        if (aimPt && now > holdUntil) {
+            var cx = vw() / 2, cy = vh() * 0.48, R = lensR();
+            var dx = aimPt.x - cx, dy = aimPt.y - cy, dist = Math.hypot(dx, dy);
+            var k = Math.max(0, Math.min(1, (dist / R - REST) / (1 - REST)));
+            k = Math.pow(k, 1.25);                               // slow near the middle, building toward the rim
+            if (dist > 0) { tx = dx / dist * PUSH * k; ty = dy / dist * PUSH * k; }
+        }
+        // ease into and out of the movement, like turning a heavy brass telescope
+        var ease = Math.min(1, dt * 4);
+        vel.x += (tx - vel.x) * ease; vel.y += (ty - vel.y) * ease;
+        var moving = Math.abs(vel.x) + Math.abs(vel.y) > 2;
+        document.body.classList.toggle('peep-pushing', moving);
+        if (moving) {
+            var next = clampPan({ x: pan.x - vel.x * dt, y: pan.y - vel.y * dt });
             if (Math.abs(next.x - pan.x) + Math.abs(next.y - pan.y) > 0.01) { pan = next; applyPan(Z, pan, 0); }
         }
+        if (!aimPt && !moving) { pushing = false; vel.x = vel.y = 0; document.body.classList.remove('peep-pushing'); return; }
         requestAnimationFrame(push);
     }
 
@@ -225,9 +236,11 @@
     document.addEventListener('pointerdown', function (e) {
         if (e.pointerType === 'mouse' && fine.matches) return;            // the mouse steers by the rim instead
         if (state !== 'looking' || e.button !== 0 || e.target.closest('button, a, .signpost, .polaris')) return;
-        drag = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
+        drag = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y, id: e.pointerId };
         dragged = false;
     });
+    document.addEventListener('touchmove', function (e) { if (state === 'looking' || state === 'scene') e.preventDefault(); }, { passive: false });
+    document.addEventListener('pointercancel', function () { drag = null; document.body.classList.remove('peep-dragging'); });
     document.addEventListener('pointermove', function (e) {
         if (!drag) return;
         var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
@@ -256,7 +269,8 @@
         state = 'looking';
         Z = vw() < 620 ? 3.4 : 2.8;
         document.body.classList.add('peep-view');
-        Sky.holdTime(EVENING, 1400);
+        document.documentElement.classList.add('peep-touch');
+        Sky.setTime(EVENING, 1400);                      // night falls, and stays when you lower it
         placeSpots();
         note.textContent = hintText();
         requestAnimationFrame(function () { chosen.length ? aim(at, 1300) : applyPan(Z, pan = clampPan({ x: 0, y: 0 }), 1300); });
@@ -268,6 +282,7 @@
         if (state === 'scene') leaveScene(true);
         state = 'off';
         document.body.classList.remove('peep-view', 'peep-close');
+        document.documentElement.classList.remove('peep-touch');
         ground.style.transition = 'transform 1s cubic-bezier(.3,.6,.2,1), opacity .9s';
         ground.style.transform = '';
         Sky.releaseTime();
@@ -276,6 +291,7 @@
     function lookUp() {
         state = 'sky';
         document.body.classList.remove('peep-view');
+        document.documentElement.classList.remove('peep-touch');
         ground.style.transition = '';
         ground.style.transform = '';                     // the sky view moves the city out of the way itself
         Sky.openSkyView({
