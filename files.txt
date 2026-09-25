@@ -47,7 +47,7 @@ assets/fonts/list.txt 117 55339362
 assets/items/list.txt 117 55339362
 assets/living/list.txt 117 55339362
 assets/sea/list.txt 117 55339362
-assets/sky/list.txt 216 1101783858
+assets/sky/list.txt 222 243196552
 assets/sounds/list.txt 228 1129530370
 assets/textures/list.txt 152 1347949450
 assets/ui/list.txt 117 55339362

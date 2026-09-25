@@ -3,7 +3,7 @@
 skybox-day.jpg
 skybox-dusk.jpg
 skybox-golden.jpg
+skybox-night.jpg
 skybox-sunset.jpg
-skybox.jpg
 sun-glow.gif
 sun.gif
