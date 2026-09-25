@@ -1,5 +1,7 @@
 # written by tools/update-lists.sh: every art file in this folder.
 # no need to edit it; it's rewritten each commit.
-skybox.png
+skybox-day.jpg
+skybox-golden.jpg
+skybox.jpg
 sun-glow.gif
 sun.gif
