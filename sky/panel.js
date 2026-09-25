@@ -294,7 +294,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry', 'unnerve', 'scare', 'typing', 'sparkle', 'bang', 'flick', 'shatter', 'book', 'claube-flick', 'claube-shot', 'loot', 'record-in', 'page-turn', 'flashbang'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry', 'unnerve', 'scare', 'typing', 'sparkle', 'bang', 'flick', 'shatter', 'book', 'claube-flick', 'claube-shot', 'loot', 'record-in', 'page-turn', 'flashbang', 'life-lost', 'lives-found', 'wall-slide'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {
@@ -374,6 +374,15 @@
         },
         'knock': function (out, t) {                                   // knuckles on a boarded-up window: knock, knock
             knock(out, t, 1); knock(out, t + 0.2, 0.85);
+        },
+        'wall-slide': function (out, t) {                              // a stone wall grinding aside
+            var n = ctx.createBufferSource(); n.buffer = noiseBuf('brown', 4);
+            var f = filter('lowpass', 320), g = gain(0);
+            chain(n, f, g, out);
+            g.gain.setValueAtTime(0.0001, t);
+            for (var i = 0; i <= 48; i++) g.gain.linearRampToValueAtTime((i < 4 ? i / 4 : 1) * (0.5 + Math.random() * 0.5) * (i > 40 ? (48 - i) / 8 : 1), t + 2.4 * i / 48);
+            n.start(t); n.stop(t + 2.5);
+            knock(out, t + 2.35, 0.8);                                 // and it stops against something
         },
         'crack': function (out, t) {                                   // a board splintering off and clattering down
             var f = noiseHit(out, t, 0.18, 'bandpass', 2600, 0.7, 0.55, 0.004);
@@ -646,6 +655,7 @@
     function sfx(name, opts) {
         opts = opts || {};
         if (sfxVol <= 0) return;
+        if (!sfxFiles[name] && !SFX[name] && opts.or) { name = opts.or; }   // (a sound of yours, or a stand-in until then)
         var size = opts.size, delay = opts.delay || 0;
         if (sfxFiles[name]) {                                          // your recording
             setTimeout(function () {

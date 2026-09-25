@@ -448,6 +448,21 @@
        "what": "the pointer while holding the revolver: a reticle, its middle is where the shot goes",
        "size": "40 x 40 to 64 x 64",
        "optional": true
+      },
+      {
+       "slot": "assets/ui/heart-empty",
+       "what": "a life that's gone",
+       "size": "64 x 64, see-through"
+      },
+      {
+       "slot": "assets/ui/lives-lock",
+       "what": "the lock on the lives (a hidden key opens it, one day)",
+       "size": "48 x 56, see-through"
+      },
+      {
+       "slot": "assets/ui/lives-frame",
+       "what": "behind the three lives (stretched to fit)",
+       "size": "about 240 x 64"
       }
      ]
     },
@@ -909,6 +924,16 @@
        "slot": "assets/city/mira",
        "what": "Mira, in mel’s room",
        "size": "about 2:5, feet at the bottom"
+      },
+      {
+       "slot": "assets/city/mel-blood",
+       "what": "the blood that runs down the screen as the thing at the window gets you (stretched to fill the screen; see-through where there's no blood)",
+       "size": "1920 x 1080"
+      },
+      {
+       "slot": "assets/city/mel-killed",
+       "what": "shown over the black after it gets you (optional)",
+       "size": "any"
       }
      ]
     }
@@ -1326,6 +1351,16 @@
        "what": "the note up close: the sheet the words are written on",
        "size": "e.g. 1100 x 1400",
        "optional": true
+      },
+      {
+       "slot": "assets/living/secret-panel",
+       "what": "the wall under the right-hand paintings that slides away (leave it unset to keep the wall as it is)",
+       "size": "1:4 upright, see-through edges"
+      },
+      {
+       "slot": "assets/living/secret-stairs",
+       "what": "what's behind it: stairs going down, a black candle on a sconce",
+       "size": "1:4 upright"
       }
      ]
     },
@@ -1850,6 +1885,18 @@
        "slot": "assets/sounds/hobo",
        "what": "behind mel’s boards: plays from the moment the last one comes off (12 s of black, then the scare)",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/life-lost",
+       "what": "losing a life"
+      },
+      {
+       "slot": "assets/sounds/lives-found",
+       "what": "the lives turning up"
+      },
+      {
+       "slot": "assets/sounds/wall-slide",
+       "what": "the wall sliding open over the stairs"
       }
      ]
     }

@@ -1,14 +1,16 @@
 /* =====================================================================
    loader.js — the loading screen, and the copy of the site kept in the
-   visitor's browser. The first time someone comes, it fetches every file
-   on the site (with a progress bar) and keeps them: every page, picture
-   and song after that comes straight from their own computer (sw.js).
-   It stays kept between visits. Each new visit it checks manifest.txt
-   (tools\publish.bat writes it, with a checksum for every file) and
-   fetches only what you've changed since, drops what you've deleted,
-   and if the page they're on was one of the changes, shows it fresh.
+   visitor's browser (sw.js keeps it).
+   The first time someone comes, it fetches just the skeleton of the site
+   (every page, the code, the folder lists: about a megabyte) with a progress
+   bar, and in they go. Pictures, songs and videos are kept as they come
+   across them, not all at the start. It stays kept between visits.
+   Each new visit it checks catalog.txt (tools\publish.bat writes it, with a
+   checksum for every file) and forgets whatever you've changed or deleted
+   since, so those come fresh from the site the next time they're needed;
+   if the page they're on was one of the changes, it shows it fresh.
 
-   "Forget your stay" (the control panel) wipes it all: see forgetStay below.
+   "Forget your stay" (the control panel) wipes it all: see davForget below.
    Your own loading picture: assets/ui/loading (a GIF can walk, spin, …)
 
        <script src="sky/loader.js"></script>     (first thing in each page's <head>)
@@ -89,8 +91,8 @@
     }
     function mb(n) { return (n / 1048576).toFixed(n > 10485760 ? 0 : 1); }
 
-    /* ---------------- what's on the site, and what this browser already has ---------------- */
-    // manifest.txt lines: "path size checksum" (older ones: "path size")
+    /* ---------------- what's on the site, and what this browser has kept ---------------- */
+    // catalog.txt lines: "path size checksum"
     function list(text) {
         var out = [];
         text.replace(/\r/g, '').split('\n').forEach(function (line) {
@@ -104,61 +106,92 @@
         });
         return out;
     }
-    // pages and code first, then pictures, then sounds and videos (the biggest)
-    function rank(f) { return /\.(html|js|css|json|txt)$/i.test(f.url) ? 0 : /\.(mp3|ogg|mp4|webm)$/i.test(f.url) ? 2 : 1; }
-    var HAVE = 'dav-have';                                                  // what's in this browser's copy: { path: "size:checksum" }
-    function have() { try { return JSON.parse(localStorage.getItem(HAVE) || 'null'); } catch (e) { return null; } }
-    function keep(m) { try { localStorage.setItem(HAVE, JSON.stringify(m)); } catch (e) {} }
+    // the skeleton: pages, code, styles, the folder lists and little text files. (not the pictures and sounds)
+    function skeleton(f) { return /\.(html|js|css|json|txt)$/i.test(f.path) && !/^tools\//.test(f.path); }
+    var SEEN = 'dav-seen';                                                  // the site as of this browser's last check: { path: "size:checksum" }
+    function seen() {
+        try { return JSON.parse(localStorage.getItem(SEEN) || localStorage.getItem('dav-have') || 'null'); } catch (e) { return null; }
+    }
+    function remember(m) { try { localStorage.setItem(SEEN, JSON.stringify(m)); localStorage.removeItem('dav-have'); } catch (e) {} }
     var art = null;
     var here = decodeURIComponent(location.pathname.replace(/^.*\//, '')) || 'index.html';
-    if (!have()) screen('packing everything up\u2026');                     // (a first visit: the screen straight away)
+    var base = new URL('./', location.href);
+    function abs(u) { return new URL(u, base).href.split('?')[0]; }
+    if (!seen()) screen('packing up…');                                // (a first visit: the screen straight away)
+
+    // the page is being looked after by sw.js (the very first time, it takes a moment to start)
+    function looked() {
+        if (navigator.serviceWorker.controller) return Promise.resolve(true);
+        return new Promise(function (ok) {
+            var t = setTimeout(function () { ok(false); }, 2500);
+            navigator.serviceWorker.addEventListener('controllerchange', function () { clearTimeout(t); ok(true); });
+        });
+    }
 
     register()
         .then(function () { return caches.open(CACHE); })
         .then(function (cache) {
-            return fetch('manifest.txt?' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (text) {
+            // (cache: 'reload', so that even the older sw.js, if it's still the one looking after the page, asks the site)
+            var get = function (name) { return fetch(name + '?' + Date.now(), { cache: 'reload' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) { return /<html/i.test(t) ? '' : t; }).catch(function () { return ''; }); };
+            return get('catalog.txt').then(function (t) { return t || get('files.txt'); }).then(function (text) {
                 var files = list(text);
-                if (files.length < 3) { finish(); return; }                   // (no manifest yet: nothing to do)
+                if (files.length < 3) { finish(); return; }                   // (no list yet: nothing to do)
                 var loadingArt = files.filter(function (f) { return /^assets\/ui\/loading\.(gif|png|webp|svg|jpe?g)$/i.test(f.path); })[0];
-                if (loadingArt) art = loadingArt.url;
-                var had = have(), first = !had, now = {}, need = [];
-                files.forEach(function (f) { now[f.path] = f.id; if (first || had[f.path] !== f.id) need.push(f); });
-                if (first) need.push({ path: '', url: './', size: 0, id: '' });
-                // gone from the site: gone from the copy
-                var drop = had ? Object.keys(had).filter(function (p) { return !(p in now); }) : [];
-                drop.forEach(function (p) { cache.delete(p.split('/').map(encodeURIComponent).join('/'), { ignoreSearch: true }); });
-                if (!need.length) { keep(now); finish(); return; }
-                // what they're looking at right now came from the old copy if it's among the changes
-                var stale = !first && need.some(function (f) { return f.path === here || /^sky\//.test(f.path); });
-                screen(first ? 'packing everything up…' : 'unpacking what’s new…');
-                need.sort(function (a, b) { return rank(a) - rank(b); });
-                var total = 0, got = 0, n = 0, i = 0;
-                need.forEach(function (f) { total += f.size; });
-                function show() {
-                    var k = total ? got / total : n / need.length;
-                    bar.style.width = (k * 100).toFixed(1) + '%';
-                    note.textContent = (first ? 'packing everything up… ' : 'unpacking what’s new… ') + n + ' of ' + need.length + (total ? ' · ' + mb(got) + ' of ' + mb(total) + ' MB' : '');
-                }
-                function next() {
-                    if (i >= need.length) return Promise.resolve();
-                    var f = need[i++];
-                    return fetch(f.url, { cache: 'reload' }).then(function (r) {
-                        return r.ok ? cache.put(f.url, r) : null;
-                    }).catch(function () {}).then(function () { n++; got += f.size; show(); return next(); });
-                }
-                show();
-                var lanes = [];
-                for (var k = 0; k < 6; k++) lanes.push(next());
-                return Promise.all(lanes).then(function () {
-                    keep(now);
-                    note.textContent = first ? 'all packed. in you go.' : 'all up to date.';
-                    bar.style.width = '100%';
-                    if (stale) { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} setTimeout(function () { location.reload(); }, 300); return; }
-                    setTimeout(finish, 350);
+                if (loadingArt && el) { art = loadingArt.url; el.querySelector('.dl-art').innerHTML = '<img alt="" src="' + art + '">'; }
+                var had = seen(), first = !had, now = {}, changed = [];
+                files.forEach(function (f) { now[f.path] = f.id; if (had && had[f.path] !== f.id) changed.push(f.path); });
+                if (had) Object.keys(had).forEach(function (p) { if (!(p in now)) changed.push(p); });
+                // what's changed or gone: forgotten, so it comes fresh from the site next time it's wanted
+                var forget = changed.map(function (p) { return abs(p.split('/').map(encodeURIComponent).join('/')); });
+                if (changed.indexOf('index.html') !== -1) forget.push(base.href);
+                var dropped = first
+                    ? cache.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return cache.delete(k); })); })   // (kept from who knows when: start clean)
+                    : Promise.all(forget.map(function (u) { return cache.delete(u, { ignoreSearch: true }); }));
+                return dropped.then(function () {
+                    remember(now);
+                    // what they're looking at right now came from the old copy if it's among the changes
+                    var stale = !first && changed.some(function (p) { return p === here || /^sky\//.test(p); });
+                    // the skeleton, whatever of it isn't kept yet
+                    var shell = files.filter(skeleton);
+                    return Promise.all(shell.map(function (f) { return cache.match(abs(f.url), { ignoreSearch: true }).then(function (hit) { return hit ? null : f; }); }))
+                        .then(function (l) { return l.filter(Boolean); })
+                        .then(function (need) {
+                            if (!need.length) { if (stale) { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} location.reload(); return; } finish(); return; }
+                            var loud = first || stale;                          // (otherwise it's done quietly, while they look around)
+                            if (loud) screen(first ? 'packing up…' : 'unpacking what’s new…');
+                            var total = 0, got = 0, n = 0, i = 0;
+                            need.forEach(function (f) { total += f.size; });
+                            function show() {
+                                if (!loud || !bar) return;
+                                bar.style.width = ((total ? got / total : n / need.length) * 100).toFixed(1) + '%';
+                                note.textContent = (first ? 'packing up… ' : 'unpacking what’s new… ') + n + ' of ' + need.length + (total ? ' · ' + mb(got) + ' of ' + mb(total) + ' MB' : '');
+                            }
+                            return looked().then(function (viaSW) {
+                                function next() {
+                                    if (i >= need.length) return Promise.resolve();
+                                    var f = need[i++];
+                                    // through sw.js, which keeps it (and shares the download if the page is asking too);
+                                    // the very first time, before sw.js has started, kept here
+                                    var go = viaSW ? fetch(abs(f.url)).then(function (r) { return r.ok ? r.blob() : null; })
+                                                   : fetch(abs(f.url), { cache: 'no-cache' }).then(function (r) { return r.ok ? cache.put(abs(f.url), r) : null; });
+                                    return go.catch(function () {}).then(function () { n++; got += f.size; show(); return next(); });
+                                }
+                                show();
+                                var lanes = [];
+                                for (var k = 0; k < (loud ? 6 : 2); k++) lanes.push(next());
+                                if (!loud) finish();
+                                return Promise.all(lanes).then(function () {
+                                    if (!loud) return;
+                                    if (note) { note.textContent = first ? 'all packed. in you go.' : 'all up to date.'; bar.style.width = '100%'; }
+                                    if (stale) { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} setTimeout(function () { location.reload(); }, 300); return; }
+                                    setTimeout(finish, 350);
+                                });
+                            });
+                        });
                 });
             });
         })
         .catch(finish);
-    setTimeout(finish, 90000);                                              // (never stuck behind it)
+    setTimeout(finish, 30000);                                              // (never stuck behind it)
 
 })();

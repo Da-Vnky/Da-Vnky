@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>the living space · DaV-nky</title>
     <!-- the loading screen: fetches the whole site once per visit (sky/loader.js, sw.js) -->
-    <script src="sky/loader.js?v=20260925f"></script>
+    <script src="sky/loader.js?v=20260925m"></script>
     <link rel="canonical" href="https://dav-nky.pleroma.nexus/living.html">
     <meta property="og:title" content="the living space · DaV-nky">
     <meta property="og:url" content="https://dav-nky.pleroma.nexus/living.html">
@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260925f">
+    <link rel="stylesheet" href="sky/sky.css?v=20260925m">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -135,6 +135,7 @@
         .shame-plaque > svg, .shame-plaque > .art { display: block; width: 100%; height: auto; filter: drop-shadow(0 3px 4px rgba(0,0,0,.5)); }
         .dungeon-character { left: 24%; bottom: 8vh; height: 25vh; }
         /* the toaster, on the floor by the plant: click it to take it (see sky/tub.js) */
+        .secret-door { left: 79%; bottom: 3vh; width: 10.5%; height: 43vh; z-index: 2; overflow: hidden; cursor: default; }
         .toaster { left: 89.5%; bottom: 2.6vh; width: 4.6vw; min-width: 52px; aspect-ratio: 100 / 70; z-index: 3; }
 
         @media (max-width: 620px) {
@@ -166,6 +167,7 @@
             .hall-hooks { display: none; }
             .hall-character { left: 36%; height: 14vh; }
             .toaster { left: 44%; width: 11vw; min-width: 0; }
+            .secret-door { left: 80%; width: 17%; height: 26vh; }
             .room .window { left: 12% !important; width: 76% !important; top: 34% !important; height: 28% !important; }
             .shelf, .lamp, .gallery-frame, .claude-plaque { display: none; }
             .pinned { left: 50%; top: 11%; width: 220px; margin-left: -110px; }
@@ -325,6 +327,29 @@
         <div class="furnish noise-machine" data-asset="assets/living/noise-machine"></div>
         <div class="furnish groove cat" data-groove="cat" data-asset="assets/living/cat"></div>
         <div class="furnish groove plant" data-groove="plant" data-asset="assets/living/plant"></div>
+
+        <!-- the secret way down: a panel of wall under the paintings on the right. pull the loose book and it slides
+             open on a stairwell lit by a black candle. your own: assets/living/secret-panel (the wall panel; match your
+             wallpaper) and assets/living/secret-stairs (what's behind it) -->
+        <div class="furnish secret-door" aria-label="the way down" tabindex="-1">
+            <div class="sd-hole" data-asset="assets/living/secret-stairs">
+                <svg class="placeholder" viewBox="0 0 100 220" preserveAspectRatio="none" aria-hidden="true">
+                    <defs><radialGradient id="sd-glow" cx=".3" cy=".3" r=".55"><stop offset="0" stop-color="#ffb870" stop-opacity=".5"/><stop offset="1" stop-color="#ffb870" stop-opacity="0"/></radialGradient>
+                        <linearGradient id="sd-deep" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1210"/><stop offset="1" stop-color="#050303"/></linearGradient></defs>
+                    <rect width="100" height="220" fill="url(#sd-deep)"/>
+                    <g fill="#2e2622" stroke="#140e0c" stroke-width="1">
+                        <path d="M0 220 H100 V204 H0 Z"/><path d="M8 204 H96 V190 H8 Z"/><path d="M16 190 H92 V177 H16 Z"/><path d="M24 177 H88 V165 H24 Z"/>
+                        <path d="M32 165 H84 V154 H32 Z"/><path d="M40 154 H80 V144 H40 Z"/><path d="M47 144 H76 V135 H47 Z"/><path d="M54 135 H72 V127 H54 Z"/>
+                    </g>
+                    <g fill="#4a3e38" opacity=".7"><path d="M0 204 H100 V206 H0 Z M8 190 H96 V192 H8 Z M16 177 H92 V179 H16 Z M24 165 H88 V167 H24 Z M32 154 H84 V156 H32 Z"/></g>
+                    <rect width="100" height="220" fill="url(#sd-glow)"/>
+                    <path d="M16 70 H36 L32 76 H20 Z" fill="#4a4446"/><path d="M26 76 V90" stroke="#4a4446" stroke-width="3"/>
+                    <path d="M22 40 Q22 37 25 37 L28 37 Q30 37 30 40 V70 H22 Z" fill="#141113"/><path d="M26 37 V33" stroke="#bda98a" stroke-width="1"/>
+                </svg>
+                <span class="sd-flame" aria-hidden="true"></span>
+            </div>
+            <div class="sd-panel" data-asset="assets/living/secret-panel"><div class="placeholder"></div></div>
+        </div>
 
         <!-- a toaster on the floor by the plant: click it and it goes in your bag (sky/tub.js). your own: assets/living/toaster -->
         <div class="furnish toaster" data-asset="assets/living/toaster"></div>
@@ -570,27 +595,28 @@
         <a class="room-arrow to-upstairs" href="#living" aria-label="back up to the living space" data-asset="assets/living/arrow"></a>
     </div>
 
-    <script src="sky/sky.js?v=20260925f"></script>
+    <script src="sky/sky.js?v=20260925m"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
-    <script src="sky/ground-view.js?v=20260925f" data-view="assets/living/view"></script>
-    <script src="sky/panel.js?v=20260925f"></script>
-    <script src="sky/music.js?v=20260925f"></script>
-    <script src="sky/weather.js?v=20260925f"></script>
-    <script src="sky/noise.js?v=20260925f"></script>
-    <script src="sky/inventory.js?v=20260925f"></script>
-    <script src="sky/loot.js?v=20260925f"></script>
-    <script src="sky/records.js?v=20260925f"></script>
-    <script src="sky/crate.js?v=20260925f"></script>
-    <script src="sky/frames.js?v=20260925f"></script>
-    <script src="sky/bathroom.js?v=20260925f"></script>
-    <script src="sky/gore.js?v=20260925f"></script>
-    <script src="sky/tub.js?v=20260925f"></script>
-    <script src="sky/dungeon.js?v=20260925f"></script>
-    <script src="sky/books.js?v=20260925f"></script>
-    <script src="sky/marker.js?v=20260925f"></script>
-    <script src="sky/revolver.js?v=20260925f"></script>
-    <script src="sky/claubes.js?v=20260925f"></script>
-    <script src="sky/textures.js?v=20260925f"></script>
-    <script src="sky/forget.js?v=20260925f"></script>
+    <script src="sky/ground-view.js?v=20260925m" data-view="assets/living/view"></script>
+    <script src="sky/panel.js?v=20260925m"></script>
+    <script src="sky/music.js?v=20260925m"></script>
+    <script src="sky/weather.js?v=20260925m"></script>
+    <script src="sky/noise.js?v=20260925m"></script>
+    <script src="sky/inventory.js?v=20260925m"></script>
+    <script src="sky/loot.js?v=20260925m"></script>
+    <script src="sky/records.js?v=20260925m"></script>
+    <script src="sky/crate.js?v=20260925m"></script>
+    <script src="sky/frames.js?v=20260925m"></script>
+    <script src="sky/bathroom.js?v=20260925m"></script>
+    <script src="sky/gore.js?v=20260925m"></script>
+    <script src="sky/tub.js?v=20260925m"></script>
+    <script src="sky/dungeon.js?v=20260925m"></script>
+    <script src="sky/books.js?v=20260925m"></script>
+    <script src="sky/marker.js?v=20260925m"></script>
+    <script src="sky/revolver.js?v=20260925m"></script>
+    <script src="sky/claubes.js?v=20260925m"></script>
+    <script src="sky/textures.js?v=20260925m"></script>
+    <script src="sky/forget.js?v=20260925m"></script>
+    <script src="sky/lives.js?v=20260925m"></script>
 </body>
 </html>

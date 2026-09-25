@@ -100,6 +100,29 @@
         '.shelf-book .sb-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font-style: italic; font-size: .9rem;' +
             'color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.8); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
         '.shelf-book:hover .sb-hint, .shelf-book:focus-visible .sb-hint { opacity: 1; }' +
+        // the secret door: a panel of wall that slides away (behind the rest of the wall) on the stairs down
+        '.secret-door .sd-hole, .secret-door .sd-panel { position: absolute; inset: 0; }' +
+        '.secret-door .sd-hole > svg, .secret-door .sd-hole > .art, .secret-door .sd-panel > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: block; }' +
+        // closed, it's just the wall (and a hairline seam, if you look). opening, the wall slides away to the left,
+        // uncovering the stairwell behind it. (your own panel picture, if you give one, covers it until it slides)
+        '.secret-door .sd-hole { clip-path: inset(0 0 0 100%); transition: clip-path 2.4s cubic-bezier(.6,0,.35,1); }' +
+        '.secret-door.open .sd-hole { clip-path: inset(0 0 0 0); }' +
+        '.secret-door .sd-panel { transition: transform 2.4s cubic-bezier(.6,0,.35,1); z-index: 1; pointer-events: none; }' +
+        '.secret-door .sd-panel > .placeholder { position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.14); }' +
+        '.secret-door .sd-panel::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: linear-gradient(90deg, rgba(0,0,0,.45), transparent); opacity: 0; transition: opacity .4s; }' +
+        '.secret-door.open .sd-panel { transform: translateX(-100%); }' +
+        '.secret-door.open .sd-panel > .placeholder { box-shadow: none; }' +
+        '.secret-door.open { cursor: pointer; box-shadow: inset 0 0 0 3px #1f1610; }' +
+        '.secret-door .sd-flame { position: absolute; left: 22.6%; top: 13%; width: 5%; aspect-ratio: 1 / 2.2; border-radius: 50% 50% 50% 50% / 64% 64% 36% 36%; opacity: 0;' +
+            'background: radial-gradient(ellipse at 50% 72%, #fff8d8 0 18%, #ffd36a 34%, #ff8a2a 62%, rgba(255,90,20,0) 72%); filter: blur(.3px) drop-shadow(0 0 4px #ff9a40);' +
+            'transform-origin: 50% 90%; animation: sd-flame 1.6s ease-in-out infinite; transition: opacity 1s 1.4s; }' +
+        '.secret-door.open .sd-flame { opacity: 1; }' +
+        '.secret-door .sd-hole.has-art .sd-flame, .secret-door .sd-hole:has(.art) ~ .sd-flame { display: none; }' +
+        '@keyframes sd-flame { 0%, 100% { transform: rotate(-3deg) scaleY(1); } 33% { transform: rotate(3deg) scaleY(1.1); } 66% { transform: rotate(-1deg) scaleY(.92); } }' +
+        // going down the stairs, and coming back up them
+        '.room .scene-character.descending { animation: sd-down .9s ease-in forwards; }' +
+        '.room .scene-character.ascending { animation: sd-down .9s ease-out .5s reverse both; }' +
+        '@keyframes sd-down { from { translate: 0 0; scale: 1; opacity: 1; } to { translate: 0 6%; scale: .82; opacity: 0; } }' +
         '.room-arrow.to-upstairs { position: absolute; left: 14px; top: 50%; margin-top: -27px; }' +
         '.room-arrow.to-upstairs > svg, .room-arrow.to-upstairs > .art { transform: rotate(-90deg); }' +
         '.room-arrow.to-upstairs:hover, .room-arrow.to-upstairs:focus-visible { transform: translateY(-4px); }' +
@@ -244,6 +267,42 @@
         sd.standAt = sd.me ? leftPct(sd.me) : 40;
     });
     var OFF = { '1': 104, '-1': -14 };                       // just past the right / left edge
+    var secret = document.querySelector('.secret-door');
+    function doorAt() { return (secret.offsetLeft + secret.offsetWidth / 2 - home.offsetWidth / 2) / (room.clientWidth || window.innerWidth) * 100; }
+    function openDoor(quiet) {
+        if (!secret || secret.classList.contains('open')) return;
+        secret.classList.add('open');
+        secret.setAttribute('role', 'button'); secret.tabIndex = 0;
+        try { sessionStorage.setItem('secret-open', '1'); } catch (e) {}
+        if (quiet) { var p = secret.querySelector('.sd-panel'), h = secret.querySelector('.sd-hole'); p.style.transition = h.style.transition = 'none'; void p.offsetWidth; setTimeout(function () { p.style.transition = h.style.transition = ''; }, 50); }
+    }
+    function closeDoor() {
+        if (!secret || !secret.classList.contains('open')) return;
+        secret.classList.remove('open');
+        secret.removeAttribute('role'); secret.removeAttribute('tabindex');
+        try { sessionStorage.removeItem('secret-open'); } catch (e) {}
+    }
+    // the book pulled again, with the wall open: it grinds shut
+    function pullShut(sd) {
+        if (busy || inSide) return;
+        busy = true;
+        body.classList.add('side-walking');
+        var from = home ? leftPct(home) : 0, at = bookAt();
+        if (Math.abs(from - at) < 8) from = at - 9;                      // (and then out of the way of the book, so it can be pulled again)
+        var shut = function () {
+            if (home) home.classList.remove('face-left');
+            sd.go.classList.add('pulled');
+            if (Sky.sounds) Sky.sounds.sfx('book');
+            setTimeout(function () { room.classList.add('rumble'); closeDoor(); if (Sky.sounds) Sky.sounds.sfx('wall-slide'); }, 500);
+            setTimeout(function () {
+                room.classList.remove('rumble'); sd.go.classList.remove('pulled');
+                var done = function () { busy = false; body.classList.remove('side-walking'); };
+                if (home) walk(home, from, done); else done();
+            }, 2900);
+        };
+        if (home) walk(home, at, shut); else shut();
+    }
+    try { if (sessionStorage.getItem('secret-open') === '1' || location.hash === '#dungeon') openDoor(true); } catch (e) {}
     function bookAt() { return (sd0().go.offsetLeft + sd0().go.offsetWidth / 2 - home.offsetWidth / 2) / (room.clientWidth || window.innerWidth) * 100; }
     function sd0() { return SIDES.filter(function (x) { return x.dir === 0; })[0]; }
     function goTo(sd, instant) {
@@ -270,13 +329,25 @@
             if (instant) { void sd.el.offsetWidth; if (sd.me) place(sd.me, sd.standAt); setTimeout(function () { sd.el.style.transition = room.style.transition = ''; }, 50); }
             return;
         }
-        if (sd.dir === 0) {                                  // over to the bookshelf, pull the book: the wall grinds open
+        if (sd.dir === 0) {
+            // the stairs: over to the open wall, and down (the room rises away as they go)
+            var down = function () {
+                walk(home, doorAt(), function () {
+                    home.classList.remove('face-left');
+                    home.classList.add('descending');
+                    if (Sky.sounds) Sky.sounds.sfx('step', { size: 0.4 });
+                    setTimeout(function () { slide(); setTimeout(function () { home.classList.remove('descending'); }, 1200); }, 800);
+                });
+            };
+            if (secret && secret.classList.contains('open')) { down(); return; }
+            // first, over to the bookshelf and pull the book: the wall under the paintings grinds open
             walk(home, bookAt(), function () {
                 home.classList.remove('face-left');
                 sd.go.classList.add('pulled');
                 if (Sky.sounds) Sky.sounds.sfx('book');
-                setTimeout(function () { room.classList.add('rumble'); }, 500);
-                setTimeout(function () { room.classList.remove('rumble'); slide(); }, 1900);
+                setTimeout(function () { room.classList.add('rumble'); openDoor(); if (Sky.sounds) Sky.sounds.sfx('wall-slide'); }, 500);
+                setTimeout(function () { room.classList.remove('rumble'); sd.go.classList.remove('pulled'); }, 2900);
+                setTimeout(down, secret ? 3300 : 0);
             });
             return;
         }
@@ -289,8 +360,8 @@
         busy = true;
         body.classList.add('side-walking');
         function slide() {
-            if (home) place(home, sd.dir > 0 ? 98 : sd.dir < 0 ? -6 : bookAt(), sd.dir > 0);
-            if (sd.dir === 0) sd.go.classList.remove('pulled');
+            if (home) place(home, sd.dir > 0 ? 98 : sd.dir < 0 ? -6 : (secret ? doorAt() : bookAt()), sd.dir > 0);
+            if (sd.dir === 0) { sd.go.classList.remove('pulled'); if (home && secret) { home.classList.add('ascending'); setTimeout(function () { home.classList.remove('ascending'); }, 1900); } }
             body.classList.add(sd.name + '-panning');
             body.classList.remove('in-' + sd.name, 'in-side');
             sd.el.setAttribute('aria-hidden', 'true');
@@ -307,10 +378,18 @@
         if (sd.dir === 0 && sd.me && !sd.me.classList.contains('gore-hidden')) { walk(sd.me, sd.enterAt, slide); return; }    // back to the foot of the stairs, then up
         if (sd.me && !sd.me.classList.contains('gore-hidden')) { walk(sd.me, OFF[-sd.dir]); setTimeout(slide, walkSecs(sd.me, OFF[-sd.dir]) * 700); } else slide();
     }
+    if (secret) {
+        var viaDoor = function (e) { if (!secret.classList.contains('open')) return; e.preventDefault(); goTo(sd0()); };
+        secret.addEventListener('click', viaDoor);
+        secret.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') viaDoor(e); });
+    }
     var hooks = [];
     function fire(what, sd) { hooks.forEach(function (fn) { try { fn(what, sd.name); } catch (e) {} }); }
     SIDES.forEach(function (sd) {
-        sd.go.addEventListener('click', function (e) { e.preventDefault(); goTo(sd); });
+        sd.go.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (sd.dir === 0 && secret && secret.classList.contains('open')) pullShut(sd); else goTo(sd);
+        });
         if (sd.back) sd.back.addEventListener('click', function (e) { e.preventDefault(); goHome(); });
         Array.prototype.forEach.call(sd.el.querySelectorAll('[data-goes-back]'), function (b) {
             b.addEventListener('click', function (e) { e.preventDefault(); goHome(); });

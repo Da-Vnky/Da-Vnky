@@ -298,6 +298,7 @@
         Sky.findAsset('assets/ui/heart', function (url) { if (url) t.querySelector('.heart').innerHTML = '<img alt="" src="' + url + '">'; });
         setTimeout(function () { t.remove(); }, 2300);
         try { var n = +(localStorage.getItem('lives-lost') || 0) + 1; localStorage.setItem('lives-lost', n); } catch (e) {}
+        document.dispatchEvent(new CustomEvent('dav:traveller-died'));     // (every death ends here: sky/lives.js counts them)
     }
 
     Sky.gore = { splat: splat, zap: zap, shot: shot, respawn: respawn, scream: function () { sfx('scream'); } };

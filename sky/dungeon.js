@@ -182,6 +182,7 @@
     function enter() {
         if (down) return;
         down = true;
+        try { if (localStorage.getItem('dungeon-found') !== '1') { localStorage.setItem('dungeon-found', '1'); document.dispatchEvent(new CustomEvent('dav:dungeon-found')); } } catch (e) {}
         placeGlows();
         if (Sky.music && Sky.music.hush) Sky.music.hush(true);
         if (Sky.noise && Sky.noise.hush) Sky.noise.hush(true);

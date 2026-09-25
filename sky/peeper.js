@@ -14,19 +14,22 @@
    MEL'S WINDOW: one building on the front row is abandoned, every window dark,
    except one that's boarded up. Click it: knock, and keep knocking, and the boards
    come off one by one until you're in. Behind the last board: darkness, a wrong
-   sound… and something at the window (once a visit), that slowly slides away.
-   Then Mel, typing away. She turns round, furious you barged in; you ask Claube
+   sound… and something at the window (once per browser) that gets you: you die
+   (and lose a life, once the lives are showing: sky/lives.js). Look again and it's
+   just Mel, typing away. She turns round, furious you barged in; you ask Claube
    to fix the place up, he's thrilled to, and it's clean (for the rest of the visit).
    Mira's there too. slots:
        assets/city/mel-room        her room, the mess (a picture, a GIF, or a .webm / .mp4)
        assets/city/mel-room-clean  her room, tidied
        assets/city/mel-board       one board (a plank, wider than tall; it's stretched)
        assets/city/mel-scare       what's waiting behind the boards (a transparent PNG/GIF)
+       assets/city/mel-blood       the blood that runs down the glass as it gets you (stretched to the screen, see-through)
+       assets/city/mel-killed      shown over the black after that (optional)
        assets/city/mel-typing      Mel at her desk, her back to you (a GIF can type)
        assets/city/mel-angry       Mel turned round, cross
        assets/city/claube          Claube
        assets/city/mira            Mira
-   sounds: assets/sounds/knock, crack, unnerve, scare, typing, sparkle
+   sounds: assets/sounds/knock, crack, unnerve, scare, scream, splat, typing, sparkle
    the words (and who says them): MEL near the top of this file. on your own skyline art, say where her
    window is: "mel": [x%, y%, w%, h%] in assets/city/skyline-front-windows.json
 
@@ -141,7 +144,7 @@
         '.peep-scene.mel .ps-curtain { display: none; }' +
         '.peep-scene.mel .ps-frame { box-shadow: 0 0 0 3px #3a2a20, 0 0 40px 6px rgba(255,160,80,.18); border-color: #3a2a20; }' +
         '.peep-scene.mel.in .ps-frame { box-shadow: 0 0 0 3px #3a2a20, 0 0 70px 14px rgba(255,170,90,.4); transition: box-shadow 1.5s; }' +
-        '.peep-scene.mel .ps-view > .mel-dark { position: absolute; inset: 0; background: #000; opacity: .82; transition: opacity 1.8s; pointer-events: none; }' +
+        '.peep-scene.mel .ps-view > .mel-dark { position: absolute; inset: 0; background: #000; opacity: 1; transition: opacity 1.8s; pointer-events: none; }' +
         '.peep-scene.mel.in .ps-view > .mel-dark { opacity: 0; }' +
         '.peep-scene.mel .ps-view > svg { width: 100%; height: 100%; display: block; }' +
         '.peep-scene.mel.void .ps-view > .mel-dark { opacity: 1 !important; transition: opacity .3s; }' +
@@ -192,6 +195,16 @@
         '.mel-scare.away { opacity: 1; transform: translateX(-125%); transition: transform 3.4s cubic-bezier(.45,0,.55,1); }' +
         '.peep-scene.jolt .ps-frame { animation: mel-jolt .45s linear; }' +
         '@keyframes mel-jolt { 0%, 100% { translate: 0 0; } 20% { translate: -9px 4px; } 40% { translate: 8px -5px; } 60% { translate: -5px 3px; } 80% { translate: 3px -2px; } }' +
+        // it gets you: blood down the glass, then black, then back on the roof
+        '.mel-killed { position: fixed; inset: 0; z-index: 9; pointer-events: auto; cursor: default; background: transparent; transition: background .5s, opacity 1s; }' +
+        '.mel-killed.black { background: #000; }' +
+        '.mel-killed.out { opacity: 0; pointer-events: none; }' +
+        '.mel-killed .mk-blood { position: absolute; inset: 0; animation: mk-run 2.2s ease-in forwards; }' +
+        '.mel-killed .mk-blood > svg, .mel-killed .mk-blood > img { width: 100%; height: 100%; display: block; object-fit: cover; }' +
+        '@keyframes mk-run { from { clip-path: inset(0 0 100% 0); } 35% { clip-path: inset(0 0 55% 0); } to { clip-path: inset(0 0 0 0); } }' +
+        '.mel-killed .mk-art { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transition: opacity .6s; }' +
+        '.mel-killed.black .mk-art { opacity: 1; }' +
+        '.mel-killed .mk-art > img, .mel-killed .mk-art > video { max-width: 100%; max-height: 100%; object-fit: contain; }' +
         '.mel-flash { position: fixed; inset: 0; z-index: 8; pointer-events: none; background: #fff; opacity: 0; }' +
         '.mel-flash.on { animation: mel-flash .5s ease-out; }' +
         '@keyframes mel-flash { 0% { opacity: .9; } 100% { opacity: 0; } }' +
@@ -569,6 +582,10 @@
         '<path d="M12 18 Q14 6 22 7 Q31 6 32 18 Q26 12 18 14 Z" fill="#d9b36a"/>' +
         '<circle cx="18.5" cy="20" r="1.4" fill="#2a1410"/><circle cx="25.5" cy="20" r="1.4" fill="#2a1410"/><path d="M19 25 Q22 27.5 25 25" stroke="#2a1410" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>';
     // what's waiting behind the boards (your own: assets/city/mel-scare)
+    var BLOOD = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g fill="#6d0a0e">' +
+        '<path d="M0 0 H100 V9 Q96 12 95 30 Q94 12 90 10 Q86 14 85 52 Q84 16 79 11 Q74 13 73 24 Q72 12 66 10 Q61 15 60 71 Q59 15 54 10 Q49 12 48 36 Q47 12 42 11 Q37 16 36 58 Q35 14 30 10 Q25 12 24 27 Q23 11 18 10 Q13 15 12 80 Q11 14 6 10 Q2 12 0 22 Z"/>' +
+        '<circle cx="95" cy="31" r="1.2"/><circle cx="85" cy="53" r="1.4"/><circle cx="60" cy="72.5" r="1.6"/><circle cx="36" cy="59.5" r="1.4"/><circle cx="12" cy="81.5" r="1.6"/></g>' +
+        '<path d="M0 0 H100 V5 Q60 9 30 6 Q12 5 0 8 Z" fill="#9a1016" opacity=".7"/></svg>';
     var SCARE = '<svg viewBox="0 0 120 150" preserveAspectRatio="xMidYMax meet" aria-hidden="true">' +
         '<path d="M6 150 Q10 96 34 86 Q60 78 86 86 Q112 96 116 150 Z" fill="#141010"/>' +
         '<path d="M22 60 Q14 22 44 12 Q60 2 78 12 Q108 22 98 62 Q104 78 90 92 Q60 108 30 92 Q16 78 22 60 Z" fill="#1c1614"/>' +      // matted hair
@@ -689,17 +706,43 @@
                 try { localStorage.setItem('mel-scared', '1'); } catch (e) {}
                 call.remove(); calls.remove();
                 viewEl.appendChild(boo);                                // (inside the window: as it slides away, the wall hides it)
-                if (!hoboUrl) sfx('scare');
+                sfx('scare');                                         // the sting, on top of the soundtrack
                 boo.classList.add('boo');
                 scene.classList.remove('jolt'); void scene.offsetWidth; scene.classList.add('jolt');
                 var fl = document.querySelector('.mel-flash') || document.body.appendChild(Object.assign(document.createElement('div'), { className: 'mel-flash' }));
                 fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on');
             });
-            later(run, wait + 1300, function () { boo.classList.remove('boo'); boo.classList.add('away'); });         // and then, slowly, it slides out of sight
-            later(run, wait + 4900, function () { boo.remove(); scene.classList.remove('void', 'jolt'); lightsUp(run); });
+            later(run, wait + 850, killed);                         // and it gets you
             return;
         }
         lightsUp(run);
+    }
+    // got: blood down the glass, black, and you're back on the roof a life down (sky/lives.js takes it,
+    // once the lives are showing). the window's open after this: look again and it's just mel.
+    function killed() {
+        var k = document.createElement('div');
+        k.className = 'mel-killed';
+        k.setAttribute('aria-label', 'you died');
+        k.innerHTML = '<div class="mk-blood"></div><div class="mk-art"></div>';
+        art('assets/city/mel-killed', '', k.querySelector('.mk-art'));
+        Sky.findAsset('assets/city/mel-blood', function (u) {
+            k.querySelector('.mk-blood').innerHTML = u ? '<img alt="" src="' + u + '">' : BLOOD;
+        });
+        document.body.appendChild(k);
+        sfx('scream'); sfx('splat', { delay: 0.35 });
+        hoboStop();
+        var me = document.querySelector('.scene-character');
+        setTimeout(function () { k.classList.add('black'); }, 1500);
+        setTimeout(function () {                                          // (under the black) off the window, back on the roof, gone
+            lower();
+            if (me) me.classList.add('gore-hidden');
+        }, 2300);
+        setTimeout(function () { k.classList.add('out'); }, 3600);
+        setTimeout(function () {
+            k.remove();
+            if (me && Sky.gore && Sky.gore.respawn) Sky.gore.respawn(me);                 // (a death like any other: sky/lives.js)
+            else { if (me) me.classList.remove('gore-hidden'); document.dispatchEvent(new CustomEvent('dav:traveller-died')); }
+        }, 4500);
     }
     function lightsUp(run) {
         scene.classList.add('in');

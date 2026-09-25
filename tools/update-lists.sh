@@ -41,9 +41,12 @@ for dir in assets/*/; do
     } > "${dir}list.txt"
 done
 
-# and a manifest of the whole site for the loading screen (sky/loader.js): every file a visitor's
-# browser might load, with its size and a checksum, so it can fetch them all up front, keep them,
-# and on a later visit fetch again only the ones you've changed since
+# and a catalogue of the whole site for sky/loader.js: every file a visitor's browser might load, with
+# its size and a checksum, so on a later visit it can forget just the ones you've changed since (they're
+# fetched fresh the next time they're needed): catalog.txt.
+# files.txt and manifest.txt are for browsers still running an older loading screen (from before the site
+# fetched pictures and sounds only as they're needed): they list just the pages and code, so those older
+# screens bring themselves up to date without downloading everything first, and then they're replaced.
 {
     echo "# written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum."
     for f in *.html sky/*.js sky/*.css assets/*/* content/*/* content/*/*/*; do
@@ -58,4 +61,12 @@ done
         set -- $(cksum < "$f")
         echo "$f $2 $1"
     done
+} > catalog.txt
+{
+    echo "# written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt)."
+    grep -v '^#' catalog.txt | grep -Ei '\.(html|js|css|json|txt) [0-9]+ [0-9]+$'
+} > files.txt
+{
+    echo "# written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens)."
+    grep -v '^#' files.txt | sed 's/ [0-9]*$//'
 } > manifest.txt

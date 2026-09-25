@@ -2,6 +2,8 @@
 # no need to edit it; it's rewritten each commit.
 cork-in.ogg
 cork-pop.ogg
+door-metal.ogg
+door.ogg
 dungeon.ogg
 hobo.ogg
 paper-roll.ogg

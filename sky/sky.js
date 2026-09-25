@@ -1443,10 +1443,18 @@
                 return as === 'json' ? r.json() : r.text();
             }).catch(function () { return null; });
         }
+        // list.txt (written by publish) is the answer, straight from the visitor's own copy of the site.
+        // only without one does it ask around: the server's folder listing, and the Forgejo API (both slow)
         var fromList = get(dir + 'list.txt').then(function (t) {
-            if (!t || /<html/i.test(t)) return [];
+            if (!t || /<html/i.test(t)) return null;
             return clean(t.split(/\r?\n/).filter(function (l) { return l.trim() && !/^\s*#/.test(l); }));
         });
+        folderCache[key] = fromList.then(function (listed) {
+            if (listed) return listed.map(function (n) { return { name: n, url: dir + encodeURIComponent(n) }; });
+            return askAround();
+        });
+        return folderCache[key].then(cb);
+        function askAround() {
         var fromServer = get(dir).then(function (t) {
             if (!t) return [];
             var path = new URL(dir, location.href).pathname;
@@ -1460,7 +1468,7 @@
             get(REPO_API + '/contents/' + new URL(dir, location.href).pathname.replace(/^\/|\/$/g, ''), 'json').then(function (j) {
                 return Array.isArray(j) ? clean(j.filter(function (f) { return f.type === 'file'; }).map(function (f) { return f.name; })) : [];
             });
-        folderCache[key] = Promise.all([fromList, fromServer, fromRepo]).then(function (all) {
+        return Promise.all([fromServer, fromRepo]).then(function (all) {
             var seen = {}, names = [];
             all.forEach(function (list) { list.forEach(function (n) { if (!seen[n]) { seen[n] = 1; names.push(n); } }); });
             // a list can be out of date: keep only the files that are really there
@@ -1471,7 +1479,7 @@
                     .catch(function () { return { name: n, url: url }; });
             })).then(function (found) { return found.filter(Boolean); });
         });
-        return folderCache[key].then(cb);
+        }
     }
 
     // "2026-09-23-lighthouse_study.png" → date "2026-09-23", title "lighthouse study"
