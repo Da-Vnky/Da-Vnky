@@ -51,6 +51,33 @@ SHELVES = {
     # pictures for the walls: hidden (never on the easel or anywhere else), only for hanging in frames
     'walls': (os.path.join(ROOT, 'content', 'frames'), 'png jpg jpeg webp gif svg'),
 }
+# the books on the living space's shelf (the decoys around the one that opens the dungeon): each one's pages.
+# (the server doesn't take .pdf files, so a PDF is added as one picture per page: see shelves.html)
+BOOKS = 4
+for _n in range(1, BOOKS + 1):
+    SHELVES['book-%d' % _n] = (os.path.join(ROOT, 'content', 'books', 'book-%d' % _n), 'png jpg jpeg webp gif svg mp4 webm')
+
+
+def book_title(which):
+    p = os.path.join(SHELVES[which][0], 'title.txt')
+    try:
+        with open(p, encoding='utf-8') as f:
+            return f.read().strip()
+    except Exception:
+        return ''
+
+
+def set_book_title(which, text):
+    folder = SHELVES[which][0]
+    os.makedirs(folder, exist_ok=True)
+    text = (text or '').strip()[:80]
+    p = os.path.join(folder, 'title.txt')
+    if text:
+        with open(p, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(text + '\n')
+    elif os.path.exists(p):
+        os.remove(p)
+    write_list(folder)
 PICS = ('png', 'jpg', 'jpeg', 'webp', 'gif', 'svg')
 UPLOAD_LIMIT = 30 * 1024 * 1024
 
@@ -206,6 +233,47 @@ def sb_request(method, path, body=None, headers=None, conf=None):
         raise ValueError('Supabase: ' + str(e.code) + ' ' + detail)
     except urllib.error.URLError as e:
         raise ValueError('couldn\'t reach Supabase (' + str(e.reason) + '). if the project was paused for a quiet week, open supabase.com and restore it.')
+
+
+# ---------------- a ping on your phone when post arrives (ntfy.sh + a Supabase trigger) ----------------
+def notify_state():
+    c = load_json(inbox_path('notify.json'), {}) if os.path.isdir(INBOX) else {}
+    topic = c.get('topic') or ''
+    sql = ''
+    if topic:
+        with open(os.path.join(HERE, 'supabase-notify.sql'), encoding='utf-8') as f:
+            sql = f.read().replace('{{TOPIC}}', topic)
+        sql = ('-- DaV-nky: a notification on your phone when a visitor sends something.\n'
+               '-- your own topic is filled in below. run this once in Supabase\'s SQL Editor.\n'
+               '-- to switch it off later: drop trigger if exists dav_notify on public.post;\n\n') + sql[sql.find('create extension'):]
+    return {'topic': topic, 'sql': sql, 'tested': c.get('tested', 0)}
+
+
+def notify_setup(fresh=False):
+    import secrets
+    os.makedirs(INBOX, exist_ok=True)
+    c = load_json(inbox_path('notify.json'), {})
+    if fresh or not c.get('topic'):                          # long and random: anyone who knew the name could read it
+        c['topic'] = 'dav-nky-' + secrets.token_urlsafe(18).replace('_', 'x').replace('-', 'y').lower()
+        c['tested'] = 0
+    save_json(inbox_path('notify.json'), c)
+    return notify_state()
+
+
+def notify_test():
+    c = load_json(inbox_path('notify.json'), {})
+    if not c.get('topic'):
+        raise ValueError('set up notifications first')
+    body = json.dumps({'topic': c['topic'], 'title': 'DaV-nky: a test', 'message': 'if you can read this on your phone, notifications work.', 'tags': ['tada']}).encode('utf-8')
+    req = urllib.request.Request('https://ntfy.sh/', data=body, method='POST', headers={'Content-Type': 'application/json', 'User-Agent': 'DaV-nky content manager'})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            r.read()
+    except urllib.error.URLError as e:
+        raise ValueError('couldn\'t reach ntfy.sh (' + str(getattr(e, 'reason', e)) + ')')
+    c['tested'] = int(datetime.datetime.now().timestamp())
+    save_json(inbox_path('notify.json'), c)
+    return notify_state()
 
 
 def connect_supabase(url, secret):
@@ -554,8 +622,27 @@ def wall_ref(path, room):
     return rest if rest and '/' not in rest else path
 
 
+def frame_names(room):
+    """a frame with a name of its own (data-frame-name="the record"): shown beside its number in the manager"""
+    wall = WALLS.get(room)
+    try:
+        with open(os.path.join(ROOT, wall['page']), encoding='utf-8') as f:
+            text = f.read()
+    except Exception:
+        return {}
+    out = {}
+    home = os.path.splitext(wall['page'])[0]
+    for tag in re.findall(r'<div[^>]*\bgallery-frame\b[^>]*>', text):
+        n = re.search(r'data-frame="(\d+)"', tag)
+        w = re.search(r'data-wall="([a-z0-9-]+)"', tag)
+        nm = re.search(r'data-frame-name="([^"]{1,40})"', tag)
+        if n and nm and (w.group(1) if w else home) == room:
+            out[n.group(1)] = nm.group(1)
+    return out
+
+
 def walls_state():
-    return [{'id': k, 'label': w['label'], 'numbers': frame_numbers(k), 'frames': frames(k)} for k, w in WALLS.items()]
+    return [{'id': k, 'label': w['label'], 'numbers': frame_numbers(k), 'names': frame_names(k), 'frames': frames(k)} for k, w in WALLS.items()]
 
 
 def moved(old_path, new_path):
@@ -618,7 +705,7 @@ def shelf(which):
         if which == 'walls':
             item['hang'] = item['hangHere'] = 'content/frames/' + n
         out.append(item)
-    if which == 'music':
+    if which == 'music' or which.startswith('book-'):                # (a book's pages: in file-name order)
         return sorted(out, key=lambda i: i['name'].lower())
     return sorted(out, key=lambda i: (i['date'] or '0000', i['name']), reverse=True)
 
@@ -651,7 +738,10 @@ def shelf_add(which, name, raw, sleeve_for=None):
         final = stem + ext
     else:
         stem, ext = clean_name(name, kinds.split())
+        if which.startswith('book-'):                # a book's new page goes at the back: numbered, so the order holds
+            stem = '%03d-%s' % (len(shelf(which)) + 1, re.sub(r'^\d{3}-', '', stem))
         final = unique(folder, stem, ext)
+    os.makedirs(folder, exist_ok=True)
     with open(os.path.join(folder, final), 'wb') as f:
         f.write(raw)
     write_list(folder)
@@ -669,6 +759,30 @@ def shelf_caption(which, name, text):
             f.write(text + '\n')
     elif os.path.exists(cap):
         os.remove(cap)
+    write_list(folder)
+
+
+def book_move(which, name, by):
+    """move a page of a book up or down; every page is renumbered 001-, 002- … (its caption goes with it)"""
+    folder = SHELVES[which][0]
+    names = [i['name'] for i in shelf(which)]
+    if name not in names:
+        raise ValueError('that page isn\'t there')
+    i = names.index(name)
+    j = max(0, min(len(names) - 1, i + (1 if by > 0 else -1)))
+    names[i], names[j] = names[j], names[i]
+    moves = []
+    for k, n in enumerate(names):
+        stem, ext = os.path.splitext(n)
+        moves.append((stem, ext, '%03d-%s' % (k + 1, re.sub(r'^\d{3}-', '', stem))))
+    for stem, ext, new in moves:                      # (by way of temporary names, so none trips over another)
+        for e in (ext, '.txt'):
+            if os.path.exists(os.path.join(folder, stem + e)):
+                os.rename(os.path.join(folder, stem + e), os.path.join(folder, '__mv-' + new + e))
+    for stem, ext, new in moves:
+        for e in (ext, '.txt'):
+            if os.path.exists(os.path.join(folder, '__mv-' + new + e)):
+                os.rename(os.path.join(folder, '__mv-' + new + e), os.path.join(folder, new + e))
     write_list(folder)
 
 
@@ -738,6 +852,25 @@ def save_notes(d):
         json.dump(out, f, indent=2, ensure_ascii=False)
         f.write('\n')
     write_list(os.path.dirname(NOTES))
+    return out
+
+
+# ---------------- the paper on the dungeon floor: content/dungeon/paper.json ----------------
+PAPER = os.path.join(ROOT, 'content', 'dungeon', 'paper.json')
+
+
+def paper():
+    d = load_json(PAPER, {})
+    return {'title': str(d.get('title') or ''), 'text': str(d.get('text') or ''), 'sign': str(d.get('sign') or '')} if isinstance(d, dict) else {'title': '', 'text': '', 'sign': ''}
+
+
+def save_paper(d):
+    out = {'title': str(d.get('title') or '').strip()[:80], 'text': re.sub(r'\s+$', '', str(d.get('text') or ''))[:6000], 'sign': str(d.get('sign') or '').strip()[:80]}
+    os.makedirs(os.path.dirname(PAPER), exist_ok=True)
+    with open(PAPER, 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(out, f, indent=2, ensure_ascii=False)
+        f.write('\n')
+    write_list(os.path.dirname(PAPER))
     return out
 
 
@@ -1054,7 +1187,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 which = q.get('which', [''])[0]
                 if which not in SHELVES:
                     raise ValueError('which shelf?')
-                return self.reply({'items': shelf(which), 'frames': frames(), 'frameNumbers': frame_numbers(),
+                return self.reply({'items': shelf(which), 'title': book_title(which) if which.startswith('book-') else '', 'frames': frames(), 'frameNumbers': frame_numbers(),
                                    'workshopFrames': frames('workshop'), 'workshopFrameNumbers': frame_numbers('workshop'), 'walls': walls_state()})
             if url.path.startswith('/__post/inbox/'):
                 name = os.path.basename(url.path)
@@ -1070,6 +1203,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return
             if url.path == '/__assets/state':
                 return self.reply({'files': asset_files(), 'tracks': tracks(), 'noise': noise_extra(), 'found': found_slots()})
+            if url.path == '/__notify/state':
+                return self.reply(notify_state())
+            if url.path == '/__paper':
+                return self.reply(paper())
             if url.path == '/__notes':
                 return self.reply(dict(notes(), today=datetime.date.today().isoformat()))
             if url.path == '/__letters/read':
@@ -1126,6 +1263,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 d = json.loads(raw or b'{}')
                 connect_supabase(d.get('url'), d.get('secret'))
                 return self.reply({'ok': True})
+            if url.path == '/__notify/setup':
+                return self.reply(notify_setup(bool(json.loads(raw or b'{}').get('fresh'))))
+            if url.path == '/__notify/test':
+                return self.reply(notify_test())
             if url.path == '/__post/fetch':
                 return self.reply({'new': fetch_post()})
             if url.path == '/__post/link':
@@ -1156,6 +1297,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 name = urllib.parse.unquote(self.headers.get('X-Name', ''))
                 sleeve = urllib.parse.unquote(self.headers.get('X-Sleeve-For', '')) or None
                 return self.reply({'name': shelf_add(which, name, raw, sleeve)})
+            if url.path == '/__book/move':
+                d = json.loads(raw or b'{}')
+                if not str(d.get('which', '')).startswith('book-') or d.get('which') not in SHELVES:
+                    raise ValueError('which book?')
+                book_move(d['which'], d.get('name'), int(d.get('by') or 1))
+                return self.reply({'ok': True})
+            if url.path == '/__book/title':
+                d = json.loads(raw or b'{}')
+                if not str(d.get('which', '')).startswith('book-') or d.get('which') not in SHELVES:
+                    raise ValueError('which book?')
+                set_book_title(d['which'], d.get('text'))
+                return self.reply({'ok': True})
             if url.path == '/__shelf/caption':
                 d = json.loads(raw or b'{}')
                 if d.get('which') not in SHELVES:
@@ -1212,6 +1365,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 d = json.loads(raw or b'{}')
                 noise_label(d.get('name'), d.get('label'))
                 return self.reply({'ok': True})
+            if url.path == '/__paper/save':
+                return self.reply(save_paper(json.loads(raw or b'{}')))
             if url.path == '/__notes/save':
                 return self.reply(save_notes(json.loads(raw or b'{}')))
             if url.path == '/__letters/publish':

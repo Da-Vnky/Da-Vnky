@@ -381,6 +381,29 @@
         if (box.classList.contains('open') && !box.contains(e.target) && !deck.contains(e.target)) close();
     });
 
+    /* ---------------- records shot to pieces (sky/revolver.js): gone for the rest of the visit ---------------- */
+    function abs(u) { try { return new URL(u, location.href).href; } catch (e) { return u; } }
+    function wasShot(url) { try { return (JSON.parse(sessionStorage.getItem('records-shot') || '[]')).indexOf(abs(url)) !== -1; } catch (e) { return false; } }
+    // what's in the crate: not a record shot to bits this visit (sky/revolver.js), and not a hidden
+    // record you haven't found yet (sky/loot.js: the P(Doom) one's behind a picture in the hall of shame)
+    var allTracks = [];
+    function showing(t) { return !wasShot(t.url) && !(Sky.loot && Sky.loot.trackHidden(t.url, t.title)); }
+    Sky.records = {
+        reload: function () {
+            var on = M.current();
+            tracks = allTracks.filter(showing).map(function (t) { return on && abs(on.url) === abs(t.url) ? on : t; });
+            M.setTracks(tracks.slice());
+            drawSleeves(); drawNow();
+        },
+        forget: function (url) {
+            try { var l = JSON.parse(sessionStorage.getItem('records-shot') || '[]'); if (l.indexOf(abs(url)) === -1) l.push(abs(url)); sessionStorage.setItem('records-shot', JSON.stringify(l)); } catch (e) {}
+            tracks = tracks.filter(function (t) { return abs(t.url) !== abs(url); });
+            M.setTracks(tracks.slice());
+            drawSleeves(); drawNow();
+        },
+        deck: deck
+    };
+
     /* ---------------- fill the crate from the folder ---------------- */
     drawNow();
     Sky.listFolder(deck.dataset.folder, AUDIO.concat(PICS), function (files) {
@@ -398,6 +421,8 @@
                 color: LABELS[Sky.hashStr(f.name) % LABELS.length]
             };
         });
+        allTracks = tracks.slice();
+        tracks = tracks.filter(showing);
         M.setTracks(tracks.slice());
         // the song that was already on (from another page) is the same record: use this crate's copy
         var on = M.current();

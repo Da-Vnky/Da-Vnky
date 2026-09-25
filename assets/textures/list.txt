@@ -1,0 +1,4 @@
+# written by tools/update-lists.sh: every art file in this folder.
+# no need to edit it; it's rewritten each commit.
+dungeonletter-1.webp
+letter-1.webp

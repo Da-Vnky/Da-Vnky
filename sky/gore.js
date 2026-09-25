@@ -2,6 +2,7 @@
    gore.js — the traveller's misfortunes, shared by every scene:
      Sky.gore.splat(el, x, y, done)   a fall from too high: blood, giblets, a splat
      Sky.gore.zap(el, done)           electrocuted: sparks, an x-ray flicker, a skeleton
+     Sky.gore.shot(el, done)          the revolver: a bang, they topple over, a pool of blood
      Sky.gore.respawn(el)             back again, with a -1 heart floating up
    (x, y = where they hit, on screen). Load after sky/sky.js and sky/panel.js.
 
@@ -195,6 +196,90 @@
         }, 1600);
     }
 
+    /* ---------------- the revolver (sky/revolver.js) ----------------
+       the gun comes up to their head, a bang and a flash, a spray of blood
+       out the other side, and they topple over; then a pool, then gone. */
+    var GUN = '<svg viewBox="0 0 100 60" aria-hidden="true"><path d="M8 14 H70 V26 H8 Z" fill="#4a4f57"/><rect x="4" y="15" width="6" height="10" fill="#2f3339"/>' +
+        '<rect x="46" y="12" width="26" height="22" rx="5" fill="#5b616a"/><path d="M66 30 L86 30 L94 56 L76 58 Z" fill="#6e4a30"/><path d="M58 32 Q60 44 70 42" fill="none" stroke="#2f3339" stroke-width="3"/></svg>';
+    var POOL = '<svg viewBox="0 0 200 40" aria-hidden="true"><path fill="#7e0d10" d="M14 22 C4 12 40 6 70 10 C100 2 150 6 176 14 C198 20 192 32 160 32 C130 40 60 38 36 32 C16 30 6 28 14 22 Z"/>' +
+        '<path fill="#a3171c" opacity=".55" d="M50 18 C70 12 110 12 130 18 C110 24 70 24 50 18 Z"/></svg>';
+    var gunArt = GUN;
+    Sky.findAsset('assets/city/revolver', function (url) { if (url) gunArt = '<img alt="" src="' + url + '">'; });
+    Sky.css(
+        '.gore-gun { position: absolute; pointer-events: none; z-index: 9; transform-origin: 90% 80%; transition: transform .35s cubic-bezier(.3,1.4,.5,1), opacity .3s; }' +
+        '.gore-gun > svg, .gore-gun > img { display: block; width: 100%; height: auto; }' +
+        '.gore-shot { transition: transform .7s cubic-bezier(.6,0,.9,.6) !important; }' +
+        '.gore-muzzle { position: absolute; z-index: 9; pointer-events: none; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%;' +
+            'background: radial-gradient(circle, #fff 0 15%, #ffe27a 30%, rgba(255,150,40,.6) 50%, transparent 70%); animation: gore-muzzle .18s ease-out forwards; }' +
+        '@keyframes gore-muzzle { from { transform: scale(.4); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }' +
+        '.gore-pool { position: absolute; z-index: 1; pointer-events: none; transform: translate(-50%, -50%) scaleX(.2); transform-origin: 50% 50%; transition: transform 2.2s ease-out, opacity 1.4s; }' +
+        '.gore-pool.spread { transform: translate(-50%, -50%) scaleX(1); }' +
+        '.gore-pool > svg, .gore-pool > img { display: block; width: 100%; height: auto; }'
+    );
+    function shot(el, done) {
+        var r = el.getBoundingClientRect(), h = r.height || 80, w = r.width || h * 0.5;
+        var faceLeft = el.classList.contains('face-left'), dir = faceLeft ? -1 : 1;
+        el.classList.remove('talking', 'walking');
+        // the gun, to the side of the head
+        var g = document.createElement('div');
+        g.className = 'gore-gun';
+        g.innerHTML = gunArt;
+        var gw = Math.max(26, w * 0.55), hx = r.left + w / 2 + (faceLeft ? w * 0.34 : -w * 0.34), hy = r.top + h * 0.28;
+        g.style.width = gw + 'px';
+        g.style.left = (hx - (faceLeft ? 0 : gw)) + 'px'; g.style.top = (hy - gw * 0.3) + 'px';
+        g.style.transform = 'scaleX(' + (faceLeft ? 1 : -1) + ') translateY(' + (h * 0.5) + 'px) rotate(30deg)';
+        g.style.opacity = '0';
+        layer.appendChild(g);
+        requestAnimationFrame(function () { g.style.opacity = '1'; g.style.transform = 'scaleX(' + (faceLeft ? 1 : -1) + ')'; });
+        setTimeout(function () {
+            sfx('bang');
+            flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
+            setTimeout(function () { flash.classList.remove('on'); }, 150);
+            var m = document.createElement('div'); m.className = 'gore-muzzle'; m.style.left = hx + 'px'; m.style.top = hy + 'px'; layer.appendChild(m);
+            setTimeout(function () { m.remove(); }, 300);
+            // out the other side
+            for (var i = 0; i < 26; i++) {
+                var d = document.createElement('div'), sz = 2.5 + Math.random() * 6;
+                d.className = 'gore-bit drop';
+                d.style.width = sz + 'px'; d.style.height = sz * 1.2 + 'px';
+                layer.appendChild(d);
+                var a = (Math.random() - 0.7) * 1.1, sp = 160 + Math.random() * 420;
+                fling({ el: d, x: r.left + w / 2 + dir * w * 0.3, y: hy, vx: Math.cos(a) * sp * dir, vy: Math.sin(a) * sp, r: 0, vr: 0,
+                        floor: r.bottom + (Math.random() - .5) * 8, drop: true, bounce: 0 });
+            }
+            g.style.transition = 'transform .5s ease-in, opacity .5s';
+            g.style.transform = 'scaleX(' + (faceLeft ? 1 : -1) + ') translate(' + (-10) + 'px,' + h * 0.8 + 'px) rotate(-80deg)';
+            g.style.opacity = '0';
+            setTimeout(function () { g.remove(); }, 600);
+            // they topple
+            var inner = el.querySelector(':scope > .art, :scope > .placeholder, :scope > .pose') || el;
+            el.style.transformOrigin = '50% 100%';
+            inner.style.transformOrigin = (faceLeft ? '30%' : '70%') + ' 100%';
+            inner.classList.add('gore-shot');
+            inner.style.transform = 'rotate(' + (faceLeft ? -84 : 84) + 'deg)';
+            setTimeout(function () {
+                sfx('land', { size: 0.6 });
+                var host = el.offsetParent || document.body, hr = host.getBoundingClientRect();
+                var p = document.createElement('div');
+                p.className = 'gore-pool';
+                p.style.width = (h * 0.9) + 'px';
+                p.style.left = (r.left - hr.left + w / 2 + dir * h * 0.35) + 'px';
+                p.style.top = (r.bottom - hr.top - 3) + 'px';
+                p.innerHTML = POOL;
+                host.appendChild(p);
+                requestAnimationFrame(function () { p.classList.add('spread'); });
+                setTimeout(function () {
+                    el.classList.add('gore-hidden');
+                    inner.classList.remove('gore-shot');
+                    inner.style.transform = ''; inner.style.transformOrigin = '';
+                    p.style.opacity = '0';
+                    setTimeout(function () { p.remove(); }, 1500);
+                    if (done) done();
+                }, 2300);
+            }, 700);
+        }, 650);
+    }
+
     /* ---------------- respawn ---------------- */
     function respawn(el) {
         el.classList.remove('gore-hidden', 'gore-back');
@@ -215,5 +300,5 @@
         try { var n = +(localStorage.getItem('lives-lost') || 0) + 1; localStorage.setItem('lives-lost', n); } catch (e) {}
     }
 
-    Sky.gore = { splat: splat, zap: zap, respawn: respawn, scream: function () { sfx('scream'); } };
+    Sky.gore = { splat: splat, zap: zap, shot: shot, respawn: respawn, scream: function () { sfx('scream'); } };
 })();

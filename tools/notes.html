@@ -57,7 +57,7 @@
     <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html">your things</a><a href="post.html">visitors</a><a href="notes.html" class="on">notes</a><a href="assets.html">assets</a></nav>
     <h1>notes</h1>
     <button type="button" class="btn publish">publish to the live site</button>
-    <p class="status">the clipboard on the workshop wall. changes save by themselves; publish to put them up.</p>
+    <p class="status">the clipboard on the workshop wall, and the paper in the dungeon. changes save by themselves; publish to put them up.</p>
 </header>
 <main>
     <section class="sheet">
@@ -71,6 +71,13 @@
         <p class="sub">anything else: thoughts, reminders, things to try. newest at the top.</p>
         <ul class="notes"></ul>
         <button type="button" class="add add-note">+ a note</button>
+    </section>
+    <section class="sheet paper-sheet">
+        <h2>the paper in the dungeon</h2>
+        <p class="sub">the sheet lying on the dungeon floor, by the pentagram (under the living space: pull the loose book). visitors can pick it up and read it.</p>
+        <input class="title-in paper-title" aria-label="the paper's heading" maxlength="80" placeholder="a heading (optional)">
+        <textarea class="paper-text" rows="10" maxlength="6000" placeholder="what it says…" style="width:100%;border:1px dashed rgba(110,82,54,.45);background:rgba(255,255,255,.25);color:var(--ink);padding:10px;line-height:1.5;resize:vertical"></textarea>
+        <input class="paper-sign" aria-label="signed" maxlength="80" placeholder="signed (optional)" style="width:100%;margin-top:8px;border:0;border-bottom:1px dashed rgba(110,82,54,.5);background:none;color:var(--ink);font-style:italic;padding:3px 0">
     </section>
 </main>
 
@@ -169,6 +176,24 @@
     $('.add-note').addEventListener('click', function () { data.notes.unshift({ text: '', date: today }); drawNotes(0); });
     $('.publish').addEventListener('click', function () {
         api('/__letters/publish', {}).then(function (r) { say(r.error || 'publishing: a small window shows it going up and closes by itself when it\u2019s done. the live site updates a minute or two later.', !!r.error); });
+    });
+
+    // the dungeon's paper: its own file (content/dungeon/paper.json)
+    var paper = { title: '', text: '', sign: '' }, paperReady = false, paperTimer = null;
+    function paperChanged() {
+        if (!paperReady) return;
+        say('saving…');
+        clearTimeout(paperTimer);
+        paperTimer = setTimeout(function () {
+            api('/__paper/save', paper).then(function (r) { say(r.error || 'saved. publish when you’re ready and the paper in the dungeon says it.', !!r.error); });
+        }, 600);
+    }
+    ['title', 'text', 'sign'].forEach(function (k) { $('.paper-' + k).addEventListener('input', function () { paper[k] = this.value; paperChanged(); }); });
+    api('/__paper').then(function (r) {
+        if (r.error) return;
+        paper = { title: r.title || '', text: r.text || '', sign: r.sign || '' };
+        $('.paper-title').value = paper.title; $('.paper-text').value = paper.text; $('.paper-sign').value = paper.sign;
+        paperReady = true;
     });
 
     api('/__notes').then(function (r) {

@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>the city · DaV-nky</title>
+    <title>the rooftop · DaV-nky</title>
+    <!-- the loading screen: fetches the whole site once per visit (sky/loader.js, sw.js) -->
+    <script src="sky/loader.js?v=20260925e"></script>
     <link rel="canonical" href="https://dav-nky.pleroma.nexus/city.html">
-    <meta property="og:title" content="the city · DaV-nky">
+    <meta property="og:title" content="the rooftop · DaV-nky">
     <meta property="og:url" content="https://dav-nky.pleroma.nexus/city.html">
     <meta property="og:site_name" content="DaV-nky.pleroma.nexus">
 
@@ -13,11 +15,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260924r">
+    <link rel="stylesheet" href="sky/sky.css?v=20260925e">
     <style>
         /* feet on the rooftop: 45% of the way up the roof strip (20vh tall, 17vh on phones) */
         .city-char { position: fixed; z-index: 3; right: 16vw; bottom: calc(max(20vh, 130px) * .45 - 2px); height: 17vh; min-height: 90px; }
         @media (max-width: 620px) { .city-char { bottom: calc(max(17vh, 110px) * .45 - 2px); height: 14vh; min-height: 70px; } }
+        /* the revolver, lying on the roof (sky/revolver.js). your own: assets/city/revolver */
+        .revolver-pickup { position: fixed; z-index: 3; left: 58vw; bottom: calc(max(20vh, 130px) * .45 - 1px); width: 3.6vw; min-width: 44px; aspect-ratio: 100 / 60; transition: opacity .4s; }
+        @media (max-width: 620px) { .revolver-pickup { left: 22vw; bottom: calc(max(17vh, 110px) * .45 - 1px); width: 10vw; min-width: 0; } }
+        body.peep-view .revolver-pickup, body.peep-close .revolver-pickup, body.sky-view .revolver-pickup, body.leaving .revolver-pickup { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body data-place="city">
@@ -41,18 +47,28 @@
         <span>telescope</span>
     </button>
 
+    <!-- a revolver someone left on the roof: it goes in your bag (sky/inventory.js, sky/revolver.js) -->
+    <div class="pickup revolver-pickup" data-item="revolver" data-asset="assets/city/revolver"></div>
+
     <!-- the traveller, stargazing. your own: assets/characters/city.(gif|png|webp|svg) -->
     <!-- they stand on the rooftop (sky/ground-city.js draws it; your own: assets/city/foreground) -->
     <div class="character scene-character city-char" data-asset="assets/characters/city" data-say="clear skies tonight"
          aria-label="the traveller"></div>
 
 
-    <script src="sky/sky.js?v=20260924r"></script>
-    <script src="sky/ground-city.js?v=20260924r"></script>
-    <script src="sky/peeper.js?v=20260924r"></script>
-    <script src="sky/panel.js?v=20260924r"></script>
-    <script src="sky/music.js?v=20260924r"></script>
-    <script src="sky/weather.js?v=20260924r"></script>
-    <script src="sky/noise.js?v=20260924r"></script>
+    <script src="sky/sky.js?v=20260925e"></script>
+    <script src="sky/ground-city.js?v=20260925e"></script>
+    <script src="sky/peeper.js?v=20260925e"></script>
+    <script src="sky/panel.js?v=20260925e"></script>
+    <script src="sky/music.js?v=20260925e"></script>
+    <script src="sky/weather.js?v=20260925e"></script>
+    <script src="sky/noise.js?v=20260925e"></script>
+    <script src="sky/gore.js?v=20260925e"></script>
+    <script src="sky/inventory.js?v=20260925e"></script>
+    <script src="sky/loot.js?v=20260925e"></script>
+    <script src="sky/marker.js?v=20260925e"></script>
+    <script src="sky/revolver.js?v=20260925e"></script>
+    <script src="sky/claubes.js?v=20260925e"></script>
+    <script src="sky/textures.js?v=20260925e"></script>
 </body>
 </html>

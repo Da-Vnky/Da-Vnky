@@ -91,6 +91,12 @@
     <p class="sub">the lit windows you find with the telescope (content/city/): one file = one window. landscape pictures (about 4:3) fit best.</p>
     <div class="grid" data-shelf="city"></div>
 
+    <h2>the books on the living space's shelf</h2>
+    <p class="sub">the four books around the one that opens the dungeon. give one pages and visitors can open it and flip through them; a book with no pages is just a book.
+       pages are pictures or short videos, in the order shown (↑ ↓ to move one). a <b>PDF</b> goes in as one picture per page (the site's server doesn't take .pdf files themselves).
+       each page can have a caption; the book's title shows when you point at it. (content/books/book-1 … book-4)</p>
+    <div class="books"></div>
+
     <h2>records</h2>
     <p class="sub">the record player's songs and sleeves have moved to <a href="assets.html" onclick="try{sessionStorage.setItem('assets-tab','records')}catch(e){}">assets &rarr; record player</a>: add songs (numbered for you), put them in order, and fetch sleeves from Spotify.</p>
     <input type="file" class="file-in" multiple hidden>
@@ -101,6 +107,8 @@
     var $ = function (s) { return document.querySelector(s); };
     var statusEl = $('.status'), fileIn = $('.file-in');
     var ACCEPT = { walls: 'image/*', easel: 'image/*,video/mp4,video/webm', city: 'image/*,video/mp4,video/webm,.html', music: 'audio/mpeg,audio/ogg,.mp3,.ogg' };
+    var BOOKS = ['book-1', 'book-2', 'book-3', 'book-4'];
+    BOOKS.forEach(function (b) { ACCEPT[b] = 'image/*,video/mp4,video/webm,application/pdf,.pdf'; });
     function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
     var OLD = { error: 'the content manager window that\u2019s open is an older version. close its black window, then double-click tools\\content.bat again' };
     function api(path, body) {
@@ -153,7 +161,7 @@
             row.className = 'acts hang';
             row.innerHTML = '<span class="hl">' + w.label + ':</span>';
             w.numbers.forEach(function (n) {
-                var b = button(String(n), function () {
+                var b = button(w.names && w.names[n] ? n + ' · ' + w.names[n] : String(n), function () {
                     var to = inFrame === String(n) ? '' : n;
                     api('/__post/hang', { path: path, frame: to, room: w.id }).then(function (x) {
                         if (x.error) say(x.error, true); else { say(to ? 'hung in frame ' + to + ' in the ' + w.label + '. publish to show everyone.' : 'taken down from its frame.'); loadAll(); }
@@ -191,6 +199,10 @@
                     });
                 }));
             } else {
+                if (/^book-/.test(which)) {
+                    acts.appendChild(button('\u2191', function () { api('/__book/move', { which: which, name: it.name, by: -1 }).then(function (x) { if (x.error) say(x.error, true); else load(which); }); }));
+                    acts.appendChild(button('\u2193', function () { api('/__book/move', { which: which, name: it.name, by: 1 }).then(function (x) { if (x.error) say(x.error, true); else load(which); }); }));
+                }
                 if (which === 'easel' || which === 'walls') acts.appendChild(button(which === 'easel' ? 'move to the walls pool' : 'put on the easel', function () {
                     api('/__shelf/move', { name: it.name, from: which, to: which === 'easel' ? 'walls' : 'easel' }).then(function (x) {
                         if (x.error) say(x.error, true); else { say(which === 'easel' ? 'moved ' + it.name + ' to the walls pool: off the easel, still in its frames.' : 'put ' + it.name + ' back on the easel.'); loadAll(); }
@@ -209,12 +221,76 @@
             c.appendChild(acts);
             grid.appendChild(c);
         });
-        if (!r.items.length) grid.innerHTML = '<p class="empty">nothing here yet.</p>';
+        if (!r.items.length) grid.innerHTML = '<p class="empty">' + (/^book-/.test(which) ? 'no pages: just a book.' : 'nothing here yet.') + '</p>';
+        var ti = document.querySelector('.book-title[data-book="' + which + '"]');
+        if (ti && document.activeElement !== ti) ti.value = r.title || '';
     }
     function load(which) {
         return api('/__shelf/list?which=' + which).then(function (r) { if (r.error) { say(r.error, true); return; } draw(which, r); });
     }
-    function loadAll() { return Promise.all(['easel', 'walls', 'city'].map(load)); }
+    function loadAll() { return Promise.all(['easel', 'walls', 'city'].concat(BOOKS).map(load)); }
+
+    /* ---------------- the books: a block each ---------------- */
+    var booksEl = $('.books');
+    BOOKS.forEach(function (b, i) {
+        var d = document.createElement('div');
+        d.innerHTML = '<h3 style="margin:18px 0 6px;font:normal 1.15rem \'IM Fell English SC\', Georgia, serif">book ' + (i + 1) +
+            ' <button type="button" class="btn main add" data-add="' + b + '">+ pages</button></h3>' +
+            '<p class="sub" style="margin:0 0 8px"><input class="book-title" data-book="' + b + '" maxlength="80" placeholder="its title (optional)" ' +
+            'style="width:min(360px,100%);padding:5px 9px;border-radius:8px;border:1px solid rgba(243,230,194,.35);background:rgba(0,0,0,.2);color:#f3e6c2;font:inherit"></p>' +
+            '<div class="grid" data-shelf="' + b + '"></div>';
+        booksEl.appendChild(d);
+        var t = d.querySelector('.book-title'), timer = 0;
+        t.addEventListener('input', function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () { api('/__book/title', { which: b, text: t.value }).then(function (x) { say(x.error || 'title saved. publish when you\u2019re ready.', !!x.error); }); }, 600);
+        });
+    });
+
+    /* ---------------- a PDF, turned into one picture per page (pdf.js, loaded the first time you need it) ---------------- */
+    var pdfjs = null;
+    function loadPdfJs() {
+        if (pdfjs) return pdfjs;
+        pdfjs = new Promise(function (ok, no) {
+            var sc = document.createElement('script');
+            sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+            sc.onload = function () {
+                var lib = window['pdfjs-dist/build/pdf'] || window.pdfjsLib;
+                if (!lib) return no(new Error('pdf.js didn\u2019t load'));
+                lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                ok(lib);
+            };
+            sc.onerror = function () { pdfjs = null; no(new Error('couldn\u2019t load the PDF reader (are you online?)')); };
+            document.head.appendChild(sc);
+        });
+        return pdfjs;
+    }
+    function pdfPages(file, which) {
+        var base = file.name.replace(/\.pdf$/i, '');
+        return loadPdfJs().then(function (lib) {
+            return file.arrayBuffer().then(function (buf) { return lib.getDocument({ data: buf }).promise; });
+        }).then(function (pdf) {
+            var n = 0, added = [];
+            function next() {
+                if (++n > pdf.numPages) return Promise.resolve(added);
+                say('turning ' + file.name + ' into pictures: page ' + n + ' of ' + pdf.numPages + '…');
+                return pdf.getPage(n).then(function (page) {
+                    var v0 = page.getViewport({ scale: 1 }), scale = Math.min(3, 1600 / Math.max(v0.width, v0.height)), v = page.getViewport({ scale: scale });
+                    var cv = document.createElement('canvas');
+                    cv.width = Math.round(v.width); cv.height = Math.round(v.height);
+                    var g = cv.getContext('2d');
+                    g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
+                    return page.render({ canvasContext: g, viewport: v }).promise.then(function () {
+                        return new Promise(function (ok) { cv.toBlob(ok, 'image/jpeg', 0.88); });
+                    });
+                }).then(function (blob) {
+                    var f = new File([blob], base + '-p' + ('00' + n).slice(-3) + '.jpg', { type: 'image/jpeg' });
+                    return upload(which, f).then(function (x) { if (x.error) throw new Error(x.error); added.push(x.name); });
+                }).then(next);
+            }
+            return next();
+        });
+    }
 
     var picked = null;
     function pick(accept, multiple, fn) { fileIn.accept = accept; fileIn.multiple = multiple; picked = fn; fileIn.click(); }
@@ -230,6 +306,10 @@
                 say('adding ' + files.length + (files.length === 1 ? ' file…' : ' files…'));
                 var added = [], errs = [];
                 files.reduce(function (p, f) {
+                    if (/\.pdf$/i.test(f.name)) {
+                        if (!/^book-/.test(which)) { errs.push(f.name + ': PDFs only go in the books'); return p; }
+                        return p.then(function () { return pdfPages(f, which).then(function (names) { added.push(f.name + ' (' + names.length + ' pages)'); }, function (e) { errs.push(f.name + ': ' + e.message); }); });
+                    }
                     return p.then(function () { return upload(which, f).then(function (x) { if (x.error) errs.push(f.name + ': ' + x.error); else added.push(x.name); }); });
                 }, Promise.resolve()).then(function () {
                     say((added.length ? 'added ' + added.join(', ') + '. publish when you\u2019re ready.' : '') + (errs.length ? ' ' + errs.join('; ') : ''), errs.length && !added.length);

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>the workshop · DaV-nky</title>
+    <!-- the loading screen: fetches the whole site once per visit (sky/loader.js, sw.js) -->
+    <script src="sky/loader.js?v=20260925e"></script>
     <link rel="canonical" href="https://dav-nky.pleroma.nexus/workshop.html">
     <meta property="og:title" content="the workshop · DaV-nky">
     <meta property="og:url" content="https://dav-nky.pleroma.nexus/workshop.html">
@@ -13,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260924r">
+    <link rel="stylesheet" href="sky/sky.css?v=20260925e">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -33,6 +35,8 @@
         .paint-easel { left: 55%; bottom: 1vh; height: 42vh; aspect-ratio: 62 / 100; z-index: 3; filter: drop-shadow(0 6px 8px rgba(0,0,0,.4)); }
         .pomodoro    { left: 71.5%; bottom: calc(30vh * .818 - 4px); width: 3.8vw; min-width: 44px; }
         .notes-board { left: 83.5%; top: 49%; width: 9.5%; }
+        /* the marker: on the floor, just right of your easel (it follows the easel's size) */
+        .marker-pickup { left: calc(13% + 56vh * .62 + 12px); bottom: 1.2vh; width: 3.6vw; min-width: 40px; aspect-ratio: 100 / 30; z-index: 3; transform: rotate(-6deg); }
 
         .pinned {
             left: 8%;
@@ -79,6 +83,7 @@
             .room .model-shelf { display: none; }
             .pomodoro { left: 70%; bottom: calc(24vh * .818 - 4px); width: 8vw; min-width: 0; }
             .notes-board { left: 79%; top: 13%; width: 17%; }
+            .marker-pickup { left: calc(8% + 38vh * .62 + 8px); bottom: 1.2vh; width: 9vw; min-width: 0; }
         }
     </style>
 </head>
@@ -251,24 +256,35 @@
         <div class="furnish groove manikin" data-groove="manikin" data-asset="assets/workshop/manikin"></div>
         <div class="furnish groove metronome" data-groove="metronome" data-asset="assets/workshop/metronome"></div>
 
+        <!-- a permanent marker lying on the floor by your easel: pick it up and draw on anything, anywhere (sky/marker.js).
+             your own: assets/workshop/marker -->
+        <div class="furnish pickup marker-pickup" data-item="marker" data-asset="assets/workshop/marker"></div>
+
         <!-- the traveller, at the bench. your own: assets/characters/workshop.(gif|png|webp|svg) -->
         <div class="furnish character scene-character" data-asset="assets/characters/workshop"
              data-say="mind the sawdust" aria-label="the traveller"
              style="left: 36%; bottom: 3vh; height: 27vh;"></div>
     </div>
 
-    <script src="sky/sky.js?v=20260924r"></script>
-    <script src="sky/ground-countryside.js?v=20260924r"></script>
-    <script src="sky/gallery.js?v=20260924r"></script>
-    <script src="sky/frames.js?v=20260924r"></script>
-    <script src="sky/models.js?v=20260924r"></script>
-    <script src="sky/timer.js?v=20260924r"></script>
-    <script src="sky/notes.js?v=20260924r"></script>
-    <script src="sky/paint.js?v=20260924r"></script>
-    <script src="sky/studio.js?v=20260924r"></script>
-    <script src="sky/panel.js?v=20260924r"></script>
-    <script src="sky/music.js?v=20260924r"></script>
-    <script src="sky/weather.js?v=20260924r"></script>
-    <script src="sky/noise.js?v=20260924r"></script>
+    <script src="sky/sky.js?v=20260925e"></script>
+    <script src="sky/ground-countryside.js?v=20260925e"></script>
+    <script src="sky/gallery.js?v=20260925e"></script>
+    <script src="sky/frames.js?v=20260925e"></script>
+    <script src="sky/models.js?v=20260925e"></script>
+    <script src="sky/timer.js?v=20260925e"></script>
+    <script src="sky/notes.js?v=20260925e"></script>
+    <script src="sky/paint.js?v=20260925e"></script>
+    <script src="sky/studio.js?v=20260925e"></script>
+    <script src="sky/panel.js?v=20260925e"></script>
+    <script src="sky/music.js?v=20260925e"></script>
+    <script src="sky/weather.js?v=20260925e"></script>
+    <script src="sky/noise.js?v=20260925e"></script>
+    <script src="sky/gore.js?v=20260925e"></script>
+    <script src="sky/inventory.js?v=20260925e"></script>
+    <script src="sky/loot.js?v=20260925e"></script>
+    <script src="sky/marker.js?v=20260925e"></script>
+    <script src="sky/revolver.js?v=20260925e"></script>
+    <script src="sky/claubes.js?v=20260925e"></script>
+    <script src="sky/textures.js?v=20260925e"></script>
 </body>
 </html>

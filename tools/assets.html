@@ -195,7 +195,7 @@
     function accept(kind) { return (CAT.kinds[kind] || CAT.kinds.image).map(function (e) { return '.' + e; }).join(','); }
     // which tab a slot found on the site (but not in tools/slots.json) belongs in
     var HOME = { sky: 'everywhere', ui: 'everywhere', fonts: 'everywhere', sea: 'sea', workshop: 'workshop', countryside: 'workshop',
-                 city: 'city', living: 'living', characters: 'characters', sounds: 'sounds' };
+                 city: 'city', living: 'living', characters: 'characters', sounds: 'sounds', items: 'loot', textures: 'everywhere' };
     var SCENES = [];
     function buildScenes() {
         var known = {};
@@ -206,7 +206,7 @@
         var extra = {};
         (STATE.found || []).forEach(function (f) {
             if (known[f.slot]) return;
-            var p = parts(f.slot), id = p.folder === 'living' && /^bath-/.test(p.stem) ? 'bathroom' : HOME[p.folder] || ('folder-' + p.folder);
+            var p = parts(f.slot), id = p.folder === 'living' && /^bath-/.test(p.stem) ? 'bathroom' : p.folder === 'living' && /^(dungeon-|candle)/.test(p.stem) ? 'dungeon' : HOME[p.folder] || ('folder-' + p.folder);
             var kind = p.folder === 'sounds' ? 'sound' : p.folder === 'fonts' ? 'font' : /^model-\d+$/.test(p.stem) ? 'model' : 'image';
             (extra[id] = extra[id] || { folder: p.folder, slots: [] }).slots.push({ slot: f.slot, what: 'used in ' + f.where.join(', ') + ' (not described yet)', kind: kind, found: true });
         });

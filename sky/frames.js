@@ -35,7 +35,7 @@
     // own art folder (the living space: visitors' art; the workshop: your paintings); a path works anywhere
     var ROOM = document.body.dataset.place || 'living';
     // each wall: its list, and the folder a name alone is from
-    var FOLDER = { living: 'content/workshop/visitors/', shame: 'content/workshop/visitors/', workshop: 'content/workshop/' };
+    var FOLDER = { living: 'content/workshop/visitors/', shame: 'content/workshop/visitors/', workshop: 'content/workshop/', claude: 'content/claude/' };
     function wallOf(f) { return f.dataset.wall || ROOM; }
     function listOf(wall) {
         var f = frames.filter(function (x) { return wallOf(x) === wall && x.dataset.list; })[0];
@@ -67,6 +67,28 @@
         '.gallery-frame[data-look=dark] { --frame: #1c140e; --mat: #e9dbb8; }' +
         '.gallery-frame[data-look=white] { --frame: #f4efe4; --mat: #faf6ec; }' +
         '.gallery-frame[data-look=plain] { --frame: #2a1d14; --frame-w: 3%; --mat-w: 0%; }' +
+        // lux: the grandest frame there is. thick carved gold, bead mouldings, rosettes at the corners,
+        // a crest on top, crimson velvet round the picture, and it gleams
+        '.gallery-frame[data-look=lux] { --frame: linear-gradient(135deg, #6e4a10, #f7dc8a 14%, #b8862e 28%, #fff2c0 42%, #a8761e 56%, #f0cf7a 72%, #8a5a14 86%, #e6bd62);' +
+            '--frame-w: 14%; --mat: radial-gradient(ellipse at 50% 40%, #8e1424, #4a0612 75%); --mat-w: 8%; filter: drop-shadow(0 10px 14px rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(255,200,90,.28)); }' +
+        '.gallery-frame[data-look=lux] .gf-border { box-shadow: inset 0 0 0 2px #fff3c0, inset 0 0 0 4px #7a5212, inset 0 0 0 6px #f0cf7a, inset 0 0 0 8px #6e4a10,' +
+            'inset 0 0 18px rgba(80,40,0,.55), 0 0 0 2px #5a3a0c, 0 0 0 4px #e6bd62; }' +
+        '.gallery-frame[data-look=lux] .gf-border::before { content: ""; position: absolute; inset: 0; pointer-events: none;' +
+            'background: radial-gradient(circle at 7% 7%, #fff6d0 0 2.2%, #c9962e 2.8% 5.2%, #6e4a10 5.8% 6.4%, transparent 7%),' +
+            'radial-gradient(circle at 93% 7%, #fff6d0 0 2.2%, #c9962e 2.8% 5.2%, #6e4a10 5.8% 6.4%, transparent 7%),' +
+            'radial-gradient(circle at 7% 93%, #fff6d0 0 2.2%, #c9962e 2.8% 5.2%, #6e4a10 5.8% 6.4%, transparent 7%),' +
+            'radial-gradient(circle at 93% 93%, #fff6d0 0 2.2%, #c9962e 2.8% 5.2%, #6e4a10 5.8% 6.4%, transparent 7%),' +
+            'repeating-linear-gradient(90deg, transparent 0 5px, rgba(110,74,16,.35) 5px 6px) 0 0 / 100% 3.5% no-repeat,' +
+            'repeating-linear-gradient(90deg, transparent 0 5px, rgba(110,74,16,.35) 5px 6px) 0 100% / 100% 3.5% no-repeat; }' +
+        '.gallery-frame[data-look=lux] .gf-mat { box-shadow: inset 0 0 0 2px #d8b060, inset 0 0 14px rgba(0,0,0,.6); }' +
+        '.gallery-frame[data-look=lux]::before { content: ""; position: absolute; left: 50%; bottom: 98%; width: 34%; aspect-ratio: 2 / 1; transform: translateX(-50%); pointer-events: none;' +
+            'background: radial-gradient(circle at 50% 70%, #fff2c0 0 12%, #d8a640 14% 26%, transparent 28%),' +
+            'radial-gradient(ellipse at 22% 88%, #e6bd62 0 18%, transparent 20%), radial-gradient(ellipse at 78% 88%, #e6bd62 0 18%, transparent 20%),' +
+            'linear-gradient(135deg, #8a5a14, #f7dc8a 45%, #b8862e); clip-path: polygon(0 100%, 12% 55%, 30% 70%, 50% 0, 70% 70%, 88% 55%, 100% 100%); }' +
+        '.gallery-frame[data-look=lux]::after { content: ""; position: absolute; inset: -6%; pointer-events: none; border-radius: 8%;' +
+            'background: linear-gradient(115deg, transparent 38%, rgba(255,246,210,.35) 46%, transparent 54%) -120% 0 / 250% 100% no-repeat; animation: lux-gleam 7s ease-in-out infinite; mix-blend-mode: screen; }' +
+        '@keyframes lux-gleam { 0%, 70% { background-position: -120% 0; } 100% { background-position: 220% 0; } }' +
+        '@media (prefers-reduced-motion: reduce) { .gallery-frame[data-look=lux]::after { animation: none; } }' +
         '.gallery-frame .gf-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font-style: italic;' +
             'font-size: .9rem; color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.7); opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 2; }' +
         '.gallery-frame:hover .gf-hint, .gallery-frame:focus-visible .gf-hint { opacity: 1; }' +

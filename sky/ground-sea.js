@@ -870,5 +870,20 @@
     });
 
     // for letters.js: where to float today's bottle (and a peek at the traveller, for testing)
-    Sky.sea = { el: sea, front: sea.querySelector('.wave-4'), splash: splash, crew: crew };
+    // the revolver (sky/revolver.js): they take it to themselves, and are back a moment later where they were
+    function kill() {
+        if (!Sky.gore || !Sky.gore.shot || /^(dead|held|falling|diving|swimming|surfacing)$/.test(crew.state)) return false;
+        var was = crew.state === 'aboard' ? 'aboard' : 'ashore';
+        cancelCrew();
+        crew.state = 'dead';
+        var run = crew.run;
+        mate.classList.remove('talking', 'walking');
+        Sky.gore.shot(mate, function () {
+            if (run !== crew.run) return;
+            Sky.gore.respawn(mate);
+            settle(was);
+        });
+        return true;
+    }
+    Sky.sea = { el: sea, front: sea.querySelector('.wave-4'), splash: splash, crew: crew, mate: mate, kill: kill };
 })();

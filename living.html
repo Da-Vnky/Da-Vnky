@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>the living space · DaV-nky</title>
+    <!-- the loading screen: fetches the whole site once per visit (sky/loader.js, sw.js) -->
+    <script src="sky/loader.js?v=20260925e"></script>
     <link rel="canonical" href="https://dav-nky.pleroma.nexus/living.html">
     <meta property="og:title" content="the living space · DaV-nky">
     <meta property="og:url" content="https://dav-nky.pleroma.nexus/living.html">
@@ -13,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260924r">
+    <link rel="stylesheet" href="sky/sky.css?v=20260925e">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -32,6 +34,22 @@
         .lamp .glow { opacity: calc(.2 + .8 * var(--dusk)); }
         .turntable { left: 47%; bottom: calc(26vw * 170 / 360 - 3px); width: 14vw; min-width: 150px; aspect-ratio: 200 / 110; z-index: 3;
                      filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
+
+        .claude-plaque { left: 27.9%; top: calc(52% + 6.8vw * 1.25 + 8px); width: 6%; padding: 3px 0 2px; text-align: center; font: italic bold clamp(9px, .75vw, 13px) "IM Fell English", Georgia, serif;
+                         color: #4a2e06; text-shadow: 0 1px 0 rgba(255,244,200,.8), 0 -1px 0 rgba(90,55,5,.5);                       /* engraved */
+                         background: linear-gradient(160deg, #7a5212 0%, #d9a93c 18%, #fff0b0 34%, #e8bd52 48%, #a8761e 64%, #f7dc8a 80%, #8a5a14 100%);
+                         border-radius: 3px; box-shadow: inset 0 0 0 1px #fff3c0, inset 0 0 0 2px #8a5a14, 0 2px 5px rgba(0,0,0,.5); pointer-events: none; white-space: nowrap; overflow: visible; }
+        /* a sparkle that twinkles across it, about once every 45 seconds */
+        .claude-plaque::after { content: ""; position: absolute; left: 12%; top: -45%; width: 18px; height: 18px; pointer-events: none; opacity: 0;
+                                background: radial-gradient(circle, #fff 0 12%, rgba(255,250,220,.9) 18%, transparent 55%),
+                                            linear-gradient(0deg, transparent 46%, #fff 48% 52%, transparent 54%), linear-gradient(90deg, transparent 46%, #fff 48% 52%, transparent 54%);
+                                filter: drop-shadow(0 0 3px #fff6c0); animation: plaque-twinkle 45s linear infinite; animation-delay: 6s; }
+        .claude-plaque::before { content: ""; position: absolute; inset: 0; border-radius: 3px; pointer-events: none; opacity: 0;
+                                 background: linear-gradient(110deg, transparent 30%, rgba(255,255,240,.85) 48%, transparent 66%) -150% 0 / 60% 100% no-repeat; animation: plaque-shine 45s linear infinite; animation-delay: 6s; }
+        @keyframes plaque-twinkle { 0%, 1.2% { opacity: 0; transform: translateX(0) scale(.2) rotate(0deg); } 2% { opacity: 1; transform: translateX(120%) scale(1.15) rotate(45deg); }
+                                    2.8% { opacity: 1; transform: translateX(260%) scale(.8) rotate(90deg); } 3.6%, 100% { opacity: 0; transform: translateX(340%) scale(.2) rotate(135deg); } }
+        @keyframes plaque-shine { 0%, .8% { opacity: 1; background-position: -150% 0; } 3.4% { opacity: 1; background-position: 250% 0; } 3.5%, 100% { opacity: 0; background-position: 250% 0; } }
+        @media (prefers-reduced-motion: reduce) { .claude-plaque::after, .claude-plaque::before { animation: none; } }
 
         /* the wallpaper stripe sits on top of the plank texture */
         .room { --wall: #3f5a55; --frame: #2a1d14; }
@@ -84,8 +102,6 @@
         .bath-tub    { left: 62%; bottom: 3vh; width: 31%; aspect-ratio: 300 / 140; }
         .bath-towel  { left: 16%; top: 38%; width: 8%; aspect-ratio: 100 / 130; }
         .bath-shelf  { left: 26.5%; top: 24%; width: 11%; aspect-ratio: 140 / 70; }
-        .shame-plaque { left: 70.5%; top: 7%; width: 13%; z-index: 3; }
-        .shame-plaque > svg, .shame-plaque > .art { display: block; width: 100%; height: auto; filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)); }
         .bath-mat    { left: 36%; right: 42%; bottom: 2vh; height: 4vh; pointer-events: none; }
         .bath-character { left: 28%; bottom: 3vh; height: 25vh; }
         /* ---------- the hallway (the arrow on the left; see sky/bathroom.js) ---------- */
@@ -95,6 +111,29 @@
         .hall-runner { left: 8%; right: 8%; bottom: 3vh; height: 5vh; pointer-events: none; }
         .hall-hooks  { left: 37%; top: 30%; width: 10%; }
         .hall-character { left: 44%; bottom: 3vh; height: 25vh; }
+        /* ---------- the dungeon (pull the loose book on the bookshelf; see sky/bathroom.js and sky/dungeon.js) ---------- */
+        .shelf-book { left: calc(44% + 26vw * 106 / 360); bottom: calc(26vw * 90 / 360); width: calc(26vw * 15 / 360); min-width: 11px; aspect-ratio: 15 / 52; }
+        .shelf-book.d1 { left: calc(44% + 26vw * 174 / 360); width: calc(26vw * 13 / 360); min-width: 10px; }
+        .shelf-book.d2 { left: calc(44% + 26vw * 274 / 360); width: calc(26vw * 14 / 360); }
+        .shelf-book.d3 { left: calc(44% + 26vw * 172 / 360); bottom: calc(26vw * 12 / 360); width: calc(26vw * 14 / 360); }
+        .shelf-book.d4 { left: calc(44% + 26vw * 190 / 360); bottom: calc(26vw * 12 / 360); width: calc(26vw * 12 / 360); min-width: 9px; }
+        .dungeon-pentagram { left: 35%; bottom: 7vh; width: 30%; height: 10vh; }
+        .dungeon-paper { left: 70%; bottom: 9vh; width: 4.6%; min-width: 46px; aspect-ratio: 100 / 70; }
+        .dungeon-stairs { left: 0; bottom: calc(18vh - 4px); width: 21%; height: 72vh; z-index: 2; cursor: pointer; }
+        .dungeon-chains { left: 76%; top: 0; width: 9%; height: 38vh; }
+        .dungeon-chains.c2 { left: 27%; width: 6%; height: 28vh; }
+        .dungeon-rack { left: 80%; bottom: calc(18vh - 6px); width: 16%; aspect-ratio: 160 / 120; }
+        .candle { width: 2.1vw; min-width: 22px; aspect-ratio: 30 / 90; z-index: 3; }
+        .candle.k1 { left: 49.1%; bottom: 15.6vh; }
+        .candle.k2 { left: 62.4%; bottom: 12.8vh; width: 1.6vw; min-width: 17px; }
+        .candle.k3 { left: 38.5%; top: 47%; }
+        .candle.k4 { left: 59.5%; top: 47%; }
+        .candle.k5 { left: 57.3%; bottom: 8.5vh; width: 1.8vw; min-width: 19px; }
+        .candle.k6 { left: 40.9%; bottom: 8.5vh; width: 1.4vw; min-width: 15px; }
+        .candle.k7 { left: 35.8%; bottom: 12.8vh; width: 1.5vw; min-width: 16px; }
+        .dungeon .shame-plaque { left: 43.5%; top: 6%; width: 13%; z-index: 3; }
+        .shame-plaque > svg, .shame-plaque > .art { display: block; width: 100%; height: auto; filter: drop-shadow(0 3px 4px rgba(0,0,0,.5)); }
+        .dungeon-character { left: 24%; bottom: 8vh; height: 25vh; }
         /* the toaster, on the floor by the plant: click it to take it (see sky/tub.js) */
         .toaster { left: 89.5%; bottom: 2.6vh; width: 4.6vw; min-width: 52px; aspect-ratio: 100 / 70; z-index: 3; }
 
@@ -103,13 +142,23 @@
             .bath-sink { left: 34%; width: 32%; }
             .bath-tub { left: 62%; width: 40%; }
             .bath-towel, .bath-shelf { display: none; }
-            .shame-plaque { left: 30%; top: 3%; width: 40%; }
+            .dungeon .shame-plaque { left: 30%; top: 3%; width: 40%; }
+            .shelf-book { left: 16%; top: calc(62% - 3.6vw * 52 / 15 + 2px); bottom: auto; width: 3.6vw; min-width: 13px; }
+            .shelf-book.d1 { left: 11%; } .shelf-book.d2 { left: 19.8%; } .shelf-book.d3 { left: 23.6%; } .shelf-book.d4 { left: 7.4%; }
+            .dungeon-pentagram { left: 22%; width: 56%; } .dungeon-paper { left: 80%; width: 12%; min-width: 0; }
+            .candle.k1 { left: 48%; } .candle.k2 { left: 64%; } .candle.k5 { left: 63%; } .candle.k6 { left: 32%; } .candle.k7 { left: 31%; }
+            .dungeon-stairs { width: 34%; height: 46vh; }
+            .dungeon-chains, .dungeon-rack, .candle.k3, .candle.k4 { display: none; }
+            .candle.k1 { left: 36%; } .candle.k2 { left: 42%; }
+            .dungeon-character { left: 50%; height: 14vh; }
             .gallery-frame[data-wall=shame] { top: 9% !important; width: 13% !important; }
             .gallery-frame[data-wall=shame][data-frame="1"] { left: 7% !important; }
             .gallery-frame[data-wall=shame][data-frame="2"] { left: 25% !important; }
             .gallery-frame[data-wall=shame][data-frame="3"] { left: 43% !important; }
             .gallery-frame[data-wall=shame][data-frame="4"] { left: 61% !important; }
             .gallery-frame[data-wall=shame][data-frame="5"] { left: 79% !important; }
+            .dungeon .gallery-frame[data-wall=shame] { display: block; }
+            .gallery-frame[data-wall=shame][data-frame="6"] { left: 34% !important; top: 25% !important; width: 32% !important; }
             .bath-mat { left: 28%; right: 30%; }
             .bath-character { left: 6%; height: 14vh; }
             .hall-door.to-workshop { left: 6%; height: 40vh; }
@@ -117,9 +166,8 @@
             .hall-hooks { display: none; }
             .hall-character { left: 36%; height: 14vh; }
             .toaster { left: 44%; width: 11vw; min-width: 0; }
-            .hallway .room-arrow.back-right { top: 34% !important; }
             .room .window { left: 12% !important; width: 76% !important; top: 34% !important; height: 28% !important; }
-            .shelf, .lamp, .gallery-frame { display: none; }
+            .shelf, .lamp, .gallery-frame, .claude-plaque { display: none; }
             .pinned { left: 50%; top: 11%; width: 220px; margin-left: -110px; }
             .pinboard { left: 8%; top: 66%; width: 42%; border-width: 7px; }
             .letter-pile { left: 54%; top: 66%; width: 28%; min-width: 0; }
@@ -174,7 +222,7 @@
              another frame: copy a line and give it the next number. they swing gently to the music. -->
         <div class="furnish gallery-frame" data-frame="1" data-look="gilt" style="left:76.5%; top:11%; width:9.5%"></div>
         <div class="furnish gallery-frame" data-frame="2" data-look="wood" style="left:78%; top:36%; width:7.5%; --tilt:.8deg"></div>
-        <div class="furnish gallery-frame" data-frame="3" data-look="dark" style="left:33%; top:40%; width:6.5%; --tilt:-1.5deg"></div>
+        <div class="furnish gallery-frame" data-frame="3" data-look="dark" style="left:35.5%; top:33.5%; width:6.5%; --tilt:-1.5deg"></div>
         <div class="furnish gallery-frame" data-frame="4" data-look="white" style="left:87.5%; top:14%; width:5.5%; aspect-ratio:1; --tilt:1.2deg"></div>
         <div class="furnish gallery-frame" data-frame="5" data-look="wood" style="left:88%; top:26%; width:4.5%; aspect-ratio:5 / 4; --tilt:-1deg"></div>
 
@@ -204,6 +252,11 @@
             </g>
         </svg>
 
+        <!-- Claude's frame: a wall of its own (data-wall="claude"), not in the content manager's lists.
+             what hangs in it: content/claude/frames.json. Victor gave this spot to Claude, September 2026. -->
+        <div class="furnish gallery-frame claude-frame" data-wall="claude" data-frame="1" data-look="wood" style="left:27.5%; top:52%; width:6.8%; --tilt:1.2deg"></div>
+        <div class="furnish claude-plaque" aria-hidden="true">Claude’s wall</div>
+
         <!-- bookshelf under the window -->
         <svg class="furnish shelf" data-asset="assets/living/bookshelf" viewBox="0 0 360 170" aria-hidden="true" style="filter: drop-shadow(0 -2px 8px rgba(0,0,0,.35))">
             <g fill="#1f1610">
@@ -218,6 +271,23 @@
                 <path d="M250 158 C230 130 240 110 262 102 C284 110 294 130 274 158 Z"/>
             </g>
         </svg>
+
+        <!-- a loose book on the bookshelf: pull it and the traveller goes down to the dungeon. your own: assets/living/shelf-book.
+             the others are decoys (assets/living/shelf-decoy-1 … 4). each is a real book if you give it pages:
+             pictures, short videos or PDFs in content/books/book-1 … book-4 (content manager -> your things -> the books).
+             open one and you flip through them (sky/books.js). an empty one is just a book. -->
+        <a class="furnish shelf-book decoy d1" href="#" aria-label="a book" data-book="content/books/book-1/" data-asset="assets/living/shelf-decoy-1"></a>
+        <a class="furnish shelf-book decoy d2" href="#" aria-label="a book" data-book="content/books/book-2/" data-asset="assets/living/shelf-decoy-2"></a>
+        <a class="furnish shelf-book decoy d3" href="#" aria-label="a book" data-book="content/books/book-3/" data-asset="assets/living/shelf-decoy-3"></a>
+        <a class="furnish shelf-book decoy d4" href="#" aria-label="a book" data-book="content/books/book-4/" data-asset="assets/living/shelf-decoy-4"></a>
+        <a class="furnish shelf-book" href="#dungeon" aria-label="a book" data-asset="assets/living/shelf-book">
+            <svg class="placeholder" viewBox="0 0 15 52" aria-hidden="true">
+                <rect x="0.5" y="0.5" width="14" height="51" rx="1.5" fill="#5e1f16" stroke="#2a0f0a"/>
+                <path d="M2 7 H13 M2 45 H13" stroke="#c49a52" stroke-width="1.4"/>
+                <rect x="4.5" y="16" width="6" height="20" rx="1" fill="#3a130d"/>
+                <path d="M7.5 20 V32" stroke="#c49a52" stroke-width=".8" opacity=".7"/>
+            </svg>
+        </a>
 
         <!-- the record player: every .mp3 in content/living/ is a record in its crate.
              custom art: assets/living/turntable (and turntable-playing, shown while music plays;
@@ -395,7 +465,60 @@
             <path d="M64 112 L52 138 H68 L76 114 Z M236 112 L248 138 H232 L224 114 Z" fill="#c49a52"/>
         </svg>
 
-        <!-- the hall of shame: five frames over the tub, a wall of their own (data-wall="shame").
+        <!-- the traveller, in here. your own: assets/characters/bathroom (+ bathroom-walking) -->
+        <div class="furnish character scene-character bath-character" data-asset="assets/characters/bathroom" aria-label="the traveller"></div>
+
+        <!-- back to the living space: the same arrow, flipped -->
+        <a class="room-arrow to-living" href="#living" aria-label="back to the living space" data-asset="assets/living/arrow"></a>
+    </div>
+
+    <!-- the dungeon (sky/bathroom.js slides it up; sky/dungeon.js lights the candles and plays its sound).
+         you get here by pulling the loose book on the bookshelf, and back up the stairs (or the arrow).
+         slots in assets/living/: dungeon-wall, dungeon-floor, dungeon-stairs, dungeon-chains, dungeon-rack,
+         candle (every candle; a GIF can flicker).
+         the traveller down here: assets/characters/dungeon (+ dungeon-walking).
+         its sound: assets/sounds/dungeon (.mp3 or .ogg, loops; until then, a drawn drone with drips).
+         while you're down here the record player and the noise machine go quiet, and come back as you leave. -->
+    <div class="dungeon" aria-hidden="true" data-asset="assets/living/dungeon-wall">
+        <div class="room-floor" data-asset="assets/living/dungeon-floor"><div class="placeholder"></div></div>
+
+        <div class="furnish dungeon-stairs" data-goes-back data-asset="assets/living/dungeon-stairs" role="button" tabindex="0" aria-label="the stairs back up">
+        <svg class="placeholder" viewBox="0 0 210 400" preserveAspectRatio="xMinYMax meet" aria-hidden="true">
+            <g>
+                <path d="M0 0 H70 V400 H0 Z" fill="#141013"/>
+                <g fill="#3b3638" stroke="#1c181a" stroke-width="2">
+                    <path d="M0 400 H210 V372 H0 Z"/><path d="M0 372 H186 V344 H0 Z"/><path d="M0 344 H162 V316 H0 Z"/><path d="M0 316 H138 V288 H0 Z"/>
+                    <path d="M0 288 H114 V260 H0 Z"/><path d="M0 260 H92 V232 H0 Z"/><path d="M0 232 H72 V204 H0 Z"/><path d="M0 204 H54 V176 H0 Z"/>
+                </g>
+                <g fill="#4a4446"><path d="M0 372 H210 V378 H0 Z M0 344 H186 V350 H0 Z M0 316 H162 V322 H0 Z M0 288 H138 V294 H0 Z M0 260 H114 V266 H0 Z M0 232 H92 V238 H0 Z M0 204 H72 V210 H0 Z M0 176 H54 V182 H0 Z"/></g>
+                <path d="M0 0 H56 V176 H0 Z" fill="url(#dg-up)"/>
+                <defs><linearGradient id="dg-up" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9c98a" stop-opacity=".35"/><stop offset="1" stop-color="#e9c98a" stop-opacity="0"/></linearGradient></defs>
+            </g>
+        </svg>
+        </div>
+
+        <svg class="furnish dungeon-chains" data-asset="assets/living/dungeon-chains" viewBox="0 0 60 240" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+            <g fill="none" stroke="#5a5557" stroke-width="3.2">
+                <ellipse cx="18" cy="10" rx="4" ry="7"/><ellipse cx="18" cy="23" rx="2" ry="7"/><ellipse cx="18" cy="36" rx="4" ry="7"/><ellipse cx="18" cy="49" rx="2" ry="7"/><ellipse cx="18" cy="62" rx="4" ry="7"/><ellipse cx="18" cy="75" rx="2" ry="7"/><ellipse cx="18" cy="88" rx="4" ry="7"/><ellipse cx="18" cy="101" rx="2" ry="7"/><ellipse cx="18" cy="114" rx="4" ry="7"/><ellipse cx="18" cy="127" rx="2" ry="7"/><ellipse cx="18" cy="140" rx="4" ry="7"/>
+                <ellipse cx="42" cy="10" rx="4" ry="7"/><ellipse cx="42" cy="23" rx="2" ry="7"/><ellipse cx="42" cy="36" rx="4" ry="7"/><ellipse cx="42" cy="49" rx="2" ry="7"/><ellipse cx="42" cy="62" rx="4" ry="7"/><ellipse cx="42" cy="75" rx="2" ry="7"/><ellipse cx="42" cy="88" rx="4" ry="7"/>
+            </g>
+            <path d="M10 148 A10 10 0 1 0 26 148 M34 96 A10 10 0 1 0 50 96" fill="none" stroke="#6c6668" stroke-width="5"/>
+        </svg>
+        <svg class="furnish dungeon-chains c2" data-asset="assets/living/dungeon-chains" viewBox="0 0 60 240" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+            <g fill="none" stroke="#5a5557" stroke-width="3.2"><ellipse cx="30" cy="10" rx="4" ry="7"/><ellipse cx="30" cy="23" rx="2" ry="7"/><ellipse cx="30" cy="36" rx="4" ry="7"/><ellipse cx="30" cy="49" rx="2" ry="7"/><ellipse cx="30" cy="62" rx="4" ry="7"/><ellipse cx="30" cy="75" rx="2" ry="7"/><ellipse cx="30" cy="88" rx="4" ry="7"/><ellipse cx="30" cy="101" rx="2" ry="7"/></g>
+            <path d="M22 110 L30 124 L38 110" fill="none" stroke="#6c6668" stroke-width="4"/>
+        </svg>
+
+        <svg class="furnish dungeon-rack" data-asset="assets/living/dungeon-rack" viewBox="0 0 160 120" aria-hidden="true">
+            <g fill="#3a2716" stroke="#1d130b" stroke-width="2">
+                <rect x="6" y="40" width="148" height="16" rx="2"/><rect x="14" y="56" width="10" height="64"/><rect x="136" y="56" width="10" height="64"/>
+                <circle cx="12" cy="48" r="11"/><circle cx="148" cy="48" r="11"/>
+            </g>
+            <path d="M12 38 V58 M2 48 H22 M148 38 V58 M138 48 H158" stroke="#6c6668" stroke-width="3"/>
+            <path d="M24 44 Q80 30 136 44" fill="none" stroke="#7a6a50" stroke-width="2" stroke-dasharray="4 3"/>
+        </svg>
+
+        <!-- the hall of shame: five frames on the dungeon wall, a wall of their own (data-wall="shame").
              hang art in them from the content manager (any picture: visitors' art, your paintings,
              the hidden pool). their list: content/shame/frames.json. your own frame art:
              assets/living/shame-frame (all) or shame-frame-1 … 5; the plaque: assets/living/shame-plaque -->
@@ -407,31 +530,66 @@
                 <text x="100" y="28.5" text-anchor="middle" font-family="IM Fell English SC, Georgia, serif" font-size="18" fill="#3a2716">hall of shame</text>
             </svg>
         </div>
-        <div class="furnish gallery-frame" data-wall="shame" data-frame="1" data-look="dark"  style="left:60.5%; top:16%; width:8%; --tilt:-3deg"></div>
-        <div class="furnish gallery-frame" data-wall="shame" data-frame="2" data-look="plain" style="left:73%; top:14.5%; width:7.5%; aspect-ratio:1; --tilt:2deg"></div>
-        <div class="furnish gallery-frame" data-wall="shame" data-frame="3" data-look="wood"  style="left:85%; top:17%; width:7.5%; --tilt:-1.5deg"></div>
-        <div class="furnish gallery-frame" data-wall="shame" data-frame="4" data-look="white" style="left:65.5%; top:37%; width:8%; aspect-ratio:5 / 4; --tilt:4deg"></div>
-        <div class="furnish gallery-frame" data-wall="shame" data-frame="5" data-look="gilt"  style="left:80%; top:36%; width:7%; --tilt:-5deg"></div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="1" data-look="dark"  style="left:25%; top:22%; width:8.5%; --tilt:-3deg"></div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="2" data-look="plain" style="left:35%; top:15%; width:8%; aspect-ratio:1; --tilt:2deg"></div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="3" data-look="wood"  style="left:57.5%; top:13%; width:8.5%; --tilt:-1.5deg"></div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="4" data-look="white" style="left:66.5%; top:33%; width:8.5%; aspect-ratio:5 / 4; --tilt:4deg"></div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="5" data-look="gilt"  style="left:26%; top:47%; width:7%; --tilt:-5deg"></div>
+        <!-- frame 6, "the record": the grandest frame down here (data-look="lux"). whatever picture you hang in it,
+             shoot it and a hidden record falls out (sky/loot.js) -->
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="6" data-frame-name="the record" data-look="lux" style="left:43%; top:41%; width:14%; aspect-ratio:1; --tilt:0deg"></div>
 
-        <!-- the traveller, in here. your own: assets/characters/bathroom (+ bathroom-walking) -->
-        <div class="furnish character scene-character bath-character" data-asset="assets/characters/bathroom" aria-label="the traveller"></div>
+        <!-- a pentagram in blood on the floor. your own: assets/living/dungeon-pentagram (see-through, seen from above at a slant, stretched to fit) -->
+        <svg class="furnish dungeon-pentagram" data-asset="assets/living/dungeon-pentagram" viewBox="0 0 300 80" preserveAspectRatio="none" aria-hidden="true">
+            <g fill="none" stroke="#8e0f14" stroke-linejoin="round" opacity=".92">
+                <ellipse cx="150" cy="40" rx="140" ry="34" stroke-width="3.2"/>
+                <ellipse cx="150" cy="40" rx="126" ry="30" stroke-width="1.6"/>
+                <path d="M150 10 L232 64 L62 30 L238 30 L68 64 Z" stroke-width="3"/>
+            </g>
+            <g fill="#8e0f14" opacity=".85"><ellipse cx="96" cy="70" rx="9" ry="2.4"/><ellipse cx="214" cy="12" rx="6" ry="1.8"/><ellipse cx="40" cy="44" rx="4" ry="1.4"/>
+                <path d="M150 10 q2 6 0 9 q-2 -3 0 -9 Z"/><ellipse cx="262" cy="52" rx="5" ry="1.5"/></g>
+        </svg>
 
-        <!-- back to the living space: the same arrow, flipped -->
-        <a class="room-arrow to-living" href="#living" aria-label="back to the living space" data-asset="assets/living/arrow"></a>
+        <!-- a note on the floor: what it says is yours to write (content manager -> notes -> the paper in the dungeon).
+             your own: assets/living/dungeon-paper (lying there), assets/living/dungeon-paper-open (the sheet up close) -->
+        <div class="furnish dungeon-paper" role="button" tabindex="0" aria-label="read the note on the floor" data-asset="assets/living/dungeon-paper"></div>
+
+        <!-- the candles (each lights its bit of the dungeon; sky/dungeon.js adds the flames and the glow) -->
+        <div class="furnish candle k1" data-asset="assets/living/candle"></div>
+        <div class="furnish candle k2" data-asset="assets/living/candle"></div>
+        <div class="furnish candle k3 sconce" data-asset="assets/living/candle"></div>
+        <div class="furnish candle k4 sconce" data-asset="assets/living/candle"></div>
+        <div class="furnish candle k5" data-asset="assets/living/candle"></div>
+        <div class="furnish candle k6" data-asset="assets/living/candle"></div>
+        <div class="furnish candle k7" data-asset="assets/living/candle"></div>
+
+        <!-- the traveller, down here. your own: assets/characters/dungeon (+ dungeon-walking) -->
+        <div class="furnish character scene-character dungeon-character" data-asset="assets/characters/dungeon" aria-label="the traveller"></div>
+
+        <!-- back up (the stairs work too): the same arrow, pointing up -->
+        <a class="room-arrow to-upstairs" href="#living" aria-label="back up to the living space" data-asset="assets/living/arrow"></a>
     </div>
 
-    <script src="sky/sky.js?v=20260924r"></script>
+    <script src="sky/sky.js?v=20260925e"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
-    <script src="sky/ground-view.js?v=20260924r" data-view="assets/living/view"></script>
-    <script src="sky/panel.js?v=20260924r"></script>
-    <script src="sky/music.js?v=20260924r"></script>
-    <script src="sky/weather.js?v=20260924r"></script>
-    <script src="sky/noise.js?v=20260924r"></script>
-    <script src="sky/records.js?v=20260924r"></script>
-    <script src="sky/crate.js?v=20260924r"></script>
-    <script src="sky/frames.js?v=20260924r"></script>
-    <script src="sky/bathroom.js?v=20260924r"></script>
-    <script src="sky/gore.js?v=20260924r"></script>
-    <script src="sky/tub.js?v=20260924r"></script>
+    <script src="sky/ground-view.js?v=20260925e" data-view="assets/living/view"></script>
+    <script src="sky/panel.js?v=20260925e"></script>
+    <script src="sky/music.js?v=20260925e"></script>
+    <script src="sky/weather.js?v=20260925e"></script>
+    <script src="sky/noise.js?v=20260925e"></script>
+    <script src="sky/inventory.js?v=20260925e"></script>
+    <script src="sky/loot.js?v=20260925e"></script>
+    <script src="sky/records.js?v=20260925e"></script>
+    <script src="sky/crate.js?v=20260925e"></script>
+    <script src="sky/frames.js?v=20260925e"></script>
+    <script src="sky/bathroom.js?v=20260925e"></script>
+    <script src="sky/gore.js?v=20260925e"></script>
+    <script src="sky/tub.js?v=20260925e"></script>
+    <script src="sky/dungeon.js?v=20260925e"></script>
+    <script src="sky/books.js?v=20260925e"></script>
+    <script src="sky/marker.js?v=20260925e"></script>
+    <script src="sky/revolver.js?v=20260925e"></script>
+    <script src="sky/claubes.js?v=20260925e"></script>
+    <script src="sky/textures.js?v=20260925e"></script>
 </body>
 </html>

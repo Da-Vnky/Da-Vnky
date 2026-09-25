@@ -40,9 +40,13 @@ Take a file out, and it's gone. That's the whole job.
                       buttons in the content manager.
 
   content/shame/frames.json
-                      THE HALL OF SHAME (five frames in the bathroom): what hangs in
+                      THE HALL OF SHAME (six frames down in the dungeon; 6 hides the record): what hangs in
                       each. Set it with the "hall of shame" buttons in the content
                       manager (your things, visitors). Any picture can go up.
+
+  content/dungeon/paper.json
+                      THE NOTE ON THE DUNGEON FLOOR: its heading, words and signature.
+                      Write it in the content manager (notes -> the paper in the dungeon).
 
   content/frames/     PICTURES FOR THE WALLS (hidden)
                       Not shown anywhere by themselves: only in the frames you

@@ -24,6 +24,10 @@
         '.ground-city .mel-boards { fill: #5b4030; }' +
         'body.mel-in .ground-city .mel-boards { display: none; }' +
         'body.mel-in .ground-city .mel-leak { fill: #ffd28a; animation: none; }' +
+        // looking through the telescope the skyline is blown up many times over: the soft shadows go (a shadow on
+        // something that big is more than the browser will draw, and whole rows of buildings would blink out)
+        'body.peep-view .ground-city .layer, body.peep-close .ground-city .layer, body.peep-settling .ground-city .layer,' +
+        'body.peep-view .ground-city .mel-leak, body.peep-close .ground-city .mel-leak, body.peep-settling .ground-city .mel-leak { filter: none !important; }' +
         '@keyframes mel-flicker { 0%, 100% { opacity: .55; } 40% { opacity: .85; } 47% { opacity: .35; } 52% { opacity: .8; } }' +
         '@keyframes city-blink { 0%, 60% { opacity: 1; } 61%, 100% { opacity: .15; } }' +
         '@media (prefers-reduced-motion: reduce) { .ground-city .beacon { animation: none; } }' +

@@ -79,11 +79,12 @@
     var state = { on: !!saved.on, levels: saved.levels || {}, master: typeof saved.master === 'number' ? saved.master : 0.8 };
     var chans = {}, avail = {};
     function save() { put(sessionStorage, KEY, state); put(localStorage, MIX, state.levels); }
+    var hushed = false;                      // (the dungeon quiets it for a while, without switching it off)
     function anyOn() { return state.on && SOUNDS.some(function (s) { return avail[s.name] && state.levels[s.name] > 0; }); }
     function apply() {
         SOUNDS.forEach(function (s) {
             var ch = chans[s.name];
-            if (ch) ch.set(state.on ? (state.levels[s.name] || 0) * state.master : 0, 0.4);
+            if (ch) ch.set(state.on && !hushed ? (state.levels[s.name] || 0) * state.master : 0, hushed ? 0.08 : 0.4);
         });
         if (machine) machine.classList.toggle('on', anyOn());
         drawLayer();
@@ -203,6 +204,7 @@
     Sky.noise = {
         get on() { return anyOn(); },
         set: function (name, level) { state.levels[name] = level; state.on = true; save(); apply(); },
-        stop: function () { state.on = false; save(); apply(); }
+        stop: function () { state.on = false; save(); apply(); },
+        hush: function (on) { hushed = !!on; apply(); }
     };
 })();

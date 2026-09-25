@@ -405,10 +405,10 @@
             strike();
             nextBolt = t + 7000 + Math.random() * 16000;
         }
-        var inside = indoors();
-        if (rainCh) rainCh.set((inside ? 0 : 1) * now.rain * volume, 0.6);
-        if (paneCh) paneCh.set((inside ? 1 : 0) * now.rain * volume, 0.6);
-        if (windCh) windCh.set(Math.max(0, now.wind - 0.2) * 0.9 * volume);
+        var inside = indoors(), heard = document.body.classList.contains('in-dungeon') ? 0 : volume;   // (not a sound of it down in the dungeon)
+        if (rainCh) rainCh.set((inside ? 0 : 1) * now.rain * heard, 0.6);
+        if (paneCh) paneCh.set((inside ? 1 : 0) * now.rain * heard, 0.6);
+        if (windCh) windCh.set(Math.max(0, now.wind - 0.2) * 0.9 * heard);
         requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);

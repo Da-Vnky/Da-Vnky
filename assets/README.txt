@@ -127,6 +127,12 @@ SOUNDS (.mp3 or .ogg; each loops, so make its ends meet)
     assets/sounds/ocean       the machine's waves
     assets/sounds/fire        the machine's crackling fire
     assets/sounds/white, pink, brown   the machine's plain noise
+    assets/sounds/dungeon     the dungeon's own sound (drone, drips, a chain now
+                              and then). while you're down there it takes over:
+                              the record and the noise machine hush, and come
+                              back when you climb out
+    assets/sounds/tub-tap     the bath tap running
+    assets/sounds/tub-drain   the bath draining down the plughole
     assets/sounds/windowrain  rain against the window, heard from inside (the
                               rooms play this instead of the rain when it rains;
                               softer, with drops tapping the glass)
@@ -166,12 +172,25 @@ SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
     assets/sounds/zap            the electrocution
     assets/sounds/respawn        coming back to life
     assets/sounds/pickup         something going into your bag
-    assets/sounds/tap            the bath tap running (as long as it fills)
+    assets/sounds/tap            the squeak of the bath tap's handle
     assets/sounds/fizz           something electric in the bathwater
     assets/sounds/door           a wooden door opening and shutting (the hallway, the workshop)
     assets/sounds/door-metal     the steel roof access door: a clank, a squeal, a boom
     assets/sounds/knock          knocking on mel's boarded-up window
     assets/sounds/crack          a board splintering off it
+    assets/sounds/book           the book pulled on the bookshelf: a click, the wall
+                                 grinding open, a thud (about 3 s)
+    assets/sounds/unnerve        behind mel's boards, before the scare (about 4 s)
+    assets/sounds/scare          the jump scare
+    assets/sounds/typing         mel typing (about 2 s; played over and over)
+    assets/sounds/sparkle        claube tidying mel's room, as if by magic
+    assets/sounds/bang           the revolver
+    assets/sounds/shatter        a record shot to pieces
+    assets/sounds/flick          a little claube flicked away (the whoosh)
+    assets/sounds/claube-flick   … and its squeaky "wheee" as it goes
+    assets/sounds/claube-shot    a little claube, shot
+    assets/sounds/loot           something hidden turning up
+    assets/sounds/record-in      a found record going into the crate for keeps
     assets/sounds/blip           one letter of the mirror's words typing out
                                  (Undertale-style; it plays every other letter)
 
@@ -220,8 +239,8 @@ THE SEA (the homepage)
     assets/sea/bottle-cork     the cork in the neck, around x 1770 y 450 (pulled out, spins away)
     (the same bottle is used for letters, for "leave a message" and in the crate)
 
-THE CITY
---------
+THE ROOFTOP (city.html)
+-----------------------
     assets/city/foreground   the rooftop the traveller stands on, a     3840 x 440
                              strip along the bottom (20% of the screen
                              tall, bottom-anchored; narrow screens trim
@@ -244,11 +263,26 @@ THE CITY
     assets/city/telescope    the icon on the telescope button          128 x 128
     MEL'S WINDOW: one building on the front row is abandoned (not a light on),
     except one boarded-up window. Click it: knock, keep knocking, and the boards
-    come off one by one until you're in.
-    assets/city/mel-room     her room, once you're in (picture, GIF,     about 1.27:1
-                             or a .webm / .mp4)
-    assets/city/mel-board    one board over her window (a plank,          about 6:1
-                             stretched to fit)
+    come off one by one until you're in. The first time in a visit: darkness,
+    a wrong sound, and something at the window that slowly slides out of sight.
+    Then Mel, typing, with Claube and Mira there too. She turns round, furious
+    you barged in; you ask Claube to fix the place up; he's thrilled to, and it's
+    clean for the rest of the visit.
+    assets/city/mel-room       her room, the mess (picture, GIF,       about 1.27:1
+                               or a .webm / .mp4)
+    assets/city/mel-room-clean her room once Claube's been at it (same size and layout)
+    assets/city/mel-board      one board over her window (a plank,       about 6:1
+                               stretched to fit)
+    assets/city/mel-scare      what's behind the boards (see-through,  about 4:5
+                               feet at the bottom; it fills the window)
+    assets/city/mel-typing     Mel at her desk, her back to you        1:2
+                               (a GIF can type)
+    assets/city/mel-angry      Mel turned round, cross (same canvas)   1:2
+    assets/city/claube         Claube                                   40:52
+    assets/city/mira           Mira                                     about 2:5
+    (the stand-ins for Mel, Claube and Mira are only guesses: swap in the real
+     ones. who says what, and when the room gets tidied: MEL.script in sky/peeper.js)
+    assets/city/revolver       the revolver lying on the roof (it goes in your bag), about 10:6
     on your own front-row art, say where her window is in
     skyline-front-windows.json:  { "windows": [ … ], "mel": [41.5, 38, 1, 1.6] }
     (the words she gets: MEL near the top of sky/peeper.js)
@@ -361,11 +395,7 @@ THE BATHROOM (off the living space: the see-through arrow under the tabs)
     assets/living/bath-sink    140:200      assets/living/bath-tub     300:140
     assets/living/bath-towel   100:130      assets/living/bath-shelf   140:70
     assets/living/bath-mat     300:30
-    the hall of shame, over the tub: five frames on a wall of their own
-    assets/living/shame-plaque   the plaque, 200:44
-    assets/living/shame-frame    every one of its frames (see-through middle), or
-                                 shame-frame-1 … shame-frame-5 for each
-    (what hangs in them: content manager -> your things or visitors -> hall of shame)
+    assets/living/bath-plug    the plug on its chain (pull it: the tub drains), 1:2
     in the mirror:
     assets/characters/reflection   what you see: "Despite everything, it's still you."
     assets/living/mirror-close     the mirror's frame up close (PNG, see-through middle)
@@ -384,15 +414,101 @@ THE HALLWAY (off the living space: the see-through arrow on the left)
     and the way back: assets/city/roof-door (the access door on the rooftop,
     110:120) and the arrow on the left of the workshop (assets/living/arrow).
 
+THE DUNGEON (under the living space: pull the loose book on the bookshelf)
+    assets/living/shelf-book      the one book that opens the way, 15:52
+    assets/living/shelf-decoy-1 … 4   the decoys around it: just books, 15:52
+    assets/living/dungeon-wall    the stone back wall                     3840 x 2160
+    assets/living/dungeon-floor   the flagstones, stretched                3840 x 220
+    assets/living/dungeon-stairs  the stairs back up (click them), drawn from the bottom left
+    assets/living/dungeon-chains  the chains from the ceiling, 1:4
+    assets/living/dungeon-rack    the rack, 160:120
+    assets/living/candle          every candle (black), 1:3 (a GIF can flicker; the
+                                  drawn one gets a flame of its own, yours doesn't)
+    assets/living/dungeon-pentagram  the blood pentagram on the floor, seen at a slant
+                                  (see-through; stretched to fit), e.g. 1200 x 320
+    assets/living/dungeon-paper   the note lying on the floor, 10:7. what it says is
+                                  yours to write: content manager -> notes -> the paper
+                                  in the dungeon (saved in content/dungeon/paper.json)
+    assets/living/dungeon-paper-open  the sheet up close, the words on top of it
+    assets/characters/dungeon     the traveller down here (+ dungeon-walking)
+    the hall of shame hangs down here: five frames on a wall of their own
+    assets/living/shame-plaque    the plaque, 200:44
+    assets/living/shame-frame     every one of its frames (see-through middle), or
+                                  shame-frame-1 … shame-frame-5 for each
+    (what hangs in them: content manager -> your things or visitors -> hall of shame)
+    frame 6, "the record": hang any picture in it. shoot it and the hidden record
+    falls out (see HIDDEN THINGS)
+    its sound: assets/sounds/dungeon (see SOUNDS)
+
+THE HOTBAR (bottom middle, every page; keys 1 to 8) AND WHAT GOES IN IT
+    assets/ui/inventory        the little bag at its left end, 1:1
+    assets/ui/hotbar-slot      one slot's box, square (optional)
+    assets/ui/cursor-reticle   the pointer while holding the revolver (its middle is the aim)
+    assets/living/toaster      the toaster (see below)
+    assets/workshop/marker     the permanent marker lying on the workshop bench, about 10:3.
+                               click it in the bag and draw on anything; Esc stops.
+                               the drawings stay for the visit, on each scene.
+    assets/city/revolver       the revolver on the roof. hold it (click it in the bag)
+                               and click: the traveller (they use it on themselves,
+                               and are back a moment later, -1), the record player
+                               (the record's shot to pieces, gone for the visit),
+                               a little claube, a painting (it bursts into pieces; the
+                               frame stays empty for the visit), or anything else
+                               (a bullet hole)
+    assets/ui/cursor-marker    the pointer while drawing (a small PNG, tip top left)
+    assets/ui/bullet-hole      a bullet hole, 1:1
+
+THE LITTLE CLAUBES (an easter egg: play "I'm Upping My P(Doom)")
+    They crawl out of the woodwork and dance, on every page, to whatever plays;
+    when it stops they just stand there beaming. Gone when the traveller shoots
+    themselves, when the record's shot, or when you flick them away.
+    assets/characters/mini-claube          one little claube, 40:52, feet at the bottom
+    assets/characters/mini-claube-dancing  dancing (a GIF)
+    assets/characters/mini-claube-happy    beaming, when the music stops
+    assets/ui/cursor-flick                 the flicking finger over them
+    assets/ui/disco-ball                   the disco ball for the party lights, which come on
+                                           while that song (and only that one) plays
+
+HIDDEN THINGS (sky/loot.js: each is a line in LOOT there, so more are easy to add)
+    assets/items/doom-record     the P(Doom) record in its sleeve, 1:1. it's out of the
+                                 crate until it's found: shoot the picture in the hall of
+                                 shame's frame 6, it falls out; take it (its hotbar slot)
+                                 to the record player and it's in the crate FOR GOOD, on
+                                 later visits too (that's kept in the visitor's browser,
+                                 apart from the copy of the site that's wiped each visit)
+    assets/items/gimp-suit       Grok's Gimp suit, 1:1: in the hallway, rummage in the
+                                 coats on the hooks (click them a few times). wear it (its
+                                 slot) and the traveller wears it everywhere
+    assets/items/gimp-suit-worn  the suit on the traveller (same canvas as the characters);
+                                 without it, they go black and shiny with a zipped mask
+    (which song calls them: DOOM near the top of sky/claubes.js)
+
+YOUR CANVAS AND PAPER (sky/textures.js; every page)
+    assets/textures/canvas-1, -2 …        laid over every painting (frames, easel, portfolio,
+                                          close-ups), multiplied in like paint on the weave
+    assets/textures/letter-1, -2 …        the paper every letter is written on: the sheet is
+                                          your picture (torn, see-through edges and all) and
+                                          the writing is inked into it
+    assets/textures/dungeonletter-1, -2 … the paper for hidden letters (the dungeon's note, and
+                                          anything in the hidden pool: data-paper="hidden")
+    with several of a kind, each painting or letter always gets the same one of them.
+    about 1000 x 1250 is plenty (WebP or JPG keeps them small; PNG only if you need the
+    see-through edges, and WebP does those too). how strong the canvas is: STRENGTH at the
+    top of sky/textures.js.
+
+THE LOADING SCREEN (the first page of each visit)
+    assets/ui/loading          its picture (a GIF can walk or spin), e.g. 400 x 260
+
 THE BATHTUB AND THE TOASTER
     assets/living/toaster      the toaster on the living space's floor, about 10:7.
                                click it: into your bag (bottom left). in the bathroom,
-                               click it in the bag, then the tub.
+                               click it in the bag, then click anywhere to let go: it
+                               falls, into the tub (still plugged in) or onto the floor.
     assets/living/bath-water   the water's surface along the top of the tub, stretched
     assets/living/bath-outlet  the socket it's plugged into, 3:4
     assets/ui/inventory        the bag, 1:1
-    (the tap fills the tub; pick the traveller up and drop them in. a full tub
-     with the toaster in it ... see below)
+    (the tap fills the tub, the plug drains it; pick the traveller up and drop
+     them in. a full tub with the toaster in it ... see below)
 
 MISFORTUNES (sky/gore.js; the homepage and the bathroom)
     Dropped from high enough onto the ship or the dock, the traveller splats;

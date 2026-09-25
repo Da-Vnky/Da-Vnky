@@ -40,3 +40,21 @@ for dir in assets/*/; do
         done
     } > "${dir}list.txt"
 done
+
+# and a manifest of the whole site for the loading screen (sky/loader.js): every file a visitor's
+# browser might load, with its size, so it can fetch them all up front and keep them for the visit
+{
+    echo "# written by tools/update-lists.sh: every file on the site a visitor loads, and its size in bytes."
+    for f in *.html sky/*.js sky/*.css assets/*/* content/*/* content/*/*/*; do
+        [ -f "$f" ] || continue
+        name=$(basename "$f")
+        case "$name" in
+            template.html|README*|readme*|.*|_*) continue ;;
+        esac
+        case "$f" in
+            assets/templates/*) continue ;;
+        esac
+        size=$(wc -c < "$f" | tr -d ' ')
+        echo "$f $size"
+    done
+} > manifest.txt

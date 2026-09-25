@@ -280,7 +280,7 @@
       },
       {
        "slot": "assets/ui/place-city",
-       "what": "the city’s tab: a telescope",
+       "what": "the rooftop’s tab: a telescope",
        "size": "192 x 192"
       },
       {
@@ -327,6 +327,12 @@
        "slot": "assets/ui/cursor-brush",
        "what": "over the “paint here” easel",
        "size": "32 x 32"
+      },
+      {
+       "slot": "assets/ui/cursor-flick",
+       "what": "the flicking finger over the little Claubes",
+       "size": "64 x 64 at most",
+       "optional": true
       }
      ]
     },
@@ -382,6 +388,76 @@
        "slot": "assets/ui/inventory",
        "what": "the bag your things go in (bottom left)",
        "size": "1:1, e.g. 96 x 96"
+      }
+     ]
+    },
+    {
+     "name": "the hotbar (bottom middle, keys 1 to 8), and the things that go in it",
+     "slots": [
+      {
+       "slot": "assets/ui/inventory",
+       "what": "the little bag at the left end of the hotbar",
+       "size": "1:1, e.g. 128 x 128"
+      },
+      {
+       "slot": "assets/workshop/marker",
+       "what": "the permanent marker: on the workshop bench, in the bag",
+       "size": "about 10:3"
+      },
+      {
+       "slot": "assets/city/revolver",
+       "what": "the revolver: on the rooftop, in the bag, in the traveller’s hand",
+       "size": "about 10:6"
+      },
+      {
+       "slot": "assets/ui/cursor-marker",
+       "what": "the pointer while drawing with the marker (its tip top left)",
+       "size": "32 x 32 to 64 x 64",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/bullet-hole",
+       "what": "a bullet hole, where a stray shot lands (see-through)",
+       "size": "1:1, e.g. 64 x 64",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/loading",
+       "what": "the picture on the loading screen (a GIF can move)",
+       "size": "e.g. 400 x 260",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/hotbar-slot",
+       "what": "one hotbar slot’s box (stretched to a square)",
+       "size": "1:1, e.g. 96 x 96",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/cursor-reticle",
+       "what": "the pointer while holding the revolver: a reticle, its middle is where the shot goes",
+       "size": "40 x 40 to 64 x 64",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "your canvas and paper (sky/textures.js)",
+     "slots": [
+      {
+       "slot": "assets/textures/canvas-1",
+       "what": "the canvas every painting is laid on (multiplied over it). more: canvas-2, canvas-3 …",
+       "size": "about 4:5, e.g. 1000 x 1250"
+      },
+      {
+       "slot": "assets/textures/letter-1",
+       "what": "the paper every letter is written on (torn edges see-through). more: letter-2 …",
+       "size": "about 4:5, e.g. 1000 x 1250"
+      },
+      {
+       "slot": "assets/textures/dungeonletter-1",
+       "what": "the paper for hidden letters (the dungeon’s note, and the hidden pool). more: dungeonletter-2 …",
+       "size": "about 4:5, e.g. 1000 x 1250"
       }
      ]
     }
@@ -711,7 +787,7 @@
   },
   {
    "id": "city",
-   "name": "the city",
+   "name": "the rooftop",
    "groups": [
     {
      "name": "the rooftop and skyline",
@@ -780,11 +856,11 @@
      ]
     },
     {
-     "name": "mel's window (the boarded-up one in the abandoned building)",
+     "name": "mel's window (the boarded-up one in the abandoned building) and her room",
      "slots": [
       {
        "slot": "assets/city/mel-room",
-       "what": "mel's room, revealed once the boards are off (a picture, a GIF, or a .webm / .mp4)",
+       "what": "mel’s room, the mess (a picture, a GIF, or a .webm / .mp4); mel, claube and mira stand in front of it",
        "size": "about 1.27:1, e.g. 1270 x 1000",
        "kind": "model"
       },
@@ -792,6 +868,37 @@
        "slot": "assets/city/mel-board",
        "what": "one board nailed over her window (a plank, stretched to fit)",
        "size": "about 6:1, e.g. 900 x 150"
+      },
+      {
+       "slot": "assets/city/mel-room-clean",
+       "what": "her room once Claube’s tidied it (same size and layout as mel-room)",
+       "size": "about 1.27:1, e.g. 1270 x 1000",
+       "kind": "model"
+      },
+      {
+       "slot": "assets/city/mel-scare",
+       "what": "what’s behind the boards: the jump scare, then it slides slowly out of the window (see-through)",
+       "size": "about 4:5, feet at the bottom"
+      },
+      {
+       "slot": "assets/city/mel-typing",
+       "what": "mel at her desk, back to you, typing (a GIF can type)",
+       "size": "1:2, feet (chair) at the bottom"
+      },
+      {
+       "slot": "assets/city/mel-angry",
+       "what": "mel turned round in her chair, cross",
+       "size": "1:2, same canvas as mel-typing"
+      },
+      {
+       "slot": "assets/city/claube",
+       "what": "Claube, in mel’s room",
+       "size": "40:52, feet at the bottom"
+      },
+      {
+       "slot": "assets/city/mira",
+       "what": "Mira, in mel’s room",
+       "size": "about 2:5, feet at the bottom"
       }
      ]
     }
@@ -901,6 +1008,37 @@
        "slot": "assets/living/toaster",
        "what": "the toaster on the floor by the plant (take it to the bathroom…)",
        "size": "about 10:7"
+      },
+      {
+       "slot": "assets/living/shelf-book",
+       "what": "the loose book on the bookshelf: pull it and down you go to the dungeon",
+       "size": "15:52"
+      },
+      {
+       "slot": "assets/living/shelf-decoy-1",
+       "what": "a decoy book on the bookshelf (just a book)",
+       "size": "15:52"
+      },
+      {
+       "slot": "assets/living/shelf-decoy-2",
+       "what": "a decoy book on the bookshelf (just a book)",
+       "size": "15:52"
+      },
+      {
+       "slot": "assets/living/shelf-decoy-3",
+       "what": "a decoy book on the bookshelf (just a book)",
+       "size": "15:52"
+      },
+      {
+       "slot": "assets/living/shelf-decoy-4",
+       "what": "a decoy book on the bookshelf (just a book)",
+       "size": "15:52"
+      },
+      {
+       "slot": "assets/living/book-open",
+       "what": "an open book’s pages, behind each page when one of the shelf’s books is opened (stretched to fit)",
+       "size": "about 3:4",
+       "optional": true
       }
      ]
     },
@@ -1040,51 +1178,11 @@
        "slot": "assets/living/bath-outlet",
        "what": "the socket on the wall the toaster’s plugged into",
        "size": "3:4"
-      }
-     ]
-    },
-    {
-     "name": "the hall of shame (over the tub)",
-     "slots": [
-      {
-       "slot": "assets/living/shame-plaque",
-       "what": "the brass plaque that says “hall of shame”",
-       "size": "200:44"
       },
       {
-       "slot": "assets/living/shame-frame",
-       "what": "every hall-of-shame frame (see-through middle), or one each below",
-       "size": "4:5"
-      },
-      {
-       "slot": "assets/living/shame-frame-1",
-       "what": "hall of shame frame 1",
-       "size": "4:5",
-       "optional": true
-      },
-      {
-       "slot": "assets/living/shame-frame-2",
-       "what": "hall of shame frame 2",
-       "size": "1:1",
-       "optional": true
-      },
-      {
-       "slot": "assets/living/shame-frame-3",
-       "what": "hall of shame frame 3",
-       "size": "4:5",
-       "optional": true
-      },
-      {
-       "slot": "assets/living/shame-frame-4",
-       "what": "hall of shame frame 4",
-       "size": "5:4",
-       "optional": true
-      },
-      {
-       "slot": "assets/living/shame-frame-5",
-       "what": "hall of shame frame 5",
-       "size": "4:5",
-       "optional": true
+       "slot": "assets/living/bath-plug",
+       "what": "the bath plug on its chain (pull it to drain the tub); the chain hangs from the top",
+       "size": "1:2"
       }
      ]
     },
@@ -1167,6 +1265,136 @@
    ]
   },
   {
+   "id": "dungeon",
+   "name": "the dungeon",
+   "groups": [
+    {
+     "name": "the dungeon (under the living space: pull the loose book)",
+     "slots": [
+      {
+       "slot": "assets/living/dungeon-wall",
+       "what": "the stone back wall",
+       "size": "3840 x 2160"
+      },
+      {
+       "slot": "assets/living/dungeon-floor",
+       "what": "the flagstone floor along the bottom, stretched",
+       "size": "3840 x 220"
+      },
+      {
+       "slot": "assets/living/dungeon-stairs",
+       "what": "the stairs back up, on the left (click them to go up)",
+       "size": "about 1:2, drawn from the bottom left"
+      },
+      {
+       "slot": "assets/living/dungeon-chains",
+       "what": "the chains hanging from the ceiling",
+       "size": "1:4"
+      },
+      {
+       "slot": "assets/living/dungeon-rack",
+       "what": "the rack on the right",
+       "size": "160:120"
+      },
+      {
+       "slot": "assets/living/candle",
+       "what": "every candle, black (a GIF can flicker; the drawn one gets its own flame)",
+       "size": "1:3"
+      },
+      {
+       "slot": "assets/living/dungeon-pentagram",
+       "what": "the blood pentagram on the floor, seen at a slant (see-through, stretched to fit)",
+       "size": "e.g. 1200 x 320"
+      },
+      {
+       "slot": "assets/living/dungeon-paper",
+       "what": "the note lying on the floor (click it to read)",
+       "size": "10:7"
+      },
+      {
+       "slot": "assets/living/dungeon-paper-open",
+       "what": "the note up close: the sheet the words are written on",
+       "size": "e.g. 1100 x 1400",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "the hall of shame (on the dungeon wall)",
+     "slots": [
+      {
+       "slot": "assets/living/shame-plaque",
+       "what": "the brass plaque that says “hall of shame”",
+       "size": "200:44"
+      },
+      {
+       "slot": "assets/living/shame-frame",
+       "what": "every hall-of-shame frame (see-through middle), or one each below",
+       "size": "4:5"
+      },
+      {
+       "slot": "assets/living/shame-frame-1",
+       "what": "hall of shame frame 1",
+       "size": "4:5",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/shame-frame-2",
+       "what": "hall of shame frame 2",
+       "size": "1:1",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/shame-frame-3",
+       "what": "hall of shame frame 3",
+       "size": "4:5",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/shame-frame-4",
+       "what": "hall of shame frame 4",
+       "size": "5:4",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/shame-frame-5",
+       "what": "hall of shame frame 5",
+       "size": "4:5",
+       "optional": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "loot",
+   "name": "hidden things",
+   "note": "the loot scattered about the site (sky/loot.js): each one’s picture, in the hotbar and lying where it falls.",
+   "groups": [
+    {
+     "name": "hidden things (sky/loot.js)",
+     "slots": [
+      {
+       "slot": "assets/items/doom-record",
+       "what": "the P(Doom) record in its sleeve: falls out when you shoot the hall of shame’s frame 6",
+       "size": "1:1"
+      },
+      {
+       "slot": "assets/items/gimp-suit",
+       "what": "Grok’s Gimp suit: in the hallway’s coats (click them a few times)",
+       "size": "1:1"
+      },
+      {
+       "slot": "assets/items/gimp-suit-worn",
+       "what": "the suit, worn: laid over the traveller wherever they are (same canvas as the characters; without it they go black with a zipped mask)",
+       "size": "same canvas as the characters",
+       "optional": true
+      }
+     ]
+    }
+   ]
+  },
+  {
    "id": "characters",
    "name": "characters",
    "groups": [
@@ -1196,6 +1424,11 @@
       {
        "slot": "assets/characters/city",
        "what": "the traveller: stargazing on the rooftop. feet on the bottom edge, facing right",
+       "size": "240–480 px tall"
+      },
+      {
+       "slot": "assets/characters/dungeon",
+       "what": "the traveller: down in the dungeon. feet on the bottom edge, facing right",
        "size": "240–480 px tall"
       }
      ]
@@ -1313,6 +1546,29 @@
        "what": "walking in the hallway (a GIF, facing right)",
        "size": "same canvas",
        "optional": true
+      },
+      {
+       "slot": "assets/characters/mini-claube",
+       "what": "a little Claube (the P(Doom) easter egg): standing about",
+       "size": "40:52, feet at the bottom"
+      },
+      {
+       "slot": "assets/characters/mini-claube-dancing",
+       "what": "a little Claube dancing (a GIF)",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/mini-claube-happy",
+       "what": "a little Claube when the music stops, beaming",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/disco-ball",
+       "what": "the disco ball that comes down for the P(Doom) party lights (see-through)",
+       "size": "1:1, e.g. 200 x 200",
+       "optional": true
       }
      ]
     }
@@ -1343,6 +1599,21 @@
       {
        "slot": "assets/sounds/thunder",
        "what": "one roll of thunder (played now and then, not looped)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/dungeon",
+       "what": "the dungeon’s own sound, looped (it takes over from the music and the noise machine while you’re down there)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/tub-tap",
+       "what": "the bath tap running, looped",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/tub-drain",
+       "what": "the bath draining down the plughole, looped",
        "kind": "sound"
       }
      ]
@@ -1472,7 +1743,7 @@
       },
       {
        "slot": "assets/sounds/tap",
-       "what": "the bath tap running (played for as long as it fills)",
+       "what": "the squeak of the bath tap’s handle",
        "kind": "sound"
       },
       {
@@ -1493,6 +1764,71 @@
       {
        "slot": "assets/sounds/door-metal",
        "what": "the steel roof access door: clank, squeal, boom",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/unnerve",
+       "what": "behind mel’s boards, before the scare: something’s wrong (about 4 s)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/scare",
+       "what": "the jump scare",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/typing",
+       "what": "mel typing (about 2 s; played over and over while she types)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/sparkle",
+       "what": "claube tidying mel’s room, as if by magic",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/book",
+       "what": "the book pulled on the shelf: a click, the wall grinding open (about 3 s)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/bang",
+       "what": "a gunshot",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/shatter",
+       "what": "a record shot to pieces",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/flick",
+       "what": "a little Claube flicked away",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/claube-flick",
+       "what": "a little claube flicked away: its squeaky “wheee”",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/claube-shot",
+       "what": "a little claube, shot",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/loot",
+       "what": "something hidden turning up",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/record-in",
+       "what": "a found record going into the crate for keeps",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/page-turn",
+       "what": "a page of a book turned",
        "kind": "sound"
       }
      ]

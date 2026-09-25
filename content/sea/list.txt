@@ -1,3 +1,4 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
-2026-09-24-hello-world.txt
+2026-09-25-hello-world.txt
+2026-09-25-mmmmm.jpg

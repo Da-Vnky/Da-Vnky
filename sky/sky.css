@@ -978,6 +978,11 @@ body.visitors-open .room-arrow, body.frame-open .room-arrow, body.model-open .ro
     opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility 0s .3s; }
 
 /* the living space's side rooms wait off either edge (hidden) from the very first frame; sky/bathroom.js slides them in */
-.bathroom, .hallway { position: fixed; inset: 0; z-index: 3; overflow: hidden; visibility: hidden; }
+.bathroom, .hallway, .dungeon { position: fixed; inset: 0; z-index: 3; overflow: hidden; visibility: hidden; }
+.dungeon { transform: translateY(100%); }
 .bathroom { transform: translateX(100%); }
 .hallway { transform: translateX(-100%); }
+
+/* Polaris shows only where you'd really see it: outdoors on the homepage, or out through
+   a window or the telescope (the sky view). indoors, and on the rooftop at a glance, it's hidden. */
+body:not([data-page=home]):not(.sky-view) .polaris { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }

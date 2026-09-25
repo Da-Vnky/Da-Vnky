@@ -152,7 +152,7 @@
             if (!t) { sessionStorage.removeItem(KEY); return; }
             sessionStorage.setItem(KEY, JSON.stringify({
                 tracks: tracks.map(function (x) { return { url: x.url, title: x.title, artist: x.artist || '', color: x.color, pic: /^blob:/.test(x.pic || '') ? '' : (x.pic || '') }; }),
-                at: at, time: audio.currentTime || 0, playing: playing() || wantPlay, savedAt: Date.now()
+                at: at, time: audio.currentTime || 0, playing: playing() || wantPlay || (hushed && hushedOn), savedAt: Date.now()
             }));
         } catch (e) {}
     }
@@ -172,7 +172,15 @@
         if (play) start();
         save();
     }
+    // hushed: silenced for a while (the dungeon has its own sound) without forgetting it was on
+    var hushed = false, hushedOn = false;
+    function hush(on) {
+        if (on === hushed) return;
+        if (on) { hushedOn = playing() || wantPlay; hushed = true; wantPlay = false; audio.pause(); save(); }
+        else { hushed = false; if (hushedOn) start(); hushedOn = false; }
+    }
     function start() {
+        hushed = false;
         wantPlay = true;
         var p = audio.play();
         if (p && p.catch) p.catch(function () {
@@ -573,7 +581,7 @@
         get tracks() { return tracks; }, get at() { return at; },
         current: current, playing: playing,
         load: load, play: function (i) { if (i === undefined) start(); else load(i, true); },
-        pause: pause, toggle: toggle, next: next, prev: prev, stop: stop,
+        pause: pause, toggle: toggle, next: next, prev: prev, stop: stop, hush: hush,
         setTracks: setTracks, setVolume: setVolume, dressGrooves: dressGrooves,
         on: function (fn) { listeners.push(fn); }
     };

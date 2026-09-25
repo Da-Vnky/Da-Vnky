@@ -72,7 +72,7 @@
         'body.in-bath .bathroom { transform: none; visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
         'body.in-bath .room { transform: translateX(-100%); }' +
         'body.bath-panning .bathroom { visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
-        'body.in-side .sky-links { visibility: hidden; }' +
+        'body.in-side .sky-links, body.in-side .sky-links * { visibility: hidden !important; }' +      // (no sky through these walls)
         // the hallway: waits off to the left
         '.hallway { position: fixed; inset: 0; z-index: 3; overflow: hidden; transform: translateX(-100%); visibility: hidden; --floor-h: 11vh;' +
             'background: linear-gradient(transparent 62%, #3a2a1f 62%, #3a2a1f calc(62% + 10px), transparent calc(62% + 10px)),' +
@@ -85,6 +85,24 @@
         'body.in-hall .hallway { transform: none; visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
         'body.in-hall .room { transform: translateX(100%); }' +
         'body.hall-panning .hallway { visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
+        // the dungeon: waits underneath; the living space rises away as it comes up
+        'body.sides-ready .dungeon { transition: transform 1.1s cubic-bezier(.55, 0, .25, 1), visibility 0s 1.1s; }' +
+        'body.in-dungeon .dungeon { transform: none; visibility: visible; transition: transform 1.1s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
+        'body.in-dungeon .room { transform: translateY(-100%); transition: transform 1.1s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
+        'body.dungeon-panning .dungeon { visibility: visible; transition: transform 1.1s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
+        'body.dungeon-panning .room { transition: transform 1.1s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
+        '.room.rumble { animation: dg-rumble .09s linear infinite alternate; }' +
+        '@keyframes dg-rumble { from { transform: translate(-1px, 1px); } to { transform: translate(1px, -1px); } }' +
+        '.shelf-book { cursor: pointer; z-index: 3; transform-origin: 50% 100%; transition: transform .5s cubic-bezier(.3,1.6,.5,1), filter .25s; }' +
+        '.shelf-book > svg, .shelf-book > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
+        '.shelf-book:hover, .shelf-book:focus-visible { filter: drop-shadow(0 0 6px rgba(255,220,150,.7)); outline: none; }' +
+        '.shelf-book.pulled { transform: rotate(-24deg) translateX(-12%); }' +
+        '.shelf-book .sb-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font-style: italic; font-size: .9rem;' +
+            'color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.8); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
+        '.shelf-book:hover .sb-hint, .shelf-book:focus-visible .sb-hint { opacity: 1; }' +
+        '.room-arrow.to-upstairs { position: absolute; left: 14px; top: 50%; margin-top: -27px; }' +
+        '.room-arrow.to-upstairs > svg, .room-arrow.to-upstairs > .art { transform: rotate(-90deg); }' +
+        '.room-arrow.to-upstairs:hover, .room-arrow.to-upstairs:focus-visible { transform: translateY(-4px); }' +
         '.hallway .furnish { position: absolute; z-index: 2; }' +
         '.hallway .room-floor { position: absolute; left: 0; right: 0; bottom: 0; height: var(--floor-h); min-height: 34px; z-index: 1; pointer-events: none; }' +
         '.hallway .room-floor .placeholder, .hallway .room-floor > .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: fill; }' +
@@ -135,7 +153,7 @@
         '.mirror-view.done .mv-more { opacity: .6; }' +
         'body.mirror-open .place-tabs, body.mirror-open .cp { opacity: 0; pointer-events: none; }' +
         '@media (max-width: 620px) { .mv-text { font-size: 1.25rem; padding: 16px 18px; } }' +
-        '@media (prefers-reduced-motion: reduce) { .bathroom, .hallway, .bath-character, .hall-character, .room .scene-character { transition-duration: 0s !important; } }'
+        '@media (prefers-reduced-motion: reduce) { .room.rumble { animation: none; } .bathroom, .hallway, .dungeon, .bath-character, .hall-character, .room .scene-character { transition-duration: 0s !important; } }'
     );
 
     /* ---------------- the arrows sit just under the tabs (the hallway's on the left) ---------------- */
@@ -149,6 +167,12 @@
         go.style.right = '8px';
         var left = document.querySelector('.room-arrow.to-hall');
         if (left) { left.style.top = Math.round(top) + 'px'; left.style.left = '8px'; }
+        // and the arrows back from the side rooms: the same height, so going and coming back they don't jump about
+        Array.prototype.forEach.call(document.querySelectorAll('.bathroom .room-arrow, .hallway .room-arrow, .dungeon .room-arrow'), function (a) {
+            a.style.top = Math.round(top) + 'px';
+            a.style.marginTop = '0';
+            if (a.classList.contains('back-right')) a.style.right = '8px'; else a.style.left = '8px';
+        });
     }
     placeArrows();
     window.addEventListener('resize', placeArrows);
@@ -193,8 +217,26 @@
        they walk in from the edge you'd expect. living.html#bathroom / #hallway starts you in there. */
     var SIDES = [
         { name: 'bath', el: bath, go: go, dir: 1, hash: '#bathroom' },
-        { name: 'hall', el: document.querySelector('.hallway'), go: document.querySelector('.room-arrow.to-hall'), dir: -1, hash: '#hallway' }
+        { name: 'hall', el: document.querySelector('.hallway'), go: document.querySelector('.room-arrow.to-hall'), dir: -1, hash: '#hallway' },
+        // the dungeon is underneath: pull the loose book on the bookshelf and down you go (dir 0: up and down, not sideways)
+        { name: 'dungeon', el: document.querySelector('.dungeon'), go: document.querySelector('.shelf-book:not(.decoy)'), dir: 0, hash: '#dungeon', enterAt: 9 }
     ].filter(function (sd) { return sd.el && sd.go; });
+    // the living space's tab only counts as "you are here" in the living space itself (and the bathroom),
+    // not out in the hallway or down in the dungeon: from there, it takes you back in
+    var livingTab = document.querySelector('.place-tab[data-place=living]');
+    function tabHere(on) {
+        if (!livingTab) return;
+        livingTab.classList.toggle('here', on);
+        if (on) livingTab.setAttribute('aria-current', 'page'); else livingTab.removeAttribute('aria-current');
+        livingTab.setAttribute('role', on ? 'text' : 'link');
+        livingTab.tabIndex = on ? -1 : 0;
+        var nm = livingTab.querySelector('.pt-name');
+        if (nm) nm.textContent = nm.textContent.replace(/ · you are here$/, '') + (on ? ' · you are here' : '');
+    }
+    if (livingTab) {
+        livingTab.addEventListener('click', function (e) { if (inSide && inSide.name !== 'bath') { e.preventDefault(); goHome(); } });
+        livingTab.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && inSide && inSide.name !== 'bath') { e.preventDefault(); goHome(); } });
+    }
     var homeAt = home ? leftPct(home) : 34, busy = false, inSide = null;
     SIDES.forEach(function (sd) {
         sd.me = sd.el.querySelector('.character');
@@ -202,15 +244,19 @@
         sd.standAt = sd.me ? leftPct(sd.me) : 40;
     });
     var OFF = { '1': 104, '-1': -14 };                       // just past the right / left edge
+    function bookAt() { return (sd0().go.offsetLeft + sd0().go.offsetWidth / 2 - home.offsetWidth / 2) / (room.clientWidth || window.innerWidth) * 100; }
+    function sd0() { return SIDES.filter(function (x) { return x.dir === 0; })[0]; }
     function goTo(sd, instant) {
         if (busy || inSide) return;
         busy = true; inSide = sd;
         body.classList.add('side-walking');
         homeAt = home ? leftPct(home) : homeAt;
+        if (sd.name !== 'bath') tabHere(false);
         function slide() {
             sd.el.setAttribute('aria-hidden', 'false');
-            if (sd.me) place(sd.me, sd.dir > 0 ? 2 : 90, sd.dir < 0);       // in from the edge you came through
+            if (sd.me) place(sd.me, sd.dir > 0 ? 2 : sd.dir < 0 ? 90 : sd.enterAt, sd.dir < 0);       // in from the edge (or the stairs) you came through
             body.classList.add(sd.name + '-panning', 'in-' + sd.name, 'in-side');
+            fire('enter', sd);
             setTimeout(function () {
                 body.classList.remove(sd.name + '-panning');
                 var arrive = function () { busy = false; body.classList.remove('side-walking'); if (sd.me) sd.me.classList.remove('face-left'); };
@@ -224,6 +270,16 @@
             if (instant) { void sd.el.offsetWidth; if (sd.me) place(sd.me, sd.standAt); setTimeout(function () { sd.el.style.transition = room.style.transition = ''; }, 50); }
             return;
         }
+        if (sd.dir === 0) {                                  // over to the bookshelf, pull the book: the wall grinds open
+            walk(home, bookAt(), function () {
+                home.classList.remove('face-left');
+                sd.go.classList.add('pulled');
+                if (Sky.sounds) Sky.sounds.sfx('book');
+                setTimeout(function () { room.classList.add('rumble'); }, 500);
+                setTimeout(function () { room.classList.remove('rumble'); slide(); }, 1900);
+            });
+            return;
+        }
         walk(home, OFF[sd.dir]);                             // off the edge; the room slides as they reach it
         setTimeout(slide, walkSecs(home, OFF[sd.dir]) * 700);
     }
@@ -233,11 +289,14 @@
         busy = true;
         body.classList.add('side-walking');
         function slide() {
-            if (home) place(home, sd.dir > 0 ? 98 : -6, sd.dir > 0);
+            if (home) place(home, sd.dir > 0 ? 98 : sd.dir < 0 ? -6 : bookAt(), sd.dir > 0);
+            if (sd.dir === 0) sd.go.classList.remove('pulled');
             body.classList.add(sd.name + '-panning');
             body.classList.remove('in-' + sd.name, 'in-side');
             sd.el.setAttribute('aria-hidden', 'true');
             inSide = null;
+            tabHere(true);
+            fire('leave', sd);
             try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
             setTimeout(function () {
                 body.classList.remove(sd.name + '-panning');
@@ -245,11 +304,18 @@
                 if (home) walk(home, homeAt, arrive); else arrive();
             }, 900);
         }
+        if (sd.dir === 0 && sd.me && !sd.me.classList.contains('gore-hidden')) { walk(sd.me, sd.enterAt, slide); return; }    // back to the foot of the stairs, then up
         if (sd.me && !sd.me.classList.contains('gore-hidden')) { walk(sd.me, OFF[-sd.dir]); setTimeout(slide, walkSecs(sd.me, OFF[-sd.dir]) * 700); } else slide();
     }
+    var hooks = [];
+    function fire(what, sd) { hooks.forEach(function (fn) { try { fn(what, sd.name); } catch (e) {} }); }
     SIDES.forEach(function (sd) {
         sd.go.addEventListener('click', function (e) { e.preventDefault(); goTo(sd); });
         if (sd.back) sd.back.addEventListener('click', function (e) { e.preventDefault(); goHome(); });
+        Array.prototype.forEach.call(sd.el.querySelectorAll('[data-goes-back]'), function (b) {
+            b.addEventListener('click', function (e) { e.preventDefault(); goHome(); });
+            b.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goHome(); } });
+        });
         if (location.hash !== sd.hash) return;
         goTo(sd, true);
         // back through one of this room's doors (from the workshop, off the roof): out of that door and back to their spot
@@ -308,7 +374,8 @@
         });
         SIDES.forEach(function (sd) { if (sd.me) { sd.me.classList.remove('gore-hidden'); place(sd.me, sd.standAt); } });
     });
-    Sky.sides = { get inSide() { return inSide && inSide.name; }, get busy() { return busy; }, walk: walk, place: place, leftPct: leftPct };
+    Sky.sides = { get inSide() { return inSide && inSide.name; }, get busy() { return busy; }, walk: walk, place: place, leftPct: leftPct,
+                  on: function (fn) { hooks.push(fn); if (inSide) fn('enter', inSide.name); }, home: goHome };
 
     /* ---------------- the mirror ---------------- */
     if (!mirror) return;

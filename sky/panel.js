@@ -131,6 +131,48 @@
                 }
             };
         },
+        // the bathtub's tap running, and its plughole gurgling (sky/tub.js turns them up and down)
+        'tub-tap': function (out) {
+            var bp = filter('bandpass', 1500, 0.7);
+            chain(loop('white', 3), bp, gain(0.45), out);
+            chain(loop('pink', 4), filter('lowpass', 600), gain(0.25), out);
+            lfo(0.7, 160, bp.frequency);
+        },
+        'tub-drain': function (out) {
+            var bp = filter('bandpass', 300, 2.2), g = gain(0.8);
+            chain(loop('brown', 4), bp, g, out);
+            lfo(0.9, 140, bp.frequency);
+            return function (level) {                                // glugs
+                if (level < 0.02 || !ctx) return;
+                var t0 = ctx.currentTime;
+                for (var i = 0; i < 4; i++) if (Math.random() < 0.7) { var t = t0 + Math.random(), f = 160 + Math.random() * 240; tone(out, t, 'sine', f, f * 2.4, 0.08, 0.14 * level); }
+            };
+        },
+        // the dungeon: a low hollow drone, a draught through the stones, drips and the odd clink of a chain
+        dungeon: function (out) {
+            [55, 55.4, 82.6].forEach(function (f, i) {
+                var o = ctx.createOscillator(), g = gain(0), lf = ctx.createOscillator(), lg = gain(0.05);
+                o.type = i === 2 ? 'sine' : 'sawtooth'; o.frequency.value = f;
+                lf.frequency.value = 0.07 + i * 0.03; lf.connect(lg); lg.connect(g.gain);
+                g.gain.value = i === 2 ? 0.1 : 0.07;
+                chain(o, filter('lowpass', 240, 1.5), g, out);
+                o.start(); lf.start();
+            });
+            chain(loop('brown', 6), filter('bandpass', 180, 0.8), gain(0.35), out);
+            return function (level) {
+                if (level < 0.02 || !ctx) return;
+                var t0 = ctx.currentTime;
+                if (Math.random() < 0.6) {                               // a drip, echoing
+                    var t = t0 + Math.random(), f = 900 + Math.random() * 900;
+                    tone(out, t, 'sine', f, f * 0.55, 0.06, 0.08 * level);
+                    tone(out, t + 0.28, 'sine', f, f * 0.55, 0.06, 0.03 * level);
+                }
+                if (Math.random() < 0.08) {                              // a chain, somewhere
+                    var c = t0 + Math.random();
+                    for (var i = 0; i < 4; i++) tone(out, c + i * 0.07, 'triangle', 1900 + Math.random() * 900, 1500, 0.12, 0.03 * level);
+                }
+            };
+        },
         storm: function (out, ch) {
             chain(loop('white', 3), filter('highpass', 350), filter('lowpass', 5200), gain(0.7), out);
             chain(loop('brown', 5), filter('lowpass', 420), gain(1.0), out);
@@ -252,7 +294,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry', 'unnerve', 'scare', 'typing', 'sparkle', 'bang', 'flick', 'shatter', 'book', 'claube-flick', 'claube-shot', 'loot', 'record-in', 'page-turn'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {
@@ -432,6 +474,100 @@
             tone(out, t + 0.85, 'sine', 95, 45, 0.5, 0.9);                                                        // the boom as it shuts
             noiseHit(out, t + 0.85, 0.12, 'lowpass', 600, 0.6, 0.5, 0.002);
             [[180, 0.15], [433, 0.08], [760, 0.05]].forEach(function (h) { tone(out, t + 0.86, 'sine', h[0], h[0] * 0.99, 1.1, h[1]); });   // and rings
+        },
+        'unnerve': function (out, t) {                                 // something's wrong: a slow dissonant swell, a heartbeat under it (about 4 s)
+            var len = 4.2;
+            [[98, 104.2], [146.8, 155.6], [392, 415.3]].forEach(function (pr, i) {
+                pr.forEach(function (f) {
+                    var o = ctx.createOscillator(), g = gain(0);
+                    o.type = i === 2 ? 'sine' : 'sawtooth'; o.frequency.setValueAtTime(f, t); o.frequency.linearRampToValueAtTime(f * 1.06, t + len);
+                    chain(o, filter('lowpass', 600 + i * 400, 1), g, out);
+                    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(i === 2 ? 0.05 : 0.09, t + len * 0.9); g.gain.exponentialRampToValueAtTime(0.0001, t + len + 0.2);
+                    o.start(t); o.stop(t + len + 0.3);
+                });
+            });
+            for (var b = 0; b < 5; b++) { var at = t + 0.5 + b * 0.75 - b * b * 0.02; tone(out, at, 'sine', 60, 40, 0.18, 0.5); tone(out, at + 0.22, 'sine', 55, 38, 0.16, 0.35); }
+        },
+        'scare': function (out, t) {                                   // the jump scare: a shrieking stab
+            [[233, 0.5], [247, 0.5], [466, 0.35], [990, 0.2], [1480, 0.12]].forEach(function (h) {
+                var o = ctx.createOscillator(), g = gain(0);
+                o.type = 'sawtooth'; o.frequency.setValueAtTime(h[0] * 1.02, t); o.frequency.exponentialRampToValueAtTime(h[0] * 0.9, t + 1.4);
+                chain(o, g, out);
+                g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(h[1], t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+                o.start(t); o.stop(t + 1.6);
+            });
+            noiseHit(out, t, 0.9, 'highpass', 1200, 0, 0.6, 0.005);
+            tone(out, t, 'sine', 80, 30, 0.8, 1);
+        },
+        'typing': function (out, t) {                                  // fingers on a mechanical keyboard, a couple of seconds
+            var at = t;
+            for (var i = 0; i < 18; i++) {
+                noiseHit(out, at, 0.02, 'bandpass', 2500 + Math.random() * 2500, 3, 0.18 + Math.random() * 0.12, 0.001);
+                tone(out, at, 'square', 180 + Math.random() * 60, 120, 0.02, 0.04);
+                at += 0.06 + Math.random() * 0.12 + (Math.random() < 0.12 ? 0.25 : 0);
+            }
+        },
+        'sparkle': function (out, t) {                                 // tidied up, as if by magic
+            for (var i = 0; i < 14; i++) { var f = 1200 + Math.random() * 2600; tone(out, t + i * 0.05 + Math.random() * 0.03, 'sine', f, f * 1.01, 0.5, 0.06); }
+            [523, 659, 784, 1047].forEach(function (f, i) { tone(out, t + 0.4 + i * 0.09, 'triangle', f, f, 0.6, 0.12); });
+        },
+        'bang': function (out, t) {                                    // a revolver shot: a crack, a boom, a ringing tail
+            noiseHit(out, t, 0.08, 'highpass', 1500, 0, 1, 0.001);
+            var f = noiseHit(out, t, 0.6, 'lowpass', 3000, 0.7, 0.8, 0.002);
+            f.frequency.exponentialRampToValueAtTime(200, t + 0.6);
+            tone(out, t, 'sine', 140, 40, 0.35, 1);
+            tone(out, t + 0.05, 'sine', 4200, 4150, 1.2, 0.02);            // your ears ringing
+        },
+        'flick': function (out, t) {                                   // flicked away: a quick whoosh and a tiny "wheee"
+            var f = noiseHit(out, t, 0.3, 'bandpass', 800, 1.5, 0.35, 0.02);
+            f.frequency.exponentialRampToValueAtTime(3000, t + 0.3);
+            tone(out, t + 0.05, 'triangle', 900, 1800, 0.35, 0.08);
+        },
+        'claube-flick': function (out, t) {                            // a little claube flicked away: a thwip, then a squeaky "wheeeee" going off into the distance
+            noiseHit(out, t, 0.06, 'bandpass', 2400, 2, 0.4, 0.002);
+            var o = ctx.createOscillator(), g = gain(0), v = ctx.createOscillator(), vg = gain(60);
+            o.type = 'square'; v.frequency.value = 22; v.connect(vg); vg.connect(o.frequency);
+            o.frequency.setValueAtTime(1300, t + 0.04); o.frequency.exponentialRampToValueAtTime(2600, t + 0.25); o.frequency.exponentialRampToValueAtTime(700, t + 1.1);
+            g.gain.setValueAtTime(0.0001, t + 0.04); g.gain.exponentialRampToValueAtTime(0.07, t + 0.1); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.15);
+            chain(o, filter('lowpass', 3500), g, out);
+            o.start(t + 0.04); v.start(t + 0.04); o.stop(t + 1.2); v.stop(t + 1.2);
+        },
+        'claube-shot': function (out, t) {                             // a little claube, shot: a squeak cut short, and a wet little pop
+            tone(out, t, 'square', 1800, 2400, 0.07, 0.07);
+            tone(out, t + 0.05, 'sine', 900, 120, 0.16, 0.25);
+            noiseHit(out, t + 0.05, 0.12, 'lowpass', 1200, 0.8, 0.5, 0.002);
+            for (var i = 0; i < 5; i++) tone(out, t + 0.2 + Math.random() * 0.3, 'sine', 400 + Math.random() * 400, 200, 0.05, 0.05);
+        },
+        'page-turn': function (out, t) {                              // a page of a book turned over
+            var f = noiseHit(out, t, 0.22, 'bandpass', 2600, 0.7, 0.22, 0.04);
+            f.frequency.exponentialRampToValueAtTime(900, t + 0.22);
+            noiseHit(out, t + 0.2, 0.05, 'lowpass', 1400, 0.5, 0.12, 0.004);
+        },
+        'loot': function (out, t) {                                    // something hidden turns up: a little fanfare
+            [523, 659, 784, 1047, 1319].forEach(function (f, i) { tone(out, t + i * 0.07, 'triangle', f, f, 0.35, 0.1); });
+            for (var i = 0; i < 8; i++) { var f2 = 2000 + Math.random() * 2500; tone(out, t + 0.3 + i * 0.04, 'sine', f2, f2, 0.3, 0.03); }
+        },
+        'record-in': function (out, t) {                               // a record slid into the crate for keeps
+            var f = noiseHit(out, t, 0.35, 'bandpass', 1400, 1, 0.3, 0.05);
+            f.frequency.exponentialRampToValueAtTime(600, t + 0.35);
+            knock(out, t + 0.36, 0.3);
+            [784, 1047].forEach(function (fq, i) { tone(out, t + 0.45 + i * 0.1, 'triangle', fq, fq, 0.4, 0.09); });
+        },
+        'shatter': function (out, t) {                                 // a record blown apart
+            for (var i = 0; i < 20; i++) { var d = t + Math.random() * 0.5; noiseHit(out, d, 0.04 + Math.random() * 0.06, 'highpass', 2500 + Math.random() * 3000, 0, 0.3, 0.001); tone(out, d, 'sine', 1500 + Math.random() * 3000, 1200, 0.1, 0.05); }
+            knock(out, t + 0.1, 0.4);
+        },
+        'book': function (out, t) {                                    // a book tipped out, a click, then stone grinding as the shelf swings away
+            rustle(out, t, 0.25, 1500);
+            noiseHit(out, t + 0.3, 0.03, 'bandpass', 2400, 3, 0.4, 0.001);
+            var n = ctx.createBufferSource(); n.buffer = noiseBuf('brown', 5);
+            var g = gain(0), f = filter('lowpass', 300, 2);
+            chain(n, f, g, out);
+            g.gain.setValueAtTime(0.0001, t + 0.5); g.gain.exponentialRampToValueAtTime(0.9, t + 0.9);
+            for (var k = 0; k < 10; k++) g.gain.linearRampToValueAtTime(0.4 + Math.random() * 0.5, t + 0.9 + k * 0.18);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 3);
+            n.start(t + 0.5); n.stop(t + 3.1);
+            knock(out, t + 2.9, 1);
         },
         'door': function (out, t) {                                    // a door: the latch, a creak, and it swings
             noiseHit(out, t, 0.04, 'bandpass', 2200, 2, 0.35, 0.002);

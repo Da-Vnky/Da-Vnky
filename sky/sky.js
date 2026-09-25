@@ -40,7 +40,7 @@
     var PLACES = [
         { id: 'sea',      name: 'the sea',          href: HOME },
         { id: 'workshop', name: 'the workshop',     href: 'workshop.html' },
-        { id: 'city',     name: 'the city',         href: 'city.html' },
+        { id: 'city',     name: 'the rooftop',      href: 'city.html' },
         { id: 'living',   name: 'the living space', href: 'living.html' }
     ];
 

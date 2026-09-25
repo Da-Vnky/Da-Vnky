@@ -95,7 +95,29 @@
         </details>
     </section>
 
-    <p class="sub"><button type="button" class="btn change-sb" hidden>change the Supabase connection</button></p>
+    <p class="sub"><button type="button" class="btn change-sb" hidden>change the Supabase connection</button>
+        <button type="button" class="btn show-notify">phone notifications</button></p>
+
+    <!-- a ping on your phone when a visitor leaves something (ntfy.sh + a trigger in your Supabase; tools/supabase-notify.sql) -->
+    <section class="setup notify" hidden>
+        <h2 style="margin-top:0">a notification on your phone when post arrives</h2>
+        <p class="sub nf-nosb" hidden>this needs your Supabase post office connected first (above).</p>
+        <p class="sub">whenever a visitor sends a bottle or a painting, your phone buzzes, so you know to come here and check. it uses <a href="https://ntfy.sh" target="_blank" style="color:#f3e6c2">ntfy.sh</a>, a free notification service: no account needed. only “a bottle / a painting, from (their name)” is sent, never the message or the picture.</p>
+        <p class="nf-start"><button type="button" class="btn main nf-setup">set it up</button></p>
+        <div class="nf-steps" hidden>
+            <ol>
+                <li>on your phone, get the free <b>ntfy</b> app (App Store or Google Play). tap <b>+</b>, and subscribe to this topic:<br>
+                    <code class="nf-topic"></code> <button type="button" class="btn nf-copy-topic">copy</button><br>
+                    <span class="sub">(or on a computer: open <a class="nf-link" target="_blank" style="color:#f3e6c2"></a> and let it show notifications.) the topic is your private address: keep it to yourself.</span></li>
+                <li>on <a href="https://supabase.com/dashboard" target="_blank" style="color:#f3e6c2">supabase.com</a>, open your project → <b>SQL Editor → New query</b>, paste this and press <b>Run</b> (once):<br>
+                    <textarea class="nf-sql" readonly rows="6" style="width:100%;margin-top:6px;font:.8rem ui-monospace,Menlo,monospace;background:rgba(0,0,0,.3);color:#f3e6c2;border:1px solid rgba(243,230,194,.3);border-radius:8px;padding:8px"></textarea>
+                    <button type="button" class="btn nf-copy-sql">copy it</button></li>
+                <li><button type="button" class="btn main nf-test">send a test</button> <span class="sub">it should pop up on your phone within a few seconds.</span></li>
+            </ol>
+            <p class="sub">to switch it off, run <code>drop trigger if exists dav_notify on public.post;</code> in the SQL Editor. think someone else knows your topic?
+               <button type="button" class="btn nf-fresh">make a new one</button> (then subscribe to it and run the new SQL).</p>
+        </div>
+    </section>
     <h2>just arrived <button type="button" class="btn keep-all" hidden>keep everything</button></h2>
     <p class="sub">new bottles and art from visitors. only you can see these; keep one and it goes on the site (after you publish).</p>
     <div class="grid inbox"></div>
@@ -153,6 +175,7 @@
     function esc(t) { var d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
 
     function draw(st) {
+        srcNow = st.source;
         $('.setup').hidden = st.source === 'supabase' && !showSetup;    // connected: hidden unless you ask to change it
         $('.change-sb').hidden = st.source !== 'supabase';
         $('.fetch').hidden = !st.hasKey;
@@ -262,7 +285,7 @@
             row.innerHTML = '<span class="hl">' + w.label + ':</span>';
             w.numbers.forEach(function (n) {
                 var b = document.createElement('button');
-                b.type = 'button'; b.textContent = n; b.title = 'frame ' + n;
+                b.type = 'button'; b.textContent = w.names && w.names[n] ? n + ' · ' + w.names[n] : n; b.title = 'frame ' + n;
                 b.setAttribute('aria-pressed', String(inFrame === String(n)));
                 b.addEventListener('click', function () { hangIt(path, inFrame === String(n) ? '' : n, w); });
                 row.appendChild(b);
@@ -299,6 +322,35 @@
             refresh().then(check);
         });
     });
+    /* ---------------- phone notifications ---------------- */
+    var srcNow = '';
+    function drawNotify(n) {
+        $('.nf-nosb').hidden = srcNow === 'supabase';
+        $('.nf-start').hidden = !!n.topic;
+        $('.nf-steps').hidden = !n.topic;
+        if (!n.topic) return;
+        $('.nf-topic').textContent = n.topic;
+        $('.nf-link').href = 'https://ntfy.sh/' + n.topic;
+        $('.nf-link').textContent = 'ntfy.sh/' + n.topic;
+        $('.nf-sql').value = n.sql;
+    }
+    function copy(text, what) {
+        (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { say(what + ' copied.'); }, function () { say('select it and press Ctrl+C', true); });
+    }
+    $('.show-notify').addEventListener('click', function () {
+        var sec = $('.notify');
+        sec.hidden = !sec.hidden;
+        if (!sec.hidden) api('/__notify/state').then(function (n) { if (n.error) { say(n.error, true); return; } drawNotify(n); });
+    });
+    $('.nf-setup').addEventListener('click', function () { api('/__notify/setup', {}).then(function (n) { if (n.error) { say(n.error, true); return; } drawNotify(n); say('your topic is ready: follow the three steps.'); }); });
+    $('.nf-fresh').addEventListener('click', function () { api('/__notify/setup', { fresh: true }).then(function (n) { if (n.error) { say(n.error, true); return; } drawNotify(n); say('a new topic: subscribe to it on your phone and run the new SQL in Supabase.'); }); });
+    $('.nf-copy-topic').addEventListener('click', function () { copy($('.nf-topic').textContent, 'the topic'); });
+    $('.nf-copy-sql').addEventListener('click', function () { copy($('.nf-sql').value, 'the SQL'); });
+    $('.nf-test').addEventListener('click', function () {
+        say('sending a test…');
+        api('/__notify/test', {}).then(function (n) { if (n.error) { say(n.error, true); return; } say('a test is on its way to your phone. (a real one comes whenever a visitor sends something, once the SQL has been run.)'); });
+    });
+
     function check() {
         say('checking for new post…');
         api('/__post/fetch', {}).then(function (r) {

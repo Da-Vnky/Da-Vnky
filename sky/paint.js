@@ -53,14 +53,12 @@
             'background: #eadcb9; box-shadow: 0 6px 14px rgba(0,0,0,.4), inset 0 0 14px rgba(120,80,30,.2); }' +
         '.pt-side h3 { margin: 2px 0 0; font: normal .95rem "IM Fell English SC", Georgia, serif; color: #6e5236; }' +
         '.pt-colour { display: flex; align-items: center; gap: 8px; }' +
-        '.pt-now { flex: none; width: 42px; height: 42px; padding: 3px; border: 0; border-radius: 50%; cursor: pointer;' +
-            'background: conic-gradient(#f33, #fb3, #ff3, #3d3, #3cf, #33f, #c3f, #f3a, #f33); box-shadow: 0 1px 4px rgba(0,0,0,.35); }' +
-        '.pt-now:hover { transform: scale(1.06); }' +
-        '.pt-now span { display: block; width: 100%; height: 100%; border-radius: 50%; border: 2px solid #eadcb9; }' +
+        '.pt-now { flex: none; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: none; box-shadow: 0 0 0 2px #f8f0dc, 0 0 0 3px rgba(58,39,22,.45), 0 1px 4px rgba(0,0,0,.35); }' +
+        '.pt-now span { display: block; width: 100%; height: 100%; border-radius: 50%; }' +
         '.pt-hexin { width: 6.2em; padding: 3px 6px; border: 1px solid rgba(110,82,54,.35); border-radius: 6px; background: #f8f0dc; font: .85rem ui-monospace, Menlo, monospace; color: #3a2716; }' +
         '.pt-tri { display: grid; place-items: center; padding: 4px 0; }' +
         '.pt-tri[hidden] { display: none; }' +
-        '.pt-tri canvas { width: 200px; height: 200px; cursor: crosshair; touch-action: none; }' +
+        '.pt-tri canvas { width: 200px; height: 200px; max-width: 100%; aspect-ratio: 1; cursor: crosshair; touch-action: none; }' +
         '.pt-stage.lassoing canvas { cursor: crosshair; }' +
         '.pt-stage.lassoing .pt-ring { display: none !important; }' +
         '.pt-hex { font-size: .85rem; color: #6e5236; font-family: ui-monospace, Menlo, monospace; }' +
@@ -112,9 +110,9 @@
                 '</div>' +
                 '<div class="pt-stage" style="--pt-ar:' + W + ' / ' + H + '"><canvas width="' + W + '" height="' + H + '"></canvas><div class="pt-ring"></div></div>' +
                 '<div class="pt-side">' +
-                    '<div class="pt-colour"><button type="button" class="pt-now" title="choose any colour" aria-expanded="false"><span></span></button>' +
+                    '<div class="pt-tri"><canvas width="400" height="400" aria-label="colour triangle: the ring picks the colour, the triangle how light, dark or grey"></canvas></div>' +
+                    '<div class="pt-colour"><span class="pt-now" title="the colour you\'re painting with"><span></span></span>' +
                         '<input class="pt-hexin" maxlength="7" spellcheck="false" aria-label="colour code"><span class="pt-hex" hidden></span></div>' +
-                    '<div class="pt-tri" hidden><canvas width="400" height="400" aria-label="colour triangle: the ring picks the colour, the triangle how light, dark or grey"></canvas></div>' +
                     '<div class="pt-sw pt-swatches">' + SWATCHES.map(function (c) { return '<button type="button" data-c="' + c + '" style="background:' + c + '" title="' + c + '"></button>'; }).join('') + '</div>' +
                     '<div class="pt-sw pt-recent"></div>' +
                     '<label class="pt-slider">size <input type="range" class="s-size" min="1" max="160" step="1"><output></output></label>' +
@@ -495,7 +493,7 @@
                 for (var i = 0; i <= 12; i++) { var q = hueRgb(i * 30); cg.addColorStop(i / 12, 'rgb(' + q.map(Math.round).join(',') + ')'); }
                 tx.fillStyle = cg;
             } else tx.fillStyle = '#c96';
-            tx.beginPath(); tx.arc(CX, CY, R1, 0, 7); tx.arc(CX, CY, R0, 0, 7, true); tx.fill();
+            tx.beginPath(); tx.arc(CX, CY, R1, 0, Math.PI * 2); tx.moveTo(CX + R0, CY); tx.arc(CX, CY, R0, Math.PI * 2, 0, true); tx.fill();
             var P = corners(), og = triOff.getContext('2d'), img = og.createImageData(TS, TS), d = img.data, C = hueRgb(hsv.h);
             var x0 = Math.floor(Math.min(P[0][0], P[1][0], P[2][0])), x1 = Math.ceil(Math.max(P[0][0], P[1][0], P[2][0]));
             var y0 = Math.floor(Math.min(P[0][1], P[1][1], P[2][1])), y1 = Math.ceil(Math.max(P[0][1], P[1][1], P[2][1]));
@@ -542,12 +540,9 @@
         });
         tc.addEventListener('pointermove', function (e) { if (triDragging) triMove(e); });
         tc.addEventListener('pointerup', function () { if (triDragging) { triDragging = null; use(state.colour); } });
-        $('.pt-now').addEventListener('click', function () {
-            tri.hidden = !tri.hidden;
-            this.setAttribute('aria-expanded', String(!tri.hidden));
-            hsv = toHsv(state.colour, hsv.h);
-            drawTri();
-        });
+        // (the triangle is always out, at the top of the right-hand side)
+        hsv = toHsv(state.colour, hsv.h);
+        drawTri();
         $('.pt-hexin').addEventListener('input', function () {
             var v = this.value.trim().replace(/^([0-9a-f]{6})$/i, '#$1');
             if (/^#[0-9a-f]{6}$/i.test(v)) setColour(v.toLowerCase());
