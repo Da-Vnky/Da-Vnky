@@ -933,16 +933,6 @@
        "slot": "assets/city/mel-scare",
        "what": "what’s behind the boards: the jump scare, then it slides slowly out of the window (see-through)",
        "size": "about 4:5, feet at the bottom"
-      },
-      {
-       "slot": "assets/city/mel-blood",
-       "what": "the blood that runs down the screen as the thing at the window gets you (stretched to fill the screen; see-through where there's no blood)",
-       "size": "1920 x 1080"
-      },
-      {
-       "slot": "assets/city/mel-killed",
-       "what": "shown over the black after it gets you (optional)",
-       "size": "any"
       }
      ]
     }

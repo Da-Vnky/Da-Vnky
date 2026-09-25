@@ -8,9 +8,10 @@
    world changes around them. Only a few things carry on:
 
      FOREVER   which reset they're in, the P(Doom) record once it's theirs,
+               the thing at Mel's window (once seen, it never comes back: "mel-scared"),
                and their settings (volumes, the brush, the weather …)
      A RESET   everything in RUN below: the hidden key, the hearts, the dungeon
-               found, the thing at Mel's window … gone at the next reset
+               found … gone at the next reset
      A VISIT   sessionStorage (the wall open, what's in the bag …): gone when
                the tab closes, and at every reset
 
@@ -66,7 +67,7 @@
     ];
 
     // what a reset forgets (the old names these always had, plus anything saved as "run:…")
-    var RUN = ['lives-shown', 'lives-left', 'lives-unlocked', 'lives-lost', 'suicides', 'dungeon-found', 'mel-scared'];
+    var RUN = ['lives-shown', 'lives-left', 'lives-unlocked', 'lives-lost', 'suicides', 'dungeon-found'];
     var RESET_KEY = 'dav-reset';                                        // how many resets they've been through (0 = still in reset 1)
 
     function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }

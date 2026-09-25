@@ -19,8 +19,13 @@
 var CACHE = 'dav-site';
 var HEAVY = /\.(png|jpe?g|gif|webp|mp3|ogg|mp4|webm)$/i;
 
+// on your own computer (a preview): keep nothing, so every change shows on refresh (sky/loader.js takes this away there too)
+var LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(self.location.hostname);
+
 self.addEventListener('install', function () { self.skipWaiting(); });
-self.addEventListener('activate', function (e) { e.waitUntil(self.clients.claim()); });
+self.addEventListener('activate', function (e) {
+    e.waitUntil((LOCAL ? caches.delete(CACHE).catch(function () {}) : Promise.resolve()).then(function () { return self.clients.claim(); }));
+});
 
 // one name per file, whatever ?v=… a page asks for it with
 function keyOf(url) { return url.origin + url.pathname; }
@@ -85,6 +90,7 @@ function keptOrFetched(req, url) {
 }
 
 self.addEventListener('fetch', function (e) {
+    if (LOCAL) return;                                              // (a preview: straight from your files, every time)
     var req = e.request, url = new URL(req.url);
     if (url.origin !== self.location.origin) return;              // (Supabase, fonts … go straight out)
     if (req.method === 'HEAD') {                                    // "is this file there?": answer from the copy if we have it

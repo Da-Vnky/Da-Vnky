@@ -3,7 +3,7 @@
    locked) once a visitor has both found the dungeon and turned the revolver
    on themselves. They're locked: nothing's taken until the visitor has found
    this reset's hidden key (sky/resets.js calls Sky.lives.unlock()). From then on every death
-   (the revolver, a fall, the toaster, what's behind mel's window) costs a life
+   (the revolver, a fall, the toaster, the scissors …) costs a life
    (sky/gore.js tells it, 'dav:traveller-died'), and when the last one goes,
    the world resets: on to the next of the seven (sky/state.js).
    The revolver's jammed while the lock's off and there's more than one heart
@@ -93,8 +93,8 @@
         put('suicides', (+get('suicides') || 0) + 1);
         if (!shown()) setTimeout(maybeShow, 3600);
     });
-    // every death (the revolver, a fall, the toaster, what's behind mel's window…) costs a life,
-    // but only once the lock's off (the key they'll craft one day): until then they're safe
+    // every death (the revolver, a fall, the toaster, the scissors …) costs a life,
+    // but only once the lock's off (this reset's hidden key): until then they're safe
     function unlocked() { return get('lives-unlocked') === '1'; }
     document.addEventListener('dav:traveller-died', function () { if (shown() && unlocked()) lose(300); });
     function lose(after) {

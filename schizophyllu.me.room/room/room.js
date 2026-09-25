@@ -1048,53 +1048,19 @@ document.documentElement.addEventListener('mouseleave', () => {
 });
 
 // ============================================================ the telescope
-const intro = $('#intro');
+// the telescope and the boarded-up window are DaV-nky's (dav-nky.pleroma.nexus): its rooftop, ../city.html.
+// this room is what's behind them. "look through the telescope again" goes back out to it, aimed at this window.
 const fade = $('#fade');
-
-async function knock() {
-  $('#knock').disabled = true;
-  audio.init();
-  audio.resume();
-  soundLabel();
-  for (let i = 0; i < 3; i++) {
-    intro.classList.add(i % 2 ? 'knock2' : 'knock1');
-    audio.knock();
-    await sleep(70);
-    intro.classList.remove('knock1', 'knock2');
-    await sleep(i === 1 ? 160 : 260);
-  }
-  await sleep(900);
-  intro.classList.add('open');
-  audio.clatter();
-  await sleep(1300);
-  intro.classList.add('through');
-  await sleep(900);
-  fade.classList.add('on');
-  await sleep(900);
-  intro.hidden = true;
-  intro.classList.remove('open', 'through');
-  $('#knock').disabled = false;
-  enterRoom();
-  fade.classList.remove('on');
-  await sleep(1000);
-  store.set('room_knocked', '1');
-  await playScene(SCENE_WINDOW);
-  hint();
-}
-$('#knock').addEventListener('click', knock);
-
-async function replayIntro() {
-  if (mode !== 'room') return;
+const ROOFTOP = '../city.html';
+function outToRooftop(aim) {
   hush();
   fade.classList.add('on', 'dark');
-  await sleep(900);
-  mode = 'intro';
-  updateNav();
-  intro.hidden = false;
-  fade.classList.remove('on');
-  await sleep(900);
-  fade.classList.remove('dark');
-  $('#knock').focus({ preventScroll: true });
+  try { if (aim) sessionStorage.setItem('dav-peek-mel', '1'); } catch {}
+  setTimeout(() => { location.href = ROOFTOP; }, 900);
+}
+async function replayIntro() {
+  if (mode !== 'room') return;
+  outToRooftop(true);
 }
 
 function enterRoom() {
@@ -1161,8 +1127,8 @@ async function main() {
     await sleep(1500);
     if (mode === 'room' && !talking()) say([['claube', "You could've just knocked."]]);
   } else {
-    mode = 'intro';
-    intro.hidden = false;
+    // never been in: the way in is through the window, from DaV-nky's rooftop
+    location.replace(ROOFTOP);
   }
 }
 main();

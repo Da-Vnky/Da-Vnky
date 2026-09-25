@@ -17,6 +17,13 @@
    (always the same one for the same thing, picked from its name).
    Without any, everything looks as it did.
 
+   The paper keeps its own shape: a letter is always at least one whole sheet of
+   your paper (its width and height in the same proportions as your picture, never
+   squashed into a strip). A note that opens up (the dungeon's, a bottle's, one from
+   the pile) is exactly one sheet, as big as fits the screen; longer writing scrolls
+   on it. The canvas lies over just the painting itself, not the empty space around
+   a painting that doesn't fill its easel.
+
    STRENGTH: how strongly the canvas shows through a painting (0 … 1).
    ===================================================================== */
 
@@ -34,22 +41,37 @@
 
     Sky.css(
         '.tx-canvas { position: relative; }' +
-        '.tx-canvas::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: var(--tx-pick) center / 100% 100% no-repeat;' +
+        '.tx-canvas::after { content: ""; position: absolute; left: var(--tx-l, 0); top: var(--tx-t, 0); width: var(--tx-w, 100%); height: var(--tx-h, 100%);' +
+            'z-index: 3; pointer-events: none; background: var(--tx-pick) center / 100% 100% no-repeat;' +
             'mix-blend-mode: multiply; opacity: var(--tx-strength, .9); }' +
         '.tx-wrap { position: relative; display: block; line-height: 0; }' +
         '.frame-zoom .tx-wrap, .vv-zoom .tx-wrap { width: fit-content; margin: 0 auto 12px; }' +
         '.frame-zoom .tx-wrap img, .vv-zoom .tx-wrap img { margin: 0 !important; }' +
         // a letter: the sheet is your paper, and whatever's on it is inked into it
-        '.tx-paper { background: var(--tx-pick) center / 100% 100% no-repeat !important; background-attachment: local !important; box-shadow: none !important;' +
-            'filter: drop-shadow(0 14px 22px rgba(0,0,0,.5)); }' +
+        // (at least one sheet tall, in your paper's own proportions: --tx-ratio is its width ÷ height)
+        '.tx-paper { background: var(--tx-pick) center / 100% 100% no-repeat !important; background-attachment: scroll !important; box-shadow: none !important;' +
+            'aspect-ratio: var(--tx-ratio, .8); filter: drop-shadow(0 14px 22px rgba(0,0,0,.5)); }' +
         '.tx-paper > *, .tx-paper .paper > *, .tx-paper .u-body > * { mix-blend-mode: multiply; }' +
         '.tx-paper .u-foot { border-top-color: transparent !important; }' +
         '.tx-paper.pv-sheet::before { display: none; }' +
-        // never squashed into a strip: a sheet keeps (at least) a paper's proportions, and the writing stays off the torn edges
-        '.paper-view .pv-sheet.tx-paper { min-height: min(80vh, calc(min(560px, 92vw) * 1.25)); padding: 11% 11% 9% !important; }' +
-        '.uncork .u-card.tx-paper { min-height: min(72vh, calc(min(460px, 86vw) * 1.2)); padding: 4% 5%; }' +
-        '.bv-card.tx-paper { min-height: min(72vh, calc(min(560px, 92vw) * 1.1)); padding: 4% 5%; }' +
-        '.pv-card.tx-paper { min-height: min(72vh, calc(min(520px, 100vw - 120px) * 1.1)); padding: 4% 5%; }'
+        // the notes that open up: exactly one sheet, as big as fits the screen (its width follows the height it's
+        // allowed, so a short window gets a smaller sheet, not a squashed one). the writing stays off the torn
+        // edges, and if there's more of it than fits, it scrolls there on the paper
+        // (--pw is the sheet's width; the margins are measured from it, not from the screen: a percentage
+        //  there would be a share of the whole window, and on a wide one squeeze the writing into a thin strip)
+        '.paper-view .pv-sheet.tx-paper { --pw: min(560px, 92vw, calc(86vh * var(--tx-ratio, .8))); width: var(--pw); min-height: 0; max-height: none; overflow: hidden;' +
+            'display: flex; flex-direction: column; padding: calc(var(--pw) * .15) calc(var(--pw) * .15) calc(var(--pw) * .13) !important; }' +
+        '.paper-view .pv-sheet.tx-paper, .uncork .u-card.tx-paper, .pv-card.tx-paper { box-sizing: border-box; }' +      // (so the sheet's shape counts its margins)
+        '.paper-view .pv-sheet.tx-paper > * { flex: 0 0 auto; }' +
+        '.paper-view .pv-sheet.tx-paper .pv-text { flex: 0 1 auto; min-height: 0; overflow: auto; }' +
+        '.uncork .u-card.tx-paper { --pw: min(460px, 86vw, calc(80vh * var(--tx-ratio, .8))); width: var(--pw); min-height: 0; max-height: none; overflow: hidden;' +
+            'padding: calc(var(--pw) * .1) calc(var(--pw) * .11) calc(var(--pw) * .09); }' +
+        '.pv-card.tx-paper { --pw: min(520px, calc(100vw - 120px), calc((100vh - 170px) * var(--tx-ratio, .8))); width: var(--pw); min-height: 0; max-height: none; overflow: hidden;' +
+            'display: flex; flex-direction: column; padding: calc(var(--pw) * .1) calc(var(--pw) * .11) calc(var(--pw) * .09); }' +
+        '.pv-card.tx-paper > * { flex: 0 0 auto; } .pv-card.tx-paper > :first-child { flex: 0 1 auto; min-height: 0; overflow: auto; }' +
+        '@media (max-width: 620px) { .pv-card.tx-paper { --pw: min(calc(100vw - 24px), calc((100vh - 150px) * var(--tx-ratio, .8))); } }' +
+        // pinned on the board, and the homepage's letters: at least one sheet (a very long one grows taller)
+        '.bv-card.tx-paper { padding: calc(min(560px, 92vw) * .09) calc(min(560px, 92vw) * .1); }'
     );
     root.style.setProperty('--tx-strength', STRENGTH);
 
@@ -62,11 +84,47 @@
         return (im && (im.getAttribute('src') || '')) || el.dataset.frame || el.className || '';
     }
 
+    // each paper picture's own proportions (width ÷ height), once it's loaded
+    var ratios = {};
+    function ratioOf(u, cb) {
+        if (ratios[u]) { if (ratios[u] > 0) cb(ratios[u]); else ratios[u].push(cb); return; }
+        var waiting = ratios[u] = [cb], im = new Image();
+        im.onload = function () { var r = im.naturalWidth && im.naturalHeight ? im.naturalWidth / im.naturalHeight : .8; ratios[u] = r; waiting.forEach(function (f) { f(r); }); };
+        im.onerror = function () { ratios[u] = .8; waiting.forEach(function (f) { f(.8); }); };
+        im.src = u;
+    }
+
+    // where the painting itself is, inside its box (a picture that doesn't fill it leaves empty space around it)
+    function fitCanvas(el) {
+        var m = el.querySelector('img, video');
+        if (!m || !el.offsetWidth) { ['--tx-l', '--tx-t', '--tx-w', '--tx-h'].forEach(function (k) { el.style.removeProperty(k); }); return; }
+        var box = el.getBoundingClientRect(), r = m.getBoundingClientRect();
+        var k = box.width ? el.offsetWidth / box.width : 1;                     // (in case it's shown scaled up or down)
+        var x = r.left, y = r.top, w = r.width, h = r.height;
+        var nw = m.naturalWidth || m.videoWidth, nh = m.naturalHeight || m.videoHeight;
+        if (nw && nh && getComputedStyle(m).objectFit === 'contain') {
+            var s = Math.min(w / nw, h / nh), cw = nw * s, ch = nh * s;
+            x += (w - cw) / 2; y += (h - ch) / 2; w = cw; h = ch;
+        }
+        el.style.setProperty('--tx-l', ((x - box.left) * k).toFixed(1) + 'px');
+        el.style.setProperty('--tx-t', ((y - box.top) * k).toFixed(1) + 'px');
+        el.style.setProperty('--tx-w', (w * k).toFixed(1) + 'px');
+        el.style.setProperty('--tx-h', (h * k).toFixed(1) + 'px');
+    }
+    var watched = typeof ResizeObserver === 'function' ? new ResizeObserver(function (es) { es.forEach(function (e) { fitCanvas(e.target); }); }) : null;
     function dressPainting(el) {
         var u = pick('canvas', keyOf(el) + '|' + (el.closest('[data-frame]') ? el.closest('[data-frame]').dataset.frame : ''));
         if (!u) return;
         el.classList.add('tx-canvas');
         el.style.setProperty('--tx-pick', 'url("' + u + '")');
+        var m = el.querySelector('img, video');
+        if (m && !m._txFit) {
+            m._txFit = true;
+            m.addEventListener('load', function () { fitCanvas(el); });
+            m.addEventListener('loadedmetadata', function () { fitCanvas(el); });
+        }
+        if (watched && !el._txWatched) { el._txWatched = true; watched.observe(el); }
+        fitCanvas(el);
     }
     function wrapImg(img) {
         if (img.parentNode.classList && img.parentNode.classList.contains('tx-wrap')) { dressPainting(img.parentNode); return; }
@@ -81,6 +139,7 @@
         if (!u) return;
         el.classList.add('tx-paper');
         el.style.setProperty('--tx-pick', 'url("' + u + '")');
+        ratioOf(u, function (r) { el.style.setProperty('--tx-ratio', r.toFixed(4)); });
     }
     function sweep(scope) {
         if (!scope.querySelectorAll) return;

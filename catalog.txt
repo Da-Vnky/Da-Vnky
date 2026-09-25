@@ -1,8 +1,8 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-city.html 4628 1342530371
-index.html 2817 373748437
-living.html 50057 2286853512
-workshop.html 19356 3920004549
+city.html 4628 1264333080
+index.html 2817 540961580
+living.html 50057 258613037
+workshop.html 19356 2245102185
 sky/bathroom.js 40712 2348253811
 sky/books.js 10851 3133918432
 sky/claubes.js 21974 1609253771
@@ -18,8 +18,8 @@ sky/ground-sea.js 54138 3693644178
 sky/ground-view.js 6631 1730141118
 sky/inventory.js 20449 1063992887
 sky/letters.js 23655 4220821966
-sky/lives.js 9102 2924590582
-sky/loader.js 14650 2197436394
+sky/lives.js 9073 640342805
+sky/loader.js 15440 1240568849
 sky/loot.js 16128 2332404378
 sky/marker.js 8207 444656591
 sky/models.js 7807 287414390
@@ -28,15 +28,15 @@ sky/noise.js 13535 2803187658
 sky/notes.js 9342 2828812493
 sky/paint.js 47856 3321309787
 sky/panel.js 58172 1034845403
-sky/peeper.js 49927 4137619505
+sky/peeper.js 47415 1852349136
 sky/post.js 27542 100469044
 sky/records.js 30255 2143094409
 sky/resets.js 18016 1939545555
 sky/revolver.js 12078 1219984109
 sky/sky.js 105342 3443475892
-sky/state.js 10632 1833672072
+sky/state.js 10680 2577853959
 sky/studio.js 28537 3071880599
-sky/textures.js 6816 3323093184
+sky/textures.js 11592 3429198461
 sky/timer.js 12508 660169094
 sky/tub.js 30544 1430321950
 sky/weather.js 27567 1795486156
@@ -130,7 +130,7 @@ content/workshop/visitors/2026-09-24-claube-by-skizy.png 600582 939281079
 content/workshop/visitors/2026-09-24-clutterflies-by-skizy.png 464922 1738138300
 content/workshop/visitors/2026-09-24-untitled.png 65299 1509521949
 content/workshop/visitors/list.txt 205 1050374648
-schizophyllu.me.room/index.html 7319 3554771380
+schizophyllu.me.room/index.html 4905 2758674683
 schizophyllu.me.room/assets/font.css 30693 1584298999
 schizophyllu.me.room/room/audio.js 15831 2945943077
 schizophyllu.me.room/room/bathroom.svg 10883 3949593245
@@ -142,8 +142,8 @@ schizophyllu.me.room/room/music.js 4978 3071417838
 schizophyllu.me.room/room/narration.js 13526 4083274310
 schizophyllu.me.room/room/radio.js 6517 830110350
 schizophyllu.me.room/room/roof.svg 30757 1371510206
-schizophyllu.me.room/room/room.css 21741 2898900294
-schizophyllu.me.room/room/room.js 47334 1823356235
+schizophyllu.me.room/room/room.css 19547 622278967
+schizophyllu.me.room/room/room.js 46791 3646311337
 schizophyllu.me.room/room/room.svg 22459 410572777
 schizophyllu.me.room/room/script.js 34321 924884382
 schizophyllu.me.room/assets/apartment/claube-drawing.png 452847 3441601832

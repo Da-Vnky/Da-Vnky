@@ -14,16 +14,14 @@
    MEL'S WINDOW: one building on the front row is abandoned, every window dark,
    except one that's boarded up. Click it: knock, and keep knocking, and the boards
    come off one by one until you're in. Behind the last board: darkness, a wrong
-   sound… and something at the window (once each reset) that gets you: you die
-   (and lose a life, once the lives are showing: sky/lives.js). Look again and the
+   sound… and something at the window. That happens once, ever, in each visitor's
+   browser (it doesn't kill you: it lunges, then slides off into the dark). Then the
    window's lit: Mel's room, her own (schizophyllu.me.room/, she made it), there
    through the glass. "[ climb in ]" and you're in it, on its own page; its
    "back to the rooftop" brings you back here. slots:
        assets/city/mel-board       one board (a plank, wider than tall; it's stretched)
        assets/city/mel-scare       what's waiting behind the boards (a transparent PNG/GIF)
-       assets/city/mel-blood       the blood that runs down the glass as it gets you (stretched to the screen, see-through)
-       assets/city/mel-killed      shown over the black after that (optional)
-   sounds: assets/sounds/knock, crack, unnerve, scare, scream, splat
+   sounds: assets/sounds/knock, crack, unnerve, scare (and hobo, the soundtrack in the dark)
    the words (and who says them): MEL near the top of this file. on your own skyline art, say where her
    window is: "mel": [x%, y%, w%, h%] in assets/city/skyline-front-windows.json
 
@@ -161,16 +159,6 @@
         '.mel-scare.away { opacity: 1; transform: translateX(-125%); transition: transform 3.4s cubic-bezier(.45,0,.55,1); }' +
         '.peep-scene.jolt .ps-frame { animation: mel-jolt .45s linear; }' +
         '@keyframes mel-jolt { 0%, 100% { translate: 0 0; } 20% { translate: -9px 4px; } 40% { translate: 8px -5px; } 60% { translate: -5px 3px; } 80% { translate: 3px -2px; } }' +
-        // it gets you: blood down the glass, then black, then back on the roof
-        '.mel-killed { position: fixed; inset: 0; z-index: 9; pointer-events: auto; cursor: default; background: transparent; transition: background .5s, opacity 1s; }' +
-        '.mel-killed.black { background: #000; }' +
-        '.mel-killed.out { opacity: 0; pointer-events: none; }' +
-        '.mel-killed .mk-blood { position: absolute; inset: 0; animation: mk-run 2.2s ease-in forwards; }' +
-        '.mel-killed .mk-blood > svg, .mel-killed .mk-blood > img { width: 100%; height: 100%; display: block; object-fit: cover; }' +
-        '@keyframes mk-run { from { clip-path: inset(0 0 100% 0); } 35% { clip-path: inset(0 0 55% 0); } to { clip-path: inset(0 0 0 0); } }' +
-        '.mel-killed .mk-art { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transition: opacity .6s; }' +
-        '.mel-killed.black .mk-art { opacity: 1; }' +
-        '.mel-killed .mk-art > img, .mel-killed .mk-art > video { max-width: 100%; max-height: 100%; object-fit: contain; }' +
         '.mel-flash { position: fixed; inset: 0; z-index: 8; pointer-events: none; background: #fff; opacity: 0; }' +
         '.mel-flash.on { animation: mel-flash .5s ease-out; }' +
         '@keyframes mel-flash { 0% { opacity: .9; } 100% { opacity: 0; } }' +
@@ -475,10 +463,6 @@
     /* ---------------- mel's window ---------------- */
     var melState = { knocks: 0, off: 0 };
     try { if (sessionStorage.getItem('mel-in') === '1') { melState.off = MEL.boards; document.body.classList.add('mel-in'); } } catch (e) {}
-    var BLOOD = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g fill="#6d0a0e">' +
-        '<path d="M0 0 H100 V9 Q96 12 95 30 Q94 12 90 10 Q86 14 85 52 Q84 16 79 11 Q74 13 73 24 Q72 12 66 10 Q61 15 60 71 Q59 15 54 10 Q49 12 48 36 Q47 12 42 11 Q37 16 36 58 Q35 14 30 10 Q25 12 24 27 Q23 11 18 10 Q13 15 12 80 Q11 14 6 10 Q2 12 0 22 Z"/>' +
-        '<circle cx="95" cy="31" r="1.2"/><circle cx="85" cy="53" r="1.4"/><circle cx="60" cy="72.5" r="1.6"/><circle cx="36" cy="59.5" r="1.4"/><circle cx="12" cy="81.5" r="1.6"/></g>' +
-        '<path d="M0 0 H100 V5 Q60 9 30 6 Q12 5 0 8 Z" fill="#9a1016" opacity=".7"/></svg>';
     var SCARE = '<svg viewBox="0 0 120 150" preserveAspectRatio="xMidYMax meet" aria-hidden="true">' +
         '<path d="M6 150 Q10 96 34 86 Q60 78 86 86 Q112 96 116 150 Z" fill="#141010"/>' +
         '<path d="M22 60 Q14 22 44 12 Q60 2 78 12 Q108 22 98 62 Q104 78 90 92 Q60 108 30 92 Q16 78 22 60 Z" fill="#1c1614"/>' +      // matted hair
@@ -529,8 +513,8 @@
         requestAnimationFrame(function () { t.classList.add('on'); });
         setTimeout(function () { location.href = ROOM + '?from=dav-nky'; }, 1100);
     }
-    // in through the window: (the first time this visit) the dark, the wrong sound, the face; then mel
-    // the scare: once per browser (it stays scared until "forget your stay" wipes it), in localStorage
+    // in through the window: (the very first time) the dark, the wrong sound, the face; then mel.
+    // the scare: once per browser, ever ("mel-scared" in localStorage: not forgotten at a reset, nor by "forget your stay")
     function scaredYet() { try { return localStorage.getItem('mel-scared') === '1'; } catch (e) { return false; } }
     var hoboUrl = null, hobo = null, boardsOffAt = 0;
     Sky.findAsset('assets/sounds/hobo.ogg|assets/sounds/hobo.mp3', function (u) { hoboUrl = u || null; });
@@ -582,37 +566,18 @@
                 var fl = document.querySelector('.mel-flash') || document.body.appendChild(Object.assign(document.createElement('div'), { className: 'mel-flash' }));
                 fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on');
             });
-            later(run, wait + 850, killed);                         // and it gets you
+            later(run, wait + 1300, function () {                   // it holds there a moment… then slides off into the dark
+                boo.classList.add('away');
+                hoboStop();
+            });
+            later(run, wait + 1300 + 3500, function () {            // and there's the room, lit
+                boo.remove();
+                scene.classList.remove('void');
+                lightsUp(run);
+            });
             return;
         }
         lightsUp(run);
-    }
-    // got: blood down the glass, black, and you're back on the roof a life down (sky/lives.js takes it,
-    // once the lives are showing). the window's open after this: look again and it's just mel.
-    function killed() {
-        var k = document.createElement('div');
-        k.className = 'mel-killed';
-        k.setAttribute('aria-label', 'you died');
-        k.innerHTML = '<div class="mk-blood"></div><div class="mk-art"></div>';
-        art('assets/city/mel-killed', '', k.querySelector('.mk-art'));
-        Sky.findAsset('assets/city/mel-blood', function (u) {
-            k.querySelector('.mk-blood').innerHTML = u ? '<img alt="" src="' + u + '">' : BLOOD;
-        });
-        document.body.appendChild(k);
-        sfx('scream'); sfx('splat', { delay: 0.35 });
-        hoboStop();
-        var me = document.querySelector('.scene-character');
-        setTimeout(function () { k.classList.add('black'); }, 1500);
-        setTimeout(function () {                                          // (under the black) off the window, back on the roof, gone
-            lower();
-            if (me) me.classList.add('gore-hidden');
-        }, 2300);
-        setTimeout(function () { k.classList.add('out'); }, 3600);
-        setTimeout(function () {
-            k.remove();
-            if (me && Sky.gore && Sky.gore.respawn) Sky.gore.respawn(me);                 // (a death like any other: sky/lives.js)
-            else { if (me) me.classList.remove('gore-hidden'); document.dispatchEvent(new CustomEvent('dav:traveller-died')); }
-        }, 4500);
     }
     function lightsUp(run) {
         var room = viewEl.querySelector('.mel-live');
@@ -710,6 +675,18 @@
         return windowAt(e.clientX, e.clientY);
     }
     Sky.peeper = { windowAt: windowAt, look: function (t) { lookThrough(t); } };
+    // back out of Mel's room with "look through the telescope again" (schizophyllu.me.room/): the telescope comes
+    // straight up, aimed at her window
+    try {
+        if (sessionStorage.getItem('dav-peek-mel') === '1') {
+            sessionStorage.removeItem('dav-peek-mel');
+            (function wait(n) {
+                var fr = frontInfo();
+                if (fr && fr.mel && state === 'off') lookThrough({ win: fr.mel, then: melPeek });
+                else if (n < 60) setTimeout(function () { wait(n + 1); }, 150);
+            })(0);
+        }
+    } catch (e) {}
     document.addEventListener('click', function (e) {
         var t = offTarget(e);
         if (!t) return;

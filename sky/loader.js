@@ -27,6 +27,17 @@
         return window.caches ? caches.delete(CACHE).catch(function () {}) : Promise.resolve();
     };
     if (!ok) return;
+    // on your own computer (preview.bat, the content manager): no kept copy at all, so every change you
+    // make shows the moment you refresh. whatever an earlier preview kept is thrown away, once.
+    if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+        try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+        var was = !!navigator.serviceWorker.controller;
+        navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })
+            .then(function () { return caches.delete(CACHE); })
+            .then(function () { if (was) location.reload(); })             // (this page came from the old copy: once more, fresh)
+            .catch(function () {});
+        return;
+    }
     var fresh = true;
     try { fresh = !sessionStorage.getItem(KEY); } catch (e) {}
     function register() { return navigator.serviceWorker.register('sw.js').catch(function () {}); }
