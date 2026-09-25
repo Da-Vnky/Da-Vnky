@@ -139,6 +139,11 @@
        "slot": "assets/sky/ursa-minor",
        "what": "the Little Dipper under Polaris: light stars on see-through",
        "size": "240 x 228 (or 960 x 912)"
+      },
+      {
+       "slot": "assets/sky/sun-pupil",
+       "what": "the sun's pupil, which follows the visitor's pointer (just the pupil, cropped close; take it out of the sun picture itself)",
+       "size": "about a quarter of the sun's width, see-through"
       }
      ]
     },
@@ -398,6 +403,17 @@
        "slot": "assets/ui/forget-screen",
        "what": "what the white turns into when someone forgets their stay (the wireframe world): full screen, covers it (a picture, a GIF, or a .webm / .mp4)",
        "size": "3840 x 2160"
+      },
+      {
+       "slot": "assets/ui/key",
+       "what": "the hidden key, in every reset that doesn't have its own (the resets tabs)",
+       "size": "about 60 x 24, see-through"
+      },
+      {
+       "slot": "assets/ui/reset-screen",
+       "what": "what the white turns into when the world resets (without it: the forget screen)",
+       "size": "full screen",
+       "optional": true
       }
      ]
     },
@@ -547,6 +563,11 @@
        "slot": "assets/sea/gull-dancing",
        "what": "the gull dancing (a GIF)",
        "optional": true
+      },
+      {
+       "slot": "assets/sea/anchor",
+       "what": "the anchor hanging off the ship's bow, from reset 3 on",
+       "size": "about 3:4, see-through"
       }
      ]
     },
@@ -703,6 +724,16 @@
        "slot": "assets/workshop/metronome-dancing",
        "what": "the metronome ticking (a GIF)",
        "optional": true
+      },
+      {
+       "slot": "assets/workshop/scissors",
+       "what": "the scissors on the bench (reset 1: taken to the neck)",
+       "size": "about 5:2, lying flat, see-through"
+      },
+      {
+       "slot": "assets/workshop/safety-scissors",
+       "what": "the safety scissors hung on the wall, from reset 2 on",
+       "size": "about 5:2 (it's turned upright on the wall), see-through"
       }
      ]
     },
@@ -877,53 +908,31 @@
        "slot": "assets/city/roof-door",
        "what": "the roof access door on the rooftop (click: down to the hallway)",
        "size": "110:120"
+      },
+      {
+       "slot": "assets/city/street-below",
+       "what": "the street far below, in the jump off the roof (reset 2)",
+       "size": "1920 x 1080, the ground about 88% down"
+      },
+      {
+       "slot": "assets/city/guard-rail",
+       "what": "the guard rails along the roof's edge, from reset 3 on (repeats sideways)",
+       "size": "a strip about 400 x 60, see-through"
       }
      ]
     },
     {
-     "name": "mel's window (the boarded-up one in the abandoned building) and her room",
+     "name": "mel's window (the boarded-up one in the abandoned building). her room behind it is her own: schizophyllu.me.room/",
      "slots": [
-      {
-       "slot": "assets/city/mel-room",
-       "what": "mel’s room, the mess (a picture, a GIF, or a .webm / .mp4); mel, claube and mira stand in front of it",
-       "size": "about 1.27:1, e.g. 1270 x 1000",
-       "kind": "model"
-      },
       {
        "slot": "assets/city/mel-board",
        "what": "one board nailed over her window (a plank, stretched to fit)",
        "size": "about 6:1, e.g. 900 x 150"
       },
       {
-       "slot": "assets/city/mel-room-clean",
-       "what": "her room once Claube’s tidied it (same size and layout as mel-room)",
-       "size": "about 1.27:1, e.g. 1270 x 1000",
-       "kind": "model"
-      },
-      {
        "slot": "assets/city/mel-scare",
        "what": "what’s behind the boards: the jump scare, then it slides slowly out of the window (see-through)",
        "size": "about 4:5, feet at the bottom"
-      },
-      {
-       "slot": "assets/city/mel-typing",
-       "what": "mel at her desk, back to you, typing (a GIF can type)",
-       "size": "1:2, feet (chair) at the bottom"
-      },
-      {
-       "slot": "assets/city/mel-angry",
-       "what": "mel turned round in her chair, cross",
-       "size": "1:2, same canvas as mel-typing"
-      },
-      {
-       "slot": "assets/city/claube",
-       "what": "Claube, in mel’s room",
-       "size": "40:52, feet at the bottom"
-      },
-      {
-       "slot": "assets/city/mira",
-       "what": "Mira, in mel’s room",
-       "size": "about 2:5, feet at the bottom"
       },
       {
        "slot": "assets/city/mel-blood",
@@ -1897,6 +1906,26 @@
       {
        "slot": "assets/sounds/wall-slide",
        "what": "the wall sliding open over the stairs"
+      },
+      {
+       "slot": "assets/sounds/jammed",
+       "what": "the revolver, jammed (more than one heart left)"
+      },
+      {
+       "slot": "assets/sounds/stab",
+       "what": "the scissors going in"
+      },
+      {
+       "slot": "assets/sounds/key",
+       "what": "picking up a reset's key"
+      },
+      {
+       "slot": "assets/sounds/boat-crash",
+       "what": "the boat landing on the traveller"
+      },
+      {
+       "slot": "assets/sounds/fall-wind",
+       "what": "the rush of air off the roof's edge (reset 2)"
       }
      ]
     }

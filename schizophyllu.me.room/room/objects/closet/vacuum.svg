@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- vacuum (closet): left wall: vacuum, broom, mop; right wall: coats, the telescope's case
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <path d="M110 840 v-230 q0 -20 20 -20" stroke="#555" stroke-width="6" fill="none"/>
+  <rect x="80" y="780" width="110" height="70" rx="20" fill="#6a3a8a"/><circle cx="100" cy="852" r="10" fill="#222"/><circle cx="172" cy="852" r="10" fill="#222"/>
+  <path d="M190 800 q60 -10 70 60" stroke="#222" stroke-width="5" fill="none"/>
+</svg>

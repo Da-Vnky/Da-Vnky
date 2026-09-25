@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>the living space · DaV-nky</title>
     <!-- the loading screen: fetches the whole site once per visit (sky/loader.js, sw.js) -->
-    <script src="sky/loader.js?v=20260925m"></script>
+    <script src="sky/loader.js?v=20260925q"></script>
+    <script src="sky/state.js?v=20260925q"></script>
     <link rel="canonical" href="https://dav-nky.pleroma.nexus/living.html">
     <meta property="og:title" content="the living space · DaV-nky">
     <meta property="og:url" content="https://dav-nky.pleroma.nexus/living.html">
@@ -15,7 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260925m">
+    <link rel="stylesheet" href="sky/sky.css?v=20260925q">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -160,6 +161,7 @@
             .gallery-frame[data-wall=shame][data-frame="5"] { left: 79% !important; }
             .dungeon .gallery-frame[data-wall=shame] { display: block; }
             .gallery-frame[data-wall=shame][data-frame="6"] { left: 34% !important; top: 25% !important; width: 32% !important; }
+            .gallery-frame[data-wall=shame][data-frame="7"] { left: 72% !important; top: 27% !important; width: 16% !important; }
             .bath-mat { left: 28%; right: 30%; }
             .bath-character { left: 6%; height: 14vh; }
             .hall-door.to-workshop { left: 6%; height: 40vh; }
@@ -543,7 +545,7 @@
             <path d="M24 44 Q80 30 136 44" fill="none" stroke="#7a6a50" stroke-width="2" stroke-dasharray="4 3"/>
         </svg>
 
-        <!-- the hall of shame: five frames on the dungeon wall, a wall of their own (data-wall="shame").
+        <!-- the hall of shame: seven frames on the dungeon wall (6 is the record's), a wall of their own (data-wall="shame").
              hang art in them from the content manager (any picture: visitors' art, your paintings,
              the hidden pool). their list: content/shame/frames.json. your own frame art:
              assets/living/shame-frame (all) or shame-frame-1 … 5; the plaque: assets/living/shame-plaque -->
@@ -560,6 +562,7 @@
         <div class="furnish gallery-frame" data-wall="shame" data-frame="3" data-look="wood"  style="left:57.5%; top:13%; width:8.5%; --tilt:-1.5deg"></div>
         <div class="furnish gallery-frame" data-wall="shame" data-frame="4" data-look="white" style="left:66.5%; top:33%; width:8.5%; aspect-ratio:5 / 4; --tilt:4deg"></div>
         <div class="furnish gallery-frame" data-wall="shame" data-frame="5" data-look="gilt"  style="left:26%; top:47%; width:7%; --tilt:-5deg"></div>
+        <div class="furnish gallery-frame" data-wall="shame" data-frame="7" data-look="dark"  style="left:66%; top:50%; width:7.5%; --tilt:3.5deg"></div>
         <!-- frame 6, "the record": the grandest frame down here (data-look="lux"). whatever picture you hang in it,
              shoot it and a hidden record falls out (sky/loot.js) -->
         <div class="furnish gallery-frame" data-wall="shame" data-frame="6" data-frame-name="the record" data-look="lux" style="left:43%; top:41%; width:14%; aspect-ratio:1; --tilt:0deg"></div>
@@ -595,28 +598,29 @@
         <a class="room-arrow to-upstairs" href="#living" aria-label="back up to the living space" data-asset="assets/living/arrow"></a>
     </div>
 
-    <script src="sky/sky.js?v=20260925m"></script>
+    <script src="sky/sky.js?v=20260925q"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
-    <script src="sky/ground-view.js?v=20260925m" data-view="assets/living/view"></script>
-    <script src="sky/panel.js?v=20260925m"></script>
-    <script src="sky/music.js?v=20260925m"></script>
-    <script src="sky/weather.js?v=20260925m"></script>
-    <script src="sky/noise.js?v=20260925m"></script>
-    <script src="sky/inventory.js?v=20260925m"></script>
-    <script src="sky/loot.js?v=20260925m"></script>
-    <script src="sky/records.js?v=20260925m"></script>
-    <script src="sky/crate.js?v=20260925m"></script>
-    <script src="sky/frames.js?v=20260925m"></script>
-    <script src="sky/bathroom.js?v=20260925m"></script>
-    <script src="sky/gore.js?v=20260925m"></script>
-    <script src="sky/tub.js?v=20260925m"></script>
-    <script src="sky/dungeon.js?v=20260925m"></script>
-    <script src="sky/books.js?v=20260925m"></script>
-    <script src="sky/marker.js?v=20260925m"></script>
-    <script src="sky/revolver.js?v=20260925m"></script>
-    <script src="sky/claubes.js?v=20260925m"></script>
-    <script src="sky/textures.js?v=20260925m"></script>
-    <script src="sky/forget.js?v=20260925m"></script>
-    <script src="sky/lives.js?v=20260925m"></script>
+    <script src="sky/ground-view.js?v=20260925q" data-view="assets/living/view"></script>
+    <script src="sky/panel.js?v=20260925q"></script>
+    <script src="sky/music.js?v=20260925q"></script>
+    <script src="sky/weather.js?v=20260925q"></script>
+    <script src="sky/noise.js?v=20260925q"></script>
+    <script src="sky/inventory.js?v=20260925q"></script>
+    <script src="sky/loot.js?v=20260925q"></script>
+    <script src="sky/records.js?v=20260925q"></script>
+    <script src="sky/crate.js?v=20260925q"></script>
+    <script src="sky/frames.js?v=20260925q"></script>
+    <script src="sky/bathroom.js?v=20260925q"></script>
+    <script src="sky/gore.js?v=20260925q"></script>
+    <script src="sky/tub.js?v=20260925q"></script>
+    <script src="sky/dungeon.js?v=20260925q"></script>
+    <script src="sky/books.js?v=20260925q"></script>
+    <script src="sky/marker.js?v=20260925q"></script>
+    <script src="sky/revolver.js?v=20260925q"></script>
+    <script src="sky/claubes.js?v=20260925q"></script>
+    <script src="sky/textures.js?v=20260925q"></script>
+    <script src="sky/forget.js?v=20260925q"></script>
+    <script src="sky/lives.js?v=20260925q"></script>
+    <script src="sky/resets.js?v=20260925q"></script>
 </body>
 </html>

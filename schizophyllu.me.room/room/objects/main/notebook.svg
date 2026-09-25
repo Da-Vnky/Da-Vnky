@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- notebook (main): open on top of the pile: the architecture
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<g transform="rotate(-6 505 838)">
+  <path d="M466 848 L472 826 L504 830 L500 852Z" fill="#e8e2d0"/>
+  <path d="M504 830 L536 826 L540 848 L500 852Z" fill="#ded8c4"/>
+  <path d="M504 830 L500 852" stroke="#9a9280" stroke-width="1"/>
+  <g stroke="#3a4a7a" stroke-width=".8" fill="none">
+    <rect x="474" y="831" width="7" height="5"/><rect x="487" y="833" width="7" height="5"/><rect x="480" y="842" width="7" height="5"/>
+    <path d="M481 834h6M490 838l-5 4M480 844q-8 -6 -2 -10"/>
+    <rect x="510" y="832" width="9" height="6"/><rect x="524" y="831" width="8" height="6"/>
+    <path d="M519 835h5M528 837q2 8 -10 8q-8 0 -8 -6"/>
+  </g>
+  <path d="M510 848h14" stroke="#b84a3a" stroke-width=".8"/>
+</g>
+</svg>

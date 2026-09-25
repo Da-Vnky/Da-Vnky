@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- sill (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="99" y="418" width="46" height="9" fill="#7d8088"/><rect x="104" y="427" width="44" height="9" fill="#9a9da4"/><rect x="100" y="436" width="46" height="10" fill="#8a8d94"/>
+  <rect x="108" y="438" width="14" height="6" fill="#eee"/><rect x="112" y="429" width="12" height="5" fill="#eee"/>
+  <rect x="152" y="438" width="34" height="8" fill="#3a6ad0"/><rect x="154" y="432" width="30" height="6" fill="#c9b85a"/>
+  <path d="M196 446 l4 -22 h24 l4 22z" fill="#8a4b2a"/>
+  <path d="M212 424 q-14 -18 -28 -8 M212 424 q2 -26 18 -26 M212 424 q18 -4 22 10" stroke="#5a6a3a" stroke-width="3" fill="none"/>
+  <rect x="250" y="432" width="13" height="14" rx="2" fill="#d8d0c0"/>
+  <rect x="290" y="428" width="16" height="18" rx="2" fill="#b86a8a"/><path d="M306 432 q6 5 0 10" stroke="#b86a8a" stroke-width="2" fill="none"/>
+</svg>

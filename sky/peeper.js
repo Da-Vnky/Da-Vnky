@@ -14,22 +14,16 @@
    MEL'S WINDOW: one building on the front row is abandoned, every window dark,
    except one that's boarded up. Click it: knock, and keep knocking, and the boards
    come off one by one until you're in. Behind the last board: darkness, a wrong
-   sound… and something at the window (once per browser) that gets you: you die
-   (and lose a life, once the lives are showing: sky/lives.js). Look again and it's
-   just Mel, typing away. She turns round, furious you barged in; you ask Claube
-   to fix the place up, he's thrilled to, and it's clean (for the rest of the visit).
-   Mira's there too. slots:
-       assets/city/mel-room        her room, the mess (a picture, a GIF, or a .webm / .mp4)
-       assets/city/mel-room-clean  her room, tidied
+   sound… and something at the window (once each reset) that gets you: you die
+   (and lose a life, once the lives are showing: sky/lives.js). Look again and the
+   window's lit: Mel's room, her own (schizophyllu.me.room/, she made it), there
+   through the glass. "[ climb in ]" and you're in it, on its own page; its
+   "back to the rooftop" brings you back here. slots:
        assets/city/mel-board       one board (a plank, wider than tall; it's stretched)
        assets/city/mel-scare       what's waiting behind the boards (a transparent PNG/GIF)
        assets/city/mel-blood       the blood that runs down the glass as it gets you (stretched to the screen, see-through)
        assets/city/mel-killed      shown over the black after that (optional)
-       assets/city/mel-typing      Mel at her desk, her back to you (a GIF can type)
-       assets/city/mel-angry       Mel turned round, cross
-       assets/city/claube          Claube
-       assets/city/mira            Mira
-   sounds: assets/sounds/knock, crack, unnerve, scare, scream, splat, typing, sparkle
+   sounds: assets/sounds/knock, crack, unnerve, scare, scream, splat
    the words (and who says them): MEL near the top of this file. on your own skyline art, say where her
    window is: "mel": [x%, y%, w%, h%] in assets/city/skyline-front-windows.json
 
@@ -54,18 +48,8 @@
         dark_secs: 12,                                     // how long it's pitch black in there, from the last board coming off
         call: 'call out\u2026',                              // the button you can press in the dark (it does nothing, but you can't help it)
         calls: ['Is anybody there?', 'Hello?', '\u2026Anybody home?'],
-        typing: 'clack clack clack',
-        // once she's noticed you. who: mel, claube, mira or you (the words go under the window).
-        // then: 'clean' tidies the room as that line's said.
-        script: [
-            { who: 'mel', say: 'HEY! who said you could just barge in here?!', ms: 2800 },
-            { who: 'you', say: 'um\u2026 Claube? could you fix this place up a bit?', ms: 2800 },
-            { who: 'claube', say: 'YES!! ON IT!!', ms: 1500 },
-            { who: 'mel', say: 'don\u2019t you DARE\u2014', ms: 1300, then: 'clean' },
-            { who: 'mira', say: 'oh, it\u2019s lovely.', ms: 2000 },
-            { who: 'mel', say: '\u2026fine. it\u2019s nice. now get out.', ms: 2800 }
-        ],
-        after: 'mel\u2019s room (tidied)'                        // its name once it's clean
+        lit: 'something inside is lit.',
+        climb: '[ climb in ]'
     };
 
     Sky.css(
@@ -148,37 +132,16 @@
         '.peep-scene.mel.in .ps-view > .mel-dark { opacity: 0; }' +
         '.peep-scene.mel .ps-view > svg { width: 100%; height: 100%; display: block; }' +
         '.peep-scene.mel.void .ps-view > .mel-dark { opacity: 1 !important; transition: opacity .3s; }' +
-        // the stage: her room (the mess, or clean), and the three of them in it
-        '.ps-view > .mel-stage { position: absolute; inset: 0; padding: 0; overflow: hidden; max-height: none; }' +
-        '.mel-stage .ms-bg { position: absolute; inset: 0; transition: opacity 1.4s; }' +
-        '.mel-stage .ms-bg > svg, .mel-stage .ms-bg > img, .mel-stage .ms-bg > video { width: 100%; height: 100%; object-fit: cover; display: block; }' +
-        '.mel-stage .ms-bg.clean { opacity: 0; }' +
-        '.mel-stage.clean .ms-bg.clean { opacity: 1; } .mel-stage.clean .ms-bg.mess { opacity: 0; }' +
-        '.mel-stage .ms-fig { position: absolute; bottom: 6%; opacity: 0; transition: opacity 1.2s; }' +
-        '.peep-scene.mel.in .mel-stage .ms-fig { opacity: 1; }' +
-        '.mel-stage .ms-art { position: absolute; inset: 0; }' +
-        '.mel-stage .ms-art > svg, .mel-stage .ms-art > img { width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; display: block; }' +
-        '.mel-stage .ms-fig.mel { left: 55%; bottom: 23%; height: 40%; aspect-ratio: 50 / 100; }' +
-        '.mel-stage .ms-fig.claube { left: 33%; height: 30%; aspect-ratio: 40 / 52; }' +
-        '.mel-stage .ms-fig.mira { left: 11%; height: 58%; aspect-ratio: 44 / 110; }' +
-        '.mel-stage .ms-fig.mel .ms-art.angry { opacity: 0; }' +
-        '.mel-stage .ms-fig.mel.turned .ms-art.angry { opacity: 1; } .mel-stage .ms-fig.mel.turned .ms-art.typing { opacity: 0; }' +
-        '.mel-stage .ms-fig.mel.typing .ms-art.typing { animation: ms-type .22s steps(2) infinite; }' +
-        '@keyframes ms-type { 0% { transform: translateY(0); } 50% { transform: translateY(1.5%) rotate(.6deg); } }' +
-        '.mel-stage .ms-fig.mel.turned { animation: ms-turn .35s ease-out; }' +
-        '@keyframes ms-turn { 0% { transform: scaleX(.2); } 100% { transform: none; } }' +
-        '.mel-stage .ms-fig.claube.thrilled { animation: ms-hop .32s ease-in-out 5 alternate; }' +
-        '@keyframes ms-hop { from { transform: translateY(0); } to { transform: translateY(-18%) rotate(4deg); } }' +
-        '.mel-stage .ms-say { position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%); width: max-content; max-width: 16em; padding: 4px 10px; border-radius: 10px;' +
-            'background: #f6ecd2; color: #2a1d14; font: italic clamp(.7rem, 1.6vh, .95rem)/1.25 "IM Fell English", Georgia, serif; text-align: center; box-shadow: 0 3px 8px rgba(0,0,0,.5);' +
-            'opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 2; }' +
-        '.mel-stage .ms-say.on { opacity: 1; }' +
-        '.mel-stage .ms-fig.mel .ms-say { color: #8a1c10; font-style: normal; font-weight: bold; }' +
-        '.mel-stage .ms-fig.mira .ms-say { left: 80%; }' +
-        '.mel-stage .ms-magic { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 60%, rgba(255,250,220,.95), rgba(255,236,170,.4) 40%, transparent 70%); }' +
-        '.mel-stage.tidying .ms-magic { animation: ms-magic 1.6s ease-in-out; }' +
-        '@keyframes ms-magic { 0% { opacity: 0; } 40% { opacity: 1; } 100% { opacity: 0; } }' +
-        '.mel-stage .ms-star { position: absolute; color: #fff2b0; text-shadow: 0 0 6px #fff; font-size: 16px; pointer-events: none; }' +
+        // her room (schizophyllu.me.room/, Mel's own): live through the glass once the thing at the window's been
+        '.ps-view > .mel-live { position: absolute; inset: 0; padding: 0; overflow: hidden; max-height: none; background: #07080d; cursor: pointer; }' +
+        '.mel-live iframe { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; border: 0; pointer-events: none; transform-origin: 50% 50%; }' +
+        '.mel-climb { position: absolute; left: 50%; bottom: 7%; z-index: 6; transform: translateX(-50%); padding: 7px 18px; border: 1px solid rgba(109,255,176,.55); border-radius: 999px;' +
+            'background: rgba(7,8,13,.8); color: #9dffc8; font: 1rem ui-monospace, Menlo, Consolas, monospace; cursor: pointer; opacity: 0; transition: opacity .8s .6s; }' +
+        '.peep-scene.mel.in .mel-climb { opacity: 1; }' +
+        '.mel-climb:hover, .mel-climb:focus-visible { background: rgba(20,40,30,.9); outline: none; }' +
+        '.mel-through { position: fixed; inset: 0; z-index: 2147483000; background: #000; opacity: 0; pointer-events: all; transition: opacity .9s ease-in; }' +
+        '.mel-through.on { opacity: 1; }' +
+        '.peep-scene.mel.climbing .ps-frame { transition: transform 1.1s cubic-bezier(.6,0,.9,.5); transform: scale(3.2); }' +
         // what's behind the boards
         '.mel-scare { position: absolute; inset: 2% 8% -2%; z-index: 4; pointer-events: none; opacity: 0; }' +
         '.mel-call { position: absolute; left: 50%; bottom: 7%; z-index: 6; transform: translateX(-50%); padding: 7px 18px; border: 1px solid rgba(243,230,194,.3); border-radius: 999px;' +
@@ -190,6 +153,9 @@
             'white-space: nowrap; box-shadow: 0 3px 10px rgba(0,0,0,.6); animation: mel-said 3s ease-out forwards; }' +
         '@keyframes mel-said { 0% { opacity: 0; transform: translateY(6px); } 10% { opacity: 1; transform: none; } 65% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }' +
         '.mel-scare > svg, .mel-scare > img, .mel-scare > video { width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; display: block; }' +
+        // your own (a photo, a GIF, a video): right up against the glass, filling the whole window
+        '.mel-scare:has(> img), .mel-scare:has(> video) { inset: 0; }' +
+        '.mel-scare > img, .mel-scare > video { object-fit: cover; object-position: 50% 35%; }' +
         '.mel-scare.boo { opacity: 1; animation: mel-boo .16s ease-out; }' +
         '@keyframes mel-boo { from { transform: scale(1.5) translateY(10%); } to { transform: none; } }' +
         '.mel-scare.away { opacity: 1; transform: translateX(-125%); transition: transform 3.4s cubic-bezier(.45,0,.55,1); }' +
@@ -208,7 +174,7 @@
         '.mel-flash { position: fixed; inset: 0; z-index: 8; pointer-events: none; background: #fff; opacity: 0; }' +
         '.mel-flash.on { animation: mel-flash .5s ease-out; }' +
         '@keyframes mel-flash { 0% { opacity: .9; } 100% { opacity: 0; } }' +
-        '@media (prefers-reduced-motion: reduce) { .peep-scene.jolt .ps-frame, .mel-scare.boo, .mel-stage .ms-fig { animation: none !important; } }' +
+        '@media (prefers-reduced-motion: reduce) { .peep-scene.jolt .ps-frame, .mel-scare.boo { animation: none !important; } }' +
         '@media (max-width: 620px) { .scope-lens { --r: min(45vh, 47vw); } body.peep-close .scope-lens { --r: 49vw; }' +
             '.peep-ui .pu-note { font-size: .95rem; } .ps-frame { border-width: 9px; } }'
     );
@@ -489,8 +455,9 @@
     }
     function leaveScene(quiet) {
         var wasMel = scene.classList.contains('mel');
-        melRun++; clearInterval(typer); hoboStop();
-        scene.querySelectorAll('.mel-call').forEach(function (b) { b.remove(); });
+        melRun++; hoboStop();
+        scene.querySelectorAll('.mel-call, .mel-climb').forEach(function (b) { b.remove(); });
+        scene.classList.remove('climbing');
         document.body.classList.remove('peep-mel');
         scene.classList.remove('drawn', 'mel', 'in', 'void', 'jolt');
         scene.querySelectorAll('.mel-scare').forEach(function (b) { b.remove(); });
@@ -508,80 +475,6 @@
     /* ---------------- mel's window ---------------- */
     var melState = { knocks: 0, off: 0 };
     try { if (sessionStorage.getItem('mel-in') === '1') { melState.off = MEL.boards; document.body.classList.add('mel-in'); } } catch (e) {}
-    var MEL_ROOM = '<svg viewBox="0 0 300 236" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
-        '<rect width="300" height="236" fill="#2b2430"/><rect y="176" width="300" height="60" fill="#221c24"/>' +
-        '<rect x="18" y="26" width="46" height="60" fill="#3b3240"/><rect x="22" y="30" width="38" height="52" fill="#4a3f52" opacity=".7"/>' +      // a poster, peeling
-        '<path d="M60 30 l4 8 l-6 0 Z" fill="#2b2430"/>' +
-        '<rect x="150" y="104" width="112" height="8" fill="#3a2c24"/><rect x="156" y="112" width="6" height="66" fill="#3a2c24"/><rect x="250" y="112" width="6" height="66" fill="#3a2c24"/>' +   // the desk
-        '<rect x="176" y="64" width="54" height="38" rx="3" fill="#15161c"/><rect x="180" y="68" width="46" height="30" fill="#5fa8c8"/>' +                 // the monitor, the only light
-        '<path d="M180 68 h46 v30 h-46 Z" fill="url(#mel-glow)" opacity=".6"/><rect x="198" y="102" width="10" height="4" fill="#15161c"/>' +
-        '<defs><radialGradient id="mel-glow"><stop offset="0" stop-color="#bfe8ff"/><stop offset="1" stop-color="#5fa8c8" stop-opacity="0"/></radialGradient>' +
-        '<radialGradient id="mel-spill" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="rgba(120,190,230,.35)"/><stop offset="1" stop-color="rgba(120,190,230,0)"/></radialGradient></defs>' +
-        '<rect x="110" y="40" width="190" height="196" fill="url(#mel-spill)"/>' +
-        // (mel herself is her own picture now, in front of this: MEL_TYPING)
-        '<rect x="176" y="176" width="46" height="6" fill="#2a2020"/>' +
-        // the garbage: bags, pizza boxes, cans, a mattress on the floor
-        '<rect x="12" y="186" width="92" height="22" rx="4" fill="#4b4150"/><rect x="12" y="182" width="92" height="8" rx="3" fill="#5a4e60"/>' +
-        '<g fill="#17151a"><ellipse cx="42" cy="206" rx="22" ry="16"/><ellipse cx="66" cy="214" rx="18" ry="13"/><ellipse cx="120" cy="208" rx="20" ry="17"/><ellipse cx="276" cy="200" rx="24" ry="20"/><ellipse cx="258" cy="216" rx="17" ry="12"/></g>' +
-        '<g fill="#23202a"><path d="M40 190 l-4 -8 l8 2 Z"/><path d="M120 191 l-3 -8 l7 3 Z"/><path d="M276 180 l-3 -9 l8 3 Z"/></g>' +
-        '<g fill="#a88a5a"><rect x="126" y="176" width="34" height="6"/><rect x="128" y="170" width="32" height="6"/><rect x="125" y="164" width="34" height="6"/><rect x="230" y="96" width="26" height="5"/></g>' +
-        '<g fill="#8a6c44" opacity=".8"><rect x="126" y="176" width="34" height="1.5"/><rect x="128" y="170" width="32" height="1.5"/><rect x="125" y="164" width="34" height="1.5"/></g>' +
-        '<g fill="#9aa4ad"><rect x="162" y="96" width="5" height="8" rx="1"/><rect x="238" y="88" width="5" height="8" rx="1"/><rect x="92" y="222" width="8" height="5" rx="1" transform="rotate(-70 96 224)"/><rect x="226" y="224" width="8" height="5" rx="1"/><rect x="146" y="226" width="8" height="5" rx="1" transform="rotate(20 150 228)"/></g>' +
-        '<g fill="#c44a3a"><rect x="162" y="96" width="5" height="2"/><rect x="238" y="88" width="5" height="2"/></g>' +
-        '<g stroke="#15161c" stroke-width="1.5" fill="none" opacity=".7"><path d="M214 110 q30 10 26 60 q-4 30 20 50"/><path d="M160 108 q-20 40 -60 60"/></g>' +     // cables
-        '</svg>';
-    // her room once Claube's been at it: the same room, the rubbish gone, a lamp on, the bed made, a plant
-    var MEL_CLEAN = '<svg viewBox="0 0 300 236" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
-        '<defs><radialGradient id="mc-lamp" cx=".2" cy=".35" r=".7"><stop offset="0" stop-color="rgba(255,214,150,.55)"/><stop offset="1" stop-color="rgba(255,214,150,0)"/></radialGradient>' +
-        '<radialGradient id="mc-glow"><stop offset="0" stop-color="#bfe8ff"/><stop offset="1" stop-color="#5fa8c8" stop-opacity="0"/></radialGradient></defs>' +
-        '<rect width="300" height="236" fill="#5a4a5e"/><rect y="176" width="300" height="60" fill="#6e5a48"/>' +
-        '<g stroke="#5e4a3a" stroke-width="1"><path d="M0 190 H300 M0 206 H300 M0 222 H300"/></g>' +
-        '<rect x="18" y="26" width="46" height="60" fill="#c49a52"/><rect x="22" y="30" width="38" height="52" fill="#7aa3b8"/><circle cx="41" cy="48" r="8" fill="#f3e6c2"/>' +   // a poster, framed now
-        '<rect x="150" y="104" width="112" height="8" fill="#6e4a30"/><rect x="156" y="112" width="6" height="66" fill="#6e4a30"/><rect x="250" y="112" width="6" height="66" fill="#6e4a30"/>' +
-        '<rect x="176" y="64" width="54" height="38" rx="3" fill="#15161c"/><rect x="180" y="68" width="46" height="30" fill="#5fa8c8"/><path d="M180 68 h46 v30 h-46 Z" fill="url(#mc-glow)" opacity=".6"/><rect x="198" y="102" width="10" height="4" fill="#15161c"/>' +
-        '<rect x="234" y="88" width="16" height="16" rx="3" fill="#b8402a"/><path d="M242 88 q-8 -14 0 -22 q8 8 0 22" fill="#4a8a4a"/>' +          // a potted plant on the desk
-        '<rect x="12" y="180" width="96" height="26" rx="4" fill="#9a3b1f"/><rect x="12" y="176" width="96" height="10" rx="4" fill="#e9dcc2"/><rect x="16" y="172" width="26" height="10" rx="4" fill="#f6ecd2"/>' +   // the bed, made
-        '<rect x="112" y="120" width="10" height="56" fill="#3a2716"/><path d="M104 108 h26 l-6 -18 h-14 Z" fill="#e8c890"/>' +      // a lamp
-        '<rect x="0" y="0" width="300" height="236" fill="url(#mc-lamp)"/>' +
-        '<rect x="176" y="176" width="46" height="6" fill="#2a2020"/>' +
-        '<ellipse cx="150" cy="222" rx="70" ry="9" fill="#8a3b4a" opacity=".6"/>' +          // a rug
-        '</svg>';
-    // mel, at the desk with her back to you, hunched in a hoodie (your own: assets/city/mel-typing)
-    var MEL_TYPING = '<svg viewBox="166 78 54 104" preserveAspectRatio="xMidYMax meet" aria-hidden="true">' +
-        '<path d="M214 178 v-40 q0 -14 -12 -16 l-18 -2 q-14 2 -14 18 v40 Z" fill="#3f4a5c"/>' +
-        '<ellipse cx="196" cy="108" rx="13" ry="15" fill="#2a2228"/><path d="M184 110 q-2 22 6 34 l14 -2 q4 -18 2 -30 Z" fill="#2a2228"/>' +
-        '<path d="M183 100 q13 -16 27 0 q-2 -18 -14 -18 q-12 0 -13 18 Z" fill="#4d5a6e"/>' +
-        '<path d="M172 150 q-4 -10 6 -14 M214 150 q6 -10 -4 -14" stroke="#3f4a5c" stroke-width="6" fill="none" stroke-linecap="round"/>' +
-        '<rect x="176" y="176" width="46" height="6" fill="#2a2020"/></svg>';
-    // mel, turned round in her chair, cross (your own: assets/city/mel-angry)
-    var MEL_ANGRY = '<svg viewBox="166 78 54 104" preserveAspectRatio="xMidYMax meet" aria-hidden="true">' +
-        '<path d="M214 178 v-40 q0 -14 -12 -16 l-18 -2 q-14 2 -14 18 v40 Z" fill="#3f4a5c"/>' +
-        '<path d="M181 104 q-4 30 4 44 l22 0 q8 -14 4 -44 Z" fill="#2a2228"/>' +                                  // hair
-        '<ellipse cx="196" cy="108" rx="11" ry="13" fill="#e8c7a8"/>' +
-        '<path d="M184 104 q12 -14 24 0 q-2 -16 -12 -16 q-10 0 -12 16 Z" fill="#4d5a6e"/>' +                       // hood
-        '<path d="M188 104 l6 3 M204 104 l-6 3" stroke="#2a1410" stroke-width="1.8" stroke-linecap="round"/>' +      // cross eyebrows
-        '<circle cx="191.5" cy="108" r="1.5" fill="#2a1410"/><circle cx="200.5" cy="108" r="1.5" fill="#2a1410"/>' +
-        '<path d="M191 116 q5 -3 10 0" stroke="#2a1410" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
-        '<path d="M172 146 l-6 -14 M214 146 q10 -6 6 -18" stroke="#3f4a5c" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="166" cy="131" r="3" fill="#e8c7a8"/>' +
-        '<rect x="176" y="176" width="46" height="6" fill="#2a2020"/></svg>';
-    // claube (your own: assets/city/claube)
-    var CLAUBE = '<svg viewBox="0 0 40 52" aria-hidden="true">' +
-        '<path d="M8 26 Q2 22 3 14 M32 26 Q38 22 37 14" stroke="#a84e2c" stroke-width="3.4" fill="none" stroke-linecap="round"/>' +
-        '<path d="M13 44 V50 H18 M27 44 V50 H22" stroke="#6e3018" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '<ellipse cx="20" cy="30" rx="14" ry="16" fill="#c8643b"/><ellipse cx="15" cy="24" rx="5" ry="6" fill="#e08a5e" opacity=".55"/>' +
-        '<path d="M20 14 Q18 6 22 3 M20 14 Q24 8 27 7" stroke="#6e3018" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
-        '<circle cx="15" cy="29" r="2.3" fill="#2a1410"/><circle cx="25" cy="29" r="2.3" fill="#2a1410"/><circle cx="15.7" cy="28.3" r=".7" fill="#fff"/><circle cx="25.7" cy="28.3" r=".7" fill="#fff"/>' +
-        '<path d="M15 35 Q20 40 25 35 Z" fill="#5a1d14"/></svg>';
-    // mira (your own: assets/city/mira)
-    var MIRA = '<svg viewBox="0 0 44 110" preserveAspectRatio="xMidYMax meet" aria-hidden="true">' +
-        '<path d="M12 106 V74 M32 106 V74" stroke="#2a2430" stroke-width="7" stroke-linecap="round"/>' +
-        '<path d="M8 36 Q22 30 36 36 L40 80 H4 Z" fill="#6a8a6e"/>' +                                             // a long green coat
-        '<path d="M8 40 Q2 58 8 70 M36 40 Q42 58 36 70" stroke="#6a8a6e" stroke-width="6" fill="none" stroke-linecap="round"/>' +
-        '<path d="M10 22 Q8 40 14 44 H30 Q36 40 34 22 Z" fill="#d9b36a"/>' +                                      // fair hair, to the shoulders
-        '<ellipse cx="22" cy="20" rx="9" ry="10.5" fill="#f0d2b0"/>' +
-        '<path d="M12 18 Q14 6 22 7 Q31 6 32 18 Q26 12 18 14 Z" fill="#d9b36a"/>' +
-        '<circle cx="18.5" cy="20" r="1.4" fill="#2a1410"/><circle cx="25.5" cy="20" r="1.4" fill="#2a1410"/><path d="M19 25 Q22 27.5 25 25" stroke="#2a1410" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>';
-    // what's waiting behind the boards (your own: assets/city/mel-scare)
     var BLOOD = '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g fill="#6d0a0e">' +
         '<path d="M0 0 H100 V9 Q96 12 95 30 Q94 12 90 10 Q86 14 85 52 Q84 16 79 11 Q74 13 73 24 Q72 12 66 10 Q61 15 60 71 Q59 15 54 10 Q49 12 48 36 Q47 12 42 11 Q37 16 36 58 Q35 14 30 10 Q25 12 24 27 Q23 11 18 10 Q13 15 12 80 Q11 14 6 10 Q2 12 0 22 Z"/>' +
         '<circle cx="95" cy="31" r="1.2"/><circle cx="85" cy="53" r="1.4"/><circle cx="60" cy="72.5" r="1.6"/><circle cx="36" cy="59.5" r="1.4"/><circle cx="12" cy="81.5" r="1.6"/></g>' +
@@ -596,68 +489,45 @@
         '<path d="M46 74 Q60 68 74 74 Q60 82 46 74 Z" fill="#0a0808"/><path d="M50 74 v3 M56 72 v4 M64 72 v4 M70 74 v3" stroke="#8a8070" stroke-width="1.4"/>' +
         '<g fill="#1c1614"><path d="M30 40 L18 20 L32 32 Z M90 40 L104 22 L88 32 Z M44 20 L40 2 L52 16 Z"/></g></svg>';
 
-    var melRun = 0, typer = 0;
+    var melRun = 0;
     function later(run, ms, fn) { setTimeout(function () { if (run === melRun && scene.classList.contains('mel')) fn(); }, ms); }
-    function melClean() { try { return sessionStorage.getItem('mel-clean') === '1'; } catch (e) { return false; } }
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
     function art(slot, fallback, box) {
         box.innerHTML = fallback;
         Sky.findAsset(slot, function (url) {
-            if (!url || !box.isConnected) return;
+            if (!url) return;                                             // (even if it isn't on the page yet: the scare waits in the dark till its moment)
             if (/\.(webm|mp4)$/i.test(url)) { box.innerHTML = ''; box.appendChild(Sky.makeMedia({ name: url.split('/').pop(), url: url })); }
             else box.innerHTML = '<img alt="" src="' + url + '">';
         });
     }
-    function buildStage() {
-        var st = document.createElement('div');
-        st.className = 'mel-stage' + (melClean() ? ' clean' : '');
-        st.innerHTML = '<div class="ms-bg mess"></div><div class="ms-bg clean"></div>' +
-            '<div class="ms-fig mira"><div class="ms-art"></div><span class="ms-say"></span></div>' +
-            '<div class="ms-fig claube"><div class="ms-art"></div><span class="ms-say"></span></div>' +
-            '<div class="ms-fig mel"><div class="ms-art typing"></div><div class="ms-art angry"></div><span class="ms-say"></span></div>' +
-            '<div class="ms-magic"></div>';
-        art('assets/city/mel-room|assets/city/mel-room.webm|assets/city/mel-room.mp4', MEL_ROOM, st.querySelector('.ms-bg.mess'));
-        art('assets/city/mel-room-clean|assets/city/mel-room-clean.webm|assets/city/mel-room-clean.mp4', MEL_CLEAN, st.querySelector('.ms-bg.clean'));
-        art('assets/city/mel-typing', MEL_TYPING, st.querySelector('.ms-fig.mel .typing'));
-        art('assets/city/mel-angry', MEL_ANGRY, st.querySelector('.ms-fig.mel .angry'));
-        art('assets/city/claube', CLAUBE, st.querySelector('.ms-fig.claube .ms-art'));
-        art('assets/city/mira', MIRA, st.querySelector('.ms-fig.mira .ms-art'));
-        return st;
+    // her room, live: Mel's own (schizophyllu.me.room/, with ?peek: no telescope, no sound, nothing to click),
+    // scaled to fill the window
+    var ROOM = 'schizophyllu.me.room/index.html';
+    function buildRoom() {
+        var box = document.createElement('div');
+        box.className = 'mel-live';
+        box.setAttribute('role', 'button');
+        box.setAttribute('aria-label', 'climb in through the window');
+        var f = document.createElement('iframe');
+        f.title = 'mel\u2019s room'; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
+        f.src = ROOM + '?peek';
+        box.appendChild(f);
+        function fit() { var k = Math.max(box.clientWidth / 1600, box.clientHeight / 900) || 0.3; f.style.transform = 'translate(-50%, -50%) scale(' + k.toFixed(4) + ')'; }
+        requestAnimationFrame(fit);
+        box._fit = fit;
+        box.addEventListener('click', climbIn);
+        return box;
     }
-    function stageSay(who, text, ms) {
-        if (who === 'you') { note.textContent = text; return; }
-        var b = viewEl.querySelector('.ms-fig.' + who + ' .ms-say');
-        if (!b) return;
-        b.textContent = text;
-        b.classList.add('on');
-        clearTimeout(b._t);
-        b._t = setTimeout(function () { b.classList.remove('on'); }, ms);
-    }
-    function typing(on) {
-        clearInterval(typer);
-        var m = viewEl.querySelector('.ms-fig.mel');
-        if (m) m.classList.toggle('typing', on);
-        if (!on) return;
-        sfx('typing');
-        typer = setInterval(function () { if (scene.classList.contains('mel')) sfx('typing'); else clearInterval(typer); }, 2100);
-    }
-    function tidy() {
-        var st = viewEl.querySelector('.mel-stage');
-        if (!st) return;
-        sfx('sparkle');
-        st.classList.add('tidying');
-        for (var i = 0; i < 16; i++) {
-            var star = document.createElement('span');
-            star.className = 'ms-star'; star.textContent = '\u2726';
-            star.style.left = (10 + Math.random() * 80) + '%'; star.style.top = (20 + Math.random() * 70) + '%';
-            st.appendChild(star);
-            star.animate([{ opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'scale(1.3) rotate(40deg)', offset: .4 }, { opacity: 0, transform: 'scale(.5) translateY(-20px) rotate(90deg)' }],
-                { duration: 1200 + Math.random() * 600, delay: Math.random() * 500, fill: 'forwards' }).onfinish = (function (e) { return function () { e.remove(); }; })(star);
-        }
-        setTimeout(function () { st.classList.add('clean'); }, 600);
-        setTimeout(function () { st.classList.remove('tidying'); }, 1700);
-        try { sessionStorage.setItem('mel-clean', '1'); } catch (e) {}
-        titleEl.textContent = MEL.after;
+    window.addEventListener('resize', function () { var b = viewEl.querySelector('.mel-live'); if (b) b._fit(); });
+    // in through the window: into her room, for real (its own page; its "back to the rooftop" brings them back here)
+    function climbIn(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (!scene.classList.contains('in') || scene.classList.contains('climbing')) return;
+        scene.classList.add('climbing');
+        sfx('step', { size: 0.5 }); setTimeout(function () { sfx('step', { size: 0.6 }); }, 380);
+        var t = document.body.appendChild(Object.assign(document.createElement('div'), { className: 'mel-through' }));
+        requestAnimationFrame(function () { t.classList.add('on'); });
+        setTimeout(function () { location.href = ROOM + '?from=dav-nky'; }, 1100);
     }
     // in through the window: (the first time this visit) the dark, the wrong sound, the face; then mel
     // the scare: once per browser (it stays scared until "forget your stay" wipes it), in localStorage
@@ -745,42 +615,29 @@
         }, 4500);
     }
     function lightsUp(run) {
+        var room = viewEl.querySelector('.mel-live');
+        if (!room) { room = buildRoom(); viewEl.insertBefore(room, viewEl.firstChild); }
         scene.classList.add('in');
-        titleEl.textContent = melClean() ? MEL.after : MEL.inside;
-        note.textContent = MEL.typing;
-        typing(true);
-        if (melClean()) { later(run, 3000, function () { typing(false); note.textContent = ''; }); return; }   // already tidied: she just gets on with it
-        later(run, 3200, function () {
-            typing(false);
-            note.textContent = '';
-            var m = viewEl.querySelector('.ms-fig.mel');
-            if (m) m.classList.add('turned');
-            var t = 400;
-            MEL.script.forEach(function (line) {
-                later(run, t, function () {
-                    stageSay(line.who, line.say, line.ms);
-                    if (line.who === 'claube') { var c = viewEl.querySelector('.ms-fig.claube'); if (c) { c.classList.remove('thrilled'); void c.offsetWidth; c.classList.add('thrilled'); } }
-                    if (line.then === 'clean') later(run, 500, tidy);
-                });
-                t += line.ms + 250;
-            });
-            later(run, t, function () {                                  // and back to it
-                note.textContent = '';
-                var m2 = viewEl.querySelector('.ms-fig.mel');
-                if (m2) m2.classList.remove('turned');
-                typing(true);
-                later(run, 2500, function () { typing(false); });
-            });
-        });
+        titleEl.textContent = MEL.inside;
+        note.textContent = MEL.lit;
+        var go = scene.querySelector('.mel-climb');
+        if (!go) {
+            go = document.createElement('button');
+            go.type = 'button';
+            go.className = 'mel-climb';
+            go.textContent = MEL.climb;
+            go.addEventListener('click', climbIn);
+            scene.querySelector('.ps-frame').appendChild(go);
+        }
     }
     function melPeek() {
         if (state !== 'looking' || !melWin) return;
         state = 'scene';
         applyPan(26, panFor(melWin, 26), 700);
         viewEl.innerHTML = '';
-        viewEl.appendChild(buildStage());
+        if (scaredYet()) viewEl.appendChild(buildRoom());
         viewEl.insertAdjacentHTML('beforeend', '<div class="mel-dark"></div>');
-        titleEl.textContent = melState.off >= MEL.boards ? (melClean() ? MEL.after : MEL.inside) : 'a boarded-up window';
+        titleEl.textContent = melState.off >= MEL.boards ? MEL.inside : 'a boarded-up window';
         scene.classList.add('mel');
         scene.classList.remove('in', 'void');
         var frame = scene.querySelector('.ps-frame'), wrap = document.createElement('div');

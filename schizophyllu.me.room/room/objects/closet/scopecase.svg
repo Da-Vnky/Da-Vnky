@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- scopecase (closet)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <g transform="rotate(-8 1440 760)"><rect x="1330" y="720" width="230" height="70" rx="12" fill="#1a1a1e"/><rect x="1330" y="720" width="230" height="10" rx="5" fill="#2e2e34"/>
+  <g fill="#9a9a9a"><rect x="1370" y="752" width="14" height="10"/><rect x="1500" y="752" width="14" height="10"/></g><rect x="1420" y="740" width="50" height="14" fill="#e8e0c8"/><text x="1424" y="750" font-size="7" fill="#333">TELESCOPE</text></g>
+</svg>

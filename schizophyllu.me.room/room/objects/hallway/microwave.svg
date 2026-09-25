@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- microwave (hallway): microwave
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<g transform="translate(8 -254)">
+  <rect x="1462" y="488" width="120" height="72" rx="3" fill="#2a2a2e"/>
+  <rect x="1470" y="496" width="76" height="56" rx="2" fill="#101114"/>
+  <rect x="1552" y="500" width="24" height="12" fill="#0a0404"/>
+  <text class="blink b1" x="1554" y="510" font-size="8" fill="#ff3b2a">12:00</text>
+  <g fill="#555"><rect x="1554" y="518" width="8" height="5"/><rect x="1566" y="518" width="8" height="5"/><rect x="1554" y="527" width="8" height="5"/><rect x="1566" y="527" width="8" height="5"/></g>
+</g>
+</svg>

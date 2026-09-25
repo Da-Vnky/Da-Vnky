@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- cables (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <filter id="f-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="2.2" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+  <!-- the long runs -->
+  <g fill="none" stroke="#08080a" stroke-width="3" stroke-linecap="round">
+    <path d="M822 762 C 828 730 858 716 872 700"/>
+    <path d="M840 762 C 850 700 900 640 950 568"/>
+    <path d="M858 762 C 1000 756 1200 750 1298 736"/>
+    <path d="M932 798 C 1000 760 1150 780 1206 720"/>
+    <path d="M950 798 C 1100 800 1350 792 1506 738"/>
+    <path d="M968 798 C 1010 740 1080 700 1100 568"/>
+    <path d="M1206 700 C 1180 740 1130 720 1110 760"/>
+    <path d="M876 650 C 870 700 820 720 804 760"/>
+  </g>
+  <path d="M858 762 C 1000 756 1200 750 1298 736" stroke="#b33" stroke-width="1.5" fill="none" opacity=".8"/>
+  <!-- the nest -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M980 862 C 1020 828 1100 892 1150 850 S 1232 838 1200 882" stroke="#0a0a0c" stroke-width="4"/>
+    <path d="M1000 882 C 1040 850 1120 862 1180 870 S 1244 868 1250 892" stroke="#111114" stroke-width="4"/>
+    <path d="M1020 846 C 1060 872 1140 830 1190 862" stroke="#0d0d10" stroke-width="3.5"/>
+    <path d="M1040 876 C 1000 846 1100 826 1130 870 S 1060 896 1040 876" stroke="#16161a" stroke-width="3"/>
+    <path d="M1150 850 C 1170 820 1230 830 1226 860 S 1180 890 1160 870" stroke="#0a0a0c" stroke-width="3"/>
+    <path d="M990 870 C 1060 840 1130 900 1210 850" stroke="#c33" stroke-width="2"/>
+    <path d="M1010 856 C 1080 880 1150 830 1236 874" stroke="#e0c030" stroke-width="2"/>
+    <path d="M1030 888 C 1090 858 1170 896 1224 846" stroke="#3a6ad0" stroke-width="2"/>
+    <path d="M1060 850 C 1100 872 1140 862 1172 884" stroke="#ddd" stroke-width="1.6"/>
+  </g>
+  <g fill="#e8e8e8"><rect x="1066" y="852" width="3" height="10" transform="rotate(20 1067 857)"/><rect x="1150" y="856" width="3" height="10" transform="rotate(-15 1151 861)"/><rect x="1196" y="858" width="3" height="10"/></g>
+  <g transform="rotate(-14 1150 842)"><rect x="1124" y="836" width="54" height="12" fill="#e8e0c8"/><text x="1128" y="845" font-size="8" fill="#333">SPOINGUS</text></g>
+  <!-- random adapters -->
+  <rect x="1236" y="878" width="22" height="10" rx="2" fill="#dcdcdc" transform="rotate(-12 1247 883)"/>
+  <rect x="966" y="880" width="16" height="7" rx="1" fill="#2b2b33" transform="rotate(18 974 884)"/><rect x="982" y="881" width="7" height="4" fill="#aaa" transform="rotate(18 974 884)"/>
+  <!-- the heads -->
+  <g class="head" style="--d:-1s">
+    <path d="M1040 862 C 1010 830 1000 792 1018 762" stroke="#0a0a0c" stroke-width="4" fill="none"/>
+    <g transform="translate(1018 760) rotate(-20) scale(1.7)"><rect x="-7" y="-14" width="14" height="14" rx="2" fill="#141417"/><rect x="-6" y="-20" width="12" height="6" fill="#b8b8b8"/></g>
+  </g>
+  <g class="head" style="--d:-2.5s">
+    <path d="M1070 862 C 1082 820 1050 790 1066 754" stroke="#111114" stroke-width="4" fill="none"/>
+    <g transform="translate(1066 752) rotate(10) scale(1.7)"><rect x="-6" y="-16" width="12" height="16" rx="2" fill="#44444c"/><rect x="-5" y="-24" width="10" height="8" fill="#ccc"/><rect x="-3" y="-22" width="2" height="2" fill="#333"/><rect x="1" y="-22" width="2" height="2" fill="#333"/></g>
+  </g>
+  <g class="head big" style="--d:-.4s">
+    <path d="M1100 864 C 1124 800 1088 770 1112 732" stroke="#0a0a0c" stroke-width="5.5" fill="none"/>
+    <g transform="translate(1112 730) rotate(6) scale(1.7)">
+      <rect x="-9" y="-10" width="18" height="12" rx="2" fill="#1b1b22"/>
+      <path d="M-13 -22 h26 l-3 12 h-20z" fill="#2a4ad0"/>
+      <circle cx="-15" cy="-16" r="3" fill="#ccc"/><circle cx="15" cy="-16" r="3" fill="#ccc"/>
+      <g fill="#6dffb0" class="eyes"><circle cx="-5" cy="-17" r="1.6"/><circle cx="5" cy="-17" r="1.6"/></g>
+    </g>
+  </g>
+  <g class="head" style="--d:-3.3s">
+    <path d="M1140 866 C 1172 830 1150 800 1168 774" stroke="#111114" stroke-width="3.5" fill="none"/>
+    <g transform="translate(1168 772) rotate(28) scale(1.7)"><rect x="-6" y="-14" width="12" height="14" rx="1" fill="#cfe8f0" opacity=".85"/><path d="M-4 -12v4M-1 -12v4M2 -12v4" stroke="#d4a020" stroke-width="1"/><path d="M-3 -2 l3 5 l3 -5" fill="#cfe8f0"/></g>
+  </g>
+  <g class="head" style="--d:-1.8s">
+    <path d="M1172 872 C 1212 852 1212 822 1222 802" stroke="#0a0a0c" stroke-width="4" fill="none"/>
+    <g transform="translate(1222 800) rotate(-12) scale(1.7)"><rect x="-13" y="-12" width="26" height="14" rx="3" fill="#222228"/><circle cx="-6" cy="-5" r="2" fill="#6dffb0" class="blink b1" filter="url(#f-glow)"/><circle cx="6" cy="-5" r="2" fill="#6dffb0" class="blink b1" filter="url(#f-glow)"/></g>
+  </g>
+  <g>
+    <path d="M1000 868 C 980 872 962 878 950 872" stroke="#0d0d10" stroke-width="3" fill="none"/>
+    <rect x="938" y="866" width="14" height="7" rx="3" fill="#2a2a30" transform="rotate(-8 945 870)"/>
+  </g>
+  <path d="M960 870 C 1040 830 1140 880 1236 860 M840 762 C 860 740 900 700 950 568 M950 798 C 1100 800 1350 792 1506 738" stroke="#000" stroke-opacity="0" stroke-width="22" fill="none"/>
+</svg>

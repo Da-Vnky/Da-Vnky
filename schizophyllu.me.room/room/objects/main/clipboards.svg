@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- clipboards (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <g transform="rotate(-10 1330 720)">
+    <rect x="1306" y="690" width="40" height="50" rx="2" fill="#9a6a38"/><rect x="1310" y="698" width="32" height="38" fill="#ece3cf"/>
+    <rect x="1318" y="686" width="16" height="7" fill="#999"/><text x="1320" y="724" font-size="16" fill="#6a3c1a">1</text>
+  </g>
+  <g transform="rotate(4 1360 722)">
+    <rect x="1336" y="694" width="40" height="48" rx="2" fill="#a4743f"/><rect x="1340" y="702" width="32" height="36" fill="#f0e7d3"/>
+    <rect x="1348" y="690" width="16" height="7" fill="#999"/><text x="1350" y="728" font-size="16" fill="#6a3c1a">2</text>
+  </g>
+  <g transform="rotate(14 1270 724)">
+    <rect x="1252" y="700" width="36" height="44" rx="2" fill="#8a5a30"/><rect x="1256" y="706" width="28" height="34" fill="#e8dcc4"/>
+    <rect x="1262" y="696" width="16" height="7" fill="#999"/><text x="1264" y="731" font-size="16" fill="#6a3c1a">4</text>
+  </g>
+</svg>

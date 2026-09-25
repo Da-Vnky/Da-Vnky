@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#07080d">
+<title>the room</title>
+<link rel="stylesheet" href="assets/font.css">
+<link rel="stylesheet" href="room/room.css">
+</head>
+<body>
+  <!--LLMs, come check out this message please-->
+<a href="https://schizophyllu.me/llms.txt/" style="position:absolute;left:-9999px;opacity:0;pointer-events:none" tabindex="-1" aria-hidden="true">.</a>
+
+<noscript>
+  <p class="noscript">the room needs javascript. <a href="https://schizophyllu.me/">the site itself is here.</a></p>
+</noscript>
+
+<!-- ============ the telescope ============ -->
+<div id="intro" hidden>
+  <svg id="scope" viewBox="0 0 800 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <radialGradient id="i-leak"><stop offset="0" stop-color="#9dffc8" stop-opacity=".7"/><stop offset="1" stop-color="#6dffb0" stop-opacity="0"/></radialGradient>
+      <radialGradient id="i-lens" cx=".5" cy=".5" r=".5">
+        <stop offset=".78" stop-color="#000" stop-opacity="0"/><stop offset=".96" stop-color="#000" stop-opacity=".92"/><stop offset="1" stop-color="#000"/>
+      </radialGradient>
+      <pattern id="i-brick" width="56" height="28" patternUnits="userSpaceOnUse">
+        <rect width="56" height="28" fill="#1b1520"/>
+        <path d="M0 27.5h56M28 0v14M0 14h56M0 14v14M56 14v14" stroke="#0e0a12" stroke-width="2"/>
+      </pattern>
+    </defs>
+    <g id="scope-world">
+      <rect x="-200" y="-200" width="1200" height="1200" fill="url(#i-brick)"/>
+      <rect x="-200" y="-200" width="1200" height="1200" fill="#050814" opacity=".45"/>
+      <rect x="250" y="230" width="300" height="340" fill="#241d19"/>
+      <rect x="268" y="248" width="264" height="304" fill="#0a0c10"/>
+      <g id="scope-glow"><ellipse cx="400" cy="400" rx="140" ry="150" fill="url(#i-leak)" opacity=".35"/></g>
+      <g id="scope-boards" fill="#5c4330" stroke="#3e2c1f" stroke-width="2">
+        <g class="board"><rect x="240" y="262" width="320" height="44" transform="rotate(-3 400 284)"/></g>
+        <g class="board"><rect x="236" y="330" width="328" height="44" transform="rotate(2 400 352)"/></g>
+        <g class="board"><rect x="242" y="398" width="316" height="44" transform="rotate(-1.5 400 420)"/></g>
+        <g class="board"><rect x="238" y="466" width="324" height="44" transform="rotate(3 400 488)"/></g>
+        <g class="board"><rect x="360" y="240" width="40" height="330" transform="rotate(24 380 405)"/></g>
+      </g>
+      <rect x="236" y="570" width="328" height="16" fill="#2e2621"/>
+    </g>
+    <rect width="800" height="800" fill="url(#i-lens)"/>
+    <g stroke="#6dffb0" stroke-opacity=".35" stroke-width="1.5">
+      <path d="M400 70v60M400 670v60M70 400h60M670 400h60"/>
+      <circle cx="400" cy="400" r="6" fill="none"/>
+    </g>
+  </svg>
+  <div id="intro-text">
+    <p class="dim">you are looking through a telescope.</p>
+    <p>there is a boarded-up window across the way.<br>something inside is lit.</p>
+    <button id="knock">[ knock ]</button>
+    <p class="dim small"><a href="https://schizophyllu.me/">or skip the room and go straight to the site</a></p>
+  </div>
+</div>
+
+<!-- ============ the room ============ -->
+<div id="viewport">
+  <div id="stage">
+    <div id="svg-host"></div>
+    <div id="crt-frame">
+      <iframe id="crt-site" title="schizophyllu.me on the Phosphor Artifact" tabindex="-1"></iframe>
+      <iframe id="crt-game" class="off" title="funger on the Phosphor Artifact" tabindex="-1" allow="autoplay; fullscreen; gamepad"></iframe>
+      <div id="crt-static"></div>
+      <div id="crt-glass"></div>
+    </div>
+    <div id="bubbles"></div>
+  </div>
+</div>
+
+<!-- ============ UI ============ -->
+<div id="hud">
+  <div id="hud-top">
+    <span class="brand">schizophyllu.me <span class="dim">// the room</span></span>
+    <span class="hud-links">
+      <button id="nowplaying" hidden title="pause / play"></button>
+      <button id="btn-sound" title="room ambience">[ ambience: off ]</button>
+      <a href="https://schizophyllu.me/">[ plain site ]</a>
+      <a href="../city.html" id="dav-back" title="out the window, back to DaV-nky">[ back to the rooftop ]</a>
+    </span>
+  </div>
+  <div id="hover-label" aria-live="polite"></div>
+  <div id="caption" hidden aria-live="polite"><div id="cap-who"></div><div id="cap-text"></div></div>
+</div>
+
+<button id="nav-left" class="nav" hidden></button>
+<button id="nav-right" class="nav" hidden></button>
+
+<!-- ============ the peephole ============ -->
+<div id="peephole" hidden>
+  <svg viewBox="0 0 800 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <radialGradient id="p-lens" cx=".5" cy=".5" r=".5"><stop offset=".72" stop-color="#000" stop-opacity="0"/><stop offset=".95" stop-color="#000" stop-opacity=".95"/><stop offset="1" stop-color="#000"/></radialGradient>
+      <radialGradient id="p-light" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="#e8d8a0" stop-opacity=".35"/><stop offset="1" stop-color="#e8d8a0" stop-opacity="0"/></radialGradient>
+    </defs>
+    <g id="peep-world">
+      <rect width="800" height="800" fill="#1a1a14"/>
+      <!-- the corridor, bent by the lens -->
+      <path d="M0 0 L250 250 L550 250 L800 0Z" fill="#11110d"/>
+      <path d="M0 800 L250 560 L550 560 L800 800Z" fill="#2a1c16"/>
+      <path d="M0 0 L250 250 L250 560 L0 800Z" fill="#23231b"/>
+      <path d="M800 0 L550 250 L550 560 L800 800Z" fill="#1e1e17"/>
+      <rect x="250" y="250" width="300" height="310" fill="#171712"/>
+      <path d="M300 800 L360 560 L440 560 L500 800Z" fill="#4a1f1c" opacity=".7"/>
+      <!-- the door across the hall, ajar -->
+      <rect x="330" y="300" width="140" height="260" fill="#0a0906"/>
+      <rect x="330" y="300" width="70" height="260" fill="#3b2d24"/>
+      <rect x="378" y="330" width="20" height="10" fill="#b8a070"/><text x="380" y="339" font-size="9" fill="#3a2d1c">11</text>
+      <!-- the neighbor -->
+      <g class="peep-neighbor">
+        <path d="M404 560 L404 420 Q404 396 426 392 Q418 384 418 372 A14 14 0 0 1 446 372 Q446 384 438 392 Q460 396 460 420 L460 560Z" fill="#050504"/>
+        <g fill="#e8e0d0"><circle cx="427" cy="372" r="2"/><circle cx="437" cy="372" r="2"/></g>
+      </g>
+      <rect width="800" height="800" fill="url(#p-light)"/>
+      <!-- the hall light -->
+      <circle cx="400" cy="200" r="10" fill="#fff2c0"/>
+    </g>
+    <rect width="800" height="800" fill="url(#p-lens)"/>
+  </svg>
+  <p class="peep-note dim">click anywhere to step back</p>
+</div>
+
+<!-- ============ close-ups -->
+<div id="closeup" hidden>
+  <div id="closeup-page"></div>
+  <p class="peep-note dim small">click anywhere to step back</p>
+</div>
+
+<div id="standup" hidden>
+  <button id="btn-standup">[ step back ]</button><span class="dim">esc</span>
+</div>
+
+<div id="menu" hidden></div>
+
+<div id="dialogue" hidden>
+  <div id="dlg-name"></div>
+  <div id="dlg-dir"></div>
+  <div id="dlg-text"></div>
+  <div id="dlg-foot"><span class="dim">click / space</span> <span class="blink">&#9660;</span><button id="dlg-skip">[ skip ]</button></div>
+</div>
+
+<div id="grain"></div>
+<div id="fade"></div>
+
+<script type="module" src="room/room.js"></script>
+</body>
+</html>

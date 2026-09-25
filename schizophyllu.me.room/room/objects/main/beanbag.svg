@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- beanbag (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <path d="M560 868 Q540 800 590 770 Q650 736 720 766 Q776 792 764 850 Q758 884 700 888 L610 890 Q568 888 560 868Z" fill="#4b3560"/>
+  <path d="M590 800 Q640 780 700 800 Q740 812 750 840" stroke="#5e4478" stroke-width="10" fill="none" opacity=".7"/>
+  <path d="M600 850 Q650 830 720 850" stroke="#3a2a4c" stroke-width="3" fill="none"/>
+  <g transform="rotate(-8 660 814)">
+    <rect x="612" y="806" width="98" height="16" fill="#d8d0b8" opacity=".92"/>
+    <text x="617" y="818" font-size="9" fill="#222">INFRASTRUCTURE</text>
+  </g>
+</svg>

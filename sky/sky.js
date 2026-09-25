@@ -176,6 +176,12 @@
     var EXTS = ['svg', 'gif', 'webp', 'png', 'jpg'];
     var assetDirs = {}, assetMemo = {};
     function assetDir(dir) {
+        // (a reset's own folder: assets/resets/index.txt already says what's in it)
+        if (!assetDirs[dir] && /^assets\/resets\//.test(dir) && window.davSave) assetDirs[dir] = window.davSave.overrides().then(function (have) {
+            var names = {}, pre = dir.replace(/^assets\/resets\//, '');
+            Object.keys(have).forEach(function (p) { if (p.indexOf(pre) === 0 && p.slice(pre.length).indexOf('/') === -1) names[p.slice(pre.length)] = 1; });
+            return names;
+        });
         if (!assetDirs[dir]) assetDirs[dir] = Promise.all([
             fetch(dir + 'list.txt', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; }),
             new Promise(function (done) { listFolder(dir, EXTS.concat(['jpeg', 'json', 'mp3', 'ogg', 'webm', 'mp4', 'woff', 'woff2', 'ttf', 'otf']), done); })
@@ -564,6 +570,7 @@
         sun.style.color = mix('#f7d35e', '#e8683c', sunHeat);
         moon.style.left = moonA[0] + 'vw';
         moon.style.top  = moonA[1] + 'vh';
+        skybox.classList.toggle('mirror', sunA[0] < 50);             // (the sun's coming up on the left: the evening skies flipped)
 
         // clouds fade out through sunset. on the homepage's scroll they drift apart;
         // anywhere the day turns by itself they sail steadily left to right, round and round
@@ -986,10 +993,13 @@
     // a matching bench-glow.(svg|png|webp|gif) is laid on top and fades in at dusk.
     // several names can be given, best first: "assets/sky/cloud-2|assets/sky/cloud"
     function findAsset(base, cb) {
-        if (!assetMemo[base]) assetMemo[base] = Promise.resolve().then(function () {
+        if (!assetMemo[base]) assetMemo[base] = (window.davSave ? window.davSave.overrides() : Promise.resolve({})).then(function (have) {
             var list = [];
             base.split('|').forEach(function (b) {
                 b = b.trim();
+                // this reset's own version of it, if it has one (sky/state.js: assets/resets/reset-<n>/…)
+                var swap = window.davSave && window.davSave.swapFor(b, have);
+                if (swap) list.push(swap);
                 if (/\.(svg|gif|webp|png|jpe?g|json|mp3|ogg|webm|mp4|woff2?|ttf|otf)$/i.test(b)) list.push(b);
                 else EXTS.forEach(function (x) { list.push(b + '.' + x); });
             });
@@ -1651,6 +1661,37 @@
     }
 
     /* ---------------- what grounds and page scripts can use ---------------- */
+    /* ---------------- the sun's eye: the pupil follows the visitor's pointer ----------------
+       only once there's a pupil to move: assets/sky/sun-pupil (a see-through PNG of just the pupil,
+       cropped close around it). take the pupil out of your sun picture, and this one looks about instead.
+       where it sits in the sun, and how far it can look, as a share of the sun's width: */
+    var EYE = { x: 47.5, y: 47, size: 24, reach: 11 };
+    findAsset('assets/sky/sun-pupil', function (url) {
+        if (!url) return;
+        css('.sun-pupil { position: absolute; z-index: 2; left: ' + EYE.x + '%; top: ' + EYE.y + '%; width: ' + EYE.size + '%; pointer-events: none;' +
+                'transform: translate(-50%, -50%); transition: transform .35s cubic-bezier(.2,.7,.3,1); }' +
+            '.sun-pupil > img { display: block; width: 100%; height: auto; }');
+        var p = document.createElement('div');
+        p.className = 'sun-pupil';
+        p.innerHTML = '<img alt="" src="' + url + '">';
+        sun.appendChild(p);
+        var want = null, queued = false;
+        function look() {
+            queued = false;
+            if (!want) return;
+            var r = sun.getBoundingClientRect();
+            if (!r.width) return;
+            var dx = want[0] - (r.left + r.width * EYE.x / 100), dy = want[1] - (r.top + r.height * EYE.y / 100);
+            var d = Math.sqrt(dx * dx + dy * dy) || 1, k = Math.min(1, d / 260) * r.width * EYE.reach / 100 / d;
+            p.style.transform = 'translate(calc(-50% + ' + (dx * k).toFixed(1) + 'px), calc(-50% + ' + (dy * k).toFixed(1) + 'px))';
+        }
+        function aim(x, y) { want = [x, y]; if (!queued) { queued = true; requestAnimationFrame(look); } }
+        document.addEventListener('pointermove', function (e) { aim(e.clientX, e.clientY); }, { passive: true });
+        document.addEventListener('pointerdown', function (e) { aim(e.clientX, e.clientY); }, { passive: true });
+        document.addEventListener('mouseleave', function () { want = null; p.style.transform = ''; });
+        hooks.push(function () { if (want && !queued) { queued = true; requestAnimationFrame(look); } });   // (and as the sun moves across the sky)
+    });
+
     window.Sky = {
         // run fn(p) every frame the scene changes; p goes 0 (noon) → 1 (midnight)
         onFrame: function (fn) { hooks.push(fn); fn(shown); },
@@ -1692,7 +1733,8 @@
         svgArt: svgArt, layerArt: layerArt, fitLayerArt: fitLayerArt, setCloudiness: setCloudiness,
         repoApi: REPO_API,
         findAsset: findAsset,
-        setupCharacters: setupCharacters,
+        setupCharacters: setupCharacters, stroll: stroll, restX: restX,
+        save: window.davSave,
         figure: FIGURE,
         places: PLACES,
         constellations: CONSTELLATIONS,

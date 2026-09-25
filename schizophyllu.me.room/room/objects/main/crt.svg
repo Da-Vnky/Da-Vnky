@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- crt (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<defs>
+  <linearGradient id="g-crt" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#cfc6ab"/><stop offset=".6" stop-color="#a89f86"/><stop offset="1" stop-color="#7d7562"/>
+  </linearGradient>
+  <pattern id="p-scan" width="4" height="3" patternUnits="userSpaceOnUse">
+    <rect width="4" height="1" fill="#000" opacity=".4"/>
+  </pattern>
+</defs>
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <filter id="f-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="2.2" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+  <polygon points="670,338 830,338 812,300 688,300" fill="#8f8772"/>
+  <polygon points="688,300 812,300 806,292 694,292" fill="#a39b85"/>
+  <rect x="638" y="334" width="224" height="243" rx="14" fill="url(#g-crt)"/>
+  <rect x="638" y="334" width="224" height="6" rx="3" fill="#fff" opacity=".15"/>
+  <rect x="656" y="352" width="188" height="147" rx="12" fill="#3c382f"/>
+  <rect id="crt-screen" x="668" y="364" width="164" height="123" rx="6" fill="#041a0c"/>
+  <rect x="668" y="364" width="164" height="123" rx="6" fill="url(#p-scan)"/>
+  <text x="652" y="524" font-size="10" fill="#5a5343" letter-spacing="2">PHOSPHOR</text>
+  <circle cx="790" cy="522" r="7" fill="#6e6754"/><circle cx="812" cy="522" r="7" fill="#6e6754"/>
+  <circle cx="836" cy="522" r="3.2" fill="#6dffb0" class="blink b1" filter="url(#f-glow)"/>
+  <rect x="656" y="542" width="188" height="3" fill="#8c8470"/>
+  <rect x="656" y="550" width="188" height="3" fill="#8c8470"/>
+  <rect x="656" y="352" width="188" height="147" rx="12" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="6" filter="url(#f-glow)"/>
+  <rect x="640" y="336" width="220" height="239" rx="13" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="1.5"/>
+  <path d="M652 572 h196" stroke="#000" stroke-opacity=".25" stroke-width="4"/>
+  <g fill="#7d7562"><circle cx="648" cy="345" r="1.8"/><circle cx="852" cy="345" r="1.8"/><circle cx="648" cy="566" r="1.8"/><circle cx="852" cy="566" r="1.8"/></g>
+  <g stroke="#6e6754" stroke-width="2"><path d="M716 514v16M722 514v16M728 514v16M734 514v16M740 514v16M746 514v16M752 514v16"/></g>
+  <rect x="762" y="516" width="16" height="10" rx="2" fill="#8c8470"/>
+  <g transform="rotate(-8 654 506)"><rect x="642" y="500" width="24" height="12" fill="#1b1b1b"/><text x="645" y="509" font-size="7" fill="#ffb347">tty1</text></g>
+  <!-- stickers -->
+  <g transform="translate(812 360) rotate(10)">
+    <ellipse cx="0" cy="0" rx="7" ry="9" fill="#111"/><ellipse cx="0" cy="2" rx="4.5" ry="6" fill="#eee"/>
+    <path d="M-5 9h4l-2 3zM1 9h4l-2 3z" fill="#f2a900"/><circle cx="-2" cy="-4" r="1" fill="#fff"/><circle cx="2" cy="-4" r="1" fill="#fff"/>
+  </g>
+  <rect x="770" y="560" width="46" height="10" fill="#1b1b1b" transform="rotate(-3 793 565)"/>
+  <text x="773" y="568" font-size="7" fill="#6dffb0" transform="rotate(-3 793 565)">devuan</text>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- solder (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <ellipse cx="1140" cy="550" rx="12" ry="3" fill="#333"/>
+  <path d="M1133 548 l5 -16 h8 l-2 16" fill="none" stroke="#999" stroke-width="1.5"/>
+  <path d="M1138 534 L1160 508" stroke="#2a6ad0" stroke-width="5" stroke-linecap="round"/>
+  <path d="M1138 534 L1130 543" stroke="#ccc" stroke-width="2"/>
+  <path d="M1160 508 q14 -6 10 20 q-4 20 8 26" stroke="#111" stroke-width="1.5" fill="none"/>
+  <path class="wisp" d="M1129 540 q-6 -10 2 -18 q8 -8 0 -18" stroke="#cfd6e0" stroke-width="2" fill="none"/>
+  <path class="wisp w2" d="M1131 540 q6 -10 -2 -18 q-8 -8 0 -18" stroke="#cfd6e0" stroke-width="1.5" fill="none"/>
+</svg>

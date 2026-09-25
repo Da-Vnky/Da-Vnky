@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" id="bathroom" preserveAspectRatio="xMidYMid meet" font-family="'IBM VGA', monospace">
+<defs>
+  <linearGradient id="t-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#141a18"/><stop offset="1" stop-color="#26302c"/></linearGradient>
+  <linearGradient id="t-porcelain" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cfcab4"/><stop offset="1" stop-color="#7c7866"/></linearGradient>
+  <linearGradient id="t-rust" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a3a14" stop-opacity=".8"/><stop offset="1" stop-color="#7a3a14" stop-opacity="0"/></linearGradient>
+  <radialGradient id="t-tube"><stop offset="0" stop-color="#dffff4" stop-opacity=".42"/><stop offset=".4" stop-color="#bfeee0" stop-opacity=".14"/><stop offset="1" stop-color="#bfeee0" stop-opacity="0"/></radialGradient>
+  <radialGradient id="t-mold"><stop offset="0" stop-color="#0b120a" stop-opacity=".9"/><stop offset="1" stop-color="#0b120a" stop-opacity="0"/></radialGradient>
+  <radialGradient id="t-vignette" cx=".5" cy=".5" r=".72"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".85"/></radialGradient>
+  <pattern id="t-tile" width="40" height="30" patternUnits="userSpaceOnUse"><rect width="40" height="30" fill="#b3b8ab"/><path d="M0 29.5h40M39.5 0v30" stroke="#4a4d44" stroke-width="1.4"/></pattern>
+  <pattern id="t-floor" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#c4c4b8"/><path d="M0 17.5h18M17.5 0v18" stroke="#3a3a34" stroke-width="1.2"/><rect x="9" y="0" width="8" height="8" fill="#9aa09a" opacity=".3"/></pattern>
+  <filter id="t-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="t-soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7"/></filter>
+</defs>
+
+<!-- walls: peeling paint above, cracked tile below -->
+<rect width="1600" height="700" fill="url(#t-wall)"/>
+<g opacity=".55">
+  <polygon points="995,281 987,293 970,296 952,298 949,285 940,274 955,267 970,264 980,273" fill="#3b4641" stroke="#0e1311" stroke-width="1.2"/>
+  <polygon points="962,137 965,144 956,146 950,142 939,141 939,133 947,129 956,128 961,133" fill="#3b4641" stroke="#0e1311" stroke-width="1.2"/>
+  <polygon points="85,272 81,279 75,291 58,286 45,278 52,267 58,258 73,260 84,264" fill="#3b4641" stroke="#0e1311" stroke-width="1.2"/>
+  <polygon points="651,187 648,191 643,192 636,194 631,190 632,184 637,181 643,182 647,184" fill="#3b4641" stroke="#0e1311" stroke-width="1.2"/>
+  <polygon points="642,67 637,70 632,72 627,72 624,69 625,65 625,60 632,61 641,61" fill="#3b4641" stroke="#0e1311" stroke-width="1.2"/>
+  <polygon points="172,180 160,188 149,189 137,192 126,185 132,176 140,172 150,169 166,169" fill="#3b4641" stroke="#0e1311" stroke-width="1.2"/>
+  <polygon points="298,94 288,98 283,104 274,103 266,98 270,91 274,85 284,81 294,86" fill="#3b4641" stroke="#0e1311" stroke-width="1.2"/>
+  <polygon points="912,224 912,232 901,234 890,233 875,230 877,219 890,214 902,208 909,217" fill="#3b4641" stroke="#0e1311" stroke-width="1.2"/>
+  <polygon points="874,278 861,286 853,301 837,290 828,283 819,271 836,265 851,263 860,270" fill="#3b4641" stroke="#0e1311" stroke-width="1.2"/>
+</g>
+<ellipse cx="1500" cy="40" rx="150" ry="60" fill="#6a5430" opacity=".18" filter="url(#t-soft)"/>
+<ellipse cx="1470" cy="80" rx="60" ry="90" fill="#6a5430" opacity=".1" filter="url(#t-soft)"/>
+<g fill="url(#t-mold)">
+  <circle cx="168" cy="75" r="6.9"/>
+  <circle cx="36" cy="11" r="9.4"/>
+  <circle cx="168" cy="25" r="10.9"/>
+  <circle cx="120" cy="16" r="5.8"/>
+  <circle cx="198" cy="10" r="7.0"/>
+  <circle cx="132" cy="116" r="15.3"/>
+  <circle cx="146" cy="156" r="14.6"/>
+  <circle cx="32" cy="8" r="5.2"/>
+  <circle cx="264" cy="71" r="6.9"/>
+  <circle cx="75" cy="3" r="13.9"/>
+  <circle cx="42" cy="16" r="6.1"/>
+  <circle cx="85" cy="21" r="6.7"/>
+  <circle cx="-38" cy="4" r="11.4"/>
+  <circle cx="60" cy="150" r="6.4"/>
+  <circle cx="145" cy="44" r="9.3"/>
+  <circle cx="130" cy="52" r="8.4"/>
+  <circle cx="57" cy="28" r="8.3"/>
+  <circle cx="242" cy="49" r="11.9"/>
+  <circle cx="57" cy="22" r="5.7"/>
+  <circle cx="103" cy="42" r="14.9"/>
+  <circle cx="36" cy="82" r="4.3"/>
+  <circle cx="37" cy="3" r="12.8"/>
+  <circle cx="-23" cy="214" r="4.9"/>
+  <circle cx="-20" cy="17" r="14.8"/>
+  <circle cx="81" cy="38" r="13.5"/>
+  <circle cx="146" cy="16" r="12.2"/>
+</g>
+<rect y="330" width="1600" height="370" fill="url(#t-tile)"/>
+<rect y="330" width="1600" height="370" fill="#0b120f" opacity=".5"/>
+<rect y="326" width="1600" height="6" fill="#8a8e84"/>
+<g fill="#0a0d0c">
+  <rect x="160" y="450" width="40" height="30"/>
+  <rect x="1400" y="390" width="40" height="30"/>
+  <rect x="1440" y="600" width="40" height="30"/>
+  <rect x="920" y="360" width="40" height="30"/>
+  <rect x="640" y="630" width="40" height="30"/>
+</g>
+<rect x="1200" y="480" width="40" height="30" fill="#8aa0b8" opacity=".55"/><rect x="480" y="360" width="40" height="30" fill="#c8b890" opacity=".45"/>
+<g stroke="#15130f" stroke-width="1.4" fill="none">
+  <path d="M40 340 l30 60 l-10 40 l24 70"/><path d="M1120 420 l-20 40 l16 36 l-8 50"/><path d="M940 600 l40 -30 l30 20"/><path d="M1540 340 l-30 80"/>
+</g>
+<rect y="700" width="1600" height="200" fill="url(#t-floor)"/>
+<rect y="700" width="1600" height="200" fill="#0b0d0c" opacity=".55"/>
+<rect y="688" width="1600" height="14" fill="#6a6e64"/>
+<circle cx="900" cy="820" r="14" fill="#3a3a34"/><g stroke="#1a1a16" stroke-width="2"><path d="M890 820h20M900 810v20M893 813l14 14M907 813l-14 14"/></g>
+<ellipse cx="900" cy="826" rx="60" ry="14" fill="#3a2a14" opacity=".35"/>
+
+<!-- the fluorescent tube -->
+<rect x="610" y="26" width="380" height="22" rx="3" fill="#cfcfc6"/>
+<rect class="t-flicker" x="622" y="44" width="356" height="8" rx="4" fill="#effff8" filter="url(#t-glow)"/>
+<g fill="#222"><circle cx="700" cy="46" r="2"/><circle cx="700" cy="46" r="2"/></g>
+<g pointer-events="none" fill="#000"><rect x="880" y="42" width="30" height="10" opacity=".5"/></g>
+
+<!-- high frosted window -->
+<g class="obj" data-id="twindow" data-art="room/objects/bathroom/twindow.svg"></g>
+
+<!-- ======================================== the pipes -->
+<g class="obj" data-id="pipes" data-art="room/objects/bathroom/pipes.svg"></g>
+
+<!-- ======================================== bathtub -->
+<g pointer-events="none">
+  <rect x="30" y="166" width="544" height="5" rx="2" fill="#9a9a94"/>
+</g>
+<g class="obj" data-id="curtain" data-art="room/objects/bathroom/curtain.svg"></g>
+<path d="M300 250 V282" stroke="#8e8a7c" stroke-width="6"/><ellipse cx="300" cy="288" rx="18" ry="7" fill="#9a968a"/>
+<ellipse class="drip" cx="302" cy="298" rx="1.8" ry="2.6" fill="#bfe6ff"/>
+<path d="M470 470 v22 q0 10 -14 10" stroke="#9a968a" stroke-width="7" fill="none"/>
+<g>
+  <path d="M34 526 Q34 510 60 510 L548 510 Q576 510 576 526 L566 736 L44 736Z" fill="url(#t-porcelain)"/>
+  <rect x="34" y="508" width="542" height="18" rx="9" fill="#d4cfb8"/>
+  <path d="M60 540 L548 540" stroke="#8a7a4a" stroke-width="3" opacity=".5"/>
+  <rect x="440" y="526" width="10" height="170" fill="url(#t-rust)"/>
+  <path d="M90 600 q60 20 140 0 t160 6" stroke="#6a6a60" stroke-width="1" fill="none" opacity=".5"/>
+</g>
+<g class="obj" data-id="duck" data-art="room/objects/bathroom/duck.svg"></g>
+<g class="obj" data-id="tpcbs" data-art="room/objects/bathroom/tpcbs.svg"></g>
+<g class="obj" data-id="ipa" data-art="room/objects/bathroom/ipa.svg"></g>
+
+<!-- ======================================== sink + mirror cabinet -->
+<g class="obj" data-id="medcab" id="medcab" data-art="room/objects/bathroom/medcab.svg"></g>
+<g>
+  <path d="M704 430 L856 430 Q866 430 862 444 L848 470 L712 470 L698 444 Q694 430 704 430Z" fill="url(#t-porcelain)"/>
+  <path d="M752 470 L808 470 L798 736 L762 736Z" fill="url(#t-porcelain)"/>
+  <path d="M780 430 v-18 q0 -6 8 -6 h10" stroke="#9a968a" stroke-width="5" fill="none"/>
+  <ellipse class="drip" cx="798" cy="412" rx="1.6" ry="2.4" fill="#bfe6ff"/>
+  <rect x="716" y="404" width="20" height="26" rx="2" fill="#6a9ab0" opacity=".85"/><path d="M722 404 l-4 -22 M730 404 l4 -20" stroke="#e8e8e8" stroke-width="2.4"/><path d="M718 384 h6 M732 386 h6" stroke="#3ad86a" stroke-width="4"/>
+  <rect x="742" y="422" width="18" height="8" rx="3" fill="#e8dca8"/>
+  <circle cx="770" cy="428" r="4" fill="none" stroke="#b86a8a" stroke-width="2"/>
+</g>
+<g class="obj" data-id="tmonster" data-art="room/objects/bathroom/tmonster.svg"></g>
+
+<!-- ======================================== toilet + the tp pyramid + trash -->
+<g class="obj" data-id="toilet" data-art="room/objects/bathroom/toilet.svg"></g>
+<g class="obj" data-id="tppyramid" data-art="room/objects/bathroom/tppyramid.svg"></g>
+<g pointer-events="none"><path d="M1150 736 v-80" stroke="#8a6a4a" stroke-width="4"/><path d="M1138 740 q12 -24 24 0z" fill="#b33a2a"/></g>
+<g class="obj" data-id="btrash" data-art="room/objects/bathroom/btrash.svg"></g>
+
+<!-- towel hook, bath mat, floor clutter -->
+<g pointer-events="none">
+  <rect x="1508" y="300" width="12" height="8" fill="#8a8a84"/>
+  <path d="M1492 306 h44 l8 190 q-30 14 -60 0z" fill="#5a4a6a"/><path d="M1496 440 h44" stroke="#4a3a5a" stroke-width="4"/>
+  <path d="M200 758 h260 l10 40 h-280z" fill="#6a8a7a" opacity=".85"/><ellipse cx="320" cy="780" rx="40" ry="8" fill="#3a4a2a" opacity=".5"/>
+  <g transform="rotate(12 620 800)"><rect x="590" y="790" width="60" height="22" fill="#b8c0c8" opacity=".5"/><rect x="600" y="796" width="30" height="10" fill="#1d6a3a"/></g>
+  <circle cx="1240" cy="780" r="4" fill="none" stroke="#111" stroke-width="2"/>
+</g>
+
+<!-- shadows + light -->
+<g pointer-events="none" fill="#000" filter="url(#t-soft)">
+  <ellipse cx="300" cy="744" rx="280" ry="10" opacity=".5"/><ellipse cx="780" cy="742" rx="50" ry="6" opacity=".5"/>
+  <ellipse cx="1074" cy="744" rx="80" ry="7" opacity=".5"/><ellipse cx="1378" cy="744" rx="60" ry="6" opacity=".5"/>
+</g>
+<g pointer-events="none" style="mix-blend-mode:screen">
+  <ellipse class="t-flicker" cx="800" cy="260" rx="720" ry="520" fill="url(#t-tube)"/>
+  <ellipse cx="1382" cy="170" rx="160" ry="120" fill="url(#t-tube)" opacity=".5"/>
+</g>
+<g pointer-events="none" opacity=".5">
+  <rect x="0" y="660" width="1600" height="40" fill="#2a2a14" opacity=".5" filter="url(#t-soft)"/>
+  <ellipse cx="300" cy="700" rx="300" ry="30" fill="#3a3418" opacity=".6" filter="url(#t-soft)"/>
+  <ellipse cx="1080" cy="740" rx="100" ry="14" fill="#4a3a14" opacity=".6" filter="url(#t-soft)"/>
+</g>
+<rect width="1600" height="900" fill="#06120c" opacity=".38" pointer-events="none"/>
+<rect width="1600" height="900" fill="url(#t-vignette)" pointer-events="none"/>
+</svg>

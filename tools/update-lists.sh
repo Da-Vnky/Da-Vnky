@@ -41,6 +41,21 @@ for dir in assets/*/; do
     } > "${dir}list.txt"
 done
 
+# and every file of the resets' own (assets/resets/reset-1/ … reset-8/, and the folders inside them):
+# assets/resets/index.txt, so a page knows at once which pictures a reset swaps (sky/state.js)
+mkdir -p assets/resets
+{
+    echo "# written by tools/update-lists.sh: every file the resets have of their own."
+    for f in assets/resets/reset-*/* assets/resets/reset-*/*/*; do
+        [ -f "$f" ] || continue
+        name=$(basename "$f")
+        case "$name" in
+            list.txt|README*|readme*|.*|_*) continue ;;
+        esac
+        echo "${f#assets/resets/}"
+    done
+} > assets/resets/index.txt
+
 # and a catalogue of the whole site for sky/loader.js: every file a visitor's browser might load, with
 # its size and a checksum, so on a later visit it can forget just the ones you've changed since (they're
 # fetched fresh the next time they're needed): catalog.txt.
@@ -49,7 +64,8 @@ done
 # screens bring themselves up to date without downloading everything first, and then they're replaced.
 {
     echo "# written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum."
-    for f in *.html sky/*.js sky/*.css assets/*/* content/*/* content/*/*/*; do
+    for f in *.html sky/*.js sky/*.css assets/*/* assets/resets/*/* assets/resets/*/*/* content/*/* content/*/*/* \
+             schizophyllu.me.room/* schizophyllu.me.room/*/* schizophyllu.me.room/*/*/* schizophyllu.me.room/*/*/*/*; do
         [ -f "$f" ] || continue
         name=$(basename "$f")
         case "$name" in

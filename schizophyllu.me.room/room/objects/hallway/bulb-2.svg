@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- bulb (hallway): light switch + calendar
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes.
+     the code looks these ids up, so keep them: #h-switch -->
+<rect x="910" y="410" width="18" height="28" rx="2" fill="#bdb6a6"/><rect id="h-switch" x="916" y="416" width="6" height="8" fill="#8e8778"/>
+</svg>

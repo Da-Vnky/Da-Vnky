@@ -47,6 +47,7 @@
         '.ship .hull { transform-box: fill-box; transform-origin: 50% 85%; }' +
         '.ship { pointer-events: none !important; } .ship .hull, .ship .hull * { pointer-events: visiblePainted; }' +
         '.ship.held { cursor: grabbing; filter: drop-shadow(0 22px 16px rgba(0,0,0,.4)); }' +
+        '.ship { overflow: visible; } .ship .ship-anchor { display: none; pointer-events: none; } .ship.anchored .ship-anchor { display: inline; }' +
         '.ship.held .hull { animation: ship-shake .09s linear infinite alternate; }' +
         '@keyframes ship-shake { from { transform: rotate(-3.5deg) translateX(-1.5px); } to { transform: rotate(3.5deg) translateX(1.5px); } }' +
 
@@ -123,7 +124,12 @@
             '<path d="M8 72 L112 72 L98 90 L22 90 Z"/><rect x="58" y="10" width="3" height="62"/>' +
             '<path d="M62 14 C 84 26, 90 48, 86 66 L62 66 Z"/><path d="M57 20 C 40 32, 36 50, 40 66 L57 66 Z"/>' +
             '<path d="M61 8 L76 12 L61 16 Z"/>' +
-        '</g></svg>' +
+        '</g>' +
+        // (after reset 2: the anchor that keeps it from being lifted high. yours: assets/sea/anchor, about 1:1.3)
+        '<g class="ship-anchor"><path d="M101 70 Q106 84 104 100" fill="none" stroke="#3a3530" stroke-width="1.8" stroke-dasharray="2.6 1.2"/>' +
+            '<g class="anc-art" fill="#2e2e34" stroke="#18181c" stroke-width=".6"><circle cx="104" cy="75.5" r="2.4" fill="none" stroke-width="1.6" stroke="#2e2e34"/><rect x="102.8" y="77.5" width="2.6" height="14"/><rect x="99" y="80" width="10" height="2.2"/>' +
+            '<path d="M96 88 Q97 96 104 97 Q111 96 112 88 L109.5 89.5 Q108.5 93.5 104 94 Q99.5 93.5 98.5 89.5 Z"/></g></g>' +
+        '</svg>' +
         wave(3, .71, .14, 145, 75) +
         wave(4, .87, .12, 125, 20);
     document.body.appendChild(sea);
@@ -356,6 +362,55 @@
     function easeIn(t)   { return t * t; }
     function easeBack(t) { var c = 2.2; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }
 
+    /* ---------------- the ship through the resets (sky/state.js) ----------------
+       reset 1: let go, and it swings back where it was. reset 2: it falls where you let it go,
+       straight down, and anyone under it is crushed (then it drifts back, in its own time).
+       after that: an anchor, too heavy to lift it more than a little. */
+    var SV = window.davSave;
+    function shipMode() { return !SV ? 'snap' : SV.live('boat') ? 'drop' : SV.patched('boat') ? 'anchor' : 'snap'; }
+    var ANCHOR_LIFT = 34;                                          // px the anchor lets it rise
+    if (shipMode() === 'anchor') {
+        ship.classList.add('anchored');
+        Sky.svgArt(ship.querySelector('.anc-art'), 'assets/sea/anchor', [95, 72, 18, 26]);
+    }
+    function crushMate() {
+        var was = crew.state === 'aboard' ? 'aboard' : 'ashore';
+        cancelCrew();
+        var run = crew.run;
+        crew.state = 'dead';
+        mate.classList.remove('talking', 'walking', 'held');
+        var mr = mate.getBoundingClientRect();
+        sfx('boat-crash', { or: 'land' }); sfx('scream');
+        Sky.gore.splat(mate, mr.left + mr.width / 2, mr.bottom, function () {
+            if (run !== crew.run) return;
+            Sky.gore.respawn(mate);
+            settle(was);
+        });
+    }
+    function dropShip() {
+        var id = ++tweenId, vy = 0, last = performance.now(), crushed = false, h0 = -drag.y;
+        var mr = mate.getBoundingClientRect(), sr0 = ship.getBoundingClientRect();
+        var under = Sky.gore && !/^(aboard|dead|held|falling|diving|swimming|surfacing)$/.test(crew.state) && !mate.classList.contains('under') &&
+            sr0.left + sr0.width * 0.12 < mr.right && sr0.right - sr0.width * 0.12 > mr.left && sr0.bottom < mr.top + mr.height * 0.5 &&
+            h0 > Math.max(110, window.innerHeight * 0.18);
+        (function fall(now) {
+            if (id !== tweenId) return;
+            var dt = Math.min(0.05, (now - last) / 1000); last = now;
+            vy += 2600 * dt;
+            drag.y = Math.min(0, drag.y + vy * dt);
+            drag.s += (1 - drag.s) * 0.2;
+            placeShip();
+            if (under && !crushed && ship.getBoundingClientRect().bottom >= mr.top + mr.height * 0.35) { crushed = true; crushMate(); }
+            if (drag.y < 0) return requestAnimationFrame(fall);
+            drag.s = 1;
+            splash(ship, 1.3);
+            drag.dip = 22;
+            tween({ dip: 0 }, 650, easeBack, id, function () {
+                setTimeout(function () { if (id === tweenId && !held) tween({ x: 0 }, 4200, function (t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }, id); }, 7000);
+            });
+        })(last);
+    }
+
     ship.addEventListener('pointerdown', function (e) {
         e.preventDefault();
         held = true;
@@ -369,12 +424,14 @@
         if (!held) return;
         drag.x = e.clientX - grab.x;
         drag.y = e.clientY - grab.y;
+        if (ship.classList.contains('anchored')) drag.y = Math.max(-ANCHOR_LIFT, drag.y);     // (too heavy)
         placeShip();
     });
     function release() {
         if (!held) return;
         held = false;
         ship.classList.remove('held');
+        if (shipMode() === 'drop' && drag.y < -20) { dropShip(); return; }
         var dist = Math.hypot(drag.x, drag.y), id = ++tweenId;
         tween({ x: 0, y: 0, s: 1 }, Math.min(520, 220 + dist * 0.6), easeIn, id, function () {
             splash(ship, 1);

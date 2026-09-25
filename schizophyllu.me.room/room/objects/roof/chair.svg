@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- chair (roof): skizy's chair, facing the sky
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<defs>
+  <pattern id="r-plaid" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#2c4637"/><path d="M0 6h24M0 18h24" stroke="#1d3327" stroke-width="5"/><path d="M6 0v24M18 0v24" stroke="#3b5c48" stroke-width="3" opacity=".7"/></pattern>
+</defs>
+  <rect x="540" y="610" width="200" height="195" fill="#000" opacity="0"/>
+  <path d="M540 800 L580 680 M660 800 L620 680 M560 740 L650 740" stroke="#3a3a40" stroke-width="5"/>
+  <path d="M556 640 L646 640 L640 740 L562 740Z" fill="#2a4a6a"/>
+  <path d="M552 640 Q560 610 600 616 Q640 610 650 644 L646 700 L556 700Z" fill="url(#r-plaid)"/>
+  <path d="M556 700 L648 700 L656 720 L548 720Z" fill="#2c4637"/>
+  <rect x="676" y="772" width="12" height="26" rx="2" fill="#111"/><path d="M679 777 l2 16 M682 776 l1 17" stroke="#6dff5a" stroke-width="1.2"/>
+  <g transform="rotate(10 720 790)"><rect x="700" y="782" width="34" height="14" rx="4" fill="#1a1a1e"/><circle cx="706" cy="789" r="6" fill="#2a2a30"/><circle cx="728" cy="789" r="6" fill="#2a2a30"/></g>
+</svg>

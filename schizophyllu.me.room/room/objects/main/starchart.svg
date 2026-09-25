@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- starchart (main): STAR CHART + SENSOR SHELF (Mira's side)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="404" y="98" width="186" height="148" fill="#0c1628" stroke="#2c4a68" stroke-width="3"/>
+  <g stroke="#6dffb0" stroke-opacity=".45" stroke-width="1" fill="none">
+    <path d="M430 140 L466 128 L490 150 L524 136 L560 160"/>
+    <path d="M444 210 L470 186 L508 198 L540 180"/>
+    <ellipse cx="497" cy="172" rx="70" ry="52" stroke-dasharray="2 4" stroke-opacity=".25"/>
+  </g>
+  <g fill="#cfffe4">
+    <circle cx="430" cy="140" r="2"/><circle cx="466" cy="128" r="1.5"/><circle cx="490" cy="150" r="2.4"/><circle cx="524" cy="136" r="1.5"/><circle cx="560" cy="160" r="2"/>
+    <circle cx="444" cy="210" r="1.6"/><circle cx="470" cy="186" r="2"/><circle cx="508" cy="198" r="1.5"/><circle cx="540" cy="180" r="2"/>
+  </g>
+  <circle class="varstar" cx="490" cy="150" r="5" fill="none" stroke="#6dffb0"/>
+  <text x="412" y="238" font-size="9" fill="#6dffb0" opacity=".7">o CETI  P=332d</text>
+  <g fill="#c33"><circle cx="410" cy="104" r="3"/><circle cx="584" cy="104" r="3"/></g>
+</svg>

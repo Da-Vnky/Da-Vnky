@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- pigeon (roof)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <g class="pigeon">
+    <ellipse cx="940" cy="582" rx="14" ry="9" fill="#6a6e7a"/><circle cx="952" cy="572" r="6" fill="#7a7e8a"/>
+    <path d="M957 572 l5 1 l-5 2z" fill="#c8a060"/><circle cx="954" cy="570" r="1.2" fill="#e84a2a"/>
+    <path d="M928 580 l-12 4 l12 2z" fill="#4a4e5a"/><path d="M938 590 v4 M944 590 v4" stroke="#c86a5a" stroke-width="1.4"/>
+    <path d="M946 576 q4 4 0 8" stroke="#5a9a7a" stroke-width="2" fill="none" opacity=".7"/>
+  </g>
+</svg>

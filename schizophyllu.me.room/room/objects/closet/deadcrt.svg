@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- deadcrt (closet)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="564" y="252" width="90" height="78" rx="6" fill="#bdb49a"/><rect x="574" y="262" width="70" height="52" rx="5" fill="#1a1d1a"/>
+  <path d="M578 268 l40 36" stroke="#3a3d3a" stroke-width="1"/><text x="576" y="326" font-size="6" fill="#6a6250">NO SIGNAL (EVER)</text>
+</svg>

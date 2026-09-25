@@ -986,3 +986,28 @@ body.visitors-open .room-arrow, body.frame-open .room-arrow, body.model-open .ro
 /* Polaris shows only where you'd really see it: outdoors on the homepage, or out through
    a window or the telescope (the sky view). indoors, and on the rooftop at a glance, it's hidden. */
 body:not([data-page=home]):not(.sky-view) .polaris { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+
+/* ================= a reset's own sun (sky/state.js: assets/resets/reset-<n>/sky/sun): twice the size ================= */
+.sun:has(> img[src*="assets/resets/"]) { width: 192px; }
+
+/* ================= a painted sky, mirrored in the morning ================= */
+/* the golden, sunset and dusk skies are painted with the sun going down on the right; while it's
+   on the left (coming up), they're flipped to match (sky.js adds .mirror) */
+.skybox.mirror > [data-sky=golden], .skybox.mirror > [data-sky=sunset], .skybox.mirror > [data-sky=dusk] { transform: scaleX(-1); }
+
+/* ================= props on strings: the sky's a stage set (resets 1 and 2 only: sky/state.js) ================= */
+html.stage-strings .sun::before, html.stage-strings .moon::before,
+html.stage-strings .cloud::before, html.stage-strings .cloud::after,
+html.stage-strings .flyer-blimp::before, html.stage-strings .flyer-blimp::after,
+html.stage-strings .flyer-balloon::before, html.stage-strings .flyer-birds::before {
+    content: ""; position: absolute; z-index: -1; left: 50%; bottom: 88%; width: 1.5px; height: 300vh; margin-left: -.75px; pointer-events: none;
+    background: linear-gradient(to top, rgba(52,40,28,.75), rgba(52,40,28,.5) 30%, rgba(52,40,28,.4));
+    box-shadow: 0 0 1.5px rgba(255,248,230, calc(.25 + .45 * var(--dusk, 0)));
+}
+html.stage-strings .moon::before { bottom: 92%; left: 38%; }
+html.stage-strings .cloud::before { left: 28%; bottom: 62%; }
+html.stage-strings .cloud::after { left: 72%; bottom: 58%; }
+html.stage-strings .flyer-blimp::before { left: 30%; bottom: 80%; }
+html.stage-strings .flyer-blimp::after { left: 70%; bottom: 80%; }
+html.stage-strings .flyer-balloon::before { bottom: 96%; }
+html.stage-strings .flyer-birds::before { bottom: 60%; }

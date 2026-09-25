@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- tpcbs (bathroom)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <path d="M300 508 h160 l-4 -12 h-152z" fill="#5a7a8a"/><path d="M304 500 h152" stroke="#4a6a7a" stroke-width="2"/>
+  <g transform="rotate(-4 330 490)"><rect x="306" y="480" width="48" height="16" fill="#1d6a3a"/><rect x="314" y="484" width="10" height="8" fill="#111"/><rect x="330" y="486" width="18" height="4" fill="#d4a020"/></g>
+  <g transform="rotate(6 390 488)"><rect x="364" y="478" width="52" height="18" fill="#2a4a8a"/><rect x="372" y="482" width="14" height="10" fill="#111"/><g fill="#ccc"><rect x="392" y="482" width="4" height="3"/><rect x="400" y="482" width="4" height="3"/><rect x="392" y="488" width="4" height="3"/></g></g>
+  <g transform="rotate(-2 440 492)"><rect x="420" y="484" width="34" height="12" fill="#1d6a3a"/><rect x="426" y="486" width="8" height="8" fill="#111"/></g>
+  <path d="M470 500 l20 -4" stroke="#e8e8e8" stroke-width="3"/><path d="M488 496 l8 -2" stroke="#3a6ad0" stroke-width="4"/>
+</svg>

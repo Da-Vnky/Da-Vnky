@@ -294,7 +294,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry', 'unnerve', 'scare', 'typing', 'sparkle', 'bang', 'flick', 'shatter', 'book', 'claube-flick', 'claube-shot', 'loot', 'record-in', 'page-turn', 'flashbang', 'life-lost', 'lives-found', 'wall-slide'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry', 'unnerve', 'scare', 'typing', 'sparkle', 'bang', 'flick', 'shatter', 'book', 'claube-flick', 'claube-shot', 'loot', 'record-in', 'page-turn', 'flashbang', 'life-lost', 'lives-found', 'wall-slide', 'jammed', 'stab', 'key', 'boat-crash', 'fall-wind'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {

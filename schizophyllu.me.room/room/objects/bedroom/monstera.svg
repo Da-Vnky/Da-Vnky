@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- monstera (bedroom): the monstera, guarding the entrance
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <path d="M884 700 l4 -34 h28 l4 34z" fill="#7a4a3a"/><rect x="882" y="664" width="40" height="6" fill="#8a5a48"/>
+  <g stroke="#1e4a24" stroke-width="2" fill="none"><path d="M900 666 q-4 -50 -30 -86"/><path d="M904 666 q6 -60 30 -100"/><path d="M902 666 q0 -40 -2 -70"/></g>
+  <g fill="#2e7a3a">
+    <path d="M870 580 q-30 -8 -30 -34 q16 -18 40 -6 q10 20 -10 40z"/>
+    <path d="M934 566 q30 -10 34 -40 q-16 -18 -42 -4 q-8 22 8 44z"/>
+    <path d="M900 596 q-22 -14 -16 -40 q18 -12 34 4 q4 22 -18 36z"/>
+  </g>
+  <g stroke="#1a3a1e" stroke-width="2.4"><path d="M852 552 l12 8M858 566 l10 2M948 536 l-12 10M952 552 l-12 4M892 572 l8 6M908 568 l-6 8"/></g>
+</svg>

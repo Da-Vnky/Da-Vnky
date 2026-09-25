@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- toolbox (closet)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="1130" y="468" width="110" height="52" rx="3" fill="#b8302a"/><rect x="1130" y="480" width="110" height="4" fill="#8a2020"/>
+  <path d="M1160 468 v-12 h50 v12" stroke="#555" stroke-width="5" fill="none"/><rect x="1178" y="490" width="14" height="8" fill="#ccc"/>
+</svg>

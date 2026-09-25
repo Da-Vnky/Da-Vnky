@@ -65,13 +65,16 @@ function keptOrFetched(req, url) {
     return caches.open(CACHE).then(function (c) {
         return c.match(key, { ignoreSearch: true }).then(function (hit) {
             if (hit) return serve(req, hit);
+            var range = req.headers.get('range');
+            // a piece from the middle (a player checking a song's length at its far end, or skipping ahead)
+            // before the whole thing's kept: just that piece, straight from the site, without waiting
+            if (range && !/^bytes=0-/.test(range.trim())) return fetch(req);
             if (inflight[key]) {                                          // already on its way
                 return inflight[key].then(function (ok) { return ok ? c.match(key, { ignoreSearch: true }) : null; })
                     .then(function (hit2) { return hit2 ? serve(req, hit2) : fetch(req); });
             }
-            var range = req.headers.get('range');
             // a song starting from the top ("bytes=0-"): fetch it whole and keep it; the player's happy with the whole thing.
-            // a range from the middle (skipping ahead before it's kept): just that piece, straight from the site
+            // (just its first part, "bytes=0-2500000": that part, from the site)
             if (range && !/^bytes=0-$/.test(range.trim())) return fetch(req);
             return download(c, key).then(function (res) {
                 // (a page that's moved: the browser has to be told, not handed the new one under the old name)

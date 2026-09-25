@@ -139,12 +139,23 @@
     .lbody .card { box-shadow: none; background: rgba(255,255,255,.35); max-width: 520px; }
     .lbody .card .look { height: 220px; }
     @media (max-width: 620px) { .lbody { padding-left: 12px; } .lname span { white-space: normal; } }
+    .reset-plan { background: var(--card); color: var(--ink); padding: 12px 18px; box-shadow: 0 8px 18px rgba(0,0,0,.4), inset 0 0 26px rgba(120,80,30,.2); }
+    .reset-plan p { margin: 4px 0; }
+    .reset-plan b { font-weight: normal; font-family: "IM Fell English SC", Georgia, serif; color: var(--red); }
+    .reset-plan .dim { color: var(--faded); font-style: italic; font-size: .92rem; }
+    .note-ed { background: var(--card); color: var(--ink); padding: 12px 16px; box-shadow: 0 8px 18px rgba(0,0,0,.4), inset 0 0 26px rgba(120,80,30,.2); max-width: 720px; }
+    .note-ed label { display: block; margin: 6px 0 2px; font-size: .9rem; font-style: italic; color: var(--faded); }
+    .note-ed input, .note-ed textarea { width: 100%; padding: 6px 9px; border: 1px solid rgba(110,82,54,.35); border-radius: 6px; background: #fbf5e6; color: var(--ink); font: inherit; }
+    .note-ed textarea { min-height: 160px; resize: vertical; }
+    .note-ed .acts { display: flex; gap: 8px; margin-top: 10px; }
+    .swap-add { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 4px; }
+    .swap-add input { flex: 1 1 280px; max-width: 420px; padding: 7px 12px; border-radius: 999px; border: 1px solid rgba(243,230,194,.35); background: #3a2a1d; color: #f3e6c2; font: .9rem ui-monospace, Menlo, Consolas, monospace; }
     [hidden] { display: none !important; }
 </style>
 </head>
 <body>
 <header>
-    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html">your things</a><a href="post.html">visitors</a><a href="notes.html">notes</a><a href="assets.html" class="on">assets</a></nav>
+    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html">your things</a><a href="post.html">visitors</a><a href="notes.html">notes</a><a href="assets.html" class="on">assets</a><a href="debug.html">debug</a></nav>
     <h1>assets</h1>
     <button type="button" class="btn publish">publish to the live site</button>
     <button type="button" class="btn side-toggle" aria-label="show the list of scenes">&#9776; scenes</button>
@@ -156,6 +167,8 @@
 </div>
 <input type="file" class="file-in" hidden>
 
+<!-- the resets: the same plan the site plays by (sky/state.js) -->
+<script src="/sky/state.js"></script>
 <script>
 (function () {
     var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -186,6 +199,13 @@
     /* ---------------- which file fills a slot ---------------- */
     function parts(slot) { var m = /^assets\/([a-z0-9-]+)\/([a-z0-9-]+)$/.exec(slot); return m ? { folder: m[1], stem: m[2] } : null; }
     function fileFor(slot) {
+        var rm = /^assets\/resets\/reset-([1-8])\/(.+)$/.exec(slot);
+        if (rm) {                                                          // one of a reset's own (assets/resets/reset-<n>/…)
+            var mine = ((STATE.resets || {})[rm[1]] || []).filter(function (f) { return f.path.replace(/\.[^.\/]+$/, '') === rm[2]; });
+            mine.sort(function (a, b) { return ORDER.indexOf(a.path.split('.').pop().toLowerCase()) - ORDER.indexOf(b.path.split('.').pop().toLowerCase()); });
+            var h = mine[0];
+            return h ? { name: h.path.split('/').pop(), size: h.size, time: h.time, url: '/assets/resets/reset-' + rm[1] + '/' + h.path.split('/').map(encodeURIComponent).join('/') + '?t=' + h.time } : null;
+        }
         var p = parts(slot);
         if (!p) return null;
         var hits = (STATE.files[p.folder] || []).filter(function (f) { return f.name.replace(/\.[^.]+$/, '') === p.stem; });
@@ -375,6 +395,13 @@
             var n = counts(slots);
             item({ id: sc.id, name: sc.name, n: n.done + '/' + n.of, pct: n.of ? Math.round(100 * n.done / n.of) : 0, cls: sc.isNew ? 'found-tab' : '' });
         });
+        if (window.DAV_RESETS) {
+            tabsEl.appendChild(el('h3', '', 'resets'));
+            DAV_RESETS.forEach(function (R) {
+                var own = ((STATE.resets || {})[R.n] || []).filter(function (f) { return f.path !== 'note.json'; }).length;
+                item({ id: 'reset-' + R.n, name: 'reset ' + R.n + ((R.tab || R.name) ? ' · ' + (R.tab || R.name) : ''), n: own || null });
+            });
+        }
         tabsEl.appendChild(el('h3', '', 'players'));
         item({ id: 'records', name: 'record player', n: STATE.tracks.length });
         item({ id: 'noise', name: 'noise machine', n: CAT.noise.length + (STATE.noise || []).length });
@@ -573,6 +600,100 @@
         main.appendChild(sheet);
     }
 
+    /* ---------------- the resets (sky/state.js has the plan) ---------------- */
+    function kindOf(slot) { return /^assets\/sounds\//.test(slot) ? 'sound' : /^assets\/fonts\//.test(slot) ? 'font' : 'image'; }
+    function whatOf(slot) { var hit = allSlots().filter(function (x) { return x.slot === slot; })[0]; return hit ? hit.what : ''; }
+    function drawReset(n) {
+        var R = DAV_RESETS[n - 1], D = window.DAV_DEATHS || {};
+        var live = Object.keys(D).filter(function (k) { return D[k].live.indexOf(n) !== -1; });
+        var gone = Object.keys(D).filter(function (k) { return n > Math.max.apply(null, D[k].live); });
+        var justGone = gone.filter(function (k) { return n === Math.max.apply(null, D[k].live) + 1; });
+        var top = el('div', 'intro');
+        top.appendChild(el('p', '', esc('reset ' + n + (n === 8 ? ', after the seven' : ' of the seven') + (R.name ? ': ' + R.name : '') + '. ' + (n === 1 ? 'where every visitor starts.' : 'where they go after losing every life in reset ' + (n - 1) + '.'))));
+        var play = el('a', '', 'play it from the start ↗'); play.href = '/index.html?reset=' + n; play.target = '_blank'; top.appendChild(play);
+        main.appendChild(top);
+        var plan = el('div', 'reset-plan');
+        plan.innerHTML =
+            '<p><b>ways to die</b> ' + (live.length ? esc(live.map(function (k) { return D[k].name; }).join('; ')) : '<span class="dim">none of its own yet (tell Claude what they are)</span>') + '</p>' +
+            '<p><b>patched away</b> ' + (gone.length ? esc(gone.map(function (k) { return D[k].patch; }).join('; ')) : '<span class="dim">nothing yet</span>') + '</p>' +
+            '<p><b>always</b> <span class="dim">the revolver (jammed until the last heart), falls, and the thing at Mel\u2019s window</span></p>' +
+            '<p><b>the key</b> ' + esc(R.key ? R.key.where : '') + ' <span class="dim">(finding it takes the lock off the hearts)</span></p>';
+        main.appendChild(plan);
+
+        main.appendChild(el('h2', '', 'its own <small>only in reset ' + n + '</small>'));
+        var grid = el('div', view === 'list' ? 'lrows' : 'grid');
+        [{ slot: 'assets/resets/reset-' + n + '/key', what: 'this reset’s key (without it: assets/ui/key, or the drawn one)', size: 'about 60 x 24, see-through' },
+         { slot: 'assets/resets/reset-' + n + '/characters/reflection', what: 'what the mirror shows in this reset (the next resets keep it until one has its own)', size: 'the same as assets/characters/reflection' }
+        ].forEach(function (x) { grid.appendChild(view === 'list' ? listRow(x) : card(x)); });
+        main.appendChild(grid);
+
+        main.appendChild(el('h2', '', 'the note <small>on the dungeon floor, this reset only (leave it empty and the usual note shows)</small>'));
+        var ed = el('div', 'note-ed', '<label>title</label><input class="n-title" maxlength="80"><label>the note</label><textarea class="n-text"></textarea><label>signed</label><input class="n-sign" maxlength="80">' +
+            '<div class="acts"><button type="button" class="sm yes n-save">save the note</button></div>');
+        main.appendChild(ed);
+        api('/__resets/note?n=' + n).then(function (d) {
+            if (d.error) return say(d.error, true);
+            ed.querySelector('.n-title').value = d.title || ''; ed.querySelector('.n-text').value = d.text || ''; ed.querySelector('.n-sign').value = d.sign || '';
+        });
+        ed.querySelector('.n-save').addEventListener('click', function () {
+            api('/__resets/note/save', { n: n, title: ed.querySelector('.n-title').value, text: ed.querySelector('.n-text').value, sign: ed.querySelector('.n-sign').value })
+                .then(function (d) { if (d.error) say(d.error, true); else { say('the note for reset ' + n + ' is saved. publish when you’re ready.'); load(); } });
+        });
+
+        var pieces = [];
+        live.forEach(function (k) { (D[k].slots || []).forEach(function (sl) { pieces.push({ slot: sl, what: D[k].name + ': ' + whatOf(sl) }); }); });
+        justGone.forEach(function (k) { (D[k].patchSlots || []).forEach(function (sl) { pieces.push({ slot: sl, what: D[k].patch + ' (from reset ' + n + ' on)' }); }); });
+        if (pieces.length) {
+            main.appendChild(el('h2', '', 'the pieces for its deaths and patches <small>the same picture in every reset they’re in</small>'));
+            var g2 = el('div', view === 'list' ? 'lrows' : 'grid');
+            pieces.forEach(function (x) { x.kind = kindOf(x.slot); g2.appendChild(view === 'list' ? listRow(x) : card(x)); });
+            main.appendChild(g2);
+        }
+
+        var h = el('h2', '', 'the world, twisted <small>swap any picture or sound on the site, from reset ' + n + ' on (a later reset can swap it again)</small>');
+        main.appendChild(h);
+        var add = el('div', 'swap-add');
+        var inp = el('input'); inp.setAttribute('list', 'all-slots'); inp.placeholder = 'which one? e.g. assets/sky/sun';
+        var dl = el('datalist'); dl.id = 'all-slots';
+        allSlots().forEach(function (x) { if (!/^assets\/resets\//.test(x.slot)) { var o = document.createElement('option'); o.value = x.slot; o.label = x.what; dl.appendChild(o); } });
+        add.appendChild(inp); add.appendChild(dl);
+        add.appendChild(btn('choose its reset ' + n + ' version…', function () {
+            var sl = inp.value.trim().replace(/\.[a-z0-9]+$/i, '');
+            var m = /^assets\/([a-z0-9-]+)\/([a-z0-9-]+)$/.exec(sl);
+            if (!m || m[1] === 'resets') return say('type (or pick) one of the site’s slots, like assets/sky/sun', true);
+            var kind = kindOf(sl);
+            pick(accept(kind), false, function (fs) { put('assets/resets/reset-' + n + '/' + m[1] + '/' + m[2], kind, fs[0]); });
+        }, 'btn main'));
+        main.appendChild(add);
+        var mine = ((STATE.resets || {})[n] || []).filter(function (f) { return f.path.indexOf('/') !== -1 && f.path !== 'characters/reflection' && !/^characters\/reflection\./.test(f.path); });
+        var box = el('div', view === 'list' ? 'lrows' : 'grid');
+        if (!mine.length) main.appendChild(el('p', 'empty', 'nothing swapped in this reset yet.'));
+        mine.forEach(function (f) {
+            var base = 'assets/' + f.path.replace(/\.[^.\/]+$/, '');
+            var x = { slot: 'assets/resets/reset-' + n + '/' + f.path.replace(/\.[^.\/]+$/, ''), what: base + ' from reset ' + n + ' on' + (whatOf(base) ? ' (' + whatOf(base) + ')' : ''), kind: kindOf(base) };
+            box.appendChild(view === 'list' ? listRow(x) : card(x));
+        });
+        if (mine.length) main.appendChild(box);
+        var carried = [];
+        for (var r = n - 1; r >= 1; r--) ((STATE.resets || {})[r] || []).forEach(function (f) {
+            if (f.path.indexOf('/') === -1) return;
+            var stem = f.path.replace(/\.[^.\/]+$/, '');
+            if (mine.some(function (m2) { return m2.path.replace(/\.[^.\/]+$/, '') === stem; }) || carried.some(function (c2) { return c2.stem === stem; })) return;
+            carried.push({ stem: stem, from: r, f: f });
+        });
+        if (carried.length) {
+            main.appendChild(el('h2', '', 'carried in from earlier resets'));
+            var sh = el('div', 'sheet');
+            carried.forEach(function (c2) {
+                var row = el('div', 'row');
+                row.appendChild(el('div', 'main', '<b>assets/' + esc(c2.stem) + '</b><span>reset ' + c2.from + '’s version (swap it here to change it again)</span>'));
+                row.appendChild(btn('open', function () { window.open('/assets/resets/reset-' + c2.from + '/' + c2.f.path, '_blank'); }));
+                sh.appendChild(row);
+            });
+            main.appendChild(sh);
+        }
+    }
+
     function draw() {
         drawTabs();
         main.innerHTML = '';
@@ -581,6 +702,7 @@
         else if (tab === 'records') drawRecords();
         else if (tab === 'noise') drawNoise();
         else if (tab === 'checklist') drawChecklist();
+        else if (/^reset-[1-8]$/.test(tab) && window.DAV_RESETS) drawReset(+tab.slice(6));
         else { tab = SCENES[0].id; draw(); }
     }
     function load() {

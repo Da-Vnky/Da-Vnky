@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- trash (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <path d="M1470 890 Q1450 820 1500 790 L1510 776 L1522 790 Q1570 810 1560 890Z" fill="#1c1d22"/>
+  <path d="M1500 810 Q1520 830 1510 870" stroke="#2a2c30" stroke-width="3" fill="none"/>
+  <path d="M1540 900 Q1530 830 1580 812 L1588 800 L1596 814 Q1612 830 1610 900Z" fill="#202127"/>
+  <path d="M1430 870 l60 -14 l6 26 l-60 14z" fill="#b08850"/>
+  <text x="1442" y="882" font-size="8" fill="#6a3a1a" transform="rotate(-13 1462 876)">PIZZA</text>
+</svg>

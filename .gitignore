@@ -4,3 +4,6 @@
 # your texture originals (the site uses the smaller copies in assets/textures/)
 textures to use/
 sfx to use/
+
+# the content manager's debug page: only for your own computer, never published
+tools/debug.html

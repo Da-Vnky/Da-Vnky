@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- bwindow (bedroom)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<defs>
+  <linearGradient id="b-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050a1e"/><stop offset="1" stop-color="#1c2a58"/></linearGradient>
+</defs>
+<g transform="translate(306 0)">
+  <rect x="890" y="104" width="260" height="330" fill="#241d19"/>
+  <rect x="904" y="118" width="232" height="302" fill="url(#b-sky)"/>
+  <g fill="#dfe8ff"><circle class="twinkle" cx="930" cy="270" r="1.2"/><circle cx="1100" cy="262" r="1"/><circle class="twinkle t2" cx="1010" cy="280" r=".9"/></g>
+  <!-- the building across the street -->
+  <rect x="904" y="292" width="232" height="128" fill="#0b0d18"/>
+  <g fill="#1a1d2a">
+    <rect x="914" y="302" width="24" height="26"/>
+    <rect x="951" y="302" width="24" height="26"/>
+    <rect x="988" y="302" width="24" height="26"/>
+    <rect x="1025" y="302" width="24" height="26"/>
+    <rect x="1062" y="302" width="24" height="26"/>
+    <rect x="1099" y="302" width="24" height="26"/>
+    <rect x="914" y="340" width="24" height="26"/>
+    <rect x="951" y="340" width="24" height="26"/>
+    <rect x="988" y="340" width="24" height="26"/>
+    <rect x="1025" y="340" width="24" height="26"/>
+    <rect x="1062" y="340" width="24" height="26"/>
+    <rect x="1099" y="340" width="24" height="26"/>
+    <rect x="914" y="378" width="24" height="26"/>
+    <rect x="951" y="378" width="24" height="26"/>
+    <rect x="988" y="378" width="24" height="26"/>
+    <rect x="1025" y="378" width="24" height="26"/>
+    <rect x="1062" y="378" width="24" height="26"/>
+    <rect x="1099" y="378" width="24" height="26"/>
+  </g>
+  <g fill="#ffcf73" opacity=".7"><rect x="951" y="340" width="24" height="26"/><rect x="1099" y="302" width="24" height="26" opacity=".6"/></g>
+  <g class="neighbor">
+    <rect x="1025" y="340" width="24" height="26" fill="#ffcf73" opacity=".85"/>
+    <path d="M1030 366 q0 -12 7 -13 q-5 -3 -5 -8 a5 5 0 0 1 10 0 q0 5 -5 8 q7 1 7 13z" fill="#15110c"/>
+    <g fill="#fff"><circle cx="1035.5" cy="345" r=".9"/><circle cx="1038.5" cy="345" r=".9"/></g>
+  </g>
+  <!-- blinds, half up -->
+  <g>
+    <rect x="904" y="118" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="125" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="129" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="136" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="140" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="147" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="151" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="158" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="162" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="169" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="173" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="180" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="184" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="191" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="195" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="202" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="206" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="213" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="217" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="224" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="228" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="235" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="904" y="239" width="232" height="9" fill="#cfc8b8" opacity=".92"/><rect x="904" y="246" width="232" height="2" fill="#000" opacity=".25"/>
+    <rect x="900" y="250" width="240" height="6" fill="#b8b0a0"/>
+    <path d="M1124 118 V300" stroke="#e8e0d0" stroke-width="1.2"/><circle cx="1124" cy="302" r="3" fill="#e8e0d0"/>
+  </g>
+  <path d="M1020 118 V292" stroke="#241d19" stroke-width="7"/>
+  <rect x="880" y="428" width="280" height="12" fill="#2e2621"/><rect x="880" y="428" width="280" height="3" fill="#4a3d33"/>
+</g>
+</svg>

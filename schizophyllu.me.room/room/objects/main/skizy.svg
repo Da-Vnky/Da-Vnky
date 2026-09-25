@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- mel (main): SKIZY (from behind, at the desk)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes.
+     the code looks these ids up, so keep them: #mel -->
+  <!-- chair base -->
+  <g stroke="#0d0c10" stroke-width="5" stroke-linecap="round"><path d="M1012 708 L968 730 M1012 708 L1056 730 M1012 708 L1012 736"/></g>
+  <g fill="#0d0c10"><circle cx="966" cy="733" r="5"/><circle cx="1058" cy="733" r="5"/><circle cx="1012" cy="739" r="5"/></g>
+  <rect x="1006" y="652" width="12" height="58" fill="#1a181e"/>
+  <rect x="962" y="636" width="100" height="22" rx="8" fill="#17151b"/>
+  <!-- body: hoodie + elbows reaching for the keyboard -->
+  <path d="M958 498 Q1012 474 1066 498 L1078 560 L1066 600 L958 600 L946 560Z" fill="#2c2340"/>
+  <g class="typing">
+    <path d="M950 520 Q934 548 948 576 L974 566 Q964 548 972 530Z" fill="#2c2340"/>
+    <path d="M1074 520 Q1090 548 1076 576 L1050 566 Q1060 548 1052 530Z" fill="#2c2340"/>
+  </g>
+  <!-- chair back (in front of her back) -->
+  <path d="M970 520 Q1012 506 1054 520 L1058 640 Q1012 650 966 640Z" fill="#151319"/>
+  <path d="M978 530 Q1012 520 1046 530" stroke="#26232c" stroke-width="3" fill="none"/>
+  <!-- hood + head -->
+  <path d="M982 494 Q1012 482 1042 494 Q1036 508 1012 510 Q988 508 982 494Z" fill="#3a2f52"/>
+  <circle cx="1012" cy="462" r="29" fill="#1a1320"/>
+  <path d="M984 456 l-9 -8 l10 1 l-4 -12 l10 6 l2 -14 l7 11 l6 -14 l5 13 l8 -10 l1 13 l10 -6 l-4 12 l10 0 l-8 8 Z" fill="#1a1320"/>
+  <path d="M1000 440 q4 10 -2 26" stroke="#6dffb0" stroke-width="2.4" fill="none" opacity=".7"/>
+  <!-- headphones -->
+  <path d="M982 462 Q984 424 1012 424 Q1040 424 1042 462" stroke="#2a2a30" stroke-width="5" fill="none"/>
+  <rect x="975" y="454" width="12" height="20" rx="4" fill="#2a2a30"/><rect x="1037" y="454" width="12" height="20" rx="4" fill="#2a2a30"/>
+  <!-- rim light from the monitors -->
+  <path d="M988 444 Q1012 426 1036 444" stroke="#9fe8ff" stroke-width="1.5" fill="none" opacity=".45"/>
+  <path d="M960 500 Q1012 478 1064 500" stroke="#9fe8ff" stroke-width="1.2" fill="none" opacity=".3"/>
+</svg>

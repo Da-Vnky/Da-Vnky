@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- boards (main): FOREGROUND
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <g transform="rotate(-68 120 740)">
+    <rect x="40" y="728" width="200" height="22" fill="#5c4330"/>
+    <path d="M44 736h190M60 744h170" stroke="#3e2c1f" stroke-width="1.2"/>
+  </g>
+  <g transform="rotate(6 200 770)">
+    <rect x="80" y="760" width="250" height="22" fill="#634833"/>
+    <path d="M86 768h240M100 776h200" stroke="#3e2c1f" stroke-width="1.2"/>
+    <circle cx="92" cy="771" r="2" fill="#999"/><circle cx="318" cy="771" r="2" fill="#999"/>
+  </g>
+  <g transform="rotate(-4 180 800)">
+    <rect x="40" y="790" width="240" height="22" fill="#56402e"/>
+    <path d="M46 798h230M60 806h200" stroke="#3a2a1d" stroke-width="1.2"/>
+    <circle cx="52" cy="801" r="2" fill="#999"/><path d="M268 796 l8 -9" stroke="#999" stroke-width="2"/>
+  </g>
+</svg>

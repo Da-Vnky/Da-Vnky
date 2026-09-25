@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- poster (main): POSTER
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes.
+     the code looks these ids up, so keep them: #poster-iris -->
+  <g transform="rotate(1.5 695 164)">
+    <rect x="634" y="78" width="122" height="172" fill="#16121a"/>
+    <rect x="640" y="84" width="110" height="160" fill="#1f1722"/>
+    <path d="M652 146 Q695 104 738 146 Q695 188 652 146Z" fill="#e8e0d6"/>
+    <path d="M656 146 q10 -4 16 2 M734 144 q-10 4 -14 -2 M662 156 q8 0 12 -4 M728 156 q-6 -1 -10 -5" stroke="#b85b5b" stroke-width=".9" fill="none"/>
+    <g id="poster-iris">
+      <circle cx="695" cy="146" r="17" fill="#2e8a5c"/>
+      <circle cx="695" cy="146" r="13" fill="#6dffb0" opacity=".55"/>
+      <circle cx="695" cy="146" r="7.5" fill="#050607"/>
+      <circle cx="699" cy="142" r="2.6" fill="#fff" opacity=".85"/>
+    </g>
+    <path d="M652 146 Q695 104 738 146" stroke="#1f1722" stroke-width="3" fill="none"/>
+    <text x="648" y="206" font-size="9" fill="#e8e0d6">THE ARCHIVE OF</text>
+    <text x="648" y="218" font-size="9" fill="#e8e0d6">THOSE WHO WATCH</text>
+    <text x="648" y="236" font-size="7" fill="#6dffb0">submissions open</text>
+    <g fill="#d8d0b8" opacity=".75"><rect x="628" y="74" width="20" height="8" transform="rotate(-30 638 78)"/><rect x="744" y="74" width="20" height="8" transform="rotate(30 754 78)"/><rect x="630" y="244" width="20" height="8" transform="rotate(30 640 248)"/><rect x="742" y="244" width="20" height="8" transform="rotate(-30 752 248)"/></g>
+  </g>
+</svg>

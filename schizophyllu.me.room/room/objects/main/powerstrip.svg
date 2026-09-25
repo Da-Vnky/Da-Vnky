@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- powerstrip (main): THE CABLE HYDRA
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <filter id="f-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="2.2" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+  <!-- outlet → strip 1 -->
+  <path d="M909 648 C 912 700 900 740 882 774" stroke="#0a0a0c" stroke-width="4" fill="none"/>
+  <rect x="790" y="772" width="100" height="14" rx="3" fill="#d8d2c4"/>
+  <rect x="872" y="774" width="12" height="9" rx="2" fill="#e0402a" filter="url(#f-glow)"/>
+  <g fill="#0d0d10"><rect x="800" y="762" width="9" height="12" rx="1"/><rect x="818" y="762" width="9" height="12" rx="1"/><rect x="836" y="762" width="9" height="12" rx="1"/><rect x="854" y="762" width="9" height="12" rx="1"/></g>
+  <!-- strip 1 → strip 2 → strip 3 -->
+  <path d="M902 816 C 862 834 790 818 804 764" stroke="#101013" stroke-width="3.5" fill="none"/>
+  <g transform="rotate(-5 950 815)">
+    <rect x="900" y="808" width="100" height="14" rx="3" fill="#cfc9ba"/>
+    <rect x="982" y="810" width="12" height="9" rx="2" fill="#e0402a" filter="url(#f-glow)"/>
+    <g fill="#0d0d10"><rect x="910" y="798" width="9" height="12" rx="1"/><rect x="928" y="798" width="9" height="12" rx="1"/><rect x="946" y="798" width="9" height="12" rx="1"/><rect x="964" y="798" width="9" height="12" rx="1"/></g>
+  </g>
+  <path d="M1032 850 C 990 872 930 858 914 802" stroke="#101013" stroke-width="3.5" fill="none"/>
+  <g transform="rotate(4 1070 849)">
+    <rect x="1030" y="842" width="80" height="14" rx="3" fill="#c4bdae"/>
+    <g fill="#0d0d10"><rect x="1040" y="832" width="9" height="12" rx="1"/><rect x="1058" y="832" width="9" height="12" rx="1"/></g>
+    <rect x="1080" y="846" width="6" height="6" fill="#5dffa0" class="blink b2"/>
+  </g>
+  <g transform="rotate(-10 960 794)"><rect x="928" y="786" width="64" height="12" fill="#e8e0c8"/><text x="931" y="795" font-size="7" fill="#b02020">DO NOT UNPLUG</text></g>
+</svg>

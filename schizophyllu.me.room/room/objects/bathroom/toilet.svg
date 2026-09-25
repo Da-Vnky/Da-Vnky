@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- toilet (bathroom): toilet + the tp pyramid + trash
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <linearGradient id="t-porcelain" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cfcab4"/><stop offset="1" stop-color="#7c7866"/></linearGradient>
+</defs>
+  <rect x="1000" y="436" width="148" height="104" rx="6" fill="url(#t-porcelain)"/>
+  <rect x="994" y="428" width="160" height="14" rx="4" fill="#e8e8e0"/>
+  <rect x="1004" y="458" width="18" height="6" rx="2" fill="#9a9a94"/>
+  <g transform="rotate(-3 1070 424)"><rect x="1030" y="414" width="84" height="14" fill="#f4f1ea"/><text x="1034" y="424" font-size="6.5" fill="#333">PCIe 5.0 BASE SPEC</text></g>
+  <path d="M1010 540 L1138 540 Q1146 600 1100 626 L1110 736 L1038 736 L1048 626 Q1002 600 1010 540Z" fill="url(#t-porcelain)"/>
+  <rect x="1004" y="536" width="140" height="12" rx="5" fill="#dcdcd4"/>
+  <path d="M1030 560 q44 18 88 0" stroke="#8a7a4a" stroke-width="2" fill="none" opacity=".5"/>
+</svg>

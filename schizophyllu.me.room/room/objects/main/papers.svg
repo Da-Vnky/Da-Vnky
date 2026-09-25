@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- papers (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <g transform="rotate(-12 1252 766)"><rect x="1232" y="752" width="40" height="28" fill="#e8dfca"/><g stroke="#9a8a70" stroke-width=".8"><path d="M1236 760h30M1236 766h26M1236 772h30"/></g></g>
+  <g transform="rotate(8 1290 774)"><rect x="1272" y="760" width="40" height="28" fill="#f0e7d3"/><text x="1275" y="769" font-size="6" fill="#a33">INCIDENT 47</text><g stroke="#9a8a70" stroke-width=".8"><path d="M1276 775h30M1276 781h22"/></g></g>
+  <circle cx="1328" cy="784" r="7" fill="#ddd4c0"/><path d="M1323 781 l5 4 l4 -3" stroke="#a89f88" fill="none"/>
+  <circle cx="1216" cy="774" r="6" fill="#d8cfbb"/><path d="M1212 772 l4 4 l3 -4" stroke="#a89f88" fill="none"/>
+</svg>

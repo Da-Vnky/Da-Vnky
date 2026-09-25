@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- bblanket (bedroom)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<defs>
+  <pattern id="b-plaid" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#2c4637"/><path d="M0 6h24M0 18h24" stroke="#1d3327" stroke-width="5"/><path d="M6 0v24M18 0v24" stroke="#3b5c48" stroke-width="3" opacity=".7"/></pattern>
+</defs>
+  <path d="M1150 704 Q1156 622 1236 616 Q1320 604 1388 626 Q1430 640 1412 700 L1398 772 Q1300 786 1206 776 Q1146 764 1150 704Z" fill="url(#b-plaid)"/>
+  <path d="M1190 700 Q1250 670 1320 690 M1250 740 Q1320 720 1380 740" stroke="#18291e" stroke-width="3" fill="none"/>
+</svg>

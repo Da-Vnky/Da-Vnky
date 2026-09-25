@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- vent (roof): vent stack: where the pipes end up
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="1300" y="560" width="30" height="170" fill="#5a5650"/><rect x="1294" y="552" width="42" height="14" rx="3" fill="#6a665e"/>
+  <rect x="1304" y="580" width="8" height="140" fill="#7a3a14" opacity=".35"/>
+  <path class="steam" d="M1310 548 q-10 -20 4 -34 q12 -14 0 -30" stroke="#dfe8ff" stroke-width="4" fill="none"/>
+  <path class="steam s2" d="M1320 548 q10 -20 -4 -34 q-12 -14 0 -30" stroke="#dfe8ff" stroke-width="3" fill="none"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- btrash (bathroom)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="1330" y="640" width="96" height="98" rx="4" fill="#5a6a6a"/>
+  <rect x="1326" y="636" width="104" height="8" rx="3" fill="#6a7a7a"/>
+  <g fill="#ecece6"><circle cx="1352" cy="630" r="12"/><circle cx="1372" cy="624" r="10"/><circle cx="1396" cy="632" r="13"/><circle cx="1416" cy="626" r="9"/></g>
+  <rect x="1360" y="610" width="34" height="16" fill="#d8dce0" transform="rotate(-18 1377 618)"/>
+  <rect x="1400" y="612" width="22" height="10" fill="#a8844e" transform="rotate(30 1411 617)"/>
+  <rect x="1340" y="612" width="24" height="30" fill="#f4f1ea" transform="rotate(12 1352 627)"/>
+  <path d="M1430 736 l20 -6 l6 10z" fill="#ecece6"/><circle cx="1450" cy="742" r="7" fill="#ecece6"/>
+</svg>

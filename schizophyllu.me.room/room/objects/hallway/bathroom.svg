@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- bathroom (hallway): bathroom door
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <filter id="h-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+  <rect x="90" y="180" width="220" height="520" fill="#3a332c"/>
+  <rect x="102" y="192" width="196" height="500" fill="#2f2a25"/>
+  <g fill="none" stroke="#252019" stroke-width="4"><rect x="120" y="212" width="160" height="200"/><rect x="120" y="440" width="160" height="230"/></g>
+  <circle cx="280" cy="452" r="8" fill="#b8a070"/><circle cx="278" cy="450" r="3" fill="#e8d8b0"/>
+  <rect class="underdoor" x="106" y="690" width="188" height="6" fill="#cfe8ff" filter="url(#h-glow)"/>
+</svg>

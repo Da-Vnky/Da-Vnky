@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- spoingus1 (closet)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="456" y="276" width="94" height="54" fill="#9a7444"/>
+  <g fill="none" stroke="#0a0a0c" stroke-width="3"><ellipse cx="503" cy="270" rx="40" ry="10"/><ellipse cx="503" cy="264" rx="36" ry="9"/><ellipse cx="503" cy="258" rx="30" ry="8"/></g>
+  <text x="462" y="302" font-size="8" fill="#2a1a0a">SPOINGUS I</text><text x="462" y="314" font-size="7" fill="#2a1a0a">(RETIRED)</text>
+</svg>

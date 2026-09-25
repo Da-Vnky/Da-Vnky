@@ -1,0 +1,175 @@
+/* =====================================================================
+   state.js — the game underneath the site: what a visitor's browser
+   remembers, and the resets.
+
+   There are seven resets (the seven spheres) and an eighth, the grand
+   mystery. Each visitor starts in reset 1. Losing every life sends them on
+   to the next reset: everything they did in this one is forgotten, and the
+   world changes around them. Only a few things carry on:
+
+     FOREVER   which reset they're in, the P(Doom) record once it's theirs,
+               and their settings (volumes, the brush, the weather …)
+     A RESET   everything in RUN below: the hidden key, the hearts, the dungeon
+               found, the thing at Mel's window … gone at the next reset
+     A VISIT   sessionStorage (the wall open, what's in the bag …): gone when
+               the tab closes, and at every reset
+
+   RESETS below is the plan for each: its theme, the two ways to die that it
+   has (DEATHS: every other reset "patches" them away), and where its key is
+   hidden. Its own art (the key, the mirror, the note, the world getting more
+   twisted) lives in assets/resets/reset-<n>/: the content manager's
+   "resets" tabs.
+
+   For you, testing: the content manager's debug page (tools/debug.html, never
+   published), or ?reset=3 on any page's address in the content manager's
+   preview (localhost only: the live site ignores it).
+
+   This runs first on every page (after sky/loader.js), and the content manager
+   reads RESETS and DEATHS from it too.
+   ===================================================================== */
+
+(function () {
+    var MAX = 8;
+
+    // the ways to die that come and go: which resets they're live in (after the last one, they're "patched")
+    var DEATHS = {
+        toaster:  { name: 'the toaster in the bath',                live: [1], patch: 'the toaster’s gone',
+                    slots: ['assets/living/toaster'], patchSlots: [] },
+        scissors: { name: 'the scissors in the workshop, to the neck', live: [1], patch: 'safety scissors, hung on the wall',
+                    slots: ['assets/workshop/scissors'], patchSlots: ['assets/workshop/safety-scissors'] },
+        boat:     { name: 'the boat, dropped on the traveller',       live: [2], patch: 'a heavy anchor: the boat can’t be lifted high',
+                    slots: ['assets/sea/ship'], patchSlots: ['assets/sea/anchor'] },
+        roof:     { name: 'a jump off the roof',                     live: [2], patch: 'guard rails along the edge',
+                    slots: ['assets/city/street-below'], patchSlots: ['assets/city/guard-rail'] }
+    };
+    // (always there: the revolver, but it's jammed until the last heart. and the thing at Mel's window, and falls.)
+
+    // key: where the reset's key is hidden. page: sea, workshop, city, living; in: which part of the page
+    // (a selector); left/top: where in it; where: said in the content manager
+    var RESETS = [
+        { n: 1, name: 'objects',     theme: 'things around the house',        deaths: ['toaster', 'scissors'],
+          key: { page: 'workshop', in: '.room',     left: 12,   top: 55.4, where: 'the workshop, between the jars on the shelf' } },
+        { n: 2, name: 'environment', theme: 'the world itself',               deaths: ['boat', 'roof'],
+          key: { page: 'city',     in: 'body',      left: 69.4, top: 89.6, where: 'the rooftop, by the potted plant' } },
+        { n: 3, name: '',            theme: '',                               deaths: [],
+          key: { page: 'living',   in: '.room',     left: 13.5, top: 93,   where: 'the living space, under the armchair' } },
+        { n: 4, name: '',            theme: '',                               deaths: [],
+          key: { page: 'living',   in: '.bathroom', left: 88,   top: 93,   where: 'the bathroom, in the corner by the tub' } },
+        { n: 5, name: '',            theme: '',                               deaths: [],
+          key: { page: 'workshop', in: '.room',     left: 93.5, top: 61,   where: 'the workshop, on top of the notes board' } },
+        { n: 6, name: '',            theme: '',                               deaths: [],
+          key: { page: 'living',   in: '.hallway',  left: 70,   top: 94,   where: 'the hallway, on the floor' } },
+        { n: 7, name: '',            theme: '',                               deaths: [],
+          key: { page: 'living',   in: '.dungeon',  left: 83,   top: 93,   where: 'the dungeon, under the rack' } },
+        { n: 8, name: 'the grand mystery', tab: 'mystery', theme: '',                         deaths: [],
+          key: { page: 'city',     in: 'body',      left: 9,    top: 76.5, where: 'the rooftop, on top of the chimney' } }
+    ];
+
+    // what a reset forgets (the old names these always had, plus anything saved as "run:…")
+    var RUN = ['lives-shown', 'lives-left', 'lives-unlocked', 'lives-lost', 'suicides', 'dungeon-found', 'mel-scared'];
+    var RESET_KEY = 'dav-reset';                                        // how many resets they've been through (0 = still in reset 1)
+
+    function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function put(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, String(v)); } catch (e) {} }
+    function done() { return Math.max(0, Math.min(MAX - 1, +get(RESET_KEY) || 0)); }
+    function sphere() { return done() + 1; }
+
+    // (from before the resets: "dav-resets" counted presses of the clear-cache button. not a reset.)
+    if (get('dav-resets') !== null) put('dav-resets', null);
+
+    function forgetRun() {
+        RUN.forEach(function (k) { put(k, null); });
+        try { for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (k && k.indexOf('run:') === 0) localStorage.removeItem(k); } } catch (e) {}
+        try { sessionStorage.clear(); } catch (e) {}
+    }
+    // on to the next reset (or, in the grand mystery, the same one again)
+    function nextReset() {
+        forgetRun();
+        put(RESET_KEY, Math.min(MAX - 1, done() + 1));
+        document.dispatchEvent(new CustomEvent('dav:reset', { detail: { reset: sphere() } }));
+        return sphere();
+    }
+    // straight to the start of a reset (the content manager's debug page)
+    function goTo(n) {
+        n = Math.max(1, Math.min(MAX, +n || 1));
+        forgetRun();
+        put(RESET_KEY, n - 1);
+        return n;
+    }
+    // testing, on your own computer only (the content manager): ?reset=3 → the start of reset 3.
+    // (on the live site it does nothing)
+    var LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    try {
+        var m = LOCAL && /[?&]reset=(\d)/.exec(location.search);
+        if (m && +m[1] >= 1 && +m[1] <= MAX) {
+            goTo(+m[1]);
+            try { sessionStorage.setItem('dav-loaded', '1'); } catch (e) {}
+            history.replaceState(null, '', location.pathname + location.search.replace(/[?&]reset=\d/, '').replace(/^&/, '?') + location.hash);
+        }
+    } catch (e) {}
+
+    // the technical fallback ("Forget your stay… (Clear cache)"): the site's copy of itself, and this
+    // visit, are thrown away. what they've done in the game (and which reset they're in) stays.
+    function clearCache() {
+        put('dav-seen', null); put('dav-have', null);
+        try { sessionStorage.clear(); } catch (e) {}
+        return window.caches ? caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }).catch(function () {}) : Promise.resolve();
+    }
+
+    /* ---------------- art for one reset: assets/resets/reset-<n>/… ----------------
+       assets/resets/index.txt names every file in there (tools/update-lists.sh and the content manager
+       write it). a picture swapped in one reset stays swapped in the ones after, until another swaps it again. */
+    var overrides = null;
+    function loadOverrides() {
+        if (!overrides) overrides = fetch('assets/resets/index.txt', { cache: 'no-cache' })
+            .then(function (r) { return r.ok ? r.text() : ''; })
+            .then(function (t) {
+                var have = {};
+                if (/<html/i.test(t)) return have;
+                t.split(/\r?\n/).forEach(function (l) { l = l.trim(); if (l && l.charAt(0) !== '#') have[l] = 1; });
+                return have;
+            }).catch(function () { return {}; });
+        return overrides;
+    }
+    // "assets/sky/sun" → "assets/resets/reset-3/sky/sun.gif", if reset 3 (or an earlier one, down to 1) swapped it
+    function swapFor(slot, have) {
+        var m = /^assets\/([a-z0-9-]+)\/([a-z0-9-]+)(\.[a-z0-9]+)?$/i.exec(slot);
+        if (!m || m[1] === 'resets') return null;
+        for (var r = sphere(); r >= 1; r--) {
+            var pre = 'reset-' + r + '/' + m[1] + '/' + m[2];
+            if (m[3]) { if (have[pre + m[3]]) return 'assets/resets/' + pre + m[3]; continue; }
+            var hits = Object.keys(have).filter(function (p) { return p.indexOf(pre + '.') === 0 && p.lastIndexOf('/') === pre.lastIndexOf('/'); });
+            if (hits.length) return 'assets/resets/' + hits[0];
+        }
+        return null;
+    }
+    // one reset's own things (its key, its note): assets/resets/reset-<n>/<name>
+    function ownFile(name, have, n) {
+        var pre = 'reset-' + (n || sphere()) + '/' + name;
+        var hits = Object.keys(have).filter(function (p) { return p === pre || p.indexOf(pre + '.') === 0; });
+        return hits.length ? 'assets/resets/' + hits[0] : null;
+    }
+
+    // resets 1 and 2: the sky's a stage set, its props hung on strings (sky/sky.css)
+    if (sphere() <= 2) document.documentElement.classList.add('stage-strings');
+
+    window.DAV_RESETS = RESETS;
+    window.DAV_DEATHS = DEATHS;
+    window.davSave = {
+        MAX: MAX, RESETS: RESETS, DEATHS: DEATHS,
+        get reset() { return sphere(); },                              // 1 … 8
+        get info() { return RESETS[sphere() - 1]; },
+        live: function (d) { return !!DEATHS[d] && DEATHS[d].live.indexOf(sphere()) !== -1; },
+        patched: function (d) { return !!DEATHS[d] && sphere() > Math.max.apply(null, DEATHS[d].live); },
+        before: function (d) { return !!DEATHS[d] && sphere() < Math.min.apply(null, DEATHS[d].live); },
+        get: function (k) { return get('run:' + k); },
+        set: function (k, v) { put('run:' + k, v); },
+        nextReset: nextReset,
+        goTo: LOCAL ? goTo : function () {},
+        RUN: RUN,
+        clearCache: clearCache,
+        overrides: loadOverrides,
+        swapFor: swapFor,
+        ownFile: ownFile
+    };
+})();

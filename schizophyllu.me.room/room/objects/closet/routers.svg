@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- routers (closet)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="330" y="540" width="110" height="12" rx="2" fill="#1d3a5a"/><rect x="340" y="544" width="3" height="3" fill="#5dffa0"/>
+  <rect x="334" y="526" width="104" height="12" rx="2" fill="#222"/><rect x="344" y="530" width="3" height="3" fill="#5dffa0"/>
+  <rect x="338" y="512" width="98" height="12" rx="2" fill="#e8e8e0"/><rect x="348" y="516" width="3" height="3" fill="#5dffa0"/>
+  <rect x="342" y="498" width="92" height="12" rx="2" fill="#2a2a30"/><rect x="352" y="502" width="3" height="3" fill="#5dffa0"/>
+  <path d="M350 488 l-8 -30 M430 488 l8 -30 M390 488 v-26" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+</svg>

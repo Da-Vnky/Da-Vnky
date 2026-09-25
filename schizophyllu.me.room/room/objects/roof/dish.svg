@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- dish (roof)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <path d="M820 594 v-30" stroke="#5a5a5e" stroke-width="4"/>
+  <ellipse cx="822" cy="552" rx="30" ry="22" fill="#8a8680" transform="rotate(-24 822 552)"/>
+  <ellipse cx="822" cy="552" rx="30" ry="22" fill="none" stroke="#6a4a2a" stroke-width="3" transform="rotate(-24 822 552)" opacity=".6"/>
+  <path d="M822 552 l26 -18" stroke="#5a5a5e" stroke-width="2"/><circle cx="848" cy="534" r="3" fill="#5a5a5e"/>
+</svg>

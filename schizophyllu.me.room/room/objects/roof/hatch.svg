@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- hatch (roof): the hatch, back down
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <radialGradient id="r-hatch"><stop offset="0" stop-color="#ffc878" stop-opacity=".55"/><stop offset="1" stop-color="#ffc878" stop-opacity="0"/></radialGradient>
+</defs>
+  <polygon points="100,860 330,860 300,770 130,770" fill="#2a2621"/>
+  <polygon points="118,850 312,850 288,780 142,780" fill="#0a0806"/>
+  <polygon points="118,850 312,850 288,780 142,780" fill="url(#r-hatch)"/>
+  <g stroke="#8a8e92" stroke-width="5"><path d="M180 850 L186 780 M250 850 L244 780"/></g>
+  <g stroke="#6a6e72" stroke-width="3"><path d="M184 830 h62 M186 806 h58"/></g>
+  <polygon points="130,770 300,770 320,640 150,640" fill="#3a352e"/><polygon points="130,770 300,770 320,640 150,640" fill="#000" opacity=".3"/>
+  <path d="M300 770 L336 700" stroke="#555" stroke-width="3"/>
+</svg>

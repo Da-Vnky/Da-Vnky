@@ -140,6 +140,12 @@
     var dying = false;
     function takeIt(c) {
         if (dying) return;
+        // the lock's off and there's more than one heart left: it won't fire (sky/lives.js)
+        if (Sky.lives && Sky.lives.jammed) {
+            if (Sky.sounds) Sky.sounds.sfx('jammed', { or: 'tap' });
+            I.say('it’s jammed.', 1600);
+            return;
+        }
         if (c.classList.contains('sea-char')) {                         // the homepage's traveller has a life of its own
             if (Sky.sea && Sky.sea.kill && Sky.sea.kill()) { dying = true; setTimeout(function () { dying = false; }, 4200); tell('dav:traveller-shot'); }
             return;

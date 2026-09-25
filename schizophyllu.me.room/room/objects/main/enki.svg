@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- enki (main): crochet Enki, sitting in the cable nest, keeping an eye on the console
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <path d="M736 287 Q735 272 741 266 L755 266 Q761 272 760 287 Z" fill="#2a2233"/>
+  <g stroke="#3d3249" stroke-width="1" stroke-dasharray="1.5 1.5" fill="none"><path d="M737 282h22M737.5 277h21M739.5 272h17"/></g>
+  <ellipse cx="737.5" cy="276" rx="2.5" ry="4.5" fill="#2a2233" transform="rotate(20 737.5 276)"/>
+  <ellipse cx="758.5" cy="276" rx="2.5" ry="4.5" fill="#2a2233" transform="rotate(-20 758.5 276)"/>
+  <circle cx="748" cy="275" r="2" fill="none" stroke="#c9a24a" stroke-width="1.1"/>
+  <circle cx="748" cy="260" r="9" fill="#2a2233"/>
+  <circle cx="748" cy="260" r="7.6" fill="none" stroke="#3d3249" stroke-width="1" stroke-dasharray="1.5 1.5"/>
+  <ellipse cx="748" cy="261.5" rx="5.3" ry="4.8" fill="#c9b8a0"/>
+  <circle cx="746" cy="261" r="1" fill="#111"/><circle cx="750" cy="261" r="1" fill="#111"/>
+</svg>

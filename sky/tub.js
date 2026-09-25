@@ -33,6 +33,8 @@
     function T() { return bath.querySelector('.bath-tub'); }        // (your art replaces the drawing, so look it up each time)
     var tub = T();
     var livingToaster = document.querySelector('.room .toaster');
+    // the toaster's only there in reset 1 (sky/state.js): after it, it's gone
+    if (livingToaster && window.davSave && !window.davSave.live('toaster')) { livingToaster.remove(); livingToaster = null; }
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
     function say(t, ms) { if (I) I.say(t, ms); }
 

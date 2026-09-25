@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- station (bedroom)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes.
+     the code looks these ids up, so keep them: #st-bars, #st-clock, #st-dial, #st-knob, #st-list, #st-playicon, #st-radioled, #st-status, #station, #vu-l, #vu-r, #woof-l, #woof-r -->
+<defs>
+  <linearGradient id="b-beige" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d2c9ae"/><stop offset="1" stop-color="#9c937a"/></linearGradient>
+  <pattern id="b-scan" width="4" height="3" patternUnits="userSpaceOnUse"><rect width="4" height="1" fill="#000" opacity=".4"/></pattern>
+  <linearGradient id="b-silver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6d6d2"/><stop offset="1" stop-color="#8e8e8a"/></linearGradient>
+</defs>
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <filter id="b-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+  <rect x="286" y="330" width="600" height="300" fill="#000" opacity="0"/>
+  <!-- speaker L: a real speaker -->
+  <rect x="298" y="452" width="60" height="116" rx="3" fill="#4a3020"/>
+  <rect x="302" y="456" width="52" height="108" rx="2" fill="#241810"/>
+  <circle cx="328" cy="480" r="8" fill="#111"/><circle cx="328" cy="480" r="3" fill="#333"/>
+  <g id="woof-l" class="woofer"><circle cx="328" cy="530" r="22" fill="#111"/><circle cx="328" cy="530" r="16" fill="#1d1d20"/><circle cx="328" cy="530" r="6" fill="#2a2a2e"/></g>
+  <!-- speaker R: a car speaker in a box -->
+  <rect x="800" y="480" width="72" height="88" fill="#a8804e"/>
+  <polygon points="800,480 812,462 842,470 836,480" fill="#b8905e"/><polygon points="872,480 862,460 838,468 842,480" fill="#9a7444"/>
+  <text x="806" y="562" font-size="6" fill="#5a3a1a">THIS SIDE UP</text>
+  <g id="woof-r" class="woofer"><circle cx="836" cy="522" r="26" fill="#111"/><circle cx="836" cy="522" r="20" fill="#2a2a2e"/><circle cx="836" cy="522" r="8" fill="#151518"/></g>
+  <!-- the tower, lying down -->
+  <rect x="366" y="512" width="212" height="56" rx="2" fill="url(#b-beige)"/>
+  <rect x="376" y="520" width="90" height="12" fill="#8a826c"/><rect x="376" y="536" width="90" height="12" fill="#8a826c"/><rect x="380" y="524" width="40" height="3" fill="#333"/>
+  <rect x="478" y="522" width="40" height="8" fill="#6e6754"/><text x="480" y="545" font-size="6" fill="#5a5343">TURBO</text>
+  <circle cx="530" cy="542" r="2.4" fill="#6dffb0" class="blink b3"/><circle cx="540" cy="542" r="2.4" fill="#ffb347" class="blink b2"/>
+  <g stroke="#8a826c" stroke-width="1.5"><path d="M552 520v40M558 520v40M564 520v40"/></g>
+  <!-- ribbon cable to a dangling board -->
+  <path d="M470 566 C 466 588 500 584 512 594" stroke="#9a9a9a" stroke-width="8" fill="none"/>
+  <path d="M470 566 C 466 588 500 584 512 594" stroke="#c33" stroke-width="1" fill="none" transform="translate(-3 0)"/>
+  <g transform="rotate(8 520 612)"><rect x="492" y="592" width="58" height="38" rx="2" fill="#1d6a3a"/><rect x="500" y="600" width="14" height="14" fill="#111"/><rect x="520" y="600" width="22" height="8" fill="#ccc"/><g fill="#d4a020"><rect x="498" y="622" width="44" height="3"/></g><circle cx="544" cy="618" r="2" fill="#ff3b2a" class="blink b1"/></g>
+  <!-- the haunted radio -->
+  <g class="obj" data-id="radio">
+    <rect x="370" y="452" width="204" height="60" rx="3" fill="url(#b-silver)"/>
+    <rect x="370" y="452" width="204" height="14" rx="3" fill="#6b4428"/>
+    <g stroke="#4e3018" stroke-width=".8" opacity=".8"><path d="M372 456 q50 3 100 0 t100 1 M372 461 q60 -2 120 1 t80 -1"/></g>
+    <g class="st-btn" data-act="radio-power"><rect x="538" y="503" width="28" height="8" rx="2" fill="#1a1a1a"/><text x="542" y="509.5" font-size="5" fill="#bbb">RADIO</text></g>
+    <circle id="st-radioled" cx="532" cy="507" r="2" fill="#3a1010"/>
+    <g fill="#2a2a2a"><rect x="409" y="447" width="1" height="1" opacity="0"/><rect x="408" y="447" width="12" height="5"/><rect x="424" y="447" width="12" height="5"/><rect x="530" y="446" width="22" height="6"/></g>
+    <rect x="382" y="472" width="72" height="30" rx="2" fill="#0a0404"/>
+    <text id="st-clock" x="418" y="495" font-size="20" fill="#ff3b2a" text-anchor="middle" filter="url(#b-glow)">3:47</text>
+    <rect x="462" y="472" width="102" height="30" rx="2" fill="#141414"/>
+    <g stroke="#cfc6a8" stroke-width=".8">
+      <path d="M468.0 476v7"/>
+      <path d="M472.5 476v4"/>
+      <path d="M477.0 476v4"/>
+      <path d="M481.5 476v4"/>
+      <path d="M486.0 476v4"/>
+      <path d="M490.5 476v7"/>
+      <path d="M495.0 476v4"/>
+      <path d="M499.5 476v4"/>
+      <path d="M504.0 476v4"/>
+      <path d="M508.5 476v4"/>
+      <path d="M513.0 476v7"/>
+      <path d="M517.5 476v4"/>
+      <path d="M522.0 476v4"/>
+      <path d="M526.5 476v4"/>
+      <path d="M531.0 476v4"/>
+      <path d="M535.5 476v7"/>
+      <path d="M540.0 476v4"/>
+      <path d="M544.5 476v4"/>
+      <path d="M549.0 476v4"/>
+      <path d="M553.5 476v4"/>
+      <path d="M558.0 476v7"/>
+    </g>
+    <g font-size="5" fill="#cfc6a8"><text x="465" y="496">88</text><text x="484" y="496">92</text><text x="503" y="496">96</text><text x="520" y="496">100</text><text x="540" y="496">104</text></g>
+    <rect id="st-dial" x="500" y="474" width="1.6" height="26" fill="#ff3b2a"/>
+    <g class="st-btn" data-act="tune"><rect x="462" y="472" width="102" height="30" fill="#000" opacity="0"/></g>
+    <text x="386" y="510" font-size="5" fill="#555">AM / FM  CLOCK RADIO</text>
+    <g transform="rotate(-4 520 460)"><rect x="494" y="453" width="54" height="10" fill="#e8e0c8" opacity=".92"/><text x="495" y="461" font-size="7" fill="#b02020">DO NOT TUNE</text></g>
+    <!-- coat-hanger antenna -->
+    <path d="M376 452 L352 404 L376 372 L344 342" stroke="#b8b8b8" stroke-width="2" fill="none"/>
+    <circle cx="344" cy="340" r="7" fill="#cfd3d8"/><path d="M340 336 l6 5 l-3 4" stroke="#fff" stroke-width=".8" fill="none"/>
+  </g>
+  <!-- VU meters on a scavenged panel -->
+  <rect x="378" y="390" width="190" height="58" rx="3" fill="#9a9ea4"/>
+  <g fill="#6a6e74"><circle cx="384" cy="396" r="2"/><circle cx="562" cy="396" r="2"/><circle cx="384" cy="442" r="2"/><circle cx="562" cy="442" r="2"/></g>
+
+  <rect x="382" y="396" width="84" height="46" rx="2" fill="#efe6c8"/>
+  <path d="M396.4 416.9 A36 36 0 0 1 439.2 407.4" stroke="#333" stroke-width="1.2" fill="none"/>
+  <path d="M439.2 407.4 A36 36 0 0 1 451.6 416.9" stroke="#c33" stroke-width="2.4" fill="none"/>
+  <text x="424" y="428" font-size="7" fill="#333" text-anchor="middle">VU</text><text x="388" y="437" font-size="7" fill="#333">L</text>
+  <line id="vu-l" x1="424" y1="440" x2="424" y2="404" stroke="#222" stroke-width="1.2" transform="rotate(-48 424 440)"/>
+  <circle cx="424" cy="440" r="3" fill="#333"/>
+  <rect x="478" y="396" width="84" height="46" rx="2" fill="#efe6c8"/>
+  <path d="M492.4 416.9 A36 36 0 0 1 535.2 407.4" stroke="#333" stroke-width="1.2" fill="none"/>
+  <path d="M535.2 407.4 A36 36 0 0 1 547.6 416.9" stroke="#c33" stroke-width="2.4" fill="none"/>
+  <text x="520" y="428" font-size="7" fill="#333" text-anchor="middle">VU</text><text x="484" y="437" font-size="7" fill="#333">R</text>
+  <line id="vu-r" x1="520" y1="440" x2="520" y2="404" stroke="#222" stroke-width="1.2" transform="rotate(-48 520 440)"/>
+  <circle cx="520" cy="440" r="3" fill="#333"/>
+  <!-- the monitor -->
+  <rect x="598" y="362" width="188" height="164" rx="8" fill="#2b2c31"/>
+  <rect x="598" y="362" width="188" height="4" rx="2" fill="#fff" opacity=".08"/>
+  <rect id="st-screenbg" x="610" y="376" width="164" height="122" rx="6" fill="#03170b"/>
+  <g id="st-screen" font-size="8.5" fill="#6dffb0">
+    <text x="616" y="389" font-size="7" fill="#6dffb0" opacity=".65">~/playlist.json</text>
+    <g id="st-bars"></g>
+    <g id="st-list"></g>
+    <text id="st-status" x="616" y="492" font-size="7.5">loading...</text>
+  </g>
+  <rect x="610" y="376" width="164" height="122" rx="6" fill="url(#b-scan)" pointer-events="none"/>
+  <rect x="610" y="376" width="164" height="122" rx="6" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="4" pointer-events="none"/>
+  <text x="608" y="516" font-size="6" fill="#6a6b70" letter-spacing="1">PHOSPHOR JR.</text>
+  <circle cx="774" cy="512" r="2.4" fill="#6dffb0" filter="url(#b-glow)"/>
+  <rect x="668" y="526" width="48" height="10" fill="#222328"/>
+  <!-- the control deck -->
+  <rect x="592" y="536" width="206" height="32" rx="3" fill="#18181c"/>
+  <rect x="592" y="536" width="206" height="3" fill="#2e2e34"/>
+  <g class="st-btn" data-act="prev"><circle cx="628" cy="553" r="10" fill="#d83a2a"/><circle cx="628" cy="551" r="10" fill="#f0503a"/><path d="M620 551 l6 -5 v10z M626 551 l6 -5 v10z" fill="#fff" opacity=".9"/></g>
+  <g class="st-btn" data-act="play"><circle cx="670" cy="553" r="12" fill="#2aa85a"/><circle cx="670" cy="551" r="12" fill="#3ad86a"/><path id="st-playicon" d="M666 545 l10 6 l-10 6z" fill="#fff" opacity=".9"/></g>
+  <g class="st-btn" data-act="next"><circle cx="712" cy="553" r="10" fill="#c8a020"/><circle cx="712" cy="551" r="10" fill="#e8c030"/><path d="M704 546 l6 5 l-6 5z M710 546 l6 5 l-6 5z" fill="#fff" opacity=".9"/></g>
+  <g class="st-btn" data-act="vol">
+    <circle cx="768" cy="552" r="14" fill="#2a2a30" stroke="#555" stroke-width="1.5"/>
+    <g id="st-knob"><line x1="768" y1="552" x2="768" y2="540" stroke="#e8e8e8" stroke-width="2.4" stroke-linecap="round"/></g>
+    <text x="742" y="566" font-size="5" fill="#777">-</text><text x="790" y="566" font-size="5" fill="#777">+</text>
+  </g>
+  <g transform="rotate(-2 700 574)"><rect x="632" y="569" width="140" height="10" fill="#e8e0c8" opacity=".9"/><text x="636" y="577" font-size="7" fill="#333">MUSIC STATION v0.3</text></g>
+  <!-- patch cables -->
+  <path d="M358 540 C 362 580 372 560 380 566 M800 540 C 790 580 760 560 740 568 M776 470 C 790 440 800 430 810 470" stroke="#111" stroke-width="2.5" fill="none"/>
+  <path d="M358 548 C 364 590 380 572 392 566" stroke="#c33" stroke-width="1.8" fill="none"/>
+  <path d="M800 548 C 790 590 770 572 758 568" stroke="#c33" stroke-width="1.8" fill="none"/>
+</svg>

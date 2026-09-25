@@ -1,14 +1,17 @@
 /* =====================================================================
-   forget.js — "Forget your stay… (Clear cache)", in the control panel.
-   The site keeps a copy of itself in each visitor's browser (sky/loader.js),
-   and remembers what they've done (records found, their things, lives lost…).
-   This button wipes all of it: a flashbang, the world goes white (and shows
-   what it really is), and the page starts over from nothing.
-   One thing survives it: how many times they've done it, localStorage
-   "dav-resets" (Sky.stay.resets), for an easter egg later.
+   forget.js — "Forget your stay… (Clear cache)", in the control panel, and
+   the moment a reset happens.
+   The button is only for when something's gone wrong: it asks first, then
+   throws away the site's copy of itself in the visitor's browser (sky/loader.js)
+   and starts the page again. What they've done in the game stays (which reset
+   they're in, the P(Doom) record…: sky/state.js).
+   A reset (sky/lives.js, when the last heart goes) looks the same: a flashbang,
+   the world goes white and shows what it really is, and then it starts again,
+   one reset on (Sky.stay.reset()).
 
    slots: assets/ui/forget-screen (what the white turns into: the wireframe world;
-          full screen, covers it), assets/ui/stay (the panel icon)
+          full screen, covers it), assets/ui/reset-screen (the same, for a reset;
+          the forget screen if you leave it out), assets/ui/stay (the panel icon)
    sound: assets/sounds/flashbang
    ===================================================================== */
 
@@ -30,7 +33,11 @@
         '.forget-white.on { opacity: 1; }' +
         '.forget-white .fw-world { position: absolute; inset: 0; opacity: 0; transition: opacity 1.6s ease-in .5s; }' +
         '.forget-white.on .fw-world { opacity: 1; }' +
-        '.forget-white .fw-world > svg, .forget-white .fw-world > img, .forget-white .fw-world > video { width: 100%; height: 100%; object-fit: cover; display: block; }'
+        '.forget-white .fw-world > svg, .forget-white .fw-world > img, .forget-white .fw-world > video { width: 100%; height: 100%; object-fit: cover; display: block; }' +
+        '.forget-white .fw-caption { position: absolute; left: 0; right: 0; bottom: 12%; text-align: center; font: italic 1.4rem "IM Fell English", Georgia, serif; color: #6a7078; opacity: 0; transition: opacity 1s ease-in 1.4s; }' +
+        '.forget-white.on .fw-caption { opacity: 1; }' +
+        '.stay-sure { margin-top: 6px; } .stay-sure button { margin: 4px 4px 0 0; padding: 6px 14px; border-radius: 999px; border: 1px solid #3a2716; background: #f3e6c2; color: #3a2716; font: italic 1rem "IM Fell English", Georgia, serif; cursor: pointer; }' +
+        '.stay-sure .stay-yes { background: #9a3b1f; border-color: #9a3b1f; color: #f3e6c2; }'
     );
 
     // the stand-in for what's under the white: a wireframe world, grey lines on white
@@ -47,12 +54,13 @@
             '<path d="M760 500 V360 L840 330 L900 360 V500 M760 360 L820 390 L900 360 M820 390 V500"/></g></svg>';
     }
 
-    function forget() {
+    // the white, the world under it, and then the page again
+    function whiteOut(slot, caption, work) {
         var w = document.createElement('div');
         w.className = 'forget-white';
-        w.innerHTML = '<div class="fw-world">' + wireframe() + '</div>';
+        w.innerHTML = '<div class="fw-world">' + wireframe() + '</div>' + (caption ? '<div class="fw-caption">' + caption + '</div>' : '');
         document.body.appendChild(w);
-        Sky.findAsset('assets/ui/forget-screen', function (url) {
+        Sky.findAsset(slot, function (url) {
             if (!url) return;
             var box = w.querySelector('.fw-world');
             if (/\.(mp4|webm)$/i.test(url)) { box.innerHTML = '<video muted autoplay playsinline loop></video>'; box.querySelector('video').src = url; }
@@ -61,21 +69,34 @@
         sfx('flashbang');
         if (Sky.music && Sky.music.stop) Sky.music.stop();
         requestAnimationFrame(function () { w.classList.add('on'); });
-        var wipe = window.davForget ? window.davForget() : Promise.resolve();
+        var job = work();
         setTimeout(function () {
-            wipe.then(function () { location.replace(location.pathname + location.search); });
+            job.then(function () { location.replace(location.pathname + location.search); });
         }, 3400);
+    }
+    function forget() { whiteOut('assets/ui/forget-screen', '', function () { return window.davForget ? window.davForget() : Promise.resolve(); }); }
+    function reset() {
+        var S = window.davSave;
+        whiteOut('assets/ui/reset-screen|assets/ui/forget-screen', '', function () {
+            if (S) S.nextReset();
+            return Promise.resolve();
+        });
     }
 
     Sky.panel.add({
         id: 'stay', title: 'your stay', order: 95, icon: ICON,
         build: function (body) {
-            body.innerHTML = '<p class="cp-note">this place keeps a copy of itself with you, and remembers what you’ve done here, between visits.</p>' +
-                '<button type="button" class="stay-forget">Forget your stay… (Clear cache)</button>';
-            body.querySelector('.stay-forget').addEventListener('click', forget);
+            body.innerHTML = '<p class="cp-note">this place keeps a copy of itself with you, between visits. if something looks broken, forgetting it can help.</p>' +
+                '<button type="button" class="stay-forget">Forget your stay… (Clear cache)</button>' +
+                '<div class="stay-sure" hidden><p class="cp-note">forget the copy and start the page again? (what you’ve done here stays.)</p>' +
+                '<button type="button" class="stay-yes">yes, forget it</button> <button type="button" class="stay-no">no</button></div>';
+            var b = body.querySelector('.stay-forget'), sure = body.querySelector('.stay-sure');
+            b.addEventListener('click', function () { b.hidden = true; sure.hidden = false; });
+            body.querySelector('.stay-no').addEventListener('click', function () { sure.hidden = true; b.hidden = false; });
+            body.querySelector('.stay-yes').addEventListener('click', forget);
         },
         status: function () { return ''; }
     });
 
-    Sky.stay = { forget: forget, get resets() { try { return +localStorage.getItem('dav-resets') || 0; } catch (e) { return 0; } } };
+    Sky.stay = { forget: forget, reset: reset, get resets() { return window.davSave ? window.davSave.reset : 1; } };
 })();

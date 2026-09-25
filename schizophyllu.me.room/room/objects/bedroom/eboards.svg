@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- eboards (bedroom)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="1420" y="716" width="130" height="50" fill="#8a6440"/>
+  <rect x="1420" y="716" width="130" height="14" fill="#000" opacity=".45"/>
+  <g transform="rotate(-6 1470 718)"><rect x="1436" y="706" width="44" height="16" fill="#1d6a3a"/><rect x="1486" y="708" width="40" height="14" fill="#2a4a8a"/></g>
+  <text x="1430" y="752" font-size="9" fill="#2a1a0a">SPARE MOBOS</text>
+</svg>

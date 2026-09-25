@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- packages (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <g transform="rotate(-6 1125 721)">
+    <rect x="1098" y="704" width="54" height="34" rx="3" fill="#bdb5a1"/>
+    <rect x="1104" y="710" width="26" height="14" fill="#f4f1ea"/>
+    <g stroke="#222" stroke-width=".8"><path d="M1107 720v3M1109 720v3M1112 720v3M1113 720v3M1116 720v3M1119 720v3M1120 720v3M1124 720v3"/></g>
+  </g>
+  <g transform="rotate(5 1163 724)">
+    <rect x="1140" y="708" width="48" height="30" rx="2" fill="#e8742a"/>
+    <text x="1145" y="727" font-size="7" fill="#fff">CN &#8594; ??</text>
+  </g>
+</svg>

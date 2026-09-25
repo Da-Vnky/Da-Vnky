@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- frontdoor (hallway): front door
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="626" y="140" width="268" height="560" fill="#2a221c"/>
+  <rect x="640" y="152" width="240" height="548" fill="#3b2d24"/>
+  <g fill="none" stroke="#2a2019" stroke-width="4"><rect x="664" y="190" width="192" height="140"/><rect x="664" y="360" width="192" height="130"/><rect x="664" y="560" width="192" height="116"/></g>
+  <rect x="736" y="226" width="48" height="28" rx="2" fill="#b8a070"/><text x="741" y="248" font-size="20" fill="#3a2d1c">12</text>
+  <circle cx="760" cy="300" r="6" fill="#b8a070"/><circle cx="760" cy="300" r="2.6" fill="#111"/>
+  <path d="M826 408 q16 18 34 4" stroke="#b8b8b8" stroke-width="2" stroke-dasharray="3 2" fill="none"/><rect x="820" y="402" width="10" height="10" fill="#9a9a9a"/><rect x="858" y="404" width="8" height="16" fill="#9a9a9a"/>
+  <circle cx="856" cy="440" r="7" fill="#b8a070"/><rect x="853" y="432" width="6" height="16" fill="#8a7040"/>
+  <circle cx="856" cy="476" r="9" fill="#b8a070"/><circle cx="854" cy="474" r="3" fill="#e8d8b0"/>
+  <rect x="720" y="520" width="80" height="14" rx="2" fill="#b8a070"/><rect x="726" y="525" width="68" height="4" fill="#1a1410"/>
+  <rect x="640" y="692" width="240" height="8" fill="#000" opacity=".4"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- mail (hallway)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <g transform="rotate(-8 720 716)"><rect x="690" y="704" width="56" height="30" fill="#e8e2d2"/><path d="M690 704 l28 16 l28 -16" stroke="#aaa" fill="none"/></g>
+  <g transform="rotate(12 780 718)"><rect x="754" y="706" width="52" height="28" fill="#f2efe6"/><rect x="784" y="710" width="10" height="12" fill="#c33"/></g>
+  <g transform="rotate(-2 740 728)"><rect x="714" y="718" width="54" height="22" fill="#d8c8a0"/><text x="718" y="732" font-size="6" fill="#a33">FINAL?</text></g>
+</svg>

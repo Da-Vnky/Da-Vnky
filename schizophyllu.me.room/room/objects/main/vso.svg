@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- vso (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <filter id="f-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="2.2" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <g id="ledrow">
+    <rect width="3" height="3" x="0"  fill="#5dffa0"/>
+    <rect width="3" height="3" x="6"  fill="#5dffa0" class="blink b2"/>
+    <rect width="3" height="3" x="12" fill="#ffb347" class="blink b3"/>
+    <rect width="3" height="3" x="18" fill="#5dffa0" class="blink b1"/>
+  </g>
+</defs>
+  <rect x="404" y="286" width="210" height="8" fill="#2a2430"/>
+  <rect x="412" y="258" width="44" height="28" rx="3" fill="#15181f"/>
+  <rect x="417" y="263" width="34" height="14" fill="#04140c"/>
+  <path d="M418 272 l5 -4 l5 6 l5 -8 l5 5 l5 -2 l4 3" stroke="#6dffb0" fill="none" stroke-width="1"/>
+  <rect x="466" y="266" width="30" height="20" fill="#1c1f27"/>
+  <use href="#ledrow" x="470" y="272"/>
+  <path d="M492 266 l8 -34" stroke="#555" stroke-width="2"/><circle cx="500" cy="231" r="3" fill="#6dffb0" class="blink b1"/>
+  <rect x="510" y="270" width="18" height="16" fill="#2a2d36"/>
+  <g transform="translate(560 266)">
+    <path d="M0 -14 L4 -4 L14 -4 L6 2 L9 12 L0 6 L-9 12 L-6 2 L-14 -4 L-4 -4Z" fill="#6dffb0" class="varstar-lamp" filter="url(#f-glow)"/>
+  </g>
+  <rect x="580" y="262" width="26" height="24" fill="#191b22"/><circle cx="593" cy="274" r="6" fill="#0b0c10" stroke="#6dffb0" stroke-width="1"/>
+  <text x="406" y="303" font-size="6.5" fill="#6dffb0" opacity=".55" letter-spacing="1">VSO-1 // RELAY</text>
+</svg>

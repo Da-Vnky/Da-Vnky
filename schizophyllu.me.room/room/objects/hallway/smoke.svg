@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- smoke (hallway)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<ellipse cx="840" cy="24" rx="24" ry="8" fill="#d8d6d0"/><rect x="820" y="14" width="40" height="10" fill="#d8d6d0"/><circle class="blink b3" cx="852" cy="27" r="2" fill="#ff3b2a"/>
+</svg>

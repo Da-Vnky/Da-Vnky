@@ -10,7 +10,7 @@
    since, so those come fresh from the site the next time they're needed;
    if the page they're on was one of the changes, it shows it fresh.
 
-   "Forget your stay" (the control panel) wipes it all: see davForget below.
+   "Forget your stay" (the control panel) throws the copy away: see davForget below.
    Your own loading picture: assets/ui/loading (a GIF can walk, spin, …)
 
        <script src="sky/loader.js"></script>     (first thing in each page's <head>)
@@ -19,14 +19,12 @@
 (function () {
     var KEY = 'dav-loaded', CACHE = 'dav-site';
     var ok = 'serviceWorker' in navigator && 'caches' in window && /^https?:$/.test(location.protocol);
-    /* ---------------- forget your stay: everything this site kept in this browser, gone ---------------- */
-    // (all but the count of how many times it's been done: localStorage "dav-resets", for later)
+    /* ---------------- forget your stay: the site's copy of itself in this browser, gone ----------------
+       (sky/state.js does it: the game — which reset they're in, what's theirs — stays) */
     window.davForget = function () {
-        var resets = 0;
-        try { resets = (+localStorage.getItem('dav-resets') || 0) + 1; } catch (e) {}
-        try { localStorage.clear(); localStorage.setItem('dav-resets', String(resets)); } catch (e) {}
-        try { sessionStorage.clear(); } catch (e) {}
-        return (window.caches ? caches.delete(CACHE).catch(function () {}) : Promise.resolve()).then(function () { return resets; });
+        if (window.davSave) return window.davSave.clearCache();
+        try { sessionStorage.clear(); localStorage.removeItem('dav-seen'); } catch (e) {}
+        return window.caches ? caches.delete(CACHE).catch(function () {}) : Promise.resolve();
     };
     if (!ok) return;
     var fresh = true;

@@ -1,14 +1,15 @@
 /* =====================================================================
    lives.js — three lives. Nobody sees them at first: they turn up (top left,
    locked) once a visitor has both found the dungeon and turned the revolver
-   on themselves. They're locked: nothing's taken until the visitor has crafted
-   the key (one day; it calls Sky.lives.unlock()). From then on every death
+   on themselves. They're locked: nothing's taken until the visitor has found
+   this reset's hidden key (sky/resets.js calls Sky.lives.unlock()). From then on every death
    (the revolver, a fall, the toaster, what's behind mel's window) costs a life
    (sky/gore.js tells it, 'dav:traveller-died'), and when the last one goes,
-   so does everything: a full wipe, like "Forget your stay" (and one more on
-   the reset counter, dav-resets).
+   the world resets: on to the next of the seven (sky/state.js).
+   The revolver's jammed while the lock's off and there's more than one heart
+   left (Sky.lives.jammed): it only fires on the last.
 
-   Kept in the visitor's browser between visits (localStorage), until a wipe.
+   Kept in the visitor's browser between visits (localStorage), until the next reset.
    slots: assets/ui/heart (a life), assets/ui/heart-empty (one lost),
           assets/ui/lives-lock (the lock on them), assets/ui/lives-frame (behind them)
    sounds: assets/sounds/life-lost, lives-found (the page makes a chime and a crack until then)
@@ -105,18 +106,28 @@
             if (n > 0) { say(n === 1 ? 'one life left.' : n + ' lives left.'); return; }
             // the last one: everything goes
             say('no lives left.');
-            setTimeout(function () {
-                if (Sky.stay && Sky.stay.forget) Sky.stay.forget();
-                else if (window.davForget) window.davForget().then(function () { location.reload(); });
+            setTimeout(function () {                                   // and on to the next reset (sky/state.js, sky/forget.js)
+                if (Sky.stay && Sky.stay.reset) Sky.stay.reset();
+                else if (window.davSave) { window.davSave.nextReset(); location.reload(); }
             }, 2600);
         }, after);
     }
     document.addEventListener('dav:dungeon-found', function () { maybeShow(); });
     draw();
 
+    Sky.css('.lives .l-lock.popping { animation: lock-pop .8s ease-in forwards; }' +
+        '@keyframes lock-pop { 0% { transform: none; } 30% { transform: translateY(-6px) rotate(-12deg); } 100% { transform: translate(14px, 40px) rotate(70deg); opacity: 0; } }');
     Sky.lives = {
-        get left() { return left(); }, get shown() { return shown(); },
-        unlock: function () { put('lives-unlocked', '1'); draw(); },            // (the hidden key, later)
+        get left() { return left(); }, get shown() { return shown(); }, get unlocked() { return unlocked(); },
+        // the key (sky/resets.js): the lock comes off, and from now on they can die for real
+        unlock: function () {
+            if (unlocked()) return;
+            put('lives-unlocked', '1');
+            var lk = el.querySelector('.l-lock');
+            if (lk && shown()) { lk.classList.add('popping'); setTimeout(draw, 800); } else draw();
+        },
+        // the revolver only fires on the last heart (once the lock's off: until then it's a free death)
+        get jammed() { return shown() && unlocked() && left() > 1; },
         give: function (k) { put('lives-left', Math.min(MAX, left() + (k || 1))); draw(); }
     };
 })();

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- hiddennote (main): tucked behind the Phosphor Artifact. you have to really look
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+    <rect x="850" y="548" width="24" height="17" fill="#e8e0c8" transform="rotate(14 862 556)"/>
+    <path d="M858 554h10M858 558h7" stroke="#8a7a5a" stroke-width=".8" transform="rotate(14 862 556)"/>
+  
+</svg>

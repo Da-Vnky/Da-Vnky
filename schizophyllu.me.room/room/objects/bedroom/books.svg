@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- books (bedroom)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="36" y="164" width="228" height="574" fill="#2a1d16"/>
+  <rect x="44" y="172" width="212" height="514" fill="#140f0c"/>
+  <g fill="#3a2a20"><rect x="36" y="296" width="228" height="8"/><rect x="36" y="426" width="228" height="8"/><rect x="36" y="556" width="228" height="8"/><rect x="36" y="686" width="228" height="52"/></g>
+  <rect x="48" y="192" width="24" height="104" fill="#111"/><rect x="48" y="198" width="24" height="2" fill="#000" opacity=".25"/><text x="62.5" y="290" font-size="7" fill="#d33" transform="rotate(-90 62.5 290)">NO LONGER HUMAN</text>
+  <rect x="74" y="200" width="20" height="96" fill="#2a4a8a"/><rect x="74" y="206" width="20" height="2" fill="#000" opacity=".25"/><text x="86.5" y="290" font-size="7" fill="#cfe8ff" transform="rotate(-90 86.5 290)">NEUROMANCER</text>
+  <rect x="96" y="196" width="26" height="100" fill="#3a6a3a"/><rect x="96" y="202" width="26" height="2" fill="#000" opacity=".25"/><text x="111.5" y="290" font-size="7" fill="#e8e0c0" transform="rotate(-90 111.5 290)">TREES OF NORTH AMERICA</text>
+  <rect x="124" y="192" width="22" height="104" fill="#e8e0d0"/><rect x="124" y="198" width="22" height="2" fill="#000" opacity=".25"/><text x="137.1" y="290" font-size="6" fill="#222" transform="rotate(-90 137.1 290)">BOBBY FISCHER TEACHES CHESS</text>
+  <g transform="rotate(14 160 296)"><rect x="150" y="204" width="18" height="92" fill="#7a3a2a"/></g>
+  <path d="M204 296 l4 -20 h26 l4 20z" fill="#8a4b2a"/><path d="M221 276 q-10 -16 -22 -10 M221 276 q4 -22 16 -24 M221 276 q14 -6 20 6" stroke="#4a6a3a" stroke-width="3" fill="none"/>
+  <rect x="48" y="318" width="30" height="108" fill="#d8e0e0"/><rect x="48" y="324" width="30" height="2" fill="#000" opacity=".25"/><text x="65.5" y="420" font-size="7" fill="#2a6a6a" transform="rotate(-90 65.5 420)">PSYCHIATRIC NURSING 2e</text>
+  <rect x="80" y="328" width="24" height="98" fill="#f2d23a"/><rect x="80" y="334" width="24" height="2" fill="#000" opacity=".25"/><text x="94.3" y="420" font-size="6.5" fill="#111" transform="rotate(-90 94.3 420)">WEB DESIGN FOR DUMMIES</text>
+  <rect x="106" y="326" width="20" height="100" fill="#5a1a14"/><rect x="106" y="332" width="20" height="2" fill="#000" opacity=".25"/><text x="118.5" y="420" font-size="7" fill="#e8c8a0" transform="rotate(-90 118.5 420)">BLOOD MERIDIAN</text>
+  <rect x="128" y="336" width="14" height="90" fill="#4a3a5a"/><rect x="128" y="342" width="14" height="2" fill="#000" opacity=".25"/>
+  <rect x="144" y="340" width="12" height="86" fill="#2a2a2a"/><rect x="144" y="346" width="12" height="2" fill="#000" opacity=".25"/>
+  <g fill="#3a3a6a"><rect x="168" y="414" width="80" height="12"/></g><rect x="172" y="404" width="72" height="10" fill="#6a2a3a"/><rect x="166" y="396" width="78" height="8" fill="#2a5a4a"/>
+  <!-- shelf 3: the game, a memory card, cds -->
+  <g class="obj" data-id="lsdgame">
+    <rect x="50" y="488" width="68" height="68" fill="#cfd6dc" opacity=".9"/>
+    <image href="../../../assets/apartment/lsd-dream-emulator.jpg" x="54" y="492" width="60" height="60" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="50" y="488" width="6" height="68" fill="#fff" opacity=".25"/>
+  </g>
+  <rect x="124" y="538" width="16" height="18" rx="1" fill="#8a8a90"/><rect x="127" y="541" width="10" height="5" fill="#5a5a60"/>
+  <g fill="#9aa2aa">
+    <rect x="150" y="552" width="98" height="4" fill="#9aa2aa"/>
+    <rect x="150" y="547" width="98" height="4" fill="#c9ced4"/>
+    <rect x="150" y="542" width="98" height="4" fill="#7a828a"/>
+    <rect x="150" y="537" width="98" height="4" fill="#9aa2aa"/>
+    <rect x="150" y="532" width="98" height="4" fill="#c9ced4"/>
+    <rect x="150" y="527" width="98" height="4" fill="#7a828a"/>
+    <rect x="150" y="522" width="98" height="4" fill="#9aa2aa"/>
+    <rect x="150" y="517" width="98" height="4" fill="#c9ced4"/>
+  </g>
+  <!-- shelf 4: tapes and the cable box -->
+  <rect x="50" y="640" width="12" height="46" fill="#222"/><rect x="52" y="650" width="8" height="14" fill="#eee" opacity=".7"/>
+  <rect x="64" y="640" width="12" height="46" fill="#c33"/><rect x="66" y="650" width="8" height="14" fill="#eee" opacity=".7"/>
+  <rect x="78" y="640" width="12" height="46" fill="#3a6ad0"/><rect x="80" y="650" width="8" height="14" fill="#eee" opacity=".7"/>
+  <rect x="92" y="640" width="12" height="46" fill="#e0c030"/><rect x="94" y="650" width="8" height="14" fill="#eee" opacity=".7"/>
+  <rect x="106" y="640" width="12" height="46" fill="#ddd"/><rect x="108" y="650" width="8" height="14" fill="#eee" opacity=".7"/>
+  <rect x="120" y="640" width="12" height="46" fill="#222"/><rect x="122" y="650" width="8" height="14" fill="#eee" opacity=".7"/>
+  <rect x="134" y="640" width="12" height="46" fill="#6a3"/><rect x="136" y="650" width="8" height="14" fill="#eee" opacity=".7"/>
+  <rect x="148" y="640" width="12" height="46" fill="#222"/><rect x="150" y="650" width="8" height="14" fill="#eee" opacity=".7"/>
+  <rect x="168" y="636" width="86" height="50" fill="#a8804e"/><path d="M168 636 l10 -10 h66 l10 10" fill="#b8905e"/>
+  <text x="174" y="664" font-size="7" fill="#3a2410">CABLES</text><text x="174" y="674" font-size="7" fill="#3a2410">(MISC)</text>
+  <path d="M230 632 q10 -20 -4 -30 q-10 -6 -2 -14" stroke="#111" stroke-width="2" fill="none"/>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- acloset (bedroom): the autism closet. skizy's. the AIs don't narrate it
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes.
+     the code looks these ids up, so keep them: #ac-closed, #ac-open -->
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <filter id="b-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+  <rect x="898" y="200" width="152" height="496" fill="#2e2420"/>
+  <rect x="898" y="200" width="152" height="5" fill="#44372e"/>
+  <rect x="912" y="214" width="124" height="476" fill="#1a1016"/>
+  <g id="ac-open" style="display:none">
+    <rect x="912" y="214" width="124" height="476" fill="#2a1a24"/>
+    <ellipse cx="974" cy="440" rx="60" ry="230" fill="#ffb86a" opacity=".16"/>
+    <!-- fairy lights, draped -->
+    <path d="M914 236 Q944 262 974 240 Q1004 262 1034 236" stroke="#1b1a20" stroke-width="1.2" fill="none"/>
+    <g filter="url(#b-glow)"><circle class="bulb d0" cx="924" cy="246" r="2.6" fill="#ffb347"/><circle class="bulb d1" cx="944" cy="252" r="2.6" fill="#ffe6b0"/><circle class="bulb d2" cx="962" cy="246" r="2.6" fill="#ff9a6a"/><circle class="bulb d3" cx="986" cy="246" r="2.6" fill="#ffd28a"/><circle class="bulb d0" cx="1004" cy="252" r="2.6" fill="#ffe6b0"/><circle class="bulb d1" cx="1024" cy="244" r="2.6" fill="#ffb347"/></g>
+    <!-- shelf: pothos + a small lava lamp -->
+    <rect x="912" y="330" width="124" height="6" fill="#4a3a30"/>
+    <path d="M926 330 l3 -18 h18 l3 18z" fill="#b86a4a"/>
+    <g stroke="#2e6a38" stroke-width="2" fill="none"><path d="M934 334 q-8 40 2 80 q6 40 -4 90"/><path d="M944 334 q10 50 0 100 q-6 30 6 60"/><path d="M938 312 q-14 -10 -20 4"/></g>
+    <g fill="#4a9a4a"><ellipse cx="930" cy="360" rx="5" ry="3.4" transform="rotate(-30 930 360)"/><ellipse cx="940" cy="384" rx="5" ry="3.4" transform="rotate(30 940 384)"/><ellipse cx="934" cy="414" rx="5" ry="3.4" transform="rotate(-20 934 414)"/><ellipse cx="938" cy="448" rx="5" ry="3.4" transform="rotate(25 938 448)"/><ellipse cx="930" cy="484" rx="5" ry="3.4" transform="rotate(-35 930 484)"/><ellipse cx="948" cy="400" rx="5" ry="3.4" transform="rotate(-15 948 400)"/><ellipse cx="944" cy="440" rx="5" ry="3.4" transform="rotate(35 944 440)"/><ellipse cx="950" cy="486" rx="5" ry="3.4" transform="rotate(-25 950 486)"/><ellipse cx="920" cy="312" rx="5" ry="3.4"/><ellipse cx="946" cy="306" rx="5" ry="3.4" transform="rotate(20 946 306)"/></g>
+    <polygon points="1002,330 1022,330 1018,316 1006,316" fill="#3a6a8a"/>
+    <path d="M1007 316 L1010 290 L1014 290 L1017 316Z" fill="#1a3450"/>
+    <ellipse class="blob b1" cx="1012" cy="308" rx="3" ry="3" fill="#6affd0"/><ellipse class="blob b2" cx="1012" cy="298" rx="2" ry="2.4" fill="#8affe0"/>
+    <ellipse cx="1012" cy="306" rx="26" ry="22" fill="#6affd0" opacity=".12"/>
+    <!-- patio cushions, piled -->
+    <rect x="916" y="640" width="116" height="46" rx="12" fill="#c85a4a"/>
+    <g stroke="#e8c8a0" stroke-width="5" opacity=".7"><path d="M934 642v42M958 642v42M982 642v42M1006 642v42"/></g>
+    <rect x="922" y="600" width="98" height="44" rx="12" fill="#4a8a8a" transform="rotate(-4 971 622)"/>
+    <g fill="#e8d890" opacity=".75" transform="rotate(-4 971 622)"><circle cx="942" cy="614" r="4"/><circle cx="966" cy="628" r="4"/><circle cx="990" cy="612" r="4"/><circle cx="1008" cy="630" r="4"/></g>
+    <rect x="940" y="568" width="72" height="36" rx="12" fill="#d8a84a" transform="rotate(6 976 586)"/>
+    <!-- the door, swung open toward you -->
+    <polygon points="1036,214 1072,196 1072,708 1036,690" fill="#3a2c24"/>
+    <polygon points="1036,214 1072,196 1072,708 1036,690" fill="none" stroke="#2a1f1a" stroke-width="2"/>
+    <circle cx="1064" cy="452" r="3.4" fill="#b8a070"/>
+  </g>
+  <g id="ac-closed">
+    <!-- ajar: a strip of warm light down the gap -->
+    <rect x="912" y="214" width="7" height="476" fill="#ffb86a" opacity=".55"/>
+    <rect x="919" y="214" width="117" height="476" fill="#3a2c24"/>
+    <rect x="930" y="232" width="94" height="190" fill="none" stroke="#2a1f1a" stroke-width="3"/>
+    <rect x="930" y="446" width="94" height="224" fill="none" stroke="#2a1f1a" stroke-width="3"/>
+    <circle cx="930" cy="440" r="4" fill="#b8a070"/>
+  </g>
+</svg>

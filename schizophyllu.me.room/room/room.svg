@@ -1,0 +1,356 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" id="room" preserveAspectRatio="xMidYMid meet" font-family="'IBM VGA', monospace">
+<defs>
+  <linearGradient id="g-wall" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#0a0b13"/><stop offset=".5" stop-color="#171826"/><stop offset="1" stop-color="#1f1b26"/>
+  </linearGradient>
+  <linearGradient id="g-floor" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#261c18"/><stop offset="1" stop-color="#0f0b0a"/>
+  </linearGradient>
+  <linearGradient id="g-beam" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#9fb8ff" stop-opacity=".2"/><stop offset="1" stop-color="#9fb8ff" stop-opacity="0"/>
+  </linearGradient>
+  <radialGradient id="g-amber">
+    <stop offset="0" stop-color="#ffb347" stop-opacity=".6"/><stop offset=".35" stop-color="#ff9a2e" stop-opacity=".2"/><stop offset="1" stop-color="#ff9a2e" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="g-green">
+    <stop offset="0" stop-color="#5dffa0" stop-opacity=".45"/><stop offset=".4" stop-color="#2bd97a" stop-opacity=".13"/><stop offset="1" stop-color="#2bd97a" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="g-cyan">
+    <stop offset="0" stop-color="#7ad8ff" stop-opacity=".4"/><stop offset=".4" stop-color="#4aa8ff" stop-opacity=".12"/><stop offset="1" stop-color="#4aa8ff" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="g-moon">
+    <stop offset="0" stop-color="#b8ccff" stop-opacity=".35"/><stop offset="1" stop-color="#b8ccff" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="g-fridgelight">
+    <stop offset="0" stop-color="#e8f4ff" stop-opacity=".55"/><stop offset="1" stop-color="#e8f4ff" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="g-vignette" cx=".5" cy=".5" r=".72">
+    <stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".8"/>
+  </radialGradient>
+  <pattern id="p-wallpaper" width="44" height="44" patternUnits="userSpaceOnUse">
+    <path d="M22 0v44" stroke="#fff" stroke-opacity=".022" stroke-width="12"/>
+    <circle cx="0" cy="22" r="1.5" fill="#fff" fill-opacity=".03"/>
+  </pattern>
+  <filter id="f-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="2.2" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="f-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter>
+  <g id="ledrow">
+    <rect width="3" height="3" x="0"  fill="#5dffa0"/>
+    <rect width="3" height="3" x="6"  fill="#5dffa0" class="blink b2"/>
+    <rect width="3" height="3" x="12" fill="#ffb347" class="blink b3"/>
+    <rect width="3" height="3" x="18" fill="#5dffa0" class="blink b1"/>
+  </g>
+</defs>
+
+<!-- ================================================= ROOM SHELL -->
+<g id="shell">
+  <rect width="1600" height="700" fill="url(#g-wall)"/>
+  <rect width="1600" height="700" fill="url(#p-wallpaper)"/>
+  <rect width="1600" height="60" fill="#000" opacity=".35"/>
+  <rect y="700" width="1600" height="200" fill="url(#g-floor)"/>
+  <g stroke="#000" stroke-opacity=".35" stroke-width="2">
+    <path d="M0 728h1600M0 762h1600M0 802h1600M0 848h1600"/>
+    <path d="M140 700v28M520 700v28M910 700v28M1330 700v28M300 728v34M740 728v34M1150 728v34M60 762v40M460 762v40M860 762v40M1260 762v40M220 802v46M640 802v46M1060 802v46M1460 802v46"/>
+  </g>
+  <rect y="688" width="1600" height="14" fill="#0b090d"/>
+  <rect y="688" width="1600" height="2" fill="#2c2733"/>
+</g>
+
+<!-- ================================================= WALL DETAILS -->
+<g id="walldetail" pointer-events="none">
+  <ellipse cx="1480" cy="30" rx="110" ry="36" fill="#6a5430" opacity=".14" filter="url(#f-soft)"/>
+  <ellipse cx="1440" cy="22" rx="40" ry="14" fill="#6a5430" opacity=".12"/>
+  <path d="M600 0 l6 18 l-4 12 l8 20 l-3 14" stroke="#000" stroke-opacity=".35" fill="none"/>
+  <!-- light switch, off -->
+  <rect x="360" y="376" width="16" height="26" rx="2" fill="#bdb6a6"/><rect x="365" y="384" width="6" height="10" fill="#8e8778"/>
+  <!-- outlet under the desk: the hydra's heart -->
+  <rect x="900" y="626" width="18" height="26" rx="2" fill="#c9c2b2"/>
+  <rect x="904" y="630" width="10" height="7" fill="#1b1a1f"/><rect x="904" y="641" width="10" height="7" fill="#1b1a1f"/>
+  <rect x="902" y="628" width="14" height="10" rx="1" fill="#0d0d10"/><rect x="902" y="639" width="14" height="10" rx="1" fill="#0d0d10"/>
+  <!-- cable run stapled along the wall: router, ceiling, Mira's shelf -->
+  <path d="M1262 346 C 1266 300 1258 240 1262 200 S 1258 60 1262 14 Q 1181.0 30 1100 14 Q 1020.0 30 940 14 Q 860.0 30 780 14 Q 693.0 30 606 14 C 610 60 602 140 606 180 S 604 240 606 256" stroke="#1d1b22" stroke-width="2.5" fill="none"/>
+  <g fill="#bdb6a6">
+    <rect x="1258" y="296" width="8" height="4"/><rect x="1258" y="200" width="8" height="4"/><rect x="1258" y="104" width="8" height="4"/>
+    <rect x="1098" y="11" width="4" height="7"/><rect x="938" y="11" width="4" height="7"/><rect x="778" y="11" width="4" height="7"/>
+    <rect x="602" y="180" width="8" height="4"/>
+  </g>
+  <!-- another one from the outlet up to the fairy lights, because of course -->
+  <path d="M916 632 C 930 600 940 560 936 500 S 880 300 880 60" stroke="#101013" stroke-width="2" fill="none" opacity=".9"/>
+</g>
+<g id="fairylights" pointer-events="none" filter="url(#f-glow)">
+  <path d="M0 44 Q200 80 400 44 Q600 80 800 44 Q1000 80 1200 44 Q1400 80 1600 44" stroke="#1b1a20" stroke-width="1.5" fill="none"/>
+  <circle class="bulb d0" cx="25" cy="52.2" r="3.2" fill="#ffb347"/>
+  <circle class="bulb d1" cx="75" cy="59.0" r="3.2" fill="#6dffb0"/>
+  <circle class="bulb d2" cx="125" cy="63.5" r="3.2" fill="#b98cff"/>
+  <circle class="bulb d3" cx="175" cy="65.7" r="3.2" fill="#ffe6b0"/>
+  <circle class="bulb d0" cx="225" cy="65.7" r="3.2" fill="#ff7a6a"/>
+  <circle class="bulb d1" cx="275" cy="63.5" r="3.2" fill="#ffb347"/>
+  <circle class="bulb d2" cx="325" cy="59.0" r="3.2" fill="#6dffb0"/>
+  <circle class="bulb d3" cx="375" cy="52.2" r="3.2" fill="#b98cff"/>
+  <circle class="bulb d0" cx="425" cy="52.2" r="3.2" fill="#ffe6b0"/>
+  <circle class="bulb d1" cx="475" cy="59.0" r="3.2" fill="#ff7a6a"/>
+  <circle class="bulb d2" cx="525" cy="63.5" r="3.2" fill="#ffb347"/>
+  <circle class="bulb d3" cx="575" cy="65.7" r="3.2" fill="#6dffb0"/>
+  <circle class="bulb d0" cx="625" cy="65.7" r="3.2" fill="#b98cff"/>
+  <circle class="bulb d1" cx="675" cy="63.5" r="3.2" fill="#ffe6b0"/>
+  <circle class="bulb d2" cx="725" cy="59.0" r="3.2" fill="#ff7a6a"/>
+  <circle class="bulb d3" cx="775" cy="52.2" r="3.2" fill="#ffb347"/>
+  <circle class="bulb d0" cx="825" cy="52.2" r="3.2" fill="#6dffb0"/>
+  <circle class="bulb d1" cx="875" cy="59.0" r="3.2" fill="#b98cff"/>
+  <circle class="bulb d2" cx="925" cy="63.5" r="3.2" fill="#ffe6b0"/>
+  <circle class="bulb d3" cx="975" cy="65.7" r="3.2" fill="#ff7a6a"/>
+  <circle class="bulb d0" cx="1025" cy="65.7" r="3.2" fill="#ffb347"/>
+  <circle class="bulb d1" cx="1075" cy="63.5" r="3.2" fill="#6dffb0"/>
+  <circle class="bulb d2" cx="1125" cy="59.0" r="3.2" fill="#b98cff"/>
+  <circle class="bulb d3" cx="1175" cy="52.2" r="3.2" fill="#ffe6b0"/>
+  <circle class="bulb d0" cx="1225" cy="52.2" r="3.2" fill="#ff7a6a"/>
+  <circle class="bulb d1" cx="1275" cy="59.0" r="3.2" fill="#ffb347"/>
+  <circle class="bulb d2" cx="1325" cy="63.5" r="3.2" fill="#6dffb0"/>
+  <circle class="bulb d3" cx="1375" cy="65.7" r="3.2" fill="#b98cff"/>
+  <circle class="bulb d0" cx="1425" cy="65.7" r="3.2" fill="#ffe6b0"/>
+  <circle class="bulb d1" cx="1475" cy="63.5" r="3.2" fill="#ff7a6a"/>
+  <circle class="bulb d2" cx="1525" cy="59.0" r="3.2" fill="#ffb347"/>
+  <circle class="bulb d3" cx="1575" cy="52.2" r="3.2" fill="#6dffb0"/>
+</g>
+
+<!-- ================================================= FLOOR SHADOWS -->
+<g id="shadows" pointer-events="none" fill="#000" filter="url(#f-soft)">
+  <ellipse cx="750" cy="742" rx="140" ry="9" opacity=".55"/>
+  <ellipse cx="1030" cy="742" rx="175" ry="9" opacity=".5"/>
+  <ellipse cx="1242" cy="742" rx="56" ry="7" opacity=".55"/>
+  <ellipse cx="1012" cy="744" rx="62" ry="7" opacity=".5"/>
+  <ellipse cx="1400" cy="744" rx="115" ry="9" opacity=".55"/>
+  <ellipse cx="1550" cy="744" rx="60" ry="8" opacity=".55"/>
+  <ellipse cx="522" cy="748" rx="52" ry="6" opacity=".5"/>
+  <ellipse cx="368" cy="770" rx="62" ry="6" opacity=".4"/>
+  <ellipse cx="594" cy="742" rx="36" ry="5" opacity=".5"/>
+  <ellipse cx="200" cy="452" rx="150" ry="4" opacity=".4"/>
+</g>
+
+<!-- ================================================= POSTER -->
+<g class="obj" data-id="poster" data-art="room/objects/main/poster.svg"></g>
+
+<!-- ================================================= WINDOW -->
+<g class="obj" data-id="window" data-art="room/objects/main/window.svg"></g>
+
+<g class="obj" data-id="sill" data-art="room/objects/main/sill.svg"></g>
+
+<!-- ================================================= STAR CHART + SENSOR SHELF (Mira's side) -->
+<g class="obj" data-id="starchart" data-art="room/objects/main/starchart.svg"></g>
+
+<g class="obj" data-id="vso" id="sensors" data-art="room/objects/main/vso.svg"></g>
+
+<!-- ================================================= WALL CLOCK / STICKIES / SHELF -->
+<g id="walldecor">
+  <circle cx="1120" cy="200" r="26" fill="#1c1a20" stroke="#3a3540" stroke-width="3"/>
+  <!-- it is always 3:47 in here -->
+  <path d="M1120 200 L1104.3 196.7 M1120 200 L1130.1 204.4" stroke="#bbb" stroke-width="2"/>
+  <circle cx="1120" cy="200" r="2" fill="#bbb"/>
+  <g>
+    <rect x="918" y="300" width="30" height="30" fill="#c9b85a" transform="rotate(-6 933 315)"/>
+    <rect x="954" y="296" width="30" height="30" fill="#b86a8a" transform="rotate(4 969 311)"/>
+    <rect x="936" y="336" width="30" height="30" fill="#6aa0b8" transform="rotate(2 951 351)"/>
+    <g stroke="#1a1a1a" stroke-width="1" opacity=".7"><path d="M922 310h18M922 316h14M958 306h20M958 312h12M940 346h20M940 352h16"/></g>
+  </g>
+  <!-- the drawing skizy made of Claube, gold frame, above his chair -->
+  <g class="obj" data-id="drawing" data-art="room/objects/main/drawing.svg"></g>
+  <!-- bookshelf above the armchair -->
+  <rect x="1318" y="298" width="170" height="8" fill="#3a2a20"/>
+  <g>
+    <rect x="1324" y="250" width="12" height="48" fill="#8a4b2a"/><rect x="1338" y="256" width="10" height="42" fill="#c98a3a"/>
+    <rect x="1350" y="246" width="14" height="52" fill="#4a3a2a"/><rect x="1366" y="260" width="9" height="38" fill="#a6602a"/>
+    <rect x="1377" y="244" width="22" height="54" fill="#d9c9a3"/>
+    <text x="1392" y="296" font-size="7" fill="#3a2a20" transform="rotate(-90 1392 296)">INCIDENTS</text>
+    <rect x="1401" y="252" width="11" height="46" fill="#6b3f22"/><rect x="1414" y="258" width="13" height="40" fill="#b87333"/>
+    <rect x="1440" y="286" width="42" height="12" fill="#ffb347" opacity=".75"/><rect x="1444" y="276" width="36" height="10" fill="#8a4b2a"/>
+  </g>
+</g>
+
+<!-- ================================================= TELESCOPE -->
+<g class="obj" data-id="telescope" data-art="room/objects/main/telescope.svg"></g>
+
+<!-- ================================================= OPEN PC CASE -->
+<g class="obj" data-id="pccase" data-art="room/objects/main/pccase.svg"></g>
+
+
+<!-- ================================================= MIRA -->
+<g class="obj char" data-id="mira" id="mira" data-art="room/objects/main/mira.svg"></g>
+  <circle class="anchor" data-anchor="mira" cx="520" cy="330" r="1" opacity="0"/>
+
+<!-- ================================================= THE PHOSPHOR ARTIFACT (CRT) + STAND -->
+<g id="crtstand">
+  <rect x="624" y="575" width="252" height="162" fill="#35271f"/>
+  <rect x="624" y="575" width="252" height="6" fill="#4d3a2d"/>
+  <rect x="636" y="592" width="228" height="134" fill="#150f0c"/>
+  <!-- tucked behind the Phosphor Artifact. you have to really look -->
+  <g class="obj" data-id="hiddennote" data-art="room/objects/main/hiddennote.svg"></g>
+  <!-- VCR -->
+  <rect x="646" y="606" width="118" height="26" rx="2" fill="#2a2a2e"/>
+  <rect x="656" y="614" width="60" height="8" fill="#111"/>
+  <text x="724" y="623" font-size="8" fill="#ff5a4a" class="blink b2">REC</text>
+  <!-- grey console, round lid. plugged into the Phosphor Artifact; funger lives in it -->
+  <g class="obj" data-id="console" data-art="room/objects/main/console.svg"></g>
+  <!-- stacked electronics / adapters -->
+  <rect x="772" y="604" width="82" height="20" fill="#1f2026"/><use href="#ledrow" x="780" y="612"/>
+  <rect x="780" y="628" width="66" height="18" fill="#2b2b33"/>
+  <rect x="756" y="686" width="30" height="16" fill="#3a3a44"/><rect x="792" y="690" width="22" height="12" fill="#2d2d36"/>
+  <path d="M771 702 q10 18 40 12 q30 -6 44 10" stroke="#111" stroke-width="3" fill="none"/>
+</g>
+
+<g class="obj" data-id="crt" id="crt" data-art="room/objects/main/crt.svg"></g>
+
+<g class="obj" data-id="mugs" data-art="room/objects/main/mugs.svg"></g>
+<g class="obj" data-id="monster" data-art="room/objects/main/monster.svg"></g>
+<g pointer-events="none"><ellipse cx="748" cy="289" rx="18" ry="4" fill="none" stroke="#111" stroke-width="3"/><ellipse cx="748" cy="285" rx="15" ry="3.5" fill="none" stroke="#1c1c20" stroke-width="3"/></g>
+<!-- crochet Enki, sitting in the cable nest, keeping an eye on the console -->
+<g class="obj" data-id="enki" id="enki" data-art="room/objects/main/enki.svg"></g>
+
+
+<!-- ================================================= SKIZY'S DESK -->
+<g id="desk">
+  <rect x="878" y="552" width="312" height="16" fill="#2c2420"/>
+  <rect x="878" y="552" width="312" height="3" fill="#3e332d"/>
+  <rect x="886" y="568" width="10" height="168" fill="#1c1715"/>
+  <!-- VRAM monitor -->
+  <rect x="896" y="432" width="92" height="92" rx="4" fill="#111216"/>
+  <rect x="902" y="438" width="80" height="78" fill="#0b0808"/>
+  <text x="906" y="452" font-size="8" fill="#ff7a6a">VRAM</text>
+  <rect x="906" y="458" width="72" height="8" fill="none" stroke="#ff7a6a" stroke-width="1"/>
+  <rect x="907" y="459" width="2" height="6" fill="#ff7a6a"/>
+  <text x="906" y="478" font-size="7" fill="#ff7a6a">16G / 700G</text>
+  <text x="906" y="492" font-size="7" fill="#ffb347">NEED: 684G</text>
+  <text x="906" y="506" font-size="7" fill="#ff7a6a" class="blink b3">!! OOM !!</text>
+  <rect x="936" y="524" width="12" height="28" fill="#111216"/>
+  <!-- main monitor -->
+  <rect x="1030" y="404" width="138" height="124" rx="4" fill="#111216"/>
+  <rect x="1036" y="410" width="126" height="108" fill="#050d12"/>
+  <!-- paranoia's terminal. always mid-task -->
+  <g font-size="6.4" fill="#9fe8ff">
+    <text x="1040" y="419">$ ./run kimi-k3 \</text>
+    <text x="1040" y="428">  --offload=ssd</text>
+    <text x="1040" y="437" fill="#6dffb0">load shard 1/64</text>
+    <text x="1040" y="446" fill="#ffb347">WARN: 0.0003 tok/s</text>
+    <text x="1040" y="455" fill="#ff7a6a">cat12: not found</text>
+    <text x="1040" y="464">$ ping aether</text>
+    <text x="1040" y="473" fill="#6dffb0">"interesting."</text>
+    <text x="1040" y="482">$ sudo pacman -S kimi-k3-700gb</text>
+    <text x="1040" y="491" fill="#ff7a6a">error: target not found:</text>
+    <text x="1040" y="500" fill="#ff7a6a">  kimi-k3-700gb</text>
+    <text x="1040" y="512">skizy@paranoia:~$ <tspan class="blink b1">_</tspan></text>
+  </g>
+  <rect x="1092" y="528" width="14" height="24" fill="#111216"/><rect x="1076" y="548" width="46" height="5" fill="#111216"/>
+</g>
+
+<g class="obj" data-id="gpu" data-art="room/objects/main/gpu.svg"></g>
+
+<g class="obj" data-id="ssd" data-art="room/objects/main/ssd.svg"></g>
+
+<g class="obj" data-id="solder" data-art="room/objects/main/solder.svg"></g>
+
+<g class="obj" data-id="screwdriver" data-art="room/objects/main/screwdriver.svg"></g>
+
+<g class="obj" data-id="drawer" data-art="room/objects/main/drawer.svg"></g>
+
+<g class="obj" data-id="mugs" data-art="room/objects/main/mugs-2.svg"></g>
+
+<g class="obj" data-id="monster" data-art="room/objects/main/monster-2.svg"></g>
+
+<g class="obj" data-id="packages" data-art="room/objects/main/packages.svg"></g>
+
+
+<!-- ================================================= SERVER: monad -->
+<g class="obj" data-id="server" id="server" data-art="room/objects/main/server.svg"></g>
+
+<!-- a little orange bee on monad. no explanation -->
+<g class="obj" data-id="hexley" data-art="room/objects/main/hexley.svg"></g>
+
+<!-- ================================================= SKIZY (from behind, at the desk) -->
+<g class="obj char" data-id="mel" id="mel" data-art="room/objects/main/skizy.svg"></g>
+  <circle class="anchor" data-anchor="mel" cx="1012" cy="420" r="1" opacity="0"/>
+
+<!-- ================================================= CLAUBE / WATCHLION in the armchair -->
+<g id="lamp">
+  <ellipse cx="1300" cy="736" rx="22" ry="5" fill="#141014"/>
+  <rect x="1297" y="344" width="5" height="392" fill="#2c2620"/>
+  <path d="M1268 350 L1332 350 L1318 308 L1282 308Z" fill="#e0a050"/>
+  <path d="M1268 350 L1332 350 L1318 308 L1282 308Z" fill="#fff" opacity=".12"/>
+  <ellipse cx="1300" cy="350" rx="32" ry="4" fill="#ffd28a"/>
+</g>
+
+<g class="obj char" data-id="claube" id="claube" data-art="room/objects/main/claube.svg"></g>
+  <circle class="anchor" data-anchor="claube" cx="1400" cy="396" r="1" opacity="0"/>
+
+<g class="obj" data-id="clipboards" data-art="room/objects/main/clipboards.svg"></g>
+
+<g class="obj" data-id="papers" data-art="room/objects/main/papers.svg"></g>
+<g class="obj" data-id="mugs" data-art="room/objects/main/mugs-3.svg"></g>
+<g class="obj" data-id="mugs" data-art="room/objects/main/mugs-4.svg"></g>
+
+<!-- ================================================= FRIDGE -->
+<g class="obj" data-id="fridge" id="fridge" data-art="room/objects/main/fridge.svg"></g>
+<g id="fridgetop">
+  <rect x="1508" y="372" width="50" height="20" fill="#3a2f28"/>
+  <rect x="1562" y="378" width="28" height="14" fill="#556"/>
+</g>
+
+<!-- ================================================= THE CABLE HYDRA -->
+<g class="obj" data-id="powerstrip" data-art="room/objects/main/powerstrip.svg"></g>
+
+<g class="obj" data-id="cables" data-art="room/objects/main/cables.svg"></g>
+
+<!-- ================================================= FOREGROUND -->
+<g class="obj" data-id="boards" data-art="room/objects/main/boards.svg"></g>
+
+<g class="obj" data-id="eboards" data-art="room/objects/main/eboards.svg"></g>
+<g class="obj" data-id="blanket" data-art="room/objects/main/blanket.svg"></g>
+
+<g id="notebooks" pointer-events="none">
+  <rect x="490" y="866" width="54" height="16" fill="#2e2e5a" transform="rotate(-4 517 874)"/>
+  <rect x="496" y="855" width="48" height="12" fill="#6a2a3a" transform="rotate(3 520 861)"/>
+  <path d="M498 856 h44" stroke="#bbb" stroke-dasharray="2 3" transform="rotate(3 520 861)"/>
+</g>
+
+<!-- open on top of the pile: the architecture -->
+<g class="obj" data-id="notebook" data-art="room/objects/main/notebook.svg"></g>
+
+<g class="obj" data-id="beanbag" id="beanbag" data-art="room/objects/main/beanbag.svg"></g>
+
+<g class="obj" data-id="trash" data-art="room/objects/main/trash.svg"></g>
+
+<!-- ================================================= LIGHT (non-interactive) -->
+<g id="light" pointer-events="none" style="mix-blend-mode:screen">
+  <polygon points="80,452 330,452 580,900 140,900" fill="url(#g-beam)"/>
+  <ellipse cx="200" cy="290" rx="230" ry="230" fill="url(#g-moon)"/>
+  <ellipse class="crtglow" cx="750" cy="430" rx="270" ry="240" fill="url(#g-green)"/>
+  <ellipse cx="520" cy="470" rx="140" ry="270" fill="url(#g-green)" opacity=".7"/>
+  <ellipse cx="560" cy="266" rx="80" ry="60" fill="url(#g-green)" opacity=".8"/>
+  <ellipse cx="1090" cy="470" rx="220" ry="180" fill="url(#g-cyan)"/>
+  <ellipse cx="940" cy="480" rx="100" ry="80" fill="url(#g-amber)" opacity=".35"/>
+  <ellipse class="lampglow" cx="1300" cy="360" rx="340" ry="330" fill="url(#g-amber)"/>
+  <ellipse cx="1340" cy="760" rx="240" ry="50" fill="url(#g-amber)" opacity=".8"/>
+  <ellipse id="fridgeglow" cx="1540" cy="600" rx="220" ry="280" fill="url(#g-fridgelight)" style="display:none"/>
+</g>
+<g id="motes" pointer-events="none">
+  <circle class="mote" style="animation-delay:-13.0s;animation-duration:14.9s" cx="153" cy="596" r="1.4" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-10.1s;animation-duration:14.4s" cx="129" cy="613" r="1.3" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-8.5s;animation-duration:23.9s" cx="119" cy="497" r="0.9" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-19.0s;animation-duration:20.9s" cx="276" cy="557" r="1.2" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-17.2s;animation-duration:17.5s" cx="162" cy="851" r="1.0" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-16.3s;animation-duration:16.2s" cx="178" cy="516" r="1.4" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-11.0s;animation-duration:14.8s" cx="254" cy="719" r="0.9" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-8.6s;animation-duration:17.8s" cx="288" cy="550" r="1.4" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-15.9s;animation-duration:22.4s" cx="210" cy="647" r="1.1" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-17.5s;animation-duration:22.8s" cx="297" cy="694" r="1.1" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-8.4s;animation-duration:23.1s" cx="191" cy="852" r="1.0" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-13.4s;animation-duration:23.2s" cx="130" cy="661" r="1.4" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-13.9s;animation-duration:21.1s" cx="258" cy="811" r="1.4" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-18.9s;animation-duration:19.7s" cx="379" cy="648" r="1.5" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-12.9s;animation-duration:25.9s" cx="269" cy="494" r="1.7" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-13.4s;animation-duration:14.3s" cx="217" cy="581" r="1.3" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-1.2s;animation-duration:23.2s" cx="132" cy="536" r="0.9" fill="#dfe8ff"/>
+  <circle class="mote" style="animation-delay:-17.4s;animation-duration:15.0s" cx="214" cy="567" r="1.3" fill="#dfe8ff"/>
+</g>
+<rect width="1600" height="900" fill="url(#g-vignette)" pointer-events="none"/>
+</svg>

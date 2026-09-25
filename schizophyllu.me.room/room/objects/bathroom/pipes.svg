@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- pipes (bathroom): the pipes
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes.
+     the code looks these ids up, so keep them: #t-gauge -->
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <linearGradient id="t-rust" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a3a14" stop-opacity=".8"/><stop offset="1" stop-color="#7a3a14" stop-opacity="0"/></linearGradient>
+</defs>
+  <path d="M592 700 V110 H1250 V440" stroke="#6e6a5e" stroke-width="16" fill="none"/>
+  <path d="M592 700 V110 H1250 V440" stroke="#8e8a7c" stroke-width="5" fill="none" transform="translate(-4 -3)"/>
+  <path d="M592 400 H 470 V 470" stroke="#6e6a5e" stroke-width="12" fill="none"/>
+  <path d="M592 180 H 300 V 250" stroke="#6e6a5e" stroke-width="10" fill="none"/>
+  <g fill="#5a564c"><rect x="580" y="104" width="24" height="16"/><rect x="1238" y="104" width="24" height="16"/><rect x="582" y="392" width="20" height="16"/><rect x="880" y="102" width="12" height="20"/><rect x="584" y="560" width="16" height="12"/></g>
+  <rect x="580" y="120" width="10" height="120" fill="url(#t-rust)"/><rect x="1244" y="120" width="8" height="90" fill="url(#t-rust)"/><rect x="884" y="120" width="6" height="140" fill="url(#t-rust)"/>
+  <!-- pressure gauge -->
+  <path d="M592 290 h22" stroke="#6e6a5e" stroke-width="8"/>
+  <circle cx="632" cy="290" r="22" fill="#2a2a26"/><circle cx="632" cy="290" r="18" fill="#e8e4d4"/>
+  <path d="M618 300 A18 18 0 1 1 646 300" stroke="#c33" stroke-width="2" fill="none" stroke-dasharray="4 30" stroke-dashoffset="-30"/>
+  <g stroke="#333" stroke-width="1"><path d="M618 290h4M642 290h4M632 276v4M622 280l3 3M642 280l-3 3"/></g>
+  <line id="t-gauge" class="t-gauge" x1="632" y1="290" x2="632" y2="276" stroke="#111" stroke-width="1.6" transform="rotate(20 632 290)"/>
+  <circle cx="632" cy="290" r="2.4" fill="#111"/>
+  <!-- valve wheel -->
+  <circle cx="592" cy="470" r="18" fill="none" stroke="#b33a2a" stroke-width="5"/><path d="M574 470h36M592 452v36" stroke="#b33a2a" stroke-width="4"/><circle cx="592" cy="470" r="5" fill="#8a2a1a"/>
+</svg>

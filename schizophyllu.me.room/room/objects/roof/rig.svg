@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- rig (roof): Mira's rooftop rig
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <filter id="r-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+  <rect x="1040" y="580" width="150" height="190" fill="#000" opacity="0"/>
+  <g stroke="#3a3a40" stroke-width="4" stroke-linecap="round"><path d="M1080 640 L1046 760 M1080 640 L1090 766 M1080 640 L1120 756"/></g>
+  <ellipse cx="1084" cy="614" rx="26" ry="16" fill="#cfd3d8" transform="rotate(-36 1084 614)"/>
+  <path d="M1084 614 l20 -18" stroke="#8a8e92" stroke-width="2"/><circle cx="1104" cy="596" r="3" fill="#6dffb0" filter="url(#r-glow)"/>
+  <rect x="1070" y="628" width="24" height="16" fill="#2a2a30"/>
+  <path d="M1160 760 v-120" stroke="#5a5a5e" stroke-width="3"/>
+  <g class="anemometer"><path d="M1160 636 h-20 M1160 636 h20 M1160 636 v-14" stroke="#8a8e92" stroke-width="2"/><circle cx="1140" cy="636" r="4" fill="#cfd3d8"/><circle cx="1180" cy="636" r="4" fill="#cfd3d8"/><circle cx="1160" cy="622" r="4" fill="#cfd3d8"/></g>
+  <rect x="1120" y="720" width="60" height="42" rx="4" fill="#1d2a24"/>
+  <g><rect x="1128" y="730" width="4" height="4" fill="#6dffb0" class="blink b1"/><rect x="1136" y="730" width="4" height="4" fill="#6dffb0" class="blink b2"/><rect x="1144" y="730" width="4" height="4" fill="#ffb347" class="blink b3"/><rect x="1152" y="730" width="4" height="4" fill="#6dffb0"/></g>
+  <text x="1126" y="752" font-size="7" fill="#6dffb0" opacity=".8">VSO-1</text>
+  <path d="M1120 750 C 900 790 600 760 330 800" stroke="#0a0a0c" stroke-width="3" fill="none"/>
+</svg>

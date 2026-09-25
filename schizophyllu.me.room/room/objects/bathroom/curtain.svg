@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- curtain (bathroom)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <g fill="none" stroke="#9a9a94" stroke-width="2">
+    <circle cx="48" cy="174" r="5"/>
+    <circle cx="92" cy="174" r="5"/>
+    <circle cx="136" cy="174" r="5"/>
+    <circle cx="180" cy="174" r="5"/>
+    <circle cx="224" cy="174" r="5"/>
+    <circle cx="268" cy="174" r="5"/>
+    <circle cx="312" cy="174" r="5"/>
+    <circle cx="356" cy="174" r="5"/>
+    <circle cx="400" cy="174" r="5"/>
+    <circle cx="444" cy="174" r="5"/>
+    <circle cx="488" cy="174" r="5"/>
+    <circle cx="532" cy="174" r="5"/>
+  </g>
+  <path d="M42 176 L226 176 Q232 300 214 410 L160 460 L186 520 L120 590 L60 560 L42 600Z" fill="#cfe0e8" opacity=".55"/>
+  <path d="M86 176 Q92 360 80 580 M134 176 Q140 350 132 560 M180 176 Q186 320 176 470" stroke="#9fb4bc" stroke-width="2" fill="none" opacity=".6"/>
+  <g fill="#3a4a2a" opacity=".55"><circle cx="70" cy="560" r="6"/><circle cx="90" cy="548" r="4"/><circle cx="130" cy="570" r="5"/><circle cx="58" cy="584" r="3"/><circle cx="150" cy="530" r="3"/></g>
+</svg>

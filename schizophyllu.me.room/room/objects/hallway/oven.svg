@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- oven (hallway): range hood + stove + oven
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <polygon points="1296,370 1440,370 1424,406 1312,406" fill="#3a3d42"/>
+  <rect x="1300" y="552" width="136" height="10" fill="#1a1a1e"/>
+  <ellipse cx="1334" cy="556" rx="18" ry="4" fill="#0a0a0c"/><ellipse cx="1400" cy="556" rx="18" ry="4" fill="#0a0a0c"/>
+  <path d="M1318 552 q2 -30 18 -30 q18 0 18 30z" fill="#1d1d22"/><path d="M1352 530 l14 -6" stroke="#1d1d22" stroke-width="4"/><rect x="1330" y="518" width="12" height="5" fill="#1d1d22"/>
+  <rect x="1296" y="577" width="144" height="159" fill="#2e3136"/>
+  <g fill="#9a9a9a"><circle cx="1316" cy="590" r="5"/><circle cx="1340" cy="590" r="5"/><circle cx="1396" cy="590" r="5"/><circle cx="1420" cy="590" r="5"/></g>
+  <rect x="1310" y="602" width="116" height="118" rx="4" fill="#1d1f24"/>
+  <rect x="1310" y="604" width="116" height="6" fill="#9a9a9a"/>
+  <rect class="ovenglow" x="1324" y="620" width="88" height="62" rx="4" fill="#ff8a2a"/>
+  <rect x="1324" y="620" width="88" height="62" rx="4" fill="#3a1a08" opacity=".35"/>
+  <rect x="1330" y="664" width="76" height="4" fill="#5a5a5a"/>
+  <rect x="1334" y="652" width="10" height="7" rx="3" fill="#d89a3a"/>
+  <rect x="1348" y="652" width="10" height="7" rx="3" fill="#d89a3a"/>
+  <rect x="1362" y="652" width="10" height="7" rx="3" fill="#d89a3a"/>
+  <rect x="1376" y="652" width="10" height="7" rx="3" fill="#d89a3a"/>
+  <rect x="1390" y="652" width="10" height="7" rx="3" fill="#d89a3a"/>
+  <rect x="1341" y="644" width="10" height="7" rx="3" fill="#d89a3a"/>
+  <rect x="1355" y="644" width="10" height="7" rx="3" fill="#d89a3a"/>
+  <rect x="1369" y="644" width="10" height="7" rx="3" fill="#d89a3a"/>
+  <rect x="1383" y="644" width="10" height="7" rx="3" fill="#d89a3a"/>
+</svg>

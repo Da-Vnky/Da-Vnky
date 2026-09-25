@@ -3,6 +3,7 @@
      Sky.gore.splat(el, x, y, done)   a fall from too high: blood, giblets, a splat
      Sky.gore.zap(el, done)           electrocuted: sparks, an x-ray flicker, a skeleton
      Sky.gore.shot(el, done)          the revolver: a bang, they topple over, a pool of blood
+     Sky.gore.stab(el, done)          the scissors (reset 1): to the neck, blood in pulses, down
      Sky.gore.respawn(el)             back again, with a -1 heart floating up
    (x, y = where they hit, on screen). Load after sky/sky.js and sky/panel.js.
 
@@ -280,6 +281,86 @@
         }, 650);
     }
 
+    /* ---------------- the scissors (reset 1, sky/resets.js) ----------------
+       up to the neck, in: blood spurting in pulses, they sink to their knees and
+       fold over; a pool, then gone. */
+    var SCISSORS = '<svg viewBox="0 0 100 40" aria-hidden="true"><path d="M40 18 L98 8 L96 13 L44 22 Z" fill="#c9ccd2" stroke="#6e737b" stroke-width="1"/>' +
+        '<path d="M40 22 L98 30 L95 34 L44 26 Z" fill="#b7bac1" stroke="#6e737b" stroke-width="1"/><circle cx="42" cy="20" r="2.4" fill="#6e737b"/>' +
+        '<ellipse cx="22" cy="12" rx="14" ry="9" fill="none" stroke="#9a3b1f" stroke-width="5"/><ellipse cx="22" cy="30" rx="14" ry="9" fill="none" stroke="#9a3b1f" stroke-width="5"/></svg>';
+    var scissorsArt = SCISSORS;
+    Sky.findAsset('assets/workshop/scissors', function (url) { if (url) scissorsArt = '<img alt="" src="' + url + '">'; });
+    function stab(el, done) {
+        var r = el.getBoundingClientRect(), h = r.height || 80, w = r.width || h * 0.5;
+        var faceLeft = el.classList.contains('face-left'), dir = faceLeft ? -1 : 1;
+        el.classList.remove('talking', 'walking');
+        var nx = r.left + w / 2 + dir * w * 0.12, ny = r.top + h * 0.36;          // the neck
+        var g = document.createElement('div');
+        g.className = 'gore-gun';
+        g.innerHTML = scissorsArt;
+        var gw = Math.max(24, w * 0.5);
+        g.style.width = gw + 'px';
+        g.style.left = (nx - gw * 0.95) + 'px'; g.style.top = (ny - gw * 0.2) + 'px';
+        g.style.transformOrigin = '95% 50%';
+        g.style.transform = 'scaleX(' + (faceLeft ? -1 : 1) + ') translate(-30px, ' + (h * 0.4) + 'px) rotate(-40deg)';
+        g.style.opacity = '0';
+        layer.appendChild(g);
+        requestAnimationFrame(function () { g.style.opacity = '1'; g.style.transform = 'scaleX(' + (faceLeft ? -1 : 1) + ') translate(-18px, 0) rotate(-8deg)'; });
+        setTimeout(function () {
+            g.style.transition = 'transform .12s ease-in';
+            g.style.transform = 'scaleX(' + (faceLeft ? -1 : 1) + ') translate(' + (w * 0.12) + 'px, 0) rotate(-8deg)';        // in
+            sfx('stab', { or: 'splat' }); sfx('scream', { delay: 0.1 });
+            flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
+            setTimeout(function () { flash.classList.remove('on'); }, 150);
+            // pulses of blood from the neck, weaker each time
+            [0, 520, 1000, 1450, 1850].forEach(function (t, k) {
+                setTimeout(function () {
+                    var n = 16 - k * 3;
+                    for (var i = 0; i < n; i++) {
+                        var d = document.createElement('div'), sz = 2.5 + Math.random() * 5;
+                        d.className = 'gore-bit drop';
+                        d.style.width = sz + 'px'; d.style.height = sz * 1.2 + 'px';
+                        layer.appendChild(d);
+                        var a = -Math.PI * (0.25 + Math.random() * 0.3), sp = (260 - k * 40) + Math.random() * 220;
+                        fling({ el: d, x: nx, y: ny, vx: Math.cos(a) * sp * -dir, vy: Math.sin(a) * sp, r: 0, vr: 0,
+                                floor: r.bottom + (Math.random() - .5) * 8, drop: true, bounce: 0 });
+                    }
+                }, t);
+            });
+            var inner = el.querySelector(':scope > .art, :scope > .placeholder, :scope > .pose') || el;
+            inner.style.transformOrigin = '50% 100%';
+            inner.classList.add('gore-shot');
+            setTimeout(function () { inner.style.transform = 'scaleY(.8) translateY(6%)'; }, 700);                         // to their knees
+            setTimeout(function () {
+                g.style.transition = 'transform .5s ease-in, opacity .5s';
+                g.style.transform = 'scaleX(' + (faceLeft ? -1 : 1) + ') translate(0, ' + h * 0.7 + 'px) rotate(-100deg)';
+                g.style.opacity = '0';
+                inner.style.transformOrigin = (faceLeft ? '30%' : '70%') + ' 100%';
+                inner.style.transform = 'rotate(' + (faceLeft ? -84 : 84) + 'deg) scaleY(.8)';                               // and over
+            }, 1600);
+            setTimeout(function () {
+                g.remove();
+                sfx('land', { size: 0.6 });
+                var host = el.offsetParent || document.body, hr = host.getBoundingClientRect();
+                var p = document.createElement('div');
+                p.className = 'gore-pool';
+                p.style.width = (h * 1.1) + 'px';
+                p.style.left = (r.left - hr.left + w / 2 + dir * h * 0.35) + 'px';
+                p.style.top = (r.bottom - hr.top - 3) + 'px';
+                p.innerHTML = POOL;
+                host.appendChild(p);
+                requestAnimationFrame(function () { p.classList.add('spread'); });
+                setTimeout(function () {
+                    el.classList.add('gore-hidden');
+                    inner.classList.remove('gore-shot');
+                    inner.style.transform = ''; inner.style.transformOrigin = '';
+                    p.style.opacity = '0';
+                    setTimeout(function () { p.remove(); }, 1500);
+                    if (done) done();
+                }, 2600);
+            }, 2300);
+        }, 600);
+    }
+
     /* ---------------- respawn ---------------- */
     function respawn(el) {
         el.classList.remove('gore-hidden', 'gore-back');
@@ -301,5 +382,5 @@
         document.dispatchEvent(new CustomEvent('dav:traveller-died'));     // (every death ends here: sky/lives.js counts them)
     }
 
-    Sky.gore = { splat: splat, zap: zap, shot: shot, respawn: respawn, scream: function () { sfx('scream'); } };
+    Sky.gore = { splat: splat, zap: zap, shot: shot, stab: stab, respawn: respawn, scream: function () { sfx('scream'); } };
 })();

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- xmas (closet): left shelves: lights, spoingus i, the dead crt, routers
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="320" y="262" width="120" height="68" fill="#a8804e"/><text x="326" y="290" font-size="8" fill="#3a2410">XMAS LIGHTS</text><text x="326" y="302" font-size="8" fill="#3a2410">(TANGLED)</text>
+  <path d="M340 262 q20 -30 50 -10 q30 20 50 -6 q14 -18 -6 -26" stroke="#1a3a1a" stroke-width="2" fill="none"/>
+  <circle class="bulb d0" cx="346" cy="256" r="3" fill="#ff5a4a"/>
+  <circle class="bulb d1" cx="360" cy="246" r="3" fill="#6dffb0"/>
+  <circle class="bulb d2" cx="378" cy="242" r="3" fill="#ffd24a"/>
+  <circle class="bulb d3" cx="396" cy="252" r="3" fill="#6ab0ff"/>
+  <circle class="bulb d0" cx="414" cy="258" r="3" fill="#ff5a4a"/>
+  <circle class="bulb d1" cx="430" cy="248" r="3" fill="#6dffb0"/>
+  <circle class="bulb d2" cx="438" cy="236" r="3" fill="#ffd24a"/>
+  <path d="M440 300 q30 20 10 60 q-10 30 20 60" stroke="#1a3a1a" stroke-width="2" fill="none"/>
+</svg>

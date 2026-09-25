@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- sinkmugs (hallway): sink + mugs
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<defs>
+  <linearGradient id="h-steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b8bcc0"/><stop offset="1" stop-color="#6a6e72"/></linearGradient>
+</defs>
+  <rect x="1044" y="560" width="132" height="8" fill="#6a6e72"/>
+  <path d="M1112 560 V506 q0 -14 16 -14 q14 0 14 14 v6" stroke="url(#h-steel)" stroke-width="6" fill="none"/>
+  <rect x="1102" y="548" width="20" height="12" fill="#8a8e92"/>
+  <ellipse class="drip" cx="1142" cy="520" rx="2" ry="3" fill="#bfe6ff"/>
+  <g transform="rotate(0 1060 542)"><rect x="1052" y="532" width="16" height="20" rx="2" fill="#b86a8a"/><path d="M1068 536 q6 5 0 11" stroke="#b86a8a" stroke-width="2.4" fill="none"/></g>
+  <g transform="rotate(-6 1078 548)"><rect x="1070" y="538" width="16" height="20" rx="2" fill="#d8d0c0"/><path d="M1086 542 q6 5 0 11" stroke="#d8d0c0" stroke-width="2.4" fill="none"/></g>
+  <g transform="rotate(8 1094 540)"><rect x="1086" y="530" width="16" height="20" rx="2" fill="#6a9ab0"/><path d="M1102 534 q6 5 0 11" stroke="#6a9ab0" stroke-width="2.4" fill="none"/></g>
+  <g transform="rotate(-14 1066 522)"><rect x="1058" y="512" width="16" height="20" rx="2" fill="#c9b85a"/><path d="M1074 516 q6 5 0 11" stroke="#c9b85a" stroke-width="2.4" fill="none"/></g>
+  <g transform="rotate(10 1088 520)"><rect x="1080" y="510" width="16" height="20" rx="2" fill="#e0a050"/><path d="M1096 514 q6 5 0 11" stroke="#e0a050" stroke-width="2.4" fill="none"/></g>
+  <g transform="rotate(-4 1076 502)"><rect x="1068" y="492" width="16" height="20" rx="2" fill="#3a6ad0"/><path d="M1084 496 q6 5 0 11" stroke="#3a6ad0" stroke-width="2.4" fill="none"/></g>
+  <g transform="rotate(6 1154 544)"><rect x="1146" y="534" width="16" height="20" rx="2" fill="#d8d0c0"/><path d="M1162 538 q6 5 0 11" stroke="#d8d0c0" stroke-width="2.4" fill="none"/></g>
+  <g transform="rotate(-10 1168 550)"><rect x="1160" y="540" width="16" height="20" rx="2" fill="#6a3a8a"/><path d="M1176 544 q6 5 0 11" stroke="#6a3a8a" stroke-width="2.4" fill="none"/></g>
+</svg>

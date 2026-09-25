@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- laptop (bedroom)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <polygon points="1296,622 1372,622 1380,568 1306,568" fill="#34353b"/>
+  <rect x="1288" y="620" width="92" height="7" rx="2" fill="#4a4b52"/>
+  <image href="../../../assets/apartment/gnu-terminal.png" x="1316" y="578" width="22" height="22" style="image-rendering:pixelated"/>
+  <g transform="translate(1356 588)"><ellipse rx="6" ry="8" fill="#111"/><ellipse cy="2" rx="4" ry="5.4" fill="#eee"/><path d="M-5 8h4l-2 3zM1 8h4l-2 3z" fill="#f2a900"/></g>
+  <circle cx="1350" cy="610" r="5" fill="#6dffb0"/><rect x="1316" y="606" width="22" height="7" fill="#1b1b1b"/><text x="1317" y="612" font-size="5" fill="#6dffb0">devuan</text>
+</svg>

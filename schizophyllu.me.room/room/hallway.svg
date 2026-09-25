@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" id="hallway" preserveAspectRatio="xMidYMid meet" font-family="'IBM VGA', monospace">
+<defs>
+  <linearGradient id="h-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c100e"/><stop offset=".55" stop-color="#18201b"/><stop offset="1" stop-color="#1e241f"/></linearGradient>
+  <linearGradient id="h-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#261c17"/><stop offset="1" stop-color="#0f0b0a"/></linearGradient>
+  <radialGradient id="h-bulb"><stop offset="0" stop-color="#ffd89a" stop-opacity=".55"/><stop offset=".35" stop-color="#ffb35a" stop-opacity=".18"/><stop offset="1" stop-color="#ffb35a" stop-opacity="0"/></radialGradient>
+  <radialGradient id="h-oven"><stop offset="0" stop-color="#ff8a2a" stop-opacity=".55"/><stop offset="1" stop-color="#ff8a2a" stop-opacity="0"/></radialGradient>
+  <radialGradient id="h-cyan"><stop offset="0" stop-color="#bfe6ff" stop-opacity=".5"/><stop offset="1" stop-color="#bfe6ff" stop-opacity="0"/></radialGradient>
+  <radialGradient id="h-red"><stop offset="0" stop-color="#ff3b2a" stop-opacity=".4"/><stop offset="1" stop-color="#ff3b2a" stop-opacity="0"/></radialGradient>
+  <radialGradient id="h-vignette" cx=".5" cy=".5" r=".72"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".8"/></radialGradient>
+  <pattern id="h-stripe" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M15 0v30" stroke="#dfffe8" stroke-opacity=".02" stroke-width="8"/></pattern>
+  <pattern id="h-lino" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#2a2e26"/><rect width="30" height="30" fill="#3e4034"/><rect x="30" y="30" width="30" height="30" fill="#3e4034"/></pattern>
+  <pattern id="h-rug" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#4a1f1c"/><path d="M20 4 l14 16 l-14 16 l-14 -16z" fill="none" stroke="#7a3a2a" stroke-width="2"/><circle cx="20" cy="20" r="3" fill="#b8883a"/></pattern>
+  <filter id="h-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="h-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter>
+</defs>
+<rect width="1600" height="700" fill="url(#h-wall)"/>
+<rect width="1000" height="700" fill="url(#h-stripe)"/>
+<rect width="1600" height="50" fill="#000" opacity=".35"/>
+<rect y="200" width="1000" height="6" fill="#2a3029"/>
+<rect y="700" width="1000" height="200" fill="url(#h-floor)"/>
+<g stroke="#000" stroke-opacity=".35" stroke-width="2"><path d="M0 728h1000M0 766h1000M0 810h1000M0 856h1000"/><path d="M180 700v28M600 700v28M380 728v38M820 728v38M90 766v44M520 766v44M300 810v46M740 810v46"/></g>
+<rect x="1000" y="700" width="600" height="200" fill="url(#h-lino)"/>
+<rect x="1000" y="700" width="600" height="200" fill="#000" opacity=".35"/>
+<rect y="688" width="1600" height="14" fill="#0b090d"/><rect y="688" width="1600" height="2" fill="#2c2733"/>
+<rect x="60" y="770" width="880" height="96" fill="url(#h-rug)" opacity=".85"/>
+<rect x="60" y="770" width="880" height="96" fill="none" stroke="#b8883a" stroke-width="3" stroke-dasharray="3 5" opacity=".6"/>
+
+<!-- shadows -->
+<g pointer-events="none" fill="#000" filter="url(#h-soft)">
+  <ellipse cx="1300" cy="742" rx="300" ry="9" opacity=".55"/><ellipse cx="946" cy="800" rx="50" ry="7" opacity=".55"/><ellipse cx="1530" cy="742" rx="66" ry="8" opacity=".55"/>
+</g>
+
+<!-- ceiling: the bulb and the smoke detector -->
+<path d="M560 0 V112" stroke="#111" stroke-width="2"/>
+<rect x="553" y="108" width="14" height="12" fill="#3a3a3a"/>
+<g class="obj" data-id="bulb" id="h-bulbobj" data-art="room/objects/hallway/bulb.svg"></g>
+<g class="obj" data-id="smoke" data-art="room/objects/hallway/smoke.svg"></g>
+
+<!-- bathroom door -->
+<g class="obj" data-id="bathroom" data-art="room/objects/hallway/bathroom.svg"></g>
+
+<!-- the closet door (the coats hang on it) -->
+<g class="obj" data-id="closetdoor" data-art="room/objects/hallway/closetdoor.svg"></g>
+<!-- coats + shoes -->
+<g pointer-events="none">
+  <rect x="340" y="258" width="230" height="8" fill="#5a4030"/>
+  <g fill="#8a8a8a"><circle cx="370" cy="270" r="4"/><circle cx="430" cy="270" r="4"/><circle cx="490" cy="270" r="4"/><circle cx="545" cy="270" r="4"/></g>
+  <path d="M352 272 Q370 262 388 272 L406 300 L398 430 L344 430 L340 300Z" fill="#3a2f52"/>
+  <path d="M358 300 q12 20 24 0" stroke="#2a2240" stroke-width="3" fill="none"/><path d="M366 330 v30 M376 330 v34" stroke="#ddd" stroke-width="1.2"/>
+  <path d="M412 272 Q430 264 448 272 L468 320 L462 540 L406 540 L402 320Z" fill="#1f2a24"/>
+  <path d="M430 280 V540" stroke="#141c18" stroke-width="2"/>
+  <path d="M484 272 L496 272 L500 440 L486 444Z" fill="#2c6a4a"/><g stroke="#e8d8b0" stroke-width="3"><path d="M485 320h14M486 360h14M486 400h14"/></g>
+  <path d="M530 280 L560 280 L566 372 L524 372Z" fill="#c8b890"/><path d="M536 280 q9 -22 18 0" stroke="#c8b890" stroke-width="3" fill="none"/>
+  <text x="530" y="330" font-size="7" fill="#5a4a2a">TOTE</text>
+  <!-- shoes -->
+  <path d="M360 742 q4 -16 26 -14 l24 6 q10 4 6 10z" fill="#e8e8e8"/><path d="M360 742 h56" stroke="#c33" stroke-width="3"/>
+  <path d="M420 748 q2 -14 22 -14 l26 8 q8 4 4 8z" fill="#2a2a2e"/>
+  <path d="M480 704 v40 h40 q6 -4 0 -10 l-18 -6 v-24z" fill="#3a2a1e"/>
+  <path d="M530 744 q6 -12 24 -8 l18 6 q6 4 -2 8z" fill="#e8e8e8" transform="rotate(-18 550 740)"/>
+</g>
+
+<!-- front door -->
+<g class="obj" data-id="frontdoor" data-art="room/objects/hallway/frontdoor.svg"></g>
+<g class="obj" data-id="mail" data-art="room/objects/hallway/mail.svg"></g>
+<g pointer-events="none">
+  <path d="M618 742 h290 l-6 40 h-280z" fill="#1a1712"/>
+  <text x="700" y="768" font-size="16" fill="#3a3326" letter-spacing="4">WELCOME</text>
+</g>
+
+<!-- light switch + calendar -->
+<g class="obj" data-id="bulb" data-art="room/objects/hallway/bulb-2.svg"></g>
+<g class="obj" data-id="calendar" data-art="room/objects/hallway/calendar.svg"></g>
+
+<!-- ======================================== kitchenette -->
+<g class="obj" data-id="kitchen" data-art="room/objects/hallway/kitchen.svg"></g>
+
+<!-- range hood + stove + oven -->
+<g class="obj" data-id="oven" data-art="room/objects/hallway/oven.svg"></g>
+
+<!-- sink + mugs -->
+<g class="obj" data-id="sinkmugs" data-art="room/objects/hallway/sinkmugs.svg"></g>
+
+<!-- ======================================== the proper fridge -->
+<g class="obj" data-id="kfridge" id="kfridge" data-art="room/objects/hallway/kfridge.svg"></g>
+<g pointer-events="none"><ellipse id="kf-glow" cx="1520" cy="560" rx="240" ry="300" fill="#e8f4ff" opacity=".12" style="display:none;mix-blend-mode:screen"/></g>
+
+<!-- boxes on top of the cabinets -->
+<g class="obj" data-id="eboards" data-art="room/objects/hallway/eboards.svg"></g>
+<!-- microwave -->
+<g class="obj" data-id="microwave" data-art="room/objects/hallway/microwave.svg"></g>
+
+<!-- trash -->
+<g class="obj" data-id="htrash" data-art="room/objects/hallway/htrash.svg"></g>
+
+<rect id="h-darkness" width="1600" height="900" fill="#02030a" opacity=".6" pointer-events="none" style="display:none"/>
+<!-- light -->
+<g pointer-events="none" style="mix-blend-mode:screen">
+  <ellipse id="h-bulbglow" cx="560" cy="200" rx="560" ry="460" fill="url(#h-bulb)"/>
+  <ellipse class="ovenglow" cx="1368" cy="660" rx="200" ry="130" fill="url(#h-oven)"/>
+  <ellipse class="underdoor" cx="200" cy="710" rx="140" ry="40" fill="url(#h-cyan)"/>
+  <ellipse cx="1574" cy="252" rx="40" ry="24" fill="url(#h-red)"/>
+</g>
+<rect width="1600" height="900" fill="url(#h-vignette)" pointer-events="none"/>
+</svg>

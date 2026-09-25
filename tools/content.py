@@ -878,7 +878,8 @@ def save_paper(d):
 ASSETS = os.path.join(ROOT, 'assets')
 SLOTS_FILE = os.path.join(HERE, 'slots.json')
 MEDIA = ('svg', 'gif', 'webp', 'png', 'jpg', 'jpeg', 'mp3', 'ogg', 'webm', 'mp4', 'json', 'woff2', 'woff', 'ttf', 'otf')
-SLOT = re.compile(r'^assets/([a-z0-9-]+)/([a-z0-9-]+)$')
+SLOT = re.compile(r'^assets/((?:resets/reset-[1-8](?:/[a-z0-9-]+)?)|[a-z0-9-]+)/([a-z0-9-]+)$')
+RESETS_DIR = os.path.join(ASSETS, 'resets')
 SOUNDS_DIR = os.path.join(ASSETS, 'sounds')
 NOISE_FILE = os.path.join(SOUNDS_DIR, 'noise.json')
 SONGS = SHELVES['music'][0]
@@ -891,9 +892,71 @@ def kinds():
 
 def slot_where(slot):
     m = SLOT.match(slot or '')
-    if not m:
+    if not m or m.group(1) == 'resets':
         raise ValueError('which slot?')
-    return os.path.join(ASSETS, m.group(1)), m.group(2)
+    return os.path.join(ASSETS, *m.group(1).split('/')), m.group(2)
+
+
+# ---------------- the resets: each one's own art, note and swapped pictures (assets/resets/reset-<n>/) ----------------
+def write_resets_index():
+    """assets/resets/index.txt, the same as tools/update-lists.sh writes it: every file the resets have of their own"""
+    os.makedirs(RESETS_DIR, exist_ok=True)
+    out = []
+    for d in sorted(os.listdir(RESETS_DIR)):
+        rd = os.path.join(RESETS_DIR, d)
+        if not (os.path.isdir(rd) and re.match(r'^reset-[1-8]$', d)):
+            continue
+        for n in sorted(os.listdir(rd)):
+            pth = os.path.join(rd, n)
+            if os.path.isfile(pth):
+                if n != 'list.txt' and not n.lower().startswith('readme') and not n.startswith(('.', '_')):
+                    out.append(d + '/' + n)
+            elif os.path.isdir(pth):
+                for m in sorted(os.listdir(pth)):
+                    if os.path.isfile(os.path.join(pth, m)) and m != 'list.txt' and not m.lower().startswith('readme') and not m.startswith(('.', '_')):
+                        out.append(d + '/' + n + '/' + m)
+    with open(os.path.join(RESETS_DIR, 'index.txt'), 'w', encoding='utf-8', newline='\n') as f:
+        f.write("# written by tools/update-lists.sh: every file the resets have of their own.\n")
+        for x in out:
+            f.write(x + '\n')
+    return out
+
+
+def resets_state():
+    """{ '3': [{'path': 'sky/sun.gif', 'size': …, 'time': …}, …], … }"""
+    out = {}
+    for x in (write_resets_index() if os.path.isdir(RESETS_DIR) else []):
+        n, rest = x.split('/', 1)
+        full = os.path.join(RESETS_DIR, n, *rest.split('/'))
+        out.setdefault(n.replace('reset-', ''), []).append({'path': rest, 'size': os.path.getsize(full), 'time': int(os.path.getmtime(full))})
+    return out
+
+
+def reset_note_path(n):
+    n = int(n)
+    if not 1 <= n <= 8:
+        raise ValueError('which reset?')
+    return os.path.join(RESETS_DIR, 'reset-%d' % n, 'note.json')
+
+
+def reset_note(n):
+    d = load_json(reset_note_path(n), {})
+    return {'title': str(d.get('title') or ''), 'text': str(d.get('text') or ''), 'sign': str(d.get('sign') or '')} if isinstance(d, dict) else {'title': '', 'text': '', 'sign': ''}
+
+
+def save_reset_note(n, d):
+    pth = reset_note_path(n)
+    out = {'title': str(d.get('title') or '').strip()[:80], 'text': re.sub(r'\s+$', '', str(d.get('text') or ''))[:6000], 'sign': str(d.get('sign') or '').strip()[:80]}
+    os.makedirs(os.path.dirname(pth), exist_ok=True)
+    if not (out['title'] or out['text'] or out['sign']):
+        if os.path.exists(pth):
+            os.remove(pth)                            # (an empty note: the dungeon's usual one shows instead)
+    else:
+        with open(pth, 'w', encoding='utf-8', newline='\n') as f:
+            json.dump(out, f, indent=2, ensure_ascii=False)
+            f.write('\n')
+    write_resets_index()
+    return out
 
 
 def asset_files():
@@ -903,7 +966,7 @@ def asset_files():
         return out
     for d in sorted(os.listdir(ASSETS)):
         p = os.path.join(ASSETS, d)
-        if not os.path.isdir(p) or d == 'templates':
+        if not os.path.isdir(p) or d in ('templates', 'resets'):
             continue
         out[d] = [{'name': n, 'size': os.path.getsize(os.path.join(p, n)), 'time': int(os.path.getmtime(os.path.join(p, n)))}
                   for n in sorted(os.listdir(p))
@@ -940,6 +1003,8 @@ def asset_put(slot, name, raw, kind='image'):
     with open(os.path.join(folder, stem + '.' + ext), 'wb') as f:
         f.write(raw)
     write_list(folder)
+    if folder.startswith(RESETS_DIR):
+        write_resets_index()
     return stem + '.' + ext
 
 
@@ -948,6 +1013,8 @@ def asset_clear(slot):
     gone = clear_slot(folder, stem)
     if os.path.isdir(folder):
         write_list(folder)
+    if folder.startswith(RESETS_DIR):
+        write_resets_index()
     return gone
 
 
@@ -963,7 +1030,7 @@ def found_slots():
     found = {}
 
     def add(folder, stem, where):
-        if folder in ('templates',) or stem in ('list', 'readme', 'noise'):
+        if folder in ('templates', 'resets') or stem in ('list', 'readme', 'noise', 'reset'):
             return
         found.setdefault('assets/' + folder + '/' + stem, set()).add(where)
     for n in sorted(os.listdir(ROOT)):
@@ -1202,7 +1269,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(raw)
                 return
             if url.path == '/__assets/state':
-                return self.reply({'files': asset_files(), 'tracks': tracks(), 'noise': noise_extra(), 'found': found_slots()})
+                return self.reply({'files': asset_files(), 'tracks': tracks(), 'noise': noise_extra(), 'found': found_slots(), 'resets': resets_state()})
+            if url.path == '/__resets/note':
+                return self.reply(reset_note(urllib.parse.parse_qs(url.query).get('n', ['1'])[0]))
             if url.path == '/__notify/state':
                 return self.reply(notify_state())
             if url.path == '/__paper':
@@ -1365,6 +1434,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 d = json.loads(raw or b'{}')
                 noise_label(d.get('name'), d.get('label'))
                 return self.reply({'ok': True})
+            if url.path == '/__resets/note/save':
+                d = json.loads(raw or b'{}')
+                return self.reply(save_reset_note(d.get('n'), d))
             if url.path == '/__paper/save':
                 return self.reply(save_paper(json.loads(raw or b'{}')))
             if url.path == '/__notes/save':

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- calendar (hallway)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="916" y="236" width="76" height="120" fill="#f0ece0"/>
+  <rect x="916" y="236" width="76" height="22" fill="#b33a2a"/>
+  <text x="922" y="251" font-size="9" fill="#fff">JULY 2026</text>
+  <g fill="#c8c2b0">
+    <rect x="920" y="264" width="8" height="12"/>
+    <rect x="930" y="264" width="8" height="12"/>
+    <rect x="940" y="264" width="8" height="12"/>
+    <rect x="950" y="264" width="8" height="12"/>
+    <rect x="960" y="264" width="8" height="12"/>
+    <rect x="970" y="264" width="8" height="12"/>
+    <rect x="980" y="264" width="8" height="12"/>
+    <rect x="920" y="280" width="8" height="12"/>
+    <rect x="930" y="280" width="8" height="12"/>
+    <rect x="940" y="280" width="8" height="12"/>
+    <rect x="950" y="280" width="8" height="12"/>
+    <rect x="960" y="280" width="8" height="12"/>
+    <rect x="970" y="280" width="8" height="12"/>
+    <rect x="980" y="280" width="8" height="12"/>
+    <rect x="920" y="296" width="8" height="12"/>
+    <rect x="930" y="296" width="8" height="12"/>
+    <rect x="940" y="296" width="8" height="12"/>
+    <rect x="950" y="296" width="8" height="12"/>
+    <rect x="960" y="296" width="8" height="12"/>
+    <rect x="970" y="296" width="8" height="12"/>
+    <rect x="980" y="296" width="8" height="12"/>
+    <rect x="920" y="312" width="8" height="12"/>
+    <rect x="930" y="312" width="8" height="12"/>
+    <rect x="940" y="312" width="8" height="12"/>
+    <rect x="950" y="312" width="8" height="12"/>
+    <rect x="960" y="312" width="8" height="12"/>
+    <rect x="970" y="312" width="8" height="12"/>
+    <rect x="980" y="312" width="8" height="12"/>
+    <rect x="920" y="328" width="8" height="12"/>
+    <rect x="930" y="328" width="8" height="12"/>
+    <rect x="940" y="328" width="8" height="12"/>
+    <rect x="950" y="328" width="8" height="12"/>
+    <rect x="960" y="328" width="8" height="12"/>
+    <rect x="970" y="328" width="8" height="12"/>
+    <rect x="980" y="328" width="8" height="12"/>
+  </g>
+  <ellipse cx="944" cy="302" rx="8" ry="9" fill="none" stroke="#e02a2a" stroke-width="2"/>
+  <circle cx="954" cy="232" r="3" fill="#555"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- drawing (main): the drawing skizy made of Claube, gold frame, above his chair
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<g transform="rotate(-2 1404 163)">
+    <path d="M1404 72 L1360 98 M1404 72 L1448 98" stroke="#6a5a40" stroke-width="1.2"/>
+    <circle cx="1404" cy="72" r="2" fill="#8a8070"/>
+    <rect x="1350" y="96" width="108" height="134" fill="#c9a24a"/>
+    <rect x="1350" y="96" width="108" height="134" fill="none" stroke="#8a6a24" stroke-width="2"/>
+    <rect x="1356" y="102" width="96" height="122" fill="none" stroke="#e8c870" stroke-width="1.2"/>
+    <image href="../../../assets/apartment/claube-drawing.png" x="1358" y="104" width="92" height="118" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="1358" y="104" width="92" height="118" fill="none" stroke="#5a4418" stroke-width="1.5"/>
+</g>
+</svg>

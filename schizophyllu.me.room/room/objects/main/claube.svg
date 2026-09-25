@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- claube (main)
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes.
+     the code looks these ids up, so keep them: #claube -->
+<defs>
+  <path id="ray" d="M1400 391 L1391 420 L1409 420Z"/>
+</defs>
+  <!-- armchair -->
+  <path d="M1322 640 L1322 500 Q1322 466 1356 464 L1444 464 Q1478 466 1478 500 L1478 640Z" fill="#5e3220"/>
+  <path d="M1336 630 L1336 506 Q1336 480 1360 480 L1440 480 Q1464 480 1464 506 L1464 630Z" fill="#6f3c25"/>
+  <rect x="1316" y="628" width="168" height="44" rx="10" fill="#6a3822"/>
+  <rect x="1300" y="580" width="40" height="100" rx="12" fill="#58301e"/>
+  <rect x="1460" y="580" width="40" height="100" rx="12" fill="#58301e"/>
+  <rect x="1326" y="672" width="10" height="64" fill="#2a1a12"/><rect x="1464" y="672" width="10" height="64" fill="#2a1a12"/>
+  <!-- tail over the armrest -->
+  <path d="M1470 650 Q1512 640 1500 596" stroke="#d98a34" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <circle cx="1500" cy="590" r="9" fill="#b35f1c"/>
+  <!-- legs -->
+  <path d="M1362 626 L1440 626 L1446 666 L1356 666Z" fill="#3a2a22"/>
+  <path d="M1366 660 L1382 660 L1384 732 L1364 732Z" fill="#3a2a22"/>
+  <path d="M1418 660 L1436 660 L1438 732 L1416 732Z" fill="#3a2a22"/>
+  <path d="M1356 730h32l2 10h-38zM1412 730h32l4 10h-38z" fill="#1a110c"/>
+  <!-- torso: cardigan -->
+  <path d="M1356 504 Q1400 488 1444 504 L1452 630 L1348 630Z" fill="#8a5226"/>
+  <path d="M1384 500 L1400 560 L1416 500Z" fill="#e8d9b8"/>
+  <path d="M1400 560 L1400 630" stroke="#6a3c1a" stroke-width="2"/>
+  <g fill="#e2b05a"><circle cx="1404" cy="580" r="2"/><circle cx="1404" cy="600" r="2"/></g>
+  <!-- clipboard on the lap -->
+  <g class="obj" data-id="clipboard">
+    <g transform="rotate(-8 1400 600)">
+      <rect x="1370" y="566" width="60" height="72" rx="3" fill="#a4743f"/>
+      <rect x="1375" y="576" width="50" height="58" fill="#f0e7d3"/>
+      <rect x="1388" y="562" width="24" height="9" rx="2" fill="#9a9a9a"/>
+      <g stroke="#8a7a60" stroke-width="1"><path d="M1380 588h36M1380 596h32M1380 604h36M1380 612h24M1380 620h30"/></g>
+      <text x="1380" y="586" font-size="6" fill="#6a3c1a">NOTED</text>
+    </g>
+  </g>
+  <!-- arms -->
+  <path d="M1358 510 Q1340 560 1372 604 L1386 596 Q1364 560 1374 520Z" fill="#8a5226"/>
+  <path d="M1442 510 Q1462 560 1428 596 L1416 588 Q1438 560 1428 520Z" fill="#8a5226"/>
+  <circle cx="1378" cy="602" r="7" fill="#f2c27a"/>
+  <g class="pen">
+    <circle cx="1420" cy="592" r="7" fill="#f2c27a"/>
+    <path d="M1414 598 L1428 578" stroke="#222" stroke-width="2.4" stroke-linecap="round"/>
+  </g>
+  <!-- mane (sun) -->
+  <g fill="#d9862e" class="mane">
+    <circle cx="1400" cy="455" r="46"/>
+    <use href="#ray"/><use href="#ray" transform="rotate(22.5 1400 455)"/><use href="#ray" transform="rotate(45 1400 455)"/><use href="#ray" transform="rotate(67.5 1400 455)"/>
+    <use href="#ray" transform="rotate(90 1400 455)"/><use href="#ray" transform="rotate(112.5 1400 455)"/><use href="#ray" transform="rotate(135 1400 455)"/><use href="#ray" transform="rotate(157.5 1400 455)"/>
+    <use href="#ray" transform="rotate(180 1400 455)"/><use href="#ray" transform="rotate(202.5 1400 455)"/><use href="#ray" transform="rotate(225 1400 455)"/><use href="#ray" transform="rotate(247.5 1400 455)"/>
+    <use href="#ray" transform="rotate(270 1400 455)"/><use href="#ray" transform="rotate(292.5 1400 455)"/><use href="#ray" transform="rotate(315 1400 455)"/><use href="#ray" transform="rotate(337.5 1400 455)"/>
+  </g>
+  <circle cx="1400" cy="455" r="38" fill="#e89a3a"/>
+  <circle cx="1374" cy="424" r="9" fill="#e89a3a"/><circle cx="1374" cy="424" r="4.5" fill="#a85a1c"/>
+  <circle cx="1426" cy="424" r="9" fill="#e89a3a"/><circle cx="1426" cy="424" r="4.5" fill="#a85a1c"/>
+  <!-- face -->
+  <ellipse cx="1400" cy="458" rx="28" ry="30" fill="#f2c27a"/>
+  <ellipse cx="1400" cy="474" rx="13" ry="9" fill="#fbe0b0"/>
+  <g stroke="#4a2a12" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M1384 453 q6 5 12 0"/><path d="M1404 453 q6 5 12 0"/>
+    <path d="M1400 471 v4 q-4 3 -7 0 M1400 475 q4 3 7 0"/>
+  </g>
+  <path d="M1395 466 h10 l-5 5z" fill="#5a2e14"/>
+  <!-- reading glasses, slid down -->
+  <g stroke="#3a2210" stroke-width="1.4" fill="#fff" fill-opacity=".08">
+    <circle cx="1390" cy="458" r="8"/><circle cx="1410" cy="458" r="8"/><path d="M1398 458h4" fill="none"/>
+  </g>
+</svg>

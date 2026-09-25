@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- eboards (hallway): boxes on top of the cabinets
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <rect x="1024" y="160" width="110" height="60" fill="#a8804e"/><path d="M1024 160 l14 -12 h82 l14 12" fill="#b8905e"/>
+  <g transform="rotate(-12 1060 150)"><rect x="1040" y="134" width="44" height="30" fill="#1d6a3a"/><rect x="1048" y="140" width="12" height="10" fill="#111"/></g>
+  <g transform="rotate(10 1100 150)"><rect x="1086" y="132" width="36" height="32" fill="#2a4a8a"/></g>
+  <text x="1036" y="196" font-size="11" fill="#3a2410">BOARDS</text>
+  <rect x="1144" y="176" width="96" height="44" fill="#9a7444"/><text x="1152" y="202" font-size="9" fill="#3a2410">BOARDS 2</text>
+  <rect x="1250" y="150" width="120" height="70" fill="#b0885a"/><path d="M1250 150 l10 -10 h100 l10 10" fill="#c09868"/>
+  <text x="1258" y="182" font-size="8" fill="#3a2410">DO NOT OPEN</text><text x="1258" y="196" font-size="8" fill="#3a2410">(SPOINGUS II)</text>
+  <path d="M1350 150 q14 -26 -2 -40 q-10 -8 0 -18" stroke="#111" stroke-width="2" fill="none"/>
+</svg>

@@ -136,7 +136,11 @@
         body.appendChild(pv);
         Sky.findAsset('assets/living/dungeon-paper-open', function (url) { if (url) pv.querySelector('.pv-sheet').style.setProperty('--paper-art', 'url("' + new URL(url, location.href).href + '")'); });
         var readPaper = function () {
-            fetch('content/dungeon/paper.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (d) {
+            // this reset's own note (the content manager's resets tabs: assets/resets/reset-<n>/note.json), or the usual one
+            var S = window.davSave;
+            (S ? S.overrides().then(function (have) { return S.ownFile('note.json', have); }) : Promise.resolve(null)).then(function (own) {
+                return fetch(own || 'content/dungeon/paper.json', { cache: 'no-cache' });
+            }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (d) {
                 var h = pv.querySelector('h2'), t = pv.querySelector('.pv-text'), sg = pv.querySelector('.pv-sign');
                 h.textContent = d.title || ''; h.hidden = !d.title;
                 t.textContent = d.text || '';

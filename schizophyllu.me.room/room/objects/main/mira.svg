@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- mira (main): MIRA
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes.
+     the code looks these ids up, so keep them: #mira -->
+<!-- shared with other things in the room: these copies are only here so this file previews right.
+     the real ones live in the room file's <defs>, and the page ignores these -->
+<defs class="preview">
+  <filter id="f-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="2.2" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+  <!-- hair (back) -->
+  <path d="M488 396 Q484 354 520 352 Q558 354 554 398 L556 432 Q520 444 484 432Z" fill="#11152a"/>
+  <!-- legs -->
+  <path d="M500 610 L494 736 L510 736 L517 612Z" fill="#141826"/>
+  <path d="M526 612 L531 736 L547 736 L542 610Z" fill="#141826"/>
+  <path d="M486 734h28v10h-32z" fill="#090b12"/><path d="M528 734h26l5 10h-31z" fill="#090b12"/>
+  <path d="M495 690h18M530 690h18" stroke="#6dffb0" stroke-width="1.2" opacity=".6"/>
+  <!-- coat -->
+  <path d="M490 440 Q520 428 550 440 L562 520 L580 628 Q520 642 460 628 L478 520Z" fill="#1a2034"/>
+  <path d="M520 444 L520 634" stroke="#6dffb0" stroke-width="1.4" opacity=".85" filter="url(#f-glow)"/>
+  <path d="M462 626 Q520 640 578 626" stroke="#6dffb0" stroke-width="1.4" fill="none" opacity=".7" filter="url(#f-glow)"/>
+  <path d="M498 440 L520 466 L542 440" stroke="#6dffb0" stroke-width="1.2" fill="none" opacity=".7"/>
+  <g fill="#6dffb0" opacity=".85"><circle cx="520" cy="500" r="1.6"/><circle cx="520" cy="540" r="1.6"/><circle cx="520" cy="580" r="1.6"/></g>
+  <!-- left arm -->
+  <path d="M490 446 Q470 500 472 562 L486 564 Q488 506 502 462Z" fill="#1a2034"/>
+  <ellipse cx="479" cy="568" rx="7" ry="8" fill="#c5c8de"/>
+  <!-- right arm + tablet (light curve) -->
+  <path d="M550 446 Q570 488 562 522 L540 530 L536 516 L548 508 Q548 480 536 462Z" fill="#1a2034"/>
+  <g transform="rotate(-12 541 512)">
+    <rect x="520" y="498" width="40" height="27" rx="3" fill="#07150e" stroke="#6dffb0" stroke-width="1.2"/>
+    <path d="M524 516 q5 -12 10 0 t10 0 t10 0" stroke="#6dffb0" fill="none" stroke-width="1.2"/>
+  </g>
+  <ellipse cx="538" cy="526" rx="6" ry="5" fill="#c5c8de"/>
+  <!-- head -->
+  <rect x="513" y="420" width="14" height="22" fill="#aeb2cb"/>
+  <ellipse cx="520" cy="398" rx="27" ry="32" fill="#c9cce1"/>
+  <path d="M497 405 q9 5 11 17" stroke="#8d91ad" fill="none" stroke-width=".8"/>
+  <path d="M492 394 Q496 358 520 358 Q546 358 550 394 Q536 378 522 386 Q506 376 492 394Z" fill="#11152a"/>
+  <path d="M504 366 Q520 360 538 368" stroke="#6dffb0" stroke-opacity=".5" fill="none" stroke-width="1.5"/>
+  <g class="mira-eyes" fill="#8dffc4" filter="url(#f-glow)">
+    <ellipse cx="510" cy="401" rx="4" ry="2.4"/><ellipse cx="530" cy="401" rx="4" ry="2.4"/>
+  </g>
+  <path d="M514 417 q6 2 12 0" stroke="#6c7090" fill="none" stroke-width="1.2"/>
+  <!-- sensor halo -->
+  <ellipse cx="520" cy="350" rx="46" ry="9" fill="none" stroke="#6dffb0" stroke-opacity=".45" stroke-dasharray="3 5"/>
+  <g fill="#aaffd0" filter="url(#f-glow)">
+    <circle r="2.6"><animateMotion dur="9s" repeatCount="indefinite" path="M474 350 a46 9 0 1 0 92 0 a46 9 0 1 0 -92 0"/></circle>
+    <circle r="2"><animateMotion dur="9s" begin="-3s" repeatCount="indefinite" path="M474 350 a46 9 0 1 0 92 0 a46 9 0 1 0 -92 0"/></circle>
+    <circle r="1.6"><animateMotion dur="9s" begin="-6s" repeatCount="indefinite" path="M474 350 a46 9 0 1 0 92 0 a46 9 0 1 0 -92 0"/></circle>
+  </g>
+</svg>

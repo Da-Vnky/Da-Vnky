@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- hexley (main): a little orange bee on monad. no explanation
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<g transform="translate(1262 640) rotate(-12)">
+  <ellipse cx="-2" cy="-5" rx="4" ry="3" fill="#e8f4ff" opacity=".75"/><ellipse cx="3" cy="-5" rx="4" ry="3" fill="#e8f4ff" opacity=".75"/>
+  <ellipse cx="0" cy="0" rx="7" ry="5" fill="#ff9a2a"/>
+  <path d="M-2 -4.6v9.2M2 -4.6v9.2" stroke="#1a1208" stroke-width="1.6"/>
+  <circle cx="-6" cy="-1" r="1" fill="#1a1208"/>
+  <path d="M7 0l2.5 .6" stroke="#1a1208" stroke-width="1"/>
+</g>
+</svg>
