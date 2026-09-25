@@ -52,14 +52,15 @@ assets/living/list.txt 117 55339362
 assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
 assets/sea/list.txt 117 55339362
-assets/sky/list.txt 222 243196552
+assets/sky/list.txt 236 543906976
 assets/sky/skybox-day.jpg 507563 3898106660
 assets/sky/skybox-dusk.jpg 936292 1272459089
 assets/sky/skybox-golden.jpg 675239 272661867
 assets/sky/skybox-night.jpg 830846 1476267125
 assets/sky/skybox-sunset.jpg 794813 1217934353
 assets/sky/sun-glow.gif 1689312 2903571900
-assets/sky/sun.gif 1689312 2903571900
+assets/sky/sun-pupil.png 23661 81897278
+assets/sky/sun.gif 3752006 4021813688
 assets/sounds/cork-in.ogg 18346 3878167734
 assets/sounds/cork-pop.ogg 19745 496428143
 assets/sounds/door-metal.ogg 40243 525939556

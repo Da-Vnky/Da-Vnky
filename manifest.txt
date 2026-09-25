@@ -51,7 +51,7 @@ assets/living/list.txt 117
 assets/resets/index.txt 77
 assets/resets/list.txt 127
 assets/sea/list.txt 117
-assets/sky/list.txt 222
+assets/sky/list.txt 236
 assets/sounds/list.txt 228
 assets/textures/list.txt 152
 assets/ui/list.txt 117

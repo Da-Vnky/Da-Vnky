@@ -6,4 +6,5 @@ skybox-golden.jpg
 skybox-night.jpg
 skybox-sunset.jpg
 sun-glow.gif
+sun-pupil.png
 sun.gif
