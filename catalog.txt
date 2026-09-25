@@ -48,7 +48,8 @@ assets/fonts/list.txt 117 55339362
 assets/items/list.txt 117 55339362
 assets/living/list.txt 117 55339362
 assets/sea/list.txt 117 55339362
-assets/sky/list.txt 138 1162442557
+assets/sky/list.txt 149 511531818
+assets/sky/skybox.jpg 1462115 3342687164
 assets/sky/sun-glow.gif 1689312 2903571900
 assets/sky/sun.gif 1689312 2903571900
 assets/sounds/cork-in.ogg 18346 3878167734
