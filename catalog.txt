@@ -73,7 +73,7 @@ content/claude/2026-09-25-keeping-a-light-on-by-claude.svg 18240 3130448096
 content/claude/frames.json 57 2015749426
 content/claude/list.txt 169 76452382
 content/dungeon/list.txt 124 1680728230
-content/dungeon/paper.json 119 1736083877
+content/dungeon/paper.json 163 2584569784
 content/frames/Andy Jassy of the Amazon.jpg 273715 1280555118
 content/frames/False God.jpg 98487 4164404709
 content/frames/Mark Zuckerberg of the Matrix.webp 12688 1584633969

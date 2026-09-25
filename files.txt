@@ -58,7 +58,7 @@ content/city/list.txt 199 2819029795
 content/claude/frames.json 57 2015749426
 content/claude/list.txt 169 76452382
 content/dungeon/list.txt 124 1680728230
-content/dungeon/paper.json 119 1736083877
+content/dungeon/paper.json 163 2584569784
 content/frames/list.txt 279 3867788761
 content/living/frames.json 150 2267752740
 content/living/list.txt 371 735336346

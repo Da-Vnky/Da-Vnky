@@ -58,7 +58,7 @@ content/city/list.txt 199
 content/claude/frames.json 57
 content/claude/list.txt 169
 content/dungeon/list.txt 124
-content/dungeon/paper.json 119
+content/dungeon/paper.json 163
 content/frames/list.txt 279
 content/living/frames.json 150
 content/living/list.txt 371
