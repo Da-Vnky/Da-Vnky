@@ -388,6 +388,16 @@
        "slot": "assets/ui/inventory",
        "what": "the bag your things go in (bottom left)",
        "size": "1:1, e.g. 96 x 96"
+      },
+      {
+       "slot": "assets/ui/stay",
+       "what": "the icon of the control panel’s “your stay” layer (Forget your stay…)",
+       "size": "1:1"
+      },
+      {
+       "slot": "assets/ui/forget-screen",
+       "what": "what the white turns into when someone forgets their stay (the wireframe world): full screen, covers it (a picture, a GIF, or a .webm / .mp4)",
+       "size": "3840 x 2160"
       }
      ]
     },
@@ -1829,6 +1839,16 @@
       {
        "slot": "assets/sounds/page-turn",
        "what": "a page of a book turned",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/flashbang",
+       "what": "forgetting your stay: the flashbang (the ringing after is part of it)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/hobo",
+       "what": "behind mel’s boards: plays from the moment the last one comes off (12 s of black, then the scare)",
        "kind": "sound"
       }
      ]

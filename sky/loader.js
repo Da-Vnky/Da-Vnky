@@ -1,23 +1,31 @@
 /* =====================================================================
-   loader.js — the loading screen. At the start of each visit it empties
-   the copy of the site kept from last time (so your latest changes always
-   show), then fetches every file on the site into a fresh copy (sw.js
-   serves them from there for the rest of the visit), with a progress bar.
-   Later pages in the same visit open instantly, with no loading screen.
+   loader.js — the loading screen, and the copy of the site kept in the
+   visitor's browser. The first time someone comes, it fetches every file
+   on the site (with a progress bar) and keeps them: every page, picture
+   and song after that comes straight from their own computer (sw.js).
+   It stays kept between visits. Each new visit it checks manifest.txt
+   (tools\publish.bat writes it, with a checksum for every file) and
+   fetches only what you've changed since, drops what you've deleted,
+   and if the page they're on was one of the changes, shows it fresh.
 
-   The list of files is manifest.txt, which tools\publish.bat writes for you.
+   "Forget your stay" (the control panel) wipes it all: see forgetStay below.
    Your own loading picture: assets/ui/loading (a GIF can walk, spin, …)
 
        <script src="sky/loader.js"></script>     (first thing in each page's <head>)
-
-   Why not "clear it as they leave"? Browsers don't let a page run anything
-   reliably once a tab is closing, so the clearing happens at the start of the
-   next visit instead: same effect, nobody ever sees an old version.
    ===================================================================== */
 
 (function () {
     var KEY = 'dav-loaded', CACHE = 'dav-site';
     var ok = 'serviceWorker' in navigator && 'caches' in window && /^https?:$/.test(location.protocol);
+    /* ---------------- forget your stay: everything this site kept in this browser, gone ---------------- */
+    // (all but the count of how many times it's been done: localStorage "dav-resets", for later)
+    window.davForget = function () {
+        var resets = 0;
+        try { resets = (+localStorage.getItem('dav-resets') || 0) + 1; } catch (e) {}
+        try { localStorage.clear(); localStorage.setItem('dav-resets', String(resets)); } catch (e) {}
+        try { sessionStorage.clear(); } catch (e) {}
+        return (window.caches ? caches.delete(CACHE).catch(function () {}) : Promise.resolve()).then(function () { return resets; });
+    };
     if (!ok) return;
     var fresh = true;
     try { fresh = !sessionStorage.getItem(KEY); } catch (e) {}
@@ -45,7 +53,7 @@
         '#dav-loader .dl-go.on { opacity: 1; }' +
         '#dav-loader .dl-go:hover { background: rgba(243,230,194,.1); }' +
         '@media (prefers-reduced-motion: reduce) { #dav-loader .dl-walk { animation: none; } }';
-    document.head.appendChild(css);
+
     // the stand-in: the traveller, walking along with a trunk
     var WALKER = '<svg class="dl-walk" viewBox="0 0 110 120" width="110" height="120" aria-hidden="true">' +
         '<path d="M8 40 Q30 32 52 40 L50 44 Q30 38 10 44 Z" fill="#3a2716" stroke="#f3e6c2" stroke-width=".6"/><path d="M17 40 Q18 22 30 21 Q42 22 43 40 Z" fill="#3a2716" stroke="#f3e6c2" stroke-width=".6"/>' +
@@ -53,64 +61,87 @@
         '<path d="M18 100 H27 V118 H18 Z M33 100 H42 V118 H33 Z" fill="#3a2716" stroke="#f3e6c2" stroke-width=".5"/>' +
         '<rect x="54" y="78" width="50" height="36" rx="4" fill="#6e4a30" stroke="#f3e6c2" stroke-width=".6"/><path d="M54 90 H104 M66 78 V114 M92 78 V114" stroke="#3a2716" stroke-width="2"/>' +
         '<path d="M70 78 Q79 68 88 78" fill="none" stroke="#c49a52" stroke-width="3"/><path d="M44 72 Q52 76 58 80" stroke="#9a3b1f" stroke-width="5" stroke-linecap="round"/></svg>';
-    var el = document.createElement('div');
-    el.id = 'dav-loader';
-    el.setAttribute('role', 'status');
-    el.setAttribute('aria-live', 'polite');
-    el.innerHTML = '<div class="dl-box"><div class="dl-art">' + WALKER + '</div><div class="dl-title">DaV-nky</div>' +
-        '<div class="dl-bar"><i></i></div><div class="dl-note">packing everything up…</div>' +
-        '<button type="button" class="dl-go">go in now (the rest keeps loading)</button></div>';
-    document.documentElement.appendChild(el);
-    var bar = el.querySelector('.dl-bar i'), note = el.querySelector('.dl-note'), go = el.querySelector('.dl-go');
-    var done = false;
+    var el = null, bar, note, go, done = false;
+    function screen(title) {                                                // (only when there's something to fetch)
+        if (el) return;
+        document.head.appendChild(css);
+        el = document.createElement('div');
+        el.id = 'dav-loader';
+        el.setAttribute('role', 'status');
+        el.setAttribute('aria-live', 'polite');
+        el.innerHTML = '<div class="dl-box"><div class="dl-art">' + WALKER + '</div><div class="dl-title">DaV-nky</div>' +
+            '<div class="dl-bar"><i></i></div><div class="dl-note"></div>' +
+            '<button type="button" class="dl-go">go in now (the rest keeps loading)</button></div>';
+        document.documentElement.appendChild(el);
+        bar = el.querySelector('.dl-bar i'); note = el.querySelector('.dl-note'); go = el.querySelector('.dl-go');
+        note.textContent = title;
+        go.addEventListener('click', finish);
+        setTimeout(function () { go.classList.add('on'); }, 4000);
+        if (art) el.querySelector('.dl-art').innerHTML = '<img alt="" src="' + art + '">';
+    }
     function finish() {
         if (done) return;
         done = true;
         try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+        if (!el) return;
         el.classList.add('gone');
         setTimeout(function () { el.remove(); }, 700);
     }
-    go.addEventListener('click', finish);
-    setTimeout(function () { go.classList.add('on'); }, 4000);
     function mb(n) { return (n / 1048576).toFixed(n > 10485760 ? 0 : 1); }
 
-    /* ---------------- the work ---------------- */
+    /* ---------------- what's on the site, and what this browser already has ---------------- */
+    // manifest.txt lines: "path size checksum" (older ones: "path size")
     function list(text) {
         var out = [];
         text.replace(/\r/g, '').split('\n').forEach(function (line) {
             line = line.trim();
             if (!line || line.charAt(0) === '#') return;
-            var i = line.lastIndexOf(' ');
-            var path = i > 0 && /^\d+$/.test(line.slice(i + 1)) ? line.slice(0, i) : line, size = i > 0 ? parseInt(line.slice(i + 1), 10) || 0 : 0;
-            out.push({ url: path.split('/').map(encodeURIComponent).join('/'), size: size });
+            var parts = line.split(' '), sum = '', size = 0;
+            if (parts.length >= 3 && /^\d+$/.test(parts[parts.length - 1]) && /^\d+$/.test(parts[parts.length - 2])) { sum = parts.pop(); size = +parts.pop(); }
+            else if (parts.length >= 2 && /^\d+$/.test(parts[parts.length - 1])) size = +parts.pop();
+            var path = parts.join(' ');
+            out.push({ path: path, url: path.split('/').map(encodeURIComponent).join('/'), size: size, id: size + ':' + sum });
         });
         return out;
     }
     // pages and code first, then pictures, then sounds and videos (the biggest)
     function rank(f) { return /\.(html|js|css|json|txt)$/i.test(f.url) ? 0 : /\.(mp3|ogg|mp4|webm)$/i.test(f.url) ? 2 : 1; }
+    var HAVE = 'dav-have';                                                  // what's in this browser's copy: { path: "size:checksum" }
+    function have() { try { return JSON.parse(localStorage.getItem(HAVE) || 'null'); } catch (e) { return null; } }
+    function keep(m) { try { localStorage.setItem(HAVE, JSON.stringify(m)); } catch (e) {} }
+    var art = null;
+    var here = decodeURIComponent(location.pathname.replace(/^.*\//, '')) || 'index.html';
+    if (!have()) screen('packing everything up\u2026');                     // (a first visit: the screen straight away)
 
-    caches.delete(CACHE)                                                    // last visit's copy: gone
-        .then(register)
-        .then(function () { return fetch('manifest.txt', { cache: 'reload' }); })
-        .then(function (r) { return r.ok ? r.text() : ''; })
-        .then(function (text) {
-            var files = list(text);
-            files.push({ url: './', size: 0 });
-            files.sort(function (a, b) { return rank(a) - rank(b); });
-            var art = files.filter(function (f) { return /^assets\/ui\/loading\.(gif|png|webp|svg|jpe?g)$/i.test(decodeURIComponent(f.url)); })[0];
-            if (art) el.querySelector('.dl-art').innerHTML = '<img alt="" src="' + art.url + '">';
-            if (files.length < 3) { finish(); return; }                     // (no manifest yet: nothing to wait for)
-            var total = 0, got = 0, n = 0, i = 0;
-            files.forEach(function (f) { total += f.size; });
-            return caches.open(CACHE).then(function (cache) {
+    register()
+        .then(function () { return caches.open(CACHE); })
+        .then(function (cache) {
+            return fetch('manifest.txt?' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (text) {
+                var files = list(text);
+                if (files.length < 3) { finish(); return; }                   // (no manifest yet: nothing to do)
+                var loadingArt = files.filter(function (f) { return /^assets\/ui\/loading\.(gif|png|webp|svg|jpe?g)$/i.test(f.path); })[0];
+                if (loadingArt) art = loadingArt.url;
+                var had = have(), first = !had, now = {}, need = [];
+                files.forEach(function (f) { now[f.path] = f.id; if (first || had[f.path] !== f.id) need.push(f); });
+                if (first) need.push({ path: '', url: './', size: 0, id: '' });
+                // gone from the site: gone from the copy
+                var drop = had ? Object.keys(had).filter(function (p) { return !(p in now); }) : [];
+                drop.forEach(function (p) { cache.delete(p.split('/').map(encodeURIComponent).join('/'), { ignoreSearch: true }); });
+                if (!need.length) { keep(now); finish(); return; }
+                // what they're looking at right now came from the old copy if it's among the changes
+                var stale = !first && need.some(function (f) { return f.path === here || /^sky\//.test(f.path); });
+                screen(first ? 'packing everything up…' : 'unpacking what’s new…');
+                need.sort(function (a, b) { return rank(a) - rank(b); });
+                var total = 0, got = 0, n = 0, i = 0;
+                need.forEach(function (f) { total += f.size; });
                 function show() {
-                    var k = total ? got / total : n / files.length;
+                    var k = total ? got / total : n / need.length;
                     bar.style.width = (k * 100).toFixed(1) + '%';
-                    note.textContent = 'packing everything up… ' + n + ' of ' + files.length + (total ? ' · ' + mb(got) + ' of ' + mb(total) + ' MB' : '');
+                    note.textContent = (first ? 'packing everything up… ' : 'unpacking what’s new… ') + n + ' of ' + need.length + (total ? ' · ' + mb(got) + ' of ' + mb(total) + ' MB' : '');
                 }
                 function next() {
-                    if (i >= files.length) return Promise.resolve();
-                    var f = files[i++];
+                    if (i >= need.length) return Promise.resolve();
+                    var f = need[i++];
                     return fetch(f.url, { cache: 'reload' }).then(function (r) {
                         return r.ok ? cache.put(f.url, r) : null;
                     }).catch(function () {}).then(function () { n++; got += f.size; show(); return next(); });
@@ -118,10 +149,16 @@
                 show();
                 var lanes = [];
                 for (var k = 0; k < 6; k++) lanes.push(next());
-                return Promise.all(lanes);
+                return Promise.all(lanes).then(function () {
+                    keep(now);
+                    note.textContent = first ? 'all packed. in you go.' : 'all up to date.';
+                    bar.style.width = '100%';
+                    if (stale) { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} setTimeout(function () { location.reload(); }, 300); return; }
+                    setTimeout(finish, 350);
+                });
             });
         })
-        .then(function () { note.textContent = 'all packed. in you go.'; bar.style.width = '100%'; setTimeout(finish, 350); })
         .catch(finish);
     setTimeout(finish, 90000);                                              // (never stuck behind it)
+
 })();

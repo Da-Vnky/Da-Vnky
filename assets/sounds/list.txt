@@ -1,4 +1,9 @@
 # written by tools/update-lists.sh: every art file in this folder.
 # no need to edit it; it's rewritten each commit.
+cork-in.ogg
+cork-pop.ogg
 dungeon.ogg
+hobo.ogg
+paper-roll.ogg
+paper-unroll.ogg
 rain.ogg

@@ -294,7 +294,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry', 'unnerve', 'scare', 'typing', 'sparkle', 'bang', 'flick', 'shatter', 'book', 'claube-flick', 'claube-shot', 'loot', 'record-in', 'page-turn'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry', 'unnerve', 'scare', 'typing', 'sparkle', 'bang', 'flick', 'shatter', 'book', 'claube-flick', 'claube-shot', 'loot', 'record-in', 'page-turn', 'flashbang'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {
@@ -537,6 +537,15 @@
             tone(out, t + 0.05, 'sine', 900, 120, 0.16, 0.25);
             noiseHit(out, t + 0.05, 0.12, 'lowpass', 1200, 0.8, 0.5, 0.002);
             for (var i = 0; i < 5; i++) tone(out, t + 0.2 + Math.random() * 0.3, 'sine', 400 + Math.random() * 400, 200, 0.05, 0.05);
+        },
+        'flashbang': function (out, t) {                              // a flashbang: a crack, a boom, and the ears ringing after
+            noiseHit(out, t, 0.08, 'highpass', 1800, 0.3, 1.0, 0.001);
+            noiseHit(out, t + 0.01, 0.9, 'lowpass', 900, 0.4, 0.9, 0.004);
+            tone(out, t, 'sine', 90, 30, 0.6, 0.7);
+            var o = ctx.createOscillator(), g = gain(0);                  // the ringing
+            o.type = 'sine'; o.frequency.setValueAtTime(3150, t + 0.05); o.frequency.linearRampToValueAtTime(3080, t + 3.2);
+            g.gain.setValueAtTime(0.0001, t + 0.05); g.gain.exponentialRampToValueAtTime(0.09, t + 0.25); g.gain.exponentialRampToValueAtTime(0.0001, t + 3.4);
+            chain(o, g, out); o.start(t + 0.05); o.stop(t + 3.5);
         },
         'page-turn': function (out, t) {                              // a page of a book turned over
             var f = noiseHit(out, t, 0.22, 'bandpass', 2600, 0.7, 0.22, 0.04);

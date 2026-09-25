@@ -1,104 +1,110 @@
-# written by tools/update-lists.sh: every file on the site a visitor loads, and its size in bytes.
-city.html 4414
-index.html 2603
-living.html 47109
-workshop.html 18703
-sky/bathroom.js 34389
-sky/books.js 10851
-sky/claubes.js 21974
-sky/crate.js 50910
-sky/dungeon.js 16555
-sky/frames.js 13957
-sky/gallery.js 15077
-sky/gore.js 22847
-sky/ground-city.js 26668
-sky/ground-countryside.js 13833
-sky/ground-sea.js 50436
-sky/ground-view.js 6631
-sky/inventory.js 20449
-sky/letters.js 23655
-sky/loader.js 8748
-sky/loot.js 16128
-sky/marker.js 8207
-sky/models.js 7807
-sky/music.js 40370
-sky/noise.js 13535
-sky/notes.js 9342
-sky/paint.js 47856
-sky/panel.js 56515
-sky/peeper.js 57280
-sky/post.js 27542
-sky/records.js 30255
-sky/revolver.js 11798
-sky/sky.js 101695
-sky/studio.js 28537
-sky/textures.js 6816
-sky/timer.js 12508
-sky/tub.js 30339
-sky/weather.js 27567
-sky/paper.css 7388
-sky/sky.css 42199
-assets/characters/list.txt 117
-assets/city/list.txt 117
-assets/countryside/list.txt 117
-assets/fonts/list.txt 117
-assets/items/list.txt 117
-assets/living/list.txt 117
-assets/sea/list.txt 117
-assets/sky/list.txt 117
-assets/sounds/dungeon.ogg 9042074
-assets/sounds/list.txt 138
-assets/sounds/rain.ogg 867714
-assets/textures/dungeonletter-1.webp 470972
-assets/textures/letter-1.webp 277104
-assets/textures/list.txt 152
-assets/ui/list.txt 117
-assets/workshop/list.txt 117
-content/books/list.txt 113
-content/city/example-cat-on-the-sill.svg 1777
-content/city/example-cat-on-the-sill.txt 96
-content/city/example-late-night-reader.svg 1418
-content/city/list.txt 199
-content/claude/2026-09-25-keeping-a-light-on-by-claude.svg 18240
-content/claude/frames.json 57
-content/claude/list.txt 169
-content/frames/False God.jpg 98487
-content/frames/droolers.png 1117345
-content/frames/list.txt 140
-content/living/01-where heaven and earth meet.jpg 890805
-content/living/01-where heaven and earth meet.ogg 992952
-content/living/02-Song on the Beach.jpg 412921
-content/living/02-Song on the Beach.ogg 976945
-content/living/03-Aerie.jpg 248646
-content/living/03-Aerie.ogg 786774
-content/living/04-Frame of Mind.jpg 122551
-content/living/04-Frame of Mind.ogg 941654
-content/living/05-I'm Upping My P(Doom).gif 5004432
-content/living/05-I'm Upping My P(Doom).ogg 2389706
-content/living/frames.json 150
-content/living/list.txt 371
-content/sea/2026-09-25-hello-world.txt 213
-content/sea/2026-09-25-mmmmm.jpg 46663
-content/sea/list.txt 161
-content/shame/frames.json 96
-content/shame/list.txt 125
-content/workshop/10.jpg 1427761
-content/workshop/The-Broken-Jug.png 5177409
-content/workshop/Untitled-1 24 .jpg 9470638
-content/workshop/cat.png 1037509
-content/workshop/foot.jpg 114929
-content/workshop/frames.json 67
-content/workshop/list.txt 198
-content/workshop/notes.json 543
-content/books/book-1/list.txt 113
-content/books/book-2/list.txt 113
-content/books/book-3/list.txt 113
-content/books/book-4/list.txt 113
-content/living/bottles/2026-09-24-from-skizy.txt 50
-content/living/bottles/2026-09-24-untitled.png 103361
-content/living/bottles/board.json 65
-content/living/bottles/list.txt 174
-content/workshop/visitors/2026-09-24-claube-by-skizy.png 600582
-content/workshop/visitors/2026-09-24-clutterflies-by-skizy.png 464922
-content/workshop/visitors/2026-09-24-untitled.png 65299
-content/workshop/visitors/list.txt 205
+# written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
+city.html 4468 2049912241
+index.html 2657 2338573193
+living.html 47163 3721142319
+workshop.html 18757 3940301606
+sky/bathroom.js 34389 1564269278
+sky/books.js 10851 3133918432
+sky/claubes.js 21974 1609253771
+sky/crate.js 50910 2912149547
+sky/dungeon.js 16555 892631833
+sky/forget.js 5634 3469274150
+sky/frames.js 13957 149097675
+sky/gallery.js 15077 3219970737
+sky/gore.js 22847 1768192869
+sky/ground-city.js 26668 2330969156
+sky/ground-countryside.js 13833 642858024
+sky/ground-sea.js 50436 1206555169
+sky/ground-view.js 6631 1730141118
+sky/inventory.js 20449 1063992887
+sky/letters.js 23655 4220821966
+sky/loader.js 11676 3991599310
+sky/loot.js 16128 2332404378
+sky/marker.js 8207 444656591
+sky/models.js 7807 287414390
+sky/music.js 40370 3594346305
+sky/noise.js 13535 2803187658
+sky/notes.js 9342 2828812493
+sky/paint.js 47856 3321309787
+sky/panel.js 57307 3292181936
+sky/peeper.js 61033 2330355829
+sky/post.js 27542 100469044
+sky/records.js 30255 2143094409
+sky/revolver.js 11798 1056790849
+sky/sky.js 101695 4023193886
+sky/studio.js 28537 3071880599
+sky/textures.js 6816 3323093184
+sky/timer.js 12508 660169094
+sky/tub.js 30339 1728658780
+sky/weather.js 27567 1795486156
+sky/paper.css 7388 392067971
+sky/sky.css 42199 237290238
+assets/characters/list.txt 117 55339362
+assets/city/list.txt 117 55339362
+assets/countryside/list.txt 117 55339362
+assets/fonts/list.txt 117 55339362
+assets/items/list.txt 117 55339362
+assets/living/list.txt 117 55339362
+assets/sea/list.txt 117 55339362
+assets/sky/list.txt 117 55339362
+assets/sounds/cork-in.ogg 18346 3878167734
+assets/sounds/cork-pop.ogg 19745 496428143
+assets/sounds/dungeon.ogg 9042074 3983005707
+assets/sounds/hobo.ogg 282187 3952305689
+assets/sounds/list.txt 204 1049875496
+assets/sounds/paper-roll.ogg 18779 2371072433
+assets/sounds/paper-unroll.ogg 21868 3550942193
+assets/sounds/rain.ogg 867714 3232814227
+assets/textures/dungeonletter-1.webp 470972 85079459
+assets/textures/letter-1.webp 277104 2867896533
+assets/textures/list.txt 152 1347949450
+assets/ui/list.txt 117 55339362
+assets/workshop/list.txt 117 55339362
+content/books/list.txt 113 3293401086
+content/city/example-cat-on-the-sill.svg 1777 1129120048
+content/city/example-cat-on-the-sill.txt 96 226222374
+content/city/example-late-night-reader.svg 1418 3155830874
+content/city/list.txt 199 2819029795
+content/claude/2026-09-25-keeping-a-light-on-by-claude.svg 18240 3130448096
+content/claude/frames.json 57 2015749426
+content/claude/list.txt 169 76452382
+content/frames/False God.jpg 98487 4164404709
+content/frames/droolers.png 1117345 4250865322
+content/frames/list.txt 140 2055304651
+content/living/01-where heaven and earth meet.jpg 890805 3644886012
+content/living/01-where heaven and earth meet.ogg 992952 826560047
+content/living/02-Song on the Beach.jpg 412921 54104781
+content/living/02-Song on the Beach.ogg 976945 1864114464
+content/living/03-Aerie.jpg 248646 1773964025
+content/living/03-Aerie.ogg 786774 2817302222
+content/living/04-Frame of Mind.jpg 122551 761190908
+content/living/04-Frame of Mind.ogg 941654 4046023712
+content/living/05-I'm Upping My P(Doom).gif 5004432 2443245632
+content/living/05-I'm Upping My P(Doom).ogg 2389706 2277024438
+content/living/frames.json 150 2267752740
+content/living/list.txt 371 735336346
+content/sea/2026-09-25-hello-world.txt 213 4016599039
+content/sea/2026-09-25-mmmmm.jpg 46663 2745439658
+content/sea/list.txt 161 3392900003
+content/shame/frames.json 96 3129646062
+content/shame/list.txt 125 95844360
+content/workshop/10.jpg 1427761 2095253941
+content/workshop/The-Broken-Jug.png 5177409 3929771409
+content/workshop/Untitled-1 24 .jpg 9470638 788155672
+content/workshop/cat.png 1037509 504963118
+content/workshop/foot.jpg 114929 1267704861
+content/workshop/frames.json 67 3895359414
+content/workshop/list.txt 198 1723977824
+content/workshop/notes.json 543 1126478583
+content/books/book-1/list.txt 113 3293401086
+content/books/book-2/list.txt 113 3293401086
+content/books/book-3/list.txt 113 3293401086
+content/books/book-4/list.txt 113 3293401086
+content/living/bottles/2026-09-24-from-skizy.txt 50 2780802433
+content/living/bottles/2026-09-24-untitled.png 103361 3665461875
+content/living/bottles/board.json 65 4093162867
+content/living/bottles/list.txt 174 2306364331
+content/workshop/visitors/2026-09-24-claube-by-skizy.png 600582 939281079
+content/workshop/visitors/2026-09-24-clutterflies-by-skizy.png 464922 1738138300
+content/workshop/visitors/2026-09-24-untitled.png 65299 1509521949
+content/workshop/visitors/list.txt 205 1050374648

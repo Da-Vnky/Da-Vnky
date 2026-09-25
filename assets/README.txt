@@ -180,7 +180,11 @@ SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
     assets/sounds/crack          a board splintering off it
     assets/sounds/book           the book pulled on the bookshelf: a click, the wall
                                  grinding open, a thud (about 3 s)
-    assets/sounds/unnerve        behind mel's boards, before the scare (about 4 s)
+    assets/sounds/hobo           behind mel's boards: from the moment the last one comes off.
+                                 12 s of pitch black (you can only call out), then the scare
+                                 (with it in, the drawn unnerve and scare sounds aren't used)
+    assets/sounds/unnerve        behind mel's boards, before the scare (only without hobo)
+    assets/sounds/flashbang      "Forget your stay": the bang, and the ringing after
     assets/sounds/scare          the jump scare
     assets/sounds/typing         mel typing (about 2 s; played over and over)
     assets/sounds/sparkle        claube tidying mel's room, as if by magic
@@ -496,8 +500,12 @@ YOUR CANVAS AND PAPER (sky/textures.js; every page)
     see-through edges, and WebP does those too). how strong the canvas is: STRENGTH at the
     top of sky/textures.js.
 
-THE LOADING SCREEN (the first page of each visit)
+THE LOADING SCREEN (a visitor's first visit, and when you've published changes)
     assets/ui/loading          its picture (a GIF can walk or spin), e.g. 400 x 260
+    the site stays in their browser between visits; each visit fetches only what you've
+    changed. "Forget your stay… (Clear cache)" in the control panel wipes it all:
+    assets/ui/forget-screen    what the white fades into (the wireframe world), full screen
+    assets/ui/stay             that panel layer's icon
 
 THE BATHTUB AND THE TOASTER
     assets/living/toaster      the toaster on the living space's floor, about 10:7.

@@ -42,9 +42,10 @@ for dir in assets/*/; do
 done
 
 # and a manifest of the whole site for the loading screen (sky/loader.js): every file a visitor's
-# browser might load, with its size, so it can fetch them all up front and keep them for the visit
+# browser might load, with its size and a checksum, so it can fetch them all up front, keep them,
+# and on a later visit fetch again only the ones you've changed since
 {
-    echo "# written by tools/update-lists.sh: every file on the site a visitor loads, and its size in bytes."
+    echo "# written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum."
     for f in *.html sky/*.js sky/*.css assets/*/* content/*/* content/*/*/*; do
         [ -f "$f" ] || continue
         name=$(basename "$f")
@@ -54,7 +55,7 @@ done
         case "$f" in
             assets/templates/*) continue ;;
         esac
-        size=$(wc -c < "$f" | tr -d ' ')
-        echo "$f $size"
+        set -- $(cksum < "$f")
+        echo "$f $2 $1"
     done
 } > manifest.txt

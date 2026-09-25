@@ -48,6 +48,9 @@
         more: ['something shifts behind the boards.', 'a board splinters.', 'the wood gives a little more.', 'one more\u2026', ''],
         inside: 'mel\u2019s room',
         dark: '\u2026',                                       // (under the window while it's pitch black in there)
+        dark_secs: 12,                                     // how long it's pitch black in there, from the last board coming off
+        call: 'call out\u2026',                              // the button you can press in the dark (it does nothing, but you can't help it)
+        calls: ['Is anybody there?', 'Hello?', '\u2026Anybody home?'],
         typing: 'clack clack clack',
         // once she's noticed you. who: mel, claube, mira or you (the words go under the window).
         // then: 'clean' tidies the room as that line's said.
@@ -174,7 +177,15 @@
         '@keyframes ms-magic { 0% { opacity: 0; } 40% { opacity: 1; } 100% { opacity: 0; } }' +
         '.mel-stage .ms-star { position: absolute; color: #fff2b0; text-shadow: 0 0 6px #fff; font-size: 16px; pointer-events: none; }' +
         // what's behind the boards
-        '.mel-scare { position: absolute; inset: -6% 8% -2%; z-index: 4; pointer-events: none; opacity: 0; }' +
+        '.mel-scare { position: absolute; inset: 2% 8% -2%; z-index: 4; pointer-events: none; opacity: 0; }' +
+        '.mel-call { position: absolute; left: 50%; bottom: 7%; z-index: 6; transform: translateX(-50%); padding: 7px 18px; border: 1px solid rgba(243,230,194,.3); border-radius: 999px;' +
+            'background: rgba(20,14,10,.85); color: #f3e6c2; font: italic 1rem "IM Fell English", Georgia, serif; cursor: pointer; }' +
+        '.mel-call:hover { background: rgba(60,40,28,.9); }' +
+        '.mel-calls { position: absolute; inset: 0; z-index: 5; pointer-events: none; }' +
+        '.ps-view > .mel-calls, .ps-view > .mel-scare { padding: 0; overflow: visible; max-height: none; }' +
+        '.mel-said { position: absolute; padding: 4px 12px; border-radius: 12px; background: #f6ecd2; color: #2a1d14; font: italic clamp(.8rem, 1.8vh, 1.05rem) "IM Fell English", Georgia, serif;' +
+            'white-space: nowrap; box-shadow: 0 3px 10px rgba(0,0,0,.6); animation: mel-said 3s ease-out forwards; }' +
+        '@keyframes mel-said { 0% { opacity: 0; transform: translateY(6px); } 10% { opacity: 1; transform: none; } 65% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }' +
         '.mel-scare > svg, .mel-scare > img, .mel-scare > video { width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; display: block; }' +
         '.mel-scare.boo { opacity: 1; animation: mel-boo .16s ease-out; }' +
         '@keyframes mel-boo { from { transform: scale(1.5) translateY(10%); } to { transform: none; } }' +
@@ -465,7 +476,8 @@
     }
     function leaveScene(quiet) {
         var wasMel = scene.classList.contains('mel');
-        melRun++; clearInterval(typer);
+        melRun++; clearInterval(typer); hoboStop();
+        scene.querySelectorAll('.mel-call').forEach(function (b) { b.remove(); });
         document.body.classList.remove('peep-mel');
         scene.classList.remove('drawn', 'mel', 'in', 'void', 'jolt');
         scene.querySelectorAll('.mel-scare').forEach(function (b) { b.remove(); });
@@ -631,29 +643,60 @@
         titleEl.textContent = MEL.after;
     }
     // in through the window: (the first time this visit) the dark, the wrong sound, the face; then mel
+    // the scare: once per browser (it stays scared until "forget your stay" wipes it), in localStorage
+    function scaredYet() { try { return localStorage.getItem('mel-scared') === '1'; } catch (e) { return false; } }
+    var hoboUrl = null, hobo = null, boardsOffAt = 0;
+    Sky.findAsset('assets/sounds/hobo.ogg|assets/sounds/hobo.mp3', function (u) { hoboUrl = u || null; });
+    function hoboStart() {                                            // the soundtrack: from the moment the last board comes off
+        boardsOffAt = performance.now();
+        if (scaredYet()) return;
+        if (!hoboUrl) { sfx('unnerve'); return; }
+        try { hobo = new Audio(hoboUrl); hobo.volume = Sky.sounds ? Math.max(.2, Sky.sounds.sfxVolume) : .8; hobo.play().catch(function () {}); } catch (e) {}
+    }
+    function hoboStop() { if (hobo) { var h = hobo; hobo = null; var v = h.volume, iv = setInterval(function () { v -= .08; if (v <= 0) { clearInterval(iv); h.pause(); } else h.volume = v; }, 60); } }
     function melScene(fresh) {
         var run = ++melRun;
-        var scared = false;
-        try { scared = sessionStorage.getItem('mel-scared') === '1'; } catch (e) {}
-        if (fresh && !scared) {
-            try { sessionStorage.setItem('mel-scared', '1'); } catch (e) {}
+        if (!scaredYet()) {
+            if (!boardsOffAt || !fresh) hoboStart();                  // (back after leaving before it happened: from the top)
             scene.classList.add('void');
-            note.textContent = MEL.dark;
-            sfx('unnerve');
+            note.textContent = '';
+            var frame = scene.querySelector('.ps-frame');
+            // pitch black. all you can do is call out
+            var calls = document.createElement('div');
+            calls.className = 'mel-calls';
+            viewEl.appendChild(calls);
+            var call = document.createElement('button');
+            call.type = 'button';
+            call.className = 'mel-call';
+            call.textContent = MEL.call;
+            frame.appendChild(call);
+            var said = 0;
+            call.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var b = document.createElement('span');
+                b.className = 'mel-said';
+                b.textContent = MEL.calls[said++ % MEL.calls.length];
+                b.style.left = (22 + Math.random() * 40) + '%';
+                b.style.top = (18 + Math.random() * 50) + '%';
+                calls.appendChild(b);
+                setTimeout(function () { b.remove(); }, 3100);
+            });
+            var wait = Math.max(0, MEL.dark_secs * 1000 - (performance.now() - boardsOffAt));
             var boo = document.createElement('div');
             boo.className = 'mel-scare';
             art('assets/city/mel-scare', SCARE, boo);
-            scene.querySelector('.ps-frame').appendChild(boo);
-            later(run, 4000, function () {
-                sfx('scare');
+            later(run, wait, function () {
+                try { localStorage.setItem('mel-scared', '1'); } catch (e) {}
+                call.remove(); calls.remove();
+                viewEl.appendChild(boo);                                // (inside the window: as it slides away, the wall hides it)
+                if (!hoboUrl) sfx('scare');
                 boo.classList.add('boo');
                 scene.classList.remove('jolt'); void scene.offsetWidth; scene.classList.add('jolt');
                 var fl = document.querySelector('.mel-flash') || document.body.appendChild(Object.assign(document.createElement('div'), { className: 'mel-flash' }));
                 fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on');
-                note.textContent = '';
             });
-            later(run, 5300, function () { boo.classList.remove('boo'); boo.classList.add('away'); });         // and then, slowly, it slides out of sight
-            later(run, 8900, function () { boo.remove(); scene.classList.remove('void', 'jolt'); lightsUp(run); });
+            later(run, wait + 1300, function () { boo.classList.remove('boo'); boo.classList.add('away'); });         // and then, slowly, it slides out of sight
+            later(run, wait + 4900, function () { boo.remove(); scene.classList.remove('void', 'jolt'); lightsUp(run); });
             return;
         }
         lightsUp(run);
@@ -717,7 +760,7 @@
         document.body.classList.add('peep-close', 'peep-mel');
         document.body.classList.remove('peep-view');
         note.textContent = melState.off >= MEL.boards ? '' : 'click the boards to knock';
-        if (melState.off >= MEL.boards) setTimeout(function () { if (scene.classList.contains('mel')) melScene(false); }, 750);
+        if (melState.off >= MEL.boards) setTimeout(function () { if (scene.classList.contains('mel')) { boardsOffAt = 0; melScene(false); } }, 750);
     }
     function knockKnock() {
         if (!scene.classList.contains('mel') || melState.off >= MEL.boards) return;
@@ -740,6 +783,7 @@
             try { sessionStorage.setItem('mel-in', '1'); } catch (e) {}
             document.body.classList.add('mel-in');
             scene.querySelector('.mel-planks').style.pointerEvents = 'none';
+            hoboStart();
             setTimeout(function () { if (scene.classList.contains('mel')) melScene(true); }, 700);
         }
     }
