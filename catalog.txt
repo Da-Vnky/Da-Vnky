@@ -74,14 +74,14 @@ content/claude/frames.json 57 2015749426
 content/claude/list.txt 169 76452382
 content/dungeon/list.txt 124 1680728230
 content/dungeon/paper.json 163 2584569784
-content/frames/Andy Jassy of the Amazon.jpg 273715 1280555118
-content/frames/False God.jpg 98487 4164404709
+content/frames/Dario Modei of CLAUBE.jpg 98487 4164404709
+content/frames/False God.gif 4458112 3686044716
 content/frames/Mark Zuckerberg of the Matrix.webp 12688 1584633969
 content/frames/Nadella Satya is Micro Soft.jpg 522655 3925892983
 content/frames/Sam GPT.jpg 95050 4272185731
 content/frames/Sundar Pichai of Googolian.jpg 527485 3281858091
 content/frames/droolers.png 1117345 4250865322
-content/frames/list.txt 279 3867788761
+content/frames/list.txt 276 99360592
 content/living/01-where heaven and earth meet.jpg 890805 3644886012
 content/living/01-where heaven and earth meet.ogg 992952 826560047
 content/living/02-Song on the Beach.jpg 412921 54104781
@@ -97,7 +97,7 @@ content/living/list.txt 371 735336346
 content/sea/2026-09-25-hello-world.txt 213 4016599039
 content/sea/2026-09-25-mmmmm.jpg 46663 2745439658
 content/sea/list.txt 161 3392900003
-content/shame/frames.json 305 811096726
+content/shame/frames.json 302 1002548155
 content/shame/list.txt 125 95844360
 content/workshop/10.jpg 1427761 2095253941
 content/workshop/The-Broken-Jug.png 5177409 3929771409

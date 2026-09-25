@@ -59,12 +59,12 @@ content/claude/frames.json 57
 content/claude/list.txt 169
 content/dungeon/list.txt 124
 content/dungeon/paper.json 163
-content/frames/list.txt 279
+content/frames/list.txt 276
 content/living/frames.json 150
 content/living/list.txt 371
 content/sea/2026-09-25-hello-world.txt 213
 content/sea/list.txt 161
-content/shame/frames.json 305
+content/shame/frames.json 302
 content/shame/list.txt 125
 content/workshop/frames.json 77
 content/workshop/list.txt 198
