@@ -62,8 +62,9 @@ content/city/list.txt 199
 content/claude/2026-09-25-keeping-a-light-on-by-claude.svg 18240
 content/claude/frames.json 57
 content/claude/list.txt 169
+content/frames/False God.jpg 98487
 content/frames/droolers.png 1117345
-content/frames/list.txt 126
+content/frames/list.txt 140
 content/living/01-where heaven and earth meet.jpg 890805
 content/living/01-where heaven and earth meet.ogg 992952
 content/living/02-Song on the Beach.jpg 412921
@@ -79,7 +80,7 @@ content/living/list.txt 371
 content/sea/2026-09-25-hello-world.txt 213
 content/sea/2026-09-25-mmmmm.jpg 46663
 content/sea/list.txt 161
-content/shame/frames.json 127
+content/shame/frames.json 96
 content/shame/list.txt 125
 content/workshop/10.jpg 1427761
 content/workshop/The-Broken-Jug.png 5177409
@@ -97,8 +98,7 @@ content/living/bottles/2026-09-24-from-skizy.txt 50
 content/living/bottles/2026-09-24-untitled.png 103361
 content/living/bottles/board.json 65
 content/living/bottles/list.txt 174
-content/workshop/visitors/2026-09-24-ap26035615816169-1-e1772197124803-2312710097.jpg 98487
 content/workshop/visitors/2026-09-24-claube-by-skizy.png 600582
 content/workshop/visitors/2026-09-24-clutterflies-by-skizy.png 464922
 content/workshop/visitors/2026-09-24-untitled.png 65299
-content/workshop/visitors/list.txt 265
+content/workshop/visitors/list.txt 205

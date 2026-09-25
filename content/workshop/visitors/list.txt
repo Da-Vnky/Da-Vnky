@@ -1,6 +1,5 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
-2026-09-24-ap26035615816169-1-e1772197124803-2312710097.jpg
 2026-09-24-claube-by-skizy.png
 2026-09-24-clutterflies-by-skizy.png
 2026-09-24-untitled.png

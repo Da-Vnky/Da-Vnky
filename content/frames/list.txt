@@ -1,3 +1,4 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
+False God.jpg
 droolers.png
