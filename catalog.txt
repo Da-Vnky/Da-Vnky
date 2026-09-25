@@ -42,7 +42,7 @@ sky/paper.css 7388 392067971
 sky/sky.css 42199 237290238
 assets/characters/list.txt 117 55339362
 assets/city/list.txt 131 2710846636
-assets/city/mel-scare.png 3918062 3124100945
+assets/city/mel-scare.png 1579804 3215643796
 assets/countryside/list.txt 117 55339362
 assets/fonts/list.txt 117 55339362
 assets/items/list.txt 117 55339362
