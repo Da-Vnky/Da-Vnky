@@ -1,4 +1,9 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
+Andy Jassy of the Amazon.jpg
 False God.jpg
+Mark Zuckerberg of the Matrix.webp
+Nadella Satya is Micro Soft.jpg
+Sam GPT.jpg
+Sundar Pichai of Googolian.jpg
 droolers.png
