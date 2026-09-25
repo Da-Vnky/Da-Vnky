@@ -1,6 +1,7 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
 Dario Modei of CLAUBE.jpg
+Elo Maw the Grokikivius.jpg
 False God.gif
 Mark Zuckerberg of the Matrix.webp
 Nadella Satya is Micro Soft.jpg
