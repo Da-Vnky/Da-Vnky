@@ -368,12 +368,15 @@
 
         var lr = letter.getBoundingClientRect();
         var rot = +letter.dataset.rot || 0;
+        // where the letter's own rolls are (on your paper, they sit on its real edge, a little way in: textures.js)
+        var ct = letter.querySelector('.curl-top'), cr = ct ? ct.getBoundingClientRect() : null;
+        var top = cr ? cr.top : lr.top - 12, left = cr ? cr.left : lr.left - 12, wide = cr ? cr.width : lr.width + 24;
         bar.animate([
             { left: (cx - L / 2) + 'px', top: (cy - T / 2) + 'px', width: L + 'px', height: T + 'px', transform: 'rotate(' + bottleAngle + 'deg)' },
-            { left: ((cx - L * 0.75) + (lr.left - 12)) / 2 + 'px', top: Math.min(cy, lr.top) - 90 + 'px', width: (L * 1.5) + 'px', height: '20px', transform: 'rotate(' + (bottleAngle / 3) + 'deg)', offset: 0.45 },
-            { left: (lr.left - 12) + 'px', top: (lr.top - 12) + 'px', width: (lr.width + 24) + 'px', height: '24px', transform: 'rotate(' + rot + 'deg)' }
+            { left: ((cx - L * 0.75) + left) / 2 + 'px', top: Math.min(cy, top + 12) - 90 + 'px', width: (L * 1.5) + 'px', height: '20px', transform: 'rotate(' + (bottleAngle / 3) + 'deg)', offset: 0.45 },
+            { left: left + 'px', top: top + 'px', width: wide + 'px', height: '24px', transform: 'rotate(' + rot + 'deg)' }
         ], { duration: 1050, easing: 'cubic-bezier(.45,0,.25,1)', fill: 'forwards' })
-           .onfinish = function () { unroll(letter, bar, lr); };
+           .onfinish = function () { unroll(letter, bar, lr, top); };
         setTimeout(function () { bar.classList.add('untied'); }, 450);
 
         bottleSvg.animate([
@@ -384,15 +387,18 @@
     }
 
     // 4. the letter unrolls downward (the roll and the reveal move together)
-    function unroll(letter, bar, lr) {
-        var bottom = Math.min(lr.bottom, window.innerHeight + 40);
+    function unroll(letter, bar, lr, top) {
+        // from the top roll down to the bottom roll (or the foot of the screen, for a long letter)
+        var cb = letter.querySelector('.curl-bottom'), end = cb ? cb.getBoundingClientRect().top : lr.bottom - 12;
+        end = Math.min(end, window.innerHeight + 28);
+        var from = Math.max(0, top + 12 - lr.top), to = Math.max(0, lr.bottom - (end + 12));   // (how much is still rolled up, from the bottom)
         var dur = 1150, ease = 'cubic-bezier(.45,.05,.35,1)';
         if (Sky.sounds) Sky.sounds.sfx('paper-unroll');
         var reveal = letter.animate([
-            { clipPath: 'inset(-40px -100px 100% -100px)' },
-            { clipPath: 'inset(-40px -100px 0% -100px)' }
+            { clipPath: 'inset(-40px -100px ' + (lr.height - from).toFixed(1) + 'px -100px)' },
+            { clipPath: 'inset(-40px -100px ' + to.toFixed(1) + 'px -100px)' }
         ], { duration: dur, easing: ease, fill: 'forwards' });
-        bar.animate([{ top: (lr.top - 12) + 'px' }, { top: (bottom - 12) + 'px' }],
+        bar.animate([{ top: top + 'px' }, { top: end + 'px' }],
             { duration: dur, easing: ease, fill: 'forwards' });
         reveal.onfinish = function () {
             letter.classList.remove('corked');

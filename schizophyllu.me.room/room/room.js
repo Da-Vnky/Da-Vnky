@@ -539,7 +539,7 @@ function interact(id) {
     case 'monstera': return;
     case 'notebook':
       return openCloseup(NOTEBOOK_PAGE);
-    case 'hexley': return;
+    case 'hexley': return buzzHexley();
     case 'deskbottle': return;
     case 'pills':
       return openMenu('pill bottles', '#e0782a', [
@@ -781,6 +781,69 @@ function vsoPanel() {
   return `<div class="vso" role="img" aria-label="VSO-1 status readout">${lines.join('\n')}</div>`;
 }
 
+// ============================================================ hexley
+// click the bee and it buzzes: a little loop over monad with its wings a blur, a "bzz", and a hum
+let hexleyBusy = false;
+function buzzHexley() {
+  const bee = svg.querySelector('[data-id="hexley"]');
+  if (!bee || hexleyBusy) return;
+  hexleyBusy = true;
+  const DUR = 1200;
+  bee.style.transformBox = 'fill-box';
+  bee.style.transformOrigin = 'center';
+  bee.animate([
+    { transform: 'none' },
+    { transform: 'translate(-4px, -12px) rotate(-16deg)', offset: .14 },
+    { transform: 'translate(8px, -22px) rotate(8deg)', offset: .32 },
+    { transform: 'translate(18px, -12px) rotate(26deg)', offset: .5 },
+    { transform: 'translate(9px, -4px) rotate(-6deg)', offset: .66 },
+    { transform: 'translate(-3px, -10px) rotate(-18deg)', offset: .82 },
+    { transform: 'translate(0, -2px) rotate(4deg)', offset: .93 },
+    { transform: 'none' },
+  ], { duration: DUR, easing: 'ease-in-out' });
+  // the wings (the first two ellipses): flapping too fast to see
+  [...bee.querySelectorAll('ellipse')].slice(0, 2).forEach(w => {
+    w.style.transformBox = 'fill-box';
+    w.style.transformOrigin = '50% 100%';
+    w.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(.25)' }], { duration: 40, iterations: Math.round(DUR / 40), direction: 'alternate' });
+  });
+  // bzz
+  const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  t.setAttribute('x', 1270); t.setAttribute('y', 620);
+  t.setAttribute('font-size', 12); t.setAttribute('fill', '#ffc766');
+  t.setAttribute('pointer-events', 'none');
+  t.textContent = 'bzz';
+  svg.append(t);
+  t.animate([
+    { transform: 'translate(0, 4px)', opacity: 0 },
+    { transform: 'translate(4px, -4px)', opacity: 1, offset: .25 },
+    { transform: 'translate(12px, -20px)', opacity: 0 },
+  ], { duration: DUR, easing: 'ease-out' }).finished.then(() => t.remove(), () => t.remove());
+  hexleyHum(DUR / 1000);
+  setTimeout(() => { hexleyBusy = false; }, DUR);
+}
+// a small buzzy hum: a sawtooth, wobbling at wingbeat speed, rising and falling with the loop
+function hexleyHum(secs) {
+  if (!audio.live) return;
+  const ctx = audio.ctx, t = ctx.currentTime;
+  const o = ctx.createOscillator(); o.type = 'sawtooth';
+  o.frequency.setValueAtTime(220, t);
+  o.frequency.linearRampToValueAtTime(300, t + secs * .45);
+  o.frequency.linearRampToValueAtTime(200, t + secs);
+  const wob = ctx.createOscillator(); wob.frequency.value = 26;
+  const depth = ctx.createGain(); depth.gain.value = 16;
+  wob.connect(depth).connect(o.frequency);
+  const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 850; f.Q.value = 1.1;
+  const g = audio.out(1262, 0);
+  g.gain.setValueAtTime(.0001, t);
+  g.gain.exponentialRampToValueAtTime(.05, t + .08);
+  g.gain.setValueAtTime(.05, t + secs - .25);
+  g.gain.exponentialRampToValueAtTime(.0001, t + secs);
+  o.connect(f).connect(g);
+  o.start(t); wob.start(t);
+  o.stop(t + secs + .05); wob.stop(t + secs + .05);
+}
+
 // ============================================================ the bathroom mirror
 function toggleCabinet(open) {
   const el = roomEls.bathroom;
@@ -840,8 +903,12 @@ function climb(id) {
 // layering stays put; this pours the drawings in before anything else touches the room
 const XLINK = 'http://www.w3.org/1999/xlink';
 async function inlineArt(root) {
+  const mine = await davArtFiles();                     // (DaV-nky: Victor's own pictures, from its asset manager. see the end)
+  davBackdrop(root, mine);
   await Promise.all([...root.querySelectorAll('[data-art]')].map(async ph => {
-    const url = new URL(ph.dataset.art, location.href);
+    const pic = davPick(mine, davStem(ph.dataset.art));
+    if (pic && !pic.svg) { ph.append(davImage(pic.url)); return; }
+    const url = new URL(pic ? pic.url : ph.dataset.art, location.href);
     try {
       const res = await fetch(url);
       if (!res.ok) throw new Error(res.status);
@@ -1351,7 +1418,7 @@ main();
 // ============================================================ DaV-nky
 // integration with Victor's site (dav-nky.pleroma.nexus), which this room sits across the street from.
 // everything here was added for that; the lines themselves are in room/davnky.js.
-//   · the pills (the bathroom cabinet) can only be taken to skizy in DaV-nky's reset 3, and only once that
+//   · the cabinet is empty before reset 3. the pills (the bathroom cabinet) can only be taken to skizy in DaV-nky's reset 3, and only once that
 //     reset's key is found. in reset 3 it's one of the ways to die: after the lights go out, the visitor
 //     can't live with what they talked her into. back to the rooftop, where it counts (DaV-nky's resets.js)
 //   · after that (and in every reset from 4 on) the room stays quiet: the ending's dark room, skizy alone
@@ -1475,6 +1542,61 @@ if (!PEEK) {
   s.src = new URL('davinv.js', import.meta.url).href;
   s.onload = () => davInv(I => { if (I.has('pills') && DAV.pillsHere) carryingMeds = true; });   // (still carrying one from earlier this visit)
   document.head.appendChild(s);
+}
+// before reset 3 the bathroom cabinet is empty: the pill bottles (and the bags and organizer with them) aren't there yet
+if (DAV.reset < 3) {
+  const st = document.createElement('style');
+  st.textContent = '[data-id="pills"] { display: none; }';
+  document.head.appendChild(st);
+}
+// Victor's own pictures for the room, from DaV-nky's asset manager (tools/assets.html → "Mel's room"), in
+// assets/mel-room/ (its list.txt says what's there):
+//   · <room>-<thing>  takes the place of room/objects/<room>/<thing>.svg: a picture the size of the whole room
+//     (1600 × 900), the thing drawn where it sits, see-through everywhere else. an .svg is poured in just like the
+//     room's own drawings (so it can keep the ids the code needs); any other picture is laid in as an <image>
+//   · <room>          the backdrop: it takes the place of everything in that room that isn't a thing to click,
+//     a speech-bubble anchor, or one of the lights and darks the scenes switch on and off (DAV_ART_KEEP)
+// Mel's own drawings stay as they are: they're the stand-ins
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const DAV_ART = '../assets/mel-room/';
+const DAV_ART_KEEP = ['afternoon-chair', 'light', 'daylight', 'alone-dark', 'h-darkness', 'c-darkness'];
+function davArtFiles() {
+  return davArtFiles.p ??= fetch(new URL(DAV_ART + 'list.txt', location.href), { cache: 'no-cache' })
+    .then(r => r.ok ? r.text() : '')
+    .then(t => /<html/i.test(t) ? [] : t.split(/\r?\n/).map(x => x.trim()).filter(x => x && x[0] !== '#'))
+    .catch(() => []);
+}
+function davPick(files, stem) {
+  if (!stem) return null;
+  for (const ext of ['svg', 'png', 'webp', 'gif', 'jpg', 'jpeg']) {
+    if (files.includes(stem + '.' + ext)) return { url: new URL(DAV_ART + stem + '.' + ext, location.href).href, svg: ext === 'svg' };
+  }
+  return null;
+}
+function davStem(art) {
+  const m = /objects\/([a-z0-9]+)\/([a-z0-9-]+)\.svg$/i.exec(art || '');
+  return m ? (m[1] + '-' + m[2]).toLowerCase() : null;
+}
+function davImage(url) {
+  const im = document.createElementNS(SVG_NS, 'image');
+  im.setAttribute('href', url);
+  for (const [k, v] of [['x', 0], ['y', 0], ['width', 1600], ['height', 900], ['preserveAspectRatio', 'none']]) im.setAttribute(k, v);
+  return im;
+}
+function davBackdrop(root, files) {
+  const ph = root.querySelector('[data-art]');
+  const room = ph && /objects\/([a-z0-9]+)\//i.exec(ph.dataset.art)?.[1].toLowerCase();
+  const pic = room && davPick(files, room);
+  if (!pic) return;
+  let first = null;
+  for (const el of [...root.children]) {
+    if (el.localName === 'defs' || el.localName === 'style' || el.matches('.obj, .anchor, [data-art]') || DAV_ART_KEEP.includes(el.id)) continue;
+    first ??= el;
+    el.style.display = 'none';
+  }
+  const im = davImage(pic.url);
+  im.classList.add('dav-backdrop');
+  if (first) first.before(im); else root.append(im);
 }
 // the way back to the rooftop in the HUD, next door too (see ROOFTOP above)
 document.querySelectorAll('a[href="https://dav-nky.pleroma.nexus/city.html"]').forEach(a => { a.href = ROOFTOP; });

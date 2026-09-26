@@ -3,8 +3,8 @@
    numbered 1 to 8, like Minecraft's. Things you pick up go in the next
    free slot and stay with you from page to page for the rest of the visit:
      the toaster (living space floor), the marker (the workshop's bench),
-     the revolver (the rooftop), and whatever turns up from the hidden
-     loot (sky/loot.js).
+     the revolver (the rooftop), a bottle of Mel's pills (her bathroom, in
+     reset 3), and whatever turns up from the hidden loot (sky/loot.js).
    Click a slot, or press its number, to hold that thing (or, for the
    marker and anything else you switch on, to switch it on); press it
    again, or Esc, to put it away.
@@ -40,6 +40,12 @@
         marker: { name: 'the marker', slot: 'assets/workshop/marker', toggle: true, hint: 'draw on anything. Esc to stop.',
             art: '<svg viewBox="0 0 100 30" aria-hidden="true"><rect x="10" y="6" width="62" height="18" rx="4" fill="#2a2a2e"/><rect x="72" y="8" width="16" height="14" rx="2" fill="#1a1a1c"/>' +
                  '<path d="M88 11 L98 15 L88 19 Z" fill="#111"/><rect x="18" y="10" width="36" height="10" rx="2" fill="#f3e6c2"/><text x="36" y="18" text-anchor="middle" font-size="7" font-family="Arial" font-weight="bold" fill="#2a2a2e">PERM</text></svg>' },
+        // a bottle of Mel's pills, taken from her bathroom cabinet (reset 3: schizophyllu.me.room/room/davinv.js has the
+        // same). it goes where you go for the rest of the visit, but it's only any use back in her room
+        pills: { name: 'a bottle of skizy\u2019s pills', label: 'a pill bottle', slot: 'assets/items/pills', hint: 'it rattles. it\u2019s for skizy.',
+            art: '<svg viewBox="0 0 40 60" aria-hidden="true"><rect x="8" y="4" width="24" height="10" rx="2" fill="#f3f0e6" stroke="#9a968a"/>' +
+                 '<rect x="6" y="14" width="28" height="42" rx="4" fill="#e0782a" opacity=".92"/><rect x="10" y="24" width="20" height="18" fill="#f8f4ea"/>' +
+                 '<path d="M13 30 H27 M13 35 H24" stroke="#8a8a8a" stroke-width="1.6"/><path d="M10 18 V52" stroke="#f7b070" stroke-width="2" opacity=".6"/></svg>' },
         revolver: { name: 'the revolver', slot: 'assets/city/revolver', hint: 'aim and click. Esc to put it away.', cursor: 'reticle', keep: true,
             art: '<svg viewBox="0 0 100 60" aria-hidden="true"><path d="M8 14 H70 V26 H8 Z" fill="#4a4f57"/><rect x="4" y="15" width="6" height="10" fill="#2f3339"/>' +
                  '<rect x="46" y="12" width="26" height="22" rx="5" fill="#5b616a"/><circle cx="52" cy="23" r="2" fill="#2f3339"/><circle cx="60" cy="23" r="2" fill="#2f3339"/><circle cx="68" cy="23" r="2" fill="#2f3339"/>' +

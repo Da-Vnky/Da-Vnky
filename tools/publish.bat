@@ -2,7 +2,8 @@
 rem =====================================================================
 rem  publish: double-click this (it's in the tools folder) to put your
 rem  changes on the live site. it
-rem    1. fetches anything new from Forgejo (songs you uploaded there too)
+rem    1. fetches anything new from Forgejo (Mel's changes, songs you
+rem       uploaded there): tools/pull.sh, the same as pull.bat
 rem    2. rewrites every list.txt, so new files appear and deleted ones go
 rem    3. asks what you changed, commits, and pushes
 rem  preview first with preview.bat if you like.
@@ -21,11 +22,11 @@ if not defined GITSH (
 )
 
 echo.
-echo  1. getting anything new from Forgejo...
-git pull --rebase --autostash
+echo  1. getting anything new from Forgejo (Mel's changes, songs you uploaded there)...
+"%GITSH%" -c "tr -d '\r' < tools/pull.sh | sh -s -- --quiet"
 if errorlevel 1 (
     echo.
-    echo  The pull didn't go through. Copy what it says above and ask for help.
+    echo  So nothing's been published. Your changes are still here, just as they were.
     pause
     goto :eof
 )

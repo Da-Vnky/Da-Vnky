@@ -3,3 +3,11 @@
 *.sh            text eol=lf
 tools/hooks/*   text eol=lf
 *.bat           text eol=crlf
+
+# the lists are written by tools/update-lists.sh, never by hand: when two people's changes come together
+# (tools/pull.sh) they can't clash, they're just written again afterwards
+list.txt                  merge=regen
+catalog.txt               merge=regen
+files.txt                 merge=regen
+manifest.txt              merge=regen
+assets/resets/index.txt   merge=regen

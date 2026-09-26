@@ -7,3 +7,6 @@ sfx to use/
 
 # the content manager's debug page: only for your own computer, never published
 tools/debug.html
+
+# your own versions of files that were changed on Forgejo too, kept by tools/pull.sh until they're put together
+_your-versions/

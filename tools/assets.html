@@ -68,6 +68,9 @@
         background: repeating-conic-gradient(#e6d8b6 0 25%, #f3ead2 0 50%) 0 0 / 18px 18px; }
     .card .look img, .card .look video { max-width: 100%; max-height: 100%; object-fit: contain; }
     .card .look audio { width: 92%; }
+    .card .look .stock.has-pic { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; height: 100%; box-sizing: border-box; }
+    .stock-pic { width: 100%; flex: 1 1 auto; min-height: 0; display: block; }
+    .lthumb .stock-pic { width: 100%; height: 100%; }
     .card .look .stock { font-style: italic; color: #8a7258; text-align: center; padding: 10px; background: rgba(243,234,210,.85); border: 1.5px dashed rgba(110,82,54,.45); border-radius: 8px; font-size: .9rem; }
     .card .look .fontdemo { font-size: 2.2rem; }
     .card .look pre { margin: 0; padding: 10px; width: 100%; height: 100%; overflow: hidden; font-size: .72rem; white-space: pre-wrap; background: rgba(255,255,255,.6); }
@@ -274,7 +277,16 @@
     }
 
     /* ---------------- a slot's card ---------------- */
-    function preview(f, kind) {
+    // a stand-in that's a file of its own (Mel's room: her drawings, each the size of the whole room), shown
+    // zoomed in on the thing (crop: x y w h in the room, measured when the slot was described)
+    function stockPic(s) {
+        if (!s || !s.stock) return '';
+        return '<svg class="stock-pic" viewBox="' + esc(s.crop || '0 0 1600 900') + '" preserveAspectRatio="xMidYMid meet">' +
+            '<image href="/' + esc(s.stock) + '" x="0" y="0" width="1600" height="900"/></svg>';
+    }
+    function preview(f, kind, s) {
+        if (!f && s && s.stock) return '<div class="stock has-pic">' + stockPic(s) + '<small>the stand-in (' + (s.kind === 'svg' ? 'SVG only' : 'Mel\u2019s drawing') + ')</small></div>';
+        if (f && s && s.stock && s.crop && PICS.test(f.name)) return stockPic({ stock: f.url.replace(/^\//, ''), crop: s.crop });
         if (!f) return '<div class="stock">the stand-in<br><small>(' + (kind === 'sound' ? 'the page makes this sound itself' : kind === 'font' ? 'the default lettering' : 'the drawing that’s there now') + ')</small></div>';
         if (PICS.test(f.name)) return '<img alt="" loading="lazy" src="' + f.url + '">';
         if (VIDS.test(f.name)) return '<video muted loop autoplay playsinline src="' + f.url + '"></video>';
@@ -285,7 +297,7 @@
     function card(s) {
         var kind = s.kind || 'image', f = fileFor(s.slot);
         var c = el('div', 'card' + (s.optional ? ' optional' : ''));
-        c.appendChild(el('div', 'look', preview(f, kind)));
+        c.appendChild(el('div', 'look', preview(f, kind, s)));
         c.appendChild(el('span', 'tag' + (f ? ' yours' : ''), f ? 'yours' : 'stand-in'));
         var pre = c.querySelector('pre[data-json]');
         if (pre) fetch(pre.dataset.json).then(function (r) { return r.text(); }).then(function (t) { pre.textContent = t; });
@@ -308,7 +320,8 @@
         droppable(c, function (fs) { put(s.slot, kind, fs[0]); });
         return c;
     }
-    function thumb(f, kind) {
+    function thumb(f, kind, s) {
+        if (!f && s && s.stock) return '<span class="lthumb">' + stockPic(s) + '</span>';
         if (!f) return '<span class="lthumb none">\u2013</span>';
         if (PICS.test(f.name)) return '<span class="lthumb"><img alt="" loading="lazy" src="' + f.url + '"></span>';
         if (VIDS.test(f.name)) return '<span class="lthumb"><video muted loop autoplay playsinline src="' + f.url + '"></video></span>';
@@ -323,7 +336,7 @@
         head.setAttribute('role', 'button');
         head.setAttribute('tabindex', '0');
         head.setAttribute('aria-expanded', String(!!openRows[s.slot]));
-        head.innerHTML = thumb(f, kind) +
+        head.innerHTML = thumb(f, kind, s) +
             '<span class="lname"><b>' + esc(s.slot.replace(/^assets\//, '')) + '</b><span>' + esc(s.what) + (s.size ? ' \u00B7 ' + esc(s.size) : '') + '</span></span>' +
             (s.optional ? '<span class="ltag opt">optional</span>' : '') +
             (g ? '<span class="ltag yours">+ glow</span>' : '') +
@@ -361,6 +374,7 @@
     }
     function counts(slots) {
         var need = slots.filter(function (s) { return !s.optional; });
+        if (!need.length) need = slots.filter(function (s) { return !s.twin; });     // (a scene that's all optional, like Mel's room: count them all)
         return { done: need.filter(function (s) { return fileFor(s.slot); }).length, of: need.length };
     }
     function intro(text, page, slots) {

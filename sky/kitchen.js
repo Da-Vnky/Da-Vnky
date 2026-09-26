@@ -10,11 +10,12 @@
    traveller wants it, takes it, bites… it's sweet, and then it isn't. A death
    like any other (sky/gore.js respawn), and there's always another apple, just
    as red, for the rest of reset 3. From reset 2 on, not before the key
-   (sky/lives.js refuse). Before reset 3 it's just a bowl of fruit; after it,
-   only the core's left, and the serpent's shed skin.
+   (sky/lives.js refuse). Before reset 3, where the serpent will be, there's
+   a string of sausages coiled round the bowl. After it, the fruit spills out
+   of a cornucopia instead (the Mandela effect: it was never there, was it?).
 
    slots (assets/living/): hall-kitchen-door, kitchen-wall, kitchen-floor, kitchen-window,
-          kitchen-counter, kitchen-fridge, fruit-bowl, apple, serpent, apple-core, serpent-skin;
+          kitchen-counter, kitchen-fridge, fruit-bowl, apple, serpent, sausages, cornucopia;
           assets/characters/kitchen (+ kitchen-walking)
    sounds: bite, hiss, choke (stand-ins till then)
    ===================================================================== */
@@ -72,10 +73,13 @@
         '.kitchen .kitchen-apple:hover, .kitchen .kitchen-apple:focus-visible { outline: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)) drop-shadow(0 0 8px rgba(255,60,60,.7)); }' +
         '.kitchen .kitchen-apple.gone { visibility: hidden; }' +
         '.kitchen .kitchen-apple.again { animation: ka-again 1.2s ease-out; } @keyframes ka-again { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }' +
-        '.kitchen .kitchen-core { left: calc(44% + 9vw + 1vw); bottom: calc(var(--floor-h) - 1vh + 24vh * .93); width: 2vw; min-width: 20px; z-index: 4; display: none; pointer-events: none; }' +
-        '.kitchen .kitchen-skin { left: calc(44% - 3vw); bottom: calc(var(--floor-h) - 1vh + 24vh * .93 - .6vh); width: 12vw; min-width: 110px; z-index: 2; display: none; pointer-events: none; }' +
-        '.kitchen.apple-live .kitchen-serpent, .kitchen.apple-live .kitchen-apple { display: block; }' +
-        '.kitchen.apple-gone .kitchen-core, .kitchen.apple-gone .kitchen-skin { display: block; }' +
+        // before reset 3: sausages where the serpent will be; after it: a cornucopia instead of the bowl
+        '.kitchen .kitchen-sausages { left: calc(44% - 2.2vw); bottom: calc(var(--floor-h) - 1vh + 24vh * .93 - 1.2vh); width: 13.5vw; min-width: 120px; aspect-ratio: 160 / 90; z-index: 4; display: none; }' +
+        '.kitchen .kitchen-cornucopia { left: calc(44% - 4vw); bottom: calc(var(--floor-h) - 1vh + 24vh * .93 - .4vh); width: 17vw; min-width: 150px; aspect-ratio: 200 / 110; z-index: 3; display: none; }' +
+        '.kitchen .kitchen-sausages > svg, .kitchen .kitchen-sausages > .art, .kitchen .kitchen-cornucopia > svg, .kitchen .kitchen-cornucopia > .art { display: block; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; }' +
+        '.kitchen .kitchen-sausages:hover .kh-hint, .kitchen .kitchen-cornucopia:hover .kh-hint { opacity: 1; }' +
+        '.kitchen.apple-live .kitchen-serpent, .kitchen.apple-live .kitchen-apple, .kitchen.apple-before .kitchen-sausages, .kitchen.apple-gone .kitchen-cornucopia { display: block; }' +
+        '.kitchen.apple-gone .kitchen-bowl { display: none; }' +
         '.kitchen .kitchen-back { position: absolute; right: 14px; top: 74%; margin-top: -27px; border: 0; cursor: pointer; }' +
         '.kitchen .kitchen-character { left: ' + ENTER + '%; bottom: 3vh; height: 25vh; z-index: 5; }' +
         // the apple, in their hand; the sweetness turning
@@ -88,9 +92,10 @@
         '.character.kt-sway { animation: kt-sway 1.6s ease-in-out infinite; transform-origin: 50% 100%; }' +
         '@keyframes kt-sway { 0%, 100% { rotate: -2deg; } 50% { rotate: 5deg; } }' +
         '@media (max-width: 620px) { .kitchen .kitchen-character { height: 14vh; } .kitchen .kitchen-counter { left: 26%; right: 4%; height: 18vh; }' +
-            '.kitchen .kitchen-bowl, .kitchen .kitchen-apple, .kitchen .kitchen-core { bottom: calc(var(--floor-h) - 1vh + 18vh * .93); }' +
-            '.kitchen .kitchen-serpent { bottom: calc(var(--floor-h) - 1vh + 18vh * .93 - 1vh); } .kitchen .kitchen-skin { bottom: calc(var(--floor-h) - 1vh + 18vh * .93); }' +
-            '.kitchen .kitchen-bowl { left: 40%; width: 20vw; } .kitchen .kitchen-serpent { left: calc(40% - 5vw); width: 30vw; } .kitchen .kitchen-apple, .kitchen .kitchen-core { left: calc(40% + 22vw); width: 6vw; }' +
+            '.kitchen .kitchen-bowl, .kitchen .kitchen-apple, .kitchen .kitchen-cornucopia { bottom: calc(var(--floor-h) - 1vh + 18vh * .93); }' +
+            '.kitchen .kitchen-serpent, .kitchen .kitchen-sausages { bottom: calc(var(--floor-h) - 1vh + 18vh * .93 - 1vh); }' +
+            '.kitchen .kitchen-bowl { left: 40%; width: 20vw; } .kitchen .kitchen-serpent, .kitchen .kitchen-sausages { left: calc(40% - 5vw); width: 30vw; } .kitchen .kitchen-apple { left: calc(40% + 22vw); width: 6vw; }' +
+            '.kitchen .kitchen-cornucopia { left: calc(40% - 8vw); width: 38vw; }' +
             '.kitchen .kitchen-fridge { height: 40vh; } .hallway .hall-kitchen { height: 34vh; } }' +
         '@media (prefers-reduced-motion: reduce) { .character.kt-sway { animation: none; } }'
     );

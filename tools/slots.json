@@ -30,6 +30,9 @@
    "woff",
    "ttf",
    "otf"
+  ],
+  "svg": [
+   "svg"
   ]
  },
  "noise": [
@@ -944,11 +947,6 @@
        "slot": "assets/city/mel-board",
        "what": "one board nailed over her window (a plank, stretched to fit)",
        "size": "about 6:1, e.g. 900 x 150"
-      },
-      {
-       "slot": "assets/city/mel-scare",
-       "what": "what’s behind the boards: the jump scare, then it slides slowly out of the window (see-through)",
-       "size": "about 4:5, feet at the bottom"
       }
      ]
     }
@@ -1480,14 +1478,14 @@
        "size": "about 160:90, see-through"
       },
       {
-       "slot": "assets/living/apple-core",
-       "what": "after reset 3: the apple core left on the counter",
-       "size": "about 40:44, see-through"
+       "slot": "assets/living/sausages",
+       "what": "before reset 3: a string of sausages coiled round the fruit bowl, where the serpent will be (laid over the bowl)",
+       "size": "about 160:90, see-through"
       },
       {
-       "slot": "assets/living/serpent-skin",
-       "what": "after reset 3: the serpent’s shed skin",
-       "size": "about 160:40, see-through"
+       "slot": "assets/living/cornucopia",
+       "what": "after reset 3: a cornucopia with the fruit spilling out, in place of the bowl (the Mandela effect)",
+       "size": "about 200:110, see-through"
       },
       {
        "slot": "assets/characters/kitchen",
@@ -1622,6 +1620,11 @@
        "slot": "assets/items/doom-record",
        "what": "the P(Doom) record in its sleeve: falls out when you shoot the hall of shame’s frame 6",
        "size": "1:1"
+      },
+      {
+       "slot": "assets/items/pills",
+       "what": "a bottle of Mel’s pills, from her bathroom cabinet (reset 3): its picture in the hotbar",
+       "size": "square-ish, see-through"
       },
       {
        "slot": "assets/items/gimp-suit",
@@ -2086,11 +2089,6 @@
        "kind": "sound"
       },
       {
-       "slot": "assets/sounds/hobo",
-       "what": "behind mel’s boards: plays from the moment the last one comes off (12 s of black, then the scare)",
-       "kind": "sound"
-      },
-      {
        "slot": "assets/sounds/life-lost",
        "what": "losing a life"
       },
@@ -2226,6 +2224,905 @@
     }
    ],
    "note": "the noise machine’s sounds have their own tab."
+  },
+  {
+   "id": "mel-room",
+   "name": "Mel’s room (schizophyllu.me.room)",
+   "page": "schizophyllu.me.room/index.html?from=dav-nky",
+   "note": "Mel’s apartment across the street. every drawing here is the size of the whole room (1600 x 900): draw the thing where it sits in the room and leave the rest see-through, and it lands in place. (open the stand-in to see where.) the ones marked SVG only have parts the page switches on and off; a flat picture would lose them. pictures don’t get the stand-ins’ little animations (a blinking light, Claube’s pen). Mel’s own drawings stay as they are.",
+   "groups": [
+    {
+     "name": "the main room (skizy’s desk, the CRT, the fridge, Mira, Claube)",
+     "slots": [
+      {
+       "slot": "assets/mel-room/main",
+       "what": "the backdrop of the main room: walls, floor, furniture, everything that isn’t something to click. the lights and darks the scenes switch stay on top of it",
+       "size": "1600 x 900 (the whole room)",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/room.svg"
+      },
+      {
+       "slot": "assets/mel-room/main-poster",
+       "what": "poster: the archive of those who watch (SVG only: the page switches parts of it, so keep these ids: #poster-iris)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/poster.svg",
+       "kind": "svg",
+       "crop": "610 53 173 221"
+      },
+      {
+       "slot": "assets/mel-room/main-window",
+       "what": "the window (unboarded)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/window.svg",
+       "crop": "0 91 388 397"
+      },
+      {
+       "slot": "assets/mel-room/main-sill",
+       "what": "window sill",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/sill.svg",
+       "crop": "82 381 244 82"
+      },
+      {
+       "slot": "assets/mel-room/main-starchart",
+       "what": "star chart",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/starchart.svg",
+       "crop": "389 83 216 178"
+      },
+      {
+       "slot": "assets/mel-room/main-vso",
+       "what": "VSO-1 relay (status)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/vso.svg",
+       "crop": "387 211 244 111"
+      },
+      {
+       "slot": "assets/mel-room/main-drawing",
+       "what": "the drawing (love, skizy)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/drawing.svg",
+       "crop": "1334 55 140 190"
+      },
+      {
+       "slot": "assets/mel-room/main-telescope",
+       "what": "telescope",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/telescope.svg",
+       "crop": "238 418 244 376"
+      },
+      {
+       "slot": "assets/mel-room/main-pccase",
+       "what": "paranoia (open case, GPU elsewhere)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/pccase.svg",
+       "crop": "555 611 91 154"
+      },
+      {
+       "slot": "assets/mel-room/main-mira",
+       "what": "Mira",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/mira.svg",
+       "crop": "428 308 185 469"
+      },
+      {
+       "slot": "assets/mel-room/main-hiddennote",
+       "what": "a folded note",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/hiddennote.svg",
+       "crop": "840 537 43 38"
+      },
+      {
+       "slot": "assets/mel-room/main-console",
+       "what": "the grey console (funger) (SVG only: the page switches parts of it, so keep these ids: #console-led)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/console.svg",
+       "kind": "svg",
+       "crop": "638 640 108 46"
+      },
+      {
+       "slot": "assets/mel-room/main-crt",
+       "what": "the Phosphor Artifact",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/crt.svg",
+       "crop": "615 269 270 331"
+      },
+      {
+       "slot": "assets/mel-room/main-mugs",
+       "what": "mugs",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/mugs.svg",
+       "crop": "694 266 35 34"
+      },
+      {
+       "slot": "assets/mel-room/main-monster",
+       "what": "Monster can",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/monster.svg",
+       "crop": "774 258 28 42"
+      },
+      {
+       "slot": "assets/mel-room/main-enki",
+       "what": "crochet Enki",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/enki.svg",
+       "crop": "726 243 45 52"
+      },
+      {
+       "slot": "assets/mel-room/main-deskbottle",
+       "what": "the pill bottle left on her desk (only after she’s taken them)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/deskbottle.svg",
+       "crop": "1088 517 34 45"
+      },
+      {
+       "slot": "assets/mel-room/main-gpu",
+       "what": "GPU (16 GB)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/gpu.svg",
+       "crop": "876 522 94 39"
+      },
+      {
+       "slot": "assets/mel-room/main-ssd",
+       "what": "2TB AliExpress SSD",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/ssd.svg",
+       "crop": "958 524 50 37"
+      },
+      {
+       "slot": "assets/mel-room/main-solder",
+       "what": "soldering iron (on)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/solder.svg",
+       "crop": "1117 496 69 66"
+      },
+      {
+       "slot": "assets/mel-room/main-screwdriver",
+       "what": "screwdriver",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/screwdriver.svg",
+       "crop": "996 530 58 29"
+      },
+      {
+       "slot": "assets/mel-room/main-drawer",
+       "what": "the drawer (CH341A inside)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/drawer.svg",
+       "crop": "1081 555 119 195"
+      },
+      {
+       "slot": "assets/mel-room/main-mugs-2",
+       "what": "more mugs",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/mugs-2.svg",
+       "crop": "1148 522 49 39"
+      },
+      {
+       "slot": "assets/mel-room/main-monster-2",
+       "what": "Monster can",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/monster-2.svg",
+       "crop": "988 503 334 256"
+      },
+      {
+       "slot": "assets/mel-room/main-packages",
+       "what": "AliExpress packages",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/packages.svg",
+       "crop": "1088 693 109 55"
+      },
+      {
+       "slot": "assets/mel-room/main-server",
+       "what": "monad (server)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/server.svg",
+       "crop": "1168 300 149 469"
+      },
+      {
+       "slot": "assets/mel-room/main-aether",
+       "what": "Aether (tiny local model)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/aether.svg",
+       "crop": "1206 308 44 71"
+      },
+      {
+       "slot": "assets/mel-room/main-hexley",
+       "what": "Hexley",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/hexley.svg",
+       "crop": "1245 622 35 32"
+      },
+      {
+       "slot": "assets/mel-room/main-skizy",
+       "what": "skizy, at her desk (Mel)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/skizy.svg",
+       "crop": "916 398 192 371"
+      },
+      {
+       "slot": "assets/mel-room/main-claube",
+       "what": "Claube",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/claube.svg",
+       "crop": "1272 363 265 405"
+      },
+      {
+       "slot": "assets/mel-room/main-clipboards",
+       "what": "clipboards 1, 2 and 4",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/clipboards.svg",
+       "crop": "1237 673 151 85"
+      },
+      {
+       "slot": "assets/mel-room/main-papers",
+       "what": "incident reports",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/papers.svg",
+       "crop": "1200 738 145 63"
+      },
+      {
+       "slot": "assets/mel-room/main-mugs-3",
+       "what": "more mugs",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/mugs-3.svg",
+       "crop": "1298 522 34 66"
+      },
+      {
+       "slot": "assets/mel-room/main-mugs-4",
+       "what": "even more mugs",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/mugs-4.svg",
+       "crop": "1470 698 45 46"
+      },
+      {
+       "slot": "assets/mel-room/main-fridge",
+       "what": "the other fridge (monster, ramen) (SVG only: the page switches parts of it, so keep these ids: #fridge-closed, #fridge-open)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/fridge.svg",
+       "kind": "svg",
+       "crop": "1476 364 124 401"
+      },
+      {
+       "slot": "assets/mel-room/main-powerstrip",
+       "what": "power strip → power strip → power strip",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/powerstrip.svg",
+       "crop": "764 622 372 263"
+      },
+      {
+       "slot": "assets/mel-room/main-cables",
+       "what": "the temporary setup (spoingus)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/cables.svg",
+       "crop": "748 512 814 388"
+      },
+      {
+       "slot": "assets/mel-room/main-boards",
+       "what": "the boards",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/boards.svg",
+       "crop": "16 601 337 244"
+      },
+      {
+       "slot": "assets/mel-room/main-eboards",
+       "what": "circuit boards",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/eboards.svg",
+       "crop": "0 743 186 157"
+      },
+      {
+       "slot": "assets/mel-room/main-blanket",
+       "what": "blanket formation",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/blanket.svg",
+       "crop": "284 776 221 124"
+      },
+      {
+       "slot": "assets/mel-room/main-notebook",
+       "what": "an open notebook",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/notebook.svg",
+       "crop": "457 814 92 50"
+      },
+      {
+       "slot": "assets/mel-room/main-beanbag",
+       "what": "bean bag (infrastructure)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/beanbag.svg",
+       "crop": "537 735 246 165"
+      },
+      {
+       "slot": "assets/mel-room/main-lump",
+       "what": "skizy (asleep under the blanket)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/lump.svg",
+       "crop": "552 693 236 207"
+      },
+      {
+       "slot": "assets/mel-room/main-trash",
+       "what": "the trash",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/trash.svg",
+       "crop": "1416 762 184 138"
+      },
+      {
+       "slot": "assets/mel-room/main-alone",
+       "what": "skizy alone in the corner (the quiet room, from reset 3 on)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/alone.svg",
+       "crop": "140 578 144 148"
+      }
+     ]
+    },
+    {
+     "name": "the bedroom",
+     "slots": [
+      {
+       "slot": "assets/mel-room/bedroom",
+       "what": "the backdrop of the bedroom: walls, floor, furniture, everything that isn’t something to click. the lights and darks the scenes switch stay on top of it",
+       "size": "1600 x 900 (the whole room)",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/bedroom.svg"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-books",
+       "what": "bookshelf",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/books.svg",
+       "crop": "0 118 320 666"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-bwindow",
+       "what": "window",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/bwindow.svg",
+       "crop": "1159 77 334 390"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-radiator",
+       "what": "radiator",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/radiator.svg",
+       "crop": "1214 458 253 260"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-acloset",
+       "what": "acloset (SVG only: the page switches parts of it, so keep these ids: #ac-closed, #ac-open)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/acloset.svg",
+       "kind": "svg",
+       "crop": "858 160 231 575"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-monstera",
+       "what": "monstera (guarding the entrance)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/monstera.svg",
+       "crop": "825 501 157 214"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-corkboard",
+       "what": "corkboard",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/corkboard.svg",
+       "crop": "380 110 292 218"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-tuxphoto",
+       "what": "a polaroid of tux",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/tuxphoto.svg",
+       "crop": "406 135 100 116"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-eboards",
+       "what": "circuit boards",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/eboards.svg",
+       "crop": "1410 690 151 87"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-bblanket",
+       "what": "the blanket formation (origin)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/bblanket.svg",
+       "crop": "1128 590 310 211"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-laptop",
+       "what": "laptop",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/laptop.svg",
+       "crop": "1280 560 108 75"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-lavalamp",
+       "what": "lava lamp",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/lavalamp.svg",
+       "crop": "1078 548 54 100"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-station",
+       "what": "the music station (SVG only: the page switches parts of it, so keep these ids: #st-bars, #st-clock, #st-dial, #st-knob, #st-list, #st-playicon, #st-radioled, #st-status, #vu-l, #vu-r, #woof-l, #woof-r)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/station.svg",
+       "kind": "svg",
+       "crop": "238 282 696 400"
+      }
+     ]
+    },
+    {
+     "name": "the hallway and kitchenette",
+     "slots": [
+      {
+       "slot": "assets/mel-room/hallway",
+       "what": "the backdrop of the hallway and kitchenette: walls, floor, furniture, everything that isn’t something to click. the lights and darks the scenes switch stay on top of it",
+       "size": "1600 x 900 (the whole room)",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/hallway.svg"
+      },
+      {
+       "slot": "assets/mel-room/hallway-bulb",
+       "what": "light switch (SVG only: the page switches parts of it, so keep these ids: #h-bulbglass)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/bulb.svg",
+       "kind": "svg",
+       "crop": "539 111 42 42"
+      },
+      {
+       "slot": "assets/mel-room/hallway-smoke",
+       "what": "smoke detector (low battery)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/smoke.svg",
+       "crop": "808 6 64 34"
+      },
+      {
+       "slot": "assets/mel-room/hallway-bathroom",
+       "what": "bathroom (light left on)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/bathroom.svg",
+       "crop": "48 138 303 603"
+      },
+      {
+       "slot": "assets/mel-room/hallway-closetdoor",
+       "what": "the closet",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/closetdoor.svg",
+       "crop": "283 145 350 596"
+      },
+      {
+       "slot": "assets/mel-room/hallway-frontdoor",
+       "what": "front door",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/frontdoor.svg",
+       "crop": "581 95 358 650"
+      },
+      {
+       "slot": "assets/mel-room/hallway-mail",
+       "what": "mail",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/mail.svg",
+       "crop": "679 691 138 59"
+      },
+      {
+       "slot": "assets/mel-room/hallway-bulb-2",
+       "what": "light switch (SVG only: the page switches parts of it, so keep these ids: #h-switch)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/bulb-2.svg",
+       "kind": "svg",
+       "crop": "902 402 34 44"
+      },
+      {
+       "slot": "assets/mel-room/hallway-calendar",
+       "what": "calendar",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/calendar.svg",
+       "crop": "906 219 96 147"
+      },
+      {
+       "slot": "assets/mel-room/hallway-kitchen",
+       "what": "kitchenette",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/kitchen.svg",
+       "crop": "959 179 547 599"
+      },
+      {
+       "slot": "assets/mel-room/hallway-oven",
+       "what": "oven (tater tots, pending)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/oven.svg",
+       "crop": "1267 341 203 425"
+      },
+      {
+       "slot": "assets/mel-room/hallway-sinkmugs",
+       "what": "the sink (mugs)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/sinkmugs.svg",
+       "crop": "1033 480 158 99"
+      },
+      {
+       "slot": "assets/mel-room/hallway-kfridge",
+       "what": "the proper fridge (SVG only: the page switches parts of it, so keep these ids: #kf-closed, #kf-open)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/kfridge.svg",
+       "kind": "svg",
+       "crop": "1433 265 167 508"
+      },
+      {
+       "slot": "assets/mel-room/hallway-eboards",
+       "what": "circuit boards",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/eboards.svg",
+       "crop": "996 64 401 183"
+      },
+      {
+       "slot": "assets/mel-room/hallway-microwave",
+       "what": "microwave (12:00)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/microwave.svg",
+       "crop": "1460 224 139 91"
+      },
+      {
+       "slot": "assets/mel-room/hallway-htrash",
+       "what": "the hallway trash",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/htrash.svg",
+       "crop": "883 627 130 186"
+      }
+     ]
+    },
+    {
+     "name": "the bathroom",
+     "slots": [
+      {
+       "slot": "assets/mel-room/bathroom",
+       "what": "the backdrop of the bathroom: walls, floor, furniture, everything that isn’t something to click. the lights and darks the scenes switch stay on top of it",
+       "size": "1600 x 900 (the whole room)",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/bathroom.svg"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-twindow",
+       "what": "frosted window",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/twindow.svg",
+       "crop": "1282 90 200 152"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-pipes",
+       "what": "the pipes (SVG only: the page switches parts of it, so keep these ids: #t-gauge)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/pipes.svg",
+       "kind": "svg",
+       "crop": "223 25 1116 752"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-curtain",
+       "what": "shower curtain",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/curtain.svg",
+       "crop": "2 129 574 510"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-duck",
+       "what": "rubber duck",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/duck.svg",
+       "crop": "70 469 58 50"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-tpcbs",
+       "what": "circuit boards, drying",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/tpcbs.svg",
+       "crop": "284 460 227 64"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-ipa",
+       "what": "isopropyl alcohol, 99%",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/ipa.svg",
+       "crop": "500 432 38 84"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-medcab",
+       "what": "mirror cabinet (SVG only: the page switches parts of it, so keep these ids: #cab-door, #cab-inside, #t-fog)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/medcab.svg",
+       "kind": "svg",
+       "crop": "656 134 248 292"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-tmonster",
+       "what": "Monster can",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/tmonster.svg",
+       "crop": "820 392 29 46"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-toilet",
+       "what": "toilet",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/toilet.svg",
+       "crop": "968 386 212 376"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-tppyramid",
+       "what": "a pyramid of empty rolls",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/tppyramid.svg",
+       "crop": "1161 621 137 129"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-btrash",
+       "what": "bathroom trash",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/btrash.svg",
+       "crop": "1314 594 154 167"
+      }
+     ]
+    },
+    {
+     "name": "the closet",
+     "slots": [
+      {
+       "slot": "assets/mel-room/closet",
+       "what": "the backdrop of the closet: walls, floor, furniture, everything that isn’t something to click. the lights and darks the scenes switch stay on top of it",
+       "size": "1600 x 900 (the whole room)",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/closet.svg"
+      },
+      {
+       "slot": "assets/mel-room/closet-xmas",
+       "what": "xmas lights (tangled)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/xmas.svg",
+       "crop": "304 204 182 232"
+      },
+      {
+       "slot": "assets/mel-room/closet-spoingus1",
+       "what": "SPOINGUS I (retired)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/spoingus1.svg",
+       "crop": "448 242 110 96"
+      },
+      {
+       "slot": "assets/mel-room/closet-deadcrt",
+       "what": "a dead CRT",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/deadcrt.svg",
+       "crop": "556 244 106 94"
+      },
+      {
+       "slot": "assets/mel-room/closet-routers",
+       "what": "routers",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/routers.svg",
+       "crop": "321 449 128 112"
+      },
+      {
+       "slot": "assets/mel-room/closet-toolbox",
+       "what": "toolbox",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/toolbox.svg",
+       "crop": "1121 447 128 82"
+      },
+      {
+       "slot": "assets/mel-room/closet-ladder",
+       "what": "ladder (roof hatch)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/ladder.svg",
+       "crop": "638 58 332 754"
+      },
+      {
+       "slot": "assets/mel-room/closet-vacuum",
+       "what": "vacuum",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/vacuum.svg",
+       "crop": "58 568 224 316"
+      },
+      {
+       "slot": "assets/mel-room/closet-scopecase",
+       "what": "the telescope's case",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/scopecase.svg",
+       "crop": "1307 685 276 139"
+      },
+      {
+       "slot": "assets/mel-room/closet-sleepbag",
+       "what": "sleeping bag",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/sleepbag.svg",
+       "crop": "1052 766 255 107"
+      },
+      {
+       "slot": "assets/mel-room/closet-cbulb",
+       "what": "pull chain (SVG only: the page switches parts of it, so keep these ids: #c-bulbglass)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/cbulb.svg",
+       "kind": "svg",
+       "crop": "772 110 61 121"
+      }
+     ]
+    },
+    {
+     "name": "the roof",
+     "slots": [
+      {
+       "slot": "assets/mel-room/roof",
+       "what": "the backdrop of the roof: walls, floor, furniture, everything that isn’t something to click. the lights and darks the scenes switch stay on top of it",
+       "size": "1600 x 900 (the whole room)",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/roof.svg"
+      },
+      {
+       "slot": "assets/mel-room/roof-mirastar",
+       "what": "a variable star",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/mirastar.svg",
+       "crop": "1148 150 68 68"
+      },
+      {
+       "slot": "assets/mel-room/roof-radiotower",
+       "what": "radio tower",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/radiotower.svg",
+       "crop": "1398 268 109 325"
+      },
+      {
+       "slot": "assets/mel-room/roof-dish",
+       "what": "satellite dish",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/dish.svg",
+       "crop": "778 512 89 90"
+      },
+      {
+       "slot": "assets/mel-room/roof-pigeon",
+       "what": "pigeon",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/pigeon.svg",
+       "crop": "908 558 62 44"
+      },
+      {
+       "slot": "assets/mel-room/roof-vent",
+       "what": "vent stack",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/vent.svg",
+       "crop": "1274 464 81 285"
+      },
+      {
+       "slot": "assets/mel-room/roof-hvac",
+       "what": "AC unit",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/hvac.svg",
+       "crop": "1375 625 220 150"
+      },
+      {
+       "slot": "assets/mel-room/roof-rig",
+       "what": "Mira's rooftop rig (VSO-1)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/rig.svg",
+       "crop": "261 511 998 358"
+      },
+      {
+       "slot": "assets/mel-room/roof-chair",
+       "what": "skizy's chair",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/chair.svg",
+       "crop": "524 594 232 227"
+      },
+      {
+       "slot": "assets/mel-room/roof-hatch",
+       "what": "the hatch (back down)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/hatch.svg",
+       "crop": "81 621 274 258"
+      }
+     ]
+    }
+   ]
   }
  ]
 }

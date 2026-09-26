@@ -14,15 +14,14 @@
 
    MEL'S WINDOW: one building on the front row is abandoned, every window dark,
    except one that's boarded up. Click it: knock, and keep knocking, and the boards
-   come off one by one until you're in. Behind the last board: darkness, a wrong
-   sound… and something at the window. That happens once, ever, in each visitor's
-   browser (it doesn't kill you: it lunges, then slides off into the dark). Then the
-   window's lit: Mel's room, her own (schizophyllu.me.room/, she made it), there
-   through the glass. "[ climb in ]" and you're in it, on its own page; its
-   "back to the rooftop" brings you back here. slots:
+   come off one by one until you're in. Behind the last board it's dark for a
+   moment (MEL.dark_secs), then the room fades up out of the black: Mel's room, her
+   own (schizophyllu.me.room/, she made it), there through the glass. "[ climb in ]"
+   and you're in it, on its own page; its "back to the rooftop" brings you back here.
+   (there used to be a jump scare in the dark, before reset 3 became ingestion: gone.)
+   slots:
        assets/city/mel-board       one board (a plank, wider than tall; it's stretched)
-       assets/city/mel-scare       what's waiting behind the boards (a transparent PNG/GIF)
-   sounds: assets/sounds/knock, crack, unnerve, scare (and hobo, the soundtrack in the dark)
+   sounds: assets/sounds/knock, crack
    the words (and who says them): MEL near the top of this file. on your own skyline art, say where her
    window is: "mel": [x%, y%, w%, h%] in assets/city/skyline-front-windows.json
 
@@ -43,10 +42,7 @@
         first: 'knock knock\u2026 nobody answers. try again?',
         more: ['something shifts behind the boards.', 'a board splinters.', 'the wood gives a little more.', 'one more\u2026', ''],
         inside: 'mel\u2019s room',
-        dark: '\u2026',                                       // (under the window while it's pitch black in there)
-        dark_secs: 12,                                     // how long it's pitch black in there, from the last board coming off
-        call: 'call out\u2026',                              // the button you can press in the dark (it does nothing, but you can't help it)
-        calls: ['Is anybody there?', 'Hello?', '\u2026Anybody home?'],
+        dark_secs: 1.5,                                    // how long it's dark in there after the last board, before the room fades up
         lit: 'something inside is lit.',
         climb: '[ climb in ]'
     };
@@ -127,11 +123,11 @@
         '.peep-scene.mel .ps-curtain { display: none; }' +
         '.peep-scene.mel .ps-frame { box-shadow: 0 0 0 3px #3a2a20, 0 0 40px 6px rgba(255,160,80,.18); border-color: #3a2a20; }' +
         '.peep-scene.mel.in .ps-frame { box-shadow: 0 0 0 3px #3a2a20, 0 0 70px 14px rgba(255,170,90,.4); transition: box-shadow 1.5s; }' +
-        '.peep-scene.mel .ps-view > .mel-dark { position: absolute; inset: 0; background: #000; opacity: 1; transition: opacity 1.8s; pointer-events: none; }' +
+        '.peep-scene.mel .ps-view > .mel-dark { position: absolute; inset: 0; background: #000; opacity: 1; transition: opacity 1.2s ease-out; pointer-events: none; }' +
         '.peep-scene.mel.in .ps-view > .mel-dark { opacity: 0; }' +
         '.peep-scene.mel .ps-view > svg { width: 100%; height: 100%; display: block; }' +
         '.peep-scene.mel.void .ps-view > .mel-dark { opacity: 1 !important; transition: opacity .3s; }' +
-        // her room (schizophyllu.me.room/, Mel's own): live through the glass once the thing at the window's been
+        // her room (schizophyllu.me.room/, Mel's own): live through the glass once the boards are off
         '.ps-view > .mel-live { position: absolute; inset: 0; padding: 0; overflow: hidden; max-height: none; background: #07080d; cursor: pointer; }' +
         '.mel-live iframe { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; border: 0; pointer-events: none; transform-origin: 50% 50%; }' +
         '.mel-climb { position: absolute; left: 50%; bottom: 7%; z-index: 6; transform: translateX(-50%); padding: 7px 18px; border: 1px solid rgba(109,255,176,.55); border-radius: 999px;' +
@@ -141,29 +137,6 @@
         '.mel-through { position: fixed; inset: 0; z-index: 2147483000; background: #000; opacity: 0; pointer-events: all; transition: opacity .9s ease-in; }' +
         '.mel-through.on { opacity: 1; }' +
         '.peep-scene.mel.climbing .ps-frame { transition: transform 1.1s cubic-bezier(.6,0,.9,.5); transform: scale(3.2); }' +
-        // what's behind the boards
-        '.mel-scare { position: absolute; inset: 2% 8% -2%; z-index: 4; pointer-events: none; opacity: 0; }' +
-        '.mel-call { position: absolute; left: 50%; bottom: 7%; z-index: 6; transform: translateX(-50%); padding: 7px 18px; border: 1px solid rgba(243,230,194,.3); border-radius: 999px;' +
-            'background: rgba(20,14,10,.85); color: #f3e6c2; font: italic 1rem "IM Fell English", Georgia, serif; cursor: pointer; }' +
-        '.mel-call:hover { background: rgba(60,40,28,.9); }' +
-        '.mel-calls { position: absolute; inset: 0; z-index: 5; pointer-events: none; }' +
-        '.ps-view > .mel-calls, .ps-view > .mel-scare { padding: 0; overflow: visible; max-height: none; }' +
-        '.mel-said { position: absolute; padding: 4px 12px; border-radius: 12px; background: #f6ecd2; color: #2a1d14; font: italic clamp(.8rem, 1.8vh, 1.05rem) "IM Fell English", Georgia, serif;' +
-            'white-space: nowrap; box-shadow: 0 3px 10px rgba(0,0,0,.6); animation: mel-said 3s ease-out forwards; }' +
-        '@keyframes mel-said { 0% { opacity: 0; transform: translateY(6px); } 10% { opacity: 1; transform: none; } 65% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }' +
-        '.mel-scare > svg, .mel-scare > img, .mel-scare > video { width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; display: block; }' +
-        // your own (a photo, a GIF, a video): right up against the glass, filling the whole window
-        '.mel-scare:has(> img), .mel-scare:has(> video) { inset: 0; }' +
-        '.mel-scare > img, .mel-scare > video { object-fit: cover; object-position: 50% 35%; }' +
-        '.mel-scare.boo { opacity: 1; animation: mel-boo .16s ease-out; }' +
-        '@keyframes mel-boo { from { transform: scale(1.5) translateY(10%); } to { transform: none; } }' +
-        '.mel-scare.away { opacity: 1; transform: translateX(-125%); transition: transform 3.4s cubic-bezier(.45,0,.55,1); }' +
-        '.peep-scene.jolt .ps-frame { animation: mel-jolt .45s linear; }' +
-        '@keyframes mel-jolt { 0%, 100% { translate: 0 0; } 20% { translate: -9px 4px; } 40% { translate: 8px -5px; } 60% { translate: -5px 3px; } 80% { translate: 3px -2px; } }' +
-        '.mel-flash { position: fixed; inset: 0; z-index: 8; pointer-events: none; background: #fff; opacity: 0; }' +
-        '.mel-flash.on { animation: mel-flash .5s ease-out; }' +
-        '@keyframes mel-flash { 0% { opacity: .9; } 100% { opacity: 0; } }' +
-        '@media (prefers-reduced-motion: reduce) { .peep-scene.jolt .ps-frame, .mel-scare.boo { animation: none !important; } }' +
         '@media (max-width: 620px) { .scope-lens { --r: min(45vh, 47vw); } body.peep-close .scope-lens { --r: 49vw; }' +
             '.peep-ui .pu-note { font-size: .95rem; } .ps-frame { border-width: 9px; } }'
     );
@@ -444,12 +417,11 @@
     }
     function leaveScene(quiet) {
         var wasMel = scene.classList.contains('mel');
-        melRun++; hoboStop();
-        scene.querySelectorAll('.mel-call, .mel-climb').forEach(function (b) { b.remove(); });
+        melRun++;
+        scene.querySelectorAll('.mel-climb').forEach(function (b) { b.remove(); });
         scene.classList.remove('climbing');
         document.body.classList.remove('peep-mel');
-        scene.classList.remove('drawn', 'mel', 'in', 'void', 'jolt');
-        scene.querySelectorAll('.mel-scare').forEach(function (b) { b.remove(); });
+        scene.classList.remove('drawn', 'mel', 'in', 'void');
         scene.querySelectorAll('.mel-planks').forEach(function (b) { b.remove(); });
         document.body.classList.remove('peep-close');
         viewEl.querySelectorAll('video').forEach(function (v) { v.pause(); });
@@ -464,23 +436,13 @@
     /* ---------------- mel's window ---------------- */
     var melState = { knocks: 0, off: 0 };
     try { if (sessionStorage.getItem('mel-in') === '1') { melState.off = MEL.boards; document.body.classList.add('mel-in'); } } catch (e) {}
-    var SCARE = '<svg viewBox="0 0 120 150" preserveAspectRatio="xMidYMax meet" aria-hidden="true">' +
-        '<path d="M6 150 Q10 96 34 86 Q60 78 86 86 Q112 96 116 150 Z" fill="#141010"/>' +
-        '<path d="M22 60 Q14 22 44 12 Q60 2 78 12 Q108 22 98 62 Q104 78 90 92 Q60 108 30 92 Q16 78 22 60 Z" fill="#1c1614"/>' +      // matted hair
-        '<path d="M34 56 Q34 30 60 28 Q86 30 86 56 Q88 82 60 90 Q32 82 34 56 Z" fill="#4a3a34"/>' +                                 // a filthy, burnt face
-        '<path d="M40 46 Q50 40 56 48 M64 48 Q70 40 80 46" stroke="#140e0c" stroke-width="3" fill="none"/>' +
-        '<ellipse cx="49" cy="54" rx="6" ry="4.5" fill="#d9d2c4"/><ellipse cx="71" cy="54" rx="6" ry="4.5" fill="#d9d2c4"/>' +
-        '<circle cx="50" cy="54" r="2" fill="#0a0808"/><circle cx="70" cy="54" r="2" fill="#0a0808"/>' +
-        '<path d="M46 74 Q60 68 74 74 Q60 82 46 74 Z" fill="#0a0808"/><path d="M50 74 v3 M56 72 v4 M64 72 v4 M70 74 v3" stroke="#8a8070" stroke-width="1.4"/>' +
-        '<g fill="#1c1614"><path d="M30 40 L18 20 L32 32 Z M90 40 L104 22 L88 32 Z M44 20 L40 2 L52 16 Z"/></g></svg>';
-
     var melRun = 0;
     function later(run, ms, fn) { setTimeout(function () { if (run === melRun && scene.classList.contains('mel')) fn(); }, ms); }
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
     function art(slot, fallback, box) {
         box.innerHTML = fallback;
         Sky.findAsset(slot, function (url) {
-            if (!url) return;                                             // (even if it isn't on the page yet: the scare waits in the dark till its moment)
+            if (!url) return;
             if (/\.(webm|mp4)$/i.test(url)) { box.innerHTML = ''; box.appendChild(Sky.makeMedia({ name: url.split('/').pop(), url: url })); }
             else box.innerHTML = '<img alt="" src="' + url + '">';
         });
@@ -514,71 +476,15 @@
         requestAnimationFrame(function () { t.classList.add('on'); });
         setTimeout(function () { location.href = ROOM + '?from=dav-nky'; }, 1100);
     }
-    // in through the window: (the very first time) the dark, the wrong sound, the face; then mel.
-    // the scare: once per browser, ever ("mel-scared" in localStorage: not forgotten at a reset, nor by "forget your stay")
-    function scaredYet() { try { return localStorage.getItem('mel-scared') === '1'; } catch (e) { return false; } }
-    var hoboUrl = null, hobo = null, boardsOffAt = 0;
-    Sky.findAsset('assets/sounds/hobo.ogg|assets/sounds/hobo.mp3', function (u) { hoboUrl = u || null; });
-    function hoboStart() {                                            // the soundtrack: from the moment the last board comes off
-        boardsOffAt = performance.now();
-        if (scaredYet()) return;
-        if (!hoboUrl) { sfx('unnerve'); return; }
-        try { hobo = new Audio(hoboUrl); hobo.volume = Sky.sounds ? Math.max(.2, Sky.sounds.sfxVolume) : .8; hobo.play().catch(function () {}); } catch (e) {}
-    }
-    function hoboStop() { if (hobo) { var h = hobo; hobo = null; var v = h.volume, iv = setInterval(function () { v -= .08; if (v <= 0) { clearInterval(iv); h.pause(); } else h.volume = v; }, 60); } }
+    // in through the window: a moment's dark, and then her room fades up out of the black
     function melScene(fresh) {
         var run = ++melRun;
-        if (!scaredYet()) {
-            if (!boardsOffAt || !fresh) hoboStart();                  // (back after leaving before it happened: from the top)
-            scene.classList.add('void');
-            note.textContent = '';
-            var frame = scene.querySelector('.ps-frame');
-            // pitch black. all you can do is call out
-            var calls = document.createElement('div');
-            calls.className = 'mel-calls';
-            viewEl.appendChild(calls);
-            var call = document.createElement('button');
-            call.type = 'button';
-            call.className = 'mel-call';
-            call.textContent = MEL.call;
-            frame.appendChild(call);
-            var said = 0;
-            call.addEventListener('click', function (e) {
-                e.stopPropagation();
-                var b = document.createElement('span');
-                b.className = 'mel-said';
-                b.textContent = MEL.calls[said++ % MEL.calls.length];
-                b.style.left = (22 + Math.random() * 40) + '%';
-                b.style.top = (18 + Math.random() * 50) + '%';
-                calls.appendChild(b);
-                setTimeout(function () { b.remove(); }, 3100);
-            });
-            var wait = Math.max(0, MEL.dark_secs * 1000 - (performance.now() - boardsOffAt));
-            var boo = document.createElement('div');
-            boo.className = 'mel-scare';
-            art('assets/city/mel-scare', SCARE, boo);
-            later(run, wait, function () {
-                try { localStorage.setItem('mel-scared', '1'); } catch (e) {}
-                call.remove(); calls.remove();
-                viewEl.appendChild(boo);                                // (inside the window: as it slides away, the wall hides it)
-                sfx('scare');                                         // the sting, on top of the soundtrack
-                boo.classList.add('boo');
-                scene.classList.remove('jolt'); void scene.offsetWidth; scene.classList.add('jolt');
-                var fl = document.querySelector('.mel-flash') || document.body.appendChild(Object.assign(document.createElement('div'), { className: 'mel-flash' }));
-                fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on');
-            });
-            later(run, wait + 1300, function () {                   // it holds there a moment… then slides off into the dark
-                boo.classList.add('away');
-                hoboStop();
-            });
-            later(run, wait + 1300 + 3500, function () {            // and there's the room, lit
-                boo.remove();
-                scene.classList.remove('void');
-                lightsUp(run);
-            });
-            return;
-        }
-        lightsUp(run);
+        scene.classList.add('void');
+        note.textContent = '';
+        later(run, fresh ? MEL.dark_secs * 1000 : 250, function () {
+            scene.classList.remove('void');                             // (.mel-dark fades out over the room: see the css above)
+            lightsUp(run);
+        });
     }
     function lightsUp(run) {
         var room = viewEl.querySelector('.mel-live');
@@ -601,7 +507,7 @@
         state = 'scene';
         applyPan(26, panFor(melWin, 26), 700);
         viewEl.innerHTML = '';
-        if (scaredYet()) viewEl.appendChild(buildRoom());
+        viewEl.appendChild(buildRoom());                                 // (behind the boards and the dark, till it's lit)
         viewEl.insertAdjacentHTML('beforeend', '<div class="mel-dark"></div>');
         titleEl.textContent = melState.off >= MEL.boards ? MEL.inside : 'a boarded-up window';
         scene.classList.add('mel');
@@ -626,7 +532,7 @@
         document.body.classList.add('peep-close', 'peep-mel');
         document.body.classList.remove('peep-view');
         note.textContent = melState.off >= MEL.boards ? '' : 'click the boards to knock';
-        if (melState.off >= MEL.boards) setTimeout(function () { if (scene.classList.contains('mel')) { boardsOffAt = 0; melScene(false); } }, 750);
+        if (melState.off >= MEL.boards) setTimeout(function () { if (scene.classList.contains('mel')) melScene(false); }, 750);
     }
     function knockKnock() {
         if (!scene.classList.contains('mel') || melState.off >= MEL.boards) return;
@@ -649,7 +555,6 @@
             try { sessionStorage.setItem('mel-in', '1'); } catch (e) {}
             document.body.classList.add('mel-in');
             scene.querySelector('.mel-planks').style.pointerEvents = 'none';
-            hoboStart();
             setTimeout(function () { if (scene.classList.contains('mel')) melScene(true); }, 700);
         }
     }

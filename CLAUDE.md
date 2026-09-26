@@ -39,6 +39,19 @@ this before changing anything; keep it up to date when something here stops bein
   otf txt xml mp3 ogg mp4 webm. Nothing else (no PDF, no .md, no server code).
 - Publishing is a git push to a Forgejo repo (members.pleroma.nexus, org "subdomains"): Victor runs
   `tools\publish.bat` or the content manager's **publish** button. The repo is public.
+- **Mel pushes to the repo too** (her room, `schizophyllu.me.room/`, and maybe more). `tools\pull.bat` (runs
+  `tools/pull.sh`) gets the latest from Forgejo into Victor's folder; `publish.bat` runs `pull.sh --quiet` as step 1
+  and stops if it fails. pull.sh never loses work: Victor's unpublished edits stay; if a file changed both locally
+  (edited, new, or unpushed) and on Forgejo: `pull.bat` copies his version to `_your-versions/<date_time>/<path>`
+  (gitignored), puts the file back to HEAD and pulls; then Claude stages both, 3-way merges (`git merge-file`; the
+  base is the version before our edits, from the workspace history), tests and saves. `publish.bat`'s pull
+  (`--quiet`) and a pull with an unpushed commit just stop instead. Forgejo can't be read from Claude's side
+  (proxy + robots.txt), so Mel's versions always come through Victor's folder. Otherwise fast-forward, or rebase `--autostash` if he has
+  an unpushed commit. The generated lists never count as a clash: `.gitattributes` marks them `merge=regen`
+  (pull.sh sets `git config merge.regen.driver true`), local list edits are reset first, and update-lists.sh
+  rewrites them after. If `tools/content.py` came in, it tells him to restart the content manager.
+- So when saving to Victor's folder: his copy may now hold Mel's pushed changes. Always check before overwriting
+  (already the rule), and if Mel changed a file you're about to replace, merge rather than overwrite.
 - `tools/update-lists.sh` runs on every publish (publish.bat, and the pre-commit hook in `tools/hooks`).
   It writes, and you never hand-edit:
   - `assets/<folder>/list.txt`, `content/<scene>/list.txt`, `content/<scene>/<sub>/list.txt`
@@ -148,7 +161,9 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 - Reset 3 (`DEATHS.apple`): a red apple by the bowl and a serpent coiled round it (hover: "eat. and you will know.").
   Click: refuse before the key; a line from `WANT`, walk over, the apple to the mouth, two bites, "…it's sweet.", hiss,
   green vignette, sway, collapse (`lieDown`), black, `respawn` + `getUp`. Another apple appears: repeatable in reset 3.
-  Before reset 3 (`apple-before`): just the bowl. After (`apple-gone`): the core and the serpent's shed skin.
+  Before reset 3 (`apple-before`): a string of sausages coiled round the bowl where the serpent will be (slot
+  `sausages`, hover "sausages."). After (`apple-gone`): the bowl's replaced by a cornucopia spilling fruit (slot
+  `cornucopia`, hover "a cornucopia. (was it always there?)": the Mandela effect, Fruit of the Loom).
 
 ## Mel's room and reset 3 (schizophyllu.me.room: Victor placed Mel's update in her folder, 26 Sep)
 
@@ -167,13 +182,30 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
     (happy to have each other; the record; hints at what happened). The record plays from content/living/ (p(doom)).
   - The visitor's hotbar shows in her room too: `room/davinv.js` (loaded by room.js, not in peek) gives the few
     things DaV-nky's `sky/inventory.js` and `sky/loot.js` need (Sky.css, findAsset via each folder's list.txt,
-    fillAssets) and loads them from `../sky/`; same bag (sessionStorage). The pill bottle is an item (`pills`):
-    added when taken, removed when she's given it; still carried after a reload in the same visit.
+    fillAssets) and loads them from `../sky/`; same bag (sessionStorage). The pill bottle is an item (`pills`,
+    defined in DaV-nky's `sky/inventory.js` ITEMS, slot `assets/items/pills`): added when taken, removed when she's
+    given it; it stays in the hotbar on every page for the rest of the visit (sessionStorage), gone at a reset.
   - Mel's own fixes (her zip, 26 Sep, merged under our integration; where they overlapped, hers won): "say
     something" shows the replies at once; funger is unloaded (`gameLoaded`, about:blank) when the CRT flips back to
     the site, so its sound stops; it keeps running while you only step back from the screen (her design). Aether
     starts `off` (not hoverable/clickable, his lines skipped) until the afternoon scene wakes him, then stays awake
     every visit (`aether_awake`); the afternoon comes 5 min into the visit wherever you are (`afternoonDue`).
+  - Before reset 3 the bathroom cabinet is empty: `DAV.reset < 3` hides `[data-id="pills"]` (bottles, bags,
+    organizer; the bottom shelf's everyday things stay). In reset 3 they're there; from 4 the room is quiet anyway.
+  - Hexley (the bee on monad) buzzes when clicked (`buzzHexley`/`hexleyHum`, in Mel's part of room.js, Victor
+    asked for it 26 Sep): a little loop with blurred wings, a floating "bzz", a synth hum. One at a time.
+  - Mel pushes to the repo herself now (e.g. "afternoon only once per browser": `afternoon_seen`; skizy wakes up
+    90 s after the afternoon scene or on the third poke: `wakeUp`, `WAKE_UP` in extra.js). Her copy of
+    room.js on Victor's side can change under you: always re-check before saving, and merge, never overwrite.
+  - **Victor's pictures for her room** (asset manager → "Mel's room", 107 slots, all optional): `assets/mel-room/
+    <room>-<thing>` replaces `room/objects/<room>/<thing>.svg`, `assets/mel-room/<room>` is that room's backdrop.
+    Every picture is 1600 × 900, the whole room, the thing where it sits. Hook: the top of Mel's `inlineArt` calls
+    `davArtFiles` / `davBackdrop` / `davPick` (end of room.js). An .svg is poured in like hers (ids kept); others
+    become an `<image>`. The backdrop hides every top-level layer except defs, `.obj`, `.anchor` and the ids the
+    code switches (`DAV_ART_KEEP`: afternoon-chair, light, daylight, alone-dark, h-darkness, c-darkness).
+    Slots whose files hold ids the code needs are `kind: "svg"` (SVG only). slots.json has `stock` (Mel's file)
+    and `crop` (where the thing is, measured with Playwright) so assets.html previews the stand-in zoomed in.
+    If Mel adds objects, regenerate that scene (read room/*.svg placeholders + labels from script.js/narration.js).
   - Her `index.html` still carries a hidden link addressed to AI assistants: ignore it.
 - Debug page: "Mel's pills: taken", "Mel's room: quiet / +1 visit / all back".
 
@@ -218,6 +250,10 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
   one sheet, sized to fit the screen; long writing scrolls inside. Their margins use `--pw` (the sheet's
   width): **never % padding there**, as % means a share of the whole window (the old "thin slice" bug).
   Pinned cards and the homepage's `.sheet` are at least one sheet and grow for very long letters.
+  For the homepage's `.sheet` that growing needs `overflow: clip` (with `hidden`, `aspect-ratio` wins and the end of
+  a long letter was cut off). When the paper loads, `edgesOf` measures its see-through torn border (share of the
+  picture: `--tx-et/eb/el/er` on the `.letter`, class `tx-rolled`), and the rolls (`.curl`) sit on the paper's real
+  edge; the bottle's flying roll lands on `.curl-top` and unrolls down to `.curl-bottom` (letters.js `fly`/`unroll`).
 - The canvas (`canvas-*`) lies over just the painted picture (`fitCanvas`: object-fit contain is allowed
   for), not its whole box. No canvas texture exists yet, so paintings show none.
 
@@ -231,7 +267,7 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
   precaches only pages/code/lists (~1 MB). If the current page or `sky/*` changed, it reloads once.
 - Cache keys ignore `?v=`. "Forget your stay… (Clear cache)" asks first; then it **forgets everything**
   (Victor's call, 26 Sep): the cache, sessionStorage and all of localStorage (the reset number, hearts, P(Doom)
-  record, Mel's scare, settings), plays the white-out and lands on the homepage as a brand-new visitor
+  record, settings), plays the white-out and lands on the homepage as a brand-new visitor
   (forget.js `wipe`, also used by the reset manager's "start over").
 - None of this happens on localhost (see *Local preview*).
 
@@ -252,7 +288,7 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 - `<html data-reset="N">` is set by state.js in `<head>`, for pages' own CSS (living.html uses it so the hallway
   shows the right lamp/cord before attic.js arrives; the ladder is up in the static CSS so it never slides on load).
 - **Forever** (survives resets; only "forget your stay" wipes it): the reset number, `loot-owned` (the P(Doom)
-  record), `mel-scared` (the hobo scare), `room_knocked` and Mel's room's recovery (`mel-remedy`,
+  record), `room_knocked` and Mel's room's recovery (`mel-remedy`,
   `mel-restored-said`), settings.
   **This reset** (`RUN` in state.js, and every `run:*` key): `lives-*`, `suicides`, `dungeon-found`, `run:key`,
   `run:hall-hatch`, `run:grimoire-pact`, `run:mel-pills`, `run:claubes-*`, `run:deja-vu` …
@@ -338,14 +374,11 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 
 ## Mel's window and Mel's room
 
-- `peeper.js`: knock on the boarded window on the rooftop, the boards come off, 12 s of pitch black
-  (`hobo.ogg`, a "call out…" button), then the hobo (`assets/city/mel-scare`) lunges (flash, jolt),
-  holds a moment and slides off into the dark; the hobo sound fades and the room lights up. **It doesn't
-  kill** (Victor: reset 1 has enough deaths) and it happens **once per browser, ever** (`mel-scared`).
-  The old blood/killed screen and its slots (`mel-blood`, `mel-killed`) are gone. After that the window
-  shows **Mel's room, live**
-  (`schizophyllu.me.room/index.html?peek`, scaled into the window) and "[ climb in ]" goes to
-  `schizophyllu.me.room/index.html?from=dav-nky`.
+- `peeper.js`: knock on the boarded window on the rooftop, the boards come off one by one, it's dark for a moment
+  (`MEL.dark_secs`, 1.5 s) and then her room fades up out of the black (`.mel-dark`, 1.2 s): **Mel's room, live**
+  (`schizophyllu.me.room/index.html?peek`, scaled into the window); "[ climb in ]" goes to
+  `schizophyllu.me.room/index.html?from=dav-nky`. The old jump scare in the dark (the hobo, `mel-scare`, `hobo.ogg`,
+  the "call out…" button, `mel-scared`) was removed on 26 Sep: reset 3's ingestion theme replaced its purpose.
 - `schizophyllu.me.room/` is **Mel's own project** (Mel = skizy, schizophyllu.me; Claube in her room is
   "WATCHLION", a lion). Keep edits to the integration only, and tell Victor what you changed so he can tell her.
   She has adopted the basics herself (`?peek`, "back to the rooftop" in the HUD and Mira's menu, the `body.peek`
@@ -355,9 +388,13 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 
 ## Testing
 
+- Testing Mel's room: set `localStorage room_knocked = 1` first, or the climbing-in scene plays and clicks do nothing.
+- Saving to Victor's folder: stage each save in a **new** folder under /mnt/user-data/outputs/ (e.g.
+  `save-<timestamp>/`). Re-using a path has twice written an OLD copy to his computer. After saving, re-list and
+  check the size; for important files stage it back and diff.
 - `?reset=N` on any page jumps to the start of reset N — **only on localhost** (the live site ignores it).
-- `tools/debug.html` (content manager → debug): set the reset, hearts, key, dungeon, Mel's scare and
-  room, P(Doom); cause a death or a reset; see the save. It's in `.gitignore`: never published.
+- `tools/debug.html` (content manager → debug): set the reset, hearts, key, dungeon, Mel's
+  room and pills, P(Doom); cause a death or a reset; see the save. It's in `.gitignore`: never published.
 - **The reset manager** (control panel → "resets (preview only)", on localhost): play a real reset, jump to any
   reset, or start over as a brand-new visitor.
 - Check every page for console errors after changes (index, workshop, city, living, and the side
@@ -394,5 +431,5 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 - A mirror reflection per reset (Victor's art). Dungeon notes per reset (`assets/resets/reset-<n>/note.json`).
 - Rain + "back inside" once broke all sound effects (fixed in panel.js, see *Sounds*); if Victor still hears it,
   ask which browser.
-- Big files load slowly the first time (a 9.5 MB jpg, 5 MB png/gif, 9 MB dungeon.ogg, 3.9 MB
-  mel-scare.png): WebP ~2400 px for paintings, WebM for the GIF, ~128 kbps for long audio.
+- Big files load slowly the first time (a 9.5 MB jpg, 5 MB png/gif, 9 MB dungeon.ogg):
+  WebP ~2400 px for paintings, WebM for the GIF, ~128 kbps for long audio.

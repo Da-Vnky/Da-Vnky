@@ -71,6 +71,12 @@
         '.pv-card.tx-paper > * { flex: 0 0 auto; } .pv-card.tx-paper > :first-child { flex: 0 1 auto; min-height: 0; overflow: auto; }' +
         '@media (max-width: 620px) { .pv-card.tx-paper { --pw: min(calc(100vw - 24px), calc((100vh - 150px) * var(--tx-ratio, .8))); } }' +
         // pinned on the board, and the homepage's letters: at least one sheet (a very long one grows taller)
+        // (overflow: clip, not hidden: then the writing sets the least height; with hidden, the paper’s shape wins and a long letter’s end is cut off)
+        '.letter .sheet.tx-paper { overflow: clip; }' +
+        // the rolls: on the paper's own top and bottom edge, a little wider than the paper
+        '.letter.tx-rolled .curl-top { top: calc(var(--tx-et, 0%) - 12px); }' +
+        '.letter.tx-rolled .curl-bottom { bottom: calc(var(--tx-eb, 0%) - 12px); }' +
+        '.letter.tx-rolled .curl { left: calc(var(--tx-el, 0%) - 12px); right: calc(var(--tx-er, 0%) - 12px); }' +
         '.bv-card.tx-paper { padding: calc(min(560px, 92vw) * .09) calc(min(560px, 92vw) * .1); }'
     );
     root.style.setProperty('--tx-strength', STRENGTH);
@@ -84,13 +90,39 @@
         return (im && (im.getAttribute('src') || '')) || el.dataset.frame || el.className || '';
     }
 
-    // each paper picture's own proportions (width ÷ height), once it's loaded
-    var ratios = {};
-    function ratioOf(u, cb) {
-        if (ratios[u]) { if (ratios[u] > 0) cb(ratios[u]); else ratios[u].push(cb); return; }
-        var waiting = ratios[u] = [cb], im = new Image();
-        im.onload = function () { var r = im.naturalWidth && im.naturalHeight ? im.naturalWidth / im.naturalHeight : .8; ratios[u] = r; waiting.forEach(function (f) { f(r); }); };
-        im.onerror = function () { ratios[u] = .8; waiting.forEach(function (f) { f(.8); }); };
+    // each paper picture's own proportions (width ÷ height), once it's loaded, and where the paper itself starts
+    // inside it: a torn edge is see-through, so the real edge is a little way in (top, bottom, left, right, as a
+    // share of the picture). the scroll's rolls sit on that edge, not on the picture's border
+    var shapes = {};
+    function edgesOf(im) {
+        var e = { t: 0, b: 0, l: 0, r: 0 };
+        try {
+            var W = 200, H = Math.max(1, Math.round(W * im.naturalHeight / im.naturalWidth));
+            var c = document.createElement('canvas'); c.width = W; c.height = H;
+            var g = c.getContext('2d'); g.drawImage(im, 0, 0, W, H);
+            var d = g.getImageData(0, 0, W, H).data;
+            var a = function (x, y) { return d[(y * W + x) * 4 + 3] / 255; };
+            // a row (or column) counts as paper once most of its middle is solid
+            var row = function (y) { var s = 0, n = 0; for (var x = Math.round(W * .2); x < W * .8; x++, n++) s += a(x, y); return s / n; };
+            var col = function (x) { var s = 0, n = 0; for (var y = Math.round(H * .2); y < H * .8; y++, n++) s += a(x, y); return s / n; };
+            var lim = .6, i;
+            for (i = 0; i < H / 4 && row(i) < lim; i++); e.t = i / H;
+            for (i = 0; i < H / 4 && row(H - 1 - i) < lim; i++); e.b = i / H;
+            for (i = 0; i < W / 4 && col(i) < lim; i++); e.l = i / W;
+            for (i = 0; i < W / 4 && col(W - 1 - i) < lim; i++); e.r = i / W;
+        } catch (err) {}                                        // (a picture from elsewhere can't be looked into: no matter)
+        return e;
+    }
+    function shapeOf(u, cb) {
+        var sh = shapes[u];
+        if (sh && !Array.isArray(sh)) { cb(sh); return; }
+        if (sh) { sh.push(cb); return; }
+        var waiting = shapes[u] = [cb], im = new Image();
+        im.onload = function () {
+            var done = { ratio: im.naturalWidth && im.naturalHeight ? im.naturalWidth / im.naturalHeight : .8, edge: edgesOf(im) };
+            shapes[u] = done; waiting.forEach(function (f) { f(done); });
+        };
+        im.onerror = function () { var done = { ratio: .8, edge: { t: 0, b: 0, l: 0, r: 0 } }; shapes[u] = done; waiting.forEach(function (f) { f(done); }); };
         im.src = u;
     }
 
@@ -139,7 +171,17 @@
         if (!u) return;
         el.classList.add('tx-paper');
         el.style.setProperty('--tx-pick', 'url("' + u + '")');
-        ratioOf(u, function (r) { el.style.setProperty('--tx-ratio', r.toFixed(4)); });
+        shapeOf(u, function (sh) {
+            el.style.setProperty('--tx-ratio', sh.ratio.toFixed(4));
+            // a letter with rolls (the homepage's): they go on the paper's real top and bottom edge
+            var holder = el.classList.contains('sheet') && el.parentNode && el.parentNode.querySelector('.curl') ? el.parentNode : null;
+            if (holder) {
+                holder.classList.add('tx-rolled');
+                [['t', sh.edge.t], ['b', sh.edge.b], ['l', sh.edge.l], ['r', sh.edge.r]].forEach(function (k) {
+                    holder.style.setProperty('--tx-e' + k[0], (k[1] * 100).toFixed(2) + '%');
+                });
+            }
+        });
     }
     function sweep(scope) {
         if (!scope.querySelectorAll) return;

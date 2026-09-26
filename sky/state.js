@@ -8,8 +8,8 @@
    world changes around them. Only a few things carry on:
 
      FOREVER   which reset they're in, the P(Doom) record once it's theirs,
-               the thing at Mel's window (once seen, it never comes back: "mel-scared"),
-               and their settings (volumes, the brush, the weather …)
+               how far Mel's room has come back, and their settings (volumes,
+               the brush, the weather …)
      A RESET   everything in RUN below: the hidden key, the hearts, the dungeon
                found … gone at the next reset
      A VISIT   sessionStorage (the wall open, what's in the bag …): gone when
@@ -53,10 +53,11 @@
         // into them; when the lights go out, the visitor can't live with it. schizophyllu.me.room/room/room.js, the end, and
         // sky/resets.js melDeath). after reset 3 her room stays quiet until the P(Doom) record brings it back (5 visits).
         // and the apple (the kitchen, off the hallway: sky/kitchen.js), with the serpent coiled round the bowl
+        // (before reset 3: sausages coiled there instead; after: a cornucopia, the Mandela effect)
         pills:    { name: 'the pills, in Mel\u2019s room',             live: [3], patch: 'Mel\u2019s room stays quiet (give her the P(Doom) record, and visit)',
                     slots: [], patchSlots: [] },
-        apple:    { name: 'the red apple in the kitchen',            live: [3], patch: 'only the core is left, and the serpent\u2019s shed skin',
-                    slots: ['assets/living/apple', 'assets/living/serpent'], patchSlots: ['assets/living/apple-core', 'assets/living/serpent-skin'] },
+        apple:    { name: 'the red apple in the kitchen',            live: [3], patch: 'the fruit spills from a cornucopia (was it always there?)',
+                    slots: ['assets/living/apple', 'assets/living/serpent'], patchSlots: ['assets/living/cornucopia'] },
         // PLACEHOLDERS: the ways to die still to be designed. each is a bubble on a page (a dashed circle with a skull:
         // sky/resets.js) that kills the traveller when clicked, so every reset can be played through to its end.
         // page: sea, workshop, city, living; in: which part of the page; left/top: where in it (%).

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>the living space · DaV-nky</title>
     <!-- the loading screen: fetches the whole site once per visit (sky/loader.js, sw.js) -->
-    <script src="sky/loader.js?v=20260926h"></script>
-    <script src="sky/state.js?v=20260926h"></script>
+    <script src="sky/loader.js?v=20260926l"></script>
+    <script src="sky/state.js?v=20260926l"></script>
     <link rel="canonical" href="https://dav-nky.pleroma.nexus/living.html">
     <meta property="og:title" content="the living space · DaV-nky">
     <meta property="og:url" content="https://dav-nky.pleroma.nexus/living.html">
@@ -16,7 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260926h">
+    <link rel="stylesheet" href="sky/sky.css?v=20260926l">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -629,9 +629,10 @@
 
     <!-- the kitchen (sky/kitchen.js), through the doorway on the left of the hallway. a counter, a window, the fridge, a bowl of fruit.
          in reset 3 (ingestion) there's a red apple by the bowl, and a serpent coiled round it: eat the apple and it's a death.
-         after reset 3, only the core's left, and the serpent's shed skin.
+         before reset 3, where the serpent will be there's a string of sausages coiled round the bowl; after it, the fruit spills
+         from a cornucopia (the Mandela effect: it was never there, was it?).
          slots in assets/living/: kitchen-wall, kitchen-floor, kitchen-window, kitchen-counter, kitchen-fridge, fruit-bowl, apple,
-         serpent, apple-core, serpent-skin. the traveller in here: assets/characters/kitchen (+ kitchen-walking). -->
+         serpent, sausages, cornucopia. the traveller in here: assets/characters/kitchen (+ kitchen-walking). -->
     <div class="kitchen" aria-hidden="true" data-asset="assets/living/kitchen-wall">
         <svg class="kitchen-wall placeholder" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
             <defs>
@@ -687,15 +688,32 @@
             </svg>
             <span class="kh-hint">a red apple</span>
         </button>
-        <!-- after reset 3: what's left -->
-        <svg class="furnish kitchen-core" data-asset="assets/living/apple-core" viewBox="0 0 40 44" aria-hidden="true">
-            <path d="M14 8 Q22 4 26 8 Q20 20 26 34 Q22 40 14 36 Q20 22 14 8 Z" fill="#efe2b8" stroke="#8a2a1c" stroke-width="2"/><path d="M20 6 L22 0" stroke="#4a2a14" stroke-width="2"/>
-            <g fill="#3a2010"><ellipse cx="19" cy="18" rx="1.2" ry="2"/><ellipse cx="21" cy="24" rx="1.2" ry="2"/></g>
-        </svg>
-        <svg class="furnish kitchen-skin" data-asset="assets/living/serpent-skin" viewBox="0 0 160 40" aria-hidden="true">
-            <path d="M6 30 Q40 40 80 30 Q120 18 154 26" fill="none" stroke="rgba(220,215,190,.75)" stroke-width="8" stroke-linecap="round"/>
-            <path d="M6 30 Q40 40 80 30 Q120 18 154 26" fill="none" stroke="rgba(150,140,110,.6)" stroke-width="2" stroke-dasharray="3 4"/>
-        </svg>
+        <!-- before reset 3: where the serpent will be, a string of sausages coiled round the bowl (just sausages) -->
+        <div class="furnish kitchen-sausages" data-asset="assets/living/sausages">
+            <svg class="placeholder" viewBox="0 0 160 90" aria-hidden="true">
+                <path d="M10 70 Q30 88 80 86 Q134 84 148 66 Q156 52 138 48 Q118 44 100 56 Q80 70 56 62 Q34 54 44 38" fill="none" stroke="#e8d8b0" stroke-width="1.2"/>
+                <g transform="translate(21.9 77.8) rotate(26)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g><g transform="translate(46.7 84.7) rotate(9)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g><g transform="translate(72.7 86.2) rotate(0)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g><g transform="translate(100.0 84.6) rotate(-6)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g><g transform="translate(125.7 79.5) rotate(-17)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g><g transform="translate(148.0 66.0) rotate(-51)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g><g transform="translate(138.0 48.0) rotate(-167)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g><g transform="translate(111.9 49.9) rotate(161)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g><g transform="translate(88.7 62.0) rotate(159)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g><g transform="translate(61.9 63.7) rotate(-168)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g><g transform="translate(41.3 50.2) rotate(-108)"><rect x="-12.0" y="-5" width="24.0" height="10" rx="5" fill="#b0503a"/><rect x="-9.2" y="-3.4" width="18.4" height="2.4" rx="1.2" fill="#d98a6a" opacity=".7"/></g>
+                <path d="M8 72 Q4 76 6 80 M40 44 Q38 38 42 36" stroke="#e8d8b0" stroke-width="1.2" fill="none"/>
+            </svg>
+            <span class="kh-hint">sausages.</span>
+        </div>
+        <!-- after reset 3: the fruit spills from a cornucopia now (was it always there?) -->
+        <div class="furnish kitchen-cornucopia" data-asset="assets/living/cornucopia">
+            <svg class="placeholder" viewBox="0 0 200 110" aria-hidden="true">
+                <path d="M8 34 Q2 22 14 20 Q30 22 44 34 Q80 20 128 22 Q140 60 128 104 Q84 104 50 86 Q24 72 16 54 Q12 44 8 34 Z" fill="#b8843a" stroke="#6e4a20" stroke-width="2"/>
+                <g fill="none" stroke="#8a5e28" stroke-width="2.2"><path d="M30 30 Q36 60 58 84"/><path d="M52 27 Q58 60 78 94"/><path d="M76 23 Q84 62 100 100"/><path d="M102 21 Q110 60 118 103"/></g>
+                <g fill="none" stroke="#d8a85a" stroke-width="1" opacity=".7"><path d="M20 40 Q60 50 128 40"/><path d="M26 58 Q70 70 132 64"/><path d="M42 76 Q80 88 130 86"/></g>
+                <ellipse cx="128" cy="63" rx="12" ry="41" fill="#5a3a14"/>
+                <g fill="#6a3a8a"><circle cx="150" cy="44" r="6"/><circle cx="160" cy="46" r="6"/><circle cx="155" cy="54" r="6"/><circle cx="145" cy="53" r="6"/><circle cx="165" cy="55" r="5.5"/><circle cx="152" cy="63" r="5.5"/><circle cx="161" cy="64" r="5"/></g>
+                <path d="M155 40 Q158 30 166 28" stroke="#4a6a2a" stroke-width="2" fill="none"/><path d="M160 32 Q172 22 180 30 Q170 36 160 32 Z" fill="#5a8a3a"/>
+                <circle cx="176" cy="82" r="13" fill="#e88a2a"/><circle cx="172" cy="78" r="3" fill="#f8b86a" opacity=".7"/>
+                <path d="M136 70 Q150 64 156 76 Q162 92 146 100 Q132 102 132 88 Q132 76 136 70 Z" fill="#b8c83a"/><path d="M146 68 L148 60" stroke="#4a3a14" stroke-width="2"/>
+                <path d="M140 36 Q170 6 196 26 Q176 18 150 42 Z" fill="#e8d24a" stroke="#b89a2a" stroke-width="1"/>
+                <circle cx="194" cy="100" r="9" fill="#8ab83a"/><path d="M194 91 L195 86" stroke="#4a3a14" stroke-width="1.6"/>
+                <path d="M120 104 Q150 108 196 106" stroke="rgba(0,0,0,.25)" stroke-width="3" fill="none"/>
+            </svg>
+            <span class="kh-hint">a cornucopia. (was it always there?)</span>
+        </div>
         <!-- back out to the hallway -->
         <button type="button" class="room-arrow kitchen-back" aria-label="back to the hallway" data-asset="assets/living/arrow"></button>
         <div class="furnish character scene-character kitchen-character" data-asset="assets/characters/kitchen" aria-label="the traveller"></div>
@@ -820,32 +838,32 @@
         <a class="room-arrow to-upstairs" href="#living" aria-label="back up to the living space" data-asset="assets/living/arrow"></a>
     </div>
 
-    <script src="sky/sky.js?v=20260926h"></script>
-    <script src="sky/eye.js?v=20260926h"></script>
+    <script src="sky/sky.js?v=20260926l"></script>
+    <script src="sky/eye.js?v=20260926l"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
-    <script src="sky/ground-view.js?v=20260926h" data-view="assets/living/view"></script>
-    <script src="sky/panel.js?v=20260926h"></script>
-    <script src="sky/music.js?v=20260926h"></script>
-    <script src="sky/weather.js?v=20260926h"></script>
-    <script src="sky/noise.js?v=20260926h"></script>
-    <script src="sky/inventory.js?v=20260926h"></script>
-    <script src="sky/loot.js?v=20260926h"></script>
-    <script src="sky/records.js?v=20260926h"></script>
-    <script src="sky/crate.js?v=20260926h"></script>
-    <script src="sky/frames.js?v=20260926h"></script>
-    <script src="sky/bathroom.js?v=20260926h"></script>
-    <script src="sky/gore.js?v=20260926h"></script>
-    <script src="sky/tub.js?v=20260926h"></script>
-    <script src="sky/dungeon.js?v=20260926h"></script>
-    <script src="sky/attic.js?v=20260926h"></script>
-    <script src="sky/kitchen.js?v=20260926h"></script>
-    <script src="sky/books.js?v=20260926h"></script>
-    <script src="sky/marker.js?v=20260926h"></script>
-    <script src="sky/revolver.js?v=20260926h"></script>
-    <script src="sky/claubes.js?v=20260926h"></script>
-    <script src="sky/textures.js?v=20260926h"></script>
-    <script src="sky/forget.js?v=20260926h"></script>
-    <script src="sky/lives.js?v=20260926h"></script>
-    <script src="sky/resets.js?v=20260926h"></script>
+    <script src="sky/ground-view.js?v=20260926l" data-view="assets/living/view"></script>
+    <script src="sky/panel.js?v=20260926l"></script>
+    <script src="sky/music.js?v=20260926l"></script>
+    <script src="sky/weather.js?v=20260926l"></script>
+    <script src="sky/noise.js?v=20260926l"></script>
+    <script src="sky/inventory.js?v=20260926l"></script>
+    <script src="sky/loot.js?v=20260926l"></script>
+    <script src="sky/records.js?v=20260926l"></script>
+    <script src="sky/crate.js?v=20260926l"></script>
+    <script src="sky/frames.js?v=20260926l"></script>
+    <script src="sky/bathroom.js?v=20260926l"></script>
+    <script src="sky/gore.js?v=20260926l"></script>
+    <script src="sky/tub.js?v=20260926l"></script>
+    <script src="sky/dungeon.js?v=20260926l"></script>
+    <script src="sky/attic.js?v=20260926l"></script>
+    <script src="sky/kitchen.js?v=20260926l"></script>
+    <script src="sky/books.js?v=20260926l"></script>
+    <script src="sky/marker.js?v=20260926l"></script>
+    <script src="sky/revolver.js?v=20260926l"></script>
+    <script src="sky/claubes.js?v=20260926l"></script>
+    <script src="sky/textures.js?v=20260926l"></script>
+    <script src="sky/forget.js?v=20260926l"></script>
+    <script src="sky/lives.js?v=20260926l"></script>
+    <script src="sky/resets.js?v=20260926l"></script>
 </body>
 </html>
