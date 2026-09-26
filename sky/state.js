@@ -48,30 +48,46 @@
         diagram:   { name: 'the sixth bullet, sent back by the diagram', live: [4], patch: 'the diagram just swallows the bullets',
                     slots: [], patchSlots: [] },
         grimoire: { name: 'the pact in the grimoire, in the attic',   live: [4], patch: 'the grimoire on the living-room bookshelf, only a book',
-                    slots: ['assets/living/grimoire', 'assets/living/grimoire-open', 'assets/living/pact-hand'], patchSlots: ['assets/living/shelf-grimoire'] }
+                    slots: ['assets/living/grimoire', 'assets/living/grimoire-open', 'assets/living/pact-hand'], patchSlots: ['assets/living/shelf-grimoire'] },
+        // PLACEHOLDERS: the ways to die still to be designed. each is a bubble on a page (a dashed circle with a skull:
+        // sky/resets.js) that kills the traveller when clicked, so every reset can be played through to its end.
+        // page: sea, workshop, city, living; in: which part of the page; left/top: where in it (%).
+        // when you design the real one, give it its own entry above and take the placeholder out.
+        r3a: { name: 'reset 3, the first way to die (to come)',  live: [3], placeholder: { page: 'sea',      in: 'body',  left: 30, top: 42 } },
+        r3b: { name: 'reset 3, the second way to die (to come)', live: [3], placeholder: { page: 'workshop', in: '.room', left: 38, top: 30 } },
+        r5a: { name: 'reset 5, the first way to die (to come)',  live: [5], placeholder: { page: 'city',     in: 'body',  left: 40, top: 42 } },
+        r5b: { name: 'reset 5, the second way to die (to come)', live: [5], placeholder: { page: 'living',   in: '.room', left: 24, top: 26 } },
+        r6a: { name: 'reset 6, the first way to die (to come)',  live: [6], placeholder: { page: 'workshop', in: '.room', left: 38, top: 30 } },
+        r6b: { name: 'reset 6, the second way to die (to come)', live: [6], placeholder: { page: 'sea',      in: 'body',  left: 30, top: 42 } },
+        r7a: { name: 'reset 7, the first way to die (to come)',  live: [7], placeholder: { page: 'living',   in: '.room', left: 24, top: 26 } },
+        r7b: { name: 'reset 7, the second way to die (to come)', live: [7], placeholder: { page: 'city',     in: 'body',  left: 40, top: 42 } },
+        r8a: { name: 'reset 8, the first way to die (to come)',  live: [8], placeholder: { page: 'sea',      in: 'body',  left: 30, top: 42 } },
+        r8b: { name: 'reset 8, the second way to die (to come)', live: [8], placeholder: { page: 'living',   in: '.room', left: 24, top: 26 } }
     };
-    // (always there: the revolver, but it's jammed until the last heart. and the thing at Mel's window, and falls.)
+    Object.keys(DEATHS).forEach(function (k) { var d = DEATHS[k]; d.patch = d.patch || ''; d.slots = d.slots || []; d.patchSlots = d.patchSlots || []; });
+    // (always there, every reset: the revolver on yourself ("the gun"), but only on the last heart once the key's found.
+    //  from reset 2, every way to die is off until the key: sky/lives.js)
 
     // key: where the reset's key is hidden. page: sea, workshop, city, living; in: which part of the page
     // (a selector); left/top: where in it; where: said in the content manager.
     // or drop: something in the game drops it instead ('claubes': sky/claubes.js), wherever that happens
     var RESETS = [
-        { n: 1, name: 'objects',     theme: 'things around the house',        deaths: ['toaster', 'scissors'],
+        { n: 1, name: 'items',       theme: 'things around the house (and the gun)', deaths: ['toaster', 'scissors'],
           key: { page: 'workshop', in: '.room',     left: 12,   top: 55.4, where: 'the workshop, between the jars on the shelf' } },
-        { n: 2, name: 'environment', theme: 'the world itself',               deaths: ['boat', 'roof'],
+        { n: 2, name: 'environmental', theme: 'the world itself',             deaths: ['boat', 'roof'],
           key: { page: 'city',     in: 'body',      left: 69.4, top: 89.6, where: 'the rooftop, by the potted plant' } },
-        { n: 3, name: '',            theme: '',                               deaths: [],
+        { n: 3, name: '',            theme: '',                               deaths: ['r3a', 'r3b'],
           // (no hiding place: the last of the seven Claubes drops it when all seven are shot, outside the dungeon: sky/claubes.js)
           key: { drop: 'claubes', page: 'living', where: 'dropped by the last of the seven Claubes, once all seven are shot (not in the dungeon)' } },
-        { n: 4, name: '',            theme: '',                               deaths: ['diagram', 'grimoire'],
+        { n: 4, name: 'dark witchcraft', theme: 'the diagram and the grimoire', deaths: ['diagram', 'grimoire'],
           key: { page: 'living',   in: '.bathroom', left: 88,   top: 93,   where: 'the bathroom, in the corner by the tub' } },
-        { n: 5, name: '',            theme: '',                               deaths: [],
+        { n: 5, name: '',            theme: '',                               deaths: ['r5a', 'r5b'],
           key: { page: 'workshop', in: '.room',     left: 93.5, top: 61,   where: 'the workshop, on top of the notes board' } },
-        { n: 6, name: '',            theme: '',                               deaths: [],
+        { n: 6, name: '',            theme: '',                               deaths: ['r6a', 'r6b'],
           key: { page: 'living',   in: '.hallway',  left: 70,   top: 94,   where: 'the hallway, on the floor' } },
-        { n: 7, name: '',            theme: '',                               deaths: [],
+        { n: 7, name: '',            theme: '',                               deaths: ['r7a', 'r7b'],
           key: { page: 'living',   in: '.dungeon',  left: 83,   top: 93,   where: 'the dungeon, under the rack' } },
-        { n: 8, name: 'the grand mystery', tab: 'mystery', theme: '',                         deaths: [],
+        { n: 8, name: 'the grand mystery', tab: 'mystery', theme: 'the truth',                deaths: ['r8a', 'r8b'],
           key: { page: 'city',     in: 'body',      left: 9,    top: 76.5, where: 'the rooftop, on top of the chimney' } }
     ];
 

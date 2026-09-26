@@ -393,6 +393,7 @@
         var under = Sky.gore && !/^(aboard|dead|held|falling|diving|swimming|surfacing)$/.test(crew.state) && !mate.classList.contains('under') &&
             sr0.left + sr0.width * 0.12 < mr.right && sr0.right - sr0.width * 0.12 > mr.left && sr0.bottom < mr.top + mr.height * 0.5 &&
             h0 > Math.max(110, window.innerHeight * 0.18);
+        if (under && Sky.lives && Sky.lives.refuse('boat')) under = false;     // (from reset 2, not before the key: it misses)
         (function fall(now) {
             if (id !== tweenId) return;
             var dt = Math.min(0.05, (now - last) / 1000); last = now;

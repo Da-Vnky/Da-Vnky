@@ -7,7 +7,7 @@ const store = {
 };
 const pan = x => Math.max(-.9, Math.min(.9, x / 800 - 1));
 const rand = (a, b) => a + Math.random() * (b - a);
-const POS = { window: 180, mira: 520, crt: 750, mel: 1012, clock: 1120, server: 1242, claube: 1400, fridge: 1550 };
+const POS = { window: 180, mira: 520, crt: 750, mel: 1012, clock: 1120, server: 1242, aether: 1228, claube: 1400, fridge: 1550 };
 
 export const audio = {
   ctx: null,
@@ -18,6 +18,7 @@ export const audio = {
   quiet: false, // true while you're using the monitor: the room recedes a bit
   room: 'main', // which room you're standing in; things sound further away from elsewhere
   keepAwake: () => false, // music.js sets this so a background tab keeps playing music
+  asleep: false, // skizy's asleep (the afternoon): nobody's at the keyboard
 
   init() {
     if (this.ctx) return true;
@@ -69,6 +70,14 @@ export const audio = {
     g.cancelScheduledValues(t);
     g.setTargetAtTime(0, t, .15);
     g.setTargetAtTime(1, t + secs, .8);
+  },
+
+  // the lights go off: no CRT whine, the fan barely there
+  lightsOff() {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    this.beds.whine?.g.gain.setTargetAtTime(0, t, .4);
+    this.beds.fan?.gain.setTargetAtTime(.003, t, .8);
   },
 
   get live() { return !!this.ctx && this.on && this.ctx.state === 'running'; },
@@ -193,10 +202,10 @@ export const audio = {
       tock = !tock;
       this.burst({ x: POS.clock, freq: tock ? 3000 : 3600, q: 8, dur: .012, gain: .018 });
     }, 1000);
-    every(4000, 14000, () => this.typing());
+    every(4000, 14000, () => { if (!this.asleep) this.typing(); });
     every(9000, 30000, () => this.hdd());
     every(55000, 130000, () => this.pipes());
-    every(20000, 60000, () => this.mouse());
+    every(20000, 60000, () => { if (!this.asleep) this.mouse(); });
     // the hallway: a dripping tap, and a smoke detector that wants a battery
     every(1800, 3400, () => { if (this.room === 'hallway' || this.room === 'bathroom') this.drip(); });
     // somewhere out there, a siren
@@ -318,21 +327,10 @@ export const audio = {
   },
 
   // ---------------------------------------------------------------- sound effects
-  knock() {
-    this.tone({ freq: 140, to: 60, dur: .16, gain: .6 });
-    this.burst({ freq: 300, dur: .08, gain: .7 });
-  },
 
-  clatter() {
-    for (let i = 0; i < 8; i++) {
-      const at = .15 + i * .09 + Math.random() * .12;
-      this.burst({ freq: rand(300, 1100), q: 3, dur: .14, gain: .8 - i * .07, at });
-      if (i % 3 === 0) this.tone({ freq: rand(160, 260), to: 80, dur: .12, gain: .25, at });
-    }
-  },
 
   blip(who) {
-    const f = { mira: 880, claube: 330, mel: 520 }[who] || 440;
+    const f = { mira: 880, claube: 330, mel: 520, aether: 1180 }[who] || 440;
     this.tone({ x: POS[who], type: 'square', freq: f, dur: .06, gain: .018 });
   },
 

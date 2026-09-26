@@ -9,6 +9,13 @@
    The revolver's jammed while the lock's off and there's more than one heart
    left (Sky.lives.jammed): it only fires on the last.
 
+   FROM RESET 2 ON they're there from the start (locked), and every way to die is
+   off until the key's found: try one and the traveller says why not (NOT_YET below,
+   one line for each). That way no reset's one-time deaths (the pact, the diagram…)
+   can be used up for free before the hearts count, and the reset can always end.
+   (Reset 1 is as before: the deaths are free until the key, and the hearts turn up
+   after the dungeon and the revolver.)
+
    Kept in the visitor's browser between visits (localStorage), until the next reset.
    slots: assets/ui/heart (a life), assets/ui/heart-empty (one lost),
           assets/ui/lives-lock (the lock on them), assets/ui/lives-frame (behind them)
@@ -19,7 +26,19 @@
     var Sky = window.Sky;
     if (!Sky || Sky.lives) return;
     var MAX = 3;
-    var body = document.body;
+    var body = document.body, S = window.davSave;
+    var ALWAYS = !!S && S.reset >= 2;                   // from reset 2: the hearts are always there, and locked till the key
+    // what the traveller says trying a way to die before the key's found (from reset 2)
+    var NOT_YET = {
+        revolver:    'My finger won\u2019t pull the trigger. Not yet. Something here is still hidden.',
+        scissors:    'I can\u2019t make my hand do it. Not until I\u2019ve found what\u2019s hidden.',
+        toaster:     'I can\u2019t bring myself to drop it in. Something tells me to look around first.',
+        boat:        'My arms won\u2019t let go of it. Not yet. I haven\u2019t found it yet, whatever it is.',
+        roof:        'My feet won\u2019t step off the edge. Not until I find what\u2019s hidden here.',
+        grimoire:    'My hand stops above the page. It won\u2019t let me sign. Not yet.',
+        diagram:     'The circle drinks the bullet\u2026 and waits. It isn\u2019t time yet.',
+        placeholder: 'Not yet. There\u2019s something I have to find first.'
+    };
     function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function put(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
@@ -61,7 +80,7 @@
     Sky.findAsset('assets/ui/lives-lock', function (u) { if (u) { art.lock = '<img alt="" src="' + u + '">'; draw(); } });
     Sky.findAsset('assets/ui/lives-frame', function (u) { if (u) el.style.setProperty('--lives-frame', 'url("' + new URL(u, location.href).href + '")'); });
 
-    function shown() { return get('lives-shown') === '1'; }
+    function shown() { return ALWAYS || get('lives-shown') === '1'; }
     function left() { var n = get('lives-left'); return n === null ? MAX : Math.max(0, +n); }
     function draw(justLost) {
         el.classList.toggle('on', shown());
@@ -116,9 +135,34 @@
         }, after);
     }
     document.addEventListener('dav:dungeon-found', function () { maybeShow(); });
+    // from reset 2: there from the first page of the reset
+    if (ALWAYS && get('lives-shown') !== '1') {
+        put('lives-shown', '1');
+        if (get('lives-left') === null) put('lives-left', MAX);
+        draw();
+        el.classList.remove('arrive'); void el.offsetWidth; el.classList.add('arrive');
+    }
     draw();
+    // a way to die, tried before the key (from reset 2): it doesn't happen, and the traveller says why
+    var saidAt = 0;
+    function refuse(kind) {
+        if (!ALWAYS || unlocked()) return false;
+        var now = Date.now();
+        if (now - saidAt > 2500) {
+            saidAt = now;
+            document.querySelectorAll('.mc-say').forEach(function (b) { b.remove(); });   // (this matters more than whatever they were saying)
+            var line = NOT_YET[kind] || NOT_YET.placeholder;
+            if (Sky.claubes && Sky.claubes.speak) Sky.claubes.speak(line, null, { hold: 1800 });
+            else if (Sky.inventory && Sky.inventory.say) Sky.inventory.say(line, 3000);
+            var lk = el.querySelector('.l-lock');                           // (and the lock on the hearts gives a little shake)
+            if (lk) { lk.classList.remove('rattle'); void lk.offsetWidth; lk.classList.add('rattle'); }
+        }
+        return true;
+    }
 
-    Sky.css('.lives .l-lock.popping { animation: lock-pop .8s ease-in forwards; }' +
+    Sky.css('.lives .l-lock.rattle { animation: lock-rattle .5s ease-in-out; }' +
+        '@keyframes lock-rattle { 0%, 100% { transform: none; } 20% { transform: rotate(-14deg); } 45% { transform: rotate(11deg); } 70% { transform: rotate(-6deg); } }' +
+        '.lives .l-lock.popping { animation: lock-pop .8s ease-in forwards; }' +
         '@keyframes lock-pop { 0% { transform: none; } 30% { transform: translateY(-6px) rotate(-12deg); } 100% { transform: translate(14px, 40px) rotate(70deg); opacity: 0; } }');
     Sky.lives = {
         get left() { return left(); }, get shown() { return shown(); }, get unlocked() { return unlocked(); },
@@ -133,6 +177,9 @@
         get jammed() { return shown() && unlocked() && left() > 1; },
         // on the last heart, the revolver doesn't kill them: it ends the reset, there and then
         get last() { return shown() && unlocked() && left() === 1; },
+        // from reset 2, until the key: every way to die is off (true = refused, and the traveller's said why)
+        get locked() { return ALWAYS && !unlocked(); },
+        refuse: refuse,
         final: function () {
             if (resetting) return;
             resetting = true;

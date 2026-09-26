@@ -47,6 +47,8 @@ export const MUSIC = [
 
 // extra ambient banter about the rest of the apartment
 export const AMBIENT_MORE = [
+  // Mira's: why they're both there
+  [mel('mira'), m('Yes?'), mel('nothing'), ['-', 'beat'], m('Okay.'), ['-', 'another beat'], mel('mira'), m('Still here.')],
   [c('There is a box above the kitchen cabinets labelled SPOINGUS II.'), m('Yes.'), c('There was never a spoingus II.'), m('Not yet.')],
   [mel('mira did you draw on the fridge'), m("I don't have hands in the traditional sense."), mel('thats not a no')],
   [m('The bedroom radio picked up 96.3 again.'), c('Log it.'), m("I did. It's the only entry in the log I can't classify.")],
@@ -60,3 +62,96 @@ export const AMBIENT_MORE = [
   [m('The star is on the dim side of its cycle.'), c('It will come back.'), m('I know. I just like saying it out loud.')],
   [mel('who keeps adding to the toilet paper pyramid'), c('No comment.'), m('No comment.'), mel('...both of you??')],
 ];
+
+// the viewer talks to skizy: she answers, then you pick what to say back.
+// each reply is [what you say, what happens]. 'funger' after a reply sits you down at the console
+export const VIEWER_TALK = {
+  hello: [mel('oh. um. hi'), mel('you can talk to me i guess. im not busy. im a little busy')],
+  again: [mel('oh hi again'), mel('you came back to talk. thats. okay yeah')],
+  replies: [
+    ['what are you working on?', [
+      mel('fitting kimi k3 on an aliexpress SSD'), mel('its going great'),
+      c('It is not going great.'), mel('its going'),
+    ]],
+    ['i like your room', [
+      mel('...thanks'), mel('its not done. its never gonna be done. thats kind of the point'),
+      ['-', 'beat'],
+      mel('you can come back. if you want'), c("The boards don't go back on."),
+    ]],
+    ['are you okay?', [
+      mel('yeah'), ['-', 'beat'], mel('mostly. i have a monster and a problem to solve. thats the good kind of okay'),
+      m("She's okay."), mel('mira stop answering for me'), m('Okay.'),
+      ['claube', 'Noted.', 'writes it down'],
+    ]],
+    ['do you want to play funger?', [
+      mel('YES'), mel('wait. are you asking if i want to play or if you can play'), mel('both are yes. sit down'),
+    ], 'funger'],
+  ],
+};
+
+// while you're sitting at the Phosphor Artifact playing funger. they show as subtitles up top
+export const FUNGER_WATCHING = [
+  [mel('oh this part. good luck')],
+  [mel('save. go find a bed and save')],
+  [mel('flip the coin. no wait dont flip the coin')],
+  [m("I'm logging this run. Neutrally.")],
+  [m('Your hunger is a suggestion. Please treat it as a warning.')],
+  [c("I'm not watching. I'm facing this direction for unrelated reasons.")],
+  [c('Should that be happening?'), mel('yes'), ['claube', '...Noted.', 'writes it down']],
+];
+
+// the afternoon: skizy's asleep, so Mira and Claube keep it down. clicking them gets one of these
+export const AFTERNOON_HUSH = {
+  mira: [
+    [['mira', "shh. she's asleep.", 'quietly']],
+    [['mira', "you can sit with us. just quiet.", 'quietly']],
+    [['mira', "she's out. we're just... sitting.", 'quietly']],
+    [['mira', "not now. later.", 'quietly']],
+  ],
+  claube: [
+    [['claube', "We're keeping it down.", 'quietly']],
+    [['claube', "Whisper, if you have to.", 'quietly']],
+    [['claube', "I'm not writing anything.", 'writing']],
+    [['claube', "She'll be up eventually. She'll want to talk about VRAM. Save your energy.", 'quietly']],
+  ],
+};
+
+// you bring skizy a bottle from the bathroom cabinet and talk her into taking them.
+// after the last line, the lights go off and the others are gone. she doesn't say anything else
+export const MEDS_TALK = {
+  open: [mel('where did you get that'), ['-', 'beat'], mel('...oh'), mel('yeah. those are mine')],
+  // first choice. 'ask' loops back here; 'push' moves on
+  first: [
+    ['you should take them', 'push', [
+      mel('i know'), ['-', 'beat'],
+      mel('its not that i forget'),
+      mel('its that when i take them it gets really quiet in here'),
+    ]],
+    ['when did you last take them?', 'ask', [
+      mel('...a while'),
+      ['claube', 'Forty-one days.', 'without looking up'],
+      mel('stop counting'),
+      ['claube', "I can't."],
+    ]],
+  ],
+  second: [
+    ["it's okay if it's quiet", [
+      mel('is it'), ['-', 'beat'],
+      ['mira', "It's okay, skizy.", 'quietly'],
+    ]],
+    ["they'd want you to be okay", [
+      mel('would they'),
+      ['claube', 'We would.'],
+      ['mira', 'We do.'],
+      mel('will you still be here'),
+      ['-', 'nobody answers'],
+    ]],
+  ],
+  last: [
+    mel('okay'),
+    mel('okay. ill take them'),
+    ['aether', 'Good luck skizy!! 😊'],
+    ['claube', 'Noted.', 'writes it down, and then stops writing'],
+    ['mira', 'Goodnight, skizy.'],
+  ],
+};

@@ -123,6 +123,13 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 
 ## Sounds, in short
 
+- A channel's timed extras (window-rain taps, thunder) run once a second, and on `set()` only as it starts. The
+  weather sets its channels every frame; when `set()` also ran the tick, window rain made ~50 taps × 60 frames a
+  second and the browser's sound engine collapsed, taking every sound effect with it (Victor: "rain, then back inside
+  breaks the sfx"; inside is where the window rain plays). Never schedule sounds per frame.
+- The traveller's dialogue box (`Sky.claubes.speak`) sits near the top, not over the traveller (it used to eat clicks
+  meant for them).
+
 - `Sky.sounds.sfx(name, { or, size, delay, volume })`: `volume` is a share of the usual loudness (0–1). Any name is looked
   for as `assets/sounds/<name>.mp3|ogg` the first time it's played (panel.js `looking`), so a new sound slot works as soon
   as Victor adds the file; until then `or` names the synthesised stand-in.
@@ -205,7 +212,17 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
     gonna happen…" (`LETDOWN`); from reset 5 the grimoire is on the living-room shelf, only a book.
     (Victor moved the reflection to reset 4 because in reset 3 it would soft-lock the Claube key.)
   - **Resets 5–7 have no themes or deaths yet** — Victor will supply them. Reset 8 is undefined.
-- Hearts (`lives.js`): appear after the dungeon's been found **and** a revolver suicide (that one's
+- **From reset 2 the hearts are there from the start** (locked), and **every way to die is off until the key**:
+  each death's trigger calls `Sky.lives.refuse(kind)` first; before the key it returns true and the traveller says
+  that death's own line (lives.js `NOT_YET`: revolver, scissors, toaster, boat, roof, grimoire, diagram, placeholder).
+  The diagram still takes bullets but holds at 5 until the key. Why: reset 4's two deaths happen once each, so used up
+  for free before the key the reset could never end (2 deaths + the revolver on the last heart = the 3 hearts).
+  Reset 1 is unchanged (free deaths before the key; the hearts appear after the dungeon + a revolver shot).
+- **Placeholder deaths**: DEATHS entries with `placeholder: { page, in, left, top }` (r3a/b, r5a/b, r6a/b, r7a/b, r8a/b)
+  are dashed skull bubbles "a way to die (to come)" (resets.js `placeholders()`): click = zapped (the sea: the
+  revolver's death), a real death. So every reset can be finished. Replace each with a real death when designed.
+- Themes (RESETS): 1 items (+ the gun), 2 environmental, 4 dark witchcraft, 8 the truth; 3, 5–7 to come.
+- Hearts (reset 1, `lives.js`): appear after the dungeon's been found **and** a revolver suicide (that one's
   free). They're locked until that reset's hidden key is clicked (`resets.js` → `Sky.lives.unlock()`);
   a key found before the hearts appear means they turn up unlocked.
   Once unlocked, every death costs a heart (`gore.respawn` fires `dav:traveller-died`), and the revolver
@@ -235,7 +252,9 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
     floor (`preserveAspectRatio="none"`, strokes `vector-effect="non-scaling-stroke"`). Each Claube stands on a circle:
     `SEATS` in claubes.js (shares of the diagram's box); `seat()` places them and re-places them after the dungeon's slide
     and on resize. Victor's template: `assets/templates/ophite-diagram-template.svg` (seats marked in a guides layer).
-    `--bow`, `CHANTS`; the diagram glows more with each bullet (`--rite`). Shots are
+    `--bow`, `CHANTS`; the diagram glows more with each bullet (`--rite`). While they worship, **frame 6 in the
+    dungeon ("the false god", Victor's lion-serpent painting) is protected**: a bullet at it is absorbed like the
+    rest and counts toward the sixth (`Sky.claubes.guardFrame`, called from revolver.js). Shots are
     absorbed; **in reset 4 only** the 6th (`ABSORB`) comes back and kills the traveller → black →
     `Sky.sides.homeNow()` → wake up on the living-room floor (a death: -1 heart if unlocked). Then
     `run:claubes-gone`: no Claubes and no callout for the rest of the reset (debug page has a switch).

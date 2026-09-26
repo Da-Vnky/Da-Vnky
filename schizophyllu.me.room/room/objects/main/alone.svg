@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- alone (main): skizy in the corner under the window, after she takes the meds. the lights are off
+     and the others are gone. only there in that ending. she doesn't say anything
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <ellipse cx="212" cy="708" rx="62" ry="8" fill="#000" opacity=".55"/>
+  <!-- back and shoulders, against the wall -->
+  <path d="M184 704 Q174 642 198 614 Q226 604 244 632 Q254 664 250 704Z" fill="#241d34"/>
+  <!-- hood up, head down -->
+  <path d="M192 626 Q190 594 214 588 Q238 590 238 620 Q232 636 214 638 Q196 638 192 626Z" fill="#30274a"/>
+  <path d="M200 630 q14 8 30 -2" stroke="#1a1426" stroke-width="3" fill="none"/>
+  <path d="M206 632 q2 6 -1 10" stroke="#6dffb0" stroke-width="1.4" fill="none" opacity=".35"/>
+  <!-- knees pulled up -->
+  <path d="M172 706 Q168 664 188 646 Q206 634 224 646 Q242 662 244 706Z" fill="#17141f"/>
+  <path d="M168 706 q8 -8 22 -4 l0 6z M222 706 q10 -8 24 -2 l0 4z" fill="#0e0c14"/>
+  <!-- arms around them -->
+  <path d="M182 664 Q210 682 240 662" stroke="#241d34" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M196 670 q-6 4 -4 10 M226 670 q6 4 4 10" stroke="#8a7a86" stroke-width="3" stroke-linecap="round" fill="none" opacity=".6"/>
+  <!-- moonlight on the hood and shoulders -->
+  <path d="M196 612 Q210 590 234 600" stroke="#b8ccff" stroke-width="1.6" fill="none" opacity=".45"/>
+  <path d="M186 650 Q182 632 196 616" stroke="#b8ccff" stroke-width="1.2" fill="none" opacity=".3"/>
+  <path d="M190 648 Q206 638 222 646" stroke="#b8ccff" stroke-width="1.2" fill="none" opacity=".35"/>
+</svg>

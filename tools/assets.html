@@ -606,7 +606,7 @@
     function drawReset(n) {
         var R = DAV_RESETS[n - 1], D = window.DAV_DEATHS || {};
         var live = Object.keys(D).filter(function (k) { return D[k].live.indexOf(n) !== -1; });
-        var gone = Object.keys(D).filter(function (k) { return n > Math.max.apply(null, D[k].live); });
+        var gone = Object.keys(D).filter(function (k) { return n > Math.max.apply(null, D[k].live) && D[k].patch; });
         var justGone = gone.filter(function (k) { return n === Math.max.apply(null, D[k].live) + 1; });
         var top = el('div', 'intro');
         top.appendChild(el('p', '', esc('reset ' + n + (n === 8 ? ', after the seven' : ' of the seven') + (R.name ? ': ' + R.name : '') + '. ' + (n === 1 ? 'where every visitor starts.' : 'where they go after losing every life in reset ' + (n - 1) + '.'))));
@@ -616,7 +616,7 @@
         plan.innerHTML =
             '<p><b>ways to die</b> ' + (live.length ? esc(live.map(function (k) { return D[k].name; }).join('; ')) : '<span class="dim">none of its own yet (tell Claude what they are)</span>') + '</p>' +
             '<p><b>patched away</b> ' + (gone.length ? esc(gone.map(function (k) { return D[k].patch; }).join('; ')) : '<span class="dim">nothing yet</span>') + '</p>' +
-            '<p><b>always</b> <span class="dim">the revolver (jammed until the last heart), falls, and the thing at Mel\u2019s window</span></p>' +
+            '<p><b>always</b> <span class="dim">the gun (the revolver on yourself: only on the last heart, once the key\u2019s found)' + (n >= 2 ? '. from reset 2, every way to die waits for the key, and the hearts are there from the start' : '') + '</span></p>' +
             '<p><b>the key</b> ' + esc(R.key ? R.key.where : '') + ' <span class="dim">(finding it takes the lock off the hearts)</span></p>';
         main.appendChild(plan);
 

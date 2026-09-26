@@ -1,17 +1,23 @@
 // THE ROOM
 // an SVG apartment with the whole site running on the CRT.
 import {
-  CAST, SCENE_WINDOW, SCENE_SSD, OBJECTS, MEL_TALK, MEL_WORK, WHAT_IS_THIS_ROOM,
+  CAST, SCENE_WINDOW, SCENE_SSD, SCENE_MIRA, OBJECTS, MEL_TALK, MEL_WORK, WHAT_IS_THIS_ROOM,
   FRIDGE_FIRST, CLAUBE_TALK, MIRA_TALK, AMBIENT, LINGER, LEAVING, FUNGER_AFTER, DRAWING_HOVER,
-  JUST_STAY, HOVER_WRITING, NOT_WRITING,
+  JUST_STAY, HOVER_WRITING, NOT_WRITING, SCENE_AFTERNOON, SLEEP_TALK,
 } from './script.js';
 import { NARRATION, ROOMS, PEEPHOLE, FOG, MIRROR, RADIO, CLOSET_FIRST, STAR_RARE } from './narration.js';
-import { RETURNING, MUSIC, AMBIENT_MORE } from './extra.js';
+import { RETURNING, MUSIC, AMBIENT_MORE, VIEWER_TALK, FUNGER_WATCHING, AFTERNOON_HUSH, MEDS_TALK } from './extra.js';
 import { audio } from './audio.js';
 import { music } from './music.js';
 import { radio, STATIONS } from './radio.js';
 
 const $ = s => document.querySelector(s);
+
+// the room lives on DaV-nky's rooftop (dav-nky.pleroma.nexus/city.html): a window across the street.
+// the knocking and the boards happen up there; you climb in (?from=dav-nky), and the way out leads
+// back up to the roof. ?peek is the live view through that window: no sound, nothing to click, no HUD
+const PEEK = new URLSearchParams(location.search).has('peek');
+const ROOFTOP = 'https://dav-nky.pleroma.nexus/city.html';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -19,21 +25,34 @@ const store = {
 };
 
 // hands out items in a shuffled order, reshuffling when it runs dry, never repeating back-to-back
+// while skizy's asleep (the afternoon), anything with her talking awake is passed over;
+// if a bag has nothing else, it hands out nothing and the room stays quiet
 function bag(list) {
   let queue = [], last;
-  return () => {
+  const next = () => {
     if (!queue.length) {
       queue = list.slice().sort(() => Math.random() - .5);
       if (queue.length > 1 && queue[queue.length - 1] === last) queue.unshift(queue.pop());
     }
     return (last = queue.pop());
   };
+  return () => {
+    for (let i = 0; i < list.length; i++) {
+      const item = next();
+      if (!afternoon || !skizyAwakeIn(item)) return item;
+    }
+    return null;
+  };
 }
+// an exchange ([[who, text, dir], ...]) or a single caption ([who, text, via]) with skizy talking, not in her sleep
+const skizyAwakeIn = item => Array.isArray(item) && (item[0] === 'mel'
+  || item.some(line => Array.isArray(line) && line[0] === 'mel' && line[2] !== 'asleep'));
 
 const bags = {
   mel: bag(MEL_TALK), melWork: bag(MEL_WORK), claube: bag(CLAUBE_TALK), mira: bag(MIRA_TALK),
   ambient: bag([...AMBIENT, ...AMBIENT_MORE]), linger: bag(LINGER), leaving: bag(LEAVING),
-  music: bag(MUSIC), funger: bag(FUNGER_AFTER),
+  hushMira: bag(AFTERNOON_HUSH.mira), hushClaube: bag(AFTERNOON_HUSH.claube),
+  music: bag(MUSIC), funger: bag(FUNGER_AFTER), watching: bag(FUNGER_WATCHING), sleeptalk: bag(SLEEP_TALK),
 };
 for (const [room, list] of Object.entries(RETURNING)) bags['back:' + room] = bag(list);
 for (const [f, list] of Object.entries(RADIO)) bags['fm:' + f] = bag(list);
@@ -42,7 +61,7 @@ for (const [id, o] of Object.entries(NARRATION)) if (o.lines?.length) bags['n:' 
 
 const NAMES = { mira: CAST.mira.name, claube: 'Claube / WATCHLION', mel: 'skizy' };
 // bubble alignment per speaker, so the ones near the edge don't fall off the stage
-const ALIGN = { mira: ['-40%', '40%'], mel: ['-50%', '50%'], claube: ['-78%', '78%'] };
+const ALIGN = { mira: ['-40%', '40%'], mel: ['-50%', '50%'], claube: ['-78%', '78%'], aether: ['-62%', '62%'] };
 
 const body = document.body;
 const stage = $('#stage');
@@ -50,7 +69,7 @@ const frame = $('#crt-frame');
 const site = $('#crt-site');
 const game = $('#crt-game');
 let svg, anchors = {};      // svg is the main room; the other rooms load when you first walk in
-let mode = 'loading';       // loading | intro | room | scene | crt | station | moving
+let mode = 'loading';       // loading | room | scene | crt | station | moving
 let current = 'main';
 const roomEls = {};
 let lastActivity = performance.now();
@@ -86,34 +105,41 @@ const readTime = t => Math.min(9000, 1600 + t.length * 48);
 let talkToken = 0;
 function clearBubbles() {
   $('#bubbles').innerHTML = '';
+  $('#subtitles').innerHTML = '';
   svg?.querySelectorAll('.speaking').forEach(el => el.classList.remove('speaking'));
 }
 async function say(exchange) {
-  if (!exchange) return;
+  if (!exchange || alone) return;
   const token = ++talkToken;
   clearBubbles();
   const claube = svg.querySelector('#claube');
-  for (const [who, text, dir] of exchange) {
+  for (let [who, text, dir] of exchange) {
     if (token !== talkToken) return;
+    if (who === 'mel' && afternoon) dir ||= 'asleep';
     if (who === '-') { // a beat. a 'hush' beat silences the whole room for a moment
       clearBubbles();
       if (dir === 'hush') audio.hold(3);
       await sleep(dir === 'hush' ? 3200 : 1300);
       continue;
     }
-    const a = anchors[who];
+    const a = who === 'mel' && afternoon ? anchors.lump : anchors[who];
     const b = document.createElement('div');
     b.className = 'bubble';
     b.style.setProperty('--c', CAST[who].color);
     b.style.setProperty('--ax', ALIGN[who][0]);
     b.style.setProperty('--tail', ALIGN[who][1]);
-    b.style.left = (a.x / 1600 * 100) + '%';
-    b.style.top = (a.y / 900 * 100) + '%';
+    // zoomed in on a screen, the room's out of view: the line shows as a subtitle up top instead
+    const sub = body.classList.contains('zoomed');
+    if (sub) b.classList.add('sub');
+    else {
+      b.style.left = (a.x / 1600 * 100) + '%';
+      b.style.top = (a.y / 900 * 100) + '%';
+    }
     b.innerHTML = `<span class="who">${esc(CAST[who].name)}</span>`
       + (dir ? `<span class="dir">(${esc(dir)})</span>` : '')
       + (text ? fmt(text) : '');
     clearBubbles();
-    $('#bubbles').append(b);
+    $(sub ? '#subtitles' : '#bubbles').append(b);
     svg.querySelector('#' + who)?.classList.add('speaking');
     const writing = who === 'claube' && /writ/.test(dir || '');
     if (writing) { claube.classList.add('writing'); audio.scribble(true); }
@@ -133,15 +159,22 @@ const hush = () => {
   svg?.querySelector('#claube').classList.remove('writing');
   audio.scribble(false);
 };
-const talking = () => $('#bubbles').childElementCount > 0;
+const talking = () => $('#bubbles').childElementCount + $('#subtitles').childElementCount > 0;
 
 // ============================================================ dialogue box (scenes)
 const dlg = { box: $('#dialogue'), name: $('#dlg-name'), dir: $('#dlg-dir'), text: $('#dlg-text') };
-let advance = null, skipScene = false;
+let advance = null, skipScene = false, skipBeat = null;
 function waitAdvance() { return new Promise(r => (advance = r)); }
+// a timed beat: clicks don't hurry it, only the skip button does
+function waitBeat(ms) {
+  return new Promise(r => {
+    const t = setTimeout(() => { skipBeat = null; r(); }, ms);
+    skipBeat = () => { clearTimeout(t); skipBeat = null; r(); };
+  });
+}
 function nudge() { const r = advance; advance = null; r?.(); }
 dlg.box.addEventListener('click', e => { if (e.target.id !== 'dlg-skip') nudge(); });
-$('#dlg-skip').addEventListener('click', e => { e.stopPropagation(); skipScene = true; nudge(); });
+$('#dlg-skip').addEventListener('click', e => { e.stopPropagation(); skipScene = true; nudge(); skipBeat?.(); });
 
 async function typeOut(el, html) {
   // types the text out; a click fills it in at once
@@ -179,8 +212,14 @@ async function playScene(lines) {
       dlg.name.textContent = '';
       dlg.dir.textContent = '';
       dlg.text.className = 'direction';
-      dlg.text.textContent = text;
-      await waitAdvance();
+      dlg.text.textContent = text || '…';
+      if (extra?.do) SCENE_CUES[extra.do]?.();
+      if (extra?.wait) {
+        dlg.box.classList.add('timed');
+        if (extra.sound) audio[extra.sound]?.();
+        await waitBeat(extra.wait * 1000);
+        dlg.box.classList.remove('timed');
+      } else await waitAdvance();
       continue;
     }
     svg.querySelector('#' + who)?.classList.add('speaking');
@@ -393,7 +432,7 @@ function toggleFridge(open) {
   audio.fridge(open);
   if (open && !toggleFridge.seen) {
     toggleFridge.seen = true;
-    say(FRIDGE_FIRST);
+    say(FRIDGE_FIRST.filter(line => !afternoon || line[0] !== 'mel'));
   }
 }
 let fridgeOpen = false;
@@ -401,7 +440,7 @@ let fridgeOpen = false;
 // ============================================================ interacting
 function interact(id) {
   lastActivity = performance.now();
-  if (mode !== 'room') return;
+  if (mode !== 'room' || alone) return;
   closeMenu();
   audio.tick();
   if (id === 'claube' && Date.now() < deniable) { deniable = 0; return say(NOT_WRITING); }
@@ -423,19 +462,24 @@ function interact(id) {
         ['look at it', () => say(bags.console())],
       ]);
     case 'claube':
+      if (afternoon) return say(bags.hushClaube());
       return openMenu(CAST.claube.name, CAST.claube.color, [
-        ['what is skizy doing?', () => playScene(SCENE_SSD)],
+        ['what is skizy doing?', () => (afternoon ? say([['claube', 'Sleeping.'], ['mira', 'Let her.']]) : playScene(SCENE_SSD))],
         ['talk', () => say(bags.claube())],
         ['what is this room?', () => say(WHAT_IS_THIS_ROOM)],
       ]);
     case 'mira':
+      if (afternoon) return say(bags.hushMira());
       return openMenu(CAST.mira.name, CAST.mira.color, [
+        ['what is skizy building?', () => playScene(SCENE_MIRA)],
         ['talk', () => say(bags.mira())],
         ['what is this room?', () => say(WHAT_IS_THIS_ROOM)],
-        ['look through the telescope again', replayIntro],
+        ['back to the rooftop', () => { location.href = ROOFTOP; }],
       ]);
     case 'mel':
       return openMenu(CAST.mel.name, CAST.mel.color, [
+        ...(carryingMeds ? [['give her the bottle', talkMeds]] : []),
+        ['say something', talkToSkizy],
         ['talk', () => say(bags.mel())],
         ['watch her work', () => say(bags.melWork())],
         ['what is this room?', () => say(WHAT_IS_THIS_ROOM)],
@@ -477,9 +521,9 @@ function interact(id) {
       el.querySelector('#ac-closed').style.display = open ? 'none' : '';
       audio.doorOpen();
       // once, quietly, after you've had a moment to look inside
-      if (open && !interact.aclosetSeen) {
+      if (open && !interact.aclosetSeen && !afternoon) {
         interact.aclosetSeen = true;
-        setTimeout(() => { if (current === 'bedroom') caption(CLOSET_FIRST); }, 6000);
+        setTimeout(() => { if (current === 'bedroom' && !afternoon) caption(CLOSET_FIRST); }, 6000);
       }
       return;
     }
@@ -487,6 +531,22 @@ function interact(id) {
     case 'notebook':
       return openCloseup(NOTEBOOK_PAGE);
     case 'hexley': return;
+    case 'deskbottle': return;
+    case 'pills':
+      return openMenu('pill bottles', '#e0782a', [
+        ['look at them', () => narrate('pills')],
+        ...(carryingMeds ? [] : [['take a bottle', () => {
+          carryingMeds = true;
+          caption(['note', "you take one of the bottles. it's full. it rattles."]);
+        }]]),
+      ]);
+    case 'aether':
+      if (svg.querySelector('#aether').classList.contains('off')) return; // not running yet
+      return say(bags.aether());
+    case 'lump':
+      // skipped or not, Aether's running by the end of it
+      if (!afternoonScene) { afternoonScene = true; return playScene(SCENE_AFTERNOON).then(SCENE_CUES.wakeAether); }
+      return say(bags.sleeptalk());
     case 'vso': return openCloseup(vsoPanel());
     case 'mirastar':
       // check on her enough times and she notices. once
@@ -539,6 +599,104 @@ function interact(id) {
 }
 
 interact.starChecks = 0;
+
+// ============================================================ the afternoon
+// after a while in the room, time passes: daylight, and skizy asleep under the blanket on
+// the bean bag. clicking the lump plays Claube's scene. it stays afternoon for the visit
+let afternoon = false, afternoonScene = false;
+// things a scene can make happen, from a beat's { do: '...' }
+const SCENE_CUES = {
+  wakeAether() {
+    const el = svg.querySelector('#aether');
+    if (el.classList.contains('off')) { el.classList.remove('off'); audio.beep(1); }
+  },
+  shift() {
+    const lump = svg.querySelector('#lump .breathe');
+    lump?.classList.remove('shift'); void lump?.getBBox(); lump?.classList.add('shift');
+  },
+};
+async function startAfternoon() {
+  if (afternoon || alone || mode !== 'room') return;
+  afternoon = true;
+  mode = 'moving';
+  hush(); closeMenu();
+  $('#hover-label').classList.remove('show');
+  fade.classList.add('dark', 'on');
+  await sleep(1400);
+  for (const [sel, show] of [['#mel', false], ['#blanket', false], ['#afternoon-chair', true], ['#lump', true], ['#daylight', true]]) {
+    svg.querySelector(sel).style.display = show ? '' : 'none';
+  }
+  body.classList.add('afternoon');
+  audio.asleep = true;
+  svg.querySelector('#aether').classList.add('off'); // not running yet. the scene boots Aether up
+  fade.classList.remove('on');
+  await sleep(900);
+  fade.classList.remove('dark');
+  mode = 'room';
+  lastActivity = performance.now();
+  caption(['note', 'later. the afternoon. skizy fell asleep on the bean bag.']);
+}
+
+// ============================================================ the meds
+// bring her a bottle from the bathroom cabinet and talk her into it. then the lights go off,
+// the others are gone, and she sits in the corner under the window. nothing talks after that
+let carryingMeds = false, alone = false;
+async function talkMeds() {
+  if (!await sayAll(MEDS_TALK.open)) return;
+  const second = () => openMenu('you', '#cfd8d2', MEDS_TALK.second.map(([line, answer]) => [line, async () => {
+    if (await sayAll(answer) && await sayAll(MEDS_TALK.last)) goDark();
+  }]));
+  const first = asked => openMenu('you', '#cfd8d2', MEDS_TALK.first
+    .filter(([, kind]) => !(asked && kind === 'ask'))
+    .map(([line, kind, answer]) => [line, async () => {
+      if (!await sayAll(answer)) return;
+      kind === 'ask' ? first(true) : second();
+    }]));
+  first(false);
+}
+async function goDark() {
+  carryingMeds = false;
+  mode = 'moving';
+  hush(); closeMenu();
+  alone = true;
+  store.set('room_quiet', '1'); // the room remembers
+  audio.asleep = true;
+  audio.hold(4.5); // whatever was mid-keystroke stops here; the room comes back without it
+  $('#hover-label').classList.remove('show');
+  fade.classList.add('dark', 'on');
+  await sleep(3200);
+  for (const [sel, show] of [['#mira', false], ['#claube', false], ['#aether', false], ['#hydra', false], ['#mel', false], ['#lump', false],
+    ['#light', false], ['#daylight', false], ['#afternoon-chair', true], ['#alone-dark', true], ['#alone', true]]) {
+    svg.querySelector(sel).style.display = show ? '' : 'none';
+  }
+  body.classList.add('alone');
+  audio.asleep = true;
+  audio.lightsOff();
+  if (music.playing) music.toggle(); // the station goes off with everything else
+  if (radio.on) radio.toggle();
+  updateNav();
+  fade.classList.remove('on');
+  await sleep(1600);
+  fade.classList.remove('dark');
+  mode = 'room';
+}
+
+// ============================================================ you, talking to skizy
+let talkedToSkizy = false;
+// true if the exchange played all the way through (nothing else talked over it)
+async function sayAll(exchange) {
+  const token = talkToken + 1;
+  await say(exchange);
+  return talkToken === token && mode === 'room';
+}
+async function talkToSkizy() {
+  const done = await sayAll(talkedToSkizy ? VIEWER_TALK.again : VIEWER_TALK.hello);
+  talkedToSkizy = true;
+  if (!done) return;
+  openMenu('you', '#cfd8d2', VIEWER_TALK.replies.map(([line, answer, then]) => [line, async () => {
+    if (await sayAll(answer) && then === 'funger') playConsole();
+  }]));
+}
 
 // ============================================================ Claube, writing
 // sometimes he just writes. hover him while he's at it and Mira tells on him
@@ -604,7 +762,9 @@ document.addEventListener('tubeflicker', () => {
 
 // ============================================================ captions (rooms with nobody in them)
 let captionTimer;
-function caption([who, text, via]) {
+function caption(line) {
+  if (!line || alone) return;
+  const [who, text, via] = line;
   const box = $('#caption');
   const isNote = who === 'note';
   box.classList.toggle('note', isNote);
@@ -720,7 +880,7 @@ function updateNav() {
   for (const side of ['left', 'right']) {
     const b = $('#nav-' + side);
     const to = r[side];
-    b.hidden = !to || mode === 'intro';
+    b.hidden = !to || alone;
     if (to) b.textContent = side === 'left' ? `\u25C2 ${ROOMS[to].name}` : `${ROOMS[to].name} \u25B8`;
   }
 }
@@ -988,9 +1148,10 @@ function wireObjects(root) {
     // the hydra notices when you look at it
     body.classList.toggle('hydra-alert', !!el && mode === 'room' && ['cables', 'powerstrip'].includes(el.dataset.id));
     if (!el || mode !== 'room') { label.classList.remove('show'); return; }
-    label.textContent = labelFor(el.dataset.id);
+    if (alone && el.dataset.id !== 'alone') { label.classList.remove('show'); return; }
+    label.textContent = alone ? 'skizy' : labelFor(el.dataset.id);
     label.classList.add('show');
-    if (el.dataset.id === 'drawing' && !show.drawingSeen) { show.drawingSeen = true; say(DRAWING_HOVER); }
+    if (el.dataset.id === 'drawing' && !show.drawingSeen && !afternoon) { show.drawingSeen = true; say(DRAWING_HOVER); }
     if (el.dataset.id === 'claube') hoverClaube();
   };
   root.addEventListener('pointerover', e => show(e.target.closest('.obj')));
@@ -1022,9 +1183,17 @@ function watchPointer() {
 let roomSince = 0, lastLinger = 0, lastLeave = 0, saidStay = false;
 function ambientLoop() {
   setTimeout(ambientLoop, 26000 + Math.random() * 30000);
+  // playing funger on the Phosphor Artifact: the room watches, now and then
+  if (mode === 'crt' && input === 'game') {
+    if (!document.hidden && !talking() && Math.random() < .5) say(bags.watching());
+    return;
+  }
   if (mode !== 'room' || current !== 'main' || document.hidden || talking() || !$('#menu').hidden) return;
   if (performance.now() - lastActivity < 8000) return;
   const now = performance.now();
+  // nothing is happening. nothing has happened for a while
+  if (afternoon || alone) return;
+  if (now - roomSince > 300000 && now - lastActivity > 15000) return startAfternoon();
   // a long quiet stretch: Mira says the thing. once
   if (!saidStay && now - lastActivity > 180000) { saidStay = true; return say(JUST_STAY); }
   if (Math.random() < .2) return claubeWrites();
@@ -1038,7 +1207,7 @@ function ambientLoop() {
 
 const TITLE = document.title;
 document.addEventListener('visibilitychange', () => {
-  document.title = document.hidden ? bags.leaving()[0][1] : TITLE;
+  document.title = document.hidden && !alone ? bags.leaving()?.[0][1] ?? TITLE : TITLE;
 });
 document.documentElement.addEventListener('mouseleave', () => {
   const now = performance.now();
@@ -1047,27 +1216,16 @@ document.documentElement.addEventListener('mouseleave', () => {
   say(bags.leaving());
 });
 
-// ============================================================ the telescope
-// the telescope and the boarded-up window are DaV-nky's (dav-nky.pleroma.nexus): its rooftop, ../city.html.
-// this room is what's behind them. "look through the telescope again" goes back out to it, aimed at this window.
+// ============================================================ arriving
 const fade = $('#fade');
-const ROOFTOP = '../city.html';
-function outToRooftop(aim) {
-  hush();
-  fade.classList.add('on', 'dark');
-  try { if (aim) sessionStorage.setItem('dav-peek-mel', '1'); } catch {}
-  setTimeout(() => { location.href = ROOFTOP; }, 900);
-}
-async function replayIntro() {
-  if (mode !== 'room') return;
-  outToRooftop(true);
-}
 
 function enterRoom() {
   mode = 'room';
   updateNav();
   roomSince = lastActivity = performance.now();
   bootCRT();
+  // testing shortcut: open the page with ?afternoon to skip the five-minute wait
+  if (new URLSearchParams(location.search).has('afternoon')) setTimeout(startAfternoon, 2500);
   // phones held upright start looking at the middle of the room
   const vp = $('#viewport');
   vp.scrollLeft = (vp.scrollWidth - vp.clientWidth) * .45;
@@ -1087,6 +1245,8 @@ async function main() {
   $('#svg-host').innerHTML = await res.text();
   svg = $('#svg-host svg');
   await inlineArt(svg);
+  // the room remembers the ending: the bottle stays on the desk, every visit after
+  if (store.get('room_quiet')) svg.querySelector('#deskbottle').style.display = '';
   for (const a of svg.querySelectorAll('[data-anchor]')) {
     anchors[a.dataset.anchor] = { x: +a.getAttribute('cx'), y: +a.getAttribute('cy') };
   }
@@ -1098,37 +1258,28 @@ async function main() {
   fitSite(false);
   ambientLoop();
 
-  // DaV-nky (dav-nky.pleroma.nexus): this room is behind the boarded-up window on its rooftop.
-  const params = new URLSearchParams(location.search);
-  if (params.has('peek')) {                  // seen from the rooftop, through the window: just the room, living its life
+  if (PEEK) {
     body.classList.add('peek');
-    mode = 'room';
+    enterRoom();
     return;
   }
-  if (params.get('from') === 'dav-nky') {    // climbed in through the window (the boards already off)
-    body.classList.add('from-davnky');
-    fade.classList.add('on', 'dark');
-    const first = !store.get('room_knocked');
-    enterRoom();
-    await sleep(60);
-    fade.classList.remove('on');
+  enterRoom();
+  // climbing in for the first time: the boards just came down on the rooftop, so the room
+  // picks up from there
+  if (!store.get('room_knocked')) {
     await sleep(1000);
-    fade.classList.remove('dark');
-    if (first) {
-      store.set('room_knocked', '1');
-      await playScene(SCENE_WINDOW);
-      hint();
-    } else if (mode === 'room' && !talking()) say([['claube', "You could've just knocked."]]);
+    store.set('room_knocked', '1');
+    await playScene(SCENE_WINDOW);
+    hint();
     return;
   }
-
-  if (store.get('room_knocked')) {
-    enterRoom();
-    await sleep(1500);
-    if (mode === 'room' && !talking()) say([['claube', "You could've just knocked."]]);
-  } else {
-    // never been in: the way in is through the window, from DaV-nky's rooftop
-    location.replace(ROOFTOP);
+  await sleep(1500);
+  if (mode === 'room' && !talking()) {
+    // the first visit after it went quiet, Mira says so. once, and never again
+    if (store.get('room_quiet') && !store.get('room_quiet_back')) {
+      store.set('room_quiet_back', '1');
+      say([['mira', 'You were here when it went quiet.']]);
+    } else say([['claube', "You could've just knocked."]]);
   }
 }
 main();

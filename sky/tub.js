@@ -427,6 +427,7 @@
     }
     function electrocute() {
         if (zapping || !Sky.gore) return;
+        if (Sky.lives && Sky.lives.refuse('toaster')) return;
         zapping = true;
         me.classList.remove('talking', 'held');
         crackle(1600);

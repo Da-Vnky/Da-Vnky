@@ -178,6 +178,7 @@
     var dying = false;
     function takeIt(c) {
         if (dying) return;
+        if (Sky.lives && Sky.lives.refuse('revolver')) return;                    // (from reset 2, not before the key: sky/lives.js)
         // the lock's off and there's more than one heart left: it won't fire (sky/lives.js)
         if (Sky.lives && Sky.lives.jammed) {
             if (Sky.sounds) Sky.sounds.sfx('jammed', { or: 'tap' });
@@ -223,6 +224,7 @@
         if (!spend()) return true;
         if (claube && Sky.claubes) { bang(); Sky.claubes.shoot(claube, x, y); return true; }
         if (deck) { shootRecord(x, y); return true; }
+        if (frame && frame.dataset.frame === '6' && Sky.claubes && Sky.claubes.guardFrame && Sky.claubes.guardFrame(x, y)) { bang(); return true; }   // (the false god's circle protects it)
         if (frame) { shootPainting(frame, x, y); return true; }
         bang();
         hole(x, y);

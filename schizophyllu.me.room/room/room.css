@@ -341,6 +341,29 @@ body.closet-dark #c-bulbglass { filter: none; }
 }
 .vso .bad { color: #ff7a6a; text-shadow: 0 0 6px rgba(255, 122, 106, .5); }
 
+/* the afternoon: skizy asleep under the blanket */
+.breathe { transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 4.6s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scaleY(1.035); } }
+.zzz text { animation: zzz 3.6s ease-out infinite; opacity: 0; }
+.zzz text:nth-child(2) { animation-delay: 1.2s; } .zzz text:nth-child(3) { animation-delay: 2.4s; }
+@keyframes zzz { 0% { opacity: 0; transform: translate(0, 4px); } 30% { opacity: .8; } 100% { opacity: 0; transform: translate(6px, -10px); } }
+/* Aether: awake, or not running yet */
+#aether.off .face-on, #aether:not(.off) .face-off { display: none; }
+#aether .antenna { animation: blink 2.2s step-end infinite; }
+#aether.off .antenna { animation: none; fill: #4a3a44; }
+.breathe.shift { animation: shift .9s ease-in-out, breathe 4.6s ease-in-out .9s infinite; }
+@keyframes shift { 30% { transform: translateX(-3px) scaleY(1.06); } 70% { transform: translateX(2px) scaleY(.98); } }
+/* after she takes them: the screen's off too */
+body.alone #crt-frame { visibility: hidden; }
+body.alone .obj { cursor: default; }
+body.alone .obj:hover, body.alone .obj:focus-visible { filter: none; }
+/* ?peek: seen through a window on DaV-nky's rooftop. just the room */
+body.peek #hud, body.peek .nav, body.peek #standup, body.peek #menu { display: none !important; }
+body.peek #viewport { overflow: hidden; }
+body.peek .obj { cursor: default; }
+/* a timed beat in a scene: nothing to click through */
+#dialogue.timed #dlg-foot .dim, #dialogue.timed #dlg-foot .blink { visibility: hidden; }
+
 /* ================================================= speech */
 #bubbles { position: absolute; inset: 0; pointer-events: none; }
 body.zoomed #bubbles { opacity: 0; }
@@ -374,6 +397,11 @@ body.zoomed #bubbles { opacity: 0; }
 }
 .bubble.out { opacity: 0; transition: opacity .4s; }
 @keyframes pop { from { opacity: 0; transform: translate(var(--ax, -50%), calc(-100% - 4px)); } }
+/* while you're zoomed in on a screen: subtitles across the top, clear of funger's own text box */
+#subtitles { position: fixed; top: 10px; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; z-index: 11; }
+.bubble.sub { position: relative; max-width: min(640px, 92vw); transform: none; animation: subpop .18s ease-out; }
+.bubble.sub::after { display: none; }
+@keyframes subpop { from { opacity: 0; transform: translateY(-4px); } }
 
 /* ================================================= HUD */
 #hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
@@ -467,8 +495,3 @@ body.zoomed #hud-top { opacity: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
-
-/* ============ DaV-nky (dav-nky.pleroma.nexus): the room behind the boarded-up window on its rooftop ============ */
-/* seen from the rooftop through the window (index.html?peek): just the room */
-body.peek #hud, body.peek .nav, body.peek #intro, body.peek #menu, body.peek #dialogue, body.peek #standup, body.peek #closeup, body.peek #peephole { display: none !important; }
-body.peek #viewport { overflow: hidden; }

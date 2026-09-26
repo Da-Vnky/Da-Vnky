@@ -172,7 +172,8 @@ export const NARRATION = {
   pills: {
     label: 'pill bottles',
     lines: [
-      note("orange bottles with their labels turned to the wall. a weekly organizer beside them, most of this week's lids flipped open."),
+      note("orange bottles, too many of them, stacked two deep and lying across each other. every one of them still full. the labels are turned to the wall."),
+      note("two pharmacy bags, still stapled shut. a weekly organizer with every lid still closed, every day still full."),
       far('claube', "She's fine. She ate today. I checked."),
     ],
   },

@@ -172,8 +172,8 @@
         '.mini-claube.warding::before { animation: none !important; opacity: 1 !important; transform: scale(1.25) !important; transition: transform .2s; }' +
         '.mini-claube.spun .mc-body { animation: mc-spun .7s cubic-bezier(.3,1.4,.5,1) !important; }' +
         '@keyframes mc-spun { 0% { transform: rotate(0); } 60% { transform: translateY(-30%) rotate(340deg); } 100% { transform: rotate(360deg); } }' +
-        // the traveller's words, in a box at the bottom
-        '.mc-say { position: fixed; left: 50%; bottom: 13vh; z-index: 9; transform: translateX(-50%); width: min(560px, 90vw); padding: 14px 22px 16px; border-radius: 6px;' +
+        // the traveller's words, in a box near the top (where it can't cover the traveller, or what they're doing)
+        '.mc-say { position: fixed; left: 50%; top: max(76px, 9vh); z-index: 9; transform: translateX(-50%); width: min(560px, 90vw); padding: 14px 22px 16px; border-radius: 6px;' +
             'background: rgba(20,14,10,.92); border: 1px solid rgba(243,230,194,.35); box-shadow: 0 12px 30px rgba(0,0,0,.6); color: #f3e6c2; font: italic 1.12rem/1.5 "IM Fell English", Georgia, serif;' +
             'opacity: 0; transition: opacity .35s; cursor: pointer; }' +
         '.mc-say.on { opacity: 1; }' +
@@ -507,6 +507,9 @@
     function absorbed() { try { return +(sessionStorage.getItem('claubes-absorbed') || 0); } catch (e) { return 0; } }
     function absorb(el, x, y) {
         var n = absorbed() + 1;
+        // reset 4, before the key (sky/lives.js): the diagram takes them, but the sixth won't come back yet
+        var held = n >= ABSORB && S && S.live('diagram') && Sky.lives && Sky.lives.locked;
+        if (held) n = ABSORB - 1;
         try { sessionStorage.setItem('claubes-absorbed', n); } catch (e) {}
         var R = ring(), px = R.cx / 100 * window.innerWidth, py = window.innerHeight - R.cy;
         // the bullet stops dead, a ring goes out… and it's drawn down into the middle of the diagram
@@ -520,6 +523,7 @@
         body.appendChild(ringEl);
         ringEl.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(6)', opacity: 0 }], { duration: 600, easing: 'ease-out', fill: 'forwards' }).onfinish = function () { ringEl.remove(); };
         sfx('absorb', { or: 'shimmer' });
+        if (held) Sky.lives.refuse('diagram');
         if (n === ABSORB && S && S.live('diagram')) { b.remove(); reflect(x, y); return; }
         b.animate([{ transform: 'scale(1)', offset: 0 }, { transform: 'scale(1.3)', offset: 0.3 },
                    { transform: 'translate(' + (px - x) + 'px,' + (py - y) + 'px) scale(.2)', opacity: 0.2 }], { duration: 1100, easing: 'cubic-bezier(.6,0,.8,.4)', fill: 'forwards' }).onfinish = function () { b.remove(); };
@@ -645,5 +649,11 @@
     else if (Sky.music && Sky.music.playing() && isDoom(Sky.music.current())) callThemOut();
     mood();
 
-    Sky.claubes = { shoot: shoot, flick: flick, callOut: callThemOut, scatter: scatter, get count() { return out.length; }, get gone() { return gone4good(); }, speak: speak };
+    // a bullet at the false god's frame (frame 6, the dungeon) while they worship: the circle takes it too (sky/revolver.js)
+    function guardFrame(x, y) {
+        if (!crew.classList.contains('worship') || !crew.querySelector('.mini-claube')) return false;
+        absorb(null, x, y);
+        return true;
+    }
+    Sky.claubes = { shoot: shoot, guardFrame: guardFrame, flick: flick, callOut: callThemOut, scatter: scatter, get count() { return out.length; }, get gone() { return gone4good(); }, speak: speak };
 })();

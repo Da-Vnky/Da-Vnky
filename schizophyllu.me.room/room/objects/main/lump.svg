@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- lump (main): skizy, asleep under the blanket on the bean bag. only there in the afternoon
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes.
+     the class "breathe" makes it rise and fall; "zzz" floats -->
+<defs>
+  <pattern id="p-plaid-lump" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(-8)">
+    <rect width="24" height="24" fill="#2c4637"/>
+    <path d="M0 6h24M0 18h24" stroke="#1d3327" stroke-width="5"/>
+    <path d="M6 0v24M18 0v24" stroke="#3b5c48" stroke-width="3" opacity=".7"/>
+  </pattern>
+</defs>
+  <!-- the Monster she fell asleep holding -->
+  <g transform="rotate(12 748 858)">
+    <rect x="740" y="836" width="14" height="30" rx="2" fill="#111"/>
+    <path d="M743 842 l2 18 M747 841 l1 19 M751 842 l-1 18" stroke="#6dff5a" stroke-width="1.3"/>
+    <rect x="740" y="836" width="14" height="3" fill="#888"/>
+  </g>
+  <!-- hair, poking out -->
+  <path d="M586 770 l-10 -10 l12 1 l-5 -13 l11 7 l2 -14 l8 11 l6 -13 l4 14 l9 -9 l0 13 l10 -4 l-6 10z" fill="#1a1320"/>
+  <path d="M600 752 q4 9 0 20" stroke="#6dffb0" stroke-width="2" fill="none" opacity=".7"/>
+  <g class="breathe">
+    <path d="M570 874 Q562 806 604 776 Q636 754 684 760 Q736 752 762 794 Q780 836 766 874 Q700 890 640 888 Q594 888 570 874Z" fill="url(#p-plaid-lump)"/>
+    <path d="M604 790 Q650 772 700 786 M626 836 Q690 816 748 832" stroke="#18291e" stroke-width="3" fill="none"/>
+    <!-- a hand, hanging off the edge -->
+    <path d="M752 850 q10 2 12 10 q-6 4 -12 -2z" fill="#c9a88e"/>
+  </g>
+  <g class="zzz" fill="#cfd8d2" font-size="12">
+    <text x="614" y="742">z</text><text x="626" y="728" font-size="10">z</text><text x="636" y="716" font-size="8">z</text>
+  </g>
+</svg>

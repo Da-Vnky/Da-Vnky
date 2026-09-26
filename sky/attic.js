@@ -510,6 +510,7 @@
     Sky.findAsset('assets/living/pact-hand', function (u) { if (u) handArt = '<img alt="" src="' + u + '">'; });
     pactBtn.addEventListener('click', function () {
         if (pactBtn.disabled || pactMade()) return;
+        if (Sky.lives && Sky.lives.refuse('grimoire')) return;              // (not before the key: sky/lives.js)
         pactBtn.disabled = true;
         set('grimoire-pact', '1');                                          // (it's made: this can't happen again this reset)
         grim.classList.add('slam');

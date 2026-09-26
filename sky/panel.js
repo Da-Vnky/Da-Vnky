@@ -48,7 +48,7 @@
     var pendingFiles = [];
     function wake() {
         if (ctx && ctx.state !== 'running') ctx.resume().then(refreshAll, function () {});
-        pendingFiles.splice(0).forEach(function (a) { a.play().catch(function () {}); });
+        pendingFiles.splice(0).forEach(function (a) { if (!a._ch || a._ch.level > 0.001) a.play().catch(function () {}); });   // (not one that's been turned down since)
         channels.forEach(function (c) { c.blocked = false; });
     }
     ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) { document.addEventListener(ev, wake, { capture: true, passive: true }); });
@@ -252,6 +252,7 @@
             ch.lp.connect(ch.out); ch.out.connect(master);
             if (ch.file) {                                           // your recording
                 ch.el = new Audio(ch.file);
+                ch.el._ch = ch;
                 ch.el.loop = true;
                 ch.el.crossOrigin = 'anonymous';
                 try { ctx.createMediaElementSource(ch.el).connect(ch.lp); } catch (e) { ch.el.volume = 1; }
@@ -267,16 +268,24 @@
             if (ch.el) {
                 if (ch.level > 0.001 && ch.el.paused && !ch.trying && !ch.blocked) {
                     ch.trying = true;
-                    ch.el.play().then(function () { ch.trying = false; }, function () { ch.trying = false; ch.blocked = true; if (pendingFiles.indexOf(ch.el) === -1) pendingFiles.push(ch.el); });
+                    ch.el.play().then(function () { ch.trying = false; if (ch.level <= 0.001) ch.el.pause(); }, function (err) {
+                        ch.trying = false;
+                        if (err && err.name === 'AbortError') return;          // (turned down again before it got going: not blocked)
+                        ch.blocked = true; if (pendingFiles.indexOf(ch.el) === -1) pendingFiles.push(ch.el);
+                    });
                 }
                 if (ch.level <= 0.001 && !ch.el.paused) ch.el.pause();
             }
         }
         ch.set = function (v, ramp) {
+            var was = ch.level;
             ch.level = Math.max(0, Math.min(1, v));
             if (ch.level > 0) { wanted = true; build(); }
             apply(ramp);
-            if (ch.tick && ctx && ctx.state === 'running') ch.tick(ch.level);
+            // its timed things (taps on the glass, thunder…) go once a second, below: here only as it starts.
+            // (some things set a channel every frame: the rain does. a tick each time was hundreds of little sounds
+            //  a second, and the browser's sound gave up under them, taking every other sound with it)
+            if (ch.tick && was <= 0.001 && ch.level > 0.001 && ctx && ctx.state === 'running') ch.tick(ch.level);
         };
         ch.refresh = function () { apply(); };
         channels.push(ch);

@@ -14,6 +14,10 @@
      the roof      reset 2: the edge of the roof can be jumped from (the street
                    below: assets/city/street-below). after it, guard rails along
                    the edge (assets/city/guard-rail, repeated sideways)
+     placeholders  the ways to die not designed yet (DEATHS with a "placeholder" in
+                   sky/state.js): a dashed bubble with a skull on a page. click it and
+                   the traveller dies (a stand-in death: zapped), so the reset can be
+                   played to its end. from reset 2, not before the key (sky/lives.js)
    (the toaster's in sky/tub.js, the boat in sky/ground-sea.js, the note on the
     dungeon floor in sky/dungeon.js, the revolver's jam in sky/revolver.js)
 
@@ -47,6 +51,19 @@
         '.scissors .sc-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%) rotate(6deg); white-space: nowrap; font-style: italic; font-size: .9rem;' +
             'color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.7); opacity: 0; transition: opacity .2s; pointer-events: none; }' +
         '.scissors:hover .sc-hint { opacity: 1; }' +
+        // a way to die, still to be designed: a dashed bubble with a skull
+        '.death-bubble { position: absolute; z-index: 6; width: 86px; height: 86px; margin: -43px 0 0 -43px; padding: 0; border-radius: 50%; cursor: pointer;' +
+            'border: 2px dashed rgba(154,59,31,.8); background: radial-gradient(circle at 38% 32%, rgba(255,250,235,.9), rgba(243,230,194,.72) 60%, rgba(220,190,150,.6));' +
+            'box-shadow: 0 4px 14px rgba(0,0,0,.35); color: #3a2716; display: grid; place-items: center; align-content: center; gap: 1px; animation: db-bob 3.2s ease-in-out infinite; }' +
+        '.death-bubble.fixed { position: fixed; }' +
+        '.death-bubble svg { width: 30px; height: 30px; display: block; }' +
+        '.death-bubble .db-t { font: italic .72rem/1.05 "IM Fell English", Georgia, serif; text-align: center; }' +
+        '.death-bubble:hover, .death-bubble:focus-visible { outline: none; border-style: solid; box-shadow: 0 4px 16px rgba(0,0,0,.35), 0 0 0 4px rgba(154,59,31,.2); }' +
+        '.death-bubble.popping { animation: db-pop .35s ease-in forwards; pointer-events: none; }' +
+        '@keyframes db-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }' +
+        '@keyframes db-pop { to { transform: scale(1.4); opacity: 0; } }' +
+        'body.leaving .death-bubble, body.sky-view .death-bubble, body.peep-view .death-bubble, body.in-side .room .death-bubble { opacity: 0; pointer-events: none; }' +
+        '@media (prefers-reduced-motion: reduce) { .death-bubble { animation: none; } }' +
         // the roof's edge, and the rails that come later
         '.roof-edge { position: fixed; z-index: 4; left: 26%; right: 4%; bottom: 0; height: calc(max(20vh, 130px) * .38); cursor: pointer; }' +
         '.roof-edge .re-hint { position: absolute; left: var(--hx, 50%); top: -8px; transform: translate(-50%, -100%); white-space: nowrap; font-style: italic; font-size: .95rem; color: #f3e6c2;' +
@@ -150,6 +167,7 @@
         var busy = false;
         function use(e) {
             if (busy || busyHands()) return;
+            if (Sky.lives && Sky.lives.refuse('scissors')) { e.preventDefault(); e.stopPropagation(); return; }
             var ch = document.querySelector('.scene-character:not(.gore-hidden)');
             if (!ch || !Sky.gore || !Sky.gore.stab) return;
             e.preventDefault(); e.stopPropagation();
@@ -203,6 +221,7 @@
         var busy = false;
         function jump(e) {
             if (busy || busyHands() || body.classList.contains('peep-view')) return;
+            if (Sky.lives && Sky.lives.refuse('roof')) { e.preventDefault(); return; }
             var ch = document.querySelector('.scene-character:not(.gore-hidden)');
             if (!ch || !Sky.gore) return;
             e.preventDefault();
@@ -288,7 +307,41 @@
         })();
     }
 
-    function start() { placeKey(); setupScissors(); setupRoof(); dejaVu(); }
+    /* ---------------- placeholder ways to die (the ones still to be designed) ---------------- */
+    var SKULL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 C6.6 2.5 3.5 6.2 3.5 10.4 C3.5 13 4.7 14.9 6.4 16 L6.4 19 C6.4 20 7.1 20.6 8 20.6 L16 20.6 C16.9 20.6 17.6 20 17.6 19 L17.6 16 C19.3 14.9 20.5 13 20.5 10.4 C20.5 6.2 17.4 2.5 12 2.5 Z" fill="#3a2716"/>' +
+        '<ellipse cx="8.6" cy="11" rx="2.3" ry="2.6" fill="#f3e6c2"/><ellipse cx="15.4" cy="11" rx="2.3" ry="2.6" fill="#f3e6c2"/><path d="M12 13.6 L10.8 16 H13.2 Z" fill="#f3e6c2"/>' +
+        '<path d="M9.4 20.6 V18.4 M12 20.6 V18.4 M14.6 20.6 V18.4" stroke="#f3e6c2" stroke-width="1"/></svg>';
+    function placeholders() {
+        Object.keys(S.DEATHS).forEach(function (id) {
+            var d = S.DEATHS[id], ph = d.placeholder;
+            if (!ph || !S.live(id) || ph.page !== PAGE) return;
+            var host = document.querySelector(ph.in || 'body') || body, fixed = host === body;
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'death-bubble' + (fixed ? ' fixed' : '');
+            b.style.left = ph.left + '%'; b.style.top = ph.top + '%';
+            b.title = 'placeholder: ' + d.name;
+            b.setAttribute('aria-label', 'a way to die, still to come');
+            b.innerHTML = SKULL + '<span class="db-t">a way to die<br>(to come)</span>';
+            host.appendChild(b);
+            var busy = false;
+            b.addEventListener('click', function (e) {
+                e.preventDefault(); e.stopPropagation();
+                if (busy || busyHands()) return;
+                if (Sky.lives && Sky.lives.refuse('placeholder')) return;
+                // the sea's traveller has a death of its own (the revolver's); anywhere else, a stand-in: zapped
+                if (PAGE === 'sea') { if (Sky.sea && Sky.sea.kill && Sky.sea.kill()) pop(); return; }
+                var ch = Array.prototype.filter.call(document.querySelectorAll('.scene-character:not(.gore-hidden)'), function (c) { return c.getClientRects().length && c.getBoundingClientRect().right > 0 && c.getBoundingClientRect().left < window.innerWidth; })[0];
+                if (!ch || !Sky.gore || !Sky.gore.zap) return;
+                busy = true;
+                pop();
+                Sky.gore.zap(ch, function () { Sky.gore.respawn(ch); busy = false; });
+            });
+            function pop() { b.classList.add('popping'); sfx('fizz', { size: 0.3 }); setTimeout(function () { b.classList.remove('popping'); }, 2600); }
+        });
+    }
+
+    function start() { placeKey(); setupScissors(); setupRoof(); placeholders(); dejaVu(); }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
     Sky.resets = { get reset() { return S.reset; }, live: S.live, patched: S.patched };
