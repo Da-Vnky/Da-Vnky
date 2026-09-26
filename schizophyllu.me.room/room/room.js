@@ -629,6 +629,7 @@ const SCENE_CUES = {
 async function startAfternoon() {
   if (afternoon || alone || mode !== 'room' || current !== 'main') return;
   afternoon = true;
+  store.set('afternoon_seen', '1');
   mode = 'moving';
   hush(); closeMenu();
   $('#hover-label').classList.remove('show');
@@ -1200,7 +1201,8 @@ let roomSince = 0, lastLinger = 0, lastLeave = 0, saidStay = false;
 // the afternoon comes after five minutes of the visit, wherever you spent them
 let visitSince = 0;
 const AFTERNOON_AFTER = 300000;
-const afternoonDue = () => !afternoon && !alone && visitSince && performance.now() - visitSince > AFTERNOON_AFTER;
+// it only ever happens once in each visitor's browser (?afternoon still brings it back, for testing)
+const afternoonDue = () => !afternoon && !alone && !store.get('afternoon_seen') && visitSince && performance.now() - visitSince > AFTERNOON_AFTER;
 function ambientLoop() {
   setTimeout(ambientLoop, 26000 + Math.random() * 30000);
   // playing funger on the Phosphor Artifact: the room watches, now and then
@@ -1208,8 +1210,9 @@ function ambientLoop() {
     if (!document.hidden && !talking() && Math.random() < .5) say(bags.watching());
     return;
   }
-  // time for the afternoon: in the main room, ten quiet seconds is enough (chatter doesn't count)
-  if (afternoonDue() && mode === 'room' && current === 'main' && !document.hidden && $('#menu').hidden
+  // time for the afternoon: in the main room, ten quiet seconds is enough. chatter doesn't hold it up,
+  // and neither does a menu left open (it closes)
+  if (afternoonDue() && mode === 'room' && current === 'main' && !document.hidden
       && performance.now() - lastActivity > 10000) return startAfternoon();
   if (mode !== 'room' || current !== 'main' || document.hidden || talking() || !$('#menu').hidden) return;
   if (performance.now() - lastActivity < 8000) return;
