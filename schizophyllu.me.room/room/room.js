@@ -1200,9 +1200,13 @@ function watchPointer() {
 let roomSince = 0, lastLinger = 0, lastLeave = 0, saidStay = false;
 // the afternoon comes after five minutes of the visit, wherever you spent them
 let visitSince = 0;
-const AFTERNOON_AFTER = 300000;
+// testing the real trigger: ?afternoonIn=30 makes it due after 30 seconds instead of five minutes,
+// and ignores "already seen". everything else is exactly what a visitor gets
+const AFTERNOON_TEST = +new URLSearchParams(location.search).get('afternoonIn') || 0;
+const AFTERNOON_AFTER = AFTERNOON_TEST ? AFTERNOON_TEST * 1000 : 300000;
 // it only ever happens once in each visitor's browser (?afternoon still brings it back, for testing)
-const afternoonDue = () => !afternoon && !alone && !store.get('afternoon_seen') && visitSince && performance.now() - visitSince > AFTERNOON_AFTER;
+const afternoonDue = () => !afternoon && !alone && (AFTERNOON_TEST || !store.get('afternoon_seen'))
+  && visitSince && performance.now() - visitSince > AFTERNOON_AFTER;
 function ambientLoop() {
   setTimeout(ambientLoop, 26000 + Math.random() * 30000);
   // playing funger on the Phosphor Artifact: the room watches, now and then
