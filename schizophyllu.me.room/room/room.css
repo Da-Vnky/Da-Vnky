@@ -351,6 +351,7 @@ body.closet-dark #c-bulbglass { filter: none; }
 #aether.off .face-on, #aether:not(.off) .face-off { display: none; }
 #aether .antenna { animation: blink 2.2s step-end infinite; }
 #aether.off .antenna { animation: none; fill: #4a3a44; }
+#aether.off { pointer-events: none; } /* not running yet: nothing to hover or click */
 .breathe.shift { animation: shift .9s ease-in-out, breathe 4.6s ease-in-out .9s infinite; }
 @keyframes shift { 30% { transform: translateX(-3px) scaleY(1.06); } 70% { transform: translateX(2px) scaleY(.98); } }
 /* after she takes them: the screen's off too */
@@ -495,5 +496,3 @@ body.zoomed #hud-top { opacity: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
-/* (DaV-nky) Aether can't be clicked or hovered until the afternoon scene wakes him */
-#aether.off { pointer-events: none; }

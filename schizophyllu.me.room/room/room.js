@@ -119,6 +119,7 @@ async function say(exchange) {
   for (let [who, text, dir] of exchange) {
     if (token !== talkToken) return;
     if (who === 'mel' && afternoon) dir ||= 'asleep';
+    if (who === 'aether' && svg.querySelector('#aether').classList.contains('off')) continue;
     if (who === '-') { // a beat. a 'hush' beat silences the whole room for a moment
       clearBubbles();
       if (dir === 'hush') audio.hold(3);
@@ -366,12 +367,6 @@ async function leaveCRT() {
   lastActivity = performance.now();
   // someone always has something to say about your run
   if (input === 'game' && Math.random() < .6) say(bags.funger());
-  if (input === 'game') {                                        // (and funger's off: its sound stops with it)
-    stopGame();
-    input = 'site';
-    site.classList.remove('off'); game.classList.add('off');
-    svg.querySelector('#console-led').setAttribute('fill', '#3a3a3e');
-  }
 }
 $('#btn-standup').addEventListener('click', () => (mode === 'station' ? leaveStation() : leaveCRT()));
 // clicking anywhere around the screen while zoomed steps back
@@ -413,17 +408,17 @@ function showOnCRT(url) {
 }
 
 // ============================================================ the console
-// it's plugged into the Phosphor Artifact. funger gets its own iframe. flip back to the site, or step
-// away from the screen, and funger's switched off (its sound with it): the game's on another site, so
-// the room can't just turn its volume down. it starts fresh the next time
+// it's plugged into the Phosphor Artifact. funger gets its own iframe so the game keeps
+// running while you step back or flip over to the site
 let input = 'site';
-const gameOn = () => !!game.getAttribute('src') && game.getAttribute('src') !== 'about:blank';
-function stopGame() { if (gameOn()) game.setAttribute('src', 'about:blank'); }
+let gameLoaded = false;
 function switchInput(to) {
   if (to === input) return;
   input = to;
-  if (to === 'game' && !gameOn()) game.src = SITE + 'funger/';
-  if (to === 'site') stopGame();
+  if (to === 'game' && !gameLoaded) { game.src = SITE + 'funger/'; gameLoaded = true; }
+  // switching back to the site turns the console off. funger's on another site, so a hidden
+  // one can't be muted: unloading it is the only way to stop its sound. (its saves are its own)
+  if (to === 'site' && gameLoaded) { game.src = 'about:blank'; gameLoaded = false; }
   site.classList.toggle('off', to !== 'site');
   game.classList.toggle('off', to !== 'game');
   svg.querySelector('#console-led').setAttribute('fill', to === 'game' ? '#ff5a4a' : '#3a3a3e');
@@ -624,6 +619,7 @@ const SCENE_CUES = {
   wakeAether() {
     const el = svg.querySelector('#aether');
     if (el.classList.contains('off')) { el.classList.remove('off'); audio.beep(1); }
+    store.set('aether_awake', '1');
   },
   shift() {
     const lump = svg.querySelector('#lump .breathe');
@@ -631,7 +627,7 @@ const SCENE_CUES = {
   },
 };
 async function startAfternoon() {
-  if (afternoon || alone || mode !== 'room') return;
+  if (afternoon || alone || mode !== 'room' || current !== 'main') return;
   afternoon = true;
   mode = 'moving';
   hush(); closeMenu();
@@ -706,10 +702,10 @@ async function sayAll(exchange) {
   await say(exchange);
   return talkToken === token && mode === 'room';
 }
-async function talkToSkizy() {
-  // (the replies come up at once, while she's still saying hello: picking one talks over her)
+function talkToSkizy() {
   say(talkedToSkizy ? VIEWER_TALK.again : VIEWER_TALK.hello);
   talkedToSkizy = true;
+  // the things you can say come up straight away; picking one talks over her greeting
   openMenu('you', '#cfd8d2', VIEWER_TALK.replies.map(([line, answer, then]) => [line, async () => {
     if (await sayAll(answer) && then === 'funger') playConsole();
   }]));
@@ -884,6 +880,8 @@ async function goTo(id) {
   updateNav();
   if (id === 'main') {
     roomSince = performance.now();
+    // back in the main room after a while: time's passed, she's fallen asleep
+    if (afternoonDue()) { setTimeout(startAfternoon, 1200); return; }
     // they noticed you were gone
     const back = bags['back:' + from];
     if (back && Math.random() < .65) {
@@ -1166,6 +1164,7 @@ function wireObjects(root) {
     body.classList.toggle('hydra-alert', !!el && mode === 'room' && ['cables', 'powerstrip'].includes(el.dataset.id));
     if (!el || mode !== 'room') { label.classList.remove('show'); return; }
     if (alone && el.dataset.id !== 'alone') { label.classList.remove('show'); return; }
+    if (el.id === 'aether' && el.classList.contains('off')) { label.classList.remove('show'); return; } // not running yet
     label.textContent = alone ? 'skizy' : labelFor(el.dataset.id);
     label.classList.add('show');
     if (el.dataset.id === 'drawing' && !show.drawingSeen && !afternoon) { show.drawingSeen = true; say(DRAWING_HOVER); }
@@ -1198,6 +1197,10 @@ function watchPointer() {
 
 // ============================================================ the room keeps talking
 let roomSince = 0, lastLinger = 0, lastLeave = 0, saidStay = false;
+// the afternoon comes after five minutes of the visit, wherever you spent them
+let visitSince = 0;
+const AFTERNOON_AFTER = 300000;
+const afternoonDue = () => !afternoon && !alone && visitSince && performance.now() - visitSince > AFTERNOON_AFTER;
 function ambientLoop() {
   setTimeout(ambientLoop, 26000 + Math.random() * 30000);
   // playing funger on the Phosphor Artifact: the room watches, now and then
@@ -1205,12 +1208,14 @@ function ambientLoop() {
     if (!document.hidden && !talking() && Math.random() < .5) say(bags.watching());
     return;
   }
+  // time for the afternoon: in the main room, ten quiet seconds is enough (chatter doesn't count)
+  if (afternoonDue() && mode === 'room' && current === 'main' && !document.hidden && $('#menu').hidden
+      && performance.now() - lastActivity > 10000) return startAfternoon();
   if (mode !== 'room' || current !== 'main' || document.hidden || talking() || !$('#menu').hidden) return;
   if (performance.now() - lastActivity < 8000) return;
   const now = performance.now();
   // nothing is happening. nothing has happened for a while
   if (afternoon || alone) return;
-  if (now - roomSince > 300000 && now - lastActivity > 15000) return startAfternoon();
   // a long quiet stretch: Mira says the thing. once
   if (!saidStay && now - lastActivity > 180000) { saidStay = true; return say(JUST_STAY); }
   if (Math.random() < .2) return claubeWrites();
@@ -1240,6 +1245,7 @@ function enterRoom() {
   mode = 'room';
   updateNav();
   roomSince = lastActivity = performance.now();
+  visitSince ||= roomSince;
   bootCRT();
   // testing shortcut: open the page with ?afternoon to skip the five-minute wait
   if (new URLSearchParams(location.search).has('afternoon')) setTimeout(startAfternoon, 2500);
@@ -1262,9 +1268,10 @@ async function main() {
   $('#svg-host').innerHTML = await res.text();
   svg = $('#svg-host svg');
   await inlineArt(svg);
-  svg.querySelector('#aether')?.classList.add('off');   // (DaV-nky: Aether sleeps until the afternoon's scene boots him up)
   // the room remembers the ending: the bottle stays on the desk, every visit after
   if (store.get('room_quiet')) svg.querySelector('#deskbottle').style.display = '';
+  // Aether doesn't start up until the afternoon scene. after that, they're running every visit
+  if (!store.get('aether_awake')) svg.querySelector('#aether').classList.add('off');
   for (const a of svg.querySelectorAll('[data-anchor]')) {
     anchors[a.dataset.anchor] = { x: +a.getAttribute('cx'), y: +a.getAttribute('cy') };
   }
