@@ -84,8 +84,8 @@
         { n: 2, name: 'environmental', theme: 'the world itself',             deaths: ['boat', 'roof'],
           key: { page: 'city',     in: 'body',      left: 69.4, top: 89.6, where: 'the rooftop, by the potted plant' } },
         { n: 3, name: 'ingestion',   theme: 'the pills, and the apple',       deaths: ['pills', 'apple'],
-          // (no hiding place: the last of the seven Claubes drops it when all seven are shot, outside the dungeon: sky/claubes.js)
-          key: { drop: 'claubes', page: 'living', where: 'dropped by the last of the seven Claubes, once all seven are shot (not in the dungeon)' } },
+          // (stuck in the apple pie in the kitchen fridge, its ring sticking out: sky/kitchen.js. the junk drawer has a hint)
+          key: { page: 'living',   in: '.kitchen-pie', left: 40, top: 30, where: 'the kitchen, in the fridge: stuck in the apple pie' } },
         { n: 4, name: 'dark witchcraft', theme: 'the diagram and the grimoire', deaths: ['diagram', 'grimoire'],
           key: { page: 'living',   in: '.bathroom', left: 88,   top: 93,   where: 'the bathroom, in the corner by the tub' } },
         { n: 5, name: '',            theme: '',                               deaths: ['r5a', 'r5b'],

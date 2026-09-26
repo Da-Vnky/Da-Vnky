@@ -191,7 +191,7 @@
         var left = document.querySelector('.room-arrow.to-hall');
         if (left) { left.style.top = Math.round(top) + 'px'; left.style.left = '8px'; }
         // and the arrows back from the side rooms: the same height, so going and coming back they don't jump about
-        Array.prototype.forEach.call(document.querySelectorAll('.bathroom .room-arrow, .hallway .room-arrow, .dungeon .room-arrow'), function (a) {
+        Array.prototype.forEach.call(document.querySelectorAll('.bathroom .room-arrow, .hallway .room-arrow:not(.hall-out), .dungeon .room-arrow, .kitchen .room-arrow, .porch .room-arrow'), function (a) {
             a.style.top = Math.round(top) + 'px';
             a.style.marginTop = '0';
             if (a.classList.contains('back-right')) a.style.right = '8px'; else a.style.left = '8px';

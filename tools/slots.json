@@ -311,6 +311,11 @@
        "slot": "assets/ui/place-living",
        "what": "the living space’s tab: a record player",
        "size": "192 x 192"
+      },
+      {
+       "slot": "assets/ui/place-kitchen",
+       "what": "the kitchen’s tab (it goes straight to the kitchen)",
+       "size": "192 x 192"
       }
      ]
     },
@@ -1430,13 +1435,8 @@
    "page": "living.html#kitchen",
    "groups": [
     {
-     "name": "the kitchen (through the doorway on the left of the hallway)",
+     "name": "the kitchen (the arrow on the left of the hallway, or its own tab)",
      "slots": [
-      {
-       "slot": "assets/living/hall-kitchen-door",
-       "what": "the doorway to the kitchen, in the hallway (open, with a glimpse of the kitchen)",
-       "size": "tall and thin, about 80:170, stretched to fit"
-      },
       {
        "slot": "assets/living/kitchen-wall",
        "what": "the whole kitchen behind everything: walls, tiles, upper cupboards",
@@ -1454,13 +1454,48 @@
       },
       {
        "slot": "assets/living/kitchen-counter",
-       "what": "the counter and the cupboards under it (its top is where the bowl sits)",
+       "what": "the counter and the cupboards under it (its top is where the bowl sits; leave the strip just under the worktop plain: the drawers go there)",
        "size": "wide, about 620:240, stretched to fit"
       },
       {
+       "slot": "assets/living/kitchen-drawer",
+       "what": "a drawer front, shut (every one of the four under the worktop; click one and it slides out)",
+       "size": "about 140:56, stretched to fit"
+      },
+      {
+       "slot": "assets/living/kitchen-drawer-1",
+       "what": "the first drawer, open, seen from above: forks, knives and spoons",
+       "size": "about 140:60, stretched to fit"
+      },
+      {
+       "slot": "assets/living/kitchen-drawer-2",
+       "what": "the second drawer, open: the junk drawer (rubber bands, batteries, a menu… in reset 3, a note: “it’s in the fridge”)",
+       "size": "about 140:60, stretched to fit"
+      },
+      {
+       "slot": "assets/living/kitchen-drawer-3",
+       "what": "the third drawer, open: tea towels",
+       "size": "about 140:60, stretched to fit"
+      },
+      {
+       "slot": "assets/living/kitchen-drawer-4",
+       "what": "the fourth drawer, open: recipe cards (apple pie)",
+       "size": "about 140:60, stretched to fit"
+      },
+      {
        "slot": "assets/living/kitchen-fridge",
-       "what": "the fridge",
-       "size": "about 120:300"
+       "what": "the fridge, shut (its door: click it and it swings open)",
+       "size": "about 120:300, stretched to fit"
+      },
+      {
+       "slot": "assets/living/kitchen-fridge-inside",
+       "what": "the fridge, open: the inside and its shelves (the pie sits on the bottom shelf, about a fifth of the way up)",
+       "size": "about 120:300, stretched to fit"
+      },
+      {
+       "slot": "assets/living/kitchen-pie",
+       "what": "the apple pie in the fridge (reset 3: the key is stuck in it, its ring sticking out)",
+       "size": "about 100:44, see-through"
       },
       {
        "slot": "assets/living/fruit-bowl",
@@ -1491,6 +1526,89 @@
        "slot": "assets/characters/kitchen",
        "what": "the traveller in the kitchen (+ kitchen-walking)",
        "size": "240–480 px tall"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "porch",
+   "name": "the porch",
+   "page": "living.html#porch",
+   "note": "out of the front door (the arrow at the bottom of the hallway). the top is open: the site’s own sky shows through. from reset 3 on, things out here aren’t right.",
+   "groups": [
+    {
+     "name": "the porch",
+     "slots": [
+      {
+       "slot": "assets/living/porch-frame",
+       "what": "the porch itself: the roof’s edge along the top, the two posts, the railing (a gap in the middle for the steps), the house wall on the left. see-through wherever the sky and the street show",
+       "size": "1920 x 1080, stretched to fit"
+      },
+      {
+       "slot": "assets/living/porch-street",
+       "what": "across the street: the houses opposite, the pavement, the road, the lawn and fence, the streetlight, the wire. see-through above them (the sky)",
+       "size": "wide, about 1600 x 500; its bottom sits just behind the railing"
+      },
+      {
+       "slot": "assets/living/porch-floor",
+       "what": "the porch floorboards",
+       "size": "wide, stretched along the bottom"
+      },
+      {
+       "slot": "assets/living/porch-door",
+       "what": "the front door (click it: back inside)",
+       "size": "about 90:190, stretched to fit"
+      },
+      {
+       "slot": "assets/living/porch-lamp",
+       "what": "the lamp by the door (it glows at dusk)",
+       "size": "about 30:50, see-through"
+      },
+      {
+       "slot": "assets/living/porch-chair",
+       "what": "the rocking chair (click it: it rocks. from reset 3 it sometimes rocks by itself)",
+       "size": "about 120:170, see-through"
+      },
+      {
+       "slot": "assets/living/porch-mailbox",
+       "what": "the mailbox on the post",
+       "size": "about 70:50, see-through"
+      },
+      {
+       "slot": "assets/living/porch-mailbox-flag",
+       "what": "its little flag (drawn standing up; it lies flat until it goes up by itself)",
+       "size": "about 10:40, see-through, the pivot at the bottom"
+      },
+      {
+       "slot": "assets/characters/porch",
+       "what": "the traveller out here (+ porch-walking)",
+       "size": "240–480 px tall"
+      }
+     ]
+    },
+    {
+     "name": "across the street (reset 3 on: the uncanny)",
+     "slots": [
+      {
+       "slot": "assets/living/porch-crow",
+       "what": "a crow on the wire (every one of the five), facing right. from reset 3 they all turn to look at you",
+       "size": "about 40:30, see-through"
+      },
+      {
+       "slot": "assets/living/porch-neighbour",
+       "what": "the neighbour in the window across the street, waving (a GIF can wave). before reset 3 they wave once; after, they don’t stop",
+       "size": "about 46:50, see-through"
+      },
+      {
+       "slot": "assets/living/porch-walker",
+       "what": "the man who walks past on the far pavement (and again, and again), facing right",
+       "size": "about 40:110, see-through"
+      },
+      {
+       "slot": "assets/living/porch-watcher",
+       "what": "the one who stands and watches: under the streetlight, then in the road, at the gate, at the top of the steps",
+       "size": "about 40:140, see-through, standing on the bottom edge"
       }
      ]
     }
@@ -2218,6 +2336,36 @@
       {
        "slot": "assets/sounds/hands",
        "what": "the hands breaking up through the floorboards",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/drawer",
+       "what": "a kitchen drawer sliding open (and shut)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/fridge-open",
+       "what": "the fridge door opening (the seal letting go)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/fridge-close",
+       "what": "the fridge door shutting",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/creak",
+       "what": "the porch: the rocking chair creaking, the mailbox flag going up",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/caw",
+       "what": "the porch: the crows, all at once",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/dread",
+       "what": "a low swell of dread (the porch’s watcher, getting closer)",
        "kind": "sound"
       }
      ]

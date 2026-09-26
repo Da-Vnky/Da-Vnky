@@ -155,15 +155,56 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 
 ## The kitchen (sky/kitchen.js)
 
-- Through the doorway on the left of the hallway (`.hall-kitchen`): the hall traveller walks over, the kitchen slides in
-  from the left (`body.in-kitchen`, hallway moved with `translate`, like the attic). Arrow on the right / Escape = back.
-  `living.html#kitchen` starts in there. Stand-in art: tiles, cupboards, window, fridge, counter, fruit bowl.
+- **Left of the hallway** (26 Sep, Victor): the arrow on the hallway's left (`.hall-to-kitchen`; the old doorway
+  `.hall-kitchen` / slot `hall-kitchen-door` is gone): the hall traveller walks off the left edge, the kitchen slides in
+  from the left (`body.in-kitchen`, hallway moved with `translate`, like the attic). Its arrow on the right
+  (`.kitchen-back`, `back-right`) / Escape = back into the hallway from its left edge. `living.html#kitchen` starts in there.
+- **Its own place tab** (sky.js `PLACES`: `kitchen`, `href: living.html#kitchen`, `tabOnly` = no plank on the homepage
+  signpost; icon: a pie, slot `assets/ui/place-kitchen`). On living.html kitchen.js catches the click (capture) and goes
+  there (from the porch or another room: back to the hallway first, then walks in once `Sky.sides` isn't busy);
+  `tabHere()` marks it "you are here" while inside.
+- **The fridge** (`.kitchen-fridge`: `.kf-door` over `.kf-inside`, slots `kitchen-fridge`, `kitchen-fridge-inside`):
+  click → the traveller walks over (`reach()`), the door swings open (rotateY); click the inside or the door to shut.
+  On the bottom shelf **the apple pie** (`.kitchen-pie`, slot `kitchen-pie`): **reset 3's key is stuck in it**
+  (`RESETS[2].key = { page: 'living', in: '.kitchen-pie' }`; CSS rotates the key ring-up and clips the blade off with
+  `clip-path` so it looks pushed in). Opening the fridge with the key there: "There's something stuck in the pie."
+  `Sky.kitchen.fridge(on)` (the debug page's "show me the key" uses it).
+- **The drawers**: four under the worktop (`.kitchen-drawer.d1–d4` inside `.kitchen-counter`; `.kc-body` is the counter
+  slot). Click: walk over, it slides out (front drops, `.kd-inside` revealed with clip-path), a line (`drawerLine`):
+  cutlery / the junk drawer (**in reset 3 before the key: a note "it's in the fridge."**) / tea towels / recipe cards
+  (from reset 3: "every one of them is for apple pie"). Click again to shut. Slots `kitchen-drawer` (every front),
+  `kitchen-drawer-1…4` (each one open, from above). The counter's stacking context keeps the bowl/serpent above them.
 - Reset 3 (`DEATHS.apple`): a red apple by the bowl and a serpent coiled round it (hover: "eat. and you will know.").
   Click: refuse before the key; a line from `WANT`, walk over, the apple to the mouth, two bites, "…it's sweet.", hiss,
   green vignette, sway, collapse (`lieDown`), black, `respawn` + `getUp`. Another apple appears: repeatable in reset 3.
   Before reset 3 (`apple-before`): a string of sausages coiled round the bowl where the serpent will be (slot
   `sausages`, hover "sausages."). After (`apple-gone`): the bowl's replaced by a cornucopia spilling fruit (slot
   `cornucopia`, hover "a cornucopia. (was it always there?)": the Mandela effect, Fruit of the Loom).
+
+## The porch (sky/porch.js)
+
+- Out of the front door: the down arrow at the bottom of the hallway (`.hall-out`, left 57%, skipped by `placeArrows`).
+  The hall traveller walks to it and steps out, the hallway lifts (`translate: 0 -100%`) and the porch comes up
+  (`body.in-porch`). Back: the arrow on the left (`.porch-back`), the front door (`.porch-door`) or Escape.
+  `living.html#porch` starts out there. `Sky.porch` = { outside, out, in, inNow, open, events, event(n) }.
+- **Open to the sky**: the porch's upper half is see-through, so the page's own sky (sun/eye, moon, clouds, weather,
+  the reset 1–2 ropes) shows; `body.in-porch` turns the constellations back on (in-side hides them elsewhere).
+  Dusk dims the porch (`--pd` from `--dusk`), the streetlight, windows and porch lamp glow.
+- Layout (stand-ins in living.html): `porch-street` (across the street, `preserveAspectRatio none`, bottom 22vh, 40vh
+  tall: houses, pavement, road, lawn, fence, streetlight, the wire), `porch-frame` (full screen: eave, posts, railing
+  with a gap for the steps, the house wall on the left), floor, door, lamp, rocking chair, mailbox (+ flag), five
+  crows on the wire, the neighbour in the window opposite, the walker, the watcher. Positions are in porch.js CSS and
+  match the stand-in drawings; Victor's `porch-street`/`porch-frame` should keep roughly the same layout.
+- Before reset 3: just a porch. The neighbours wave once per visit ("I wave back."), crows shift about, the chair
+  creaks, the mailbox has bills.
+- **From reset 3**: **the watcher** (`run:porch-watcher`, 0–4, per reset): each time you come out he's closer:
+  under the streetlight → in the road → at the gate → at the top of the steps (in front of the railing) → gone, and
+  three knocks on the front door "…That came from inside the house." Then it starts over. Plus one `EVENTS` at a time
+  (first ~9 s after arriving, then every 12–26 s after the last ends, never the same twice): `neighbours` (waving,
+  won't stop, then gone), `walker` (walks past three times, identically), `crows` (all turn to stare), `mail` (the
+  flag goes up by itself; click: a note in the traveller's own handwriting, per reset `NOTES`), `chair` (rocks by
+  itself). Everything stops (`quiet()`) when you go back in.
+- Debug page: "the porch's watcher: one step closer", buttons to trigger each event now, "the kitchen" / "the porch" pages.
 
 ## Mel's room and reset 3 (schizophyllu.me.room: Victor placed Mel's update in her folder, 26 Sep)
 
@@ -291,7 +332,7 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
   record), `room_knocked` and Mel's room's recovery (`mel-remedy`,
   `mel-restored-said`), settings.
   **This reset** (`RUN` in state.js, and every `run:*` key): `lives-*`, `suicides`, `dungeon-found`, `run:key`,
-  `run:hall-hatch`, `run:grimoire-pact`, `run:mel-pills`, `run:claubes-*`, `run:deja-vu` …
+  `run:hall-hatch`, `run:grimoire-pact`, `run:mel-pills`, `run:claubes-*`, `run:deja-vu`, `run:porch-watcher` …
   **This visit** (sessionStorage): the bag (`inventory`), the open secret wall, the boards off Mel's window …
 - `RESETS` table: each reset's theme, its two ways to die, and where its hidden key is.
   `DEATHS` table: which resets each death is live in; after its last one it's "patched".
@@ -300,7 +341,7 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
     (`resets.js`, with a street cutscene). The toaster is gone; safety scissors hang on the wall.
   - Reset 3+: an anchor on the boat (can't be lifted high), guard rails on the roof.
   - Reset 3 "ingestion": **the pills** (Mel's room: see *Mel's room and reset 3*) and **the apple** (the kitchen).
-    Its key is dropped by the last of the seven Claubes (below).
+    Its key is **stuck in the apple pie in the kitchen fridge** (26 Sep; it used to be dropped by the last Claube).
   - Reset 4 "dark witchcraft": **the diagram** (the worshipping Claubes' 6th absorbed bullet comes back:
     `DEATHS.diagram`, claubes.js) and **the grimoire** (the pact in the attic, once: `DEATHS.grimoire`, attic.js).
     Outside reset 4 the 6th bullet just vanishes and the traveller says "Huh, I thought something cool was
@@ -333,15 +374,13 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 - **Claubes** (`claubes.js`, the P(Doom) easter egg):
   - **Once a reset**: the song calls them out once (`run:claubes-called`); who's out is kept for the reset
     (`run:claubes-out`, not the visit). Any that are shot, flicked or scatter (the traveller or a record shot)
-    are gone for the rest of the reset. Reset 3: when the last one goes, however (`emptied()`), it drops the key
-    (`run:claubes-key`), so flicking some can't soft-lock it. The debug page's Claubes switch clears all this.
+    are gone for the rest of the reset. (`emptied()` can still make the last one drop a key for a reset whose
+    `RESETS` key has `drop: 'claubes'`; none does now.) The debug page's Claubes switch clears all this.
   - **Reset 4, outside the dungeon** (`warded()`): they can't be harmed (the diagram death needs them). A red ward
     ellipse at their feet (`body.claube-warded`); bullets stop in it (the absorb effect), flicks just spin them,
     scatters become a panic; the traveller says `WARD_LINES` ("Something is protecting them.").
   - Shot outside the dungeon: that one pops, the rest panic (run back and forth ~9 s). All seven shot
-    (`sessionStorage["claubes-kills"]`, per group) → once a reset (`run:claubes-massacre`): in **reset 3**
-    the last one drops the reset's key (`RESETS[2].key = { drop: 'claubes' }`, event `dav:drop-key`
-    handled in resets.js; there's no armchair key any more), in any other reset the house rumbles
+    (`sessionStorage["claubes-kills"]`, per group) → once a reset (`run:claubes-massacre`): the house rumbles
     (shake + dust + `rumble`) and the traveller speaks in a typed dialogue box (`speak()`, `MASSACRE_LINES`).
   - In the dungeon they worship on **the Ophite diagram** (`.dungeon-diagram`, slot `assets/living/dungeon-diagram`,
     replacing the old pentagram): Leviathan round the outside, seven Archon circles (planet glyphs, saturn at the back)
@@ -369,7 +408,7 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
   backdrop (`--stage-shadow`). A prop with Victor's art casts one shadow from the whole prop (filter on `.sun.has-art`
   etc., the rope's own shadow off), so the picture and its `-glow` twin (two GIFs, never in step) can't flicker.
   From reset 3 the ropes are gone (checked). A reset's own sun is shown at double size.
-- Reset 3's key is dropped by the last Claube (above); resets 4–8 have hiding spots in `RESETS`. `nextReset()` in reset 8 starts reset 8 again.
+- Reset 3's key is in the pie in the kitchen fridge (above); resets 4–8 have hiding spots in `RESETS`. `nextReset()` in reset 8 starts reset 8 again.
 - The golden/sunset/dusk skyboxes are mirrored while the sun is on the left (sunrise).
 
 ## Mel's window and Mel's room
@@ -398,7 +437,7 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 - **The reset manager** (control panel → "resets (preview only)", on localhost): play a real reset, jump to any
   reset, or start over as a brand-new visitor.
 - Check every page for console errors after changes (index, workshop, city, living, and the side
-  rooms via `living.html#bathroom` / `#hallway` / `#dungeon` / `#attic` / `#kitchen`, and Mel's room:
+  rooms via `living.html#bathroom` / `#hallway` / `#dungeon` / `#attic` / `#kitchen` / `#porch`, and Mel's room:
   `schizophyllu.me.room/index.html?from=dav-nky` and `?peek`). The debug page has previews and switches for most
   states (hatch, lamp, pact, Claubes, Mel's pills and recovery…). Note `?reset=N` rewrites the address, so a
   following `#attic` in the same tab is only a hash change (reload to act on it).

@@ -1,12 +1,12 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
 city.html 7710
 index.html 2868
-living.html 80772
+living.html 105560
 workshop.html 19407
 sky/attic.js 43749
-sky/bathroom.js 41904
+sky/bathroom.js 41961
 sky/books.js 17675
-sky/claubes.js 48882
+sky/claubes.js 48917
 sky/crate.js 50910
 sky/dungeon.js 17076
 sky/eye.js 14868
@@ -18,8 +18,8 @@ sky/ground-city.js 26668
 sky/ground-countryside.js 13833
 sky/ground-sea.js 54266
 sky/ground-view.js 6631
-sky/inventory.js 21353
-sky/kitchen.js 18185
+sky/inventory.js 21557
+sky/kitchen.js 29152
 sky/letters.js 24342
 sky/lives.js 12980
 sky/loader.js 15448
@@ -32,12 +32,13 @@ sky/notes.js 9342
 sky/paint.js 47856
 sky/panel.js 63554
 sky/peeper.js 39569
+sky/porch.js 24933
 sky/post.js 27542
 sky/records.js 30255
-sky/resets.js 26607
+sky/resets.js 26614
 sky/revolver.js 15115
-sky/sky.js 109673
-sky/state.js 14848
+sky/sky.js 110611
+sky/state.js 14831
 sky/studio.js 28537
 sky/textures.js 14471
 sky/timer.js 12508

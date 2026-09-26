@@ -385,7 +385,7 @@
     function emptied(at, allShot) {
         setKills(0);
         if (!S) return;
-        // reset 3: the last of them was carrying its key (sky/resets.js), however they went
+        // a reset whose key they carry (RESETS key.drop 'claubes': none, now) gets it from the last of them, however they went
         var k = S.info && S.info.key, W = window.innerWidth, H = window.innerHeight;
         if (k && k.drop === 'claubes' && S.get('key') !== '1' && S.get('claubes-key') !== '1') {
             S.set('claubes-key', '1');

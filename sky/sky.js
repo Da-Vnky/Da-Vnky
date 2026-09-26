@@ -41,7 +41,9 @@
         { id: 'sea',      name: 'the sea',          href: HOME },
         { id: 'workshop', name: 'the workshop',     href: 'workshop.html' },
         { id: 'city',     name: 'the rooftop',      href: 'city.html' },
-        { id: 'living',   name: 'the living space', href: 'living.html' }
+        { id: 'living',   name: 'the living space', href: 'living.html' },
+        // (a tab of its own, but no plank on the homepage's signpost: it's a room of the living space)
+        { id: 'kitchen',  name: 'the kitchen',      href: 'living.html#kitchen', tabOnly: true }
     ];
 
     // the constellations: they come out at night, on every page. each one is a link
@@ -388,7 +390,7 @@
     sign.setAttribute('aria-label', 'places');
     sign.innerHTML = '<div class="post" aria-hidden="true"></div>';
     var TILTS = [-1.6, 1.2, -0.8, 1.8, -1.3, 0.9];
-    PLACES.forEach(function (pl, i) {
+    PLACES.filter(function (pl) { return !pl.tabOnly; }).forEach(function (pl, i) {
         var el = document.createElement(pl.id === here ? 'span' : 'a');
         el.className = 'plank' + (pl.id === here ? ' here' : '');
         el.style.setProperty('--tilt', TILTS[i % TILTS.length] + 'deg');
@@ -441,6 +443,12 @@
             '<circle cx="21" cy="26" r="9.5" fill="#2a1d14"/><circle cx="21" cy="26" r="6.5" fill="none" stroke="#5a4535" stroke-width=".7"/>' +
             '<circle cx="21" cy="26" r="2.6" fill="#9a3b1f"/><circle cx="36.5" cy="18.5" r="2" fill="#c49a52"/>' +
             '<path d="M36.5 18.5 L35 30 L29 33" fill="none" stroke="#c49a52" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+        // a pie on the sill, still warm
+        kitchen: '<path d="M8 30 H40" stroke="#3a2716" stroke-width="1.6" stroke-linecap="round"/>' +
+            '<path d="M9 29 Q9 21 24 20 Q39 21 39 29 Z" fill="#d8a45a" stroke="#3a2716" stroke-width="1.3"/>' +
+            '<path d="M13 25 L35 25 M16 22.5 L32 27.5 M32 22.5 L16 27.5" stroke="#9a5a24" stroke-width="1.2" stroke-linecap="round"/>' +
+            '<path d="M11 29 L14 34 H34 L37 29" fill="#c49a52" stroke="#3a2716" stroke-width="1.3" stroke-linejoin="round"/>' +
+            '<path d="M19 17 Q17 13 19 10 M24 16 Q22 11 24 7 M29 17 Q27 13 29 10" fill="none" stroke="#9a8a7a" stroke-width="1.2" stroke-linecap="round" opacity=".8"/>',
         // any new place: a door
         door: '<path d="M14 42 V20 a10 10 0 0 1 20 0 V42 Z" fill="#6e4a30" stroke="#3a2716" stroke-width="1.3"/>' +
             '<path d="M24 12 V42" stroke="#3a2716" stroke-width="1" opacity=".5"/><circle cx="29" cy="30" r="1.6" fill="#c49a52"/><path d="M10 42 H38" stroke="#3a2716" stroke-width="1.6" stroke-linecap="round"/>'

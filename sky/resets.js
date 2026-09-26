@@ -6,8 +6,8 @@
                    and the lock comes off the hearts (sky/lives.js): from then
                    on, dying costs a life. its picture: the reset's own
                    assets/resets/reset-<n>/key, or assets/ui/key for all of them.
-                   a key with "drop" isn't hidden: something drops it (reset 3:
-                   the last of the seven Claubes, shot), where it happens
+                   a key with "drop" isn't hidden: something drops it where it
+                   happens (none does now: reset 3's is in the pie in the fridge)
      the scissors  the workshop bench (reset 1): the traveller takes them to
                    their neck. after reset 1, safety scissors hang on the wall
                    instead (assets/workshop/scissors, assets/workshop/safety-scissors)

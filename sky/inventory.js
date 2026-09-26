@@ -86,6 +86,7 @@
         '.inv-note { position: fixed; left: 50%; bottom: calc(var(--bar-bottom, 12px) + 72px); z-index: 10; transform: translateX(-50%); padding: 4px 14px; border-radius: 999px; background: rgba(40,28,18,.85);' +
             'color: #f3e6c2; font: italic .95rem "IM Fell English", Georgia, serif; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; max-width: 92vw; overflow: hidden; text-overflow: ellipsis; }' +
         '.inv-note.on { opacity: 1; }' +
+        '@media (max-width: 620px) { .inv-note { white-space: normal; width: max-content; max-width: 88vw; text-align: center; border-radius: 14px; } }' +   // (a long line wraps on a phone, not cut off)
         // things you can pick up: a little glint now and then
         '.pickup { cursor: pointer; filter: drop-shadow(0 3px 4px rgba(0,0,0,.4)); transition: transform .2s; }' +
         '.pickup:hover, .pickup:focus-visible { transform: translateY(-3px) rotate(-4deg); outline: none; }' +

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>the living space · DaV-nky</title>
     <!-- the loading screen: fetches the whole site once per visit (sky/loader.js, sw.js) -->
-    <script src="sky/loader.js?v=20260926l"></script>
-    <script src="sky/state.js?v=20260926l"></script>
+    <script src="sky/loader.js?v=20260926m"></script>
+    <script src="sky/state.js?v=20260926m"></script>
     <link rel="canonical" href="https://dav-nky.pleroma.nexus/living.html">
     <meta property="og:title" content="the living space · DaV-nky">
     <meta property="og:url" content="https://dav-nky.pleroma.nexus/living.html">
@@ -16,7 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260926l">
+    <link rel="stylesheet" href="sky/sky.css?v=20260926m">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -112,7 +112,6 @@
         .hall-light  { top: 0; width: 3.4%; min-width: 34px; }
         .hall-light.l { left: 33.5%; } .hall-light.r { left: 62.8%; }
         .hall-cord   { left: 54%; top: 2.2vh; width: 1.8%; min-width: 18px; aspect-ratio: 20 / 200; }
-        .hall-kitchen { left: 2.5%; bottom: calc(11vh - 12px); height: 50vh; aspect-ratio: 80 / 170; padding: 0; border: 0; background: none; cursor: pointer; }
         /* how the hallway looks before sky/attic.js arrives, so nothing shows and then jumps away as the page opens:
            the ladder's up, and it's the lamp in reset 4 and the cord and its two lights in any other (LAMP_RESETS in attic.js) */
         .hallway .hall-ladder { transform: translateY(-101%); visibility: hidden; }
@@ -486,24 +485,14 @@
             <path d="M40 16 Q20 10 6 18" stroke="#1f1610" stroke-width="1.6" fill="none"/>
         </svg>
 
-        <!-- the doorway to the kitchen (sky/kitchen.js), on the left of the hallway. your own: assets/living/hall-kitchen-door (an open doorway,
-             tall and thin, with a glimpse of the kitchen through it) -->
-        <button type="button" class="furnish hall-kitchen" data-asset="assets/living/hall-kitchen-door" aria-label="the kitchen">
-            <svg class="placeholder" viewBox="0 0 80 170" preserveAspectRatio="none" aria-hidden="true">
-                <rect x="0" y="0" width="80" height="170" fill="#2a1d14"/>
-                <path d="M7 170 V40 Q7 8 40 8 Q73 8 73 40 V170 Z" fill="#d9d2bd"/>
-                <g fill="#b9c7c0" opacity=".8"><rect x="10" y="70" width="10" height="10"/><rect x="30" y="70" width="10" height="10"/><rect x="50" y="70" width="10" height="10"/><rect x="20" y="80" width="10" height="10"/><rect x="40" y="80" width="10" height="10"/><rect x="60" y="80" width="10" height="10"/></g>
-                <rect x="7" y="104" width="66" height="8" fill="#8a6a44"/><rect x="7" y="112" width="66" height="58" fill="#6e4a30"/>
-                <path d="M7 170 V40 Q7 8 40 8 Q73 8 73 40 V170" fill="none" stroke="#1f1610" stroke-width="4"/>
-                <path d="M7 170 L73 170" stroke="#1f1610" stroke-width="3"/>
-            </svg>
-            <span class="door-hint">the kitchen</span>
-        </button>
-
         <div class="furnish character scene-character hall-character" data-asset="assets/characters/hallway" aria-label="the traveller"></div>
 
         <!-- back to the living space (it's to the right of here) -->
         <a class="room-arrow back-right" href="#living" aria-label="back to the living space" data-asset="assets/living/arrow"></a>
+        <!-- the kitchen is off to the left of here (sky/kitchen.js), and the front door's out the bottom: the porch (sky/porch.js).
+             (after the arrow back: the first arrow in the hallway is the way back to the living space) -->
+        <button type="button" class="room-arrow hall-to-kitchen" aria-label="the kitchen" data-asset="assets/living/arrow"><span class="ra-hint">the kitchen</span></button>
+        <button type="button" class="room-arrow hall-out" aria-label="out of the front door: the porch" data-asset="assets/living/arrow"><span class="ra-hint">outside</span></button>
     </div>
 
     <!-- the arrow under the tabs: the traveller walks off to the bathroom. your own: assets/living/arrow
@@ -627,11 +616,13 @@
         <div class="furnish character scene-character attic-character" data-asset="assets/characters/attic" aria-label="the traveller"></div>
     </div>
 
-    <!-- the kitchen (sky/kitchen.js), through the doorway on the left of the hallway. a counter, a window, the fridge, a bowl of fruit.
+    <!-- the kitchen (sky/kitchen.js), off to the left of the hallway (the arrow there), and its own tab. a counter with drawers,
+         a window, the fridge (the reset 3 key is in the pie in there), a bowl of fruit.
          in reset 3 (ingestion) there's a red apple by the bowl, and a serpent coiled round it: eat the apple and it's a death.
          before reset 3, where the serpent will be there's a string of sausages coiled round the bowl; after it, the fruit spills
          from a cornucopia (the Mandela effect: it was never there, was it?).
-         slots in assets/living/: kitchen-wall, kitchen-floor, kitchen-window, kitchen-counter, kitchen-fridge, fruit-bowl, apple,
+         slots in assets/living/: kitchen-wall, kitchen-floor, kitchen-window, kitchen-counter, kitchen-drawer (+ kitchen-drawer-1 … -4),
+         kitchen-fridge (+ kitchen-fridge-inside, kitchen-pie), fruit-bowl, apple,
          serpent, sausages, cornucopia. the traveller in here: assets/characters/kitchen (+ kitchen-walking). -->
     <div class="kitchen" aria-hidden="true" data-asset="assets/living/kitchen-wall">
         <svg class="kitchen-wall placeholder" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
@@ -652,18 +643,108 @@
             <path d="M80 8 V122 M8 65 H152" stroke="#5a3a24" stroke-width="6"/>
             <path d="M0 0 H160 V10 H0 Z" fill="#6e4a30"/><path d="M-6 126 H166 V134 H-6 Z" fill="#6e4a30"/>
         </svg>
-        <svg class="furnish kitchen-fridge" data-asset="assets/living/kitchen-fridge" viewBox="0 0 120 300" aria-hidden="true">
-            <rect x="0" y="0" width="120" height="300" rx="10" fill="#e6e2d6" stroke="#9a968a" stroke-width="3"/>
-            <path d="M0 110 H120" stroke="#9a968a" stroke-width="3"/><rect x="98" y="30" width="8" height="50" rx="3" fill="#b0aa9a"/><rect x="98" y="130" width="8" height="80" rx="3" fill="#b0aa9a"/>
-            <rect x="20" y="30" width="30" height="36" fill="#f3e6c2" transform="rotate(-4 35 48)"/>
-        </svg>
-        <svg class="furnish kitchen-counter" data-asset="assets/living/kitchen-counter" viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true">
-            <rect x="0" y="0" width="620" height="18" fill="#c9bfa8" stroke="#8a7a5a" stroke-width="2"/>
-            <rect x="8" y="18" width="604" height="222" fill="#7a5134"/>
-            <g fill="none" stroke="#5a3a24" stroke-width="3"><rect x="22" y="34" width="130" height="190"/><rect x="166" y="34" width="130" height="190"/><rect x="310" y="34" width="140" height="90"/><rect x="310" y="134" width="140" height="90"/><rect x="464" y="34" width="134" height="190"/></g>
-            <g fill="#c49a52"><circle cx="138" cy="130" r="5"/><circle cx="180" cy="130" r="5"/><rect x="360" y="76" width="40" height="6" rx="3"/><rect x="360" y="176" width="40" height="6" rx="3"/><circle cx="478" cy="130" r="5"/></g>
-            <rect x="420" y="-2" width="120" height="8" rx="3" fill="#9aa4a8"/>
-        </svg>
+        <!-- the fridge (sky/kitchen.js): click it and it swings open. inside, the shelves, and on the middle one an apple pie
+             (in reset 3 the key is stuck in it, its ring sticking out: RESETS in sky/state.js). slots: kitchen-fridge (shut: the door,
+             the whole front), kitchen-fridge-inside (open: the shelves, empty), kitchen-pie -->
+        <div class="furnish kitchen-fridge">
+            <div class="kf-inside" data-asset="assets/living/kitchen-fridge-inside">
+                <svg class="placeholder" viewBox="0 0 120 300" preserveAspectRatio="none" aria-hidden="true">
+                    <rect x="0" y="0" width="120" height="300" rx="10" fill="#d8d4c6" stroke="#9a968a" stroke-width="3"/>
+                    <rect x="8" y="8" width="104" height="96" rx="4" fill="#dce8ee"/><rect x="8" y="116" width="104" height="176" rx="4" fill="#f4f0e2"/>
+                    <path d="M14 20 Q30 14 46 22 M60 18 Q80 12 104 20" stroke="#fff" stroke-width="3" fill="none" opacity=".8"/>
+                    <rect x="16" y="62" width="44" height="30" rx="3" fill="#b8ccd6" stroke="#8aa0aa"/><rect x="68" y="70" width="34" height="22" rx="2" fill="#e8e0d0" stroke="#aaa090"/>
+                    <circle cx="60" cy="122" r="5" fill="#fff8d0"/><ellipse cx="60" cy="140" rx="42" ry="22" fill="rgba(255,250,220,.5)"/>
+                    <g fill="#c8d4d8" stroke="#9aa6aa" stroke-width="1.5"><rect x="8" y="176" width="104" height="4"/><rect x="8" y="236" width="104" height="4"/></g>
+                    <rect x="14" y="138" width="16" height="38" rx="3" fill="#f8f8f4" stroke="#b8b8b0"/><rect x="14" y="138" width="16" height="10" fill="#4a7ab8"/>
+                    <rect x="36" y="150" width="18" height="26" rx="4" fill="#b8402a"/><rect x="36" y="146" width="18" height="6" rx="2" fill="#e8d8b0"/>
+                    <g fill="#f0e8d4" stroke="#c8bca0"><ellipse cx="80" cy="170" rx="5" ry="6"/><ellipse cx="91" cy="170" rx="5" ry="6"/><ellipse cx="102" cy="170" rx="5" ry="6"/></g>
+                    <rect x="14" y="246" width="92" height="40" rx="4" fill="rgba(200,220,210,.7)" stroke="#9ab4aa"/><circle cx="36" cy="266" r="9" fill="#8ab83a"/><path d="M58 262 h30 v12 h-30 Z" fill="#e8b33c"/>
+                </svg>
+            </div>
+            <div class="kitchen-pie" data-asset="assets/living/kitchen-pie">
+                <svg class="placeholder" viewBox="0 0 100 44" aria-hidden="true">
+                    <ellipse cx="50" cy="36" rx="46" ry="7" fill="#b8b4a8"/>
+                    <path d="M8 22 L14 38 H86 L92 22 Z" fill="#c9883a" stroke="#7a4a1a" stroke-width="1.4"/>
+                    <path d="M8 22 Q8 10 50 9 Q92 10 92 22 Q70 28 50 27 Q30 28 8 22 Z" fill="#e0a456" stroke="#7a4a1a" stroke-width="1.4"/>
+                    <g stroke="#a8642a" stroke-width="2.4" stroke-linecap="round"><path d="M22 13 L28 25 M38 10 L44 26 M56 10 L62 26 M72 12 L78 24"/><path d="M14 18 L86 16 M16 23 L84 22"/></g>
+                    <path d="M58 9 L70 24 L86 22 Q92 18 88 14 Z" fill="#8a1a2a" opacity=".85"/><path d="M58 9 L70 24" stroke="#7a4a1a" stroke-width="1.2"/>
+                    <path d="M8 22 Q8 10 50 9 Q92 10 92 22" fill="none" stroke="#f0c47a" stroke-width="3" stroke-dasharray="3 4" stroke-linecap="round"/>
+                </svg>
+                <span class="kh-hint">an apple pie</span>
+            </div>
+            <button type="button" class="kf-door" data-asset="assets/living/kitchen-fridge" aria-label="the fridge">
+                <svg class="placeholder" viewBox="0 0 120 300" preserveAspectRatio="none" aria-hidden="true">
+                    <rect x="0" y="0" width="120" height="300" rx="10" fill="#e6e2d6" stroke="#9a968a" stroke-width="3"/>
+                    <path d="M0 110 H120" stroke="#9a968a" stroke-width="3"/><rect x="98" y="30" width="8" height="50" rx="3" fill="#b0aa9a"/><rect x="98" y="130" width="8" height="80" rx="3" fill="#b0aa9a"/>
+                    <rect x="20" y="30" width="30" height="36" fill="#f3e6c2" transform="rotate(-4 35 48)"/>
+                    <path d="M26 40 h18 M26 46 h14 M26 52 h16" stroke="#9a8a6a" stroke-width="1.4" transform="rotate(-4 35 48)"/>
+                </svg>
+                <span class="kh-hint">the fridge</span>
+            </button>
+        </div>
+        <!-- the counter, and its drawers (sky/kitchen.js): click one and it slides out, click it again and it shuts.
+             slots: kitchen-counter (the cupboards under the worktop; leave the strip under the worktop for the drawers),
+             kitchen-drawer (a drawer front: every drawer), kitchen-drawer-1 … -4 (each one open, seen from above: what's in it) -->
+        <div class="furnish kitchen-counter">
+            <div class="kc-body" data-asset="assets/living/kitchen-counter">
+                <svg class="placeholder" viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true">
+                    <rect x="0" y="0" width="620" height="18" fill="#c9bfa8" stroke="#8a7a5a" stroke-width="2"/>
+                    <rect x="8" y="18" width="604" height="222" fill="#7a5134"/>
+                    <rect x="14" y="24" width="592" height="62" fill="#4a3020"/>
+                    <g fill="none" stroke="#5a3a24" stroke-width="3"><rect x="22" y="96" width="140" height="130"/><rect x="172" y="96" width="140" height="130"/><rect x="322" y="96" width="140" height="130"/><rect x="472" y="96" width="126" height="130"/></g>
+                    <g fill="#c49a52"><circle cx="150" cy="160" r="5"/><circle cx="184" cy="160" r="5"/><circle cx="450" cy="160" r="5"/><circle cx="484" cy="160" r="5"/></g>
+                    <rect x="420" y="-2" width="120" height="8" rx="3" fill="#9aa4a8"/>
+                </svg>
+            </div>
+            <button type="button" class="kitchen-drawer d1" data-drawer="1" aria-label="a drawer">
+                <span class="kd-inside" data-asset="assets/living/kitchen-drawer-1">
+                    <svg class="placeholder" viewBox="0 0 140 60" preserveAspectRatio="none" aria-hidden="true">
+                        <path d="M0 60 L10 0 H130 L140 60 Z" fill="#6a4428"/><path d="M8 56 L16 6 H124 L132 56 Z" fill="#8a5e3a"/>
+                        <path d="M46 8 V54 M94 8 V54" stroke="#6a4428" stroke-width="3"/>
+                        <g stroke="#c8ccd2" stroke-width="3" stroke-linecap="round"><path d="M22 12 L20 50 M28 12 L26 50 M34 12 L32 50"/><path d="M58 12 L56 50 M66 12 L64 50 M74 14 L78 48"/><path d="M104 14 L102 50 M112 14 L110 50 M120 14 L119 50"/></g>
+                        <g fill="#c8ccd2"><ellipse cx="104" cy="16" rx="4" ry="6"/><ellipse cx="112" cy="16" rx="4" ry="6"/><ellipse cx="120" cy="16" rx="4" ry="6"/></g>
+                    </svg>
+                </span>
+                <span class="kd-front" data-asset="assets/living/kitchen-drawer"><svg class="placeholder" viewBox="0 0 140 56" preserveAspectRatio="none" aria-hidden="true"><rect x="1" y="1" width="138" height="54" rx="3" fill="#8a5e3a" stroke="#5a3a24" stroke-width="2"/><rect x="50" y="24" width="40" height="7" rx="3.5" fill="#c49a52" stroke="#7a5a22"/></svg></span>
+                <span class="kh-hint">a drawer</span>
+            </button>
+            <button type="button" class="kitchen-drawer d2" data-drawer="2" aria-label="a drawer">
+                <span class="kd-inside" data-asset="assets/living/kitchen-drawer-2">
+                    <svg class="placeholder" viewBox="0 0 140 60" preserveAspectRatio="none" aria-hidden="true">
+                        <path d="M0 60 L10 0 H130 L140 60 Z" fill="#6a4428"/><path d="M8 56 L16 6 H124 L132 56 Z" fill="#8a5e3a"/>
+                        <rect x="20" y="14" width="34" height="22" fill="#f3e6c2" transform="rotate(-8 37 25)"/><path d="M24 20 h24 M24 26 h18" stroke="#b8402a" stroke-width="2" transform="rotate(-8 37 25)"/>
+                        <g fill="#3a3a3a"><rect x="62" y="30" width="16" height="7" rx="2"/><rect x="66" y="40" width="16" height="7" rx="2" transform="rotate(20 74 43)"/></g>
+                        <g fill="none" stroke="#b8402a" stroke-width="2"><circle cx="100" cy="22" r="8"/><circle cx="108" cy="30" r="7"/></g>
+                        <path d="M88 44 l14 -4 l4 8 Z" fill="#c49a52"/><circle cx="118" cy="46" r="4" fill="#9a968a"/><path d="M30 44 q10 -6 22 2" stroke="#4a8a3a" stroke-width="2.5" fill="none"/>
+                    </svg>
+                </span>
+                <span class="kd-front" data-asset="assets/living/kitchen-drawer"><svg class="placeholder" viewBox="0 0 140 56" preserveAspectRatio="none" aria-hidden="true"><rect x="1" y="1" width="138" height="54" rx="3" fill="#8a5e3a" stroke="#5a3a24" stroke-width="2"/><rect x="50" y="24" width="40" height="7" rx="3.5" fill="#c49a52" stroke="#7a5a22"/></svg></span>
+                <span class="kh-hint">a drawer</span>
+            </button>
+            <button type="button" class="kitchen-drawer d3" data-drawer="3" aria-label="a drawer">
+                <span class="kd-inside" data-asset="assets/living/kitchen-drawer-3">
+                    <svg class="placeholder" viewBox="0 0 140 60" preserveAspectRatio="none" aria-hidden="true">
+                        <path d="M0 60 L10 0 H130 L140 60 Z" fill="#6a4428"/><path d="M8 56 L16 6 H124 L132 56 Z" fill="#8a5e3a"/>
+                        <g stroke="#fff" stroke-width="1" opacity=".9"><rect x="18" y="10" width="34" height="42" fill="#d8e4ec"/><rect x="54" y="10" width="34" height="42" fill="#e8d4c4"/><rect x="90" y="10" width="34" height="42" fill="#d8e4ec"/></g>
+                        <g stroke="#b8402a" stroke-width="2"><path d="M18 18 h34 M18 44 h34 M90 18 h34 M90 44 h34"/></g><g stroke="#4a7ab8" stroke-width="2"><path d="M54 18 h34 M54 44 h34"/></g>
+                    </svg>
+                </span>
+                <span class="kd-front" data-asset="assets/living/kitchen-drawer"><svg class="placeholder" viewBox="0 0 140 56" preserveAspectRatio="none" aria-hidden="true"><rect x="1" y="1" width="138" height="54" rx="3" fill="#8a5e3a" stroke="#5a3a24" stroke-width="2"/><rect x="50" y="24" width="40" height="7" rx="3.5" fill="#c49a52" stroke="#7a5a22"/></svg></span>
+                <span class="kh-hint">a drawer</span>
+            </button>
+            <button type="button" class="kitchen-drawer d4" data-drawer="4" aria-label="a drawer">
+                <span class="kd-inside" data-asset="assets/living/kitchen-drawer-4">
+                    <svg class="placeholder" viewBox="0 0 140 60" preserveAspectRatio="none" aria-hidden="true">
+                        <path d="M0 60 L10 0 H130 L140 60 Z" fill="#6a4428"/><path d="M8 56 L16 6 H124 L132 56 Z" fill="#8a5e3a"/>
+                        <g fill="#f3e6c2" stroke="#c8b890"><rect x="20" y="12" width="40" height="26" transform="rotate(-6 40 25)"/><rect x="50" y="16" width="40" height="26" transform="rotate(4 70 29)"/><rect x="80" y="10" width="40" height="26" transform="rotate(-3 100 23)"/></g>
+                        <g stroke="#6e4a30" stroke-width="1.4"><path d="M84 18 h30 M84 24 h24 M84 30 h28" transform="rotate(-3 100 23)"/></g>
+                        <text x="100" y="17" text-anchor="middle" font-size="5.5" font-style="italic" fill="#9a3b1f" transform="rotate(-3 100 23)">apple pie</text>
+                    </svg>
+                </span>
+                <span class="kd-front" data-asset="assets/living/kitchen-drawer"><svg class="placeholder" viewBox="0 0 140 56" preserveAspectRatio="none" aria-hidden="true"><rect x="1" y="1" width="138" height="54" rx="3" fill="#8a5e3a" stroke="#5a3a24" stroke-width="2"/><rect x="50" y="24" width="40" height="7" rx="3.5" fill="#c49a52" stroke="#7a5a22"/></svg></span>
+                <span class="kh-hint">a drawer</span>
+            </button>
+        </div>
         <div class="furnish kitchen-bowl" data-asset="assets/living/fruit-bowl">
             <svg class="placeholder" viewBox="0 0 120 60" aria-hidden="true">
                 <circle cx="44" cy="22" r="13" fill="#e8b33c"/><circle cx="70" cy="18" r="12" fill="#d98a2a"/><path d="M58 30 Q78 0 96 20 Q84 24 70 30 Z" fill="#e8d24a"/>
@@ -715,8 +796,94 @@
             <span class="kh-hint">a cornucopia. (was it always there?)</span>
         </div>
         <!-- back out to the hallway -->
-        <button type="button" class="room-arrow kitchen-back" aria-label="back to the hallway" data-asset="assets/living/arrow"></button>
+        <button type="button" class="room-arrow back-right kitchen-back" aria-label="back to the hallway" data-asset="assets/living/arrow"><span class="ra-hint">the hallway</span></button>
         <div class="furnish character scene-character kitchen-character" data-asset="assets/characters/kitchen" aria-label="the traveller"></div>
+    </div>
+
+    <!-- the porch (sky/porch.js): out of the front door from the hallway (the arrow at the bottom). the sky over the street, the
+         houses across it, a streetlight, a wire with crows on it. from reset 3 on, things out here aren't right.
+         slots in assets/living/: porch-frame (the porch itself: the roof's edge, the posts, the railing, the house wall on the left:
+         see-through wherever the sky and the street show, 1920 x 1080), porch-street (across the street: the houses, the road, the lawn,
+         the fence: see-through above them, wide), porch-floor, porch-door, porch-lamp, porch-chair, porch-mailbox (+ porch-mailbox-flag),
+         porch-crow, porch-watcher, porch-walker, porch-neighbour (in the window across the street, waving: a GIF can wave);
+         the traveller out here: assets/characters/porch (+ porch-walking) -->
+    <div class="porch" aria-hidden="true">
+        <div class="porch-street" data-asset="assets/living/porch-street">
+            <svg class="placeholder" viewBox="0 0 1600 500" preserveAspectRatio="none" aria-hidden="true">
+                <g fill="#3a3440"><path d="M60 300 V190 L150 130 L240 190 V300 Z"/><path d="M1050 300 V170 L1200 90 L1350 170 V300 Z"/><path d="M1420 300 V210 L1500 160 L1600 210 V300 Z"/><path d="M560 300 V220 L640 170 L720 220 V300 Z"/></g>
+                <g fill="#22202a"><rect x="1050" y="166" width="300" height="10"/><rect x="60" y="186" width="180" height="8"/></g>
+                <g class="ps-windows" fill="#e8c878"><rect x="95" y="220" width="30" height="34"/><rect x="175" y="220" width="30" height="34"/><rect x="1090" y="200" width="46" height="50"/><rect x="1180" y="200" width="46" height="50"/><rect x="1270" y="200" width="46" height="50"/><rect x="600" y="240" width="26" height="30"/><rect x="1460" y="236" width="28" height="30"/></g>
+                <rect x="1182" y="262" width="40" height="38" fill="#2a2430"/>
+                <g stroke="#2a2a30" stroke-width="6"><path d="M240 40 V330"/><path d="M1360 40 V330"/></g>
+                <path d="M0 64 Q240 96 240 44 Q800 110 1360 44 Q1360 96 1600 70" fill="none" stroke="#1a1a1e" stroke-width="2.4"/>
+                <g stroke="#2e2e34" stroke-width="7" fill="none"><path d="M410 330 V120 Q410 104 430 104 H470"/></g><rect x="458" y="98" width="30" height="12" rx="3" fill="#2e2e34"/>
+                <ellipse class="ps-lamp" cx="473" cy="114" rx="11" ry="5" fill="#ffe6a0"/>
+                <rect x="0" y="300" width="1600" height="30" fill="#8a8a88"/><path d="M0 300 H1600" stroke="#b0b0aa" stroke-width="3"/>
+                <rect x="0" y="330" width="1600" height="70" fill="#3e3e44"/><path d="M0 366 H1600" stroke="#d8d0a0" stroke-width="4" stroke-dasharray="60 50"/>
+                <rect x="0" y="400" width="1600" height="100" fill="#4e6a3a"/><path d="M0 402 H1600" stroke="#8a8a88" stroke-width="5"/>
+                <g fill="#ece6d6" stroke="#b0a890" stroke-width="1"><path d="M0 430 H700 V440 H0 Z M900 430 H1600 V440 H900 Z"/></g>
+                <g fill="#ece6d6" stroke="#b0a890" stroke-width="1"><path d="M10 500 V424 l6 -8 l6 8 V500 Z"/><path d="M46 500 V424 l6 -8 l6 8 V500 Z"/><path d="M82 500 V424 l6 -8 l6 8 V500 Z"/><path d="M118 500 V424 l6 -8 l6 8 V500 Z"/><path d="M154 500 V424 l6 -8 l6 8 V500 Z"/><path d="M190 500 V424 l6 -8 l6 8 V500 Z"/><path d="M226 500 V424 l6 -8 l6 8 V500 Z"/><path d="M262 500 V424 l6 -8 l6 8 V500 Z"/><path d="M298 500 V424 l6 -8 l6 8 V500 Z"/><path d="M334 500 V424 l6 -8 l6 8 V500 Z"/><path d="M370 500 V424 l6 -8 l6 8 V500 Z"/><path d="M406 500 V424 l6 -8 l6 8 V500 Z"/><path d="M442 500 V424 l6 -8 l6 8 V500 Z"/><path d="M478 500 V424 l6 -8 l6 8 V500 Z"/><path d="M514 500 V424 l6 -8 l6 8 V500 Z"/><path d="M550 500 V424 l6 -8 l6 8 V500 Z"/><path d="M586 500 V424 l6 -8 l6 8 V500 Z"/><path d="M622 500 V424 l6 -8 l6 8 V500 Z"/><path d="M658 500 V424 l6 -8 l6 8 V500 Z"/><path d="M910 500 V424 l6 -8 l6 8 V500 Z"/><path d="M946 500 V424 l6 -8 l6 8 V500 Z"/><path d="M982 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1018 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1054 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1090 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1126 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1162 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1198 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1234 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1270 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1306 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1342 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1378 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1414 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1450 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1486 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1522 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1558 500 V424 l6 -8 l6 8 V500 Z"/><path d="M1594 500 V424 l6 -8 l6 8 V500 Z"/></g>
+                <path d="M700 500 L760 402 H840 L900 500 Z" fill="#a89a80"/>
+            </svg>
+        </div>
+        <div class="porch-neighbour" data-asset="assets/living/porch-neighbour">
+            <svg class="placeholder" viewBox="0 0 46 50" aria-hidden="true"><circle cx="23" cy="20" r="7" fill="#1e1a22"/><path d="M10 50 Q10 30 23 29 Q36 30 36 50 Z" fill="#1e1a22"/>
+                <g class="pn-arm"><path d="M33 34 L42 16" stroke="#1e1a22" stroke-width="5" stroke-linecap="round"/><circle cx="42" cy="15" r="3.6" fill="#1e1a22"/></g></svg>
+            <span class="kh-hint">the neighbours</span>
+        </div>
+        <div class="porch-crows"><div class="porch-crow c1" data-asset="assets/living/porch-crow"><svg class="placeholder" viewBox="0 0 40 30" aria-hidden="true"><path d="M8 22 Q6 12 16 9 Q24 7 28 12 L34 10 L30 15 Q30 22 22 24 Q14 26 8 22 Z" fill="#141418"/><path d="M12 22 L6 29 M18 24 L16 30" stroke="#141418" stroke-width="1.6"/><circle class="pc-eye" cx="27" cy="11.5" r="1.1" fill="#6a6a70"/><path d="M4 18 Q10 20 14 16" fill="#141418"/></svg></div><div class="porch-crow c2" data-asset="assets/living/porch-crow"><svg class="placeholder" viewBox="0 0 40 30" aria-hidden="true"><path d="M8 22 Q6 12 16 9 Q24 7 28 12 L34 10 L30 15 Q30 22 22 24 Q14 26 8 22 Z" fill="#141418"/><path d="M12 22 L6 29 M18 24 L16 30" stroke="#141418" stroke-width="1.6"/><circle class="pc-eye" cx="27" cy="11.5" r="1.1" fill="#6a6a70"/><path d="M4 18 Q10 20 14 16" fill="#141418"/></svg></div><div class="porch-crow c3" data-asset="assets/living/porch-crow"><svg class="placeholder" viewBox="0 0 40 30" aria-hidden="true"><path d="M8 22 Q6 12 16 9 Q24 7 28 12 L34 10 L30 15 Q30 22 22 24 Q14 26 8 22 Z" fill="#141418"/><path d="M12 22 L6 29 M18 24 L16 30" stroke="#141418" stroke-width="1.6"/><circle class="pc-eye" cx="27" cy="11.5" r="1.1" fill="#6a6a70"/><path d="M4 18 Q10 20 14 16" fill="#141418"/></svg></div><div class="porch-crow c4" data-asset="assets/living/porch-crow"><svg class="placeholder" viewBox="0 0 40 30" aria-hidden="true"><path d="M8 22 Q6 12 16 9 Q24 7 28 12 L34 10 L30 15 Q30 22 22 24 Q14 26 8 22 Z" fill="#141418"/><path d="M12 22 L6 29 M18 24 L16 30" stroke="#141418" stroke-width="1.6"/><circle class="pc-eye" cx="27" cy="11.5" r="1.1" fill="#6a6a70"/><path d="M4 18 Q10 20 14 16" fill="#141418"/></svg></div><div class="porch-crow c5" data-asset="assets/living/porch-crow"><svg class="placeholder" viewBox="0 0 40 30" aria-hidden="true"><path d="M8 22 Q6 12 16 9 Q24 7 28 12 L34 10 L30 15 Q30 22 22 24 Q14 26 8 22 Z" fill="#141418"/><path d="M12 22 L6 29 M18 24 L16 30" stroke="#141418" stroke-width="1.6"/><circle class="pc-eye" cx="27" cy="11.5" r="1.1" fill="#6a6a70"/><path d="M4 18 Q10 20 14 16" fill="#141418"/></svg></div></div>
+        <div class="porch-walker" data-asset="assets/living/porch-walker">
+            <svg class="placeholder" viewBox="0 0 40 110" aria-hidden="true"><circle cx="20" cy="12" r="8" fill="#2a2630"/><path d="M8 20 L32 20 L34 64 L6 64 Z" fill="#3a3440"/><rect x="6" y="18" width="28" height="6" rx="3" fill="#2a2630"/>
+                <g class="pw-legs" stroke="#2a2630" stroke-width="7" stroke-linecap="round"><path class="pw-l" d="M14 64 L10 104"/><path class="pw-r" d="M26 64 L30 104"/></g>
+                <path d="M4 8 H36 L32 2 H8 Z" fill="#1e1a22"/></svg>
+        </div>
+        <div class="porch-watcher" data-asset="assets/living/porch-watcher">
+            <svg class="placeholder" viewBox="0 0 40 140" aria-hidden="true"><ellipse cx="20" cy="14" rx="8" ry="10" fill="#08080a"/>
+                <path d="M10 24 Q20 20 30 24 L33 90 L28 90 L27 138 L22 138 L20 96 L18 138 L13 138 L12 90 L7 90 Z" fill="#08080a"/>
+                <g fill="#d8d8d0" opacity=".55"><circle cx="16.5" cy="13" r="1"/><circle cx="23.5" cy="13" r="1"/></g></svg>
+        </div>
+        <div class="porch-frame" data-asset="assets/living/porch-frame">
+            <svg class="placeholder" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">
+                <rect x="0" y="0" width="1600" height="64" fill="#e8e0cc"/><g stroke="#c8bea6" stroke-width="2"><path d="M0 16 H1600 M0 32 H1600 M0 48 H1600"/></g>
+                <rect x="0" y="62" width="1600" height="18" fill="#6e4a30"/><rect x="0" y="80" width="1600" height="6" fill="#4a3020"/>
+                <g fill="#f0eadc" stroke="#b8ae96" stroke-width="3"><rect x="196" y="86" width="34" height="690"/><rect x="1382" y="86" width="34" height="690"/></g>
+                <g fill="#e2dac6"><rect x="230" y="560" width="470" height="16"/><rect x="900" y="560" width="482" height="16"/><rect x="230" y="740" width="470" height="12"/><rect x="900" y="740" width="482" height="12"/></g>
+                <g fill="#ece4d0" stroke="#b8ae96" stroke-width="1.5"><rect x="254" y="576" width="12" height="164"/><rect x="288" y="576" width="12" height="164"/><rect x="322" y="576" width="12" height="164"/><rect x="356" y="576" width="12" height="164"/><rect x="390" y="576" width="12" height="164"/><rect x="424" y="576" width="12" height="164"/><rect x="458" y="576" width="12" height="164"/><rect x="492" y="576" width="12" height="164"/><rect x="526" y="576" width="12" height="164"/><rect x="560" y="576" width="12" height="164"/><rect x="594" y="576" width="12" height="164"/><rect x="628" y="576" width="12" height="164"/><rect x="662" y="576" width="12" height="164"/><rect x="918" y="576" width="12" height="164"/><rect x="952" y="576" width="12" height="164"/><rect x="986" y="576" width="12" height="164"/><rect x="1020" y="576" width="12" height="164"/><rect x="1054" y="576" width="12" height="164"/><rect x="1088" y="576" width="12" height="164"/><rect x="1122" y="576" width="12" height="164"/><rect x="1156" y="576" width="12" height="164"/><rect x="1190" y="576" width="12" height="164"/><rect x="1224" y="576" width="12" height="164"/><rect x="1258" y="576" width="12" height="164"/><rect x="1292" y="576" width="12" height="164"/><rect x="1326" y="576" width="12" height="164"/><rect x="1360" y="576" width="12" height="164"/></g>
+                <g stroke="#b8ae96" stroke-width="2"><path d="M700 560 V776 M900 560 V776"/></g><rect x="690" y="548" width="20" height="228" fill="#f0eadc" stroke="#b8ae96" stroke-width="2"/><rect x="890" y="548" width="20" height="228" fill="#f0eadc" stroke="#b8ae96" stroke-width="2"/>
+                <path d="M0 0 H176 V900 H0 Z" fill="#6a7a86"/><g stroke="#56646e" stroke-width="3"><path d="M0 30 H176"/><path d="M0 64 H176"/><path d="M0 98 H176"/><path d="M0 132 H176"/><path d="M0 166 H176"/><path d="M0 200 H176"/><path d="M0 234 H176"/><path d="M0 268 H176"/><path d="M0 302 H176"/><path d="M0 336 H176"/><path d="M0 370 H176"/><path d="M0 404 H176"/><path d="M0 438 H176"/><path d="M0 472 H176"/><path d="M0 506 H176"/><path d="M0 540 H176"/><path d="M0 574 H176"/><path d="M0 608 H176"/><path d="M0 642 H176"/><path d="M0 676 H176"/><path d="M0 710 H176"/><path d="M0 744 H176"/><path d="M0 778 H176"/><path d="M0 812 H176"/><path d="M0 846 H176"/><path d="M0 880 H176"/></g>
+                <rect x="170" y="0" width="14" height="900" fill="#e8e0cc"/>
+            </svg>
+        </div>
+        <div class="room-floor" data-asset="assets/living/porch-floor"><div class="placeholder"></div></div>
+        <button type="button" class="furnish porch-door" data-asset="assets/living/porch-door" aria-label="back inside">
+            <svg class="placeholder" viewBox="0 0 90 190" preserveAspectRatio="none" aria-hidden="true">
+                <rect x="0" y="0" width="90" height="190" fill="#e8e0cc"/><rect x="8" y="8" width="74" height="182" fill="#5a2a1c"/>
+                <g fill="none" stroke="#3e1c12" stroke-width="3"><rect x="18" y="20" width="54" height="50"/><rect x="18" y="84" width="22" height="92"/><rect x="50" y="84" width="22" height="92"/></g>
+                <rect x="24" y="26" width="42" height="38" fill="#e8c878" opacity=".75"/><circle cx="70" cy="110" r="4" fill="#c49a52"/>
+            </svg>
+            <span class="kh-hint">back inside</span>
+        </button>
+        <div class="furnish porch-lamp" data-asset="assets/living/porch-lamp">
+            <svg class="placeholder" viewBox="0 0 30 50" aria-hidden="true"><rect x="0" y="16" width="6" height="18" fill="#1f1a16"/><path d="M6 22 H12 V28 H6 Z" fill="#1f1a16"/>
+                <path d="M10 10 H26 L24 40 H12 Z" fill="#2a241e"/><rect class="pl-glass" x="13" y="14" width="10" height="22" fill="#ffe2a0"/><path d="M8 10 H28 L24 4 H12 Z" fill="#1f1a16"/></svg>
+        </div>
+        <button type="button" class="furnish porch-chair" data-asset="assets/living/porch-chair" aria-label="a rocking chair">
+            <svg class="placeholder" viewBox="0 0 120 170" aria-hidden="true">
+                <g fill="none" stroke="#6e4a30" stroke-width="7" stroke-linecap="round"><path d="M26 20 L32 120"/><path d="M52 18 L56 118"/><path d="M26 22 Q40 14 52 20"/><path d="M28 60 Q42 54 54 60"/>
+                <path d="M30 118 H100"/><path d="M92 120 L96 84 H40"/><path d="M34 120 L30 150 M96 120 L100 150"/></g>
+                <path d="M4 150 Q60 172 116 142" fill="none" stroke="#5a3a24" stroke-width="7" stroke-linecap="round"/>
+                <path d="M36 110 H98 L96 122 H34 Z" fill="#9a3b1f" opacity=".85"/>
+            </svg>
+            <span class="kh-hint">a rocking chair</span>
+        </button>
+        <button type="button" class="furnish porch-mailbox" data-asset="assets/living/porch-mailbox" aria-label="the mailbox">
+            <svg class="placeholder" viewBox="0 0 70 50" aria-hidden="true"><path d="M4 18 Q4 4 24 4 H56 Q66 4 66 18 V46 H4 Z" fill="#3a4a5a" stroke="#1e2a36" stroke-width="2"/>
+                <path d="M4 18 Q4 4 18 4 Q32 4 32 18 V46 H4 Z" fill="#46586a" stroke="#1e2a36" stroke-width="2"/><circle cx="18" cy="24" r="3" fill="#c8ccd2"/></svg>
+            <span class="porch-flag" data-asset="assets/living/porch-mailbox-flag"><svg class="placeholder" viewBox="0 0 10 40" aria-hidden="true"><rect x="3" y="4" width="3" height="36" fill="#6a6a70"/><rect x="0" y="0" width="10" height="12" fill="#c8202a"/></svg></span>
+            <span class="kh-hint">the mailbox</span>
+        </button>
+        <button type="button" class="room-arrow porch-back" aria-label="back inside" data-asset="assets/living/arrow"><span class="ra-hint">back inside</span></button>
+        <div class="furnish character scene-character porch-character" data-asset="assets/characters/porch" aria-label="the traveller"></div>
     </div>
 
     <!-- the dungeon (sky/bathroom.js slides it up; sky/dungeon.js lights the candles and plays its sound).
@@ -838,32 +1005,33 @@
         <a class="room-arrow to-upstairs" href="#living" aria-label="back up to the living space" data-asset="assets/living/arrow"></a>
     </div>
 
-    <script src="sky/sky.js?v=20260926l"></script>
-    <script src="sky/eye.js?v=20260926l"></script>
+    <script src="sky/sky.js?v=20260926m"></script>
+    <script src="sky/eye.js?v=20260926m"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
-    <script src="sky/ground-view.js?v=20260926l" data-view="assets/living/view"></script>
-    <script src="sky/panel.js?v=20260926l"></script>
-    <script src="sky/music.js?v=20260926l"></script>
-    <script src="sky/weather.js?v=20260926l"></script>
-    <script src="sky/noise.js?v=20260926l"></script>
-    <script src="sky/inventory.js?v=20260926l"></script>
-    <script src="sky/loot.js?v=20260926l"></script>
-    <script src="sky/records.js?v=20260926l"></script>
-    <script src="sky/crate.js?v=20260926l"></script>
-    <script src="sky/frames.js?v=20260926l"></script>
-    <script src="sky/bathroom.js?v=20260926l"></script>
-    <script src="sky/gore.js?v=20260926l"></script>
-    <script src="sky/tub.js?v=20260926l"></script>
-    <script src="sky/dungeon.js?v=20260926l"></script>
-    <script src="sky/attic.js?v=20260926l"></script>
-    <script src="sky/kitchen.js?v=20260926l"></script>
-    <script src="sky/books.js?v=20260926l"></script>
-    <script src="sky/marker.js?v=20260926l"></script>
-    <script src="sky/revolver.js?v=20260926l"></script>
-    <script src="sky/claubes.js?v=20260926l"></script>
-    <script src="sky/textures.js?v=20260926l"></script>
-    <script src="sky/forget.js?v=20260926l"></script>
-    <script src="sky/lives.js?v=20260926l"></script>
-    <script src="sky/resets.js?v=20260926l"></script>
+    <script src="sky/ground-view.js?v=20260926m" data-view="assets/living/view"></script>
+    <script src="sky/panel.js?v=20260926m"></script>
+    <script src="sky/music.js?v=20260926m"></script>
+    <script src="sky/weather.js?v=20260926m"></script>
+    <script src="sky/noise.js?v=20260926m"></script>
+    <script src="sky/inventory.js?v=20260926m"></script>
+    <script src="sky/loot.js?v=20260926m"></script>
+    <script src="sky/records.js?v=20260926m"></script>
+    <script src="sky/crate.js?v=20260926m"></script>
+    <script src="sky/frames.js?v=20260926m"></script>
+    <script src="sky/bathroom.js?v=20260926m"></script>
+    <script src="sky/gore.js?v=20260926m"></script>
+    <script src="sky/tub.js?v=20260926m"></script>
+    <script src="sky/dungeon.js?v=20260926m"></script>
+    <script src="sky/attic.js?v=20260926m"></script>
+    <script src="sky/kitchen.js?v=20260926m"></script>
+    <script src="sky/porch.js?v=20260926m"></script>
+    <script src="sky/books.js?v=20260926m"></script>
+    <script src="sky/marker.js?v=20260926m"></script>
+    <script src="sky/revolver.js?v=20260926m"></script>
+    <script src="sky/claubes.js?v=20260926m"></script>
+    <script src="sky/textures.js?v=20260926m"></script>
+    <script src="sky/forget.js?v=20260926m"></script>
+    <script src="sky/lives.js?v=20260926m"></script>
+    <script src="sky/resets.js?v=20260926m"></script>
 </body>
 </html>
