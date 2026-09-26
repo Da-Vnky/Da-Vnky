@@ -6,7 +6,7 @@ import {
   JUST_STAY, HOVER_WRITING, NOT_WRITING, SCENE_AFTERNOON, SLEEP_TALK,
 } from './script.js';
 import { NARRATION, ROOMS, PEEPHOLE, FOG, MIRROR, RADIO, CLOSET_FIRST, STAR_RARE } from './narration.js';
-import { RETURNING, MUSIC, AMBIENT_MORE, VIEWER_TALK, FUNGER_WATCHING, AFTERNOON_HUSH, MEDS_TALK } from './extra.js';
+import { RETURNING, MUSIC, AMBIENT_MORE, VIEWER_TALK, FUNGER_WATCHING, AFTERNOON_HUSH, MEDS_TALK, WAKE_UP } from './extra.js';
 import { GUILT, QUIET_NOTES, REMEDY_BACK, RESTORED_FIRST, RESTORED } from './davnky.js';   // (DaV-nky: see the end of this file)
 import { audio } from './audio.js';
 import { music } from './music.js';
@@ -555,7 +555,12 @@ function interact(id) {
       return say(bags.aether());
     case 'lump':
       // skipped or not, Aether's running by the end of it
-      if (!afternoonScene) { afternoonScene = true; return playScene(SCENE_AFTERNOON).then(SCENE_CUES.wakeAether); }
+      if (!afternoonScene) {
+        afternoonScene = true;
+        return playScene(SCENE_AFTERNOON).then(() => { SCENE_CUES.wakeAether(); sceneEndedAt = performance.now(); });
+      }
+      // poke her enough and she wakes up
+      if (++lumpPokes >= 3) return wakeUp();
       return say(bags.sleeptalk());
     case 'vso': return openCloseup(vsoPanel());
     case 'mirastar':
@@ -613,7 +618,7 @@ interact.starChecks = 0;
 // ============================================================ the afternoon
 // after a while in the room, time passes: daylight, and skizy asleep under the blanket on
 // the bean bag. clicking the lump plays Claube's scene. it stays afternoon for the visit
-let afternoon = false, afternoonScene = false;
+let afternoon = false, afternoonScene = false, sceneEndedAt = 0, lumpPokes = 0, waking = false;
 // things a scene can make happen, from a beat's { do: '...' }
 const SCENE_CUES = {
   wakeAether() {
@@ -647,6 +652,32 @@ async function startAfternoon() {
   mode = 'room';
   lastActivity = performance.now();
   caption(['note', 'later. the afternoon. skizy fell asleep on the bean bag.']);
+}
+
+// she wakes up: a minute and a half after the scene, or on the third poke after it. everything the
+// afternoon changed goes back, and she's at her desk again
+async function wakeUp() {
+  if (!afternoon || alone || waking || mode !== 'room' || current !== 'main') return;
+  waking = true;
+  if (!await sayAll(WAKE_UP.stir)) { waking = false; return; }   // (talked over: she'll try again)
+  mode = 'moving';
+  hush(); closeMenu();
+  $('#hover-label').classList.remove('show');
+  fade.classList.add('dark', 'on');
+  await sleep(1400);
+  for (const [sel, show] of [['#mel', true], ['#blanket', true], ['#afternoon-chair', false], ['#lump', false], ['#daylight', false]]) {
+    svg.querySelector(sel).style.display = show ? '' : 'none';
+  }
+  body.classList.remove('afternoon');
+  afternoon = false;
+  audio.asleep = false;
+  fade.classList.remove('on');
+  await sleep(900);
+  fade.classList.remove('dark');
+  mode = 'room';
+  lastActivity = performance.now();
+  await sleep(700);
+  say(WAKE_UP.after);
 }
 
 // ============================================================ the meds
@@ -1214,6 +1245,9 @@ function ambientLoop() {
   // and neither does a menu left open (it closes)
   if (afternoonDue() && mode === 'room' && current === 'main' && !document.hidden
       && performance.now() - lastActivity > 10000) return startAfternoon();
+  // a minute and a half after the afternoon's scene, she wakes up (next time you're in the main room)
+  if (afternoon && sceneEndedAt && performance.now() - sceneEndedAt > 90000 && mode === 'room' && current === 'main'
+      && !document.hidden) return wakeUp();
   if (mode !== 'room' || current !== 'main' || document.hidden || talking() || !$('#menu').hidden) return;
   if (performance.now() - lastActivity < 8000) return;
   const now = performance.now();

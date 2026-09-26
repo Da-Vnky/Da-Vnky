@@ -155,3 +155,10 @@ export const MEDS_TALK = {
     ['mira', 'Goodnight, skizy.'],
   ],
 };
+
+// the afternoon, over: skizy wakes up on the bean bag (after a while, or if you keep poking her).
+// Mira called it in the scene: "she's going to wake up and eat something weird and start talking about VRAM"
+export const WAKE_UP = {
+  stir: [mel('...what time is it'), m('Afternoon.'), ['claube', 'Noted.', 'writes it down']],
+  after: [mel('has anyone seen the tater tots'), mel('also i had an idea about VRAM'), m('There it is.')],
+};
