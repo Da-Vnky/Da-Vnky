@@ -1,8 +1,8 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-city.html 7710 2668320007
-index.html 2868 660819863
-living.html 67412 3445211451
-workshop.html 19407 3880918657
+city.html 7710 114180750
+index.html 2868 198179432
+living.html 76472 589420292
+workshop.html 19407 3169892260
 sky/attic.js 43749 30995443
 sky/bathroom.js 41904 1605479838
 sky/books.js 17675 1423934026
@@ -19,8 +19,9 @@ sky/ground-countryside.js 13833 642858024
 sky/ground-sea.js 54266 950476150
 sky/ground-view.js 6631 1730141118
 sky/inventory.js 20449 1063992887
+sky/kitchen.js 17503 889855492
 sky/letters.js 23655 4220821966
-sky/lives.js 12866 2656641229
+sky/lives.js 12980 3390867880
 sky/loader.js 15448 3284628827
 sky/loot.js 16128 2332404378
 sky/marker.js 8207 444656591
@@ -33,10 +34,10 @@ sky/panel.js 63554 1604886247
 sky/peeper.js 47556 1964038431
 sky/post.js 27542 100469044
 sky/records.js 30255 2143094409
-sky/resets.js 25326 2231585385
+sky/resets.js 26607 1880326624
 sky/revolver.js 15115 933686295
 sky/sky.js 109673 293130328
-sky/state.js 14109 492987470
+sky/state.js 14816 1979909672
 sky/studio.js 28537 3071880599
 sky/textures.js 11592 3429198461
 sky/timer.js 12508 660169094
@@ -87,11 +88,13 @@ content/workshop/visitors/list.txt 205 1050374648
 schizophyllu.me.room/index.html 4701 3567669813
 schizophyllu.me.room/assets/font.css 30693 1584298999
 schizophyllu.me.room/room/audio.js 15818 4103357033
+schizophyllu.me.room/room/davinv.js 4246 760496670
+schizophyllu.me.room/room/davnky.js 3848 2547100227
 schizophyllu.me.room/room/extra.js 7955 1877410787
 schizophyllu.me.room/room/music.js 4978 3071417838
 schizophyllu.me.room/room/narration.js 13671 3534524410
 schizophyllu.me.room/room/radio.js 6517 830110350
-schizophyllu.me.room/room/room.css 21154 2681259886
-schizophyllu.me.room/room/room.js 54211 2406169241
+schizophyllu.me.room/room/room.css 21279 4040246288
+schizophyllu.me.room/room/room.js 62539 3681856612
 schizophyllu.me.room/room/script.js 46214 305240998
 schizophyllu.me.room/assets/playlist/playlist.json 254 360607204

@@ -495,3 +495,5 @@ body.zoomed #hud-top { opacity: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+/* (DaV-nky) Aether can't be clicked or hovered until the afternoon scene wakes him */
+#aether.off { pointer-events: none; }

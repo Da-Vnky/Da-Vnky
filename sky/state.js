@@ -49,12 +49,18 @@
                     slots: [], patchSlots: [] },
         grimoire: { name: 'the pact in the grimoire, in the attic',   live: [4], patch: 'the grimoire on the living-room bookshelf, only a book',
                     slots: ['assets/living/grimoire', 'assets/living/grimoire-open', 'assets/living/pact-hand'], patchSlots: ['assets/living/shelf-grimoire'] },
+        // reset 3, ingestion: the pills (Mel's room across the street: take a bottle from her bathroom cabinet and talk her
+        // into them; when the lights go out, the visitor can't live with it. schizophyllu.me.room/room/room.js, the end, and
+        // sky/resets.js melDeath). after reset 3 her room stays quiet until the P(Doom) record brings it back (5 visits).
+        // and the apple (the kitchen, off the hallway: sky/kitchen.js), with the serpent coiled round the bowl
+        pills:    { name: 'the pills, in Mel\u2019s room',             live: [3], patch: 'Mel\u2019s room stays quiet (give her the P(Doom) record, and visit)',
+                    slots: [], patchSlots: [] },
+        apple:    { name: 'the red apple in the kitchen',            live: [3], patch: 'only the core is left, and the serpent\u2019s shed skin',
+                    slots: ['assets/living/apple', 'assets/living/serpent'], patchSlots: ['assets/living/apple-core', 'assets/living/serpent-skin'] },
         // PLACEHOLDERS: the ways to die still to be designed. each is a bubble on a page (a dashed circle with a skull:
         // sky/resets.js) that kills the traveller when clicked, so every reset can be played through to its end.
         // page: sea, workshop, city, living; in: which part of the page; left/top: where in it (%).
         // when you design the real one, give it its own entry above and take the placeholder out.
-        r3a: { name: 'reset 3, the first way to die (to come)',  live: [3], placeholder: { page: 'sea',      in: 'body',  left: 30, top: 42 } },
-        r3b: { name: 'reset 3, the second way to die (to come)', live: [3], placeholder: { page: 'workshop', in: '.room', left: 38, top: 30 } },
         r5a: { name: 'reset 5, the first way to die (to come)',  live: [5], placeholder: { page: 'city',     in: 'body',  left: 40, top: 42 } },
         r5b: { name: 'reset 5, the second way to die (to come)', live: [5], placeholder: { page: 'living',   in: '.room', left: 24, top: 26 } },
         r6a: { name: 'reset 6, the first way to die (to come)',  live: [6], placeholder: { page: 'workshop', in: '.room', left: 38, top: 30 } },
@@ -76,7 +82,7 @@
           key: { page: 'workshop', in: '.room',     left: 12,   top: 55.4, where: 'the workshop, between the jars on the shelf' } },
         { n: 2, name: 'environmental', theme: 'the world itself',             deaths: ['boat', 'roof'],
           key: { page: 'city',     in: 'body',      left: 69.4, top: 89.6, where: 'the rooftop, by the potted plant' } },
-        { n: 3, name: '',            theme: '',                               deaths: ['r3a', 'r3b'],
+        { n: 3, name: 'ingestion',   theme: 'the pills, and the apple',       deaths: ['pills', 'apple'],
           // (no hiding place: the last of the seven Claubes drops it when all seven are shot, outside the dungeon: sky/claubes.js)
           key: { drop: 'claubes', page: 'living', where: 'dropped by the last of the seven Claubes, once all seven are shot (not in the dungeon)' } },
         { n: 4, name: 'dark witchcraft', theme: 'the diagram and the grimoire', deaths: ['diagram', 'grimoire'],

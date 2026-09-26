@@ -37,6 +37,7 @@
         roof:        'My feet won\u2019t step off the edge. Not until I find what\u2019s hidden here.',
         grimoire:    'My hand stops above the page. It won\u2019t let me sign. Not yet.',
         diagram:     'The circle drinks the bullet\u2026 and waits. It isn\u2019t time yet.',
+        apple:       'I pick it up\u2026 and put it back. Not yet. There\u2019s something I haven\u2019t found.',
         placeholder: 'Not yet. There\u2019s something I have to find first.'
     };
     function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }

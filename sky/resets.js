@@ -341,7 +341,28 @@
         });
     }
 
-    function start() { placeKey(); setupScissors(); setupRoof(); placeholders(); dejaVu(); }
+    /* ---------------- back from Mel's room, after the pills (reset 3: schizophyllu.me.room/room/room.js) ----------------
+       the room sends the visitor back here (sessionStorage "dav-mel-death"): it was too much. the screen's
+       black; the traveller comes to on the rooftop, and it counts as a death */
+    function melDeath() {
+        var was = null;
+        try { was = sessionStorage.getItem('dav-mel-death'); sessionStorage.removeItem('dav-mel-death'); } catch (e) {}
+        if (!was || PAGE !== 'city') return;
+        var ch = document.querySelector('.scene-character');
+        var blk = document.createElement('div');
+        blk.className = 'mc-black on';
+        blk.style.cssText = 'position:fixed;inset:0;z-index:2147482000;background:#000;opacity:1;transition:opacity 2.4s;pointer-events:all';
+        body.appendChild(blk);
+        if (ch && Sky.gore && Sky.gore.lieDown) Sky.gore.lieDown(ch);
+        setTimeout(function () {
+            blk.style.opacity = '0';
+            if (ch && Sky.gore) { Sky.gore.respawn(ch); setTimeout(function () { Sky.gore.getUp(ch); }, 1500); }
+            else document.dispatchEvent(new CustomEvent('dav:traveller-died'));
+            setTimeout(function () { blk.remove(); }, 2600);
+        }, 1800);
+    }
+
+    function start() { placeKey(); setupScissors(); setupRoof(); placeholders(); melDeath(); dejaVu(); }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
     Sky.resets = { get reset() { return S.reset; }, live: S.live, patched: S.patched };

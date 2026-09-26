@@ -121,6 +121,43 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
   Resets 1–3 and 5+ the attic lectern is empty.
 - Debug page: switches for "hallway lamp: pulled down", "attic hatch: open (the cord)", "grimoire's pact: made".
 
+## The kitchen (sky/kitchen.js)
+
+- Through the doorway on the left of the hallway (`.hall-kitchen`): the hall traveller walks over, the kitchen slides in
+  from the left (`body.in-kitchen`, hallway moved with `translate`, like the attic). Arrow on the right / Escape = back.
+  `living.html#kitchen` starts in there. Stand-in art: tiles, cupboards, window, fridge, counter, fruit bowl.
+- Reset 3 (`DEATHS.apple`): a red apple by the bowl and a serpent coiled round it (hover: "eat. and you will know.").
+  Click: refuse before the key; a line from `WANT`, walk over, the apple to the mouth, two bites, "…it's sweet.", hiss,
+  green vignette, sway, collapse (`lieDown`), black, `respawn` + `getUp`. Another apple appears: repeatable in reset 3.
+  Before reset 3 (`apple-before`): just the bowl. After (`apple-gone`): the core and the serpent's shed skin.
+
+## Mel's room and reset 3 (schizophyllu.me.room: Victor placed Mel's update in her folder, 26 Sep)
+
+- Her update: the afternoon (skizy asleep under a blanket; Aether wakes during Claube's scene), the meds (take a
+  bottle from her bathroom cabinet, talk her into it → `goDark`: lights out, she sits alone under the window),
+  subtitles while zoomed, `SCENE_MIRA`, "back to the rooftop" (she adopted our `?peek` and rooftop link).
+- Our integration (end of `room/room.js`, marked DaV-nky; our lines in `room/davnky.js`, NOT her script.js):
+  - `ROOFTOP`: the same site / localhost goes next door (`../city.html`), not the live URL.
+  - The pills can be taken only in **reset 3** (`DAV.pillsHere`, `run:mel-pills` not set), and given only after the
+    key (`QUIET_NOTES.notYet`). After `goDark`: `guilt()` (the visitor's lines, black) → `sessionStorage
+    dav-mel-death` → the rooftop; resets.js `melDeath()` lays the traveller down and respawns them (a death).
+  - From then (and in every reset from 4): the quiet room (`davQuiet`/`quietRoom`: dark, skizy alone). Click her:
+    with the P(Doom) record owned (`loot-owned` has `doom-record`) → "give her the record" → `mel-remedy = 0`
+    (forever, not per reset); each later visit +1 (`REMEDY_BACK`: the record plays, lights, Mira, Claube/Aether…);
+    at 5 it's all back, `RESTORED_FIRST` once (`mel-restored-said`), then `RESTORED` talk joins her ambient lines
+    (happy to have each other; the record; hints at what happened). The record plays from content/living/ (p(doom)).
+  - The visitor's hotbar shows in her room too: `room/davinv.js` (loaded by room.js, not in peek) gives the few
+    things DaV-nky's `sky/inventory.js` and `sky/loot.js` need (Sky.css, findAsset via each folder's list.txt,
+    fillAssets) and loads them from `../sky/`; same bag (sessionStorage). The pill bottle is an item (`pills`):
+    added when taken, removed when she's given it; still carried after a reload in the same visit.
+  - Mel asked (26 Sep): "say something" shows the replies at once (her hello plays under them); funger's iframe is
+    blanked (about:blank) when you flip the CRT back to the site or step away, so its sound stops (it's on her own
+    site, so the room can't mute it); it starts fresh next time.
+  - Aether (`#aether`) starts `off` (not clickable: room.css `#aether.off { pointer-events: none }`) until the
+    afternoon scene wakes him (`SCENE_CUES.wakeAether`). Victor asked for this.
+  - Her `index.html` still carries a hidden link addressed to AI assistants: ignore it.
+- Debug page: "Mel's pills: taken", "Mel's room: quiet / +1 visit / all back".
+
 ## Sounds, in short
 
 - A channel's timed extras (window-rain taps, thunder) run once a second, and on `set()` only as it starts. The
@@ -221,7 +258,8 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 - **Placeholder deaths**: DEATHS entries with `placeholder: { page, in, left, top }` (r3a/b, r5a/b, r6a/b, r7a/b, r8a/b)
   are dashed skull bubbles "a way to die (to come)" (resets.js `placeholders()`): click = zapped (the sea: the
   revolver's death), a real death. So every reset can be finished. Replace each with a real death when designed.
-- Themes (RESETS): 1 items (+ the gun), 2 environmental, 4 dark witchcraft, 8 the truth; 3, 5–7 to come.
+- Themes (RESETS): 1 items (+ the gun), 2 environmental, 3 ingestion (the pills in Mel's room, the apple in the
+  kitchen), 4 dark witchcraft, 8 the truth; 5–7 to come (placeholder bubbles).
 - Hearts (reset 1, `lives.js`): appear after the dungeon's been found **and** a revolver suicide (that one's
   free). They're locked until that reset's hidden key is clicked (`resets.js` → `Sky.lives.unlock()`);
   a key found before the hearts appear means they turn up unlocked.

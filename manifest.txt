@@ -1,7 +1,7 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
 city.html 7710
 index.html 2868
-living.html 67412
+living.html 76472
 workshop.html 19407
 sky/attic.js 43749
 sky/bathroom.js 41904
@@ -19,8 +19,9 @@ sky/ground-countryside.js 13833
 sky/ground-sea.js 54266
 sky/ground-view.js 6631
 sky/inventory.js 20449
+sky/kitchen.js 17503
 sky/letters.js 23655
-sky/lives.js 12866
+sky/lives.js 12980
 sky/loader.js 15448
 sky/loot.js 16128
 sky/marker.js 8207
@@ -33,10 +34,10 @@ sky/panel.js 63554
 sky/peeper.js 47556
 sky/post.js 27542
 sky/records.js 30255
-sky/resets.js 25326
+sky/resets.js 26607
 sky/revolver.js 15115
 sky/sky.js 109673
-sky/state.js 14109
+sky/state.js 14816
 sky/studio.js 28537
 sky/textures.js 11592
 sky/timer.js 12508
@@ -87,11 +88,13 @@ content/workshop/visitors/list.txt 205
 schizophyllu.me.room/index.html 4701
 schizophyllu.me.room/assets/font.css 30693
 schizophyllu.me.room/room/audio.js 15818
+schizophyllu.me.room/room/davinv.js 4246
+schizophyllu.me.room/room/davnky.js 3848
 schizophyllu.me.room/room/extra.js 7955
 schizophyllu.me.room/room/music.js 4978
 schizophyllu.me.room/room/narration.js 13671
 schizophyllu.me.room/room/radio.js 6517
-schizophyllu.me.room/room/room.css 21154
-schizophyllu.me.room/room/room.js 54211
+schizophyllu.me.room/room/room.css 21279
+schizophyllu.me.room/room/room.js 62539
 schizophyllu.me.room/room/script.js 46214
 schizophyllu.me.room/assets/playlist/playlist.json 254

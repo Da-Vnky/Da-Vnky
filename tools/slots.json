@@ -1355,7 +1355,7 @@
    "page": "living.html#attic",
    "groups": [
     {
-     "name": "the attic (up the ladder from the hallway, once its lamp is pulled down)",
+     "name": "the attic (up the ladder from the hallway, once the hatch is open)",
      "slots": [
       {
        "slot": "assets/living/attic-wall",
@@ -1421,6 +1421,78 @@
        "slot": "assets/ui/cursor-blood",
        "what": "the pointer while signing in blood (a pricked fingertip): its tip at 19, 7",
        "size": "32 x 32"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kitchen",
+   "name": "the kitchen",
+   "page": "living.html#kitchen",
+   "groups": [
+    {
+     "name": "the kitchen (through the doorway on the left of the hallway)",
+     "slots": [
+      {
+       "slot": "assets/living/hall-kitchen-door",
+       "what": "the doorway to the kitchen, in the hallway (open, with a glimpse of the kitchen)",
+       "size": "tall and thin, about 80:170, stretched to fit"
+      },
+      {
+       "slot": "assets/living/kitchen-wall",
+       "what": "the whole kitchen behind everything: walls, tiles, upper cupboards",
+       "size": "1920 x 1080, cropped at the sides"
+      },
+      {
+       "slot": "assets/living/kitchen-floor",
+       "what": "the kitchen floor",
+       "size": "wide, stretched along the bottom"
+      },
+      {
+       "slot": "assets/living/kitchen-window",
+       "what": "the window over the counter",
+       "size": "about 160:130"
+      },
+      {
+       "slot": "assets/living/kitchen-counter",
+       "what": "the counter and the cupboards under it (its top is where the bowl sits)",
+       "size": "wide, about 620:240, stretched to fit"
+      },
+      {
+       "slot": "assets/living/kitchen-fridge",
+       "what": "the fridge",
+       "size": "about 120:300"
+      },
+      {
+       "slot": "assets/living/fruit-bowl",
+       "what": "the bowl of fruit on the counter",
+       "size": "about 120:60, see-through"
+      },
+      {
+       "slot": "assets/living/apple",
+       "what": "reset 3: the red apple by the bowl (click it: a death)",
+       "size": "about 40:44, see-through"
+      },
+      {
+       "slot": "assets/living/serpent",
+       "what": "reset 3: the serpent coiled round the bowl, laid over it (\"eat. and you will know.\")",
+       "size": "about 160:90, see-through"
+      },
+      {
+       "slot": "assets/living/apple-core",
+       "what": "after reset 3: the apple core left on the counter",
+       "size": "about 40:44, see-through"
+      },
+      {
+       "slot": "assets/living/serpent-skin",
+       "what": "after reset 3: the serpent’s shed skin",
+       "size": "about 160:40, see-through"
+      },
+      {
+       "slot": "assets/characters/kitchen",
+       "what": "the traveller in the kitchen (+ kitchen-walking)",
+       "size": "240–480 px tall"
       }
      ]
     }
@@ -2083,6 +2155,21 @@
       {
        "slot": "assets/sounds/cord",
        "what": "the hatch cord being pulled (a short tug and click)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/bite",
+       "what": "a bite of the apple (played twice)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/hiss",
+       "what": "the serpent’s hiss, as the apple’s bitten",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/choke",
+       "what": "the apple: the sweetness turning, a choke",
        "kind": "sound"
       },
       {

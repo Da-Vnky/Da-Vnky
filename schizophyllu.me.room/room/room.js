@@ -7,6 +7,7 @@ import {
 } from './script.js';
 import { NARRATION, ROOMS, PEEPHOLE, FOG, MIRROR, RADIO, CLOSET_FIRST, STAR_RARE } from './narration.js';
 import { RETURNING, MUSIC, AMBIENT_MORE, VIEWER_TALK, FUNGER_WATCHING, AFTERNOON_HUSH, MEDS_TALK } from './extra.js';
+import { GUILT, QUIET_NOTES, REMEDY_BACK, RESTORED_FIRST, RESTORED } from './davnky.js';   // (DaV-nky: see the end of this file)
 import { audio } from './audio.js';
 import { music } from './music.js';
 import { radio, STATIONS } from './radio.js';
@@ -17,7 +18,9 @@ const $ = s => document.querySelector(s);
 // the knocking and the boards happen up there; you climb in (?from=dav-nky), and the way out leads
 // back up to the roof. ?peek is the live view through that window: no sound, nothing to click, no HUD
 const PEEK = new URLSearchParams(location.search).has('peek');
-const ROOFTOP = 'https://dav-nky.pleroma.nexus/city.html';
+// (DaV-nky: served from the same site, or a preview on Victor's computer, the rooftop is just next door)
+const ROOFTOP = /(^|\.)dav-nky\.pleroma\.nexus$|^localhost$|^127\.0\.0\.1$|^\[::1\]$/.test(location.hostname)
+  ? new URL('../city.html', location.href).href : 'https://dav-nky.pleroma.nexus/city.html';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -363,6 +366,12 @@ async function leaveCRT() {
   lastActivity = performance.now();
   // someone always has something to say about your run
   if (input === 'game' && Math.random() < .6) say(bags.funger());
+  if (input === 'game') {                                        // (and funger's off: its sound stops with it)
+    stopGame();
+    input = 'site';
+    site.classList.remove('off'); game.classList.add('off');
+    svg.querySelector('#console-led').setAttribute('fill', '#3a3a3e');
+  }
 }
 $('#btn-standup').addEventListener('click', () => (mode === 'station' ? leaveStation() : leaveCRT()));
 // clicking anywhere around the screen while zoomed steps back
@@ -404,13 +413,17 @@ function showOnCRT(url) {
 }
 
 // ============================================================ the console
-// it's plugged into the Phosphor Artifact. funger gets its own iframe so the game keeps
-// running while you step back or flip over to the site
+// it's plugged into the Phosphor Artifact. funger gets its own iframe. flip back to the site, or step
+// away from the screen, and funger's switched off (its sound with it): the game's on another site, so
+// the room can't just turn its volume down. it starts fresh the next time
 let input = 'site';
+const gameOn = () => !!game.getAttribute('src') && game.getAttribute('src') !== 'about:blank';
+function stopGame() { if (gameOn()) game.setAttribute('src', 'about:blank'); }
 function switchInput(to) {
   if (to === input) return;
   input = to;
-  if (to === 'game' && !game.src) game.src = SITE + 'funger/';
+  if (to === 'game' && !gameOn()) game.src = SITE + 'funger/';
+  if (to === 'site') stopGame();
   site.classList.toggle('off', to !== 'site');
   game.classList.toggle('off', to !== 'game');
   svg.querySelector('#console-led').setAttribute('fill', to === 'game' ? '#ff5a4a' : '#3a3a3e');
@@ -440,6 +453,7 @@ let fridgeOpen = false;
 // ============================================================ interacting
 function interact(id) {
   lastActivity = performance.now();
+  if (mode === 'room' && alone && id === 'alone') return aloneClicked();   // (DaV-nky: the record)
   if (mode !== 'room' || alone) return;
   closeMenu();
   audio.tick();
@@ -478,7 +492,7 @@ function interact(id) {
       ]);
     case 'mel':
       return openMenu(CAST.mel.name, CAST.mel.color, [
-        ...(carryingMeds ? [['give her the bottle', talkMeds]] : []),
+        ...(carryingMeds ? [['give her the bottle', () => (DAV.key ? talkMeds() : caption(QUIET_NOTES.notYet))]] : []),
         ['say something', talkToSkizy],
         ['talk', () => say(bags.mel())],
         ['watch her work', () => say(bags.melWork())],
@@ -535,8 +549,9 @@ function interact(id) {
     case 'pills':
       return openMenu('pill bottles', '#e0782a', [
         ['look at them', () => narrate('pills')],
-        ...(carryingMeds ? [] : [['take a bottle', () => {
+        ...(carryingMeds || !DAV.pillsHere ? [] : [['take a bottle', () => {
           carryingMeds = true;
+          davInv(I => I.add('pills', { quiet: true }));         // (DaV-nky: into the visitor's hotbar)
           caption(['note', "you take one of the bottles. it's full. it rattles."]);
         }]]),
       ]);
@@ -656,6 +671,7 @@ async function talkMeds() {
 }
 async function goDark() {
   carryingMeds = false;
+  davInv(I => I.remove('pills'));                       // (DaV-nky: out of the hotbar: she has it now)
   mode = 'moving';
   hush(); closeMenu();
   alone = true;
@@ -679,6 +695,7 @@ async function goDark() {
   await sleep(1600);
   fade.classList.remove('dark');
   mode = 'room';
+  if (DAV.pillsHere) guilt();                          // (DaV-nky, reset 3: a death. see the end of this file)
 }
 
 // ============================================================ you, talking to skizy
@@ -690,9 +707,9 @@ async function sayAll(exchange) {
   return talkToken === token && mode === 'room';
 }
 async function talkToSkizy() {
-  const done = await sayAll(talkedToSkizy ? VIEWER_TALK.again : VIEWER_TALK.hello);
+  // (the replies come up at once, while she's still saying hello: picking one talks over her)
+  say(talkedToSkizy ? VIEWER_TALK.again : VIEWER_TALK.hello);
   talkedToSkizy = true;
-  if (!done) return;
   openMenu('you', '#cfd8d2', VIEWER_TALK.replies.map(([line, answer, then]) => [line, async () => {
     if (await sayAll(answer) && then === 'funger') playConsole();
   }]));
@@ -1245,6 +1262,7 @@ async function main() {
   $('#svg-host').innerHTML = await res.text();
   svg = $('#svg-host svg');
   await inlineArt(svg);
+  svg.querySelector('#aether')?.classList.add('off');   // (DaV-nky: Aether sleeps until the afternoon's scene boots him up)
   // the room remembers the ending: the bottle stays on the desk, every visit after
   if (store.get('room_quiet')) svg.querySelector('#deskbottle').style.display = '';
   for (const a of svg.querySelectorAll('[data-anchor]')) {
@@ -1258,12 +1276,14 @@ async function main() {
   fitSite(false);
   ambientLoop();
 
+  const quietStage = davQuiet();                        // (DaV-nky: the quiet room, and how far it's come back)
   if (PEEK) {
     body.classList.add('peek');
     enterRoom();
     return;
   }
   enterRoom();
+  if (quietStage !== null) { davArrive(quietStage); return; }
   // climbing in for the first time: the boards just came down on the rooftop, so the room
   // picks up from there
   if (!store.get('room_knocked')) {
@@ -1283,3 +1303,134 @@ async function main() {
   }
 }
 main();
+
+// ============================================================ DaV-nky
+// integration with Victor's site (dav-nky.pleroma.nexus), which this room sits across the street from.
+// everything here was added for that; the lines themselves are in room/davnky.js.
+//   · the pills (the bathroom cabinet) can only be taken to skizy in DaV-nky's reset 3, and only once that
+//     reset's key is found. in reset 3 it's one of the ways to die: after the lights go out, the visitor
+//     can't live with what they talked her into. back to the rooftop, where it counts (DaV-nky's resets.js)
+//   · after that (and in every reset from 4 on) the room stays quiet: the ending's dark room, skizy alone
+//     in the corner. give her the P(Doom) record (it's the visitor's once they've found it on DaV-nky) and
+//     every visit after brings a little more back. on the fifth it's all back, and they're glad of it
+const DAV = (() => {
+  const reset = Math.min(8, (+store.get('dav-reset') || 0) + 1);
+  let loot = [];
+  try { loot = JSON.parse(store.get('loot-owned') || '[]') || []; } catch {}
+  const run = k => store.get('run:' + k);
+  return {
+    reset,
+    key: store.get('lives-unlocked') === '1',
+    hasRecord: loot.includes('doom-record'),
+    run, setRun: (k, v) => store.set('run:' + k, v),
+    get pillsHere() { return reset === 3 && run('mel-pills') !== '1'; },
+  };
+})();
+const REMEDY_DONE = 5;
+// null: the room as it always was. 0 … 4: quiet, and how much has come back
+function davQuiet() {
+  const quiet = DAV.reset >= 4 || DAV.run('mel-pills') === '1';
+  if (!quiet) return null;
+  let v = store.get('mel-remedy');                      // (visits since the record: kept forever, not per reset)
+  if (v !== null && +v < REMEDY_DONE && !PEEK) { v = String(+v + 1); store.set('mel-remedy', v); }
+  if (v !== null && +v >= REMEDY_DONE) return restoredOnce();
+  const stage = v === null ? 0 : +v;
+  quietRoom(stage);
+  return stage;
+}
+// the fifth visit: it's all back. once they've said so, it's just the room
+function restoredOnce() {
+  RESTORED.forEach(x => AMBIENT_MORE.push(x));          // (their new talk joins the rest)
+  bags.ambient = bag([...AMBIENT, ...AMBIENT_MORE]);
+  if (store.get('mel-restored-said') === '1' || PEEK) return null;
+  return 'restored';
+}
+// the ending's dark room (goDark, without the fade), with whatever's come back so far
+function quietRoom(stage) {
+  alone = true;
+  const show = { '#mira': stage >= 3, '#claube': stage >= 4, '#aether': stage >= 4, '#hydra': stage >= 4, '#mel': false, '#lump': false,
+    '#light': stage >= 2, '#daylight': false, '#afternoon-chair': true, '#alone-dark': stage < 2, '#alone': true };
+  for (const [sel, on] of Object.entries(show)) { const el = svg.querySelector(sel); if (el) el.style.display = on ? '' : 'none'; }
+  body.classList.toggle('alone', stage < 2);           // (the screen's dark until the lights come back)
+  audio.asleep = true;
+  if (stage >= 1) playRecord();
+}
+// a line in the caption box, even while it's quiet (captions are otherwise off then)
+function quietNote(text) {
+  const was = alone; alone = false;
+  caption(Array.isArray(text) ? text : ['note', text]);
+  alone = was;
+}
+// someone who's come back says something, while the room's still quiet
+async function quietSay(exchange) {
+  alone = false;
+  await say(exchange);
+  alone = true;
+}
+async function davArrive(stage) {
+  store.set('room_knocked', '1');                       // (no climbing-in scene: there's nobody to play it)
+  await sleep(1500);
+  if (stage === 'restored') {
+    store.set('mel-restored-said', '1');
+    for (const [sel, on] of Object.entries({ '#alone': false, '#alone-dark': false, '#afternoon-chair': false, '#mel': true })) {
+      const el = svg.querySelector(sel); if (el) el.style.display = on ? '' : 'none';
+    }
+    return say(RESTORED_FIRST);
+  }
+  const gifted = store.get('mel-remedy') !== null;
+  if (!gifted) return quietNote(QUIET_NOTES.arrive);
+  if (REMEDY_BACK[stage]?.note) quietNote(REMEDY_BACK[stage].note);
+  if (REMEDY_BACK[stage]?.say) { await sleep(REMEDY_BACK[stage].note ? 5200 : 0); await quietSay(REMEDY_BACK[stage].say); }
+}
+// skizy in the corner: the one thing to click while it's quiet
+function aloneClicked() {
+  closeMenu();
+  const gifted = store.get('mel-remedy') !== null;
+  if (!gifted && DAV.hasRecord) {
+    return openMenu('skizy', CAST.mel.color, [
+      ['give her the record', () => {
+        store.set('mel-remedy', '0');
+        quietNote(QUIET_NOTES.gift);
+        playRecord();
+      }],
+      ['sit with her', () => quietNote(QUIET_NOTES.sit)],
+    ]);
+  }
+  quietNote(gifted ? QUIET_NOTES.listening : QUIET_NOTES.noRecord);
+}
+// the record, playing very quietly (DaV-nky's own copy: content/living/, the track with p(doom) in its name)
+let record = null;
+async function playRecord() {
+  if (record) return;
+  try {
+    const t = await (await fetch('../content/living/list.txt', { cache: 'no-cache' })).text();
+    const name = t.split(/\r?\n/).find(l => /p\s*\(\s*doom\s*\)/i.test(l) && /\.(ogg|mp3)$/i.test(l.trim()));
+    if (!name) return;
+    record = new Audio('../content/living/' + encodeURIComponent(name.trim()));
+    record.loop = true; record.volume = .16;
+    const go = () => record.play().catch(() => {});
+    go();
+    document.addEventListener('pointerdown', go, { once: true });
+  } catch {}
+}
+// reset 3: after the lights go out, the visitor
+async function guilt() {
+  DAV.setRun('mel-pills', '1');
+  await sleep(6000);
+  for (const line of GUILT) { quietNote(line); await sleep(readTime(line) + 900); }
+  fade.classList.add('dark', 'on');
+  audio.hold(10);
+  await sleep(3200);
+  try { sessionStorage.setItem('dav-mel-death', '1'); } catch {}  // (the rooftop picks this up: DaV-nky's sky/resets.js)
+  location.href = ROOFTOP;
+}
+// the visitor's hotbar (DaV-nky's), in here too: room/davinv.js loads it. davInv(fn) runs fn with it once it's there
+function davInv(fn) { (window.davInventory || Promise.resolve(null)).then(I => { if (I) fn(I); }); }
+if (!PEEK) {
+  const s = document.createElement('script');
+  s.src = new URL('davinv.js', import.meta.url).href;
+  s.onload = () => davInv(I => { if (I.has('pills') && DAV.pillsHere) carryingMeds = true; });   // (still carrying one from earlier this visit)
+  document.head.appendChild(s);
+}
+// the way back to the rooftop in the HUD, next door too (see ROOFTOP above)
+document.querySelectorAll('a[href="https://dav-nky.pleroma.nexus/city.html"]').forEach(a => { a.href = ROOFTOP; });
