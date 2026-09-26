@@ -41,20 +41,29 @@
         boat:     { name: 'the boat, dropped on the traveller',       live: [2], patch: 'a heavy anchor: the boat can’t be lifted high',
                     slots: ['assets/sea/ship'], patchSlots: ['assets/sea/anchor'] },
         roof:     { name: 'a jump off the roof',                     live: [2], patch: 'guard rails along the edge',
-                    slots: ['assets/city/street-below'], patchSlots: ['assets/city/guard-rail'] }
+                    slots: ['assets/city/street-below'], patchSlots: ['assets/city/guard-rail'] },
+        // reset 4: the diagram's sixth bullet comes back (while the Claubes worship: sky/claubes.js); and the pact in
+        // the attic's grimoire (sky/attic.js). before and after reset 4 the sixth bullet just vanishes like the rest,
+        // and from reset 5 the grimoire's on the living-room shelf, only a book (sky/books.js)
+        diagram:   { name: 'the sixth bullet, sent back by the diagram', live: [4], patch: 'the diagram just swallows the bullets',
+                    slots: [], patchSlots: [] },
+        grimoire: { name: 'the pact in the grimoire, in the attic',   live: [4], patch: 'the grimoire on the living-room bookshelf, only a book',
+                    slots: ['assets/living/grimoire', 'assets/living/grimoire-open', 'assets/living/pact-hand'], patchSlots: ['assets/living/shelf-grimoire'] }
     };
     // (always there: the revolver, but it's jammed until the last heart. and the thing at Mel's window, and falls.)
 
     // key: where the reset's key is hidden. page: sea, workshop, city, living; in: which part of the page
-    // (a selector); left/top: where in it; where: said in the content manager
+    // (a selector); left/top: where in it; where: said in the content manager.
+    // or drop: something in the game drops it instead ('claubes': sky/claubes.js), wherever that happens
     var RESETS = [
         { n: 1, name: 'objects',     theme: 'things around the house',        deaths: ['toaster', 'scissors'],
           key: { page: 'workshop', in: '.room',     left: 12,   top: 55.4, where: 'the workshop, between the jars on the shelf' } },
         { n: 2, name: 'environment', theme: 'the world itself',               deaths: ['boat', 'roof'],
           key: { page: 'city',     in: 'body',      left: 69.4, top: 89.6, where: 'the rooftop, by the potted plant' } },
         { n: 3, name: '',            theme: '',                               deaths: [],
-          key: { page: 'living',   in: '.room',     left: 13.5, top: 93,   where: 'the living space, under the armchair' } },
-        { n: 4, name: '',            theme: '',                               deaths: [],
+          // (no hiding place: the last of the seven Claubes drops it when all seven are shot, outside the dungeon: sky/claubes.js)
+          key: { drop: 'claubes', page: 'living', where: 'dropped by the last of the seven Claubes, once all seven are shot (not in the dungeon)' } },
+        { n: 4, name: '',            theme: '',                               deaths: ['diagram', 'grimoire'],
           key: { page: 'living',   in: '.bathroom', left: 88,   top: 93,   where: 'the bathroom, in the corner by the tub' } },
         { n: 5, name: '',            theme: '',                               deaths: [],
           key: { page: 'workshop', in: '.room',     left: 93.5, top: 61,   where: 'the workshop, on top of the notes board' } },
@@ -153,6 +162,7 @@
 
     // resets 1 and 2: the sky's a stage set, its props hung on strings (sky/sky.css)
     if (sphere() <= 2) document.documentElement.classList.add('stage-strings');
+    document.documentElement.setAttribute('data-reset', sphere());          // (for the pages' own styles: html[data-reset="4"] …)
 
     window.DAV_RESETS = RESETS;
     window.DAV_DEATHS = DEATHS;

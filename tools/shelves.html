@@ -94,7 +94,7 @@
     <h2>the books on the living space's shelf</h2>
     <p class="sub">the four books around the one that opens the dungeon. give one pages and visitors can open it and flip through them; a book with no pages is just a book.
        pages are pictures or short videos, in the order shown (↑ ↓ to move one). a <b>PDF</b> goes in as one picture per page (the site's server doesn't take .pdf files themselves).
-       each page can have a caption; the book's title shows when you point at it. (content/books/book-1 … book-4)</p>
+       each page can have a caption; the book's title shows when you point at it. (content/books/book-1 … book-4, and the grimoire: content/books/grimoire)</p>
     <div class="books"></div>
 
     <h2>records</h2>
@@ -107,7 +107,7 @@
     var $ = function (s) { return document.querySelector(s); };
     var statusEl = $('.status'), fileIn = $('.file-in');
     var ACCEPT = { walls: 'image/*', easel: 'image/*,video/mp4,video/webm', city: 'image/*,video/mp4,video/webm,.html', music: 'audio/mpeg,audio/ogg,.mp3,.ogg' };
-    var BOOKS = ['book-1', 'book-2', 'book-3', 'book-4'];
+    var BOOKS = ['book-1', 'book-2', 'book-3', 'book-4', 'book-grimoire'];
     BOOKS.forEach(function (b) { ACCEPT[b] = 'image/*,video/mp4,video/webm,application/pdf,.pdf'; });
     function say(t, bad) { statusEl.textContent = t || ''; statusEl.className = 'status' + (bad ? ' bad' : ''); }
     var OLD = { error: 'the content manager window that\u2019s open is an older version. close its black window, then double-click tools\\content.bat again' };
@@ -234,7 +234,7 @@
     var booksEl = $('.books');
     BOOKS.forEach(function (b, i) {
         var d = document.createElement('div');
-        d.innerHTML = '<h3 style="margin:18px 0 6px;font:normal 1.15rem \'IM Fell English SC\', Georgia, serif">book ' + (i + 1) +
+        d.innerHTML = '<h3 style="margin:18px 0 6px;font:normal 1.15rem \'IM Fell English SC\', Georgia, serif">' + (b === 'book-grimoire' ? 'the grimoire <small style="font:italic .9rem \'IM Fell English\', Georgia, serif;opacity:.7">(on the shelf from reset 5, once its pact is made in reset 4)</small>' : 'book ' + (i + 1)) +
             ' <button type="button" class="btn main add" data-add="' + b + '">+ pages</button></h3>' +
             '<p class="sub" style="margin:0 0 8px"><input class="book-title" data-book="' + b + '" maxlength="80" placeholder="its title (optional)" ' +
             'style="width:min(360px,100%);padding:5px 9px;border-radius:8px;border:1px solid rgba(243,230,194,.35);background:rgba(0,0,0,.2);color:#f3e6c2;font:inherit"></p>' +

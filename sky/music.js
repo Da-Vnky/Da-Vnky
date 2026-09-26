@@ -357,6 +357,32 @@
     audio.addEventListener('seeked', function () { requestAnimationFrame(syncDances); });
     setInterval(syncDances, 3000);                                // keep them on the beat (and catch any that just started)
     Sky.beat = function () { return { bpm: beat.bpm, dance: danceBpm(), phase: beat.phase }; };
+
+    /* ---------------- the stars keep time too ----------------
+       at night (once the constellations are out), while a record plays, one of them (now and then two)
+       pulses on every beat of the song: a quick swell and a glow, a different one each time */
+    Sky.css('.sky-link .sl-art { transform-origin: 50% 50%; }' +
+        '.sky-link.sl-beat .sl-art { animation: sl-beat var(--sl-beat, .45s) cubic-bezier(.2,.8,.3,1); }' +
+        '@keyframes sl-beat { 0% { transform: scale(1); filter: none; } 16% { transform: scale(1.17); filter: brightness(1.9) drop-shadow(0 0 7px rgba(255,244,200,.95)); } 100% { transform: scale(1); filter: none; } }' +
+        '@media (prefers-reduced-motion: reduce) { .sky-link.sl-beat .sl-art { animation: none; } }');
+    var starBeat = -1, lastStar = null;
+    (function starsOnTheBeat() {
+        requestAnimationFrame(starsOnTheBeat);
+        if (!beat.bpm || !playing()) return;
+        var nav = document.querySelector('.sky-links.live');               // (only once they're out: night)
+        if (!nav) return;
+        var b = danceBpm(), n = Math.floor((audio.currentTime - beat.phase) / (60 / b));
+        if (n === starBeat) return;
+        starBeat = n;
+        var out = Array.prototype.filter.call(nav.querySelectorAll('.sky-link'), function (a) { return a.style.visibility !== 'hidden' && a !== lastStar; });
+        if (!out.length) return;
+        for (var k = Math.random() < 0.25 ? 2 : 1; k > 0 && out.length; k--) {
+            var a = out.splice(Math.floor(Math.random() * out.length), 1)[0];
+            a.style.setProperty('--sl-beat', (60 / b * 0.95).toFixed(3) + 's');
+            a.classList.remove('sl-beat'); void a.offsetWidth; a.classList.add('sl-beat');
+            lastStar = a;
+        }
+    })();
     var fadeIn = false;
     audio.addEventListener('playing', function () {
         if (!fadeIn) return;
@@ -560,6 +586,8 @@
         'body.music-playing .character.has-dancing:not(.walking) > .placeholder, body.music-playing .character.has-dancing:not(.walking) > .art { display: none; }' +
         // anything else in a room can join in: class="sways" or "wobbles"
         'body.music-playing .sways { animation: g-sway 1s ease-in-out infinite alternate; transform-origin: 50% 100%; }' +
+        // (a light that hangs from the ceiling swings from its top, like a pendulum: class="sways hangs")
+        'body.music-playing .sways.hangs { transform-origin: 50% 0; }' +
         'body.music-playing .wobbles { animation: g-wobble 1s ease-in-out infinite alternate; transform-origin: 50% 0; }' +
         '@media (prefers-reduced-motion: reduce) { body.music-playing .groove, body.music-playing .groove *, body.music-playing .sways, body.music-playing .wobbles,' +
             'body.music-playing .character > * { animation: none !important; } }'

@@ -1,13 +1,18 @@
 /* =====================================================================
    forget.js — "Forget your stay… (Clear cache)", in the control panel, and
    the moment a reset happens.
-   The button is only for when something's gone wrong: it asks first, then
-   throws away the site's copy of itself in the visitor's browser (sky/loader.js)
-   and starts the page again. What they've done in the game stays (which reset
-   they're in, the P(Doom) record…: sky/state.js).
+   It asks first, then forgets everything: the site's copy of itself in the
+   visitor's browser (sky/loader.js) and everything they've done here (which
+   reset they're in, the hearts, the P(Doom) record, Mel's scare, the settings:
+   sky/state.js). The white, and then the homepage, as a brand-new visitor.
    A reset (sky/lives.js, when the last heart goes) looks the same: a flashbang,
    the world goes white and shows what it really is, and then it starts again,
-   one reset on (Sky.stay.reset()).
+   one reset on, back at the beginning: the homepage, the sea (Sky.stay.reset()).
+
+   THE RESET MANAGER (only in your preview, on your own computer: never on the
+   live site): a "resets" layer in the control panel. The next reset, or straight
+   to any reset 1-8, or starting over as a brand-new visitor: each one plays the
+   reset exactly as a visitor would see it, and starts again at the homepage.
 
    slots: assets/ui/forget-screen (what the white turns into: the wireframe world;
           full screen, covers it), assets/ui/reset-screen (the same, for a reset;
@@ -55,7 +60,12 @@
     }
 
     // the white, the world under it, and then the page again
-    function whiteOut(slot, caption, work) {
+    // where a reset starts again: the homepage (found next to this script, so it works from any page)
+    var HOME = (function () {
+        var me = document.querySelector('script[src*="sky/forget.js"]');
+        try { return new URL('../index.html', me ? me.src : location.href).href; } catch (e) { return 'index.html'; }
+    })();
+    function whiteOut(slot, caption, work, to) {
         var w = document.createElement('div');
         w.className = 'forget-white';
         w.innerHTML = '<div class="fw-world">' + wireframe() + '</div>' + (caption ? '<div class="fw-caption">' + caption + '</div>' : '');
@@ -71,25 +81,70 @@
         requestAnimationFrame(function () { w.classList.add('on'); });
         var job = work();
         setTimeout(function () {
-            job.then(function () { location.replace(location.pathname + location.search); });
+            job.then(function () { location.replace(to || location.pathname + location.search); });
         }, 3400);
     }
-    function forget() { whiteOut('assets/ui/forget-screen', '', function () { return window.davForget ? window.davForget() : Promise.resolve(); }); }
-    function reset() {
+    function wipe() {
+        try { localStorage.clear(); } catch (e) {}
+        try { sessionStorage.clear(); } catch (e) {}
         var S = window.davSave;
+        return window.davForget ? window.davForget() : S && S.clearCache ? S.clearCache() : Promise.resolve();
+    }
+    function forget() { whiteOut('assets/ui/forget-screen', '', wipe, HOME); }
+    var busy = false;
+    // a reset: the white, the world under it, and then the homepage (how = what changes in the save, while it's white)
+    function reset(how) {
+        var S = window.davSave;
+        if (busy) return;
+        busy = true;
         whiteOut('assets/ui/reset-screen|assets/ui/forget-screen', '', function () {
+            if (typeof how === 'function') return Promise.resolve(how());
             if (S) S.nextReset();
             return Promise.resolve();
-        });
+        }, HOME);
     }
+
+    /* ---------------- the reset manager: in your preview only ---------------- */
+    var LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    var RICON = '<svg class="placeholder" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12 A7 7 0 1 1 16.5 6.6" fill="none" stroke="#3a2716" stroke-width="1.9" stroke-linecap="round"/>' +
+        '<path d="M13.5 3.2 L17.8 6.3 L13.9 9.6" fill="none" stroke="#9a3b1f" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.8" fill="#3a2716"/></svg>';
+    Sky.css(
+        '.rm-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 6px 0; }' +
+        '.rm-grid button, .rm-next, .rm-fresh { padding: 6px 4px; border-radius: 999px; border: 1px solid #3a2716; background: #f3e6c2; color: #3a2716; cursor: pointer; font: italic .95rem "IM Fell English", Georgia, serif; }' +
+        '.rm-grid button:hover, .rm-fresh:hover { background: #e6d5ae; }' +
+        '.rm-grid button.now { background: #3a2716; color: #f3e6c2; }' +
+        '.rm-next { display: block; width: 100%; margin: 6px 0 2px; padding: 9px 12px; background: #3a2716; color: #f3e6c2; font-size: 1rem; }' +
+        '.rm-next:hover { background: #9a3b1f; }' +
+        '.rm-fresh { display: block; width: 100%; margin-top: 8px; padding: 7px 12px; border-color: #9a3b1f; color: #9a3b1f; }'
+    );
+    if (LOCAL && window.davSave) Sky.panel.add({
+        id: 'resets', title: 'resets (preview only)', order: 96, icon: RICON,
+        build: function (body) {
+            var S = window.davSave, n = S.reset, grid = '';
+            for (var i = 1; i <= 8; i++) grid += '<button type="button" data-n="' + i + '"' + (i === n ? ' class="now"' : '') + '>' + (i === 8 ? '8 ?' : i) + '</button>';
+            body.innerHTML = '<p class="cp-note">only here in your preview, never on the live site. each one plays the reset as a visitor sees it, then starts again at the sea.</p>' +
+                '<button type="button" class="rm-next">the next reset</button>' +
+                '<p class="cp-note">or start one from the beginning:</p><div class="rm-grid">' + grid + '</div>' +
+                '<button type="button" class="rm-fresh">start over: a brand-new visitor</button>' +
+                '<p class="cp-note">(a brand-new visitor forgets everything: the reset, the P(Doom) record, Mel\u2019s scare, your settings.)</p>';
+            body.querySelector('.rm-next').addEventListener('click', function () { reset(); });
+            body.querySelectorAll('.rm-grid button').forEach(function (b) {
+                b.addEventListener('click', function () { var k = +b.dataset.n; reset(function () { S.goTo(k); }); });
+            });
+            body.querySelector('.rm-fresh').addEventListener('click', function () {
+                reset(wipe);
+            });
+        },
+        status: function () { return window.davSave ? 'reset ' + window.davSave.reset : ''; }
+    });
 
     Sky.panel.add({
         id: 'stay', title: 'your stay', order: 95, icon: ICON,
         build: function (body) {
-            body.innerHTML = '<p class="cp-note">this place keeps a copy of itself with you, between visits. if something looks broken, forgetting it can help.</p>' +
+            body.innerHTML = '<p class="cp-note">this place remembers you between visits: a copy of itself, and all you\u2019ve done here. forget it, and you start again from the very beginning.</p>' +
                 '<button type="button" class="stay-forget">Forget your stay… (Clear cache)</button>' +
-                '<div class="stay-sure" hidden><p class="cp-note">forget the copy and start the page again? (what you’ve done here stays.)</p>' +
-                '<button type="button" class="stay-yes">yes, forget it</button> <button type="button" class="stay-no">no</button></div>';
+                '<div class="stay-sure" hidden><p class="cp-note">forget everything? the copy, and all you’ve done here: the resets, the hearts, what you’ve found. you’ll start again from the very beginning.</p>' +
+                '<button type="button" class="stay-yes">yes, forget it all</button> <button type="button" class="stay-no">no</button></div>';
             var b = body.querySelector('.stay-forget'), sure = body.querySelector('.stay-sure');
             b.addEventListener('click', function () { b.hidden = true; sure.hidden = false; });
             body.querySelector('.stay-no').addEventListener('click', function () { sure.hidden = true; b.hidden = false; });
@@ -98,5 +153,5 @@
         status: function () { return ''; }
     });
 
-    Sky.stay = { forget: forget, reset: reset, get resets() { return window.davSave ? window.davSave.reset : 1; } };
+    Sky.stay = { forget: forget, reset: function () { reset(); }, get resets() { return window.davSave ? window.davSave.reset : 1; } };
 })();

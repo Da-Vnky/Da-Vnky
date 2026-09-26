@@ -20,7 +20,7 @@
     var KEY = 'dav-loaded', CACHE = 'dav-site';
     var ok = 'serviceWorker' in navigator && 'caches' in window && /^https?:$/.test(location.protocol);
     /* ---------------- forget your stay: the site's copy of itself in this browser, gone ----------------
-       (sky/state.js does it: the game — which reset they're in, what's theirs — stays) */
+       (sky/state.js does it; sky/forget.js forgets the game as well, everything they've done here) */
     window.davForget = function () {
         if (window.davSave) return window.davSave.clearCache();
         try { sessionStorage.clear(); localStorage.removeItem('dav-seen'); } catch (e) {}

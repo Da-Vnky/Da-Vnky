@@ -10,13 +10,16 @@
      • anything else — a bullet hole, for a while
      • a painting in a frame — it bursts into pieces, and the frame stays
        empty for the rest of the visit
+   Six shots, then it reloads (RELOAD_MS): while it does, every bullet hole
+   fades away, gone by the time it's loaded again. And the holes vanish when the
+   view changes: the telescope comes up, or you look out of a window.
    It fires 'dav:traveller-shot', 'dav:record-shot', 'dav:painting-shot' and
    'dav:shot' (anything else) on the document,
    for anything else that wants to know.
 
    slots: assets/city/revolver (the gun: on the roof, in the bag, in their hand),
           assets/ui/bullet-hole (a small transparent PNG)
-   sounds: assets/sounds/bang, shatter
+   sounds: assets/sounds/bang, shatter, reload
    ===================================================================== */
 
 (function () {
@@ -24,10 +27,12 @@
     if (!Sky || !Sky.inventory || Sky.revolver) return;
     var body = document.body, I = Sky.inventory;
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
+    var ROUNDS = 6, RELOAD_MS = 2600;                  // six in the cylinder; how long it takes to load six more
     function tell(name, detail) { try { document.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch (e) {} }
 
     Sky.css(
         '.shot-layer { position: fixed; inset: 0; z-index: 6; pointer-events: none; overflow: hidden; }' +
+        '.bullet-hole.reloading { transition: opacity ' + RELOAD_MS + 'ms linear; opacity: 0; }' +
         '.bullet-hole { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; transition: opacity 2s; }' +
         '.bullet-hole > svg, .bullet-hole > img { display: block; width: 100%; height: 100%; }' +
         '.shot-flash { position: fixed; inset: 0; z-index: 7; pointer-events: none; background: #fff6d0; opacity: 0; }' +
@@ -85,6 +90,38 @@
         }
     }
 
+    /* ---------------- six shots, then it reloads (and the holes fade as it does) ---------------- */
+    var FIRED = 'revolver-fired', reloading = false;
+    function fired() { try { return +(sessionStorage.getItem(FIRED) || 0); } catch (e) { return 0; } }
+    function setFired(n) { try { sessionStorage.setItem(FIRED, n); } catch (e) {} }
+    function clearHoles(ms) {
+        layer.querySelectorAll('.bullet-hole').forEach(function (h) {
+            if (ms) { h.style.transition = 'opacity ' + ms + 'ms linear'; void h.offsetWidth; h.style.opacity = '0'; }
+            setTimeout(function () { h.remove(); }, ms || 0);
+        });
+    }
+    function reload() {
+        reloading = true;
+        sfx('reload', { or: 'pickup' });
+        setTimeout(function () { sfx('reload-click', { or: 'tap' }); }, RELOAD_MS - 200);
+        I.say('reloading…', RELOAD_MS);
+        clearHoles(RELOAD_MS);
+        setTimeout(function () { reloading = false; setFired(0); }, RELOAD_MS);
+    }
+    // a round goes: false if it's still reloading (nothing happens)
+    function spend() {
+        if (reloading) { I.say('reloading…', 900); return false; }
+        var n = fired() + 1;
+        setFired(n);
+        if (n >= ROUNDS) setTimeout(reload, 350);
+        return true;
+    }
+    if (fired() >= ROUNDS) reload();                                // (the page changed mid-reload: finish it)
+    // the telescope comes up, or they look out of a window: the holes (on the glass, as it were) are gone
+    new MutationObserver(function () {
+        if (/\b(peep-view|peep-close|sky-view)\b/.test(body.className) && layer.firstChild) clearHoles(250);
+    }).observe(body, { attributes: true, attributeFilter: ['class'] });
+
     /* ---------------- a painting in a frame: blown to pieces, for the rest of the visit ---------------- */
     var SHOT_KEY = 'paintings-shot';
     function frameKey(f) { return location.pathname.replace(/.*\//, '') + '|' + (f.dataset.wall || '') + '|' + f.dataset.frame; }
@@ -134,7 +171,8 @@
     /* ---------------- who's the traveller on this page ---------------- */
     function traveller(t) {
         var c = t.closest && t.closest('.sea-char, .scene-character, .character');
-        if (!c || c.classList.contains('gore-hidden') || c.offsetParent === null) return null;
+        // (not offsetParent: on the rooftop the traveller is pinned to the screen, and that has none)
+        if (!c || c.classList.contains('gore-hidden') || !c.getClientRects().length) return null;
         return c;
     }
     var dying = false;
@@ -146,6 +184,9 @@
             I.say('it’s jammed.', 1600);
             return;
         }
+        if (!spend()) return;
+        // the last heart: no falling down, no getting up. the world goes straight to white (sky/lives.js)
+        if (Sky.lives && Sky.lives.last) { dying = true; bang(); Sky.lives.final(); return; }
         if (c.classList.contains('sea-char')) {                         // the homepage's traveller has a life of its own
             if (Sky.sea && Sky.sea.kill && Sky.sea.kill()) { dying = true; setTimeout(function () { dying = false; }, 4200); tell('dav:traveller-shot'); }
             return;
@@ -175,20 +216,19 @@
     I.onUse(function (id, e) {
         if (id !== 'revolver') return false;
         var x = e.clientX, y = e.clientY, t = e.target;
-        var claube = t.closest && t.closest('.mini-claube');
-        if (claube && Sky.claubes) { bang(); Sky.claubes.shoot(claube, x, y); return true; }
-        var deck = t.closest && t.closest('.turntable');
-        if (deck) { shootRecord(x, y); return true; }
         var c = traveller(t);
-        if (c) { takeIt(c); return true; }
-        var frame = t.closest && t.closest('.gallery-frame[data-frame]');
+        if (c) { takeIt(c); return true; }                              // (it counts its own round: a jam doesn't use one)
+        var claube = t.closest && t.closest('.mini-claube'), deck = t.closest && t.closest('.turntable'), frame = t.closest && t.closest('.gallery-frame[data-frame]');
+        if (!claube && !deck && !frame && t.closest && t.closest('.cp, .place-tabs, .sky-links, .marker-tray, a[href], button')) return false;   // (the controls still work)
+        if (!spend()) return true;
+        if (claube && Sky.claubes) { bang(); Sky.claubes.shoot(claube, x, y); return true; }
+        if (deck) { shootRecord(x, y); return true; }
         if (frame) { shootPainting(frame, x, y); return true; }
-        if (t.closest && t.closest('.cp, .place-tabs, .sky-links, .marker-tray, a[href], button')) return false;   // (the controls still work)
         bang();
         hole(x, y);
         tell('dav:shot', { target: t, x: x, y: y });
         return true;
     });
 
-    Sky.revolver = { bang: bang, hole: hole };
+    Sky.revolver = { bang: bang, hole: hole, get left() { return reloading ? 0 : ROUNDS - fired(); }, get reloading() { return reloading; } };
 })();

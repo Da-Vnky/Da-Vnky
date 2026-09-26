@@ -56,6 +56,8 @@ SHELVES = {
 BOOKS = 4
 for _n in range(1, BOOKS + 1):
     SHELVES['book-%d' % _n] = (os.path.join(ROOT, 'content', 'books', 'book-%d' % _n), 'png jpg jpeg webp gif svg mp4 webm')
+# the grimoire: from reset 5 on it sits on the shelf too (sky/books.js), its pages like any book's
+SHELVES['book-grimoire'] = (os.path.join(ROOT, 'content', 'books', 'grimoire'), 'png jpg jpeg webp gif svg mp4 webm')
 
 
 def book_title(which):

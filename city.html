@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>the rooftop · DaV-nky</title>
     <!-- the loading screen: fetches the whole site once per visit (sky/loader.js, sw.js) -->
-    <script src="sky/loader.js?v=20260925s"></script>
-    <script src="sky/state.js?v=20260925s"></script>
+    <script src="sky/loader.js?v=20260926e"></script>
+    <script src="sky/state.js?v=20260926e"></script>
     <link rel="canonical" href="https://dav-nky.pleroma.nexus/city.html">
     <meta property="og:title" content="the rooftop · DaV-nky">
     <meta property="og:url" content="https://dav-nky.pleroma.nexus/city.html">
@@ -16,7 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260925s">
+    <link rel="stylesheet" href="sky/sky.css?v=20260926e">
     <style>
         /* feet on the rooftop: 45% of the way up the roof strip (20vh tall, 17vh on phones) */
         .city-char { position: fixed; z-index: 3; right: 16vw; bottom: calc(max(20vh, 130px) * .45 - 2px); height: 17vh; min-height: 90px; }
@@ -25,27 +25,51 @@
         .revolver-pickup { position: fixed; z-index: 3; left: 58vw; bottom: calc(max(20vh, 130px) * .45 - 1px); width: 3.6vw; min-width: 44px; aspect-ratio: 100 / 60; transition: opacity .4s; }
         @media (max-width: 620px) { .revolver-pickup { left: 22vw; bottom: calc(max(17vh, 110px) * .45 - 1px); width: 10vw; min-width: 0; } }
         body.peep-view .revolver-pickup, body.peep-close .revolver-pickup, body.sky-view .revolver-pickup, body.leaving .revolver-pickup { opacity: 0; pointer-events: none; }
+        /* the telescope on its tripod, standing just left of the traveller (sky/peeper.js). your own: assets/city/telescope */
+        .roof-telescope { position: fixed; z-index: 3; right: calc(16vw + max(17vh, 90px) * .55); bottom: calc(max(20vh, 130px) * .45 - 2px); height: 16vh; min-height: 84px;
+            aspect-ratio: 120 / 150; padding: 0; border: 0; background: none; cursor: pointer; transition: opacity .4s, filter .2s; filter: drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
+        .roof-telescope > svg, .roof-telescope > .art { display: block; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; }
+        .roof-telescope:hover, .roof-telescope:focus-visible { outline: none; filter: drop-shadow(0 3px 3px rgba(0,0,0,.35)) drop-shadow(0 0 8px rgba(255,220,150,.8)); }
+        .roof-telescope .rt-hint { position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%); white-space: nowrap; font: italic .95rem "IM Fell English", Georgia, serif;
+            color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.8); opacity: 0; transition: opacity .2s; pointer-events: none; }
+        .roof-telescope:hover .rt-hint, .roof-telescope:focus-visible .rt-hint { opacity: 1; }
+        body.peep-view .roof-telescope, body.peep-close .roof-telescope, body.sky-view .roof-telescope, body.leaving .roof-telescope { opacity: 0; pointer-events: none; }
+        @media (max-width: 620px) { .roof-telescope { right: calc(16vw + max(14vh, 70px) * .55); bottom: calc(max(17vh, 110px) * .45 - 2px); height: 13vh; min-height: 66px; } }
     </style>
 </head>
 <body data-place="city">
 
-    <!-- the telescope (an interface button, bottom-left): look across the lit skyline.
+    <!-- the telescope, on its tripod on the roof, just left of the traveller: look across the lit skyline.
          the warm, glowing windows each hold a scene from content/city/ (one file = one window);
          click one to zoom right in. "look up at the sky" shows Polaris, the constellations and
          the day/night player.
-         a custom icon can go in assets/city/telescope.(svg|png|webp|gif) -->
-    <button class="ui-button telescope-btn" type="button" data-folder="content/city/">
-        <span class="ui-icon" data-asset="assets/city/telescope">
-            <svg class="placeholder" viewBox="0 0 32 32" aria-hidden="true" fill="currentColor">
-                <g transform="rotate(-32 16 16)">
-                    <rect x="3" y="13" width="22" height="6" rx="1.5"/>
-                    <rect x="23" y="11.5" width="6" height="9" rx="1.5"/>
-                    <rect x="1" y="14.2" width="3" height="3.6" rx=".8"/>
-                </g>
-                <path d="M15 19 L10 30 H12 L16 21 L20 30 H22 L17 19 Z"/>
-            </svg>
-        </span>
-        <span>telescope</span>
+         your own: assets/city/telescope.(svg|png|webp|gif), the telescope and its tripod standing on the roof -->
+    <button class="telescope-btn roof-telescope" type="button" data-folder="content/city/" data-asset="assets/city/telescope" aria-label="the telescope">
+        <svg class="placeholder" viewBox="0 0 120 150" aria-hidden="true">
+            <defs>
+                <linearGradient id="rt-brass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0cf82"/><stop offset=".45" stop-color="#c49a52"/><stop offset="1" stop-color="#7a5a22"/></linearGradient>
+                <linearGradient id="rt-wood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e4a30"/><stop offset=".5" stop-color="#8a5e3a"/><stop offset="1" stop-color="#5a3a24"/></linearGradient>
+            </defs>
+            <!-- the tripod -->
+            <g stroke-linecap="round">
+                <path d="M64 74 L34 148" stroke="url(#rt-wood)" stroke-width="5"/>
+                <path d="M64 74 L92 148" stroke="url(#rt-wood)" stroke-width="5"/>
+                <path d="M64 74 L66 146" stroke="#4e321e" stroke-width="4.4"/>
+                <path d="M45 120 L85 120" stroke="#4e321e" stroke-width="1.6" opacity=".7"/>
+            </g>
+            <circle cx="64" cy="74" r="6" fill="#3a2716"/>
+            <!-- the tube, aimed up over the skyline -->
+            <g transform="rotate(-24 64 66)">
+                <rect x="14" y="58" width="78" height="16" rx="3" fill="url(#rt-brass)" stroke="#5a3f14" stroke-width="1.2"/>
+                <rect x="4" y="55" width="16" height="22" rx="3" fill="url(#rt-brass)" stroke="#5a3f14" stroke-width="1.2"/>
+                <rect x="90" y="61" width="16" height="10" rx="2" fill="url(#rt-brass)" stroke="#5a3f14" stroke-width="1.2"/>
+                <rect x="104" y="62.5" width="6" height="7" rx="1.5" fill="#3a2716"/>
+                <path d="M34 58 V74 M60 58 V74" stroke="#7a5a22" stroke-width="2"/>
+                <ellipse cx="5" cy="66" rx="2.4" ry="10" fill="#1d2a3a" opacity=".85"/>
+                <path d="M22 61 H86" stroke="#fff4d0" stroke-width="1.6" opacity=".55"/>
+            </g>
+        </svg>
+        <span class="rt-hint">the telescope</span>
     </button>
 
     <!-- a revolver someone left on the roof: it goes in your bag (sky/inventory.js, sky/revolver.js) -->
@@ -57,22 +81,23 @@
          aria-label="the traveller"></div>
 
 
-    <script src="sky/sky.js?v=20260925s"></script>
-    <script src="sky/ground-city.js?v=20260925s"></script>
-    <script src="sky/peeper.js?v=20260925s"></script>
-    <script src="sky/panel.js?v=20260925s"></script>
-    <script src="sky/music.js?v=20260925s"></script>
-    <script src="sky/weather.js?v=20260925s"></script>
-    <script src="sky/noise.js?v=20260925s"></script>
-    <script src="sky/gore.js?v=20260925s"></script>
-    <script src="sky/inventory.js?v=20260925s"></script>
-    <script src="sky/loot.js?v=20260925s"></script>
-    <script src="sky/marker.js?v=20260925s"></script>
-    <script src="sky/revolver.js?v=20260925s"></script>
-    <script src="sky/claubes.js?v=20260925s"></script>
-    <script src="sky/textures.js?v=20260925s"></script>
-    <script src="sky/forget.js?v=20260925s"></script>
-    <script src="sky/lives.js?v=20260925s"></script>
-    <script src="sky/resets.js?v=20260925s"></script>
+    <script src="sky/sky.js?v=20260926e"></script>
+    <script src="sky/eye.js?v=20260926e"></script>
+    <script src="sky/ground-city.js?v=20260926e"></script>
+    <script src="sky/peeper.js?v=20260926e"></script>
+    <script src="sky/panel.js?v=20260926e"></script>
+    <script src="sky/music.js?v=20260926e"></script>
+    <script src="sky/weather.js?v=20260926e"></script>
+    <script src="sky/noise.js?v=20260926e"></script>
+    <script src="sky/gore.js?v=20260926e"></script>
+    <script src="sky/inventory.js?v=20260926e"></script>
+    <script src="sky/loot.js?v=20260926e"></script>
+    <script src="sky/marker.js?v=20260926e"></script>
+    <script src="sky/revolver.js?v=20260926e"></script>
+    <script src="sky/claubes.js?v=20260926e"></script>
+    <script src="sky/textures.js?v=20260926e"></script>
+    <script src="sky/forget.js?v=20260926e"></script>
+    <script src="sky/lives.js?v=20260926e"></script>
+    <script src="sky/resets.js?v=20260926e"></script>
 </body>
 </html>

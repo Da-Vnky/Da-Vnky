@@ -76,9 +76,30 @@
      "slots": [
       {
        "slot": "assets/sky/sun",
-       "what": "the sun. its -glow twin is the setting sun, fading in through sunset",
+       "what": "the ordinary sun, in resets 1 and 2 (and any reset before the eye). its -glow twin is the setting sun, fading in through sunset",
        "size": "400 x 400, centred",
        "glow": true
+      },
+      {
+       "slot": "assets/sky/sun-eyeball",
+       "what": "the eye that takes the sun's place from reset 3 on (sky/eye.js). a GIF can blink: the site plays its frames itself, in step with the pupil. paint no pupil on it",
+       "size": "400 x 400, the eye in the middle (shown about 480 px wide)"
+      },
+      {
+       "slot": "assets/sky/sun-pupil",
+       "what": "the eye's pupil on its own, cropped close: it follows the visitor's pointer, and hides in step with the blink (a drawn pupil stands in until then)",
+       "size": "square, see-through, about a third of the eye's width"
+      },
+      {
+       "slot": "assets/sky/sun-eyelids",
+       "what": "optional: a GIF with the same frames as the eyeball, only the eyelids (and whatever should cover the pupil as it blinks), see-through everywhere else. laid over the pupil so the lids really close over it",
+       "size": "400 x 400, the same frames and timing as sun-eyeball",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/rope",
+       "what": "the rope the sky's props hang from in resets 1 and 2: a short piece hanging straight down, that repeats along its length",
+       "size": "e.g. 20 x 80 (drawn 5 px wide on the page, so thin detail is lost), see-through at the sides"
       },
       {
        "slot": "assets/sky/moon",
@@ -139,11 +160,6 @@
        "slot": "assets/sky/ursa-minor",
        "what": "the Little Dipper under Polaris: light stars on see-through",
        "size": "240 x 228 (or 960 x 912)"
-      },
-      {
-       "slot": "assets/sky/sun-pupil",
-       "what": "the sun's pupil, which follows the visitor's pointer (just the pupil, cropped close; take it out of the sun picture itself)",
-       "size": "about a quarter of the sun's width, see-through"
       }
      ]
     },
@@ -881,8 +897,8 @@
       },
       {
        "slot": "assets/city/telescope",
-       "what": "the icon on the telescope button",
-       "size": "128 x 128"
+       "what": "the telescope on its tripod, standing on the roof just left of the traveller: click it to look across the skyline",
+       "size": "about 480 x 600, standing on the bottom edge, see-through"
       },
       {
        "slot": "assets/city/cat",
@@ -1073,6 +1089,11 @@
        "what": "an open book’s pages, behind each page when one of the shelf’s books is opened (stretched to fit)",
        "size": "about 3:4",
        "optional": true
+      },
+      {
+       "slot": "assets/living/shelf-grimoire",
+       "what": "the grimoire's spine on the bookshelf (from reset 5 on)",
+       "size": "a book's spine, like shelf-book"
       }
      ]
     },
@@ -1276,7 +1297,7 @@
       },
       {
        "slot": "assets/living/hall-lamp",
-       "what": "the hanging lamp",
+       "what": "the hanging lamp under the hatch (reset 4 only: pull it down and it comes away)",
        "size": "50:150"
       },
       {
@@ -1293,6 +1314,113 @@
        "slot": "assets/characters/hallway",
        "what": "the traveller in the hallway",
        "size": "240–480 px tall"
+      },
+      {
+       "slot": "assets/living/hall-hatch",
+       "what": "the hatch in the hallway ceiling, shut (dims once it’s open, unless you add hall-hatch-open)",
+       "size": "about 600 x 150, stretched to fit"
+      },
+      {
+       "slot": "assets/living/hall-light",
+       "what": "the two small hanging lights either side of the cord (any reset but 4); swing to music",
+       "size": "about 40:110, hangs from its top"
+      },
+      {
+       "slot": "assets/living/hall-cord",
+       "what": "the pull cord hanging from the hatch, any reset but 4 (pull it: the hatch opens); swings to music",
+       "size": "long and thin, about 1:10, hangs from its top"
+      },
+      {
+       "slot": "assets/living/hall-hatch-open",
+       "what": "the hatch, open (a dark square up into the attic)",
+       "size": "about 600 x 150, stretched to fit"
+      },
+      {
+       "slot": "assets/living/attic-ladder",
+       "what": "the ladder that slides down from the hatch once it’s open (click it to climb)",
+       "size": "tall and thin, e.g. 120 x 900, stretched to fit"
+      },
+      {
+       "slot": "assets/living/hall-lamp-broken",
+       "what": "what's left of the hallway lamp on the floor, once it's been pulled down",
+       "size": "about 480 x 120, see-through"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "attic",
+   "name": "the attic",
+   "page": "living.html#attic",
+   "groups": [
+    {
+     "name": "the attic (up the ladder from the hallway, once its lamp is pulled down)",
+     "slots": [
+      {
+       "slot": "assets/living/attic-wall",
+       "what": "the whole attic behind everything: sloping roof, rafters",
+       "size": "1920 x 1080, cropped at the sides"
+      },
+      {
+       "slot": "assets/living/attic-floor",
+       "what": "the floorboards along the bottom",
+       "size": "1920 x 130, stretched"
+      },
+      {
+       "slot": "assets/living/attic-window",
+       "what": "the little round window, moonlight coming in",
+       "size": "about 300 x 300, see-through"
+      },
+      {
+       "slot": "assets/living/attic-clutter",
+       "what": "the junk on the left: trunk, boxes, a sheet over something",
+       "size": "about 1200 x 480, see-through, standing on the bottom edge"
+      },
+      {
+       "slot": "assets/living/attic-lectern",
+       "what": "the lectern the grimoire lies on",
+       "size": "about 320 x 600, see-through"
+      },
+      {
+       "slot": "assets/living/attic-hole",
+       "what": "the square hole in the floor, bottom right, the way back down (the ladder's top showing)",
+       "size": "about 640 x 320, stretched"
+      },
+      {
+       "slot": "assets/characters/attic",
+       "what": "the traveller up here (and attic-walking)",
+       "size": "like the other scenes' traveller"
+      }
+     ]
+    },
+    {
+     "name": "the grimoire (reset 4: the pact)",
+     "slots": [
+      {
+       "slot": "assets/living/grimoire",
+       "what": "the black book, shut, on the lectern (it also floats up in front of the traveller when the pact is made)",
+       "size": "about 720 x 320, see-through"
+      },
+      {
+       "slot": "assets/living/grimoire-open",
+       "what": "the open book: both pages and its cover edges, behind everything on them",
+       "size": "about 1460 x 1000"
+      },
+      {
+       "slot": "assets/living/grimoire-ritual",
+       "what": "the ritual, on the left page (it replaces the stand-in words and sigil)",
+       "size": "about 680 x 920, see-through"
+      },
+      {
+       "slot": "assets/living/pact-hand",
+       "what": "one of the hands that come up through the floor and drag the traveller down",
+       "size": "about 250 x 550, the wrist at the bottom, see-through"
+      },
+      {
+       "slot": "assets/ui/cursor-blood",
+       "what": "the pointer while signing in blood (a pricked fingertip): its tip at 19, 7",
+       "size": "32 x 32"
       }
      ]
     }
@@ -1336,9 +1464,9 @@
        "size": "1:3"
       },
       {
-       "slot": "assets/living/dungeon-pentagram",
-       "what": "the blood pentagram on the floor, seen at a slant (see-through, stretched to fit)",
-       "size": "e.g. 1200 x 320"
+       "slot": "assets/living/dungeon-diagram",
+       "what": "the Ophite diagram in blood on the floor: draw it from straight above, square; it’s squashed onto the floor. the seven Claubes stand on its seven circles (template: assets/templates/ophite-diagram-template.svg)",
+       "size": "square, e.g. 1000 x 1000, see-through"
       },
       {
        "slot": "assets/living/dungeon-paper",
@@ -1659,6 +1787,11 @@
        "slot": "assets/sounds/tub-drain",
        "what": "the bath draining down the plughole, looped",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/grimoire",
+       "what": "the grimoire open (the attic one, and the one on the shelf): looped, low and wrong",
+       "kind": "sound"
       }
      ]
     },
@@ -1916,6 +2049,91 @@
       {
        "slot": "assets/sounds/fall-wind",
        "what": "the rush of air off the roof's edge (reset 2)"
+      },
+      {
+       "slot": "assets/sounds/reload",
+       "what": "the revolver reloading, after six shots (about 2.5 s)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/reload-click",
+       "what": "the cylinder snapping shut at the end of the reload",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/key-drop",
+       "what": "a small key dropping to the floor",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/rumble",
+       "what": "the whole house rumbling, when all seven Claubes are dead (about 2 s)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/absorb",
+       "what": "a bullet taken by the diagram in the dungeon",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/ricochet",
+       "what": "the sixth bullet, coming back",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/cord",
+       "what": "the hatch cord being pulled (a short tug and click)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/hatch",
+       "what": "the attic hatch swinging open",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/lamp-creak",
+       "what": "the hallway lamp straining on its cable as it is pulled",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/lamp-snap",
+       "what": "the lamp coming away from the ceiling",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/glass",
+       "what": "the lamp smashing on the floor",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/ladder",
+       "what": "the attic ladder sliding down",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/quill",
+       "what": "signing the grimoire in blood (short, played as you draw)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/grimoire-open",
+       "what": "the grimoire opening: something horrible (every time; quieter once its pact is made)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/book-slam",
+       "what": "the grimoire slamming shut",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/pact",
+       "what": "the terrible sound when the pact is made",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/hands",
+       "what": "the hands breaking up through the floorboards",
+       "kind": "sound"
       }
      ]
     }

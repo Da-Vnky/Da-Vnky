@@ -382,5 +382,22 @@
         document.dispatchEvent(new CustomEvent('dav:traveller-died'));     // (every death ends here: sky/lives.js counts them)
     }
 
-    Sky.gore = { splat: splat, zap: zap, shot: shot, stab: stab, respawn: respawn, scream: function () { sfx('scream'); } };
+    /* ---------------- waking up on the floor, and getting up ----------------
+       (after a death that sends them somewhere else: they come to lying flat, then push themselves up) */
+    Sky.css(
+        '.character.lying, .scene-character.lying { rotate: -86deg; translate: 0 -14%; transform-origin: 50% 100%; }' +
+        '.character.getting-up, .scene-character.getting-up { transform-origin: 50% 100%; animation: gore-get-up 1.9s cubic-bezier(.4,0,.3,1) both; }' +
+        '@keyframes gore-get-up { 0% { rotate: -86deg; translate: 0 -14%; } 22% { rotate: -86deg; translate: 0 -14%; } 34% { rotate: -74deg; translate: 0 -12%; }' +
+            '46% { rotate: -78deg; translate: 0 -12%; } 66% { rotate: -32deg; translate: 0 -4%; } 82% { rotate: 7deg; translate: 0 0; } 92% { rotate: -3deg; } 100% { rotate: 0deg; translate: 0 0; } }' +
+        '@media (prefers-reduced-motion: reduce) { .character.getting-up, .scene-character.getting-up { animation-duration: .01s; } }'
+    );
+    function lieDown(el) { el.classList.remove('getting-up', 'walking', 'talking'); el.classList.add('lying'); }
+    function getUp(el, done) {
+        el.classList.remove('lying');
+        el.classList.add('getting-up');
+        setTimeout(function () { sfx('step', { size: 0.4 }); }, 700);
+        setTimeout(function () { el.classList.remove('getting-up'); if (done) done(); }, 1950);
+    }
+
+    Sky.gore = { splat: splat, zap: zap, shot: shot, stab: stab, respawn: respawn, scream: function () { sfx('scream'); }, lieDown: lieDown, getUp: getUp };
 })();

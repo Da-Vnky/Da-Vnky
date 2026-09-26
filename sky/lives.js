@@ -97,7 +97,9 @@
     // but only once the lock's off (this reset's hidden key): until then they're safe
     function unlocked() { return get('lives-unlocked') === '1'; }
     document.addEventListener('dav:traveller-died', function () { if (shown() && unlocked()) lose(300); });
+    var resetting = false;
     function lose(after) {
+        if (resetting) return;
         var n = left() - 1;
         put('lives-left', Math.max(0, n));
         setTimeout(function () {
@@ -105,6 +107,7 @@
             sfx('life-lost', { or: 'crack' });
             if (n > 0) { say(n === 1 ? 'one life left.' : n + ' lives left.'); return; }
             // the last one: everything goes
+            resetting = true;
             say('no lives left.');
             setTimeout(function () {                                   // and on to the next reset (sky/state.js, sky/forget.js)
                 if (Sky.stay && Sky.stay.reset) Sky.stay.reset();
@@ -128,6 +131,16 @@
         },
         // the revolver only fires on the last heart (once the lock's off: until then it's a free death)
         get jammed() { return shown() && unlocked() && left() > 1; },
+        // on the last heart, the revolver doesn't kill them: it ends the reset, there and then
+        get last() { return shown() && unlocked() && left() === 1; },
+        final: function () {
+            if (resetting) return;
+            resetting = true;
+            put('lives-left', 0);
+            draw(0);
+            if (Sky.stay && Sky.stay.reset) Sky.stay.reset();
+            else if (window.davSave) { window.davSave.nextReset(); location.reload(); }
+        },
         give: function (k) { put('lives-left', Math.min(MAX, left() + (k || 1))); draw(); }
     };
 })();

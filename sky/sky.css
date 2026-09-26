@@ -995,19 +995,55 @@ body:not([data-page=home]):not(.sky-view) .polaris { opacity: 0 !important; visi
    on the left (coming up), they're flipped to match (sky.js adds .mirror) */
 .skybox.mirror > [data-sky=golden], .skybox.mirror > [data-sky=sunset], .skybox.mirror > [data-sky=dusk] { transform: scaleX(-1); }
 
-/* ================= props on strings: the sky's a stage set (resets 1 and 2 only: sky/state.js) ================= */
+/* ================= props on ropes: the sky's a stage set (resets 1 and 2 only: sky/state.js) =================
+   each prop hangs on a rope from the flies: the rope runs down behind it and ends out of sight behind its
+   middle (so it's never seen stopping short in mid-air). your own rope: assets/sky/rope, a short piece
+   hanging straight down that repeats along its length (sky.js sets --rope-art). and, like any flat prop in
+   front of a painted backdrop, each one throws a shadow onto the sky behind it, lit from the front and above. */
+:root { --stage-shadow: 14px 19px 7px rgba(22, 13, 5, calc(.46 - .16 * var(--dusk, 0))); --rope-w: 5px; }
+@media (max-width: 620px) { :root { --stage-shadow: 8px 11px 5px rgba(22, 13, 5, calc(.34 - .14 * var(--dusk, 0))); --rope-w: 3.5px; } }
 html.stage-strings .sun::before, html.stage-strings .moon::before,
 html.stage-strings .cloud::before, html.stage-strings .cloud::after,
 html.stage-strings .flyer-blimp::before, html.stage-strings .flyer-blimp::after,
 html.stage-strings .flyer-balloon::before, html.stage-strings .flyer-birds::before {
-    content: ""; position: absolute; z-index: -1; left: 50%; bottom: 88%; width: 1.5px; height: 300vh; margin-left: -.75px; pointer-events: none;
-    background: linear-gradient(to top, rgba(52,40,28,.75), rgba(52,40,28,.5) 30%, rgba(52,40,28,.4));
-    box-shadow: 0 0 1.5px rgba(255,248,230, calc(.25 + .45 * var(--dusk, 0)));
+    content: ""; position: absolute; z-index: -1; left: 50%; bottom: 50%; width: var(--rope-w); height: 300vh; margin-left: calc(var(--rope-w) / -2); pointer-events: none;
+    /* the drawn rope: twisted strands, rounded by the light */
+    background:
+        linear-gradient(90deg, rgba(0,0,0,.38), rgba(0,0,0,0) 38%, rgba(255,236,200,.22) 52%, rgba(0,0,0,.42)),
+        repeating-linear-gradient(-58deg, #5b4229 0 1.6px, #8d6c45 1.6px 3.6px, #6e5234 3.6px 5.2px);
+    box-shadow: var(--stage-shadow);
+    filter: brightness(calc(1 - .45 * var(--dusk, 0)));
 }
-html.stage-strings .moon::before { bottom: 92%; left: 38%; }
-html.stage-strings .cloud::before { left: 28%; bottom: 62%; }
-html.stage-strings .cloud::after { left: 72%; bottom: 58%; }
-html.stage-strings .flyer-blimp::before { left: 30%; bottom: 80%; }
-html.stage-strings .flyer-blimp::after { left: 70%; bottom: 80%; }
-html.stage-strings .flyer-balloon::before { bottom: 96%; }
-html.stage-strings .flyer-birds::before { bottom: 60%; }
+html.stage-strings.has-rope-art .sun::before, html.stage-strings.has-rope-art .moon::before,
+html.stage-strings.has-rope-art .cloud::before, html.stage-strings.has-rope-art .cloud::after,
+html.stage-strings.has-rope-art .flyer-blimp::before, html.stage-strings.has-rope-art .flyer-blimp::after,
+html.stage-strings.has-rope-art .flyer-balloon::before, html.stage-strings.has-rope-art .flyer-birds::before {
+    background: var(--rope-art) center bottom / 100% auto repeat-y;
+}
+/* where each rope ties on (its bottom end, tucked behind the prop) */
+html.stage-strings .moon::before { left: 20%; }                 /* (onto the crescent itself, not the empty middle) */
+html.stage-strings .cloud::before { left: 30%; bottom: 40%; }
+html.stage-strings .cloud::after { left: 70%; bottom: 40%; }
+html.stage-strings .flyer-blimp::before { left: 32%; bottom: 60%; }
+html.stage-strings .flyer-blimp::after { left: 68%; bottom: 60%; }
+html.stage-strings .flyer-balloon::before { bottom: 62%; }
+html.stage-strings .flyer-birds::before { bottom: 55%; }
+/* the shadows the props throw on the backdrop (the flyers already have a filter of their own: it's added to) */
+html.stage-strings :is(.sun, .moon, .cloud) > :is(.art:not(.glow-layer), .placeholder) { filter: drop-shadow(var(--stage-shadow)); }
+/* with your picture (and its -glow twin fading in over it at dusk), the shadow's cast by the prop as a whole: one shadow
+   of whatever's showing, rope and all, so it can't flicker between the two pictures as they play (a GIF each) */
+html.stage-strings :is(.sun, .moon, .cloud).has-art { filter: drop-shadow(var(--stage-shadow)); }
+html.stage-strings :is(.sun, .moon, .cloud).has-art > .art { filter: none; }
+html.stage-strings :is(.sun, .moon, .cloud).has-art::before,
+html.stage-strings :is(.sun, .moon, .cloud).has-art::after { box-shadow: none; }
+html.stage-strings :is(.flyer-blimp, .flyer-balloon, .flyer-birds) { filter: brightness(calc(1 - .55 * var(--dusk))) drop-shadow(var(--stage-shadow)); }
+html.stage-strings :is(.flyer-blimp, .flyer-balloon, .flyer-birds)::before,
+html.stage-strings :is(.flyer-blimp, .flyer-balloon, .flyer-birds)::after { box-shadow: none; }      /* (their shadow comes with the rest of them) */
+
+/* ================= a picture, not a page of text =================
+   a double-click or a drag doesn't highlight things like text (or bring up the browser's little
+   pop-up menu for the "selected text"), and pictures don't come loose to be dragged about.
+   anywhere you type still works as usual. */
+html { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input, textarea, select, [contenteditable]:not([contenteditable=false]), [contenteditable]:not([contenteditable=false]) * { -webkit-user-select: text; user-select: text; }
+img, svg, a { -webkit-user-drag: none; }

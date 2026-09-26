@@ -5,7 +5,8 @@
    From the telescope you can also look up at the sky (Polaris, the
    constellations and the day/night player).
 
-       <button class="ui-button telescope-btn" data-folder="content/city/"> … </button>
+       <button class="telescope-btn" data-folder="content/city/"> … </button>   (on the rooftop it's the telescope
+                                                                                 standing on the roof: city.html)
        <script src="sky/peeper.js"></script>     (after sky/sky.js and sky/ground-city.js)
 
    Click a window on the skyline (telescope down) and it comes up already aimed at

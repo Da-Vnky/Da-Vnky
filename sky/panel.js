@@ -173,6 +173,36 @@
                 }
             };
         },
+        // the grimoire, open: a low, wrong chord that breathes, a draught through the pages, and now and then
+        // something like a whisper, or a heartbeat (your own: assets/sounds/grimoire, loops)
+        grimoire: function (out) {
+            [[41.2, 'sawtooth', 0.05], [58.3, 'sawtooth', 0.04], [61.7, 'triangle', 0.06], [87.3, 'sine', 0.05]].forEach(function (v, i) {
+                var o = ctx.createOscillator(), g = gain(v[2]), lf = ctx.createOscillator(), lg = gain(v[2] * 0.9);
+                o.type = v[1]; o.frequency.value = v[0]; o.detune.value = (i - 1.5) * 7;
+                lf.frequency.value = 0.05 + i * 0.037; lf.connect(lg); lg.connect(g.gain);
+                chain(o, filter('lowpass', 320, 2), g, out);
+                o.start(); lf.start();
+            });
+            var br = gain(0.0), blf = ctx.createOscillator(), blg = gain(0.22);
+            blf.frequency.value = 0.11; blf.connect(blg); blg.connect(br.gain);
+            chain(loop('pink', 5), filter('bandpass', 700, 0.7), br, out); blf.start();
+            return function (level) {
+                if (level < 0.02 || !ctx) return;
+                var t0 = ctx.currentTime;
+                if (Math.random() < 0.28) {                              // a whisper: a breath of hiss, shaped like a word
+                    var n = ctx.createBufferSource(), g = gain(0), f = filter('bandpass', 1400 + Math.random() * 1800, 5);
+                    n.buffer = noiseBuf('white', 2); chain(n, f, g, out);
+                    var t = t0 + Math.random() * 0.8, len = 0.35 + Math.random() * 0.6;
+                    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.09 * level, t + len * 0.3); g.gain.linearRampToValueAtTime(0, t + len);
+                    f.frequency.setValueAtTime(1200 + Math.random() * 2400, t); f.frequency.linearRampToValueAtTime(900 + Math.random() * 2000, t + len);
+                    n.start(t); n.stop(t + len + 0.05);
+                }
+                if (Math.random() < 0.12) {                              // a heartbeat, far off
+                    tone(out, t0 + 0.2, 'sine', 62, 38, 0.18, 0.22 * level);
+                    tone(out, t0 + 0.5, 'sine', 58, 36, 0.2, 0.16 * level);
+                }
+            };
+        },
         storm: function (out, ch) {
             chain(loop('white', 3), filter('highpass', 350), filter('lowpass', 5200), gain(0.7), out);
             chain(loop('brown', 5), filter('lowpass', 420), gain(1.0), out);
@@ -508,6 +538,24 @@
             noiseHit(out, t, 0.9, 'highpass', 1200, 0, 0.6, 0.005);
             tone(out, t, 'sine', 80, 30, 0.8, 1);
         },
+        'dread': function (out, t) {                                   // the grimoire opening: a deep boom, a rushing breath in, and a chord that's all wrong (about 3 s)
+            tone(out, t, 'sine', 55, 26, 2.2, 1);                                   // the boom
+            tone(out, t, 'triangle', 110, 50, 0.9, 0.35);
+            var n = ctx.createBufferSource(); n.buffer = noiseBuf('white', 3);      // a breath, drawn in backwards
+            var f = filter('bandpass', 500, 0.8), g = gain(0);
+            chain(n, f, g, out);
+            g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5, t + 0.9); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.05);
+            f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(2600, t + 0.95);
+            n.start(t, Math.random() * 2); n.stop(t + 1.2);
+            [[73.4, 0.14], [77.8, 0.14], [110, 0.1], [155.6, 0.09], [233, 0.05], [311, 0.035]].forEach(function (h) {   // the chord
+                var o = ctx.createOscillator(), og = gain(0);
+                o.type = 'sawtooth'; o.frequency.setValueAtTime(h[0], t + 0.95); o.frequency.linearRampToValueAtTime(h[0] * 0.97, t + 3.2);
+                chain(o, filter('lowpass', 900, 1.5), og, out);
+                og.gain.setValueAtTime(0.0001, t + 0.95); og.gain.exponentialRampToValueAtTime(h[1], t + 1.0); og.gain.exponentialRampToValueAtTime(0.0001, t + 3.3);
+                o.start(t + 0.95); o.stop(t + 3.4);
+            });
+            noiseHit(out, t + 0.95, 1.4, 'highpass', 3000, 0, 0.12, 0.004);         // and a hiss, like a whisper
+        },
         'typing': function (out, t) {                                  // fingers on a mechanical keyboard, a couple of seconds
             var at = t;
             for (var i = 0; i < 18; i++) {
@@ -652,15 +700,28 @@
         g.gain.linearRampToValueAtTime(0.0001, t + len + 0.05);
         n.start(t, Math.random() * 2); n.stop(t + len + 0.1);
     }
+    var looking = {};
     function sfx(name, opts) {
         opts = opts || {};
         if (sfxVol <= 0) return;
+        // a name not looked for yet (the ones above are looked for as the page opens): is there a recording of yours?
+        if (!(name in sfxFiles) && Sky.findAsset) {
+            if (looking[name]) { looking[name].push(opts); return; }
+            looking[name] = [opts];
+            Sky.findAsset('assets/sounds/' + name + '.mp3|assets/sounds/' + name + '.ogg', function (url) {
+                sfxFiles[name] = url || null;
+                var q = looking[name]; delete looking[name];
+                q.forEach(function (o) { sfx(name, o); });
+            });
+            return;
+        }
         if (!sfxFiles[name] && !SFX[name] && opts.or) { name = opts.or; }   // (a sound of yours, or a stand-in until then)
         var size = opts.size, delay = opts.delay || 0;
+        var vol = sfxVol * (opts.volume === undefined ? 1 : Math.max(0, Math.min(1, opts.volume)));   // (volume: a share of the usual loudness)
         if (sfxFiles[name]) {                                          // your recording
             setTimeout(function () {
                 var a = new Audio(sfxFiles[name]);
-                a.volume = sfxVol;
+                a.volume = vol;
                 if (name === 'splash' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = 1.3 - 0.55 * size; }
                 if (name === 'angry' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = 0.9 + 0.45 * size; }
                 a.play().catch(function () {});
@@ -669,7 +730,7 @@
         }
         if (!SFX[name] || !ac()) return;
         var play = function () {
-            var out = gain(sfxVol);
+            var out = gain(vol);
             out.connect(master);
             SFX[name](out, ctx.currentTime + delay + 0.01, size);
         };

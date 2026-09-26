@@ -239,7 +239,11 @@
          assets/sky/skybox-night    midnight
        or just one, assets/sky/skybox: it's tinted toward evening and night by itself.
        wide pictures (1920 x 1080 or bigger) that can be cropped at the sides; horizon low. */
-    var SKYBOX = [['day', 0], ['golden', 0.33], ['sunset', 0.45], ['dusk', 0.62], ['night', 0.9]];
+    var SKYBOX = [['day', 0], ['golden', 0.33], ['sunset', 0.5], ['dusk', 0.6], ['night', 0.9]];
+    // where each picture is at its fullest, on the sky's time (0 = noon, 0.5 = sunset, 1 = midnight). two numbers:
+    // it holds between them. on the visitor's real clock: day until an hour and 20 minutes before sunset, golden
+    // hour for the last hour before it, the sunset picture at sunset, dusk half an hour after (sunClock below)
+    var SKY_AT = { day: [0, 0.29], golden: [0.33, 0.42], sunset: [0.5], dusk: [0.6], night: [0.9] };
     var skybox = document.createElement('div');
     skybox.className = 'skybox';
     skybox.innerHTML = SKYBOX.map(function (k) { return '<div data-sky="' + k[0] + '"></div>'; }).join('') + '<div data-sky="one"></div><div class="skybox-tint"></div>';
@@ -250,7 +254,7 @@
             if (!url) return;
             var el = skybox.querySelector('[data-sky="' + k[0] + '"]');
             el.style.backgroundImage = 'url("' + new URL(url, location.href).href + '")';
-            skyLayers.push({ el: el, at: k[1] });
+            SKY_AT[k[0]].forEach(function (at) { skyLayers.push({ el: el, at: at }); });
             skyLayers.sort(function (a, b) { return a.at - b.at; });
             body.classList.add('has-skybox');
             kick();
@@ -270,7 +274,7 @@
             for (i = skyLayers.length - 1; i >= 0; i--) if (skyLayers[i].at >= p) hi = skyLayers[i];
             skyLayers.forEach(function (L) { L.el.style.opacity = 0; });
             lo.el.style.opacity = 1;
-            if (hi && hi !== lo) hi.el.style.opacity = smooth(clamp((p - lo.at) / (hi.at - lo.at))).toFixed(3);
+            if (hi && hi !== lo && hi.el !== lo.el) hi.el.style.opacity = smooth(clamp((p - lo.at) / (hi.at - lo.at))).toFixed(3);
             skybox.querySelector('.skybox-tint').style.opacity = 0;
         } else if (skyOne) {                                          // one picture, tinted as the day goes
             skyOne.style.opacity = 1;
@@ -509,8 +513,81 @@
     // the visitor's clock: angle 0 = noon, π/2 = 6pm (setting, right), π = midnight, 3π/2 = 6am (rising, left)
     var clockMode = still && CLOCK && !body.hasAttribute('data-time');
     function clockTheta() {
-        var d = new Date(), h = d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600;
+        var t = sunClock(new Date());
+        if (t) return t;
+        var d = new Date(), h = d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600;   // (the sun's times unknown: noon and midnight on the clock)
         return ((h - 12) / 24 * 2 * Math.PI + 2 * Math.PI) % (2 * Math.PI);
+    }
+
+    /* ---------------- the real sun, where the visitor is ----------------
+       sunrise and sunset worked out for today (no asking anyone: it's the same sums an almanac does),
+       from where the visitor is: the place the weather found from their time zone ("America/Phoenix" →
+       Phoenix), or their exact spot if they gave it; until then, a guess from their clock's offset.
+       the sky's time then follows the real sun:
+         the first hour after sunrise and the last hour before sunset: golden hour
+         sunrise / sunset themselves: the sunset sky (mirrored in the morning)
+         half an hour either side: dusk (dawn), and night an hour and 40 minutes out */
+    var RAD = Math.PI / 180;
+    function sunTimes(date, lat, lon) {
+        var J1970 = 2440588, J2000 = 2451545, E = RAD * 23.4397, J0 = 0.0009;
+        var toDays = function (d) { return d.valueOf() / 864e5 - 0.5 + J1970 - J2000; };
+        var fromJ = function (j) { return new Date((j + 0.5 - J1970) * 864e5); };
+        var lw = RAD * -lon, phi = RAD * lat, d = toDays(date);
+        var n = Math.round(d - J0 - lw / (2 * Math.PI)), ds = J0 + lw / (2 * Math.PI) + n;
+        var M = RAD * (357.5291 + 0.98560028 * ds);
+        var L = M + RAD * (1.9148 * Math.sin(M) + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M)) + RAD * 102.9372 + Math.PI;
+        var dec = Math.asin(Math.sin(E) * Math.sin(L));
+        var noon = J2000 + ds + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
+        var w = Math.acos((Math.sin(RAD * -0.833) - Math.sin(phi) * Math.sin(dec)) / (Math.cos(phi) * Math.cos(dec)));
+        var out = { noon: fromJ(noon) };
+        if (isNaN(w)) return out;                                               // (the midnight sun, or the polar night)
+        var set = J2000 + J0 + (w + lw) / (2 * Math.PI) + n + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
+        out.set = fromJ(set); out.rise = fromJ(noon - (set - noon));
+        return out;
+    }
+    var PLACE_KEY = 'weather-place';                                           // (sky/weather.js keeps it too)
+    function visitorPlace() {
+        try { var pl = JSON.parse(localStorage.getItem(PLACE_KEY) || 'null'); if (pl && isFinite(pl.lat) && isFinite(pl.lon)) return pl; } catch (e) {}
+        return null;
+    }
+    var looking = false;
+    function findPlace() {                                                     // once: the city their time zone names
+        if (looking || visitorPlace()) return;
+        looking = true;
+        var zone = '';
+        try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+        if (!zone || /^(UTC|GMT|Etc\/)/.test(zone)) return;
+        fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name=' + encodeURIComponent(zone.split('/').pop().replace(/_/g, ' ')))
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (j) {
+                var r = j && j.results && j.results[0];
+                if (!r || visitorPlace()) return;
+                try { localStorage.setItem(PLACE_KEY, JSON.stringify({ lat: +(+r.latitude).toFixed(2), lon: +(+r.longitude).toFixed(2), name: r.name, zone: zone, exact: false, t: Date.now() })); } catch (e) {}
+                if (clockMode) followClock();
+            }, function () {});
+    }
+    var sunCache = { day: '', t: null };
+    function sunClock(now) {
+        var pl = visitorPlace();
+        if (!pl) findPlace();
+        var lat = pl ? pl.lat : 35, lon = pl ? pl.lon : -now.getTimezoneOffset() / 4;   // (a guess: 15° of longitude per hour of offset)
+        var key = now.toDateString() + '|' + lat + '|' + lon;
+        if (sunCache.day !== key) {
+            var mid = new Date(now); mid.setHours(12, 0, 0, 0);
+            sunCache = { day: key, t: sunTimes(mid, lat, lon) };
+        }
+        var st = sunCache.t;
+        if (!st.rise || !st.set) return null;
+        var H = 36e5, M = 6e4, t = now.valueOf(), N = st.noon.valueOf(), R = st.rise.valueOf(), S = st.set.valueOf();
+        var evening = t >= N && t < N + 12 * H;
+        var at = evening
+            ? [[N, 0], [S - 80 * M, 0.29], [S - 60 * M, 0.33], [S - 10 * M, 0.42], [S, 0.5], [S + 30 * M, 0.6], [S + 100 * M, 0.9], [N + 12 * H, 1]]
+            : [[N - 12 * H, 1], [R - 100 * M, 0.9], [R - 30 * M, 0.6], [R, 0.5], [R + 10 * M, 0.42], [R + 60 * M, 0.33], [R + 80 * M, 0.29], [N, 0]];
+        if (!evening && t >= N + 12 * H) at = at.map(function (a) { return [a[0] + 24 * H, a[1]]; });   // (after solar midnight: tomorrow's morning)
+        at = at.filter(function (a, i) { return i === 0 || a[0] > at[i - 1][0]; });   // (in a very long or short day, anything out of order is skipped)
+        var p = at[at.length - 1][1];
+        for (var i = 1; i < at.length; i++) if (t < at[i][0]) { var a = at[i - 1], b = at[i]; p = a[1] + (b[1] - a[1]) * Math.max(0, (t - a[0]) / (b[0] - a[0])); break; }
+        return evening ? p * Math.PI : 2 * Math.PI - p * Math.PI;
     }
     if (still) body.classList.add('still-time');
     var voyage = document.createElement('div');
@@ -632,10 +709,10 @@
     function timeName(p, theta) {
         var rising = theta !== null && theta !== undefined && ((theta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) > Math.PI;
         if (rising) {
-            return p < .18 ? 'midday' : p < .3 ? 'morning' : p < .42 ? 'sunrise' : p < .6 ? 'dawn'
+            return p < .18 ? 'midday' : p < .29 ? 'morning' : p < .45 ? 'golden hour' : p < .56 ? 'sunrise' : p < .64 ? 'dawn'
                  : p < .8 ? 'first light' : p < .95 ? 'small hours' : 'midnight';
         }
-        return p < .18 ? 'midday' : p < .3 ? 'afternoon' : p < .38 ? 'golden hour' : p < .5 ? 'sunset'
+        return p < .18 ? 'midday' : p < .29 ? 'afternoon' : p < .45 ? 'golden hour' : p < .56 ? 'sunset'
              : p < .64 ? 'dusk' : p < .82 ? 'twilight' : p < .95 ? 'night' : 'midnight';
     }
 
@@ -874,7 +951,7 @@
         holdId++;
         body.classList.add('sky-view');
         if (view.mode) body.classList.add(view.mode + '-view');
-        exitBtn.querySelector('span').textContent = view.exitLabel || 'back inside';
+        exitBtn.querySelector('span:not(.bi-ic)').textContent = view.exitLabel || 'back inside';
         setPlaying(false);
         var from = override === null ? shown : override;
         override = from;
@@ -1661,35 +1738,15 @@
     }
 
     /* ---------------- what grounds and page scripts can use ---------------- */
-    /* ---------------- the sun's eye: the pupil follows the visitor's pointer ----------------
-       only once there's a pupil to move: assets/sky/sun-pupil (a see-through PNG of just the pupil,
-       cropped close around it). take the pupil out of your sun picture, and this one looks about instead.
-       where it sits in the sun, and how far it can look, as a share of the sun's width: */
-    var EYE = { x: 47.5, y: 47, size: 24, reach: 11 };
-    findAsset('assets/sky/sun-pupil', function (url) {
+    /* (the sun's eye, from reset 3 on, is sky/eye.js) */
+    // (and pictures and links don't come loose to be dragged about: sky.css has the rest of this, for text)
+    document.addEventListener('dragstart', function (e) { if (!(e.target.closest && e.target.closest('[draggable=true]'))) e.preventDefault(); });
+    document.addEventListener('selectstart', function (e) { var t = e.target.nodeType === 1 ? e.target : e.target.parentElement; if (!(t && t.closest('input, textarea, select, [contenteditable]'))) e.preventDefault(); });
+    // the rope the sky's props hang from in resets 1 and 2 (sky.css: props on ropes): your own, if you've drawn one
+    findAsset('assets/sky/rope', function (url) {
         if (!url) return;
-        css('.sun-pupil { position: absolute; z-index: 2; left: ' + EYE.x + '%; top: ' + EYE.y + '%; width: ' + EYE.size + '%; pointer-events: none;' +
-                'transform: translate(-50%, -50%); transition: transform .35s cubic-bezier(.2,.7,.3,1); }' +
-            '.sun-pupil > img { display: block; width: 100%; height: auto; }');
-        var p = document.createElement('div');
-        p.className = 'sun-pupil';
-        p.innerHTML = '<img alt="" src="' + url + '">';
-        sun.appendChild(p);
-        var want = null, queued = false;
-        function look() {
-            queued = false;
-            if (!want) return;
-            var r = sun.getBoundingClientRect();
-            if (!r.width) return;
-            var dx = want[0] - (r.left + r.width * EYE.x / 100), dy = want[1] - (r.top + r.height * EYE.y / 100);
-            var d = Math.sqrt(dx * dx + dy * dy) || 1, k = Math.min(1, d / 260) * r.width * EYE.reach / 100 / d;
-            p.style.transform = 'translate(calc(-50% + ' + (dx * k).toFixed(1) + 'px), calc(-50% + ' + (dy * k).toFixed(1) + 'px))';
-        }
-        function aim(x, y) { want = [x, y]; if (!queued) { queued = true; requestAnimationFrame(look); } }
-        document.addEventListener('pointermove', function (e) { aim(e.clientX, e.clientY); }, { passive: true });
-        document.addEventListener('pointerdown', function (e) { aim(e.clientX, e.clientY); }, { passive: true });
-        document.addEventListener('mouseleave', function () { want = null; p.style.transform = ''; });
-        hooks.push(function () { if (want && !queued) { queued = true; requestAnimationFrame(look); } });   // (and as the sun moves across the sky)
+        root.style.setProperty('--rope-art', 'url("' + new URL(url, location.href).href + '")');
+        root.classList.add('has-rope-art');
     });
 
     window.Sky = {

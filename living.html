@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>the living space · DaV-nky</title>
     <!-- the loading screen: fetches the whole site once per visit (sky/loader.js, sw.js) -->
-    <script src="sky/loader.js?v=20260925s"></script>
-    <script src="sky/state.js?v=20260925s"></script>
+    <script src="sky/loader.js?v=20260926e"></script>
+    <script src="sky/state.js?v=20260926e"></script>
     <link rel="canonical" href="https://dav-nky.pleroma.nexus/living.html">
     <meta property="og:title" content="the living space · DaV-nky">
     <meta property="og:url" content="https://dav-nky.pleroma.nexus/living.html">
@@ -16,7 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=20260925s">
+    <link rel="stylesheet" href="sky/sky.css?v=20260926e">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
@@ -29,7 +29,7 @@
         .noise-machine { left: 63%; bottom: calc(26vw * 170 / 360 - 3px); width: 5.6vw; min-width: 64px; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
         .groove.cat   { left: 21%; bottom: calc(4vh + min(20vw, 260px) * .77 * .47); width: 5.5vw; min-width: 56px; z-index: 3; }
         .groove.plant { left: 83%; bottom: 3vh; width: 5.5vw; min-width: 58px; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
-        .bottle-crate { left: 72%; bottom: 3vh; width: 8.5vw; min-width: 90px; aspect-ratio: 120 / 90; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
+        .room .bottle-crate { left: 72%; bottom: 3vh; width: 8.5vw; min-width: 90px; aspect-ratio: 120 / 90; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }   /* (in front of the secret door) */
         .bottle-crate > .art { position: absolute; inset: 0; width: 100%; height: 100%; }
 
         .lamp .glow { opacity: calc(.2 + .8 * var(--dusk)); }
@@ -109,6 +109,13 @@
         .hall-door.to-workshop { left: 16%; bottom: calc(11vh - 12px); height: 58vh; aspect-ratio: 90 / 170; }
         .hall-door.to-roof     { left: 64%; bottom: calc(11vh - 12px); height: 58vh; aspect-ratio: 90 / 170; }
         .hall-lamp   { left: 46%; top: 0; width: 5%; min-width: 50px; }
+        .hall-light  { top: 0; width: 3.4%; min-width: 34px; }
+        .hall-light.l { left: 33.5%; } .hall-light.r { left: 62.8%; }
+        .hall-cord   { left: 54%; top: 2.2vh; width: 1.8%; min-width: 18px; aspect-ratio: 20 / 200; }
+        /* how the hallway looks before sky/attic.js arrives, so nothing shows and then jumps away as the page opens:
+           the ladder's up, and it's the lamp in reset 4 and the cord and its two lights in any other (LAMP_RESETS in attic.js) */
+        .hallway .hall-ladder { transform: translateY(-101%); visibility: hidden; }
+        html:not([data-reset="4"]) .hallway .hall-lamp, html[data-reset="4"] .hallway .hall-cord, html[data-reset="4"] .hallway .hall-light { display: none; }
         .hall-runner { left: 8%; right: 8%; bottom: 3vh; height: 5vh; pointer-events: none; }
         .hall-hooks  { left: 37%; top: 30%; width: 10%; }
         .hall-character { left: 44%; bottom: 3vh; height: 25vh; }
@@ -118,7 +125,8 @@
         .shelf-book.d2 { left: calc(44% + 26vw * 274 / 360); width: calc(26vw * 14 / 360); }
         .shelf-book.d3 { left: calc(44% + 26vw * 172 / 360); bottom: calc(26vw * 12 / 360); width: calc(26vw * 14 / 360); }
         .shelf-book.d4 { left: calc(44% + 26vw * 190 / 360); bottom: calc(26vw * 12 / 360); width: calc(26vw * 12 / 360); min-width: 9px; }
-        .dungeon-pentagram { left: 35%; bottom: 7vh; width: 30%; height: 10vh; }
+        .shelf-book.d5 { left: calc(44% + 26vw * 290 / 360); width: calc(26vw * 16 / 360); }
+        .dungeon-diagram { left: 33%; bottom: 5vh; width: 34%; height: 13vh; }
         .dungeon-paper { left: 70%; bottom: 9vh; width: 4.6%; min-width: 46px; aspect-ratio: 100 / 70; }
         .dungeon-stairs { left: 0; bottom: calc(18vh - 4px); width: 21%; height: 72vh; z-index: 2; cursor: pointer; }
         .dungeon-chains { left: 76%; top: 0; width: 9%; height: 38vh; }
@@ -137,6 +145,8 @@
         .dungeon-character { left: 24%; bottom: 8vh; height: 25vh; }
         /* the toaster, on the floor by the plant: click it to take it (see sky/tub.js) */
         .secret-door { left: 79%; bottom: 3vh; width: 10.5%; height: 43vh; z-index: 2; overflow: hidden; cursor: default; }
+        /* (it opens in the wall only: from the top of the floor up, the floor itself stays whole) */
+        .secret-door { bottom: var(--floor-h, 9vh); height: calc(46vh - var(--floor-h, 9vh)); }
         .toaster { left: 89.5%; bottom: 2.6vh; width: 4.6vw; min-width: 52px; aspect-ratio: 100 / 70; z-index: 3; }
 
         @media (max-width: 620px) {
@@ -146,8 +156,8 @@
             .bath-towel, .bath-shelf { display: none; }
             .dungeon .shame-plaque { left: 30%; top: 3%; width: 40%; }
             .shelf-book { left: 16%; top: calc(62% - 3.6vw * 52 / 15 + 2px); bottom: auto; width: 3.6vw; min-width: 13px; }
-            .shelf-book.d1 { left: 11%; } .shelf-book.d2 { left: 19.8%; } .shelf-book.d3 { left: 23.6%; } .shelf-book.d4 { left: 7.4%; }
-            .dungeon-pentagram { left: 22%; width: 56%; } .dungeon-paper { left: 80%; width: 12%; min-width: 0; }
+            .shelf-book.d1 { left: 11%; } .shelf-book.d2 { left: 19.8%; } .shelf-book.d3 { left: 23.6%; } .shelf-book.d4 { left: 7.4%; } .shelf-book.d5 { left: 27.4%; }
+            .dungeon-diagram { left: 18%; width: 64%; } .dungeon-paper { left: 80%; width: 12%; min-width: 0; }
             .candle.k1 { left: 48%; } .candle.k2 { left: 64%; } .candle.k5 { left: 63%; } .candle.k6 { left: 32%; } .candle.k7 { left: 31%; }
             .dungeon-stairs { width: 34%; height: 46vh; }
             .dungeon-chains, .dungeon-rack, .candle.k3, .candle.k4 { display: none; }
@@ -169,7 +179,7 @@
             .hall-hooks { display: none; }
             .hall-character { left: 36%; height: 14vh; }
             .toaster { left: 44%; width: 11vw; min-width: 0; }
-            .secret-door { left: 80%; width: 17%; height: 26vh; }
+            .secret-door { left: 80%; width: 17%; height: calc(29vh - var(--floor-h, 9vh)); }
             .room .window { left: 12% !important; width: 76% !important; top: 34% !important; height: 28% !important; }
             .shelf, .lamp, .gallery-frame, .claude-plaque { display: none; }
             .pinned { left: 50%; top: 11%; width: 220px; margin-left: -110px; }
@@ -284,6 +294,9 @@
         <a class="furnish shelf-book decoy d2" href="#" aria-label="a book" data-book="content/books/book-2/" data-asset="assets/living/shelf-decoy-2"></a>
         <a class="furnish shelf-book decoy d3" href="#" aria-label="a book" data-book="content/books/book-3/" data-asset="assets/living/shelf-decoy-3"></a>
         <a class="furnish shelf-book decoy d4" href="#" aria-label="a book" data-book="content/books/book-4/" data-asset="assets/living/shelf-decoy-4"></a>
+        <!-- from reset 5 on (after the pact in reset 4), the grimoire from the attic stands here too: its pages in content/books/grimoire/.
+             your own spine: assets/living/shelf-grimoire (sky/books.js) -->
+        <a class="furnish shelf-book decoy d5 grimoire-book" href="#" aria-label="a black book" data-book="content/books/grimoire/" data-asset="assets/living/shelf-grimoire"></a>
         <a class="furnish shelf-book" href="#dungeon" aria-label="a book" data-asset="assets/living/shelf-book">
             <svg class="placeholder" viewBox="0 0 15 52" aria-hidden="true">
                 <rect x="0.5" y="0.5" width="14" height="51" rx="1.5" fill="#5e1f16" stroke="#2a0f0a"/>
@@ -371,12 +384,37 @@
     <div class="hallway" aria-hidden="true" data-asset="assets/living/hall-wall">
         <div class="room-floor" data-asset="assets/living/hall-floor"><div class="placeholder"></div></div>
 
-        <svg class="furnish hall-lamp sways" data-asset="assets/living/hall-lamp" viewBox="0 0 50 150" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+        <svg class="furnish hall-lamp sways hangs" data-asset="assets/living/hall-lamp" viewBox="0 0 50 150" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
             <rect x="24" y="0" width="2" height="96" fill="#1f1610"/>
             <path d="M14 96 H36 L40 112 H10 Z" fill="#2a1d14"/>
             <circle class="glow" cx="25" cy="120" r="9" fill="#ffe2a0"/>
             <circle cx="25" cy="120" r="22" fill="rgba(255,210,130,.18)"/>
         </svg>
+
+        <!-- in any reset but 4 (sky/attic.js) there's no lamp in the middle: a pull cord hangs from the hatch instead (pull it down and
+             the hatch opens, and the ladder slides down), with a smaller light either side of it. only in reset 4 is it the lamp, the one that
+             comes away in your hand. slots: hall-light (both side lights, hanging from the top), hall-cord (the cord and its pull: long, thin) -->
+        <svg class="furnish hall-light l sways hangs" data-asset="assets/living/hall-light" viewBox="0 0 40 110" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+            <rect x="19" y="0" width="2" height="60" fill="#1f1610"/>
+            <path d="M12 60 H28 L32 74 H8 Z" fill="#2a1d14"/>
+            <circle class="glow" cx="20" cy="80" r="6.5" fill="#ffe2a0"/>
+            <circle cx="20" cy="80" r="17" fill="rgba(255,210,130,.18)"/>
+        </svg>
+        <svg class="furnish hall-light r sways hangs" data-asset="assets/living/hall-light" viewBox="0 0 40 110" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+            <rect x="19" y="0" width="2" height="60" fill="#1f1610"/>
+            <path d="M12 60 H28 L32 74 H8 Z" fill="#2a1d14"/>
+            <circle class="glow" cx="20" cy="80" r="6.5" fill="#ffe2a0"/>
+            <circle cx="20" cy="80" r="17" fill="rgba(255,210,130,.18)"/>
+        </svg>
+        <div class="furnish hall-cord sways hangs" data-asset="assets/living/hall-cord" role="button" tabindex="0" aria-label="a cord, hanging from the hatch">
+            <svg class="placeholder" viewBox="0 0 20 200" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+                <path d="M10 0 Q11 60 10 120 T10 168" stroke="#d9c79c" stroke-width="1.6" fill="none"/>
+                <path d="M10 0 Q11 60 10 120 T10 168" stroke="#8a7650" stroke-width=".6" stroke-dasharray="2 3" fill="none"/>
+                <path d="M7 168 H13 L14 172 Q16 180 15 190 Q14 197 10 198 Q6 197 5 190 Q4 180 6 172 Z" fill="#7a5134" stroke="#3a2716" stroke-width="1"/>
+                <path d="M6 177 H14 M5.4 186 H14.6" stroke="#3a2716" stroke-width=".8"/>
+            </svg>
+            <span class="hc-hint">pull</span>
+        </div>
 
         <svg class="furnish hall-hooks" data-asset="assets/living/hall-hooks" viewBox="0 0 120 110" aria-hidden="true">
             <rect x="0" y="0" width="120" height="10" rx="2" fill="#3a2716"/>
@@ -425,6 +463,28 @@
         </svg>
 
         <!-- the traveller, in the hallway. your own: assets/characters/hallway (+ hallway-walking) -->
+        <!-- the way up to the attic (sky/attic.js): pull the cord (in reset 4: tug the lamp down, hard, and it comes away and smashes,
+             for the rest of the reset); the hatch above it opens and a ladder slides down. slots: hall-hatch (the hatch, shut), hall-hatch-open,
+             attic-ladder (tall and thin: the ladder), hall-lamp-broken (what's left of the lamp on the floor) -->
+        <svg class="furnish hall-hatch" data-asset="assets/living/hall-hatch" viewBox="0 0 120 30" preserveAspectRatio="none" aria-hidden="true">
+            <rect x="0" y="0" width="120" height="30" fill="#2a1d14"/><rect x="6" y="3" width="108" height="22" fill="#4a3322" stroke="#1f1610" stroke-width="2"/>
+            <path d="M6 14 H114" stroke="#3a2716" stroke-width="1.4"/><circle cx="60" cy="20" r="2.6" fill="#c49a52"/>
+        </svg>
+        <button type="button" class="furnish hall-ladder" data-asset="assets/living/attic-ladder" aria-label="the ladder up to the attic">
+            <svg class="placeholder" viewBox="0 0 60 400" preserveAspectRatio="none" aria-hidden="true">
+                <rect x="6" y="0" width="7" height="400" fill="#7a5134"/><rect x="47" y="0" width="7" height="400" fill="#6e4a30"/>
+                <g fill="#8a5e3a"><rect x="10" y="24" width="40" height="6" rx="1"/><rect x="10" y="58" width="40" height="6" rx="1"/><rect x="10" y="92" width="40" height="6" rx="1"/><rect x="10" y="126" width="40" height="6" rx="1"/><rect x="10" y="160" width="40" height="6" rx="1"/><rect x="10" y="194" width="40" height="6" rx="1"/><rect x="10" y="228" width="40" height="6" rx="1"/><rect x="10" y="262" width="40" height="6" rx="1"/><rect x="10" y="296" width="40" height="6" rx="1"/><rect x="10" y="330" width="40" height="6" rx="1"/><rect x="10" y="364" width="40" height="6" rx="1"/><rect x="10" y="398" width="40" height="6" rx="1"/></g>
+                <rect x="6" y="0" width="7" height="400" fill="url(#hl-shade)" opacity=".5"/>
+                <defs><linearGradient id="hl-shade" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".4"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient></defs>
+            </svg>
+            <span class="hl-hint">up to the attic</span>
+        </button>
+        <svg class="furnish hall-lamp-broken" data-asset="assets/living/hall-lamp-broken" viewBox="0 0 120 30" aria-hidden="true">
+            <path d="M34 26 L44 14 H64 L72 26 Z" fill="#2a1d14" transform="rotate(-14 54 20)"/>
+            <g fill="#e8dcc0" opacity=".85"><path d="M20 27 l5 -6 l3 6 Z"/><path d="M78 28 l6 -8 l2 8 Z"/><path d="M92 26 l3 -3 l2 3 Z"/><path d="M8 28 l3 -4 l3 4 Z"/><path d="M60 28 l2 -5 l4 5 Z"/></g>
+            <path d="M40 16 Q20 10 6 18" stroke="#1f1610" stroke-width="1.6" fill="none"/>
+        </svg>
+
         <div class="furnish character scene-character hall-character" data-asset="assets/characters/hallway" aria-label="the traveller"></div>
 
         <!-- back to the living space (it's to the right of here) -->
@@ -499,6 +559,59 @@
         <a class="room-arrow to-living" href="#living" aria-label="back to the living space" data-asset="assets/living/arrow"></a>
     </div>
 
+    <!-- the attic (sky/attic.js), up the ladder from the hallway (once the hatch is open: the cord, or in reset 4 the lamp). dust, junk, a round
+         window, and in reset 4 a black book on a lectern: the grimoire. the square hole bottom right goes back down.
+         slots in assets/living/: attic-wall, attic-floor, attic-window, attic-clutter, attic-lectern, grimoire (the closed book),
+         grimoire-open (the open book, behind its pages), grimoire-ritual (the ritual, on its left page), attic-hole, pact-hand.
+         the traveller up here: assets/characters/attic (+ attic-walking). -->
+    <div class="attic" aria-hidden="true" data-asset="assets/living/attic-wall">
+        <svg class="attic-roof placeholder" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+                <linearGradient id="at-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a130e"/><stop offset="1" stop-color="#3a2a1e"/></linearGradient>
+                <pattern id="at-planks" width="1000" height="34" patternUnits="userSpaceOnUse"><rect width="1000" height="34" fill="#2e2118"/><path d="M0 33 H1000" stroke="#1a120c" stroke-width="2"/></pattern>
+            </defs>
+            <rect width="1000" height="600" fill="url(#at-wall)"/>
+            <path d="M0 0 L300 0 L0 380 Z" fill="url(#at-planks)"/><path d="M1000 0 L700 0 L1000 380 Z" fill="url(#at-planks)"/>
+            <g stroke="#140e0a" stroke-width="18" stroke-linecap="square"><path d="M0 380 L300 0"/><path d="M1000 380 L700 0"/></g>
+            <g stroke="#2a1d14" stroke-width="14"><path d="M140 200 L140 600"/><path d="M860 200 L860 600"/><path d="M300 0 L700 0"/></g>
+            <path d="M40 330 L140 200 L240 200" stroke="#20160f" stroke-width="10" fill="none"/>
+            <g stroke="rgba(230,220,200,.18)" stroke-width="1" fill="none"><path d="M300 0 Q330 40 360 0 M300 0 Q320 60 380 20 M318 0 L332 46"/><path d="M700 0 Q670 40 640 0 M700 0 Q680 60 620 20"/></g>
+        </svg>
+        <div class="room-floor" data-asset="assets/living/attic-floor"><div class="placeholder"></div></div>
+        <svg class="furnish attic-window" data-asset="assets/living/attic-window" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="46" fill="#2a1d14"/><circle cx="50" cy="50" r="38" fill="#12182a"/>
+            <circle cx="64" cy="36" r="9" fill="#e8e2c8"/><circle cx="60" cy="33" r="8" fill="#12182a"/>
+            <g fill="#e8e2c8"><circle cx="30" cy="30" r="1"/><circle cx="40" cy="62" r=".8"/><circle cx="72" cy="66" r="1"/></g>
+            <path d="M50 12 V88 M12 50 H88" stroke="#2a1d14" stroke-width="4"/>
+        </svg>
+        <div class="attic-beam" aria-hidden="true"></div>
+        <svg class="furnish attic-clutter" data-asset="assets/living/attic-clutter" viewBox="0 0 400 160" aria-hidden="true">
+            <rect x="10" y="70" width="120" height="90" fill="#5a3a24"/><rect x="10" y="70" width="120" height="14" fill="#6e4a30"/><rect x="62" y="84" width="16" height="20" fill="#c49a52"/>
+            <rect x="140" y="96" width="70" height="64" fill="#8a6a44"/><rect x="150" y="60" width="54" height="40" fill="#9a7a50"/><path d="M140 96 H210 M150 60 H204" stroke="#6e4a30" stroke-width="2"/>
+            <path d="M232 160 Q236 60 290 40 Q344 60 350 160 Z" fill="#cfc4ae" opacity=".9"/><path d="M262 80 Q290 96 318 80" stroke="#a89c86" stroke-width="2" fill="none"/>
+            <path d="M360 160 V96 Q380 90 392 100 V160 Z" fill="#4a3322"/>
+        </svg>
+        <svg class="furnish attic-lectern" data-asset="assets/living/attic-lectern" viewBox="0 0 80 150" aria-hidden="true">
+            <path d="M6 40 L74 22 L74 34 L6 52 Z" fill="#5a3a24"/><rect x="34" y="44" width="12" height="96" fill="#4a3322"/><path d="M14 150 L40 132 L66 150 Z" fill="#3a2716"/>
+        </svg>
+        <button type="button" class="furnish attic-grimoire" data-asset="assets/living/grimoire" aria-label="a black book">
+            <svg class="placeholder" viewBox="0 0 90 40" aria-hidden="true">
+                <path d="M4 30 L82 8 L86 16 L8 38 Z" fill="#e8dcc0"/><path d="M2 26 L80 4 L84 12 L6 34 Z" fill="#0e0a0a" stroke="#3a1010" stroke-width="1.2"/>
+                <g transform="rotate(-16 43 19)"><circle cx="43" cy="19" r="7" fill="none" stroke="#8a1a14" stroke-width="1.2"/><path d="M43 12 L47 24 L37 16 H49 L39 24 Z" fill="none" stroke="#8a1a14" stroke-width=".9"/></g>
+            </svg>
+            <span class="ag-hint">a black book</span>
+        </button>
+        <a class="furnish attic-hole" href="#hallway" data-asset="assets/living/attic-hole" aria-label="the hole back down to the hallway">
+            <svg class="placeholder" viewBox="0 0 160 80" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M14 4 H146 L158 76 H2 Z" fill="#050303" stroke="#4a3322" stroke-width="5"/>
+                <rect x="46" y="10" width="6" height="66" fill="#7a5134"/><rect x="108" y="10" width="6" height="66" fill="#6e4a30"/>
+                <rect x="48" y="30" width="64" height="5" fill="#8a5e3a"/><rect x="48" y="58" width="64" height="5" fill="#6e4a30"/>
+            </svg>
+            <span class="ah-hint">back down</span>
+        </a>
+        <div class="furnish character scene-character attic-character" data-asset="assets/characters/attic" aria-label="the traveller"></div>
+    </div>
+
     <!-- the dungeon (sky/bathroom.js slides it up; sky/dungeon.js lights the candles and plays its sound).
          you get here by pulling the loose book on the bookshelf, and back up the stairs (or the arrow).
          slots in assets/living/: dungeon-wall, dungeon-floor, dungeon-stairs, dungeon-chains, dungeon-rack,
@@ -567,15 +680,34 @@
              shoot it and a hidden record falls out (sky/loot.js) -->
         <div class="furnish gallery-frame" data-wall="shame" data-frame="6" data-frame-name="the record" data-look="lux" style="left:43%; top:41%; width:14%; aspect-ratio:1; --tilt:0deg"></div>
 
-        <!-- a pentagram in blood on the floor. your own: assets/living/dungeon-pentagram (see-through, seen from above at a slant, stretched to fit) -->
-        <svg class="furnish dungeon-pentagram" data-asset="assets/living/dungeon-pentagram" viewBox="0 0 300 80" preserveAspectRatio="none" aria-hidden="true">
-            <g fill="none" stroke="#8e0f14" stroke-linejoin="round" opacity=".92">
-                <ellipse cx="150" cy="40" rx="140" ry="34" stroke-width="3.2"/>
-                <ellipse cx="150" cy="40" rx="126" ry="30" stroke-width="1.6"/>
-                <path d="M150 10 L232 64 L62 30 L238 30 L68 64 Z" stroke-width="3"/>
+        <!-- the Ophite diagram (after the old Gnostic one): drawn in blood on the floor. round the outside, Leviathan, the serpent with
+             its tail in its mouth; inside, the seven circles of the seven Archons (the seven spheres: saturn, jupiter, mars, the sun,
+             venus, mercury, the moon), joined by a seven-pointed star; at the middle, the lion-faced serpent, the Demiurge, with his seven
+             rays. when the Claubes worship, each one stands on one of the seven circles (sky/claubes.js: SEATS).
+             your own: assets/living/dungeon-diagram. draw it seen from straight above, square (assets/templates/ophite-diagram-template.svg
+             has it, with where the Claubes stand); it's squashed flat onto the floor to fit. see-through. -->
+        <svg class="furnish dungeon-diagram" data-asset="assets/living/dungeon-diagram" viewBox="0 0 400 400" preserveAspectRatio="none" aria-hidden="true">
+            <g opacity=".92">
+                <path d="M12 200 a188 188 0 1 0 376 0 a188 188 0 1 0 -376 0 Z M28 200 a172 172 0 1 0 344 0 a172 172 0 1 0 -344 0 Z" fill="#8e0f14" fill-rule="evenodd"/>
+                <circle cx="200" cy="200" r="180" fill="none" stroke="#5a0508" stroke-width="1.2" stroke-dasharray="3 5" vector-effect="non-scaling-stroke"/>
+                <g transform="translate(208 380)"><path d="M-26 0 Q-20 -12 0 -12 Q22 -10 26 0 Q22 10 0 12 Q-20 12 -26 0 Z" fill="#8e0f14"/>
+                    <path d="M-26 0 L-40 -4 M-26 0 L-40 4" stroke="#8e0f14" stroke-width="1.4" vector-effect="non-scaling-stroke"/><circle cx="10" cy="-4" r="3" fill="#1a0000"/></g>
+                <circle cx="200" cy="200" r="160" fill="none" stroke="#8e0f14" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+                <circle cx="200" cy="200" r="118" fill="none" stroke="#8e0f14" stroke-width="1" vector-effect="non-scaling-stroke"/>
+                <path d="M200.0 82.0 L251.2 306.3 M292.3 126.4 L148.8 306.3 M315.0 226.3 L85.0 226.3 M251.2 306.3 L107.7 126.4 M148.8 306.3 L200.0 82.0 M85.0 226.3 L292.3 126.4 M107.7 126.4 L315.0 226.3" fill="none" stroke="#8e0f14" stroke-width="1.2" opacity=".75" vector-effect="non-scaling-stroke"/>
+                <path d="M150 200 a50 50 0 1 0 100 0 a50 50 0 1 0 -100 0 Z M156 200 a44 44 0 1 0 88 0 a44 44 0 1 0 -88 0 Z" fill="#8e0f14" fill-rule="evenodd"/>
+                <path d="M203.0 179.0 L200.0 162.0 L197.0 179.0 Z M212.0 186.2 L223.5 173.3 L208.3 181.5 Z M212.0 197.8 L229.2 198.7 L213.3 192.0 Z M202.9 205.0 L213.0 219.0 L208.3 202.4 Z M191.7 202.4 L187.0 219.0 L197.1 205.0 Z M186.7 192.0 L170.8 198.7 L188.0 197.8 Z M191.7 181.5 L176.5 173.3 L188.0 186.2 Z" fill="#8e0f14"/>
+                <circle cx="200" cy="192" r="11" fill="#8e0f14"/><circle cx="200" cy="192" r="15" fill="none" stroke="#8e0f14" stroke-width="1.2" stroke-dasharray="2 2" vector-effect="non-scaling-stroke"/>
+                <path d="M200 205 Q216 216 204 228 Q188 238 202 246" fill="none" stroke="#8e0f14" stroke-width="3" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+                <g transform="translate(200.0 82.0)"><path d="M-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 Z M-24 0 a24 24 0 1 0 48 0 a24 24 0 1 0 -48 0 Z" fill="#8e0f14" fill-rule="evenodd"/><g class="glyph" fill="none" stroke="#5a0508" stroke-width="1.4" vector-effect="non-scaling-stroke"><path vector-effect="non-scaling-stroke" d="M-3 -11 V6 M-8 -6 H2 M-3 -1 Q5 -6 6 1 Q6 6 2 10"/></g></g>
+                <g transform="translate(292.3 126.4)"><path d="M-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 Z M-24 0 a24 24 0 1 0 48 0 a24 24 0 1 0 -48 0 Z" fill="#8e0f14" fill-rule="evenodd"/><g class="glyph" fill="none" stroke="#5a0508" stroke-width="1.4" vector-effect="non-scaling-stroke"><path vector-effect="non-scaling-stroke" d="M-8 -4 Q-6 -11 0 -9 Q4 -7 0 0 Q-4 5 -8 5 H9 M4 -11 V11"/></g></g>
+                <g transform="translate(315.0 226.3)"><path d="M-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 Z M-24 0 a24 24 0 1 0 48 0 a24 24 0 1 0 -48 0 Z" fill="#8e0f14" fill-rule="evenodd"/><g class="glyph" fill="none" stroke="#5a0508" stroke-width="1.4" vector-effect="non-scaling-stroke"><circle vector-effect="non-scaling-stroke" cx="-3" cy="3" r="6"/><path vector-effect="non-scaling-stroke" d="M1 -1 L9 -9 M3 -9 H9 V-3"/></g></g>
+                <g transform="translate(251.2 306.3)"><path d="M-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 Z M-24 0 a24 24 0 1 0 48 0 a24 24 0 1 0 -48 0 Z" fill="#8e0f14" fill-rule="evenodd"/><g class="glyph" fill="none" stroke="#5a0508" stroke-width="1.4" vector-effect="non-scaling-stroke"><circle vector-effect="non-scaling-stroke" r="9"/><circle vector-effect="non-scaling-stroke" r="2" fill="#5a0508"/></g></g>
+                <g transform="translate(148.8 306.3)"><path d="M-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 Z M-24 0 a24 24 0 1 0 48 0 a24 24 0 1 0 -48 0 Z" fill="#8e0f14" fill-rule="evenodd"/><g class="glyph" fill="none" stroke="#5a0508" stroke-width="1.4" vector-effect="non-scaling-stroke"><circle vector-effect="non-scaling-stroke" cy="-4" r="6"/><path vector-effect="non-scaling-stroke" d="M0 2 V12 M-5 7 H5"/></g></g>
+                <g transform="translate(85.0 226.3)"><path d="M-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 Z M-24 0 a24 24 0 1 0 48 0 a24 24 0 1 0 -48 0 Z" fill="#8e0f14" fill-rule="evenodd"/><g class="glyph" fill="none" stroke="#5a0508" stroke-width="1.4" vector-effect="non-scaling-stroke"><circle vector-effect="non-scaling-stroke" cy="-2" r="5"/><path vector-effect="non-scaling-stroke" d="M0 3 V12 M-4 8 H4 M-5 -11 Q0 -5 5 -11"/></g></g>
+                <g transform="translate(107.7 126.4)"><path d="M-30 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0 Z M-24 0 a24 24 0 1 0 48 0 a24 24 0 1 0 -48 0 Z" fill="#8e0f14" fill-rule="evenodd"/><g class="glyph" fill="none" stroke="#5a0508" stroke-width="1.4" vector-effect="non-scaling-stroke"><path vector-effect="non-scaling-stroke" d="M3 -10 A10 10 0 1 0 3 10 A8 8 0 1 1 3 -10 Z" fill="#5a0508"/></g></g>
             </g>
-            <g fill="#8e0f14" opacity=".85"><ellipse cx="96" cy="70" rx="9" ry="2.4"/><ellipse cx="214" cy="12" rx="6" ry="1.8"/><ellipse cx="40" cy="44" rx="4" ry="1.4"/>
-                <path d="M150 10 q2 6 0 9 q-2 -3 0 -9 Z"/><ellipse cx="262" cy="52" rx="5" ry="1.5"/></g>
+            <g fill="#8e0f14" opacity=".8"><circle cx="70" cy="330" r="9"/><circle cx="330" cy="60" r="6"/><circle cx="24" cy="160" r="4"/><circle cx="366" cy="262" r="5"/><circle cx="150" cy="30" r="3"/></g>
         </svg>
 
         <!-- a note on the floor: what it says is yours to write (content manager -> notes -> the paper in the dungeon).
@@ -598,29 +730,31 @@
         <a class="room-arrow to-upstairs" href="#living" aria-label="back up to the living space" data-asset="assets/living/arrow"></a>
     </div>
 
-    <script src="sky/sky.js?v=20260925s"></script>
+    <script src="sky/sky.js?v=20260926e"></script>
+    <script src="sky/eye.js?v=20260926e"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
-    <script src="sky/ground-view.js?v=20260925s" data-view="assets/living/view"></script>
-    <script src="sky/panel.js?v=20260925s"></script>
-    <script src="sky/music.js?v=20260925s"></script>
-    <script src="sky/weather.js?v=20260925s"></script>
-    <script src="sky/noise.js?v=20260925s"></script>
-    <script src="sky/inventory.js?v=20260925s"></script>
-    <script src="sky/loot.js?v=20260925s"></script>
-    <script src="sky/records.js?v=20260925s"></script>
-    <script src="sky/crate.js?v=20260925s"></script>
-    <script src="sky/frames.js?v=20260925s"></script>
-    <script src="sky/bathroom.js?v=20260925s"></script>
-    <script src="sky/gore.js?v=20260925s"></script>
-    <script src="sky/tub.js?v=20260925s"></script>
-    <script src="sky/dungeon.js?v=20260925s"></script>
-    <script src="sky/books.js?v=20260925s"></script>
-    <script src="sky/marker.js?v=20260925s"></script>
-    <script src="sky/revolver.js?v=20260925s"></script>
-    <script src="sky/claubes.js?v=20260925s"></script>
-    <script src="sky/textures.js?v=20260925s"></script>
-    <script src="sky/forget.js?v=20260925s"></script>
-    <script src="sky/lives.js?v=20260925s"></script>
-    <script src="sky/resets.js?v=20260925s"></script>
+    <script src="sky/ground-view.js?v=20260926e" data-view="assets/living/view"></script>
+    <script src="sky/panel.js?v=20260926e"></script>
+    <script src="sky/music.js?v=20260926e"></script>
+    <script src="sky/weather.js?v=20260926e"></script>
+    <script src="sky/noise.js?v=20260926e"></script>
+    <script src="sky/inventory.js?v=20260926e"></script>
+    <script src="sky/loot.js?v=20260926e"></script>
+    <script src="sky/records.js?v=20260926e"></script>
+    <script src="sky/crate.js?v=20260926e"></script>
+    <script src="sky/frames.js?v=20260926e"></script>
+    <script src="sky/bathroom.js?v=20260926e"></script>
+    <script src="sky/gore.js?v=20260926e"></script>
+    <script src="sky/tub.js?v=20260926e"></script>
+    <script src="sky/dungeon.js?v=20260926e"></script>
+    <script src="sky/attic.js?v=20260926e"></script>
+    <script src="sky/books.js?v=20260926e"></script>
+    <script src="sky/marker.js?v=20260926e"></script>
+    <script src="sky/revolver.js?v=20260926e"></script>
+    <script src="sky/claubes.js?v=20260926e"></script>
+    <script src="sky/textures.js?v=20260926e"></script>
+    <script src="sky/forget.js?v=20260926e"></script>
+    <script src="sky/lives.js?v=20260926e"></script>
+    <script src="sky/resets.js?v=20260926e"></script>
 </body>
 </html>

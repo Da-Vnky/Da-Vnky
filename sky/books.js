@@ -13,14 +13,37 @@
 
        <a class="furnish shelf-book decoy" data-book="content/books/book-1/" …></a>
 
-   slots: assets/living/book-open (the open book's pages, behind each page; optional)
-   sound: assets/sounds/page-turn
+   THE GRIMOIRE: its pages are content/books/grimoire/ (its title "grimoire" unless
+   title.txt says otherwise; a few drawn stand-in pages until you add some). It's this
+   book wherever you find it once its pact has been made (sky/attic.js): on the attic's
+   lectern for the rest of reset 4, and on this shelf from reset 5 on. Every time,
+   before it opens, the traveller remarks on how wrong it feels (VIBES), and it opens
+   with a horrible sound (quieter than on the night of the pact: QUIET). While it's
+   open its drone plays (assets/sounds/grimoire, or a drawn one).
+
+   slots: assets/living/book-open (the open book's pages, behind each page; optional),
+          assets/living/shelf-grimoire (its spine on the shelf)
+   sound: assets/sounds/page-turn, grimoire, grimoire-open
    ===================================================================== */
 
 (function () {
-    var Sky = window.Sky;
+    var Sky = window.Sky, S = window.davSave;
+    var GRIM_DIR = 'content/books/grimoire/';
+    // the grimoire's only on the shelf once its pact has had its reset (sky/state.js: DEATHS.grimoire)
+    Array.prototype.forEach.call(document.querySelectorAll('.shelf-book.grimoire-book'), function (g) { if (!S || !S.patched('grimoire')) g.remove(); });
     var books = Array.prototype.slice.call(document.querySelectorAll('.shelf-book[data-book]'));
-    if (!Sky || !books.length) return;
+    if (!Sky || (!books.length && !document.querySelector('.attic'))) return;
+    // what the traveller says before it opens (one of these, each time)
+    var VIBES = ['I really don\u2019t like the feel of this book.', 'This thing is giving off some seriously bad vibes.', 'Is it\u2026 warm? Why is a book warm?',
+                 'Every hair on my arms just stood up.', 'It\u2019s humming. Books shouldn\u2019t hum.', 'Something in there wants to be read. I don\u2019t like that.'];
+    var QUIET = 0.35;                          // the sound it opens with, once its pact is made (a share of full loudness)
+    // its stand-in pages, until you add your own to content/books/grimoire/
+    var STANDIN = [
+        'Seven are the spheres, and seven the Archons that keep them, and the wheel turneth, and turneth, and turneth.',
+        'The lion-faced one sitteth at the middle and saith: I am, and there is none beside me. He lieth.',
+        'Round all of it the serpent Leviathan, with his tail in his mouth. What goeth out of the world goeth into him.',
+        'Thou hast signed. Thou art known. Now read on, and count the spheres as they go by.'
+    ];
     var body = document.body;
     var MEDIA = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'mp4', 'webm'];
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
@@ -48,12 +71,47 @@
         '.book-view .bk-prev { left: max(6px, calc(50% - min(92vw, 78vh * .78) / 2 - 58px)); } .book-view .bk-next { right: max(6px, calc(50% - min(92vw, 78vh * .78) / 2 - 58px)); }' +
         '.book-view .bk-count { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); font-style: italic; font-size: .9rem; opacity: .75; }' +
         'body.book-open .place-tabs, body.book-open .cp { opacity: 0; pointer-events: none; }' +
+        // the grimoire: black, with a red sigil on its spine; and darker, redder all round while it's open
+        '.shelf-book.grimoire-book > svg.placeholder > rect:first-of-type { fill: #120b0b; } .shelf-book.grimoire-book > svg.placeholder path { stroke: #8a1a14; }' +
+        '.book-view.grim { background: radial-gradient(ellipse at 50% 45%, rgba(40,4,4,.88), rgba(4,1,1,.96) 75%); }' +
+        '.book-view.grim .bk-book { background: linear-gradient(90deg, #0c0707, #1e0f0f 6%, #160a0a 60%, #0c0606); box-shadow: 0 24px 60px rgba(0,0,0,.8), inset 0 0 0 2px rgba(140,20,20,.3); }' +
+        '.book-view .bk-words { display: grid; place-items: center; align-content: center; gap: 1.2em; padding: 8%; text-align: center; font: italic clamp(1rem, 2.4vh, 1.4rem)/1.55 "IM Fell English", Georgia, serif; color: #3a1008; }' +
+        '.book-view .bk-words svg { width: 34%; opacity: .8; }' +
         '@media (prefers-reduced-motion: reduce) { .book-view .bk-page { transition: none; } }'
     );
 
     /* ---------------- what's in each book ---------------- */
+    var grimRec = { pages: [], title: 'grimoire', grim: true };
+    function load(dir, done) {
+        Sky.listFolder(dir, MEDIA.concat(['txt']), function (files) {
+            var caps = {}, pages = [];
+            files.forEach(function (f) {
+                var stem = f.name.replace(/\.[^.]+$/, ''), ext = f.name.split('.').pop().toLowerCase();
+                if (ext === 'txt') { if (stem !== 'title') caps[stem] = f.url; }
+                else pages.push({ name: f.name, url: f.url, stem: stem, video: /^(mp4|webm)$/.test(ext) });
+            });
+            pages.sort(function (x, y) { return x.name.toLowerCase() < y.name.toLowerCase() ? -1 : 1; });
+            pages.forEach(function (p) { p.cap = caps[p.stem] || null; });
+            done(pages, files.some(function (f) { return f.name === 'title.txt'; }));
+        });
+    }
+    // the grimoire, wherever it is (the attic's lectern opens this one too)
+    grimRec.pages = STANDIN.map(function (t) { return { text: t }; });
+    load(GRIM_DIR, function (pages, titled) {
+        if (pages.length) grimRec.pages = pages;
+        if (titled) fetch(GRIM_DIR + 'title.txt', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+            t = (t || '').trim();
+            if (t && !/<html/i.test(t)) grimRec.title = t;
+        }).catch(function () {});
+    });
     books.forEach(function (b) {
         var dir = b.dataset.book.replace(/\/?$/, '/');
+        if (b.classList.contains('grimoire-book')) {
+            b._book = grimRec;
+            var gh = b.querySelector('.sb-hint'); if (gh) gh.textContent = 'grimoire';
+            b.setAttribute('aria-label', 'a book: grimoire');
+            return;
+        }
         Sky.listFolder(dir, MEDIA.concat(['txt']), function (files) {
             var caps = {}, pages = [];
             files.forEach(function (f) {
@@ -86,9 +144,16 @@
     body.appendChild(view);
     Sky.findAsset('assets/living/book-open', function (url) { if (url) view.style.setProperty('--book-art', 'url("' + new URL(url, location.href).href + '")'); });
     var bookEl = view.querySelector('.bk-book'), cur = null, at = 0, busy = false;
+    var SIGIL = '<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#6a0808" stroke-width="1.6"><circle cx="50" cy="50" r="44"/><circle cx="50" cy="50" r="30"/>' +
+        '<path d="M50 50 L50.0 20.0 M50 50 L73.5 31.3 M50 50 L79.2 56.7 M50 50 L63.0 77.0 M50 50 L37.0 77.0 M50 50 L20.8 56.7 M50 50 L26.5 31.3"/><circle cx="50" cy="50" r="7" fill="#6a0808"/></g></svg>';
     function pageEl(p) {
         var el = document.createElement('div');
         el.className = 'bk-page';
+        if (p.text !== undefined) {                                 // (a stand-in page: just words)
+            el.innerHTML = '<div class="bk-words">' + SIGIL + '<p></p></div>';
+            el.querySelector('p').textContent = p.text;
+            return el;
+        }
         el.innerHTML = '<div class="bk-media"></div><p class="bk-cap"></p>';
         var m = p.video ? document.createElement('video') : new Image();
         if (p.video) { m.muted = true; m.loop = true; m.autoplay = true; m.playsInline = true; m.controls = true; }
@@ -122,23 +187,35 @@
         view.querySelector('.bk-next').disabled = i === cur.pages.length - 1;
         view.querySelector('.bk-count').textContent = (i + 1) + ' / ' + cur.pages.length;
     }
-    function open(b) {
-        var bk = b._book;
+    function open(b, now) {
+        if (b === grimRec || (b.classList && b.classList.contains('grimoire-book'))) { if (now) return show1(grimRec); return grimoire(); }
+        return show1(b._book);
+    }
+    function show1(bk) {
         if (!bk || !bk.pages.length) return false;
         cur = bk;
         view.querySelector('.bk-title').textContent = bk.title || '';
         bookEl.innerHTML = '';
         show(0);
         view.classList.add('open');
+        view.classList.toggle('grim', !!bk.grim);
         body.classList.add('book-open');
         sfx('page-turn');
+        if (bk.grim) hum(0.8);
         return true;
+    }
+    var drone = null;
+    function hum(on) {
+        if (!drone && Sky.sounds && Sky.sounds.channel) drone = Sky.sounds.channel('grimoire');
+        if (drone) drone.set(on || 0, on ? 1.2 : 0.8);
+        if (Sky.music && Sky.music.hush) Sky.music.hush(!!on);
     }
     function close() {
         if (!view.classList.contains('open')) return;
         view.classList.remove('open');
         body.classList.remove('book-open');
         view.querySelectorAll('video').forEach(function (v) { v.pause(); });
+        if (cur && cur.grim) hum(0);
         cur = null;
     }
     view.querySelector('.bk-close').addEventListener('click', close);
@@ -159,5 +236,24 @@
         if (Math.abs(dx) > 40) show(at + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
     });
 
-    Sky.books = { open: open, close: close };
+    /* ---------------- the grimoire: a remark first, then it opens with a horrible sound ---------------- */
+    var remarking = false;
+    function grimoire(o) {
+        o = o || {};
+        if (remarking || view.classList.contains('open')) return true;
+        remarking = true;
+        var line = o.line || VIBES[Math.floor(Math.random() * VIBES.length)];
+        var go = function () {
+            remarking = false;
+            if (sfxOK()) sfx('grimoire-open', { or: 'dread', volume: o.loud ? 1 : QUIET });
+            if (o.open) o.open(); else show1(grimRec);
+        };
+        var speak = Sky.claubes && Sky.claubes.speak;
+        if (speak) speak(line, null, { hold: 700, typed: function () { setTimeout(go, 600); } });
+        else { if (Sky.inventory && Sky.inventory.say) Sky.inventory.say(line, 2400); setTimeout(go, 1500); }
+        return true;
+    }
+    function sfxOK() { return !!Sky.sounds; }
+
+    Sky.books = { open: open, close: close, grimoire: grimoire, get remarking() { return remarking; } };
 })();

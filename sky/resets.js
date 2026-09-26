@@ -5,7 +5,9 @@
      the key       one per reset, hidden somewhere (RESETS[…].key). click it
                    and the lock comes off the hearts (sky/lives.js): from then
                    on, dying costs a life. its picture: the reset's own
-                   assets/resets/reset-<n>/key, or assets/ui/key for all of them
+                   assets/resets/reset-<n>/key, or assets/ui/key for all of them.
+                   a key with "drop" isn't hidden: something drops it (reset 3:
+                   the last of the seven Claubes, shot), where it happens
      the scissors  the workshop bench (reset 1): the traveller takes them to
                    their neck. after reset 1, safety scissors hang on the wall
                    instead (assets/workshop/scissors, assets/workshop/safety-scissors)
@@ -67,18 +69,12 @@
         '<circle cx="11" cy="12" r="8.5" fill="none" stroke="#7a5a22" stroke-width="1" opacity=".6"/>' +
         '<path d="M19 10 H56 V14.5 H52 V20 H47 V14.5 H43 V19 H39 V14.5 H19 Z" fill="#c49a52" stroke="#7a5a22" stroke-width="1"/></svg>';
     function keyFound() { return S.get('key') === '1'; }
-    function placeKey() {
-        var k = S.info && S.info.key;
-        if (!k || k.page !== PAGE || keyFound()) return;
-        var host = document.querySelector(k.in);
-        if (!host) return;
+    function makeKey(host, fixed) {
         var el = document.createElement('div');
-        el.className = 'reset-key' + (k.in === 'body' ? ' fixed' : '');
+        el.className = 'reset-key' + (fixed ? ' fixed' : '');
         el.setAttribute('role', 'button');
         el.setAttribute('tabindex', '0');
         el.setAttribute('aria-label', 'a small key');
-        el.style.left = k.in === 'body' ? k.left + 'vw' : k.left + '%';
-        el.style.top = k.in === 'body' ? k.top + 'vh' : k.top + '%';
         el.innerHTML = KEY;
         host.appendChild(el);
         Sky.findAsset('assets/resets/reset-' + S.reset + '/key|assets/ui/key', function (u) { if (u) el.innerHTML = '<img alt="" src="' + u + '">'; });
@@ -101,7 +97,30 @@
         }
         el.addEventListener('click', take);
         el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') take(e); });
+        return el;
     }
+    function placeKey() {
+        var k = S.info && S.info.key;
+        if (!k || k.drop || k.page !== PAGE || keyFound()) return;
+        var host = document.querySelector(k.in);
+        if (!host) return;
+        var el = makeKey(host, k.in === 'body');
+        el.style.left = k.in === 'body' ? k.left + 'vw' : k.left + '%';
+        el.style.top = k.in === 'body' ? k.top + 'vh' : k.top + '%';
+    }
+    // dropped: it falls from where it was (x, y: on the screen) to the floor there, with a little bounce
+    document.addEventListener('dav:drop-key', function (e) {
+        var k = S.info && S.info.key, d = e.detail || {};
+        if (!k || k.drop !== d.by || keyFound()) return;
+        var el = makeKey(body, true);
+        el.style.left = d.x + 'px'; el.style.top = d.y + 'px';
+        el.style.zIndex = 6;
+        el.animate([{ translate: '0 -60px', opacity: 0 }, { translate: '0 -60px', opacity: 1, offset: 0.1 }, { translate: '0 0', offset: 0.55 },
+                    { translate: '0 -14px', offset: 0.72 }, { translate: '0 0', offset: 0.86 }, { translate: '0 -3px', offset: 0.93 }, { translate: '0 0', opacity: 1 }],
+                   { duration: 900, easing: 'ease-in' });
+        setTimeout(function () { sfx('key-drop', { or: 'tap' }); }, 480);
+        say('something small fell with a clink.', 2600);
+    });
     // (found before the hearts turned up: they turn up unlocked)
     if (keyFound() && Sky.lives && !Sky.lives.unlocked) Sky.lives.unlock();
 
@@ -243,7 +262,33 @@
         edge.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') jump(e); });
     }
 
-    function start() { placeKey(); setupScissors(); setupRoof(); }
+    /* ---------------- déjà vu: the start of every reset after the first ----------------
+       the first page they see in a new reset, the traveller says it (typed out, in the box at the bottom:
+       sky/claubes.js speak). once a reset (run:deja-vu). one line per reset, 2 to 8: */
+    var DEJA = {
+        2: 'Huh. I could swear I\u2019ve been here before.',
+        3: 'This again? Why does all of this feel so\u2026 familiar?',
+        4: 'I\u2019ve been here before. More than once. I know I have.',
+        5: 'Same sea. Same sky. How many times have I done this now?',
+        6: 'Every time I come back, a little more of it feels\u2026 painted on.',
+        7: 'I remember this. I remember all of it. Round and round and round.',
+        8: 'Again. It\u2019s always again.'
+    };
+    function dejaVu() {
+        var line = DEJA[S.reset];
+        if (!line || S.get('deja-vu') === '1') return;
+        var tries = 0;
+        (function when() {                                           // (after the loading screen, if there is one)
+            if (document.getElementById('dav-loader') || !(Sky.claubes && Sky.claubes.speak)) { if (++tries < 80) setTimeout(when, 250); return; }
+            setTimeout(function () {
+                if (S.get('deja-vu') === '1') return;
+                S.set('deja-vu', '1');
+                Sky.claubes.speak(line);
+            }, 1800);
+        })();
+    }
+
+    function start() { placeKey(); setupScissors(); setupRoof(); dejaVu(); }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
     Sky.resets = { get reset() { return S.reset; }, live: S.live, patched: S.patched };

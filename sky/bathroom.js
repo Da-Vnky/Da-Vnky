@@ -453,8 +453,27 @@
         });
         SIDES.forEach(function (sd) { if (sd.me) { sd.me.classList.remove('gore-hidden'); place(sd.me, sd.standAt); } });
     });
+    // straight back to the living space, no walking and no sliding (for when the screen's black anyway)
+    function homeNow() {
+        var sd = inSide;
+        if (!sd) return;
+        sd.el.style.transition = room.style.transition = 'none';
+        body.classList.remove('in-' + sd.name, 'in-side', sd.name + '-panning', 'side-walking');
+        sd.el.setAttribute('aria-hidden', 'true');
+        inSide = null; busy = false;
+        tabHere(true);
+        fire('leave', sd);
+        if (sd.dir === 0) sd.go.classList.remove('pulled');
+        if (sd.me) sd.me.classList.remove('gore-hidden');
+        if (home) { home.classList.remove('descending', 'ascending', 'walking', 'gore-hidden'); home.style.transform = ''; place(home, homeAt, false); }
+        try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+        void room.offsetWidth;
+        setTimeout(function () { sd.el.style.transition = room.style.transition = ''; }, 60);
+    }
     Sky.sides = { get inSide() { return inSide && inSide.name; }, get busy() { return busy; }, walk: walk, place: place, leftPct: leftPct,
-                  on: function (fn) { hooks.push(fn); if (inSide) fn('enter', inSide.name); }, home: goHome };
+                  on: function (fn) { hooks.push(fn); if (inSide) fn('enter', inSide.name); }, home: goHome, homeNow: homeNow,
+                  goNow: function (name) { var sd = SIDES.filter(function (x) { return x.name === name; })[0]; if (sd && !inSide) goTo(sd, true); },
+                  get me() { return home; } };
 
     /* ---------------- the mirror ---------------- */
     if (!mirror) return;

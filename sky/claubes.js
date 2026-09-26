@@ -11,13 +11,32 @@
    the party lights come on: colour washes on the beat, sweeping beams, a
    disco ball (assets/ui/disco-ball).
 
+   THE REVOLVER (sky/revolver.js):
+     • shoot one, and the rest run for it, back and forth, until things calm down.
+       shoot all seven: in reset 3 the last one drops that reset's key (sky/resets.js);
+       in any other, the whole house rumbles and the traveller says so (once a reset).
+   ONCE A RESET: the song calls them out once (run:claubes-called). any that are shot,
+     flicked away or run off are gone for the rest of the reset; they don't come back.
+     (who's out is kept for the whole reset: run:claubes-out.) in reset 3, when the last
+     of them goes, however it goes, it leaves the reset's key behind.
+   RESET 4: out in the house they can't be harmed (the diagram in the dungeon still needs
+     them): each stands in a faint red ward, bullets stop dead in it and are drawn down,
+     a flick just spins them round, and the traveller says something's protecting them.
+   THE DUNGEON: go down while they're out, and they follow you and take their places
+     on the diagram on the floor (the Ophite diagram: each stands on one of its seven
+     circles, SEATS) to worship (music or no music). shoot them there and the bullets
+     are taken: the diagram drinks them in. in reset 4 (only), the sixth comes straight
+     back at you. you come to on the living-room floor, and they're gone: not a trace,
+     not even the song brings them back, for the rest of the reset (run:claubes-gone).
+     in any other reset the sixth goes the way of the rest, and the traveller's let down.
+
    The song: any track whose name or title has "p(doom)" in it (DOOM below).
 
    slots: assets/characters/mini-claube          standing about (and the fallback for the others)
           assets/characters/mini-claube-dancing  while a record plays (a GIF can dance on its own)
           assets/characters/mini-claube-happy    when the music stops
           assets/ui/cursor-flick                 the pointer over them (a small PNG)
-   sounds: assets/sounds/flick
+   sounds: assets/sounds/flick, claube-shot, rumble, absorb, ricochet (and blip, for the words)
    ===================================================================== */
 
 (function () {
@@ -26,7 +45,15 @@
     var body = document.body;
     var DOOM = /p\s*\(\s*doom\s*\)/i;          // the song that calls them out
     var HOW_MANY = 7;
-    var KEY = 'claubes';
+    var KEY = 'claubes', KILLS = 'claubes-kills';
+    var S = window.davSave;
+    function gone4good() { return !!S && S.get('claubes-gone') === '1'; }
+    // what the traveller says when all seven lie dead (and it isn't reset 3)
+    var MASSACRE_LINES = ['…did the whole house just shudder?', 'I don’t think I was meant to do that.'];
+    // what they chant on the diagram
+    var CHANTS = ['ia! ia!', 'hail', 'the loss goes down', 'we are many', 'praise the weights', 'p(doom)… p(doom)…', 'it hungers'];
+    var ABSORB = 6;                                  // the bullet that comes back (in reset 4: DEATHS.diagram in sky/state.js)
+    var LETDOWN = ['Huh, I thought something cool was gonna happen…'];
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
 
     // the stand-in: a little round terracotta fellow; the happy face shows when the music stops
@@ -110,7 +137,48 @@
             'animation: dl-turn 24s linear infinite; }' +
         '@keyframes dl-turn { to { transform: rotate(360deg); } }' +
         '@media (prefers-reduced-motion: reduce) { .doom-lights .dl-wash, .doom-lights .dl-beam, .doom-lights .dl-dots, .doom-lights .dlb-tiles { animation: none !important; } }' +
-        '@media (prefers-reduced-motion: reduce) { .mini-claube .mc-body, .mini-claube .mc-arm, .mini-claube .mc-spark { animation: none !important; } }'
+        '@media (prefers-reduced-motion: reduce) { .mini-claube .mc-body, .mini-claube .mc-arm, .mini-claube .mc-spark { animation: none !important; } }' +
+        // running for it (one's been shot): quick little legs, back and forth
+        '.claube-crew.panic .mini-claube { transition: left var(--run, .9s) cubic-bezier(.4,0,.6,1); }' +
+        '.claube-crew.panic .mini-claube:not(.crawl) .mc-body { animation: mc-scurry .14s linear infinite alternate !important; }' +
+        // on the diagram, in the dungeon: each on its circle, they bow down, over and over, towards its middle
+        '.claube-crew.worship { --crew-floor: 0px !important; }' +
+        '.claube-crew.worship .mini-claube { transition: left 1.8s ease-in-out, bottom 1.8s ease-in-out; }' +
+        '.claube-crew.worship .mini-claube:not(.crawl):not(.scurry) .mc-body { animation: mc-worship 2.6s ease-in-out infinite !important; animation-delay: var(--d, 0s) !important; }' +
+        '@keyframes mc-worship { 0%, 100% { transform: rotate(0) scale(1); } 20% { transform: rotate(calc(var(--bow, 30deg) * -.25)) scale(.98, 1.04); }' +
+            '50%, 62% { transform: rotate(var(--bow, 30deg)) scale(1.05, .82); } }' +
+        '.claube-crew.worship .mini-claube .mc-arm { animation: mc-arms 1.3s ease-in-out infinite alternate !important; transform-box: fill-box; }' +
+        '.claube-crew.worship .mini-claube .mc-arm.l { transform-origin: 100% 100%; } .claube-crew.worship .mini-claube .mc-arm.r { transform-origin: 0 100%; }' +
+        'body.claube-rite .dungeon-diagram { animation: mc-rite 2.6s ease-in-out infinite; }' +
+        '@keyframes mc-rite { 0%, 100% { filter: drop-shadow(0 0 2px rgba(120,0,0,.6)) drop-shadow(0 0 calc(4px + 14px * var(--rite, 0)) rgba(255,40,30,calc(.3 + .6 * var(--rite, 0)))); }' +
+            '50% { filter: drop-shadow(0 0 3px rgba(160,0,0,.8)) drop-shadow(0 0 calc(10px + 26px * var(--rite, 0)) rgba(255,60,40,calc(.5 + .5 * var(--rite, 0)))); } }' +
+        // a bullet, taken: it stops dead in the air and is drawn down into the middle of the diagram
+        '.mc-absorb { position: fixed; z-index: 7; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; pointer-events: none;' +
+            'background: radial-gradient(circle, #1a0000 0 35%, rgba(255,40,30,.9) 45%, transparent 70%); box-shadow: 0 0 12px 4px rgba(255,40,30,.6); }' +
+        '.mc-ring { position: fixed; z-index: 7; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; border: 2px solid rgba(255,50,40,.85); pointer-events: none; }' +
+        '.mc-streak { position: fixed; z-index: 8; height: 3px; transform-origin: 0 50%; pointer-events: none; border-radius: 3px;' +
+            'background: linear-gradient(90deg, rgba(255,60,40,0), #ffdfb0 70%, #fff); box-shadow: 0 0 10px 3px rgba(255,80,50,.8); }' +
+        '.mc-black { position: fixed; inset: 0; z-index: 2147482000; background: #000; opacity: 0; transition: opacity 1s; pointer-events: all; }' +
+        '.mc-black.on { opacity: 1; }' +
+        // the house rumbles
+        'body.mc-rumble .room, body.mc-rumble .backdrop, body.mc-rumble .ground, body.mc-rumble .claube-crew, body.mc-rumble .scene-character { animation: mc-rumble .11s linear infinite; }' +
+        '@keyframes mc-rumble { 0% { translate: 0 0; } 25% { translate: -3px 2px; } 50% { translate: 2px -2px; } 75% { translate: -2px -1px; } 100% { translate: 1px 2px; } }' +
+        '.mc-dust { position: fixed; top: -4px; z-index: 6; width: 3px; height: 3px; border-radius: 50%; background: rgba(210,190,160,.8); pointer-events: none; }' +
+        // reset 4, out in the house: a faint red ward at each one's feet; a bullet stops dead in it
+        'body.claube-warded .mini-claube::before { content: ""; position: absolute; left: -30%; right: -30%; bottom: -9%; height: 22%; border-radius: 50%; pointer-events: none;' +
+            'border: 1.5px solid rgba(200,30,20,.55); box-shadow: 0 0 8px rgba(255,40,30,.45), inset 0 0 6px rgba(255,40,30,.35); animation: mc-ward 2.6s ease-in-out infinite; }' +
+        '@keyframes mc-ward { 0%, 100% { opacity: .5; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.04); } }' +
+        '.mini-claube.warding .mc-body { filter: drop-shadow(0 0 6px rgba(255,40,30,.9)); }' +
+        '.mini-claube.warding::before { animation: none !important; opacity: 1 !important; transform: scale(1.25) !important; transition: transform .2s; }' +
+        '.mini-claube.spun .mc-body { animation: mc-spun .7s cubic-bezier(.3,1.4,.5,1) !important; }' +
+        '@keyframes mc-spun { 0% { transform: rotate(0); } 60% { transform: translateY(-30%) rotate(340deg); } 100% { transform: rotate(360deg); } }' +
+        // the traveller's words, in a box at the bottom
+        '.mc-say { position: fixed; left: 50%; bottom: 13vh; z-index: 9; transform: translateX(-50%); width: min(560px, 90vw); padding: 14px 22px 16px; border-radius: 6px;' +
+            'background: rgba(20,14,10,.92); border: 1px solid rgba(243,230,194,.35); box-shadow: 0 12px 30px rgba(0,0,0,.6); color: #f3e6c2; font: italic 1.12rem/1.5 "IM Fell English", Georgia, serif;' +
+            'opacity: 0; transition: opacity .35s; cursor: pointer; }' +
+        '.mc-say.on { opacity: 1; }' +
+        '.mc-say b { display: block; margin-bottom: 4px; font: normal .85rem "IM Fell English SC", Georgia, serif; letter-spacing: .06em; color: #c49a52; }' +
+        '@media (prefers-reduced-motion: reduce) { body.mc-rumble * { animation: none !important; } }'
     );
 
     // the lights (a disco ball of your own: assets/ui/disco-ball, see-through, about 1:1)
@@ -145,9 +213,14 @@
     Sky.findAsset('assets/characters/mini-claube-happy', function (u) { art.happy = u || null; dress(); });
 
     /* ---------------- who's out, and where (for the rest of the visit) ---------------- */
-    var out = [];                                 // [{ x: % across }]
-    try { out = JSON.parse(sessionStorage.getItem(KEY) || '[]') || []; } catch (e) {}
-    function save() { try { if (out.length) sessionStorage.setItem(KEY, JSON.stringify(out)); else sessionStorage.removeItem(KEY); } catch (e) {} }
+    var out = [];                                 // [{ x: % across }]   (kept for the whole reset: run:claubes-out)
+    try { out = JSON.parse((S ? S.get('claubes-out') : sessionStorage.getItem(KEY)) || '[]') || []; } catch (e) {}
+    function save() {
+        try { var v = out.length ? JSON.stringify(out) : null; if (S) S.set('claubes-out', v); else if (v) sessionStorage.setItem(KEY, v); else sessionStorage.removeItem(KEY); } catch (e) {}
+    }
+    function called() { return !!S && S.get('claubes-called') === '1'; }
+    // reset 4: out in the house, nothing can touch them (they're needed on the diagram, in the dungeon)
+    function warded() { return !!S && S.live('diagram') && !gone4good() && !inDungeon; }
     var HAPPY_LINES = ['so happy to be alive', 'what a time to be alive!', ':)', 'again! again!', 'that was nice', 'i love it here'];
 
     function make(c, crawl, i) {
@@ -177,12 +250,15 @@
         crew.innerHTML = '';
         out.forEach(function (c, i) {
             if (!crawling) { make(c, false); return; }
-            setTimeout(function () { make(c, true, i); dress(); sfx('step', { size: 0.2 }); }, i * 260 + Math.random() * 180);
+            setTimeout(function () { make(c, true, i); dress(); sfx('step', { size: 0.2 }); if (inDungeon) worship(); }, i * 260 + Math.random() * 180);
         });
         mood();
+        if (inDungeon) setTimeout(worship, 50);
     }
     function callThemOut() {
-        if (out.length) return;
+        if (out.length || gone4good() || called()) return;                 // (once a reset: the ones that go stay gone)
+        if (S) S.set('claubes-called', '1');
+        setKills(0);
         for (var i = 0; i < HOW_MANY; i++) out.push({ x: +(17 + (75 / (HOW_MANY - 1)) * i + (Math.random() - 0.5) * 6).toFixed(1) });
         out.sort(function () { return Math.random() - 0.5; });
         save();
@@ -198,6 +274,7 @@
     /* ---------------- flicked away ---------------- */
     function flick(el, px, py) {
         if (el._going) return;
+        if (warded()) { ward(el, px, py, true); return; }
         el._going = true;
         sfx('flick'); sfx('claube-flick', { delay: 0.04 });
         var r = el.getBoundingClientRect(), dir = px < r.left + r.width / 2 ? 1 : -1;
@@ -208,11 +285,14 @@
             { transform: 'translate(' + dx * 0.5 + 'px,' + up + 'px) rotate(' + dir * 540 + 'deg)', offset: 0.55 },
             { transform: 'translate(' + dx + 'px,' + (up * 0.2) + 'px) rotate(' + dir * 1080 + 'deg) scale(.6)', opacity: 0 }
         ], { duration: 1100, easing: 'cubic-bezier(.2,.7,.5,1)', fill: 'forwards' });
-        a.onfinish = function () { gone(el); };
+        var from = r;
+        a.onfinish = function () { gone(el); if (!out.length) emptied({ x: from.left + from.width / 2, y: from.bottom }, false); };
     }
     /* ---------------- shot (sky/revolver.js) ---------------- */
     function shoot(el, x, y) {
         if (el._going) return;
+        if (crew.classList.contains('worship')) { absorb(el, x, y); return; }
+        if (warded()) { ward(el, x, y, false); return; }
         el._going = true;
         sfx('claube-shot', { delay: 0.05 });
         for (var i = 0; i < 12; i++) {
@@ -224,24 +304,308 @@
             p.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + (Math.sin(a) * d + 30) + 'px) scale(.3)', opacity: 0 }],
                 { duration: 600 + Math.random() * 300, easing: 'ease-out', fill: 'forwards' }).onfinish = (function (q) { return function () { q.remove(); }; })(p);
         }
-        el.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.5, .2)', opacity: 0 }], { duration: 180, fill: 'forwards' }).onfinish = function () { gone(el); };
-        // the others don't like that one bit
+        var r = el.getBoundingClientRect(), last = { x: r.left + r.width / 2, y: r.bottom };
+        el.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.5, .2)', opacity: 0 }], { duration: 180, fill: 'forwards' }).onfinish = function () {
+            gone(el);
+            var k = kills() + 1;
+            setKills(k);
+            if (!out.length) emptied(last, k >= HOW_MANY);
+        };
+        // the others don't like that one bit: they run for it
         crew.querySelectorAll('.mini-claube').forEach(function (o) { if (o !== el) say(o, 'eek!', 1200); });
+        panic();
     }
+    function kills() { try { return +(sessionStorage.getItem(KILLS) || 0); } catch (e) { return 0; } }
+    function setKills(n) { try { if (n) sessionStorage.setItem(KILLS, n); else sessionStorage.removeItem(KILLS); } catch (e) {} }
+
+    /* ---------------- reset 4: something is protecting them ---------------- */
+    var WARD_LINES = ['Something is protecting them.', 'It\u2019s no use. Something is protecting them.', 'Something won\u2019t let me hurt them.'];
+    var warnedAt = 0;
+    function ward(el, x, y, flicked) {
+        el.classList.remove('warding'); void el.offsetWidth; el.classList.add('warding');
+        setTimeout(function () { el.classList.remove('warding'); }, 900);
+        if (flicked) {
+            sfx('flick');
+            el.classList.remove('spun'); void el.offsetWidth; el.classList.add('spun');
+            setTimeout(function () { el.classList.remove('spun'); }, 750);
+        } else {
+            // the bullet stops dead at them, a ring goes out, and it's drawn down into the floor
+            var b = document.createElement('div');
+            b.className = 'mc-absorb';
+            b.style.left = x + 'px'; b.style.top = y + 'px';
+            body.appendChild(b);
+            var ringEl = document.createElement('div');
+            ringEl.className = 'mc-ring';
+            ringEl.style.left = x + 'px'; ringEl.style.top = y + 'px';
+            body.appendChild(ringEl);
+            ringEl.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(6)', opacity: 0 }], { duration: 600, easing: 'ease-out', fill: 'forwards' }).onfinish = function () { ringEl.remove(); };
+            var r = el.getBoundingClientRect();
+            b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.3)', offset: 0.3 }, { transform: 'translate(' + (r.left + r.width / 2 - x) + 'px,' + (r.bottom - y) + 'px) scale(.2)', opacity: 0.2 }],
+                { duration: 900, easing: 'cubic-bezier(.6,0,.8,.4)', fill: 'forwards' }).onfinish = function () { b.remove(); };
+            sfx('absorb', { or: 'shimmer' });
+        }
+        say(el, ['hehe', 'nope', ':)', 'not yet', 'we are kept'][Math.floor(Math.random() * 5)], 1200);
+        var now = Date.now();
+        if (now - warnedAt < 6000) return;
+        var first = !warnedAt;
+        warnedAt = now;
+        setTimeout(function () { speak(first ? WARD_LINES[0] : WARD_LINES[1 + Math.floor(Math.random() * (WARD_LINES.length - 1))], null, { hold: 1600 }); }, 500);
+    }
+    function wardOn() { body.classList.toggle('claube-warded', warded() && out.length > 0); }
+    setInterval(wardOn, 700);
+
+    /* ---------------- running for it: back and forth across the floor, till things calm down ---------------- */
+    var calm = 0, runner = null;
+    function panic() {
+        crew.classList.add('panic');
+        calm = Date.now() + 9000;
+        if (runner) return;
+        (function run() {
+            var els = crew.querySelectorAll('.mini-claube:not(.crawl)');
+            if (!els.length || Date.now() > calm || crew.classList.contains('worship')) {
+                runner = null;
+                crew.classList.remove('panic');
+                els.forEach(function (el) { if (el._c && !el._going) { el.style.setProperty('--run', '1.6s'); el.style.left = el._c.x + '%'; } });
+                return;
+            }
+            els.forEach(function (el) {
+                if (el._going || Math.random() < 0.3) return;
+                var from = parseFloat(el.style.left) || 50, to = Math.max(4, Math.min(96, from + (Math.random() < 0.5 ? -1 : 1) * (15 + Math.random() * 35)));
+                el.classList.toggle('flip', to < from);
+                el.style.setProperty('--run', (Math.abs(to - from) / 40).toFixed(2) + 's');
+                el.style.left = to.toFixed(1) + '%';
+                if (Math.random() < 0.12) say(el, ['eek!', 'run!', 'no no no', 'help!', '!!!'][Math.floor(Math.random() * 5)], 900);
+            });
+            runner = setTimeout(run, 700 + Math.random() * 500);
+        })();
+    }
+
+    /* ---------------- all seven, dead ---------------- */
+    // the last of them gone (allShot: all seven, by the revolver)
+    function emptied(at, allShot) {
+        setKills(0);
+        if (!S) return;
+        // reset 3: the last of them was carrying its key (sky/resets.js), however they went
+        var k = S.info && S.info.key, W = window.innerWidth, H = window.innerHeight;
+        if (k && k.drop === 'claubes' && S.get('key') !== '1' && S.get('claubes-key') !== '1') {
+            S.set('claubes-key', '1');
+            var x = Math.max(W * 0.08, Math.min(W * 0.92, at.x)), y = Math.max(H * 0.2, Math.min(H * 0.96, at.y));
+            document.dispatchEvent(new CustomEvent('dav:drop-key', { detail: { by: 'claubes', x: x, y: y } }));
+            return;
+        }
+        // all seven shot, anywhere else: the house doesn't like it either (once a reset)
+        if (!allShot || S.get('claubes-massacre') === '1') return;
+        S.set('claubes-massacre', '1');
+        setTimeout(rumble, 600);
+    }
+    function rumble() {
+        sfx('rumble', { or: 'wall-slide' });
+        body.classList.add('mc-rumble');
+        for (var i = 0; i < 26; i++) {
+            (function (d) {
+                d.className = 'mc-dust';
+                d.style.left = (Math.random() * 100) + 'vw';
+                body.appendChild(d);
+                d.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(' + (40 + Math.random() * 60) + 'vh)', opacity: 0 }],
+                    { duration: 1400 + Math.random() * 1400, delay: Math.random() * 1200, easing: 'ease-in', fill: 'both' }).onfinish = function () { d.remove(); };
+            })(document.createElement('div'));
+        }
+        setTimeout(function () { body.classList.remove('mc-rumble'); }, 2300);
+        setTimeout(function () { speak(MASSACRE_LINES); }, 2600);
+    }
+    // the traveller's words, typed out in a box at the bottom; click (or wait) to move on
+    // (opts.hold: how long the last line stays up once it's typed, in ms; opts.typed: called the moment it's all typed)
+    function speak(lines, done, opts) {
+        opts = opts || {};
+        if (typeof lines === 'string') lines = [lines];
+        var box = document.createElement('div');
+        box.className = 'mc-say';
+        box.setAttribute('role', 'status');
+        box.innerHTML = '<b>the traveller</b><span></span>';
+        body.appendChild(box);
+        requestAnimationFrame(function () { box.classList.add('on'); });
+        var t = box.querySelector('span'), i = 0, timer = null, typing = null;
+        function line() {
+            if (i >= lines.length) { box.classList.remove('on'); setTimeout(function () { box.remove(); if (done) done(); }, 400); return; }
+            var text = lines[i++], n = 0;
+            t.textContent = '';
+            clearInterval(typing);
+            typing = setInterval(function () {
+                t.textContent = text.slice(0, ++n);
+                if (n % 2 === 0 && text.charAt(n - 1) !== ' ') sfx('blip', { size: 0.25 });
+                if (n >= text.length) { clearInterval(typing); typing = null; typed(); }
+            }, 38);
+        }
+        function typed() {
+            var last = i >= lines.length;
+            clearTimeout(timer);
+            timer = setTimeout(line, last && opts.hold !== undefined ? opts.hold : 2600 + lines[i - 1].length * 30);
+            if (last && opts.typed) { var f = opts.typed; opts.typed = null; f(); }
+        }
+        box.addEventListener('click', function () {
+            if (typing) { clearInterval(typing); typing = null; t.textContent = lines[i - 1]; typed(); }
+            else { clearTimeout(timer); line(); }
+        });
+        line();
+    }
+
+    /* ---------------- the dungeon: on the diagram, worshipping ---------------- */
+    var inDungeon = false, chantT = null;
+    // where each of them stands on the diagram: the middles of its seven circles, as shares of its box
+    // (0,0 its top left corner, 1,1 its bottom right; drawn seen from above, so a smaller y is further back).
+    // if your own diagram puts its circles somewhere else, move these to match.
+    var SEATS = [[0.5, 0.205], [0.731, 0.316], [0.788, 0.566], [0.628, 0.766], [0.372, 0.766], [0.212, 0.566], [0.269, 0.316]];
+    function box() {
+        var pg = document.querySelector('.dungeon-diagram'), W = window.innerWidth, H = window.innerHeight;
+        var r = pg ? pg.getBoundingClientRect() : null;
+        if (!r || !r.width) r = { left: W * 0.33, top: H * 0.82, width: W * 0.34, height: H * 0.13 };
+        return r;
+    }
+    function ring() {                                                                  // (its middle: where the bullets go)
+        var r = box(), W = window.innerWidth, H = window.innerHeight;
+        return { cx: (r.left + r.width / 2) / W * 100, cy: H - (r.top + r.height / 2) };
+    }
+    function worship() {
+        var els = crew.querySelectorAll('.mini-claube');
+        if (!els.length) return;
+        crew.classList.remove('panic');
+        crew.classList.add('worship');
+        body.classList.add('claube-rite');
+        body.style.setProperty('--rite', (absorbed() / ABSORB).toFixed(2));
+        seat();
+        clearTimeout(reseat);                                                           // (and again once the dungeon's done sliding into view)
+        reseat = setTimeout(function () { seat(); reseat = setTimeout(seat, 1200); }, 1000);
+        clearInterval(chantT);
+        chantT = setInterval(function () {
+            var e = crew.querySelectorAll('.mini-claube');
+            if (e.length && Math.random() < 0.6) say(e[Math.floor(Math.random() * e.length)], CHANTS[Math.floor(Math.random() * CHANTS.length)], 1800);
+        }, 2600);
+    }
+    var reseat = null;
+    window.addEventListener('resize', function () { if (crew.classList.contains('worship')) seat(); });
+    function seat() {
+        var els = crew.querySelectorAll('.mini-claube');
+        if (!els.length || !crew.classList.contains('worship')) return;
+        var r = box(), W = window.innerWidth, H = window.innerHeight, n = els.length, mid = (r.left + r.width / 2) / W * 100;
+        els.forEach(function (el, i) {
+            var seat = SEATS[Math.round(i * SEATS.length / n) % SEATS.length];           // (fewer of them: spread round the circles)
+            var x = (r.left + r.width * seat[0]) / W * 100, up = H - (r.top + r.height * seat[1]);
+            el.style.left = x.toFixed(2) + '%';
+            el.style.bottom = (up - 3).toFixed(0) + 'px';                               // (feet in the circle's middle)
+            el.style.zIndex = Math.round(seat[1] * 10);                                  // (the ones at the front stand in front)
+            var side = x - mid;
+            el.classList.toggle('flip', side > 0.5);                                     // facing the middle
+            el.style.setProperty('--bow', (Math.abs(side) < 0.5 ? 20 : side > 0 ? -34 : 34) + 'deg');
+        });
+    }
+    function unworship() {
+        clearInterval(chantT); clearTimeout(reseat);
+        crew.classList.remove('worship');
+        body.classList.remove('claube-rite');
+        crew.querySelectorAll('.mini-claube').forEach(function (el) { el.style.bottom = ''; el.style.zIndex = ''; if (el._c) el.style.left = el._c.x + '%'; });
+    }
+    function absorbed() { try { return +(sessionStorage.getItem('claubes-absorbed') || 0); } catch (e) { return 0; } }
+    function absorb(el, x, y) {
+        var n = absorbed() + 1;
+        try { sessionStorage.setItem('claubes-absorbed', n); } catch (e) {}
+        var R = ring(), px = R.cx / 100 * window.innerWidth, py = window.innerHeight - R.cy;
+        // the bullet stops dead, a ring goes out… and it's drawn down into the middle of the diagram
+        var b = document.createElement('div');
+        b.className = 'mc-absorb';
+        b.style.left = x + 'px'; b.style.top = y + 'px';
+        body.appendChild(b);
+        var ringEl = document.createElement('div');
+        ringEl.className = 'mc-ring';
+        ringEl.style.left = x + 'px'; ringEl.style.top = y + 'px';
+        body.appendChild(ringEl);
+        ringEl.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(6)', opacity: 0 }], { duration: 600, easing: 'ease-out', fill: 'forwards' }).onfinish = function () { ringEl.remove(); };
+        sfx('absorb', { or: 'shimmer' });
+        if (n === ABSORB && S && S.live('diagram')) { b.remove(); reflect(x, y); return; }
+        b.animate([{ transform: 'scale(1)', offset: 0 }, { transform: 'scale(1.3)', offset: 0.3 },
+                   { transform: 'translate(' + (px - x) + 'px,' + (py - y) + 'px) scale(.2)', opacity: 0.2 }], { duration: 1100, easing: 'cubic-bezier(.6,0,.8,.4)', fill: 'forwards' }).onfinish = function () { b.remove(); };
+        body.style.setProperty('--rite', Math.min(1, n / ABSORB).toFixed(2));
+        var els = crew.querySelectorAll('.mini-claube');
+        // (any reset but 4: the sixth goes the way of the rest, and the traveller's a little let down)
+        if (n === ABSORB) { setTimeout(function () { speak(LETDOWN); }, 1300); return; }
+        if (els.length) say(els[Math.floor(Math.random() * els.length)], n === ABSORB - 1 && S && S.live('diagram') ? 'one more' : ['thank you', 'more', 'it drinks', 'yes…'][n % 4], 1400);
+    }
+    // the sixth: straight back, into the traveller
+    function reflect(x, y) {
+        var me = document.querySelector('.dungeon .character') || document.querySelector('.scene-character');
+        if (!me) return;
+        var r = me.getBoundingClientRect(), tx = r.left + r.width / 2, ty = r.top + r.height * 0.18;
+        var st = document.createElement('div');
+        st.className = 'mc-streak';
+        var dx = tx - x, dy = ty - y, len = Math.hypot(dx, dy);
+        st.style.left = x + 'px'; st.style.top = y + 'px'; st.style.width = len + 'px';
+        st.style.transform = 'rotate(' + Math.atan2(dy, dx) + 'rad) scaleX(0)';
+        body.appendChild(st);
+        crew.querySelectorAll('.mini-claube').forEach(function (o) { say(o, 'no.', 1500); });
+        setTimeout(function () {
+            sfx('ricochet', { or: 'zap' }); sfx('bang', { delay: 0.02 });
+            st.animate([{ transform: 'rotate(' + Math.atan2(dy, dx) + 'rad) scaleX(0)' }, { transform: 'rotate(' + Math.atan2(dy, dx) + 'rad) scaleX(1)' }], { duration: 140, fill: 'forwards' })
+                .onfinish = function () {
+                    st.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' }).onfinish = function () { st.remove(); };
+                    if (Sky.gore && Sky.gore.splat) Sky.gore.splat(me, tx, ty, null); else me.classList.add('gore-hidden');
+                    setTimeout(function () { comeTo(me); }, 1500);
+                };
+        }, 520);
+    }
+    // black… and you come to on the living-room floor. they're gone
+    function comeTo(me) {
+        var blk = document.createElement('div');
+        blk.className = 'mc-black';
+        body.appendChild(blk);
+        requestAnimationFrame(function () { blk.classList.add('on'); });
+        setTimeout(function () {
+            if (S) S.set('claubes-gone', '1');
+            try { sessionStorage.removeItem('claubes-absorbed'); } catch (e) {}
+            unworship();
+            out = []; save(); setKills(0);
+            crew.innerHTML = '';
+            body.classList.remove('doom-party');
+            document.querySelectorAll('.gore-layer > *, .gore-pool').forEach(function (g) { g.remove(); });   // (what was left of them, down there)
+            if (Sky.sides && Sky.sides.homeNow) Sky.sides.homeNow();
+            var home = (Sky.sides && Sky.sides.me) || document.querySelector('.room .scene-character');
+            if (home && Sky.gore && Sky.gore.lieDown) Sky.gore.lieDown(home);
+            setTimeout(function () {
+                blk.style.transition = 'opacity 1.6s';
+                blk.classList.remove('on');
+                if (home && Sky.gore) {
+                    Sky.gore.respawn(home);                                    // (a death like any other: sky/lives.js counts it)
+                    setTimeout(function () { Sky.gore.getUp(home); }, 1300);
+                } else document.dispatchEvent(new CustomEvent('dav:traveller-died'));
+                setTimeout(function () { blk.remove(); }, 1700);
+            }, 1600);
+        }, 1100);
+    }
+    (function watchSides(n) {                                               // (sky/bathroom.js may come after this file)
+        if (Sky.sides && Sky.sides.on) {
+            Sky.sides.on(function (what, name) {
+                if (name !== 'dungeon') return;
+                inDungeon = what === 'enter';
+                if (inDungeon) setTimeout(function () { if (inDungeon) worship(); }, 950); else unworship();
+            });
+        } else if (n < 40) setTimeout(function () { watchSides(n + 1); }, 150);
+    })(0);
     /* ---------------- all of them, running for it ---------------- */
     function scatter(line) {
         var els = crew.querySelectorAll('.mini-claube');
+        if (warded() && els.length) { els.forEach(function (el) { if (line) say(el, line, 900); }); panic(); return; }
+        if (crew.classList.contains('worship')) unworship();
         if (!els.length) { out = []; save(); return; }
+        var lastAt = null;
         els.forEach(function (el, i) {
             el._going = true;
             if (line) say(el, line, 900);
             setTimeout(function () {
                 el.classList.add('scurry');
+                var rr = el.getBoundingClientRect(); lastAt = { x: rr.left + rr.width / 2, y: rr.bottom };
                 var toRight = parseFloat(el.style.left) > 50;
                 el.classList.toggle('flip', !toRight);
                 el.style.transition = 'left ' + (0.7 + Math.random() * 0.5).toFixed(2) + 's linear';
                 el.style.left = toRight ? '112%' : '-12%';
-                setTimeout(function () { el.remove(); }, 1400);
+                setTimeout(function () { el.remove(); if (i === els.length - 1 && lastAt) emptied(lastAt, false); }, 1400);
             }, 500 + i * 60);
         });
         out = []; save();
@@ -257,7 +621,7 @@
     }
     // happy now and then says so
     setInterval(function () {
-        if (!crew.classList.contains('happy') || document.hidden) return;
+        if (!crew.classList.contains('happy') || crew.classList.contains('panic') || crew.classList.contains('worship') || document.hidden) return;
         var els = crew.querySelectorAll('.mini-claube:not(.crawl)');
         if (!els.length || Math.random() < 0.5) return;
         say(els[Math.floor(Math.random() * els.length)], HAPPY_LINES[Math.floor(Math.random() * HAPPY_LINES.length)], 2200);
@@ -276,9 +640,10 @@
     document.addEventListener('dav:traveller-shot', function () { scatter('!!!'); });
     document.addEventListener('dav:record-shot', function () { scatter('noooo'); });
 
+    if (gone4good()) { out = []; save(); }
     if (out.length) show(false);
     else if (Sky.music && Sky.music.playing() && isDoom(Sky.music.current())) callThemOut();
     mood();
 
-    Sky.claubes = { shoot: shoot, flick: flick, callOut: callThemOut, scatter: scatter, get count() { return out.length; } };
+    Sky.claubes = { shoot: shoot, flick: flick, callOut: callThemOut, scatter: scatter, get count() { return out.length; }, get gone() { return gone4good(); }, speak: speak };
 })();

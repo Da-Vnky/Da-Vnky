@@ -56,8 +56,8 @@
         '.candle.has-art .cd-flame { display: none; }' +
         '.dungeon .room-arrow.to-upstairs { z-index: 6; }' +
         '.dungeon .gallery-frame[data-look=lux] { z-index: 5 !important; } .dungeon .gallery-frame[data-look=lux] .gf-border { filter: brightness(.82); }' +                    // (the grand frame catches the candlelight)
-        '.dungeon-pentagram { pointer-events: none; z-index: 5 !important; opacity: .8; filter: drop-shadow(0 0 2px rgba(120,0,0,.6)); }' +     // (over the dark: wet blood catches the candlelight)
-        '.dungeon-pentagram > svg, .dungeon-pentagram > .art { object-fit: fill !important; }' +
+        '.dungeon-diagram { pointer-events: none; z-index: 5 !important; opacity: .8; filter: drop-shadow(0 0 2px rgba(120,0,0,.6)); }' +     // (over the dark: wet blood catches the candlelight)
+        '.dungeon-diagram > svg, .dungeon-diagram > .art { object-fit: fill !important; }' +
         '.dungeon-paper { cursor: pointer; z-index: 3 !important; transform: rotate(-8deg); transition: transform .2s; filter: drop-shadow(0 2px 3px rgba(0,0,0,.6)); }' +
         '.dungeon-paper:hover, .dungeon-paper:focus-visible { transform: rotate(-8deg) translateY(-3px); outline: none; }' +
         '.dungeon-paper .dp-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%) rotate(8deg); white-space: nowrap; font-style: italic; font-size: .9rem;' +
