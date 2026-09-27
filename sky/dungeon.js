@@ -19,70 +19,7 @@
     var body = document.body;
     var LOUD = 0.85;                                  // how loud its sound plays (0 … 1)
 
-    Sky.css(
-        // the stones: rough blocks, darker at the top, a damp stain or two
-        '.dungeon { --floor-h: 18vh; background:' +
-            'radial-gradient(ellipse 30% 22% at 70% 64%, rgba(20,40,30,.35), transparent 70%),' +
-            'radial-gradient(ellipse 18% 30% at 18% 40%, rgba(0,0,0,.35), transparent 70%),' +
-            'repeating-linear-gradient(to bottom, transparent 0 54px, rgba(0,0,0,.55) 54px 57px),' +
-            'repeating-linear-gradient(90deg, transparent 0 94px, rgba(0,0,0,.5) 94px 97px) 0 0 / 100% 114px,' +
-            'repeating-linear-gradient(90deg, transparent 0 47px, rgba(0,0,0,.5) 47px 50px, transparent 50px 97px) 0 57px / 100% 114px,' +
-            'linear-gradient(#1f1b1d, #3b3437 55%, #2f2a2c); }' +
-        '.dungeon > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }' +
-        '.dungeon .furnish { position: absolute; z-index: 2; }' +
-        '.dungeon .furnish > svg, .dungeon .furnish > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
-        '.dungeon .room-floor { position: absolute; left: 0; right: 0; bottom: 0; height: var(--floor-h); min-height: 34px; z-index: 1; pointer-events: none; }' +
-        '.dungeon .room-floor .placeholder, .dungeon .room-floor > .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: fill; }' +
-        '.dungeon .room-floor .placeholder { border-top: 6px solid #1a1617; box-shadow: 0 -3px 10px rgba(0,0,0,.5);' +
-            'background: linear-gradient(rgba(0,0,0,.45), transparent 50%), repeating-linear-gradient(90deg, transparent 0 120px, rgba(0,0,0,.5) 120px 123px),' +
-            'repeating-linear-gradient(to bottom, transparent 0 22px, rgba(0,0,0,.45) 22px 24px), #2c2729; }' +
-        '.dungeon-stairs { filter: drop-shadow(4px 0 10px rgba(0,0,0,.6)); }' +
-        '.dungeon-stairs:hover, .dungeon-stairs:focus-visible { filter: drop-shadow(0 0 12px rgba(255,210,140,.35)); outline: none; }' +
-        // the dark: everything's dim but what the candles light
-        '.dungeon::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;' +
-            'background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(6,3,8,.42), rgba(6,3,8,.86) 80%); }' +
-        '.dg-glow { position: absolute; z-index: 5; width: 22vw; height: 22vw; margin: -11vw 0 0 -11vw; border-radius: 50%; pointer-events: none;' +
-            'background: radial-gradient(circle, rgba(255,160,80,.24), rgba(255,130,60,.07) 38%, transparent 66%); mix-blend-mode: screen;' +
-            'animation: dg-flicker 3.1s ease-in-out infinite; }' +
-        '.dg-glow.small { width: 15vw; height: 15vw; margin: -7.5vw 0 0 -7.5vw; }' +
-        '@keyframes dg-flicker { 0%, 100% { opacity: .9; transform: scale(1); } 13% { opacity: .72; transform: scale(.97); } 21% { opacity: 1; }' +
-            '47% { opacity: .8; transform: scale(1.02); } 62% { opacity: .95; } 71% { opacity: .7; transform: scale(.96); } 83% { opacity: 1; } }' +
-        '.candle { z-index: 5 !important; pointer-events: none; filter: drop-shadow(0 0 3px rgba(255,170,90,.18)); }' +
-        '.candle .cd-flame { position: absolute; left: 50%; top: 0; width: 46%; aspect-ratio: 1 / 2.2; transform: translate(-50%, -88%); transform-origin: 50% 90%;' +
-            'border-radius: 50% 50% 50% 50% / 64% 64% 36% 36%; background: radial-gradient(ellipse at 50% 72%, #fff8d8 0 18%, #ffd36a 34%, #ff8a2a 62%, rgba(255,90,20,0) 72%);' +
-            'filter: blur(.4px) drop-shadow(0 0 3px #ff9a40); animation: dg-flame 1.7s ease-in-out infinite; }' +
-        '@keyframes dg-flame { 0%, 100% { transform: translate(-50%, -88%) rotate(-2deg) scaleY(1); } 25% { transform: translate(-52%, -90%) rotate(3deg) scaleY(1.08); }' +
-            '50% { transform: translate(-48%, -86%) rotate(-4deg) scaleY(.94); } 75% { transform: translate(-51%, -91%) rotate(2deg) scaleY(1.05); } }' +
-        '.candle.has-art .cd-flame { display: none; }' +
-        '.dungeon .room-arrow.to-upstairs { z-index: 6; }' +
-        '.dungeon .gallery-frame[data-look=lux] { z-index: 5 !important; } .dungeon .gallery-frame[data-look=lux] .gf-border { filter: brightness(.82); }' +                    // (the grand frame catches the candlelight)
-        '.dungeon-diagram { pointer-events: none; z-index: 5 !important; opacity: .8; filter: drop-shadow(0 0 2px rgba(120,0,0,.6)); }' +     // (over the dark: wet blood catches the candlelight)
-        '.dungeon-diagram > svg, .dungeon-diagram > .art { object-fit: fill !important; }' +
-        '.dungeon-paper { cursor: pointer; z-index: 3 !important; transform: rotate(-8deg); transition: transform .2s; filter: drop-shadow(0 2px 3px rgba(0,0,0,.6)); }' +
-        '.dungeon-paper:hover, .dungeon-paper:focus-visible { transform: rotate(-8deg) translateY(-3px); outline: none; }' +
-        '.dungeon-paper .dp-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%) rotate(8deg); white-space: nowrap; font-style: italic; font-size: .9rem;' +
-            'color: #f3e6c2; text-shadow: 0 1px 3px #000; opacity: 0; transition: opacity .25s; pointer-events: none; }' +
-        '.dungeon-paper:hover .dp-hint { opacity: 1; }' +
-        // the paper, picked up and read
-        '.paper-view { position: fixed; inset: 0; z-index: 9; display: grid; place-items: center; padding: 24px 16px; background: rgba(8,4,6,.86); cursor: pointer;' +
-            'visibility: hidden; opacity: 0; transition: opacity .35s, visibility 0s .35s; }' +
-        '.paper-view.open { visibility: visible; opacity: 1; transition: opacity .35s; }' +
-        '.paper-view .pv-sheet { position: relative; width: min(560px, 92vw); max-height: 82vh; overflow: auto; padding: 38px 42px 34px; color: #2a1810; cursor: auto;' +
-            'background: var(--paper-art, radial-gradient(ellipse at 30% 20%, #efe0bd, #d8c090 70%, #b89a64)) center / 100% 100% no-repeat;' +
-            'box-shadow: 0 20px 50px rgba(0,0,0,.7), inset 0 0 50px rgba(90,50,20,.45); transform: rotate(-1.2deg); font: 1.15rem/1.6 "IM Fell English", Georgia, serif; }' +
-        '.paper-view .pv-sheet::before { content: ""; position: absolute; right: 26px; top: 20px; width: 60px; height: 50px; pointer-events: none; opacity: .75;' +
-            'background: radial-gradient(ellipse at 40% 40%, #7a0d10 0 30%, transparent 32%), radial-gradient(circle at 80% 75%, #7a0d10 0 9%, transparent 11%), radial-gradient(circle at 20% 85%, #7a0d10 0 6%, transparent 8%); }' +
-        '.paper-view h2 { margin: 0 0 12px; font: normal 1.6rem "IM Fell English SC", Georgia, serif; color: #5a0d0d; }' +
-        '.paper-view .pv-text { white-space: pre-wrap; }' +
-        '.paper-view .pv-sign { margin-top: 18px; text-align: right; font-style: italic; }' +
-        '.paper-view .pv-empty { font-style: italic; color: #6e5236; }' +
-        'body.paper-open .place-tabs, body.paper-open .cp { opacity: 0; pointer-events: none; }' +
-        // the books on the shelf that aren't the one
-        '.shelf-book.decoy.nudge { animation: sb-nudge .5s ease-out; }' +
-        '@keyframes sb-nudge { 0%, 100% { transform: none; } 35% { transform: rotate(-9deg) translateX(-8%); } 65% { transform: rotate(3deg); } }' +
-        '.dungeon .character .bubble { color: #3a2716; }' +
-        '@media (prefers-reduced-motion: reduce) { .dg-glow, .candle .cd-flame { animation: none; } }'
-    );
+    // (its look is in sky/css/dungeon.css, linked from each page's head)
 
     /* ---------------- the candles ---------------- */
     function candleArt(sconce) {
