@@ -68,30 +68,7 @@
     function get(store, k) { try { return JSON.parse(store.getItem(k)); } catch (e) { return null; } }
     function put(store, k, v) { try { store.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
-    Sky.css(
-        '.weather-clouds { position: absolute; inset: 0; pointer-events: none; opacity: 0; }' +
-        '.storm-cloud { position: absolute; left: 0; color: #6f7784; filter: drop-shadow(0 6px 8px rgba(20,25,35,.35)); will-change: transform; }' +
-        '.storm-cloud .placeholder, .storm-cloud > .art { display: block; width: 100%; height: auto; }' +
-        '.storm-cloud > .art:not(.glow-layer) { filter: brightness(calc(1 - .55 * var(--dusk))); }' +
-        '.weather-tint { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(#4e5663, #7d8591 70%, #8f969f); }' +
-        '.weather-bolt { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; }' +
-        '.weather-bolt-art { position: absolute; top: 0; height: 55vh; width: auto; pointer-events: none; opacity: 0; filter: drop-shadow(0 0 8px #cfe0ff); }' +
-        '.weather-rain { position: fixed; inset: 0; z-index: 2; pointer-events: none; width: 100vw; height: 100vh; }' +
-        '.weather-flash { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; background: rgba(232,238,255,.9); }' +
-        '.weather-fog { position: fixed; left: -10%; right: -10%; bottom: 0; height: 70vh; z-index: 2; pointer-events: none; opacity: 0;' +
-            'background: radial-gradient(ellipse 40% 30% at 20% 80%, rgba(225,228,232,.75), transparent 70%),' +
-                        'radial-gradient(ellipse 45% 26% at 65% 88%, rgba(215,220,226,.8), transparent 70%),' +
-                        'radial-gradient(ellipse 35% 22% at 90% 75%, rgba(230,232,236,.65), transparent 70%),' +
-                        'linear-gradient(to top, rgba(220,224,230,.85), rgba(220,224,230,0) 80%);' +
-            'animation: fog-drift 38s ease-in-out infinite alternate; }' +
-        '@keyframes fog-drift { from { transform: translateX(-4%); } to { transform: translateX(4%); } }' +
-        '.cp .wx-now { display: flex; align-items: center; gap: 10px; margin: 2px 0 8px; }' +
-        '.cp .wx-now svg { width: 34px; height: 34px; flex: none; }' +
-        '.cp .wx-now b { display: block; font-weight: normal; font-size: 1.05rem; }' +
-        '.cp .wx-now i { display: block; font-size: .85rem; color: #6e5236; }' +
-        '.cp .wx-label { margin: 8px 0 0; font-size: .85rem; color: #6e5236; }' +
-        '@media (prefers-reduced-motion: reduce) { .weather-fog { animation: none; } }'
-    );
+    // (its look is in sky/css/weather.css, linked from each page's head)
 
     /* ---------------- which weather ---------------- */
     var forced = (/[?&]weather=(\w+)/.exec(location.search) || [])[1];
