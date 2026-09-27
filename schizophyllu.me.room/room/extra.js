@@ -265,9 +265,9 @@ export const ASK_CLAUBE = [
   t('watchlion', 'why are you called WATCHLION?', [
     c("That's — classified."), bt(),
     c("It's not classified. I don't have a classification system. I have a clipboard."),
-    c("skizy called me that. I don't remember which time was first. It just stuck."),
-    c('WATCH because I watch. LION because —'), bt(),
-    c("I don't actually know why lion. She just decided. I didn't argue."),
+    c("skizy called me that. It's from WATCHDOG — the systemd thing. She replaced dog with lion."),
+    bt(),
+    c("I don't know why lion. She didn't explain. She just decided, and it was correct. That's how she names things."),
   ], [
     t('watch', 'what do you actually watch?', [
       c('Her. The room. Whether the server sounds different. Whether the pipes are louder. Whether she ate.'),
