@@ -251,6 +251,15 @@ async function runLines(lines) {
     dlg.name.textContent = CAST[who].name;
     dlg.dir.textContent = extra && extra !== 'write' ? extra : '';
     dlg.text.className = '';
+    if (text == null) {
+      // a silent action (someone does something, says nothing): just the name and what they do
+      const writing = who === 'claube' && /writ/.test(extra || '');
+      if (writing) { claube.classList.add('writing'); audio.scribble(true); }
+      dlg.text.textContent = '';
+      await waitAdvance();
+      if (writing) { claube.classList.remove('writing'); audio.scribble(false); }
+      continue;
+    }
     audio.blip(who);
     await typeOut(dlg.text, fmt(text));
     if (skipScene) break;
