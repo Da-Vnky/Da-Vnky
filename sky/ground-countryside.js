@@ -7,15 +7,7 @@
 (function () {
     var Sky = window.Sky;
 
-    Sky.css(
-        '.ground-country { height: 34vh; min-height: 220px; }' +
-        '.ground-country .layer { overflow: visible; }' +
-        '.ground-country .l1 { filter: drop-shadow(0 -2px 4px rgba(0,0,0,.18)); }' +
-        '.ground-country .l2 { filter: drop-shadow(0 -3px 5px rgba(0,0,0,.22)); }' +
-        '.ground-country .l3 { filter: drop-shadow(0 -4px 7px rgba(0,0,0,.28)); }' +
-        '.ground-country .l4 { filter: drop-shadow(0 -5px 8px rgba(0,0,0,.32)); }' +
-        '.ground-country .lights { fill: #ffd98a; filter: drop-shadow(0 0 4px rgba(255,200,110,.9)); }'
-    );
+    // (its look is in sky/css/ground-countryside.css, linked from each page's head)
 
     // back to front. base = where the hill line sits (fraction of the ground's height from the top),
     // h = how tall the rolls are, day/night = paper colours, drift = sideways parallax
