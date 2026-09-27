@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- opi (closet): a small monitor on a little wall shelf, still on. opi's terminal: click it and type
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+<defs>
+  <radialGradient id="opi-glow"><stop offset="0" stop-color="#6dffb0" stop-opacity=".16"/><stop offset="1" stop-color="#6dffb0" stop-opacity="0"/></radialGradient>
+</defs>
+  <!-- the glow it puts on the wall -->
+  <ellipse cx="1036" cy="398" rx="120" ry="86" fill="url(#opi-glow)"/>
+  <!-- the little shelf and its brackets -->
+  <rect x="966" y="440" width="140" height="7" fill="#4a3a30"/>
+  <path d="M976 447 l0 14 l12 -14 M1096 447 l0 14 l-12 -14" stroke="#3a2c24" stroke-width="3" fill="none"/>
+  <!-- the monitor -->
+  <rect x="984" y="360" width="104" height="80" rx="7" fill="#cfc6ae"/>
+  <rect x="984" y="360" width="104" height="4" rx="2" fill="#fff" opacity=".2"/>
+  <rect x="992" y="367" width="88" height="60" rx="4" fill="#041a0c"/>
+  <g font-size="6.4" fill="#6dffb0">
+    <text x="996" y="380" opacity=".6">opi's terminal</text>
+    <text x="996" y="392" opacity=".6">type 'help'</text>
+    <text x="996" y="418">opi@closet:~$ <tspan class="blink b1">_</tspan></text>
+  </g>
+  <rect x="992" y="367" width="88" height="60" rx="4" fill="#6dffb0" opacity=".05"/>
+  <circle cx="1078" cy="433" r="1.6" fill="#6dffb0" class="blink b3"/>
+  <!-- a label on the bezel -->
+  <rect x="990" y="430" width="22" height="7" fill="#f4f1ea" transform="rotate(-3 1001 433)"/>
+  <text x="992" y="436" font-size="5.5" fill="#3a2d1c" transform="rotate(-3 1001 433)">opi</text>
+  <!-- a keyboard pushed back against it -->
+  <rect x="1000" y="436" width="72" height="5" rx="1.5" fill="#bdb6a6"/>
+</svg>

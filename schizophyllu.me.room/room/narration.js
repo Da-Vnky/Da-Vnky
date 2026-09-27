@@ -199,6 +199,15 @@ export const MORE = {
   routers: { label: 'routers', lines: [note('four routers. one runs OpenWrt, one runs something skizy wrote, and two are a mystery nobody is ready to solve.')] },
   toolbox: { label: 'toolbox', lines: [note('a red toolbox. the screwdrivers are not in it. the screwdrivers are never in it.')] },
   scopecase: { label: "the telescope's case", lines: [note("the telescope's case, empty. the telescope has not been back inside it since it was pointed at the window.")] },
+  opi: { label: "opi's terminal (still on)" },
+  gobag: {
+    label: 'hiking pack (packed)',
+    lines: [
+      note('an olive green hiking pack, packed. water, a filter, a knife, a first aid kit, a headlamp, a rain shell, three days of food that doesn\'t need cooking. the straps are already adjusted.'),
+      note('a tag on the zipper, in skizy\'s handwriting: "just in case."'),
+      far('mel', 'thats packed. dont unpack it. its not for anything. its just packed'),
+    ],
+  },
   sleepbag: { label: 'sleeping bag', lines: [note('a sleeping bag, rolled tight, for when the bean bag is occupied.')] },
   hiddennote: { label: 'a folded note', lines: [note("a small note, tucked behind the Phosphor Artifact, in Claube's handwriting: \"she's going to be fine.\"")] },
   vacuum: { label: 'vacuum', lines: [note('the vacuum. the bag is mostly solder clippings and one (1) screw that skizy is still looking for.')] },
