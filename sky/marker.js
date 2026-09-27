@@ -29,17 +29,7 @@
     var cursorUrl = CURSOR, hot = '2 2';
     Sky.findAsset('assets/ui/cursor-marker', function (url) { if (url) { cursorUrl = new URL(url, location.href).href; hot = '1 1'; setCursor(); } });
 
-    Sky.css(
-        '.marker-layer { position: fixed; inset: 0; z-index: 6; pointer-events: none; transition: opacity .35s; }' +
-        'body.marker-on .marker-layer { pointer-events: auto; touch-action: none; }' +
-        'body.side-walking .marker-layer, body.leaving .marker-layer { opacity: 0; }' +
-        '.marker-tray { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--bar-bottom, 12px) + 110px); z-index: 11; display: none; gap: 6px; align-items: center; padding: 5px 8px; border-radius: 999px;' +
-            'background: rgba(234,220,185,.94); box-shadow: 0 4px 12px rgba(0,0,0,.35); font: italic .85rem "IM Fell English", Georgia, serif; color: #3a2716; }' +
-        'body.marker-on .marker-tray { display: flex; }' +
-        '.marker-tray button { width: 24px; height: 24px; padding: 0; border-radius: 50%; border: 2px solid rgba(58,39,22,.35); cursor: pointer; }' +
-        '.marker-tray button[aria-pressed=true] { border-color: #3a2716; box-shadow: 0 0 0 2px #eadcb9, 0 0 0 4px #3a2716; }' +
-        '.marker-tray .mk-act { width: auto; height: 24px; padding: 0 9px; border-radius: 999px; background: #f8f0dc; font: inherit; color: inherit; }'
-    );
+    // (its look is in sky/css/marker.css, linked from each page's head)
 
     var cv = document.createElement('canvas');
     cv.className = 'marker-layer';
