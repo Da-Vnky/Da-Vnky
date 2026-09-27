@@ -388,13 +388,10 @@ body.attic-now .hallway {
 .attic .attic-character {
     left: calc(var(--attic-stand) * 1%);
     bottom: 3vh;
-    height: 25vh;
+    height: var(--traveller-h);
     z-index: 4;
 }
 @media (max-width: 620px) {
-    .attic .attic-character {
-        height: 14vh;
-    }
     .attic .attic-lectern {
         left: 56%;
         height: 18vh;
@@ -503,8 +500,30 @@ body.attic-now .hallway {
     margin: 6% 0 4%;
     height: 42%;
     border-bottom: 1.5px solid rgba(60, 20, 10, .6);
-    cursor: var(--attic-blood-cursor) 19 7, crosshair;
+    cursor: none;                        /* (the finger is drawn by the page: .gr-quill) */
     touch-action: none;
+}
+/* the bloodied finger, following the pointer over the signing line: its tip (--quill-x, --quill-y of its picture) on the ink */
+.grim-page .gr-quill {
+    --quill-x: 19px;
+    --quill-y: 7px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 32px;
+    height: 32px;
+    margin: calc(var(--quill-y) * -1) 0 0 calc(var(--quill-x) * -1);
+    pointer-events: none;
+    z-index: 2;
+    display: none;
+}
+.grim-page .gr-quill.on {
+    display: block;
+}
+.grim-page .gr-quill>img {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 .grim-page .gr-sign canvas {
     position: absolute;
@@ -664,4 +683,20 @@ body.attic-now .hallway {
     .character.writhing {
         animation: none;
     }
+}
+
+/* the attic's dancers (sky/music.js GROOVES): they move while a record plays */
+.attic .attic-music-box {
+    left: 6%;
+    bottom: calc(var(--floor-h) - 1.4vh + max(32vw, 220px) * .225);
+    width: 4.2vw;
+    min-width: 40px;
+    z-index: 3;
+}
+.attic .attic-rocking-horse {
+    left: 40%;
+    bottom: calc(var(--floor-h) - 1.4vh);
+    width: 8vw;
+    min-width: 70px;
+    z-index: 3;
 }

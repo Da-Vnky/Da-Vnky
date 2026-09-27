@@ -60,6 +60,7 @@
     var white = false;                                  // (the shot in hand is the white revolver's: sky/hell.js)
     function bang() {
         if (white) sfx('white-bang', { or: 'bang' }); else sfx('bang');
+        try { document.dispatchEvent(new CustomEvent('dav:bang', { detail: { white: white } })); } catch (e) {}   // (sky/claubes.js: the static, in a robed reset)
         flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
         body.classList.remove('recoil'); void body.offsetWidth; body.classList.add('recoil');
     }
@@ -230,6 +231,9 @@
         var claube = t.closest && t.closest('.mini-claube'), deck = t.closest && t.closest('.turntable'), frame = t.closest && t.closest('.gallery-frame[data-frame]');
         if (!claube && !deck && !frame && t.closest && t.closest('.cp, .place-tabs, .sky-links, .marker-tray, a[href], button')) return false;   // (the controls still work)
         if (!spend()) return true;
+        // below, in reset 4: the eye (sky/hell.js). the white revolver bursts it and it gives up the key
+        var eye = t.closest && t.closest('.hell .hl-eye');
+        if (eye && Sky.hell && Sky.hell.shootEye) { bang(); if (!Sky.hell.shootEye(x, y, white)) hole(x, y); return true; }
         if (claube && Sky.claubes) { bang(); Sky.claubes.shoot(claube, x, y, { white: white }); return true; }
         if (deck) { shootRecord(x, y); return true; }
         var god = frame && frame.dataset.frame === '6' && frame.dataset.wall === 'shame';

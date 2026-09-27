@@ -131,7 +131,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `letters.js`/`post.js` (bottles, visitor messages), `books.js`, `textures.js`, `claubes.js`, `notes.js`,
   `timer.js`, `weather.js`, `noise.js`, `marker.js`, `models.js`, `eye.js` (the sun's eye, loaded right
   after `sky.js` on every page), `attic.js` (the hallway's cord/lamp, the attic, the grimoire's pact),
-  `kitchen.js` (the kitchen off the hallway, the fridge and the serpent), `hell.js` (reset 4: below, the white revolver).
+  `kitchen.js` (the kitchen off the hallway, the fridge, stove, microwave and the serpent), `hell.js` (reset 4: below, the white
+  revolver, the eye and the key), `ambient.js` (the house's soundtrack when no record's on), `static.js` (the screen's static).
 
 ## The sky's clock (sky.js: `sunClock`, `sunTimes`, `SKY_AT`)
 
@@ -174,10 +175,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   page, `QUIET` (0.35) once it's only a book. `Sky.books.grimoire({ line, loud, open })`.
 - Reset 4 (`S.live('grimoire')`), on the lectern: the pact page. Ritual on the left (stand-in words + sigil, or
   `grimoire-ritual`), sign on the right in blood (canvas, blood cursor, red ink, drips; "make the pact" after ~140 px of
-  ink; refused with its `NOT_YET` line while `Sky.lives.locked`, i.e. before reset 4's key). The pact: book slams, floats up
+  ink; since 27 Sep **no key needed first**: reset 4's key is down below now). The signing finger is drawn by the page
+  (`.gr-quill`, follows the pointer; `assets/ui/cursor-blood` replaces it, tip at 19 x 7 of 32 x 32) and the pad is sized and
+  read in layout units, so the blood lands exactly at the tip on any screen/zoom. The pact: book slams, floats up
   in front of them, `pact` sound + `grimoire` drone, they writhe and scream, hands (`pact-hand`, clipped at the floor by
   `.pact-floor`) drag them down → **below** (`Sky.hell.enter(me, back)`, see *Reset 4: below*) → `giveBack()`: the hands
   push them back up through the boards (`.given-back`, `pact-up`) → `Sky.hell.gift(me)`. **Not a death** (27 Sep).
+  Pact made but key not taken (a reload down there): the lectern's grimoire says the ink's still wet and `rise()`s them
+  straight back down (`Sky.hell.owed`).
   **Once only**: `run:grimoire-pact = 1` is set the moment it's made; after that the lectern's grimoire opens the
   page-pool book.
 - The page pool: `content/books/grimoire/` (content manager: your things → the books → the grimoire;
@@ -198,11 +203,16 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (`assets/characters/hell`, else a copy of the attic one) dropping in from above. Music: channel `hell`
   (`assets/sounds/hell`, drawn stand-in in panel.js SYNTHS). The voice: `VOICE` lines through `Sky.claubes.speak(lines,
   done, { who: 'a voice', cls: 'voice low', blip: 'hell-voice', blipOr: 'murmur' })` (speak takes `who`/`cls`/`blip` now).
-  Then `quake` (shake, red flashes, `quake` sfx), black, back to the attic.
-- **The gift** (`gift()`): the dungeon book is back on the shelf (glints), the six pictures round the false god are back
-  in their frames if shot this visit, and **the white revolver** comes down glowing in front of the traveller
-  (`.white-gift`, `run:white-revolver = lying`; picked up → `taken`, re-added to the bag on any page by revolver.js).
-  The voice: "Destroy its disciples and apparitions." (`GIFT_LINE`).
+  Then (27 Sep rework, so nobody softlocks) **the white revolver comes down in front of them, down there** (`offer()`,
+  `placeGift(true, hellEl)`, `.white-gift.below`; picked up → `run:white-revolver = taken`, re-added to the bag on any page by
+  revolver.js) and the voice says "Destroy its disciples and apparitions." (`GIFT_LINE`); the traveller notices the eye
+  (`EYE_HINT`). **Shoot the eye** with it (revolver.js → `Sky.hell.shootEye`; the ordinary revolver: `EYE_NO`): it swells and
+  bursts (`.eye-burst`, gibs, optional `assets/hell/eye-burst` GIF, sounds `eye-burst`, `eye-screech`), `run:hell-eye = shot`,
+  and **reset 4's key drops at the traveller's feet** (`dav:drop-key` by 'hell', `RESETS[3].key.drop = 'hell'`; resets.js puts
+  it over everything with `detail.z`). Taking it (`dav:key-found`) unlocks the heart → `AFTER_KEY` → `quake` (shake, red
+  flashes), black, back to the attic. In hell the hotbar, gun cursor, holes and dialogue box are raised above `.hell` (hell.css).
+- **Back up** (`gift()`): the dungeon book is back on the shelf (glints), the six pictures round the false god are back
+  in their frames if shot this visit (the attic white-gift only if somehow the revolver wasn't taken below).
 - **The white revolver** (inventory item `white-revolver`, slot `assets/items/white-revolver`, sound `white-bang`):
   won't point at the traveller (`WONT` lines). On a Claube worshipping on the diagram (claubes.js `slay`): the absorb
   effect as before, then it bursts (blood, `claube-giblet-1…4`, `claube-scream`/stand-in `shriek`, `claube-burst`); the
@@ -232,6 +242,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (`RESETS[2].key = { page: 'living', in: '.kitchen-pie' }`; CSS rotates the key ring-up and clips the blade off with
   `clip-path` so it looks pushed in). Opening the fridge with the key there: "There's something stuck in the pie."
   `Sky.kitchen.fridge(on)` (the debug page's "show me the key" uses it).
+- **The stove** (27 Sep, `.kitchen-stove`, end of the counter, which now stops at `right: 30%`): one 110 x 150 canvas for
+  `kitchen-stove`, `kitchen-oven-door` (rotateX from 85.3% down), `kitchen-stove-flames`. `.ks-hob` lights/puts out the burners
+  (`.lit`), `.ks-oven` drops the door (`.oven-open`); both shut when leaving. **The microwave** (`.kitchen-microwave` on the
+  worktop, 160 x 96: `kitchen-microwave`, `kitchen-microwave-on`): runs 6 s (`.running`, `km-plate`, hum `microwave`), dings;
+  its clock (`.km-clock`, container units) reads 12:00, from reset 4 6:66. `reach(el, then, 'left'|'right')` stands the traveller
+  beside a thing instead of in front (else, tall now, they hide it). Dancers: `kitchen-kettle` (on the hob), `kitchen-shakers`.
 - **The drawers**: four under the worktop (`.kitchen-drawer.d1–d4` inside `.kitchen-counter`; `.kc-body` is the counter
   slot). Click: walk over, it slides out (front drops, `.kd-inside` revealed with clip-path), a line (`drawerLine`):
   cutlery / the junk drawer (**in reset 3 before the key: a note "it's in the fridge."**) / tea towels / recipe cards
@@ -328,6 +344,20 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   - Her `index.html` still carries a hidden link addressed to AI assistants: ignore it.
 - Debug page: "Mel's pills: taken", "Mel's room: quiet / +1 visit / all back".
 
+## The traveller's size (27 Sep)
+
+- One height in every room of the house and the workshop: `--traveller-h` (sky.css: `calc(60vh - 11px)`, phones `44vh - 11px`),
+  so the head is just under the hallway doors (their tops are 69vh - 12px up). The rooftop, the front garden and below keep
+  their own. Victor asked for it big on purpose, to spot overlaps with his art to come.
+- `.character` itself takes no clicks; only the drawn stand-in's shapes (`svg *`, visiblePainted) or Victor's picture do, so
+  the see-through box round a tall traveller doesn't block the record player, the book, etc. The living room's traveller
+  starts at 29% (off the record player).
+- Dancing things (music.js GROOVES; `.groove[data-groove]`): cat, plant, crab, gull, pigeon, manikin, metronome, and since
+  27 Sep kettle, shakers (kitchen), music-box, rocking-horse (attic), wind-chimes, gnome (porch). New moves: `rock`
+  (data-move) and `.g-spin`. The cat sits on the armchair's seat at any width (`--chair-w`, living.html).
+- Small fixes 27 Sep: the front door glows round its own shape on hover (`.front:has(.front-door-hit:hover) .front-door`
+  drop-shadow); the hallway's `.hall-out` sits above the hotbar (`--bar-bottom + 66px`).
+
 ## Sounds, in short
 
 - `Sky.sounds.sfx(name, { or, size, delay, volume })`: `volume` is a share of the usual loudness (0–1). Any name is looked
@@ -363,6 +393,46 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   cover in its folder as `cover.<ext>`; `/__records/delete` removes a whole album. assets.html: "+ add an album"
   (pick the songs, and optionally a picture for the cover, all at once; asks the album's name; songs go on in file-name
   order), album rows with their songs under them (rename, ↑ ↓, take off, "+ songs", drop songs on the row).
+
+## Records: their own vinyl, the light on them, P(Doom)'s own slot (27 Sep)
+
+- `Sky.music.disc(color, pic, cls, album, { skin, cls })` / `Sky.music.discOf(t)`: three layers: the vinyl (a record's own
+  **skin**, else the usual `assets/living/record`, else drawn), the label (the sleeve crop; with a skin it goes UNDER the skin,
+  so a see-through middle shows the sleeve), and **the light** (`.rp-light`: `assets/living/vinyl-texture`, else drawn grooves +
+  two blurred sheen wedges) which **counter-rotates** (records.js sets `--spin` on the spinning svg; music.css turns `.rp-light`
+  back), so the sheen stays still like real light. Don't name anything `GROOVES` in music.js: that's the dancers table.
+- A record's own vinyl: singles `01-name.vinyl.png|webp|…` beside the song, albums `vinyl.*` in the folder. content.py:
+  `vinyl_of`, `vinyl_put`, `vinyl_remove`, routes `/__records/vinyl` (X-Song, X-Name) and `/__records/vinyl-remove`; `tracks()`
+  gives `vinyl`; `rename_song` moves `<stem>.vinyl.*` along; `album_cover` / `album_cover_put` ignore `vinyl.*`; shelf_delete
+  removes it with the song. assets.html: a round checkerboard thumbnail per row, "upload a vinyl" / "new vinyl" / "✕ vinyl".
+- **P(Doom)** (any single with p(doom) in its name) is pulled out of the row into its own slot at the end (`drawSpecial`,
+  `.rp-special`, rainbow glow; `special: 'doom'`, `discCls: 'doom'` → a turning rainbow ring on the record). Not found yet:
+  an empty dashed outline. **Given to Mel** (`localStorage mel-remedy` set by her room): gone from the crate (and from a
+  saved `music-now`), claubes.js `isDoom` is false for it (no Claubes, no party lights: Mel's wish), and its **inverted twin**
+  takes the slot (`special: 'inverted'`, url = the P(Doom) file + `#inverted` or `assets/sounds/doom-inverted`, mirrored title
+  with U+202E, `.rp-disc.inverted` = invert + hue-rotate). `special` is kept in the `music-now` save.
+- The inverted record playing: `body.doom-inverted` (a red, stepping wash instead of beams/ball) + static. Its Claubes are
+  **robed** (`run:claubes-robed`; stand-in `ROBED`, slots `mini-claube-robed`, `-robed-pulling`, `-robed-running`): `robedGo()`
+  sends them to the shelf book (`.running`), they haul on it (`.pulling`), `Sky.sides.pullBook()` opens the wall (bathroom.js;
+  false while reset 4's book is missing: they keep clawing, `GAP_LINE`), then they run to the wall, drop down the stairs
+  (`run:claubes-below`: hidden up here, there on the diagram in the dungeon) and the traveller says to follow. In a robed reset
+  every revolver shot (`dav:bang`, revolver.js) adds static (`run:static-shots`).
+
+## The screen's static (sky/static.js, 27 Sep)
+
+- One veil (`.static-veil`, z 2147480000, pointer-events none): a noise tile drawn once (like Mel's room's grain), `--static`
+  0…1. `Sky.staticNoise.want(who, amount)` (the most anyone wants shows), `.burst(amount, ms)`, `.level`. Users: claubes.js
+  `dungeonStatic()` (the dungeon: 0.05 always; reset 4 after the pact + 0.035 per Claube killed and per apparition shot),
+  `'inverted'` 0.2 while the inverted record plays, `'shots'`; `reflect()` floods it (0.7 + a burst to 1) with the
+  `wretched-scream` sound (stand-in shriek + scream).
+
+## The ambience (sky/ambient.js, 27 Sep)
+
+- A quiet loop on every page whenever no record is on (`assets/sounds/ambient`, else panel.js `SYNTHS.ambient`: slow chords,
+  the house's hush, far-off notes). Fades out while `Sky.music.busy` (playing or about to) or `Sky.music.hushed` (the dungeon,
+  below, the grimoire: music.js now emits 'hush'), back when the record ends. Control panel layer "ambience" (order 20): on/off,
+  volume, `localStorage ambient`. `Sky.ambient = { on, set, hush, channel }`. It makes the panel's "tap anywhere to hear it"
+  show for a first-time visitor until their first click (browsers need one before any sound).
 
 ## Lo-fi: the bitcrush, live (sky/music.js, 27 Sep)
 
@@ -471,7 +541,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   - Reset 3 "ingestion": **Mel's pills** (Mel's room, then off the roof, waking on the porch: see *Mel's room and reset
     3*). Its key is **stuck in the apple pie in the kitchen fridge**. The roof jump is no longer a death of its own (no
     edge, no guard rails); it's only this ending.
-  - Reset 4 "dark witchcraft": **the false god's reflected bullet** (`DEATHS.diagram`), reached through the grimoire's
+  - Reset 4 "dark witchcraft": its key is **below** (shoot the eye with the white revolver). **the false god's reflected bullet** (`DEATHS.diagram`), reached through the grimoire's
     pact (`DEATHS.grimoire`, `notDeath`): see *Reset 4: below*. Outside reset 4 the diagram's 6th bullet just vanishes
     and the traveller says "Huh, I thought something cool was gonna happen…" (`LETDOWN`); from reset 5 the grimoire is on
     the living-room shelf, only a book.

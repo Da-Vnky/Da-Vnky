@@ -1,0 +1,16 @@
+/* =====================================================================
+   ambient.css — the look of sky/ambient.js: its layer in the control panel.
+   ===================================================================== */
+.cp .amb-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+.cp .amb-power {
+    font-style: normal !important;
+    min-width: 3.2em;
+}
+.cp .amb-note {
+    flex: 1;
+}

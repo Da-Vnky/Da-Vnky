@@ -224,6 +224,13 @@ body.music-playing .groove .g-leg.r {
 body.music-playing .groove .g-tick {
     animation: g-tick .5s ease-in-out infinite alternate;
 }
+body.music-playing .groove .g-spin {
+    animation: g-spin 1s ease-in-out infinite alternate;
+}
+body.music-playing .groove[data-move="rock"]:not(.has-dancing) {
+    animation: g-rock 1s ease-in-out infinite alternate;
+    transform-origin: 50% 90%;
+}
 body.music-playing .groove[data-move="bob"]:not(.has-dancing) {
     animation: g-bob .5s ease-in-out infinite alternate;
 }
@@ -240,6 +247,22 @@ body.music-playing .groove[data-move="step"]:not(.has-dancing) {
 body.music-playing .groove[data-move="wobble"]:not(.has-dancing) {
     animation: g-wobble 1s ease-in-out infinite alternate;
     transform-origin: 50% 0;
+}
+@keyframes g-spin {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(-1);
+    }
+}
+@keyframes g-rock {
+    from {
+        transform: rotate(-7deg);
+    }
+    to {
+        transform: rotate(7deg);
+    }
 }
 @keyframes g-nod {
     from {
@@ -483,4 +506,34 @@ body.music-playing .wobbles {
 .cp .mu-lofi:focus-visible .mu-lofi-track {
     outline: 2px solid rgba(154, 59, 31, .45);
     outline-offset: 2px;
+}
+
+/* ---------------- a record (Sky.music.disc): the light on it stays still while it turns ----------------
+   records.js hands the record's angle over as --spin; the light (.rp-light: the vinyl texture) turns back by as much */
+.rp-disc .rp-light {
+    transform-box: view-box;
+    transform-origin: 50% 50%;
+    transform: rotate(calc(var(--spin, 0) * -1deg));
+    pointer-events: none;
+}
+
+/* P(Doom)'s record: its ring of colours turns through the rainbow. its inverted twin: turned inside out, and red */
+.rp-disc .rp-rainbow {
+    animation: rp-rainbow 3.5s linear infinite;
+}
+@keyframes rp-rainbow {
+    to {
+        filter: hue-rotate(360deg);
+    }
+}
+.rp-disc.doom {
+    filter: drop-shadow(0 0 4px rgba(255, 120, 220, .55)) drop-shadow(0 0 9px rgba(120, 200, 255, .4));
+}
+.rp-disc.inverted {
+    filter: invert(1) hue-rotate(180deg) drop-shadow(0 0 6px rgba(80, 255, 255, .6));
+}
+@media (prefers-reduced-motion: reduce) {
+    .rp-disc .rp-rainbow {
+        animation: none;
+    }
 }

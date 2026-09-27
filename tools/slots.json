@@ -389,6 +389,11 @@
        "size": "96 x 96"
       },
       {
+       "slot": "assets/ui/ambient",
+       "what": "the ambience layer’s icon",
+       "size": "96 x 96"
+      },
+      {
        "slot": "assets/ui/effects",
        "what": "the sound effects’ icon",
        "size": "96 x 96"
@@ -1133,8 +1138,14 @@
       },
       {
        "slot": "assets/living/record",
-       "what": "the vinyl: square, see-through outside the disc; the sleeve goes on its label",
+       "what": "the usual vinyl (every record without one of its own): square, see-through outside the disc; the sleeve goes on its label. a record's own vinyl: the record player tab's \"upload a vinyl\"",
        "size": "1:1"
+      },
+      {
+       "slot": "assets/living/vinyl-texture",
+       "what": "the light on every record: laid over the vinyl and stays still while it turns (fine grooves, the sheen, dust). mostly see-through: .webp or .png, the size of the record, the label area see-through",
+       "size": "1:1, see-through",
+       "optional": true
       },
       {
        "slot": "assets/living/noise-machine",
@@ -1373,6 +1384,18 @@
        "size": "about 1200 x 480, see-through, standing on the bottom edge"
       },
       {
+       "slot": "assets/living/attic-music-box",
+       "what": "a music box on the trunk, its little dancer turning while a record plays (or an attic-music-box-dancing GIF)",
+       "size": "about 44:64, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/attic-rocking-horse",
+       "what": "a rocking horse: it rocks while a record plays (or an attic-rocking-horse-dancing GIF)",
+       "size": "about 90:70, see-through",
+       "optional": true
+      },
+      {
        "slot": "assets/living/attic-lectern",
        "what": "the lectern the grimoire lies on",
        "size": "about 320 x 600, see-through"
@@ -1448,6 +1471,12 @@
        "slot": "assets/hell/ouroboros",
        "what": "the ouroboros, the serpent eating its tail: a ring round the eye. an animated GIF or WebP loops by itself (the drawn stand-in just turns)",
        "size": "square, see-through, the eye fits inside the middle two thirds"
+      },
+      {
+       "slot": "assets/hell/eye-burst",
+       "what": "the eye bursting when it's shot with the white revolver (a GIF that plays once, the same size and shape as the eye; the drawn one swells and splits)",
+       "size": "about 2:1, see-through",
+       "optional": true
       },
       {
        "slot": "assets/characters/hell",
@@ -1538,6 +1567,45 @@
        "size": "about 100:44, see-through"
       },
       {
+       "slot": "assets/living/kitchen-stove",
+       "what": "the stove at the end of the counter: the range, the hob, the oven (its inside showing where the door is), the drawer. leave the oven door out: it's its own picture",
+       "size": "110:150 (e.g. 550 x 750), see-through round it"
+      },
+      {
+       "slot": "assets/living/kitchen-oven-door",
+       "what": "the oven door alone, on the whole stove canvas (see-through except the door, 8-102 across, 40-128 down of 110 x 150). it drops open from its bottom edge",
+       "size": "110:150, same canvas as the stove"
+      },
+      {
+       "slot": "assets/living/kitchen-stove-flames",
+       "what": "the burners' flames alone, on the whole stove canvas (shown while the hob's lit; a GIF can flicker)",
+       "size": "110:150, same canvas as the stove",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/kitchen-microwave",
+       "what": "the microwave on the worktop, shut and off. leave its display dark (120-148 across, 16-30 down of 160 x 96): the site writes the clock there",
+       "size": "160:96 (e.g. 640 x 384), see-through round it"
+      },
+      {
+       "slot": "assets/living/kitchen-microwave-on",
+       "what": "the microwave running: the whole canvas again, see-through except the lit window with the plate (a GIF can turn the plate)",
+       "size": "160:96, same canvas as the microwave",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/kitchen-kettle",
+       "what": "the kettle on the hob (dances to music: hops, its lid nods; or a kitchen-kettle-dancing GIF)",
+       "size": "about 60:50, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/kitchen-shakers",
+       "what": "salt and pepper on the worktop (dance to music: step side to side; or a kitchen-shakers-dancing GIF)",
+       "size": "about 1:1, see-through",
+       "optional": true
+      },
+      {
        "slot": "assets/living/fruit-bowl",
        "what": "the bowl of fruit on the counter",
        "size": "about 120:60, see-through"
@@ -1599,6 +1667,18 @@
        "slot": "assets/living/porch-chair",
        "what": "the rocking chair (click it: it rocks. from reset 3 it sometimes rocks by itself)",
        "size": "about 120:170, see-through"
+      },
+      {
+       "slot": "assets/living/porch-wind-chimes",
+       "what": "wind chimes hanging from the porch roof: they swing while a record plays (or a porch-wind-chimes-dancing GIF)",
+       "size": "about 40:80, see-through, hanging from the top edge",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/porch-gnome",
+       "what": "a garden gnome on the boards: it hops and nods while a record plays (or a porch-gnome-dancing GIF)",
+       "size": "about 40:60, see-through",
+       "optional": true
       },
       {
        "slot": "assets/living/porch-mailbox",
@@ -2000,6 +2080,23 @@
        "optional": true
       },
       {
+       "slot": "assets/characters/mini-claube-robed",
+       "what": "a Claube in black robes (the inverted P(Doom) record calls these out): standing, and worshipping on the diagram",
+       "size": "40:52, like the other Claubes, see-through"
+      },
+      {
+       "slot": "assets/characters/mini-claube-robed-pulling",
+       "what": "a robed Claube hauling on the bookshelf's book (a GIF can pull on its own)",
+       "size": "40:52, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/mini-claube-robed-running",
+       "what": "a robed Claube running (to the shelf, then down the stairs; a GIF can run on its own)",
+       "size": "40:52, see-through",
+       "optional": true
+      },
+      {
        "slot": "assets/characters/claube-giblet-1",
        "what": "what’s left of a Claube shot with the white revolver: a bit that flies off (1 of 4)",
        "size": "small, about 1:1, see-through",
@@ -2058,6 +2155,11 @@
       {
        "slot": "assets/sounds/thunder",
        "what": "one roll of thunder (played now and then, not looped)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/ambient",
+       "what": "the house’s own soundtrack: plays (looped, quietly) on every page whenever no record is on, and fades away when one is (sky/ambient.js). make its ends meet",
        "kind": "sound"
       },
       {
@@ -2479,6 +2581,16 @@
        "kind": "sound"
       },
       {
+       "slot": "assets/sounds/eye-burst",
+       "what": "the eye below, bursting (shot with the white revolver)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/eye-screech",
+       "what": "the eye's screech as it bursts (plays twice, the second a little later)",
+       "kind": "sound"
+      },
+      {
        "slot": "assets/sounds/white-appear",
        "what": "the white revolver coming down in front of the traveller in the attic",
        "kind": "sound"
@@ -2518,6 +2630,17 @@
        "size": "1600 x 900 (the whole room)",
        "optional": true,
        "stock": "schizophyllu.me.room/room/room.svg"
+      },
+      {
+       "slot": "assets/sounds/wretched-scream",
+       "what": "reset 4's end: the wretched scream as the false god sends the bullet back (plays twice, overlapping)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/doom-inverted",
+       "what": "the inverted P(Doom) record's song (optional: without it, it plays P(Doom) itself). a whole song, .mp3 or .ogg",
+       "kind": "sound",
+       "optional": true
       },
       {
        "slot": "assets/mel-room/main-poster",

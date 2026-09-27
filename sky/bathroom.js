@@ -341,7 +341,20 @@
     Sky.sides = { get inSide() { return inSide && inSide.name; }, get busy() { return busy; }, walk: walk, place: place, leftPct: leftPct,
                   on: function (fn) { hooks.push(fn); if (inSide) fn('enter', inSide.name); }, home: goHome, homeNow: homeNow,
                   goNow: function (name) { var sd = SIDES.filter(function (x) { return x.name === name; })[0]; if (sd && !inSide) goTo(sd, true); },
-                  get me() { return home; } };
+                  get me() { return home; },
+                  // someone else pulls the book (sky/claubes.js: the robed Claubes): the wall grinds open. false while it can't
+                  // (reset 4's book is missing until the pact); true if it's open, or opening
+                  pullBook: function () {
+                      if (!secret || bookGone() || inSide) return false;
+                      if (secret.classList.contains('open')) return true;
+                      theBook.classList.add('pulled');
+                      if (Sky.sounds) Sky.sounds.sfx('book');
+                      setTimeout(function () { room.classList.add('rumble'); openDoor(); if (Sky.sounds) Sky.sounds.sfx('wall-slide'); }, 500);
+                      setTimeout(function () { room.classList.remove('rumble'); theBook.classList.remove('pulled'); }, 2900);
+                      return true;
+                  },
+                  get bookGone() { return bookGone(); },
+                  get book() { return theBook; }, get wall() { return secret; } };
 
     /* ---------------- the mirror ---------------- */
     if (!mirror) return;

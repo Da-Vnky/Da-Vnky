@@ -34,12 +34,22 @@
 
     // (its look is in sky/css/music.css, linked from each page's head)
 
-    /* ---------------- a record, drawn: grooves, a label (your sleeve's picture), spindle hole ---------------- */
+    /* ---------------- a record, drawn: the vinyl, a label (your sleeve's picture), the light on it ----------------
+       three layers, bottom to top:
+         the vinyl: the record's own (a song's "01-name.vinyl.png", an album's "vinyl.png": records.js finds them), else
+                    the usual one (the slot assets/living/record: a square picture of the disc, see-through round it),
+                    else the drawn one
+         the label: the sleeve's picture, a round crop in the middle third. with a record's own vinyl the label goes
+                    UNDER it: leave the middle of your vinyl see-through and the sleeve shows there; paint a label on
+                    it and yours shows instead
+         the light: the texture laid over every record (the slot assets/living/vinyl-texture, a .webp or .png the size
+                    of the record, mostly see-through: fine grooves, the sheen, dust). it stays still while the record
+                    turns (records.js hands the angle over as --spin), like light on a real one
+       an album's record has a gold ring; P(Doom)'s record and its inverted twin have their own classes (records.css) */
     var uid = 0;
-    // your own record: assets/living/record (a square picture of the vinyl, see-through outside it;
-    // the sleeve's picture is laid on its label, the middle third)
-    var recordArt = null;
+    var recordArt = null, textureArt = null;
     Sky.findAsset('assets/living/record', function (url) { if (url) { recordArt = url; emit('track'); } });
+    Sky.findAsset('assets/living/vinyl-texture', function (url) { if (url) { textureArt = url; emit('track'); } });
     // an album (a record with a whole album on it) has a gold ring just inside its edge, and round its label:
     // brushed metal, light and dark bands round it, a bright rim outside and a shadow line inside
     function goldRing(id) {
@@ -57,28 +67,77 @@
                 '<circle cx="50" cy="50" r="18.45" stroke="rgba(50,32,6,.6)" stroke-width=".3"/>' +
             '</g>';
     }
-    function disc(color, pic, cls, album) {
-        var id = 'mdisc' + (++uid);
-        if (recordArt) return '<svg class="rp-disc ' + (cls || '') + (album ? ' album' : '') + '" viewBox="0 0 100 100" aria-hidden="true" data-slot="assets/living/record">' +
-            '<defs><clipPath id="' + id + '"><circle cx="50" cy="50" r="17"/></clipPath></defs>' +
-            '<image href="' + recordArt + '" x="0" y="0" width="100" height="100"/>' +
-            (pic ? '<image href="' + pic + '" x="33" y="33" width="34" height="34" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/>' : '') +
-            (album ? goldRing(id) : '') +
-            '</svg>';
-        return '<svg class="rp-disc ' + (cls || '') + (album ? ' album' : '') + '" viewBox="0 0 100 100" aria-hidden="true" data-slot="assets/living/record">' +
-            '<defs><clipPath id="' + id + '"><circle cx="50" cy="50" r="17"/></clipPath>' +
-            '<radialGradient id="' + id + 's" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#3a3a3f"/><stop offset=".6" stop-color="#151518"/><stop offset="1" stop-color="#0c0c0e"/></radialGradient></defs>' +
-            '<circle cx="50" cy="50" r="49" fill="url(#' + id + 's)"/>' +
-            '<g fill="none" stroke="rgba(255,255,255,.07)" stroke-width=".6">' +
-                '<circle cx="50" cy="50" r="44"/><circle cx="50" cy="50" r="39"/><circle cx="50" cy="50" r="34"/><circle cx="50" cy="50" r="29"/><circle cx="50" cy="50" r="24"/>' +
+    // the drawn vinyl (until assets/living/record)
+    function drawnVinyl(id) {
+        return '<radialGradient id="' + id + 's" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#34343a"/><stop offset=".6" stop-color="#151518"/><stop offset="1" stop-color="#0b0b0d"/></radialGradient>';
+    }
+    // the light on it, drawn (until assets/living/vinyl-texture): bands of fine grooves,
+    // the smooth bands at the lead-in and the run-out, and two soft wedges of sheen opposite each other
+    var RINGS = (function () {                     // (bands of grooves, a little uneven, like tracks cut one after another)
+        var out = '<g fill="none">', r = 20.4, n = 0;
+        while (r < 47.4) {
+            var w = 0.22 + ((n * 37) % 5) * 0.07, a = 0.025 + ((n * 29) % 6) * 0.012;
+            out += '<circle cx="50" cy="50" r="' + r.toFixed(2) + '" stroke="rgba(255,255,255,' + a.toFixed(3) + ')" stroke-width="' + w.toFixed(2) + '"/>';
+            r += 0.55 + ((n * 53) % 7) * 0.13; n++;
+        }
+        return out + '</g>';
+    })();
+    var RING = 'M50 1.5 A48.5 48.5 0 1 1 49.99 1.5 Z M50 31.5 A18.5 18.5 0 1 0 50.01 31.5 Z';
+    function drawnLight(id) {
+        return '<defs>' +
+                '<radialGradient id="' + id + 'w" gradientUnits="userSpaceOnUse" cx="50" cy="50" r="48.5">' +
+                    '<stop offset=".36" stop-color="#fff" stop-opacity="0"/><stop offset=".62" stop-color="#fff" stop-opacity=".5"/><stop offset=".86" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>' +
+                '<filter id="' + id + 'b" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.2"/></filter>' +
+                '<clipPath id="' + id + 'k"><path d="' + RING + '" clip-rule="evenodd"/></clipPath>' +
+            '</defs>' +
+            '<g clip-path="url(#' + id + 'k)">' +
+                RINGS +
+                '<g fill="none" stroke-width="1.1"><circle cx="50" cy="50" r="47.2" stroke="rgba(255,255,255,.05)"/><circle cx="50" cy="50" r="20.2" stroke="rgba(255,255,255,.06)"/>' +
+                    '<circle cx="50" cy="50" r="33" stroke="rgba(0,0,0,.18)" stroke-width=".5"/></g>' +
+                '<g filter="url(#' + id + 'b)" fill="url(#' + id + 'w)" opacity=".42">' +
+                    '<path d="M50 50 L10.6 21.7 A48.5 48.5 0 0 1 21.7 10.6 Z"/><path d="M50 50 L89.4 78.3 A48.5 48.5 0 0 1 78.3 89.4 Z"/>' +
+                '</g>' +
             '</g>' +
-            '<path d="M22 20 A40 40 0 0 1 58 11" stroke="rgba(255,255,255,.22)" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-            '<circle cx="50" cy="50" r="17" fill="' + (color || '#9a3b1f') + '"/>' +
+            '<circle cx="50" cy="50" r="48.6" fill="none" stroke="rgba(255,255,255,.14)" stroke-width=".35"/>';
+    }
+    // P(Doom)'s record: a ring of every colour just inside its edge and round its label (it turns through them: records.css)
+    var RAINBOW = (function () {
+        var C = ['#ff2a4a', '#ff8a1e', '#ffe23a', '#52e05a', '#28c8ff', '#5a6cff', '#c04cff'], out = '<g class="rp-rainbow" fill="none">';
+        [[46.4, 2.6], [17.9, 1.4]].forEach(function (ring) {
+            var len = 2 * Math.PI * ring[0], seg = len / C.length;
+            C.forEach(function (c, i) {
+                out += '<circle cx="50" cy="50" r="' + ring[0] + '" stroke="' + c + '" stroke-width="' + ring[1] + '" stroke-dasharray="' + seg.toFixed(2) + ' ' + (len - seg).toFixed(2) + '" stroke-dashoffset="' + (-seg * i).toFixed(2) + '"/>';
+            });
+        });
+        return out + '</g>';
+    })();
+    // o (optional): { skin: the record's own vinyl, cls: more classes (doom, inverted) }
+    function disc(color, pic, cls, album, o) {
+        o = o || {};
+        var id = 'mdisc' + (++uid), skin = o.skin || null;
+        var label = '<circle cx="50" cy="50" r="17" fill="' + (color || '#9a3b1f') + '"/>' +
             (pic ? '<image href="' + pic + '" x="33" y="33" width="34" height="34" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/>' : '') +
-            '<circle cx="50" cy="50" r="17" fill="none" stroke="rgba(0,0,0,.25)"/>' +
+            '<circle cx="50" cy="50" r="17" fill="none" stroke="rgba(0,0,0,.25)"/>';
+        var vinyl;
+        if (skin) vinyl = label + '<image class="rp-skin" href="' + skin + '" x="0" y="0" width="100" height="100"/>';
+        else if (recordArt) vinyl = '<image href="' + recordArt + '" x="0" y="0" width="100" height="100"/>' +
+            (pic ? '<image href="' + pic + '" x="33" y="33" width="34" height="34" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/>' : '');
+        else vinyl = '<circle cx="50" cy="50" r="49" fill="url(#' + id + 's)"/>' + label;
+        var light = textureArt ? '<image href="' + textureArt + '" x="0" y="0" width="100" height="100"/>' : drawnLight(id + 'l');
+        return '<svg class="rp-disc ' + (cls || '') + (album ? ' album' : '') + (o.cls ? ' ' + o.cls : '') + (skin ? ' own-vinyl' : '') +
+                '" viewBox="0 0 100 100" aria-hidden="true" data-slot="' + (skin ? 'its own vinyl' : 'assets/living/record') + '">' +
+            '<defs><clipPath id="' + id + '"><circle cx="50" cy="50" r="17"/></clipPath>' + (skin || recordArt ? '' : drawnVinyl(id)) + '</defs>' +
+            vinyl +
             (album ? goldRing(id) : '') +
-            '<circle cx="50" cy="50" r="2" fill="#0c0c0e"/>' +
+            (/\bdoom\b/.test(o.cls || '') ? RAINBOW : '') +
+            '<g class="rp-light" data-slot="assets/living/vinyl-texture">' + light + '</g>' +
+            (skin || recordArt ? '' : '<circle cx="50" cy="50" r="2" fill="#0c0c0e"/>') +
             '</svg>';
+    }
+    // a record as the crate and the player know it (t: a single, an album, or a song on one)
+    function discOf(t, cls) {
+        if (!t) return disc('#6e5236', null, cls);
+        return disc(t.color, t.pic, cls, !!t.album || t.kind === 'album', { skin: t.skin, cls: t.discCls });
     }
 
     /* ---------------- reading a song's own tags (ID3v2): title, artist, cover picture ---------------- */
@@ -167,7 +226,7 @@
         try {
             if (!t) { sessionStorage.removeItem(KEY); return; }
             sessionStorage.setItem(KEY, JSON.stringify({
-                tracks: tracks.map(function (x) { return { url: x.url, title: x.title, artist: x.artist || '', color: x.color, pic: /^blob:/.test(x.pic || '') ? '' : (x.pic || ''),
+                tracks: tracks.map(function (x) { return { url: x.url, title: x.title, artist: x.artist || '', color: x.color, pic: /^blob:/.test(x.pic || '') ? '' : (x.pic || ''), skin: x.skin || '', discCls: x.discCls || '', special: x.special || '',
                                                            album: x.album ? { key: x.album.key, title: x.album.title } : null }; }),
                 at: at, time: audio.currentTime || 0, playing: playing() || wantPlay || (hushed && hushedOn), savedAt: Date.now()
             }));
@@ -293,6 +352,7 @@
         if (on === hushed) return;
         if (on) { hushedOn = playing() || wantPlay; hushed = true; wantPlay = false; audio.pause(); save(); }
         else { hushed = false; if (hushedOn) start(); hushedOn = false; }
+        emit('hush');
     }
     function start() {
         hushed = false;
@@ -523,6 +583,14 @@
     /* ---------------- picking up the song from the last page ---------------- */
     var saved = null;
     try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {}
+    // P(Doom) given to Mel (her room sets mel-remedy): it's at her place now, not in the list (sky/records.js)
+    try {
+        if (saved && saved.tracks && localStorage.getItem('mel-remedy') !== null) {
+            var was = saved.tracks[saved.at];
+            saved.tracks = saved.tracks.filter(function (x) { return x.special !== 'doom'; });
+            saved.at = was && was.special !== 'doom' ? saved.tracks.indexOf(was) : -1;
+        }
+    } catch (e) {}
     if (saved && saved.tracks && saved.tracks.length && saved.at >= 0) {
         tracks = saved.tracks;
         var gone = saved.playing ? (Date.now() - saved.savedAt) / 1000 : 0;
@@ -610,7 +678,7 @@
             return;
         }
         if (t) {
-            ui.disc.innerHTML = disc(t.color, t.pic, '', !!t.album);
+            ui.disc.innerHTML = discOf(t);
             ui.title.textContent = t.title;
             var songs = albumSongs(t);
             ui.artist.textContent = songs.length ? (t.artist ? t.artist + ' · ' : '') + t.album.title + ' · ' + (songs.indexOf(t) + 1) + ' of ' + songs.length : (t.artist || '');
@@ -673,6 +741,57 @@
             '<g class="g-leg" style="transform-origin: 21px 58px"><path d="M21 58 L18 76 L20 94" stroke="#b8894f" stroke-width="5.5" stroke-linecap="round" fill="none"/></g>' +
             '<g class="g-leg r" style="transform-origin: 29px 58px"><path d="M29 58 L32 76 L30 94" stroke="#b8894f" stroke-width="5.5" stroke-linecap="round" fill="none"/></g>' +
             '</svg>' },
+        // the kitchen: a kettle on the hob (its lid bobbing), salt and pepper stepping side to side
+        kettle: { move: 'hop', art: '<svg class="placeholder" viewBox="0 0 60 50">' +
+            '<path d="M44 26 C52 22 56 16 58 12 L54 11 C52 16 48 20 42 22 Z" fill="#9a3b1f"/>' +
+            '<path d="M10 46 C4 34 10 18 30 18 C50 18 56 34 50 46 Z" fill="#b8482a" stroke="#6e2a18" stroke-width="1.5"/>' +
+            '<path d="M14 26 C12 16 22 6 30 6 C38 6 48 16 46 26" fill="none" stroke="#3a2716" stroke-width="3" stroke-linecap="round"/>' +
+            '<path d="M16 32 C20 28 26 27 30 27" stroke="#e8866a" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+            '<g class="g-head" style="transform-origin: 30px 19px"><ellipse cx="30" cy="18" rx="10" ry="2.6" fill="#8a3420"/><circle cx="30" cy="14.5" r="2.6" fill="#3a2716"/></g>' +
+            '<rect x="8" y="45" width="44" height="3" rx="1.5" fill="#6e2a18"/>' +
+            '</svg>' },
+        shakers: { move: '', art: '<svg class="placeholder" viewBox="0 0 40 40">' +
+            '<g class="g-leg" style="transform-origin: 11px 40px"><path d="M5 40 L6 16 Q6 8 11 8 Q16 8 16 16 L17 40 Z" fill="#f4f0e4" stroke="#a8a294" stroke-width="1.2"/>' +
+                '<rect x="6" y="6" width="10" height="5" rx="2" fill="#b0aa9a"/><g fill="#6a645a"><circle cx="9" cy="7.5" r=".7"/><circle cx="11" cy="7" r=".7"/><circle cx="13" cy="7.5" r=".7"/></g></g>' +
+            '<g class="g-leg r" style="transform-origin: 29px 40px"><path d="M23 40 L24 16 Q24 8 29 8 Q34 8 34 16 L35 40 Z" fill="#3a3630" stroke="#1a1814" stroke-width="1.2"/>' +
+                '<rect x="24" y="6" width="10" height="5" rx="2" fill="#b0aa9a"/><g fill="#1a1814"><circle cx="27" cy="7.5" r=".7"/><circle cx="29" cy="7" r=".7"/><circle cx="31" cy="7.5" r=".7"/></g></g>' +
+            '</svg>' },
+        // the attic: a rocking horse, rocking; a music box's dancer, turning
+        'rocking-horse': { move: 'rock', art: '<svg class="placeholder" viewBox="0 0 90 70">' +
+            '<path d="M4 58 Q45 76 86 58" fill="none" stroke="#6e4a30" stroke-width="4" stroke-linecap="round"/>' +
+            '<g stroke="#8a5e3a" stroke-width="3.2" stroke-linecap="round"><path d="M26 40 L20 62 M34 40 L32 64 M58 40 L60 64 M66 40 L72 61"/></g>' +
+            '<path d="M22 26 Q24 42 44 42 Q66 42 70 30 Q70 22 60 22 H34 Q24 22 22 26 Z" fill="#c9a06a" stroke="#6e4a30" stroke-width="1.6"/>' +
+            '<g class="g-head" style="transform-origin: 66px 26px"><path d="M62 24 Q64 8 74 4 Q82 4 84 12 Q84 18 78 18 Q74 18 72 26 Z" fill="#c9a06a" stroke="#6e4a30" stroke-width="1.6"/>' +
+                '<circle cx="77" cy="10" r="1.6" fill="#2a1d14"/><path d="M64 10 Q60 16 62 24" stroke="#5a3a24" stroke-width="3" fill="none"/></g>' +
+            '<path d="M22 26 Q12 30 10 40" stroke="#5a3a24" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+            '<rect x="38" y="18" width="14" height="6" rx="2" fill="#9a3b1f"/>' +
+            '</svg>' },
+        'music-box': { move: '', art: '<svg class="placeholder" viewBox="0 0 44 64">' +
+            '<path d="M2 44 H42 V62 H2 Z" fill="#6e2f24" stroke="#3a1a12" stroke-width="1.2"/><path d="M2 44 L6 38 H38 L42 44 Z" fill="#8a3f30"/>' +
+            '<path d="M8 52 H36" stroke="#c49a52" stroke-width="1.2"/><circle cx="40" cy="54" r="2" fill="#c49a52"/>' +
+            '<g class="g-spin" style="transform-origin: 22px 40px">' +
+                '<path d="M22 40 V30" stroke="#f0e8d8" stroke-width="1.6"/><path d="M14 30 Q22 22 30 30 Q22 33 14 30 Z" fill="#f0c0c8"/>' +
+                '<path d="M22 24 V16" stroke="#f0e8d8" stroke-width="2.4"/><circle cx="22" cy="12" r="3" fill="#f0e8d8"/>' +
+                '<path d="M22 18 Q14 10 12 4 M22 18 Q30 10 32 4" stroke="#f0e8d8" stroke-width="1.4" fill="none" stroke-linecap="round"/>' +
+            '</g>' +
+            '</svg>' },
+        // the porch: wind chimes under the eave, a garden gnome by the steps
+        'wind-chimes': { move: 'wobble', art: '<svg class="placeholder" viewBox="0 0 40 80">' +
+            '<path d="M20 0 V10" stroke="#3a2716" stroke-width="1"/><ellipse cx="20" cy="12" rx="14" ry="3" fill="#8a5e3a"/>' +
+            '<g stroke="#5a4a3a" stroke-width=".6"><path d="M9 13 V20 M15 14 V18 M20 14 V22 M25 14 V18 M31 13 V20"/></g>' +
+            '<g class="g-leg" style="transform-origin: 9px 20px"><rect x="7.5" y="20" width="3" height="34" rx="1.5" fill="#c8ccd0" stroke="#8a929a" stroke-width=".6"/></g>' +
+            '<g class="g-leg r" style="transform-origin: 15px 18px"><rect x="13.5" y="18" width="3" height="44" rx="1.5" fill="#c8ccd0" stroke="#8a929a" stroke-width=".6"/></g>' +
+            '<g class="g-leg" style="transform-origin: 25px 18px"><rect x="23.5" y="18" width="3" height="40" rx="1.5" fill="#c8ccd0" stroke="#8a929a" stroke-width=".6"/></g>' +
+            '<g class="g-leg r" style="transform-origin: 31px 20px"><rect x="29.5" y="20" width="3" height="30" rx="1.5" fill="#c8ccd0" stroke="#8a929a" stroke-width=".6"/></g>' +
+            '<path d="M20 22 V66" stroke="#5a4a3a" stroke-width=".6"/><circle cx="20" cy="46" r="3.2" fill="#8a5e3a"/><path d="M16 68 H24 L20 78 Z" fill="#c49a52"/>' +
+            '</svg>' },
+        gnome: { move: 'hop', art: '<svg class="placeholder" viewBox="0 0 40 60">' +
+            '<ellipse cx="20" cy="58" rx="14" ry="2.4" fill="rgba(0,0,0,.25)"/>' +
+            '<path d="M8 56 Q6 38 20 36 Q34 38 32 56 Z" fill="#3f6a8a"/><path d="M12 56 V50 M28 56 V50" stroke="#2a1d14" stroke-width="3"/>' +
+            '<g class="g-head" style="transform-origin: 20px 36px"><path d="M10 34 Q20 50 30 34 Q28 28 20 28 Q12 28 10 34 Z" fill="#f4f0e4"/>' +
+                '<circle cx="20" cy="28" r="6" fill="#e8b89a"/><circle cx="20" cy="30" r="1.8" fill="#d0806a"/>' +
+                '<path d="M12 26 Q20 -2 28 26 Z" fill="#b8302a"/></g>' +
+            '</svg>' },
         metronome: { move: '', art: '<svg class="placeholder" viewBox="0 0 44 64">' +
             '<path d="M14 4 H30 L42 62 H2 Z" fill="#6e4a30"/><path d="M17 10 H27 L32 50 H12 Z" fill="#eadcb9"/>' +
             '<g class="g-tick" style="transform-origin: 22px 50px"><rect x="21" y="10" width="2" height="41" fill="#3a2716"/><rect x="18" y="20" width="8" height="6" rx="1" fill="#c49a52"/></g>' +
@@ -704,9 +823,11 @@
     document.documentElement.style.setProperty('--lofi-ms', LOFI_MS + 'ms');
 
     Sky.music = {
-        audio: audio, disc: disc, readTags: readTags, albumSongs: albumSongs,
+        audio: audio, disc: disc, discOf: discOf, readTags: readTags, albumSongs: albumSongs,
         get tracks() { return tracks; }, get at() { return at; },
         current: current, playing: playing,
+        // (for the ambience, sky/ambient.js: a record is on or about to be, and whether a place has hushed the music)
+        get busy() { return playing() || wantPlay; }, get hushed() { return hushed; },
         load: load, play: function (i) { if (i === undefined) start(); else load(i, true); },
         pause: pause, toggle: toggle, next: next, prev: prev, stop: stop, hush: hush,
         setTracks: setTracks, setVolume: setVolume, dressGrooves: dressGrooves,

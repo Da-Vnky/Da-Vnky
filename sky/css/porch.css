@@ -8,7 +8,7 @@
     position: absolute;
     left: 57%;
     top: auto;
-    bottom: 1.5vh;
+    bottom: calc(var(--bar-bottom, 12px) + 66px);       /* (above the hotbar, not under it) */
     margin-left: -27px;
 }
 .hallway .room-arrow.hall-out>svg,
@@ -417,13 +417,10 @@ body.in-porch .sky-links * {
 .porch .porch-character {
     left: calc(var(--porch-stand) * 1%);
     bottom: 3vh;
-    height: 25vh;
+    height: var(--traveller-h);
     z-index: 5;
 }
 @media (max-width: 620px) {
-    .porch .porch-character {
-        height: 15vh;
-    }
     .porch .porch-chair {
         height: 17vh;
     }
@@ -439,4 +436,22 @@ body.in-porch .sky-links * {
     .porch .porch-walker .pw-r {
         animation: none !important;
     }
+}
+
+/* the porch's dancers (sky/music.js GROOVES): they move while a record plays */
+.porch .porch-chimes {
+    left: 30%;
+    top: 8.6vh;
+    width: 3.6vw;
+    min-width: 34px;
+    z-index: 3;
+    filter: brightness(var(--pd));
+}
+.porch .porch-gnome {
+    left: 80%;
+    bottom: calc(var(--floor-h) - 1.5vh);
+    width: 4.4vw;
+    min-width: 40px;
+    z-index: 4;
+    filter: brightness(var(--pd));
 }

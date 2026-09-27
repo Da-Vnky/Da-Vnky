@@ -58,7 +58,6 @@
 
     // its look is in sky/css/attic.css (linked from each page's head); these are the values it takes from here
     document.documentElement.style.setProperty('--attic-stand', STAND);
-    document.documentElement.style.setProperty('--attic-blood-cursor', 'url("' + BLOOD_CURSOR + '")');
 
     var dark = document.createElement('div');
     dark.className = 'hall-dark';
@@ -302,7 +301,7 @@
         '<p>Here beginneth the covenant of the Seventh Sphere, whereby one who would be free of the wheel may pass beyond the Archons that keep it.</p>' +
         '<p>Let the seeker give what is theirs alone: their name, written in their own blood upon this page. So shall the one who made the wheel know them, and they shall be known.</p>' +
         '<p>And what is written here cannot be unwritten.</p><div class="gr-ritual"></div></div>' +
-        '<div class="grim-page right"><h3>Sign, in thine own blood</h3><div class="gr-sign"><canvas></canvas></div>' +
+        '<div class="grim-page right"><h3>Sign, in thine own blood</h3><div class="gr-sign"><canvas></canvas><span class="gr-quill" aria-hidden="true"></span></div>' +
         '<div class="gr-acts"><button type="button" class="gr-pact" disabled>make the pact</button><button type="button" class="gr-shut">close the book</button></div></div></div>';
     body.appendChild(grim);
     Sky.findAsset('assets/living/grimoire-open', function (u) { if (u) { grim.querySelector('.grim-book').style.setProperty('--grim-art', 'url("' + new URL(u, location.href).href + '") center / 100% 100% no-repeat'); grim.classList.add('has-art'); } });
@@ -312,7 +311,12 @@
         left.querySelectorAll(':scope > :not(.gr-ritual)').forEach(function (n) { n.remove(); });
         left.querySelector('.gr-ritual').innerHTML = '<img alt="" src="' + u + '">';
     });
-    Sky.findAsset('assets/ui/cursor-blood', function (u) { if (u) grim.querySelector('.gr-sign').style.cursor = 'url("' + u + '") 19 7, crosshair'; });
+    // the pointer over the page: a bloodied finger drawn by the page itself, not the browser's cursor (a cursor picture's
+    // tip lands in a different place on different screens and browsers; this one is always exactly where the blood goes).
+    // its tip is at 19 x 7 of its 32 x 32 (--quill-x / --quill-y in attic.css): your own assets/ui/cursor-blood, same.
+    var quill = grim.querySelector('.gr-quill');
+    quill.innerHTML = '<img alt="" src="' + BLOOD_CURSOR + '">';
+    Sky.findAsset('assets/ui/cursor-blood', function (u) { if (u) quill.innerHTML = '<img alt="" src="' + u + '">'; });
     var drone = null;
     function hum(on) {
         if (!drone && Sky.sounds && Sky.sounds.channel) drone = Sky.sounds.channel('grimoire');
@@ -323,13 +327,30 @@
     // signing: the pointer draws in blood
     var pad = grim.querySelector('.gr-sign'), cv = pad.querySelector('canvas'), cx = cv.getContext('2d'), pactBtn = grim.querySelector('.gr-pact');
     var ink = 0, pen = null, lastScratch = 0;
+    // (sized and read in the page's own units, so a book mid-animation, a zoomed page or a resized window can't shift the ink)
     function sizePad() {
-        var r = pad.getBoundingClientRect(), k = window.devicePixelRatio || 1;
-        cv.width = Math.max(1, r.width * k); cv.height = Math.max(1, r.height * k);
+        var k = window.devicePixelRatio || 1, w = pad.offsetWidth, h = pad.offsetHeight;
+        if (ink > 0 && cv.width === Math.round(w * k) && cv.height === Math.round(h * k)) return;
+        var old = ink > 0 ? cv.toDataURL() : null, ow = cv.width, oh = cv.height;
+        cv.width = Math.max(1, Math.round(w * k)); cv.height = Math.max(1, Math.round(h * k));
         cx.setTransform(k, 0, 0, k, 0, 0);
         cx.lineCap = 'round'; cx.lineJoin = 'round';
+        if (old) { var im = new Image(); im.onload = function () { cx.drawImage(im, 0, 0, ow / k, oh / k, 0, 0, w, h); }; im.src = old; }  // (keep what's signed)
     }
-    function at(e) { var r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() }; }
+    window.addEventListener('resize', function () { if (grim.classList.contains('open')) sizePad(); });
+    function at(e) {
+        var r = cv.getBoundingClientRect(), sx = cv.offsetWidth / (r.width || 1), sy = cv.offsetHeight / (r.height || 1);
+        return { x: (e.clientX - r.left) * sx, y: (e.clientY - r.top) * sy, t: performance.now() };
+    }
+    function quillTo(e) {
+        if (e.pointerType === 'touch') { quill.classList.remove('on'); return; }
+        var p = at(e);
+        quill.style.transform = 'translate(' + p.x.toFixed(1) + 'px,' + p.y.toFixed(1) + 'px)';
+        quill.classList.add('on');
+    }
+    pad.addEventListener('pointerenter', quillTo);
+    pad.addEventListener('pointermove', quillTo);
+    pad.addEventListener('pointerleave', function () { if (!pen) quill.classList.remove('on'); });
     pad.addEventListener('pointerdown', function (e) {
         e.preventDefault();
         try { pad.setPointerCapture(e.pointerId); } catch (x) {}
@@ -392,12 +413,19 @@
             // a word first (sky/books.js), then it opens: the ritual, loud, if its pact is still to be made; else only a book
             var first = get('grimoire-looked') !== '1';
             set('grimoire-looked', '1');
+            // the pact's made but they came back up without the key (a reload down there): it pulls them straight back
+            if (Sky.hell && Sky.hell.owed && !Sky.hell.open) {
+                if (Sky.inventory) Sky.inventory.say(PULLED, 2600);
+                setTimeout(rise, 1400);
+                return;
+            }
             if (!Sky.books || !Sky.books.grimoire) { if (!pactMade()) openBook(); return; }
             if (pactMade()) Sky.books.grimoire();
             else Sky.books.grimoire({ line: first ? FIRST_LOOK : null, loud: true, open: openBook });
         });
     });
 
+    var PULLED = 'The ink on the page is still wet. It wants me back down there.';
     /* ---------------- the pact ---------------- */
     var HAND = '<svg viewBox="0 0 50 110" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><path d="M14 110 Q12 74 10 60 Q4 48 3 36 Q2 30 6 31 Q9 32 11 44 L13 28 Q12 14 14 8 Q17 4 19 9 L20 30 L22 6 Q24 0 27 4 Q29 8 27 30 L30 10 Q32 5 35 8 Q37 12 34 34 L38 22 Q41 18 43 22 Q44 28 40 44 Q38 60 36 74 Q35 92 36 110 Z" fill="#0c0808" stroke="#2a1414" stroke-width="1"/>' +
         '<path d="M16 70 Q24 76 32 70 M18 84 Q25 88 33 84" stroke="#241010" stroke-width="1.2" fill="none"/></svg>';
@@ -405,7 +433,7 @@
     Sky.findAsset('assets/living/pact-hand', function (u) { if (u) handArt = '<img alt="" src="' + u + '">'; });
     pactBtn.addEventListener('click', function () {
         if (pactBtn.disabled || pactMade()) return;
-        if (Sky.lives && Sky.lives.locked) { Sky.lives.refuse('grimoire'); return; }   // (not before the key: sky/lives.js)
+        // (27 Sep: no key needed first any more. reset 4's key is down there now: sky/hell.js)
         pactBtn.disabled = true;
         set('grimoire-pact', '1');                                          // (it's made: this can't happen again this reset)
         grim.classList.add('slam');

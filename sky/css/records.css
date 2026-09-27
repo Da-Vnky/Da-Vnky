@@ -610,3 +610,91 @@ body.records-open .signpost {
 .turntable:has(.tt-lofi:focus-visible) .tt-hint {
     opacity: 0;
 }
+
+/* ---------------- P(Doom)'s own slot, at the end of the crate (records.js drawSpecial) ---------------- */
+.rp-special {
+    position: relative;
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 150px;
+    height: 150px;
+    margin: -9px 0 0 84px;
+    border-radius: 10px;
+}
+/* its glow: every colour, turning */
+.rp-special::before {
+    content: "";
+    position: absolute;
+    inset: -9px;
+    border-radius: 14px;
+    background: conic-gradient(#ff2a4a, #ff8a1e, #ffe23a, #52e05a, #28c8ff, #5a6cff, #c04cff, #ff2a4a);
+    filter: blur(10px);
+    opacity: .85;
+    animation: rp-special-glow 4s linear infinite;
+    z-index: 0;
+}
+.rp-special::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: 8px;
+    background: rgba(243, 230, 194, .9);
+    box-shadow: inset 0 0 0 1.5px rgba(154, 59, 31, .25);
+    z-index: 0;
+}
+@keyframes rp-special-glow {
+    to {
+        filter: blur(10px) hue-rotate(360deg);
+    }
+}
+.rp-special>.rp-sleeve {
+    margin: 0;
+    z-index: 2 !important;
+    --tilt: 0deg !important;
+}
+.rp-special .rp-special-mark {
+    position: absolute;
+    top: -12px;
+    right: -8px;
+    z-index: 3;
+    font-size: 1.2rem;
+    color: #c04cff;
+    text-shadow: 0 0 6px #fff;
+    animation: rp-special-glow 4s linear infinite;
+}
+/* not found yet: a faint outline, somewhere a record should be */
+.rp-special.waiting::before {
+    opacity: .28;
+}
+.rp-special .rp-special-empty {
+    position: relative;
+    z-index: 1;
+    width: 132px;
+    height: 132px;
+    border: 2px dashed rgba(110, 82, 54, .35);
+    border-radius: 3px;
+}
+/* the inverted twin (P(Doom) is at Mel's): red, staticky */
+.rp-special.inverted::before {
+    background: conic-gradient(#ff1a1a, #3a0000, #ff3a2a, #120000, #ff1a1a);
+    animation: rp-special-flicker .22s steps(2) infinite;
+}
+@keyframes rp-special-flicker {
+    50% {
+        opacity: .5;
+        filter: blur(12px);
+    }
+}
+.rp-sleeve.inverted .sl-cover {
+    filter: invert(1) hue-rotate(180deg) contrast(1.1);
+}
+.rp-sleeve.inverted .sl-name {
+    color: #9a0a0a;
+}
+@media (prefers-reduced-motion: reduce) {
+    .rp-special::before,
+    .rp-special .rp-special-mark {
+        animation: none;
+    }
+}

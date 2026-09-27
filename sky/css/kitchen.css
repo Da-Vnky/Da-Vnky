@@ -219,7 +219,7 @@ body.kitchen-now .hallway {
 }
 .kitchen .kitchen-counter {
     left: 22%;
-    right: 12%;
+    right: 30%;
     bottom: calc(var(--floor-h) - 1vh);
     height: 24vh;
 }
@@ -442,16 +442,228 @@ body.kitchen-now .hallway {
 .kitchen .kitchen-character {
     left: calc(var(--kitchen-enter) * 1%);
     bottom: 3vh;
-    height: 25vh;
+    height: var(--traveller-h);
     z-index: 5;
 }
+/* ---------------- the stove, at the end of the counter ---------------- */
+.kitchen .kitchen-stove {
+    left: 70.4%;
+    bottom: calc(var(--floor-h) - 1vh);
+    height: 31vh;
+    aspect-ratio: 110 / 150;
+    z-index: 2;
+}
+.kitchen .kitchen-stove>.ks-body,
+.kitchen .kitchen-stove>.ks-flames,
+.kitchen .kitchen-stove>.ks-door {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.kitchen .ks-body>svg,
+.kitchen .ks-body>.art,
+.kitchen .ks-flames>svg,
+.kitchen .ks-flames>.art,
+.kitchen .ks-door>svg,
+.kitchen .ks-door>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+/* the flames: only while the hob's lit, flickering */
+.kitchen .ks-flames {
+    opacity: 0;
+    transition: opacity .25s;
+}
+.kitchen .kitchen-stove.lit .ks-flames {
+    opacity: 1;
+}
+.kitchen .kitchen-stove.lit .ks-flames .ks-flame {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: ks-flicker .18s ease-in-out infinite alternate;
+}
+.kitchen .kitchen-stove.lit .ks-flames .f2 { animation-delay: -.07s; }
+.kitchen .kitchen-stove.lit .ks-flames .f3 { animation-delay: -.12s; animation-duration: .22s; }
+.kitchen .kitchen-stove.lit .ks-flames .f4 { animation-delay: -.03s; animation-duration: .2s; }
+@keyframes ks-flicker {
+    from { transform: scaleY(.82); opacity: .85; }
+    to { transform: scaleY(1.08); opacity: 1; }
+}
+.kitchen .kitchen-stove.lit .ks-body {
+    filter: drop-shadow(0 -6px 10px rgba(110, 150, 255, .35));
+}
+/* the oven door: drops open from its bottom edge (85.3% of the way down the canvas) */
+.kitchen .ks-door {
+    transform-origin: 50% 85.3%;
+    transition: transform .55s cubic-bezier(.4, 0, .3, 1.15);
+}
+.kitchen .kitchen-stove.oven-open .ks-door {
+    transform: perspective(700px) rotateX(-78deg);
+}
+.kitchen .kitchen-stove.oven-open .ks-body {
+    filter: drop-shadow(0 0 16px rgba(255, 150, 70, .35));
+}
+/* where to click: the hob (the top fifth) and the oven door */
+.kitchen .ks-hob,
+.kitchen .ks-oven {
+    position: absolute;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    z-index: 3;
+}
+.kitchen .ks-hob {
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 25%;
+}
+.kitchen .ks-oven {
+    left: 7%;
+    right: 7%;
+    top: 26.6%;
+    height: 58.7%;
+}
+.kitchen .ks-hob:hover .kh-hint,
+.kitchen .ks-hob:focus-visible .kh-hint,
+.kitchen .ks-oven:hover .kh-hint,
+.kitchen .ks-oven:focus-visible .kh-hint,
+.kitchen .km-hit:hover .kh-hint,
+.kitchen .km-hit:focus-visible .kh-hint {
+    opacity: 1;
+}
+.kitchen .ks-hob:focus-visible,
+.kitchen .ks-oven:focus-visible,
+.kitchen .km-hit:focus-visible {
+    outline: none;
+}
+.kitchen .kitchen-stove:has(.ks-hob:hover) .ks-body,
+.kitchen .kitchen-stove:has(.ks-oven:hover) .ks-door,
+.kitchen .kitchen-microwave:has(.km-hit:hover) .km-body {
+    filter: drop-shadow(0 0 6px rgba(255, 220, 150, .6));
+}
+/* the kettle, on the back of the hob */
+.kitchen .kitchen-kettle {
+    position: absolute;
+    left: 58%;
+    bottom: 86%;
+    width: 30%;
+    aspect-ratio: 60 / 50;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* ---------------- the microwave, on the worktop ---------------- */
+.kitchen .kitchen-microwave {
+    left: 24.5%;
+    bottom: calc(var(--floor-h) - 1vh + 24vh * .93);
+    width: 9.5vw;
+    min-width: 96px;
+    aspect-ratio: 160 / 96;
+    z-index: 3;
+    container-type: inline-size;
+}
+.kitchen .kitchen-microwave>.km-body,
+.kitchen .kitchen-microwave>.km-on {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.kitchen .km-body>svg,
+.kitchen .km-body>.art,
+.kitchen .km-on>svg,
+.kitchen .km-on>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+.kitchen .km-on {
+    opacity: 0;
+    transition: opacity .3s;
+}
+.kitchen .kitchen-microwave.running .km-on {
+    opacity: 1;
+}
+.kitchen .kitchen-microwave.running {
+    filter: drop-shadow(0 0 12px rgba(255, 210, 120, .45));
+    animation: km-hum .09s linear infinite alternate;
+}
+@keyframes km-hum {
+    from { translate: 0 0; }
+    to { translate: .4px 0; }
+}
+/* the turning plate (the stand-in's: a dot going round, seen from the front) */
+.kitchen .kitchen-microwave.running .km-plate {
+    animation: km-turn 3s linear infinite;
+}
+@keyframes km-turn {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(9px); }
+    50% { transform: translateX(14px) scaleX(.9); }
+    75% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+/* its clock, in the display (120-148 across, 16-30 down of 160 x 96) */
+.kitchen .km-clock {
+    position: absolute;
+    left: 75%;
+    top: 16.7%;
+    width: 17.5%;
+    height: 14.6%;
+    display: grid;
+    place-items: center;
+    font: 700 5.2cqw/1 ui-monospace, Menlo, Consolas, monospace;
+    color: #8adf8a;
+    text-shadow: 0 0 4px rgba(120, 255, 120, .7);
+    letter-spacing: .04em;
+    pointer-events: none;
+}
+.kitchen .kitchen-microwave.blink .km-clock {
+    animation: km-blink 1s steps(1) infinite;
+}
+@keyframes km-blink {
+    50% { opacity: 0; }
+}
+.kitchen .km-hit {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+/* salt and pepper, dancing on the worktop */
+.kitchen .kitchen-shakers {
+    left: 36.5%;
+    bottom: calc(var(--floor-h) - 1vh + 24vh * .93);
+    width: 3.2vw;
+    min-width: 34px;
+    aspect-ratio: 40 / 40;
+    z-index: 3;
+    pointer-events: none;
+}
+
 @media (max-width: 620px) {
-    .kitchen .kitchen-character {
-        height: 14vh;
+    .kitchen .kitchen-stove {
+        left: 71%;
+        height: 17vh;
+    }
+    .kitchen .kitchen-microwave {
+        left: 38.5%;
+        bottom: calc(var(--floor-h) - 1vh + 18vh * .93);
+        width: 13vw;
+        min-width: 0;
+    }
+    .kitchen .kitchen-shakers {
+        display: none;
     }
     .kitchen .kitchen-counter {
         left: 26%;
-        right: 4%;
+        right: 30%;
         height: 18vh;
     }
     .kitchen .kitchen-bowl {
@@ -462,19 +674,26 @@ body.kitchen-now .hallway {
         bottom: calc(var(--floor-h) - 1vh + 18vh * .93 - 1vh);
     }
     .kitchen .kitchen-bowl {
-        left: 40%;
-        width: 20vw;
+        left: 52%;
+        width: 15vw;
+        min-width: 0;
     }
     .kitchen .kitchen-serpent,
     .kitchen .kitchen-sausages {
-        left: calc(40% - 5vw);
-        width: 30vw;
+        left: calc(52% - 4vw);
+        width: 23vw;
+        min-width: 0;
     }
     .kitchen .kitchen-fridge {
         height: 40vh;
     }
 }
 @media (prefers-reduced-motion: reduce) {
+    .kitchen .kitchen-stove.lit .ks-flames .ks-flame,
+    .kitchen .kitchen-microwave.running,
+    .kitchen .kitchen-microwave.running .km-plate {
+        animation: none;
+    }
     .kitchen.bowl-turning.turn .kitchen-sausages,
     .kitchen.bowl-turning.turn .kitchen-serpent {
         animation-duration: .01s;

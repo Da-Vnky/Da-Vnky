@@ -339,3 +339,92 @@
     outline: none;
     transform: translateY(-3px);
 }
+
+/* down there, the bag, the gun in hand and its bullet holes stay on top (they'd be under the whole of below otherwise) */
+body.in-hell .hotbar,
+body.in-hell .inv-note {
+    z-index: 2147481400;
+}
+body.in-hell .inv-cursor {
+    z-index: 2147481500;
+}
+body.in-hell .shot-layer,
+body.in-hell .shot-flash {
+    z-index: 2147481200;
+}
+/* the white revolver, come down to them below: in front of them on the brimstone */
+.hell .white-gift.below {
+    z-index: 3;
+}
+
+/* the eye, shot with the white revolver: it swells, splits and is gone; the ring goes still */
+.hell.eye-burst .hl-eye {
+    transition: none;
+    animation: hl-eye-burst .9s cubic-bezier(.3, 0, .7, 1) forwards;
+}
+@keyframes hl-eye-burst {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        filter: drop-shadow(0 0 22px rgba(255, 60, 20, .7));
+    }
+    35% {
+        transform: translate(-50%, -50%) scale(1.25, 1.4);
+        filter: drop-shadow(0 0 40px rgba(255, 30, 10, 1)) brightness(1.5) saturate(1.6);
+    }
+    60% {
+        transform: translate(-50%, -50%) scale(1.5, .3);
+        opacity: .9;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.8, 0);
+        opacity: 0;
+    }
+}
+.hell.eye-gone .hl-eye {
+    visibility: hidden;
+}
+.hell.eye-burst .hl-flash {
+    animation: hl-burst-flash .7s ease-out;
+}
+@keyframes hl-burst-flash {
+    0% {
+        opacity: .9;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+.hell.eye-gone .hl-ouro>svg {
+    animation-play-state: paused;
+    filter: brightness(.6) saturate(.6);
+}
+.hell .hl-gib {
+    position: fixed;
+    z-index: 4;
+    width: 9px;
+    height: 7px;
+    border-radius: 45% 55% 40% 60%;
+    background: #7a0a06;
+    box-shadow: inset -2px -1px 0 rgba(0, 0, 0, .35);
+    pointer-events: none;
+}
+.hell .hl-gib.big {
+    width: 16px;
+    height: 12px;
+    background: #d9b89a;
+    box-shadow: inset -3px -2px 0 #9a1a0c;
+}
+.hell .hl-burst-art {
+    position: fixed;
+    z-index: 4;
+    object-fit: contain;
+    pointer-events: none;
+}
+body.in-hell .mc-say {
+    z-index: 2147481600;
+}
+/* reset 4's key, fallen at their feet down there: bigger, and shining, so it's seen against the brimstone */
+body.in-hell .reset-key {
+    width: 40px;
+    filter: drop-shadow(0 0 6px rgba(255, 230, 160, .95)) drop-shadow(0 0 16px rgba(255, 170, 60, .7));
+}

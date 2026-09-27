@@ -39,6 +39,17 @@
 
    The song: any track whose name or title has "p(doom)" in it (DOOM below).
 
+   ONCE P(DOOM) IS MEL'S (given to her in her room: localStorage mel-remedy), it's gone
+   from the crate and it calls nobody (and the party lights never come on for it: Mel
+   asked for that). Its INVERTED TWIN takes its slot (sky/records.js, special 'inverted'):
+   played, the light goes red and staticky (sky/static.js) instead of the party, and the
+   Claubes that come out wear BLACK ROBES (run:claubes-robed). They don't dance: they
+   make for the bookshelf, pull the book (the wall opens: Sky.sides.pullBook) and run down
+   the stairs to the dungeon (run:claubes-below), and the traveller had better follow.
+   Reset 4 before the pact, the book's missing: they claw at the gap until it's back.
+   In a reset they came out robed, every shot fired makes the screen more staticky.
+   slots: assets/characters/mini-claube-robed (+ -robed-pulling, -robed-running)
+
    slots: assets/characters/mini-claube          standing about (and the fallback for the others)
           assets/characters/mini-claube-dancing  while a record plays (a GIF can dance on its own)
           assets/characters/mini-claube-happy    when the music stops
@@ -53,6 +64,11 @@
     if (!Sky || Sky.claubes) return;
     var body = document.body;
     var DOOM = /p\s*\(\s*doom\s*\)/i;          // the song that calls them out
+    function doomGiven() { try { return localStorage.getItem('mel-remedy') !== null; } catch (e) { return false; } }
+    function robed() { return !!S && S.get('claubes-robed') === '1'; }
+    function below() { return !!S && S.get('claubes-below') === '1'; }
+    var GAP_LINE = ['They\u2019re clawing at the shelf. At the gap where the book should be.'];
+    var FOLLOW_LINE = ['They pulled the book. They went down there, all of them.', '…I should follow them.'];
     var HOW_MANY = 7;
     var KEY = 'claubes', KILLS = 'claubes-kills';
     var S = window.davSave;
@@ -79,6 +95,18 @@
         '<g class="mc-face-happy"><path d="M12.5 30 Q15 26.5 17.5 30 M22.5 30 Q25 26.5 27.5 30" stroke="#2a1410" stroke-width="1.7" fill="none" stroke-linecap="round"/>' +
             '<path d="M14.5 34 Q20 41.5 25.5 34 Z" fill="#5a1d14"/><path d="M16.5 37 Q20 39.5 23.5 37" fill="#e0707a"/>' +
             '<ellipse cx="11.5" cy="34" rx="2.4" ry="1.5" fill="#f0a08a" opacity=".8"/><ellipse cx="28.5" cy="34" rx="2.4" ry="1.5" fill="#f0a08a" opacity=".8"/></g>' +
+        '</svg>';
+    // in black robes (the inverted record's): the hood up, only the face showing
+    var ROBED = '<svg class="placeholder robed" viewBox="0 0 40 52" aria-hidden="true">' +
+        '<g class="mc-arm l"><path d="M9 28 Q3 24 4 16" stroke="#120d0d" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="4" cy="15" r="2" fill="#c8643b"/></g>' +
+        '<g class="mc-arm r"><path d="M31 28 Q37 24 36 16" stroke="#120d0d" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="36" cy="15" r="2" fill="#c8643b"/></g>' +
+        '<path d="M20 6 Q7 8 7 24 L4 51 H36 L33 24 Q33 8 20 6 Z" fill="#0d0a0a"/>' +
+        '<path d="M20 6 Q7 8 7 24 L4 51 M20 6 Q33 8 33 24 L36 51" stroke="#3a0c0c" stroke-width="1" fill="none"/>' +
+        '<path d="M11 51 L14 30 M29 51 L26 30" stroke="#241616" stroke-width="1" fill="none"/>' +
+        '<ellipse cx="20" cy="24" rx="8.5" ry="8" fill="#000"/><ellipse cx="20" cy="25" rx="6.6" ry="6.4" fill="#b85a36"/>' +
+        '<g class="mc-face-plain"><circle cx="17.4" cy="24.4" r="1.5" fill="#1a0a08"/><circle cx="22.6" cy="24.4" r="1.5" fill="#1a0a08"/><path d="M18 28.4 Q20 29.6 22 28.4" stroke="#1a0a08" stroke-width="1" fill="none" stroke-linecap="round"/></g>' +
+        '<g class="mc-face-happy"><path d="M16 25 Q17.4 23 18.8 25 M21.2 25 Q22.6 23 24 25" stroke="#1a0a08" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M17.4 27.6 Q20 31 22.6 27.6 Z" fill="#3a0a08"/></g>' +
+        '<circle cx="17.4" cy="24.4" r=".5" fill="#ff3a2a" class="mc-glint"/><circle cx="22.6" cy="24.4" r=".5" fill="#ff3a2a" class="mc-glint"/>' +
         '</svg>';
     var FLICK = 'data:image/svg+xml;utf8,' + encodeURIComponent(
         '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M9 30 Q4 24 6 17 L8 12 Q9 10 11 11 L12 15 L13 6 Q14 3 16 4 Q17.5 5 17 8 L16.5 14 L22 6 Q24 4 25.5 5.5 Q26.5 7 25 9 L20 16 Q24 17 23 22 Q21 29 14 30 Z" fill="#f0d2b0" stroke="#3a2716" stroke-width="1.3" stroke-linejoin="round"/>' +
@@ -109,8 +137,12 @@
     body.appendChild(crew);
 
     /* ---------------- their pictures ---------------- */
-    var art = { base: null, dancing: null, happy: null, menace: null };
+    var art = { base: null, dancing: null, happy: null, menace: null, robed: null, robedPulling: null, robedRunning: null };
     function pic() {
+        if (crew.classList.contains('robed')) {
+            var r = crew.classList.contains('pulling') ? art.robedPulling : crew.classList.contains('running') ? art.robedRunning : null;
+            return (r || art.robed) ? '<img alt="" src="' + (r || art.robed) + '">' : ROBED;
+        }
         var mode = crew.classList.contains('menace') ? 'menace' : crew.classList.contains('dancing') ? 'dancing' : 'happy';
         var url = art[mode] || (mode === 'menace' && art.happy) || art.base;
         return url ? '<img alt="" src="' + url + '">' : ART;
@@ -120,6 +152,9 @@
     Sky.findAsset('assets/characters/mini-claube-dancing', function (u) { art.dancing = u || null; dress(); });
     Sky.findAsset('assets/characters/mini-claube-happy', function (u) { art.happy = u || null; dress(); });
     Sky.findAsset('assets/characters/mini-claube-menace', function (u) { art.menace = u || null; dress(); });
+    Sky.findAsset('assets/characters/mini-claube-robed', function (u) { art.robed = u || null; dress(); });
+    Sky.findAsset('assets/characters/mini-claube-robed-pulling', function (u) { art.robedPulling = u || null; dress(); });
+    Sky.findAsset('assets/characters/mini-claube-robed-running', function (u) { art.robedRunning = u || null; dress(); });
 
     /* ---------------- who's out, and where (for the rest of the visit) ---------------- */
     var out = [];                                 // [{ x: % across }]   (kept for the whole reset: run:claubes-out)
@@ -149,10 +184,14 @@
         return el;
     }
     function mood() {
-        var on = !!(Sky.music && Sky.music.playing());
-        crew.classList.toggle('dancing', on);
-        crew.classList.toggle('happy', !on);
-        body.classList.toggle('doom-party', on && isDoom(Sky.music.current()));        // the lights: only for this one song
+        var on = !!(Sky.music && Sky.music.playing()), cur = Sky.music && Sky.music.current();
+        crew.classList.toggle('robed', robed());
+        crew.classList.toggle('dancing', on && !robed());                               // (robed, they don't dance)
+        crew.classList.toggle('happy', !on && !robed());
+        body.classList.toggle('doom-party', on && isDoom(cur));                          // the lights: only for this one song
+        body.classList.toggle('doom-inverted', on && isInverted(cur));                   // its inverted twin: red, and static
+        if (Sky.staticNoise) Sky.staticNoise.want('inverted', on && isInverted(cur) ? 0.2 : 0);
+        crew.classList.toggle('below', below() && !inDungeon);                           // (gone down to the dungeon: not up here)
         dress();
     }
     function show(crawling) {
@@ -164,14 +203,68 @@
         mood();
         if (inDungeon) setTimeout(worship, 50);
     }
-    function callThemOut() {
+    function callThemOut(inverted) {
         if (out.length || gone4good() || called()) return;                 // (once a reset: the ones that go stay gone)
         if (S) S.set('claubes-called', '1');
+        if (S && inverted) S.set('claubes-robed', '1');
         setKills(0);
         for (var i = 0; i < HOW_MANY; i++) out.push({ x: +(17 + (75 / (HOW_MANY - 1)) * i + (Math.random() - 0.5) * 6).toFixed(1) });
         out.sort(function () { return Math.random() - 0.5; });
         save();
         show(true);
+        if (inverted) setTimeout(robedGo, 1150 + HOW_MANY * 260 + 1800);
+    }
+
+    /* ---------------- robed: to the bookshelf, pull the book, and down the stairs ---------------- */
+    var goingDown = false;
+    function robedGo() {
+        if (!robed() || below() || goingDown || !out.length) return;
+        var sides = Sky.sides, book = sides && sides.book;
+        // (only in the living space itself, with the shelf in view: anywhere else, they wait for the traveller to come home)
+        if (!book || !sides.pullBook || body.classList.contains('in-side') || sides.busy) { setTimeout(robedGo, 1500); return; }
+        goingDown = true;
+        var W = window.innerWidth, br = book.getBoundingClientRect(), at = (br.left + br.width / 2) / W * 100;
+        var els = Array.prototype.slice.call(crew.querySelectorAll('.mini-claube'));
+        crew.classList.add('running'); dress();
+        els.forEach(function (el, i) {
+            var to = at + (i - (els.length - 1) / 2) * 2.6;
+            el.classList.toggle('flip', to < (parseFloat(el.style.left) || 50));
+            el.style.transition = 'left 1.3s cubic-bezier(.4,0,.6,1)';
+            el.style.left = to.toFixed(1) + '%';
+        });
+        sfx('step', { size: 0.2 });
+        setTimeout(function pull() {
+            crew.classList.remove('running'); crew.classList.add('pulling'); dress();
+            if (!pull.said || Math.random() < 0.3) sfx('book', { or: 'tap', size: 0.3 });
+            if (Sky.sides.bookGone) {                                          // (reset 4, before the pact: nothing to pull. they keep at it)
+                if (!pull.said) { pull.said = true; speak(GAP_LINE, null, { hold: 1800 }); }
+                setTimeout(pull, 2600);
+                return;
+            }
+            if (body.classList.contains('in-side')) { crew.classList.remove('pulling'); goingDown = false; setTimeout(robedGo, 1500); return; }
+            Sky.sides.pullBook();
+            // the wall's open: down they go
+            setTimeout(function () {
+                var wall = Sky.sides.wall, wr = wall ? wall.getBoundingClientRect() : { left: W * 0.8, width: 0 }, wx = (wr.left + wr.width / 2) / W * 100;
+                crew.classList.remove('pulling'); crew.classList.add('running'); dress();
+                els.forEach(function (el, i) {
+                    setTimeout(function () {
+                        el.classList.toggle('flip', wx < (parseFloat(el.style.left) || 50));
+                        el.style.transition = 'left 1.1s cubic-bezier(.4,0,.6,1)';
+                        el.style.left = (wx + (Math.random() - 0.5) * 2).toFixed(1) + '%';
+                        setTimeout(function () { el.classList.add('down-stairs'); }, 1100);
+                    }, i * 170);
+                });
+                setTimeout(function () {
+                    if (S) S.set('claubes-below', '1');
+                    crew.classList.remove('running');
+                    els.forEach(function (el) { el.classList.remove('down-stairs'); el.style.transition = ''; });
+                    goingDown = false;
+                    mood();
+                    speak(FOLLOW_LINE, null, { hold: 1800 });
+                }, 1100 + els.length * 170 + 1000);
+            }, 3000);
+        }, 1400);
     }
     function gone(el) {
         var i = out.indexOf(el._c);
@@ -498,6 +591,8 @@
             burst(r.left + r.width / 2, r.top + r.height * 0.55, Math.max(34, r.width));
             el.remove();
             gone(el);
+            dungeonStatic();
+            if (Sky.staticNoise) Sky.staticNoise.burst(0.8, 500);
             // the rest: not a step, not a word. they turn to the traveller and smile
             var me = document.querySelector('.dungeon .character'), mx = me ? me.getBoundingClientRect().left + me.getBoundingClientRect().width / 2 : 0;
             crew.querySelectorAll('.mini-claube').forEach(function (o) { var q = o.getBoundingClientRect(); o.classList.toggle('flip', q.left > mx); o.querySelector('.mc-bubble').classList.remove('on'); });
@@ -543,6 +638,10 @@
         st.style.transform = 'rotate(' + Math.atan2(dy, dx) + 'rad) scaleX(0)';
         body.appendChild(st);
         body.classList.add('god-sends');                                             // (the frame flares as it sends it back)
+        // the whole dungeon screams: a wretched, tearing scream, and the static swallows everything
+        sfx('wretched-scream', { or: 'shriek' });
+        setTimeout(function () { sfx('wretched-scream', { or: 'scream' }); }, 250);
+        if (Sky.staticNoise) { Sky.staticNoise.want('dungeon', 0.7); Sky.staticNoise.burst(1, 2400); }
         setTimeout(function () { body.classList.remove('god-sends'); }, 1400);
         setTimeout(function () {
             sfx('ricochet', { or: 'zap' }); sfx('bang', { delay: 0.02 });
@@ -563,6 +662,8 @@
             Sky.sides.on(function (what, name) {
                 if (name !== 'dungeon') return;
                 inDungeon = what === 'enter';
+                crew.classList.toggle('below', below() && !inDungeon);
+                dungeonStatic();
                 if (inDungeon) setTimeout(function () { if (inDungeon) worship(); }, 950); else unworship();
             });
         } else if (n < 40) setTimeout(function () { watchSides(n + 1); }, 150);
@@ -607,21 +708,44 @@
     }, 3500);
 
     /* ---------------- the music calls them out, and sets them dancing ---------------- */
+    function isInverted(t) { return !!t && t.special === 'inverted'; }
     function isDoom(t) {
-        if (!t) return false;
+        if (!t || isInverted(t) || doomGiven()) return false;
         var name = String(t.title || '') + ' ' + (function () { try { return decodeURIComponent(t.url || ''); } catch (e) { return t.url || ''; } })();
         return DOOM.test(name);
     }
     if (Sky.music) Sky.music.on(function (what) {
         if (what === 'play' && isDoom(Sky.music.current())) callThemOut();
+        if (what === 'play' && isInverted(Sky.music.current())) callThemOut(true);
         if (what === 'play' || what === 'pause' || what === 'stop') mood();
     });
     document.addEventListener('dav:traveller-shot', function () { scatter('!!!'); });
     document.addEventListener('dav:record-shot', function () { scatter('noooo'); });
 
+    var SHOT_STATIC = 0.035;
+    function shotStatic() { return Math.min(0.55, (+(S && S.get('static-shots')) || 0) * SHOT_STATIC); }
+    document.addEventListener('dav:bang', function () {
+        if (!robed() || !S) return;
+        S.set('static-shots', String((+S.get('static-shots') || 0) + 1));
+        if (Sky.staticNoise) { Sky.staticNoise.want('shots', shotStatic()); Sky.staticNoise.burst(Math.min(1, shotStatic() + 0.35), 260); }
+    });
+    if (robed() && Sky.staticNoise) Sky.staticNoise.want('shots', shotStatic());
+    // the dungeon's own static: always faint; in reset 4 thicker with every Claube and picture destroyed since the pact
+    function dungeonStatic() {
+        if (!Sky.staticNoise) return;
+        if (!inDungeon) { Sky.staticNoise.want('dungeon', 0); return; }
+        var n = 0;
+        if (R4() && S && S.get('grimoire-pact') === '1') n = (called() ? HOW_MANY - out.length : 0) + (6 - apparitionsLeft());
+        Sky.staticNoise.want('dungeon', 0.05 + n * 0.035);
+    }
+    document.addEventListener('dav:painting-shot', function () { setTimeout(dungeonStatic, 50); });
+    setInterval(dungeonStatic, 1500);
+
     if (gone4good()) { out = []; save(); }
     if (out.length) show(false);
     else if (Sky.music && Sky.music.playing() && isDoom(Sky.music.current())) callThemOut();
+    else if (Sky.music && Sky.music.playing() && isInverted(Sky.music.current())) callThemOut(true);
+    if (out.length && robed() && !below()) setTimeout(robedGo, 2500);
     mood();
 
     // a bullet at the false god's frame (frame 6, the dungeon) while they worship: the circle takes it too (sky/revolver.js)

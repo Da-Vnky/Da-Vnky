@@ -82,7 +82,7 @@
           // (stuck in the apple pie in the kitchen fridge, its ring sticking out: sky/kitchen.js. the junk drawer has a hint)
           key: { page: 'living',   in: '.kitchen-pie', left: 40, top: 30, where: 'the kitchen, in the fridge: stuck in the apple pie' } },
         { n: 4, name: 'dark witchcraft', theme: 'the grimoire, the Claubes and the false god', deaths: ['diagram'],
-          key: { page: 'living',   in: '.bathroom', left: 88,   top: 93,   where: 'the bathroom, in the corner by the tub' } },
+          key: { page: 'living',   drop: 'hell', where: 'below (after the grimoire\u2019s pact): shoot the eye with the white revolver and it drops at your feet' } },
         { n: 5, name: '',            theme: '',                               deaths: ['r5'],
           key: { page: 'workshop', in: '.room',     left: 93.5, top: 61,   where: 'the workshop, on top of the notes board' } },
         { n: 6, name: '',            theme: '',                               deaths: ['r6'],

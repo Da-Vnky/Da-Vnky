@@ -1,0 +1,69 @@
+/* =====================================================================
+   static.css — the look of sky/static.js: the screen's static.
+   --static (0 … 1, set by the script) is how thick it is.
+   ===================================================================== */
+
+.static-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 2147480000;
+    pointer-events: none;
+    display: none;
+    --s: var(--static, 0);
+}
+.static-veil.on {
+    display: block;
+}
+/* the fine snow, over everything (like the grain in Mel's room) */
+.static-veil .sv-snow {
+    position: absolute;
+    inset: 0;
+    background: var(--static-snow) 0 0 / 160px repeat;
+    mix-blend-mode: overlay;
+    opacity: calc(var(--s) * 1.1);
+    animation: sv-snow .5s steps(6) infinite;
+}
+/* grey specks on top: they only really show as it thickens */
+.static-veil .sv-specks {
+    position: absolute;
+    inset: 0;
+    background: var(--static-specks) 0 0 / 120px repeat;
+    opacity: calc(var(--s) * var(--s) * .9);
+    mix-blend-mode: screen;
+    animation: sv-snow .3s steps(4) infinite reverse;
+}
+@keyframes sv-snow {
+    to {
+        background-position: 97px 53px;
+    }
+}
+/* heavy: bands tear across the screen now and then */
+.static-veil .sv-tear {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 30%;
+    height: 7%;
+    background: var(--static-specks) 0 0 / 60px 8px repeat;
+    opacity: 0;
+    mix-blend-mode: screen;
+}
+.static-veil.heavy .sv-tear {
+    animation: sv-tear 1.7s steps(1) infinite;
+}
+@keyframes sv-tear {
+    0%, 70%, 100% { opacity: 0; top: 30%; }
+    72% { opacity: calc(var(--s) * .9); top: 18%; height: 4%; }
+    76% { opacity: calc(var(--s) * .7); top: 62%; height: 9%; }
+    80% { opacity: 0; }
+    88% { opacity: calc(var(--s) * .8); top: 44%; height: 3%; }
+    90% { opacity: 0; }
+}
+/* the dungeon: always a little (sky/claubes.js asks for more in reset 4) */
+@media (prefers-reduced-motion: reduce) {
+    .static-veil .sv-snow,
+    .static-veil .sv-specks,
+    .static-veil.heavy .sv-tear {
+        animation: none;
+    }
+}

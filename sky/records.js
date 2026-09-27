@@ -25,6 +25,15 @@
    its sleeve and its record have a gold ring just inside the edge. while
    an album plays, its songs pop up under the player (pick one), and the
    usual ⏮ ⏭ (and the phone's media keys) go from song to song.
+
+   P(DOOM)'S OWN SLOT: the record "I'm Upping My P(Doom)" (any song with p(doom) in
+   its name) isn't with the others: it has a slot of its own at the end of the crate,
+   glowing rainbow. Empty (a faint outline) until it's found (sky/loot.js). Once it's
+   been given to Mel (her room sets localStorage mel-remedy) it's at her place, not
+   here: the slot holds its INVERTED twin instead (colours turned inside out, a red,
+   staticky light instead of the party; its Claubes wear black robes, pull the book
+   and run down to the dungeon: sky/claubes.js). The inverted record plays the same
+   song, or assets/sounds/doom-inverted if Victor adds one.
    ===================================================================== */
 
 (function () {
@@ -32,7 +41,11 @@
     var deck = document.querySelector('.turntable[data-folder]');
     if (!deck || !Sky.music) return;
     var M = Sky.music, audio = M.audio;
-    var AUDIO = ['mp3', 'ogg'], PICS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+    var AUDIO = ['mp3', 'ogg'], PICS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'];
+    var DOOM = /p\s*\(\s*doom\s*\)/i;
+    function doomGiven() { try { return localStorage.getItem('mel-remedy') !== null; } catch (e) { return false; } }
+    var invertedSong = null;
+    Sky.findAsset('assets/sounds/doom-inverted.mp3|assets/sounds/doom-inverted.ogg', function (u) { invertedSong = u || null; if (doomEntry) refill(); });
     var LABELS = ['#9a3b1f', '#c49a52', '#3f5a55', '#6e2f24', '#56636f', '#8a3f6e', '#b88c5e', '#28323b'];
 
     // (its look is in sky/css/records.css, linked from each page's head)
@@ -110,7 +123,7 @@
         if (labelDot) labelDot.setAttribute('fill', t ? t.color : '#9a3b1f');
         if (labelArt) { if (t && t.pic) labelArt.setAttribute('href', t.pic); else labelArt.removeAttribute('href'); }
         ttRecord.classList.toggle('on', !!t);
-        ttRecord.innerHTML = t ? M.disc(t.color, t.pic, '', !!t.album) : '';
+        ttRecord.innerHTML = t ? M.discOf(t) : '';
     }
 
     /* ---------------- the player ---------------- */
@@ -142,9 +155,9 @@
 
     // entries: the crate, in order (songs on their own, and albums: { kind: 'album', songs: […] });
     // tracks: every song in playing order (an album's songs one after another), the list the player plays through
-    var entries = [], tracks = [], seeking = false;
+    var entries = [], tracks = [], seeking = false, special = null, doomEntry = null;
     function songsOf(e) { return e.kind === 'album' ? e.songs : [e]; }
-    function flatten() { tracks = []; entries.forEach(function (e) { songsOf(e).forEach(function (t) { tracks.push(t); }); }); }
+    function flatten() { tracks = []; entries.forEach(function (e) { songsOf(e).forEach(function (t) { tracks.push(t); }); }); if (special) tracks.push(special); }
     var albumBox = null;
     var nowDisc = box.querySelector('.rp-now-disc'), titleEl = box.querySelector('.rp-title'), artistEl = box.querySelector('.rp-artist');
     var seek = box.querySelector('.rp-seek input'), cur = box.querySelector('.rp-cur'), dur = box.querySelector('.rp-dur');
@@ -155,11 +168,12 @@
     var shownAlbum = null;
     function drawNow() {
         var t = M.current(), songs = M.albumSongs ? M.albumSongs(t) : [];
-        nowDisc.innerHTML = M.disc(t ? t.color : '#6e5236', t && t.pic, '', !!(t && t.album));
+        nowDisc.innerHTML = M.discOf(t);
         titleEl.textContent = t ? t.title : 'no record on';
         artistEl.textContent = t ? (songs.length ? (t.artist ? t.artist + ' · ' : '') + t.album.title + ' · ' + (songs.indexOf(t) + 1) + ' of ' + songs.length : (t.artist || ''))
                                  : (tracks.length ? 'pick one from the crate' : '');
-        sleeves.querySelectorAll('.rp-sleeve').forEach(function (s, i) { s.classList.toggle('on', !!t && !!entries[i] && songsOf(entries[i]).indexOf(t) !== -1); });
+        var all = special ? entries.concat([special]) : entries;
+        sleeves.querySelectorAll('.rp-sleeve').forEach(function (s, i) { s.classList.toggle('on', !!t && !!all[i] && songsOf(all[i]).indexOf(t) !== -1); });
         // an album on: its songs pop up, to pick from
         albumBox = albumBox || box.querySelector('.rp-album');
         var key = songs.length > 1 ? t.album.key : null;
@@ -191,25 +205,42 @@
             sleeves.innerHTML = '<p class="rp-empty">the crate is empty. put .mp3 files in content/living/ and they turn up here as records.</p>';
             return;
         }
-        entries.forEach(function (t, i) {
+        entries.forEach(function (t, i) { sleeves.appendChild(sleeveFor(t, i)); });
+        if (sleeves.lastChild) sleeves.lastChild.style.marginRight = '0';
+        drawSpecial();
+        drawNow();
+    }
+    // P(Doom)'s own slot, at the end: the record (found, still here), its inverted twin (she has it), or waiting (not found yet)
+    function drawSpecial() {
+        if (!doomEntry) return;
+        var box = document.createElement('div');
+        box.className = 'rp-special' + (special ? ' ' + special.special : ' waiting');
+        box.innerHTML = '<span class="rp-special-mark" aria-hidden="true">✦</span>';
+        if (special) box.appendChild(sleeveFor(special, 0));
+        else {
+            var e = document.createElement('span');
+            e.className = 'rp-special-empty';
+            e.title = doomGiven() ? '' : 'something goes here';
+            box.appendChild(e);
+        }
+        sleeves.appendChild(box);
+    }
+    function sleeveFor(t, i) {
             var album = t.kind === 'album';
             var s = document.createElement('button');
             s.type = 'button';
-            s.className = 'rp-sleeve' + (album ? ' album' : '');
+            s.className = 'rp-sleeve' + (album ? ' album' : '') + (t.special ? ' ' + t.special : '');
             s.style.zIndex = i + 1;
             s.style.setProperty('--tilt', (((Sky.hashStr(t.url || t.key || t.title) % 7) - 3) * 0.8).toFixed(1) + 'deg');
             s.style.setProperty('--sl', t.color);
-            s.innerHTML = '<span class="sl-disc">' + M.disc(t.color, t.pic, '', album) + '</span><span class="sl-cover">' + coverHTML(t) +
+            s.innerHTML = '<span class="sl-disc">' + M.discOf(t) + '</span><span class="sl-cover">' + coverHTML(t) +
                 (album ? '<span class="sl-count">' + t.songs.length + ' songs</span>' : '') + '</span><span class="sl-name"></span>';
             var plain = s.querySelector('.sl-plain');
             if (plain) plain.textContent = t.title;
             s.querySelector('.sl-name').textContent = album ? t.title + ' · the album' : t.artist ? t.title + ' · ' + t.artist : t.title;
             s.setAttribute('aria-label', (album ? 'play the album ' : 'play ') + t.title);
-            s.addEventListener('click', function () { pick(i, s); });
-            sleeves.appendChild(s);
-        });
-        sleeves.lastChild.style.marginRight = '0';
-        drawNow();
+            s.addEventListener('click', function () { pick(t, s); });
+            return s;
     }
 
     /* ---------------- picking a record: out of the sleeve and onto the turntable ---------------- */
@@ -220,8 +251,8 @@
         var r = el.getBoundingClientRect();
         return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width };
     }
-    function pick(i, sleeve) {
-        var e = entries[i], songs = songsOf(e), on = M.current();
+    function pick(e, sleeve) {
+        var songs = songsOf(e), on = M.current();
         if (busy || !songs.length) return;
         if (songs.indexOf(on) !== -1) { if (!M.playing()) M.play(); return; }         // (already on: an album carries on where it was)
         var t = songs[0];
@@ -232,7 +263,7 @@
         layer.className = 'rp-fly';
         var d = document.createElement('div');
         d.className = 'fly-disc';
-        d.innerHTML = M.disc(e.color, e.pic, '', e.kind === 'album');
+        d.innerHTML = M.discOf(e);
         var c = document.createElement('div');
         c.className = 'rp-sleeve fly-cover' + (e.kind === 'album' ? ' album' : '');
         c.style.setProperty('--sl', e.color);
@@ -308,8 +339,8 @@
         var r = 'rotate(' + spin.angle.toFixed(2) + 'deg)';
         var a = deck.querySelector('.tt-disc'), b = ttRecord.querySelector('svg'), c = nowDisc.querySelector('svg');
         if (a) a.style.transform = r;
-        if (b) b.style.transform = r;
-        if (c) c.style.transform = r;
+        if (b) { b.style.transform = r; b.style.setProperty('--spin', spin.angle.toFixed(2)); }       // (the light on it stays still: --spin)
+        if (c) { c.style.transform = r; c.style.setProperty('--spin', spin.angle.toFixed(2)); }
         if (!playing && spin.speed === 0) { spin.on = false; audio.muted = false; audio.playbackRate = 1; return; }
         requestAnimationFrame(spinFrame);
     }
@@ -380,16 +411,28 @@
     function showing(t) { return !wasShot(t.url) && !(Sky.loot && Sky.loot.trackHidden(t.url, t.title)); }
     // the crate as it stands: without the shot and the still-hidden songs (an album with none left goes too).
     // the song that's on is the same record wherever it's listed: that one object, so the player knows it
-    function visible() {
+    function same(t) {
         var on = M.current();
-        function same(t) { if (on && abs(on.url) === abs(t.url)) { if (!on.album && t.album) on.album = t.album; if (!on.pic) on.pic = t.pic; return on; } return t; }
+        if (on && abs(on.url) === abs(t.url)) { if (!on.album && t.album) on.album = t.album; if (!on.pic) on.pic = t.pic; on.skin = t.skin; on.discCls = t.discCls; on.special = t.special; on.title = t.title; return on; }
+        return t;
+    }
+    // the special slot: P(Doom) while it's theirs (found, not shot this visit), its inverted twin once Mel has it
+    function specialNow() {
+        if (!doomEntry) return null;
+        if (!doomGiven()) return showing(doomEntry) ? same(doomEntry) : null;
+        var inv = { kind: 'single', special: 'inverted', discCls: 'inverted', name: doomEntry.name, artist: '',
+                    url: invertedSong || doomEntry.url + '#inverted', pic: doomEntry.pic, color: '#1a0606',
+                    title: '\u202E' + doomEntry.title + '\u202C' };
+        return wasShot(inv.url) ? null : same(inv);
+    }
+    function visible() {
         return allEntries.map(function (e) {
             if (e.kind !== 'album') return showing(e) ? same(e) : null;
             var songs = e.songs.filter(showing).map(same);
             return songs.length ? Object.assign({}, e, { songs: songs }) : null;
         }).filter(Boolean);
     }
-    function refill() { entries = visible(); flatten(); M.setTracks(tracks.slice()); drawSleeves(); drawNow(); }
+    function refill() { entries = visible(); special = specialNow(); flatten(); M.setTracks(tracks.slice()); drawSleeves(); drawNow(); }
     Sky.records = {
         reload: refill,
         // shot: the whole record's gone (an album: every song on it)
@@ -406,16 +449,19 @@
     drawNow();
     var folder = deck.dataset.folder.replace(/\/?$/, '/');
     function listed(dir) { return new Promise(function (ok) { Sky.listFolder(dir, AUDIO.concat(PICS), ok); }); }
+    // the pictures beside the songs, by name without the type: "01-aerie" (its sleeve), "01-aerie.vinyl" (its own vinyl)
     function picsOf(files) {
         var pics = {};
-        files.forEach(function (f) { if (/\.(jpe?g|png|webp|gif)$/i.test(f.name)) pics[f.name.replace(/\.[^.]+$/, '').toLowerCase()] = f.url; });
+        files.forEach(function (f) { if (/\.(jpe?g|png|webp|gif|svg)$/i.test(f.name)) pics[f.name.replace(/\.[^.]+$/, '').toLowerCase()] = f.url; });
         return pics;
     }
-    function songsIn(files, pics, fallback, album, color) {
+    function isVinyl(name) { return /(^|\.)vinyl\.[a-z]+$/i.test(name); }
+    function songsIn(files, pics, fallback, album, color, skin) {
         return Sky.sortByName(files.filter(function (f) { return /\.(mp3|ogg)$/i.test(f.name); })).map(function (f) {
             var base = f.name.replace(/\.[^.]+$/, '');
             return { url: f.url, title: Sky.fileTitle(f.name), artist: '', pic: pics[base.toLowerCase()] || fallback || null,
-                     color: color || LABELS[Sky.hashStr(f.name) % LABELS.length], album: album || null, name: f.name };
+                     color: color || LABELS[Sky.hashStr(f.name) % LABELS.length], album: album || null, name: f.name,
+                     skin: skin || pics[base.toLowerCase() + '.vinyl'] || null };
         });
     }
     var albumNames = fetch(folder + 'albums.txt', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; })
@@ -424,19 +470,22 @@
         var files = got[0], singles = songsIn(files, picsOf(files)).map(function (t) { t.kind = 'single'; return t; });
         return Promise.all(got[1].map(function (name) {
             return listed(folder + encodeURIComponent(name) + '/').then(function (fs) {
-                var pics = picsOf(fs), cover = pics.cover || (fs.filter(function (f) { return /\.(jpe?g|png|webp|gif)$/i.test(f.name); })[0] || {}).url || null;
+                var pics = picsOf(fs), cover = pics.cover || (fs.filter(function (f) { return /\.(jpe?g|png|webp|gif)$/i.test(f.name) && !isVinyl(f.name); })[0] || {}).url || null;
                 var title = name.replace(/^\d+[-_. ]+/, '').replace(/[_]+/g, ' ').trim() || name;
                 var color = LABELS[Sky.hashStr(name) % LABELS.length], album = { key: name, title: title };
-                var songs = songsIn(fs, pics, cover, album, color);
-                return songs.length ? { kind: 'album', name: name, key: name, title: title, pic: cover, color: color, songs: songs } : null;
+                var skin = pics.vinyl || null, songs = songsIn(fs, pics, cover, album, color, skin);
+                return songs.length ? { kind: 'album', name: name, key: name, title: title, pic: cover, color: color, skin: skin, songs: songs } : null;
             });
         })).then(function (albums) { return Sky.sortByName(singles.concat(albums.filter(Boolean))); });
     }).then(function (all) {
+        // P(Doom) leaves the row for its own slot
+        doomEntry = all.filter(function (e) { return e.kind !== 'album' && DOOM.test(e.title + ' ' + e.name); })[0] || null;
+        if (doomEntry) { doomEntry.special = 'doom'; doomEntry.discCls = 'doom'; all = all.filter(function (e) { return e !== doomEntry; }); }
         allEntries = all;
         refill();
         // their own tags: title, artist, a picture (an album's cover stays its cover)
         tracks.forEach(function (t) {
-            if (!/\.mp3$/i.test(t.url)) return;
+            if (!/\.mp3$/i.test(t.url) || t.special === 'inverted') return;
             M.readTags(t.url).then(function (tags) {
                 if (!tags) return;
                 if (tags.title) t.title = tags.title;

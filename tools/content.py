@@ -801,6 +801,9 @@ def shelf_delete(which, name):
         p = os.path.join(folder, stem + '.' + e)
         if os.path.exists(p) and (e == 'txt' or which == 'music'):
             os.remove(p)
+        v = os.path.join(folder, stem + '.vinyl.' + e)            # (a record's own vinyl too)
+        if which == 'music' and e != 'txt' and os.path.exists(v):
+            os.remove(v)
     if which in ('easel', 'walls'):
         unhang_everywhere(os.path.relpath(os.path.join(folder, name), ROOT).replace(os.sep, '/'))
     write_list(folder)
@@ -1080,7 +1083,7 @@ def album_songs(name):
 
 def album_cover(name):
     d = os.path.join(SONGS, name)
-    pics = sorted(n for n in os.listdir(d) if os.path.splitext(n)[1][1:].lower() in PICS)
+    pics = sorted(n for n in os.listdir(d) if os.path.splitext(n)[1][1:].lower() in PICS and os.path.splitext(n)[0].lower() != 'vinyl')
     for n in pics:
         if os.path.splitext(n)[0].lower() == 'cover':
             return n
@@ -1103,6 +1106,10 @@ def tracks():
     """every record in the crate, in playing order: songs on their own (singles) and albums (a folder of songs)"""
     if not os.path.isdir(SONGS):
         return []
+    try:
+        finish_renames(SONGS)                           # (a rename that was cut short last time: finish it, so nothing stays hidden)
+    except ValueError:
+        pass
     entries = os.listdir(SONGS)
     files = [n for n in entries if os.path.isfile(os.path.join(SONGS, n))]
     songs = [n for n in files if n.lower().endswith(AUDIO_EXT)]
@@ -1117,6 +1124,9 @@ def tracks():
             c = album_cover(n)
             if c:
                 item['sleeve'] = '/content/living/' + urllib.parse.quote(n) + '/' + urllib.parse.quote(c)
+            v = vinyl_of(n)
+            if v:
+                item['vinyl'] = '/content/living/' + urllib.parse.quote(n) + '/' + urllib.parse.quote(v.split('/')[-1])
             out.append(item)
             continue
         stem = os.path.splitext(n)[0]
@@ -1127,8 +1137,63 @@ def tracks():
             if stem + '.' + e in files:
                 item['sleeve'] = '/content/living/' + urllib.parse.quote(stem + '.' + e)
                 break
+        v = vinyl_of(n)
+        if v:
+            item['vinyl'] = '/content/living/' + urllib.parse.quote(v)
         out.append(item)
     return out
+
+
+# ---------------- a record's own vinyl (its skin): a picture of the whole record, see-through round it ----------------
+# a song on its own: "01-aerie.vinyl.png" beside "01-aerie.mp3"; an album: "vinyl.png" inside its folder.
+# without one, the record is the default vinyl (the slot assets/living/record, or the drawn one)
+VINYL_PICS = ('png', 'webp', 'gif', 'svg', 'jpg', 'jpeg')
+
+
+def vinyl_of(name):
+    """the file name of a record's own vinyl (for an album: "<album>/vinyl.png"), or None"""
+    if album_dir(name):
+        d = os.path.join(SONGS, name)
+        for e in VINYL_PICS:
+            if os.path.isfile(os.path.join(d, 'vinyl.' + e)):
+                return name + '/vinyl.' + e
+        return None
+    stem = os.path.splitext(name)[0]
+    for e in VINYL_PICS:
+        if os.path.isfile(os.path.join(SONGS, stem + '.vinyl.' + e)):
+            return stem + '.vinyl.' + e
+    return None
+
+
+def vinyl_put(song, name, raw):
+    ext = os.path.splitext(name or '')[1].lower()
+    if ext[1:] not in VINYL_PICS:
+        raise ValueError('a vinyl is a picture (png or webp keep the see-through parts; also gif, svg, jpg)')
+    if len(raw) > 4 * 1024 * 1024:
+        raise ValueError('a vinyl has to be under 4 MB (about 1000 x 1000 is plenty)')
+    if album_dir(song):
+        d, base = os.path.join(SONGS, song), 'vinyl'
+    elif song in [t['name'] for t in tracks()]:
+        d, base = SONGS, os.path.splitext(song)[0] + '.vinyl'
+    else:
+        raise ValueError('that record isn\'t there')
+    for e in VINYL_PICS:
+        p = os.path.join(d, base + '.' + e)
+        if os.path.exists(p):
+            os.remove(p)
+    with open(os.path.join(d, base + ext), 'wb') as f:
+        f.write(raw)
+    write_list(d)
+    return base + ext
+
+
+def vinyl_remove(song):
+    v = vinyl_of(song) if song and os.path.basename(song) == song else None
+    if not v:
+        raise ValueError('that record has no vinyl of its own')
+    os.remove(os.path.join(SONGS, *v.split('/')))
+    write_list(os.path.dirname(os.path.join(SONGS, *v.split('/'))))
+    return True
 
 
 def song_stem(number, title, width=2):
@@ -1141,12 +1206,29 @@ def stem_of(name, folder=None):
     return name if os.path.isdir(os.path.join(folder or SONGS, name)) else os.path.splitext(name)[0]
 
 
+def replace_hard(src, dst):
+    """os.replace, but patient: on Windows a file or folder that's open somewhere (a song still playing in the manager,
+    a folder window, OneDrive or the antivirus looking at new files) can't be renamed for a moment. try for a few seconds,
+    then say so plainly"""
+    import time
+    for i in range(24):
+        try:
+            os.replace(src, dst)
+            return
+        except PermissionError:
+            if i == 23:
+                raise ValueError('Windows wouldn\'t let me rename ' + os.path.basename(src).lstrip('~').replace('.tmp', '') +
+                                 ': something has it open (a song playing here, a folder window on it, or OneDrive syncing). '
+                                 'close that and try again. nothing is lost.')
+            time.sleep(0.25)
+
+
 def rename_song(old, new_stem, folder=None):
     """rename a song and everything that goes with it (its sleeve), or an album's folder"""
     folder = folder or SONGS
     if os.path.isdir(os.path.join(folder, old)):
         if old != new_stem:
-            os.replace(os.path.join(folder, old), os.path.join(folder, '~' + new_stem + '.tmp'))
+            replace_hard(os.path.join(folder, old), os.path.join(folder, '~' + new_stem + '.tmp'))
         return new_stem
     old_stem, ext = os.path.splitext(old)
     if old_stem == new_stem:
@@ -1154,15 +1236,24 @@ def rename_song(old, new_stem, folder=None):
     for n in os.listdir(folder):
         st, e = os.path.splitext(n)
         if st == old_stem and os.path.isfile(os.path.join(folder, n)):
-            os.replace(os.path.join(folder, n), os.path.join(folder, '~' + new_stem + e + '.tmp'))
+            replace_hard(os.path.join(folder, n), os.path.join(folder, '~' + new_stem + e + '.tmp'))
+        elif st == old_stem + '.vinyl' and os.path.isfile(os.path.join(folder, n)):     # (its own vinyl goes with it)
+            replace_hard(os.path.join(folder, n), os.path.join(folder, '~' + new_stem + '.vinyl' + e + '.tmp'))
     return new_stem + ext
 
 
 def finish_renames(folder=None):
+    """the second half of a rename: "~05-name.tmp" becomes "05-name" (also run on its own, to mend a rename that was cut short)"""
     folder = folder or SONGS
+    if not os.path.isdir(folder):
+        return
     for n in os.listdir(folder):
         if n.startswith('~') and n.endswith('.tmp'):
-            os.replace(os.path.join(folder, n), os.path.join(folder, n[1:-4]))
+            dst = os.path.join(folder, n[1:-4])
+            if os.path.exists(dst):                        # (never over something that's there: keep both)
+                st, e = os.path.splitext(n[1:-4])
+                dst = os.path.join(folder, st + ' (2)' + e)
+            replace_hard(os.path.join(folder, n), dst)
 
 
 def renumber(order, folder=None):
@@ -1170,12 +1261,14 @@ def renumber(order, folder=None):
     folder = folder or SONGS
     width = max(2, len(str(len(order))))
     names = []
-    for i, n in enumerate(order):
-        st = stem_of(n, folder)
-        title = NUMBERED.match(st)
-        title = title.group(2) if title else st
-        names.append(rename_song(n, song_stem(i + 1, title, width), folder))
-    finish_renames(folder)
+    try:
+        for i, n in enumerate(order):
+            st = stem_of(n, folder)
+            title = NUMBERED.match(st)
+            title = title.group(2) if title else st
+            names.append(rename_song(n, song_stem(i + 1, title, width), folder))
+    finally:
+        finish_renames(folder)                          # (even if one rename failed: nothing's left half-renamed and hidden)
     write_list(folder)
     if folder != SONGS:
         write_list(SONGS)
@@ -1283,7 +1376,7 @@ def album_cover_put(album, name, raw):
         raise ValueError('a sleeve is a picture (png, jpg, webp, gif)')
     d = os.path.join(SONGS, album)
     for n in os.listdir(d):
-        if os.path.splitext(n)[1][1:].lower() in PICS:
+        if os.path.splitext(n)[1][1:].lower() in PICS and os.path.splitext(n)[0].lower() != 'vinyl':     # (not its vinyl)
             os.remove(os.path.join(d, n))
     with open(os.path.join(d, 'cover' + ext), 'wb') as f:
         f.write(raw)
@@ -1607,6 +1700,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'name': track_rename(d.get('name'), d.get('title'))})
             if url.path == '/__records/delete':
                 return self.reply({'names': track_delete(json.loads(raw or b'{}').get('name'))})
+            if url.path == '/__records/vinyl':
+                return self.reply({'name': vinyl_put(urllib.parse.unquote(self.headers.get('X-Song', '')),
+                                                     urllib.parse.unquote(self.headers.get('X-Name', '')), raw)})
+            if url.path == '/__records/vinyl-remove':
+                return self.reply({'ok': vinyl_remove(json.loads(raw or b'{}').get('name'))})
             if url.path == '/__records/sleeve-link':
                 d = json.loads(raw or b'{}')
                 return self.reply(track_sleeve_link(d.get('name'), d.get('link')))

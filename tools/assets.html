@@ -103,6 +103,10 @@
     .row .num { flex: none; width: 38px; font: normal 1.3rem "IM Fell English SC", Georgia, serif; color: var(--faded); text-align: right; }
     .row .sleeve { flex: none; width: 64px; height: 64px; background: #2a1d14; display: grid; place-items: center; color: #cdbb96; font-size: .7rem; font-style: italic; text-align: center; overflow: hidden; }
     .row .sleeve img { width: 100%; height: 100%; object-fit: cover; }
+    /* a record's own vinyl: on a checkerboard, so its see-through parts show */
+    .row .vinyl { flex: none; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; color: #8a7258; font-size: .66rem; font-style: italic; text-align: center; overflow: hidden;
+        background: repeating-conic-gradient(#d8c8a8 0 25%, #efe3c6 0 50%) 0 0 / 12px 12px; box-shadow: inset 0 0 0 1px rgba(110,82,54,.35); line-height: 1.1; }
+    .row .vinyl img { width: 100%; height: 100%; object-fit: contain; }
     .row input.title { width: 100%; border: 0; border-bottom: 1px dashed transparent; background: none; color: var(--ink); font-size: 1.05rem; padding: 1px 0; }
     .row input.title:hover { border-bottom-color: rgba(110,82,54,.4); }
     .row input.title:focus { outline: none; border-bottom-color: var(--red); background: rgba(255,255,255,.4); }
@@ -500,7 +504,7 @@
 
     /* ---------------- the record player ---------------- */
     function drawRecords() {
-        var d = intro('every song in content/living/ is a record, played in number order: 01-, 02-, … new ones get the next number. ↑ ↓ renumber them all. a sleeve is the record’s cover (under 1 MB). an album is several songs on one record (a folder of them): its record and sleeve have a gold ring, and its songs play one after another.', 'living.html');
+        var d = intro('every song in content/living/ is a record, played in number order: 01-, 02-, … new ones get the next number. ↑ ↓ renumber them all. a sleeve is the record’s cover (under 1 MB). a vinyl is the record itself, if you want one different from the usual (a square picture of the disc, see-through round it: png or webp). an album is several songs on one record (a folder of them): its record and sleeve have a gold ring, and its songs play one after another.', 'living.html');
         main.appendChild(d);
         var h = el('h2', '', 'the records <small>' + STATE.tracks.length + '</small>');
         main.appendChild(h);
@@ -522,6 +526,10 @@
             var sl = el('div', 'sleeve', t.sleeve ? '<img alt="" src="' + t.sleeve + '?t=' + Date.now() + '">' : 'no sleeve');
             r.appendChild(sl);
             droppable(sl, function (fs) { sleeveUpload(t, fs[0]); });
+            var vi = el('div', 'vinyl', t.vinyl ? '<img alt="" src="' + t.vinyl + '?t=' + Date.now() + '">' : 'usual<br>vinyl');
+            vi.title = t.vinyl ? 'this record’s own vinyl' : 'no vinyl of its own: it plays on the usual one (drop a picture here to give it one)';
+            r.appendChild(vi);
+            droppable(vi, function (fs) { vinylUpload(t, fs[0]); });
             var m = el('div', 'main');
             var ti = el('input', 'title'); ti.value = t.title; ti.setAttribute('aria-label', 'title'); ti.maxLength = 80;
             function rename() {
@@ -550,6 +558,12 @@
                 });
             }, 'yes'));
             b.appendChild(btn(t.sleeve ? 'new sleeve' : 'upload a sleeve', function () { pick('image/png,image/jpeg,image/webp,image/gif', false, function (fs) { sleeveUpload(t, fs[0]); }); }));
+            b.appendChild(btn(t.vinyl ? 'new vinyl' : 'upload a vinyl', function () { pick('image/png,image/webp,image/gif,image/svg+xml,image/jpeg', false, function (fs) { vinylUpload(t, fs[0]); }); }));
+            b.lastChild.title = 'the record itself: a square picture of the whole disc, see-through round it (png or webp keep the see-through). the sleeve’s picture still goes on its label';
+            if (t.vinyl) b.appendChild(btn('✕ vinyl', function () {
+                if (!confirm('take ' + t.title + '’s own vinyl off? it goes back to the usual one.')) return;
+                api('/__records/vinyl-remove', { name: t.name }).then(function (x) { if (x.error) say(x.error, true); else say(t.title + ' is on the usual vinyl again.'); load(); });
+            }, 'no'));
             b.appendChild(btn('delete', function () {
                 if (!confirm(album ? 'delete the whole album ' + t.title + ' (all ' + t.songs.length + ' songs, and its cover)? the records after it move up a number.'
                                    : 'delete ' + t.name + ' (and its sleeve)? the songs after it move up a number.')) return;
@@ -562,7 +576,7 @@
         });
         main.appendChild(sheet);
         var slots = [];
-        SCENES.forEach(function (sc) { sc.groups.forEach(function (g) { g.slots.forEach(function (s) { if (/^assets\/living\/(turntable|turntable-playing|record)$/.test(s.slot)) slots.push(s); }); }); });
+        SCENES.forEach(function (sc) { sc.groups.forEach(function (g) { g.slots.forEach(function (s) { if (/^assets\/living\/(turntable|turntable-playing|record|vinyl-texture|lofi-fader|lofi-knob)$/.test(s.slot)) slots.push(s); }); }); });
         main.appendChild(el('h2', '', 'the record player itself'));
         var grid = el('div', 'grid');
         slots.forEach(function (s) { grid.appendChild(card(s)); });
@@ -647,6 +661,14 @@
         });
     }
     function move(t, by) { api('/__records/move', { name: t.name, by: by }).then(function (x) { if (x.error) say(x.error, true); else say('moved. the records are numbered 01 to ' + String(x.names.length).padStart(2, '0') + ' now.'); load(); }); }
+    function vinylUpload(t, f) {
+        if (!/\.(png|webp|gif|svg|jpe?g)$/i.test(f.name)) return say('a vinyl is a picture (png or webp keep the see-through parts).', true);
+        send('/__records/vinyl', f, { 'X-Song': t.name }).then(function (x) {
+            if (x.error) say(x.error, true);
+            else say(t.title + ' has its own vinyl now' + (/\.jpe?g$/i.test(f.name) ? ' (a jpg has no see-through parts: its corners will show. a png or webp is better).' : '.'));
+            load();
+        });
+    }
     function sleeveUpload(t, f) {
         if (!PICS.test(f.name)) return say('a sleeve is a picture (png, jpg, webp, gif).', true);
         send('/__records/sleeve', f, { 'X-Song': t.name }).then(function (x) { if (x.error) say(x.error, true); else say('sleeve saved for ' + t.title + '.'); load(); });
@@ -697,8 +719,6 @@
                 api('/__noise/remove', { name: n.name }).then(function (x) { if (x.error) say(x.error, true); else say('removed.'); load(); });
             }, 'no'));
             r.appendChild(b);
-            if (album) r.appendChild(albumSongs(t));
-            if (album) droppable(r, function (fs) { addToAlbum(t.name, fs); });
             sheet.appendChild(r);
         });
         main.appendChild(sheet);

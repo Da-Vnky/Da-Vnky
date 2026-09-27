@@ -10,6 +10,10 @@
    sticking out (RESETS in sky/state.js; the key itself is sky/resets.js's).
    THE DRAWERS: four under the worktop; click one and it slides out, again and
    it shuts. What's in each is a picture of its own (kitchen-drawer-1 … -4).
+   THE STOVE, at the end of the counter: the hob lights (and goes out), the oven
+   door drops open. THE MICROWAVE, on the worktop: it runs for a few seconds, empty,
+   and dings (from reset 4 its clock says 6:66). Dancers while a record plays: a
+   kettle on the hob, salt and pepper (sky/music.js GROOVES).
 
    THE BOWL: a fruit bowl on the worktop, and coiled round it a string of
    sausages (resets 1 and 2). From reset 3 on it's a serpent ("eat. and you
@@ -20,9 +24,10 @@
 
    slots (assets/living/): kitchen-wall, kitchen-floor, kitchen-window, kitchen-counter,
           kitchen-drawer, kitchen-drawer-1 … -4, kitchen-fridge, kitchen-fridge-inside, kitchen-pie,
-          fruit-bowl, serpent, sausages; assets/ui/place-kitchen (its tab);
+          fruit-bowl, serpent, sausages, kitchen-stove, kitchen-oven-door, kitchen-stove-flames,
+          kitchen-microwave, kitchen-microwave-on, kitchen-kettle, kitchen-shakers; assets/ui/place-kitchen (its tab);
           assets/characters/kitchen (+ kitchen-walking)
-   sounds: hiss, drawer, fridge-open, fridge-close (stand-ins till then)
+   sounds: hiss, drawer, fridge-open, fridge-close, burner, oven-open, oven-close, microwave, ding (stand-ins till then)
    ===================================================================== */
 
 (function () {
@@ -152,10 +157,15 @@
     var fridge = kit.querySelector('.kitchen-fridge'), pie = kit.querySelector('.kitchen-pie');
     function busyHands() { return body.classList.contains('inv-holding'); }
     // over to it first, then do it
-    function reach(el, then) {
+    // side: 'left' / 'right' = stand beside it rather than in front (so they don't hide the thing they came to use)
+    function reach(el, then, side) {
         if (busy || !inside || busyHands()) return;
         busy = true;
         var x = standAt(me, pctOf(el, kit)), at = Sky.sides && Sky.sides.leftPct ? Sky.sides.leftPct(me) : x;
+        if (side) {
+            var r = el.getBoundingClientRect(), kr = kit.getBoundingClientRect(), w = me.offsetWidth / (kr.width || window.innerWidth) * 100;
+            x = side === 'left' ? (r.left - kr.left) / kr.width * 100 - w * 0.95 : (r.right - kr.left) / kr.width * 100 - w * 0.05;
+        }
         var go = function () { busy = false; then(); };
         if (Math.abs(at - x) < 6) go(); else walk(me, Math.max(1, Math.min(90, x)), go);
     }
@@ -196,6 +206,7 @@
     function shutAll(quiet) {
         drawers.forEach(function (d) { d.classList.remove('open'); d.setAttribute('aria-expanded', 'false'); });
         if (fridge) fridgeOpen(false, quiet);
+        hob(false, true); oven(false, true);
     }
     drawers.forEach(function (d) {
         d.setAttribute('aria-expanded', 'false');
@@ -208,6 +219,80 @@
                 setTimeout(function () { say(drawerLine(+d.dataset.drawer), 3400); }, 350);
             });
         });
+    });
+
+    /* ---------------- the stove: the hob, and the oven ---------------- */
+    var stove = kit.querySelector('.kitchen-stove');
+    function hob(on, quiet) {
+        if (!stove || stove.classList.contains('lit') === on) return;
+        stove.classList.toggle('lit', on);
+        if (!quiet) sfx(on ? 'burner' : 'tap', { size: 0.4 });
+        if (on && !quiet) setTimeout(function () { say(hobLine(), 2600); }, 500);
+    }
+    function hobLine() {
+        var r = S ? S.reset : 1;
+        return r < 3 ? 'Click, click… whump. The burners catch.' : r === 3 ? 'The burners catch. For a moment it smells like apples.' : 'They light blue. Then, for a second, red.';
+    }
+    function oven(on, quiet) {
+        if (!stove || stove.classList.contains('oven-open') === on) return;
+        stove.classList.toggle('oven-open', on);
+        if (!quiet) sfx(on ? 'oven-open' : 'oven-close', { or: on ? 'door-metal' : 'tap', size: 0.5 });
+        if (on && !quiet) setTimeout(function () { say(ovenLine(), 2800); }, 600);
+    }
+    function ovenLine() {
+        var r = S ? S.reset : 1;
+        return r < 3 ? 'The oven. Warm, though nobody’s baking.' : r === 3 ? 'Warm in there. It smells of apple pie.' : 'It’s warm in there. Too warm. Nobody turned it on.';
+    }
+    if (stove) {
+        stove.querySelector('.ks-hob').addEventListener('click', function (e) {
+            e.preventDefault(); e.stopPropagation();
+            if (stove.classList.contains('lit')) { hob(false); return; }
+            reach(stove, function () { hob(true); }, 'left');
+        });
+        stove.querySelector('.ks-oven').addEventListener('click', function (e) {
+            e.preventDefault(); e.stopPropagation();
+            if (stove.classList.contains('oven-open')) { oven(false); return; }
+            reach(stove, function () { oven(true); }, 'left');
+        });
+    }
+
+    /* ---------------- the microwave: it runs, it hums, it dings. there's nothing in it ---------------- */
+    var micro = kit.querySelector('.kitchen-microwave'), clock = micro && micro.querySelector('.km-clock');
+    var RUN = 6, running = false;
+    function idleClock() {                                               // (reset 4 on: the clock's wrong)
+        if (!clock) return;
+        clock.textContent = S && S.reset >= 4 ? '6:66' : '12:00';
+        micro.classList.add('blink');
+    }
+    idleClock();
+    function runMicro() {
+        if (running || !micro) return;
+        running = true;
+        micro.classList.remove('blink');
+        micro.classList.add('running');
+        sfx('microwave', { size: 0.5 });
+        var left = RUN;
+        clock.textContent = '0:0' + left;
+        var tick = setInterval(function () {
+            left--;
+            clock.textContent = '0:0' + Math.max(0, left);
+            if (left > 0) return;
+            clearInterval(tick);
+            micro.classList.remove('running');
+            sfx('ding', { size: 0.5 });
+            clock.textContent = 'End';
+            micro.classList.add('blink');
+            if (inside) setTimeout(function () { say(microLine(), 2800); }, 400);
+            setTimeout(function () { running = false; idleClock(); }, 3200);
+        }, 1000);
+    }
+    function microLine() {
+        var r = S ? S.reset : 1;
+        return r < 3 ? 'Ding. There was nothing in it.' : r === 3 ? 'Ding. Nothing in it. …It’s warm anyway.' : 'Ding. Something in there is warm now.';
+    }
+    if (micro) micro.querySelector('.km-hit').addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        reach(micro, runMicro, 'right');
     });
 
     Sky.kitchen = { get inside() { return inside; }, open: function () { openKitchen(true); }, out: goOut, goIn: goIn,

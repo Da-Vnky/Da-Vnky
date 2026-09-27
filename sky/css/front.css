@@ -91,10 +91,16 @@ body.in-front .sky-links * {
     cursor: pointer;
     border-radius: 3px;
 }
-.front .front-door-hit:hover,
+/* pointing at it: the door itself glows (a warm light round its own shape, not a box) */
 .front .front-door-hit:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(255, 220, 150, .7), 0 0 18px rgba(255, 220, 150, .55);
+}
+.front .front-door {
+    transition: filter .3s;
+}
+.front:has(.front-door-hit:hover) .front-door,
+.front:has(.front-door-hit:focus-visible) .front-door {
+    filter: drop-shadow(0 0 .5vw rgba(255, 214, 140, .95)) drop-shadow(0 0 1.6vw rgba(255, 190, 110, .6)) brightness(1.12);
 }
 .front .kh-hint {
     position: absolute;

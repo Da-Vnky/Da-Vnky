@@ -6,13 +6,20 @@
    traveller down through the boards… and they land here. A red sky, a floor of
    brimstone with fire in its cracks, embers rising, and a great eye in the sky,
    inside an ouroboros (the serpent eating its own tail) that turns and turns. A
-   voice nobody can see speaks (VOICE below): kill the Claubes. The ground shakes,
-   the dark comes back, and the hands push them up through the attic floor again.
+   voice nobody can see speaks (VOICE below): kill the Claubes.
 
-   THE GIFT: a white revolver comes down in front of them, glowing, and the voice
+   THE WHITE REVOLVER comes down in front of them, down there, glowing, and the voice
    says one more thing (GIFT_LINE). Pick it up: it's theirs for the rest of reset 4
-   (run:white-revolver, sky/revolver.js). And the book that opens the dungeon is back
-   on the living-room shelf (it went missing at the start of reset 4: sky/bathroom.js).
+   (run:white-revolver, sky/revolver.js). They can't leave yet: the eye is watching.
+   SHOOT THE EYE with it (sky/revolver.js calls shootEye): it bursts, screeches, and
+   reset 4's KEY drops at the traveller's feet (RESETS[3].key.drop = 'hell', sky/resets.js).
+   Picking the key up unlocks the heart, the ground shakes, the dark comes back and the
+   hands push them up through the attic floor again. Back up there the book that opens the
+   dungeon is on the living-room shelf again (it went missing at the start of reset 4:
+   sky/bathroom.js). (27 Sep, Victor: the pact no longer needs the key first; the key is
+   down here now, so nobody can get stuck.)
+   A reload down there (or leaving the page) before the key: the grimoire on the lectern
+   pulls them straight back down (sky/attic.js), the eye as they left it (run:hell-eye).
 
    ITS APPARITIONS: the six pictures round the false god in the hall of shame (frames
    1–5 and 7). When the revolver comes, any of them already shot this visit are back
@@ -25,10 +32,12 @@
                          eye        the great eye (about 2:1, see-through): it opens, blinks and closes
                          ouroboros  the serpent ring round the eye (square, see-through). an animated GIF / WebP
                                     loops on its own; the drawn stand-in turns
+                         eye-burst  the eye bursting (optional; a GIF that plays once, the size of the eye)
          assets/characters/hell    the traveller down there (else the attic's)
          assets/items/white-revolver   the white revolver (sky/inventory.js)
    sounds: assets/sounds/hell (loops: the music down there; a drawn one till then),
-           hell-voice (a letter of the voice's words), quake, white-appear, land
+           hell-voice (a letter of the voice's words), quake, white-appear, land,
+           eye-burst, eye-screech (the eye, shot)
    ===================================================================== */
 
 (function () {
@@ -51,6 +60,10 @@
     var WHO = 'a voice';
     // and when the white revolver comes
     var GIFT_LINE = 'Destroy its disciples and apparitions.';
+    // the traveller, once it's in their hand: the way out is through the eye
+    var EYE_HINT = ['That eye hasn\u2019t looked away from me once.', 'There\u2019s something in it. Something small and bright, in the black of it.'];
+    var EYE_NO = 'It doesn\u2019t even blink. Not with that gun.';
+    var AFTER_KEY = 'Go. Up, and then down, to where they kneel.';
     var APPARITIONS = ['1', '2', '3', '4', '5', '7'];
 
     /* ---------------- the stand-ins ---------------- */
@@ -151,10 +164,77 @@
         setTimeout(function () { who.classList.remove('falling'); who.classList.add('landed'); sfx('land', { size: 1 }); sfx('scream', { delay: 0.05 }); }, 2200);
         setTimeout(function () { who.classList.remove('landed'); who.classList.add('trembling'); }, 2800);
         setTimeout(function () { hellEl.classList.add('eye-open'); sfx('unnerve'); }, 3300);   // and above them, an eye opens
+        backFn = back;
+        var again = get('hell-eye') === 'shot';
+        if (again) {                                                            // (back down after a reload: the eye's already gone)
+            hellEl.classList.add('eye-gone');
+            setTimeout(function () { if (get('white-revolver') !== 'taken') offer(); else dropKey(); }, 3300);
+            return;
+        }
         setTimeout(function () {
-            voice(VOICE, function () { quake(back); }, true);
+            voice(get('hell-visited') === '1' ? [VOICE[VOICE.length - 1]] : VOICE, offer, true);
+            set('hell-visited', '1');
         }, 5200);
     }
+    var backFn = null;
+    // the white revolver comes down in front of them (unless they have it already)
+    function offer() {
+        if (!hellEl) return;
+        if (get('white-revolver') === 'taken') { voice(GIFT_LINE, hint); return; }
+        placeGift(true, hellEl);
+        sfx('white-appear', { or: 'shimmer' });
+        setTimeout(function () { voice(GIFT_LINE); }, 1800);
+    }
+    function hint() {
+        if (!hellEl || get('hell-eye') === 'shot') return;
+        setTimeout(function () { if (hellEl && Sky.claubes && Sky.claubes.speak) Sky.claubes.speak(EYE_HINT); }, 900);
+    }
+    // shot, down here (sky/revolver.js): the eye, with the white revolver, bursts and gives up the key
+    function shootEye(x, y, white) {
+        if (!hellEl || get('hell-eye') === 'shot') return false;
+        if (!white) { if (Sky.inventory) Sky.inventory.say(EYE_NO, 2600); return true; }
+        set('hell-eye', 'shot');
+        var eye = hellEl.querySelector('.hl-eye'), r = eye.getBoundingClientRect();
+        var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        hellEl.classList.add('eye-burst');
+        sfx('eye-burst', { or: 'claube-burst', size: 1 });
+        sfx('eye-screech', { or: 'shriek', delay: 0.1 });
+        setTimeout(function () { sfx('eye-screech', { or: 'shriek' }); }, 700);
+        Sky.findAsset('assets/hell/eye-burst', function (u) {
+            if (!u || !hellEl) return;
+            var b = document.createElement('img'); b.className = 'hl-burst-art'; b.alt = ''; b.src = u + (u.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now();
+            b.style.left = r.left + 'px'; b.style.top = r.top + 'px'; b.style.width = r.width + 'px'; b.style.height = r.height + 'px';
+            hellEl.appendChild(b);
+        });
+        // what's left of it, everywhere
+        for (var i = 0; i < 46; i++) {
+            var g = document.createElement('span');
+            g.className = 'hl-gib' + (i % 3 ? '' : ' big');
+            g.style.left = cx + 'px'; g.style.top = cy + 'px';
+            hellEl.appendChild(g);
+            var a = Math.random() * Math.PI * 2, d = 80 + Math.random() * Math.min(window.innerWidth, window.innerHeight) * 0.5;
+            g.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+                       { transform: 'translate(calc(-50% + ' + (Math.cos(a) * d).toFixed(0) + 'px), calc(-50% + ' + (Math.sin(a) * d * 0.7 + 60).toFixed(0) + 'px)) scale(.5)', opacity: 1, offset: 0.7 },
+                       { transform: 'translate(calc(-50% + ' + (Math.cos(a) * d * 1.1).toFixed(0) + 'px), calc(-50% + ' + (Math.sin(a) * d * 0.7 + 260).toFixed(0) + 'px)) scale(.4)', opacity: 0 }],
+                      { duration: 1300 + Math.random() * 900, easing: 'cubic-bezier(.2,.7,.4,1)', fill: 'forwards' });
+        }
+        setTimeout(function () { hellEl && hellEl.querySelectorAll('.hl-gib').forEach(function (n) { n.remove(); }); }, 2400);
+        setTimeout(function () { if (hellEl) hellEl.classList.add('eye-gone'); }, 900);
+        setTimeout(dropKey, 1700);
+        return true;
+    }
+    // the key, at their feet (sky/resets.js catches dav:drop-key)
+    function dropKey() {
+        if (!hellEl || (S && S.get('key') === '1')) { if (hellEl) keyTaken(); return; }
+        var me = hellEl.querySelector('.hl-me').getBoundingClientRect();
+        document.dispatchEvent(new CustomEvent('dav:drop-key', { detail: { by: 'hell', x: me.right + 18, y: me.bottom - 4, z: 2147481300 } }));
+    }
+    function keyTaken() {
+        if (!hellEl || hellEl.classList.contains('leaving')) return;
+        hellEl.classList.add('leaving');
+        setTimeout(function () { voice(AFTER_KEY, function () { quake(backFn); }, true); }, 1300);
+    }
+    document.addEventListener('dav:key-found', function () { if (hellEl) keyTaken(); });
     function quake(back) {
         var h = hellEl;
         if (!h) return;
@@ -179,9 +259,12 @@
 
     /* ---------------- back in the attic: the white revolver, the book back on the shelf ---------------- */
     var giftEl = null;
-    function placeGift(coming) {
-        if (giftEl || !attic) return;
-        var me = attic.querySelector('.attic-character');
+    // where: the attic (after), or down there (host: the .hell), in front of the traveller
+    function placeGift(coming, host) {
+        if (giftEl) giftEl.remove();
+        host = host || attic;
+        if (!host) return;
+        var me = host === attic ? attic.querySelector('.attic-character') : host.querySelector('.hl-me');
         var g = document.createElement('div');
         g.className = 'white-gift' + (coming ? ' coming' : '');
         g.setAttribute('role', 'button');
@@ -193,13 +276,14 @@
         // in front of the traveller, on the boards
         var left = 44, bottom = null;
         if (me) {
-            var ar = attic.getBoundingClientRect(), mr = me.getBoundingClientRect();
+            var ar = host.getBoundingClientRect(), mr = me.getBoundingClientRect();
             left = Math.min(88, (mr.right - ar.left) / (ar.width || 1) * 100 + 3);
             bottom = ar.bottom - mr.bottom;
         }
         g.style.left = left.toFixed(1) + '%';
         g.style.bottom = (bottom === null ? '14vh' : Math.max(0, bottom).toFixed(0) + 'px');
-        attic.appendChild(g);
+        if (host !== attic) g.classList.add('below');
+        host.appendChild(g);
         giftEl = g;
         var take = function (e) {
             if (e) { e.preventDefault(); e.stopPropagation(); }
@@ -207,6 +291,7 @@
             Sky.inventory.add('white-revolver');
             set('white-revolver', 'taken');
             g.remove(); giftEl = null;
+            if (host !== attic) hint();
         };
         g.addEventListener('click', take);
         g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') take(e); });
@@ -235,10 +320,11 @@
     function gift(me) {
         bookBack();
         apparitionsBack();
-        set('white-revolver', 'lying');
-        placeGift(true);
-        sfx('white-appear', { or: 'shimmer' });
-        setTimeout(function () { voice(GIFT_LINE); }, 1800);
+        if (get('white-revolver') !== 'taken') {                           // (it's normally in their bag by now: taken down there)
+            set('white-revolver', 'lying');
+            placeGift(true);
+            sfx('white-appear', { or: 'shimmer' });
+        }
     }
 
     /* ---------------- its apparitions, counted ---------------- */
@@ -266,5 +352,7 @@
         });
     }
 
-    Sky.hell = { enter: enter, gift: gift, voice: voice, get open() { return !!hellEl; } };
+    Sky.hell = { enter: enter, gift: gift, voice: voice, shootEye: shootEye, get open() { return !!hellEl; },
+                 // (sky/attic.js: the pact's made but the key's still down there: the book pulls them back)
+                 get owed() { return R4 && get('grimoire-pact') === '1' && !(S && S.get('key') === '1'); } };
 })();

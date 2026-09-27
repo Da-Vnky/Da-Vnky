@@ -748,6 +748,16 @@ body.scope-view .sky-link.l7 { left: calc(50% - 70px);  right: auto; top: 76vh; 
 /* =====================================================================
    characters (placeholders until assets/characters/<scene> exists)
    ===================================================================== */
+/* how tall the traveller stands in the house's rooms (27 Sep, Victor: the top of their head just under the hallway's
+   doors, whose tops are 69vh - 12px up; they stand at 3vh). every room's traveller uses it, so they're one size everywhere */
+:root {
+    --traveller-h: calc(60vh - 11px);
+}
+@media (max-width: 620px) {
+    :root {
+        --traveller-h: calc(44vh - 11px);
+    }
+}
 .character {
     position: absolute;
     height: 120px;
@@ -757,6 +767,13 @@ body.scope-view .sky-link.l7 { left: calc(50% - 70px);  right: auto; top: 76vh; 
 }
 .character .placeholder,
 .character .art { display: block; height: 100%; width: auto; }
+/* only the traveller themselves takes a click, not the see-through box round them (they're tall now: they stand in front of
+   things, the record player, the bookshelf, and those must still be clickable round them). the drawn stand-in: exactly its
+   shape; your own picture: its box, as ever */
+.character { pointer-events: none; }
+.character > img, .character > .art { pointer-events: auto; }
+.character svg { pointer-events: none; }
+.character svg * { pointer-events: visiblePainted; }
 .character .art.glow-layer { position: absolute; left: 0; top: 0; opacity: var(--dusk); }
 .character:focus-visible { outline: 2px dashed #fff6dc; outline-offset: 4px; }
 

@@ -632,3 +632,92 @@ body.claube-warded .mini-claube::before {
         animation: none !important;
     }
 }
+
+/* ---------------- the inverted record's Claubes: black robes (sky/claubes.js robedGo) ---------------- */
+.claube-crew.below {
+    visibility: hidden;
+}
+.claube-crew.robed .mc-glint {
+    animation: mc-glint 2.4s ease-in-out infinite;
+}
+@keyframes mc-glint {
+    50% {
+        fill: #ffb0a0;
+    }
+}
+/* hauling on the book: leaning back, and again */
+.claube-crew.robed.pulling .mc-body {
+    animation: mc-pull .5s ease-in-out infinite alternate;
+    animation-delay: var(--d, 0s);
+}
+@keyframes mc-pull {
+    from {
+        transform: rotate(-4deg) translateX(0);
+    }
+    to {
+        transform: rotate(-16deg) translateX(-4px);
+    }
+}
+.claube-crew.robed.pulling .mc-arm {
+    transform-box: view-box;
+    transform-origin: 50% 50%;
+}
+/* running: a quick bob */
+.claube-crew.robed.running .mc-body {
+    animation: mc-run .22s ease-in-out infinite alternate;
+    animation-delay: var(--d, 0s);
+}
+@keyframes mc-run {
+    from {
+        transform: translateY(0) rotate(4deg);
+    }
+    to {
+        transform: translateY(-18%) rotate(-4deg);
+    }
+}
+/* down the stairs behind the wall: they drop out of sight */
+.mini-claube.down-stairs {
+    animation: mc-down .9s ease-in forwards;
+}
+@keyframes mc-down {
+    to {
+        transform: translateY(70%);
+        opacity: 0;
+    }
+}
+
+/* the inverted record playing: no party. a red light, pulsing, dirty */
+body.doom-inverted .doom-lights {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .8s, visibility 0s;
+}
+body.doom-inverted .doom-lights .dl-beam,
+body.doom-inverted .doom-lights .dl-ball,
+body.doom-inverted .doom-lights .dl-dots {
+    display: none;
+}
+body.doom-inverted .doom-lights .dl-wash {
+    mix-blend-mode: multiply;
+    animation: dl-red 2.6s steps(3) infinite;
+}
+@keyframes dl-red {
+    0% {
+        background: radial-gradient(ellipse at 50% 40%, rgba(255, 90, 70, .35), rgba(150, 0, 0, .55) 75%);
+    }
+    40% {
+        background: radial-gradient(ellipse at 45% 45%, rgba(255, 60, 40, .3), rgba(120, 0, 0, .62) 70%);
+    }
+    70% {
+        background: radial-gradient(ellipse at 55% 38%, rgba(255, 100, 80, .38), rgba(160, 0, 0, .5) 78%);
+    }
+    100% {
+        background: radial-gradient(ellipse at 50% 40%, rgba(255, 90, 70, .35), rgba(150, 0, 0, .55) 75%);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .claube-crew.robed .mc-body,
+    body.doom-inverted .doom-lights .dl-wash {
+        animation: none !important;
+    }
+}

@@ -54,6 +54,7 @@
             e.preventDefault(); e.stopPropagation();
             S.set('key', '1');
             sfx('key', { or: 'pickup' });
+            document.dispatchEvent(new CustomEvent('dav:key-found'));
             // off to the lock on the hearts
             var r = el.getBoundingClientRect(), lk = document.querySelector('.lives.on .l-lock');
             el.classList.remove('fixed');
@@ -85,7 +86,7 @@
         if (!k || k.drop !== d.by || keyFound()) return;
         var el = makeKey(body, true);
         el.style.left = d.x + 'px'; el.style.top = d.y + 'px';
-        el.style.zIndex = 6;
+        el.style.zIndex = d.z || 6;                                         // (below, in reset 4: over everything down there)
         el.animate([{ translate: '0 -60px', opacity: 0 }, { translate: '0 -60px', opacity: 1, offset: 0.1 }, { translate: '0 0', offset: 0.55 },
                     { translate: '0 -14px', offset: 0.72 }, { translate: '0 0', offset: 0.86 }, { translate: '0 -3px', offset: 0.93 }, { translate: '0 0', opacity: 1 }],
                    { duration: 900, easing: 'ease-in' });

@@ -234,6 +234,36 @@
                 }
             };
         },
+        // the ambience (sky/ambient.js), when no record's on: a slow warm haze of chords that drift one into the next,
+        // the hush of the house under it, and now and then a soft note, like something far off in another room
+        // (your own: assets/sounds/ambient, loops)
+        ambient: function (out) {
+            var CHORDS = [[87.3, 130.8, 164.8, 220, 261.6], [110, 130.8, 164.8, 196, 293.7], [73.4, 110, 174.6, 220, 261.6], [65.4, 130.8, 164.8, 196, 246.9]];
+            var PENT = [523.3, 587.3, 659.3, 784, 880, 1046.5];
+            var voices = CHORDS[0].map(function (f, i) {
+                var o = ctx.createOscillator(), g = gain(i ? 0.035 : 0.05), lf = ctx.createOscillator(), lg = gain(0.018);
+                o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f; o.detune.value = (i - 2) * 4;
+                lf.frequency.value = 0.05 + i * 0.021; lf.connect(lg); lg.connect(g.gain);
+                chain(o, filter('lowpass', 900, 0.5), g, out);
+                o.start(); lf.start();
+                return o;
+            });
+            chain(loop('pink', 6), filter('lowpass', 420), gain(0.05), out);       // the house, breathing
+            var n = 0, chord = 0;
+            return function (level) {
+                if (level < 0.02 || !ctx) return;
+                var t0 = ctx.currentTime;
+                if (++n % 9 === 0) {                                                  // on to the next chord, slowly
+                    chord = (chord + 1) % CHORDS.length;
+                    voices.forEach(function (o, i) { o.frequency.setTargetAtTime(CHORDS[chord][i], t0, 2.2); });
+                }
+                if (Math.random() < 0.22) {                                          // a soft note, far off
+                    var f = PENT[Math.floor(Math.random() * PENT.length)], t = t0 + Math.random() * 0.8;
+                    tone(out, t, 'sine', f, f * 0.999, 2.6, 0.025 * (0.5 + level));
+                    tone(out, t + 0.35, 'sine', f, f * 0.999, 2.2, 0.009 * (0.5 + level));
+                }
+            };
+        },
         storm: function (out, ch) {
             chain(loop('white', 3), filter('highpass', 350), filter('lowpass', 5200), gain(0.7), out);
             chain(loop('brown', 5), filter('lowpass', 420), gain(1.0), out);
@@ -707,6 +737,34 @@
             f.frequency.setValueAtTime(90, t); f.frequency.linearRampToValueAtTime(220, t + 1.2); f.frequency.linearRampToValueAtTime(70, t + 2.4);
             tone(out, t, 'sine', 38, 24, 2.4, 0.8);
             for (var i = 0; i < 6; i++) noiseHit(out, t + 0.2 + Math.random() * 2, 0.08, 'bandpass', 600 + Math.random() * 900, 1, 0.3, 0.003);
+        },
+        // the kitchen's hob: the igniter ticking, then the gas catching (whump) and a soft roar
+        'burner': function (out, t) {
+            for (var i = 0; i < 3; i++) noiseHit(out, t + i * 0.13, 0.02, 'highpass', 3500, 0, 0.35, 0.002);
+            var f = noiseHit(out, t + 0.42, 0.9, 'lowpass', 300, 1, 0.5, 0.03);
+            f.frequency.setValueAtTime(900, t + 0.42); f.frequency.exponentialRampToValueAtTime(260, t + 1.2);
+            tone(out, t + 0.42, 'sine', 90, 55, 0.3, 0.35);
+        },
+        // the microwave: a clunk, then the hum of it running (six seconds), the fan's hiss under it
+        'microwave': function (out, t) {
+            knock(out, t, 0.5);
+            [60, 120, 180].forEach(function (f, i) {
+                var o = ctx.createOscillator(), g = gain(0);
+                o.type = i ? 'sine' : 'triangle'; o.frequency.value = f;
+                chain(o, g, out);
+                g.gain.setValueAtTime(0.0001, t + 0.1); g.gain.exponentialRampToValueAtTime([0.16, 0.08, 0.03][i], t + 0.4);
+                g.gain.setValueAtTime([0.16, 0.08, 0.03][i], t + 5.8); g.gain.exponentialRampToValueAtTime(0.0001, t + 6.1);
+                o.start(t + 0.1); o.stop(t + 6.2);
+            });
+            var n = ctx.createBufferSource(), ng = gain(0); n.buffer = noiseBuf('pink', 4); n.loop = true;
+            chain(n, filter('bandpass', 1200, 0.6), ng, out);
+            ng.gain.setValueAtTime(0.0001, t + 0.1); ng.gain.exponentialRampToValueAtTime(0.08, t + 0.5); ng.gain.setValueAtTime(0.08, t + 5.8); ng.gain.exponentialRampToValueAtTime(0.0001, t + 6.1);
+            n.start(t + 0.1); n.stop(t + 6.2);
+        },
+        // done: ding
+        'ding': function (out, t) {
+            tone(out, t, 'sine', 1760, 1756, 1.4, 0.3);
+            tone(out, t, 'sine', 3520, 3510, 0.6, 0.06);
         },
         // the voice's words, typed out: a low murmur a letter (a stand-in for assets/sounds/hell-voice)
         'murmur': function (out, t) {
