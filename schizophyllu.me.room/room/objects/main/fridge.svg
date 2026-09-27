@@ -42,5 +42,44 @@
     <text x="1540" y="538" font-size="10" fill="#c33" transform="rotate(3 1554 523)">??</text>
     <circle cx="1554" cy="498" r="3" fill="#c33"/>
     <circle cx="1530" cy="420" r="5" fill="#6dffb0"/><rect x="1560" y="426" width="14" height="10" fill="#b98cff"/>
+    <!-- stickers, like the real fridge: gentoo, vim, tux, beastie (the BSD daemon), wayland -->
+    <g class="fridge-stickers">
+      <!-- gentoo -->
+      <g transform="rotate(-8 1541 590)">
+        <circle cx="1541" cy="590" r="13" fill="#f4f1ea"/>
+        <path d="M1533 586 q2 -9 12 -8 q9 2 7 10 q-2 8 -12 11 q-4 1 -5 -2 q6 -1 9 -5 q2 -4 -2 -6 q-5 -2 -8 3z" fill="#9b8fd6"/>
+        <ellipse cx="1544" cy="585" rx="2.4" ry="1.6" fill="#f4f1ea"/>
+      </g>
+      <!-- vim -->
+      <g transform="rotate(6 1575 600)">
+        <rect x="1565" y="590" width="20" height="20" rx="2" fill="#f4f1ea" transform="rotate(45 1575 600)"/>
+        <rect x="1568" y="593" width="14" height="14" fill="#3c9a3c" transform="rotate(45 1575 600)"/>
+        <path d="M1570 595 l5 11 l5 -11" stroke="#f4f1ea" stroke-width="2.4" fill="none" stroke-linejoin="round"/>
+      </g>
+      <!-- tux -->
+      <g transform="rotate(-4 1537 638)">
+        <ellipse cx="1537" cy="638" rx="11" ry="14" fill="#f4f1ea"/>
+        <ellipse cx="1537" cy="639" rx="8" ry="11" fill="#1b1b1b"/>
+        <ellipse cx="1537" cy="642" rx="5" ry="7" fill="#eeeeee"/>
+        <circle cx="1535" cy="633" r="1.3" fill="#fff"/><circle cx="1539" cy="633" r="1.3" fill="#fff"/>
+        <path d="M1535 636 l2 2 l2 -2z" fill="#f2a900"/>
+        <path d="M1531 649 h4 l-2 2z M1539 649 h4 l-2 2z" fill="#f2a900"/>
+      </g>
+      <!-- beastie, the BSD daemon -->
+      <g transform="rotate(7 1573 648)">
+        <circle cx="1573" cy="648" r="13" fill="#f4f1ea"/>
+        <path d="M1564 641 l-3 -9 l7 6z M1582 641 l3 -9 l-7 6z" fill="#b8161d"/>
+        <circle cx="1573" cy="649" r="9" fill="#c8202a"/>
+        <ellipse cx="1569.5" cy="647" rx="2.4" ry="2.8" fill="#fff"/><ellipse cx="1576.5" cy="647" rx="2.4" ry="2.8" fill="#fff"/>
+        <circle cx="1570" cy="647.6" r="1.1" fill="#111"/><circle cx="1576" cy="647.6" r="1.1" fill="#111"/>
+        <path d="M1569 653 q4 3 8 0" stroke="#5a0a0e" stroke-width="1.2" fill="none"/>
+      </g>
+      <!-- wayland -->
+      <g transform="rotate(-5 1553 692)">
+        <rect x="1540" y="680" width="26" height="24" rx="5" fill="#f4f1ea"/>
+        <rect x="1542.5" y="682.5" width="21" height="19" rx="3.5" fill="#f5b72b"/>
+        <path d="M1545 686 l3 12 l5 -9 l5 9 l3 -12" stroke="#5a3a0a" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+      </g>
+    </g>
   </g>
 </svg>
