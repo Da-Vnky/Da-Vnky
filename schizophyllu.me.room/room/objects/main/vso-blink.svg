@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- vso-blink (main): the relay lights, the parts of vso.svg that blink or move. they sit on top of it, so a painted
+     (flat) vso keeps them. not clickable. drawn in room coordinates (the whole 1600x900 room). -->
+<!-- shared with the room: this copy is only so the file previews on its own -->
+<defs class="preview">
+  <g id="ledrow">
+    <rect width="3" height="3" x="0"  fill="#5dffa0"/>
+    <rect width="3" height="3" x="6"  fill="#5dffa0" class="blink b2"/>
+    <rect width="3" height="3" x="12" fill="#ffb347" class="blink b3"/>
+    <rect width="3" height="3" x="18" fill="#5dffa0" class="blink b1"/>
+  </g>
+</defs>
+  <use href="#ledrow" x="470" y="272"/>
+  <circle cx="500" cy="231" r="3" fill="#6dffb0" class="blink b1"/>
+</svg>

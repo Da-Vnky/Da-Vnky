@@ -134,6 +134,7 @@
 
 <!-- ================================================= WINDOW -->
 <g class="obj" data-id="window" data-art="room/objects/main/window.svg"></g>
+<g class="blinks" data-id="window-blink" pointer-events="none" data-art="room/objects/main/window-blink.svg"></g>
 
 <g class="obj" data-id="sill" data-art="room/objects/main/sill.svg"></g>
 
@@ -141,6 +142,7 @@
 <g class="obj" data-id="starchart" data-art="room/objects/main/starchart.svg"></g>
 
 <g class="obj" data-id="vso" id="sensors" data-art="room/objects/main/vso.svg"></g>
+<g class="blinks" data-id="vso-blink" pointer-events="none" data-art="room/objects/main/vso-blink.svg"></g>
 
 <!-- ================================================= WALL CLOCK / STICKIES / SHELF -->
 <g id="walldecor">
@@ -173,10 +175,12 @@
 
 <!-- ================================================= OPEN PC CASE -->
 <g class="obj" data-id="pccase" data-art="room/objects/main/pccase.svg"></g>
+<g class="blinks" data-id="pccase-blink" pointer-events="none" data-art="room/objects/main/pccase-blink.svg"></g>
 
 
 <!-- ================================================= MIRA -->
 <g class="obj char" data-id="mira" id="mira" data-art="room/objects/main/mira.svg"></g>
+<g class="blinks" data-id="mira-blink" pointer-events="none" data-art="room/objects/main/mira-blink.svg"></g>
   <circle class="anchor" data-anchor="mira" cx="520" cy="330" r="1" opacity="0"/>
 
 <!-- ================================================= THE PHOSPHOR ARTIFACT (CRT) + STAND -->
@@ -200,6 +204,7 @@
 </g>
 
 <g class="obj" data-id="crt" id="crt" data-art="room/objects/main/crt.svg"></g>
+<g class="blinks" data-id="crt-blink" pointer-events="none" data-art="room/objects/main/crt-blink.svg"></g>
 
 <g class="obj" data-id="mugs" data-art="room/objects/main/mugs.svg"></g>
 <g class="obj" data-id="monster" data-art="room/objects/main/monster.svg"></g>
@@ -264,6 +269,7 @@
 
 <!-- ================================================= SERVER: monad -->
 <g class="obj" data-id="server" id="server" data-art="room/objects/main/server.svg"></g>
+<g class="blinks" data-id="server-blink" pointer-events="none" data-art="room/objects/main/server-blink.svg"></g>
 <!-- Aether's LED strip: their own idea -->
 <g class="obj" data-id="ledstrip" id="ledstrip" data-art="room/objects/main/ledstrip.svg"></g>
 <g class="obj char" data-id="aether" id="aether" data-art="room/objects/main/aether.svg"></g>
@@ -313,8 +319,10 @@
 
 <!-- ================================================= THE CABLE HYDRA -->
 <g class="obj" data-id="powerstrip" data-art="room/objects/main/powerstrip.svg"></g>
+<g class="blinks" data-id="powerstrip-blink" pointer-events="none" data-art="room/objects/main/powerstrip-blink.svg"></g>
 
 <g class="obj" data-id="cables" id="hydra" data-art="room/objects/main/cables.svg"></g>
+<g class="blinks" data-id="cables-blink" pointer-events="none" data-art="room/objects/main/cables-blink.svg"></g>
 
 <!-- ================================================= FOREGROUND -->
 <g class="obj" data-id="boards" data-art="room/objects/main/boards.svg"></g>

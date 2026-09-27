@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- powerstrip-blink (main): the switch light, the parts of powerstrip.svg that blink or move. they sit on top of it, so a painted
+     (flat) powerstrip keeps them. not clickable. drawn in room coordinates (the whole 1600x900 room). -->
+  <g transform="rotate(4 1070 849)"><rect x="1080" y="846" width="6" height="6" fill="#5dffa0" class="blink b2"/></g>
+</svg>

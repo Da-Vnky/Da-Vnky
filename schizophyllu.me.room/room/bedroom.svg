@@ -79,6 +79,7 @@
 <g class="obj" data-id="books" data-art="room/objects/bedroom/books.svg"></g>
 
 <g class="obj" data-id="bwindow" data-art="room/objects/bedroom/bwindow.svg"></g>
+<g class="blinks" data-id="bwindow-blink" pointer-events="none" data-art="room/objects/bedroom/bwindow-blink.svg"></g>
 
 <g class="obj" data-id="radiator" data-art="room/objects/bedroom/radiator.svg"></g>
 
@@ -122,6 +123,7 @@
 <g pointer-events="none"><ellipse cx="560" cy="646" rx="42" ry="9" fill="#2a2330"/><path d="M530 650 L520 736 M590 650 L600 736 M560 654 V740" stroke="#1a151e" stroke-width="5"/></g>
 
 <g class="obj" data-id="station" id="station" data-art="room/objects/bedroom/station.svg"></g>
+<g class="blinks" data-id="station-blink" pointer-events="none" data-art="room/objects/bedroom/station-blink.svg"></g>
 
 <!-- light -->
 <g pointer-events="none" style="mix-blend-mode:screen">

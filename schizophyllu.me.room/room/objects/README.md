@@ -52,3 +52,12 @@ canvas, and you draw the light where it falls.
 - **They aren't clickable,** and they sit in the room's light layer, above everything else.
 - **A few are switched or animated by the code** (the fridge's light, the lava lamp, the bulbs, the CRT's flicker, the
   music station's pulse…). Those files say so at the top: keep that id or class on your painted glow.
+
+## The blinkies
+
+The little lights that blink or move (monad's LED rows, the CRT's power light, the stars in the windows, Mira's
+sparkles, the xmas lights, the radio tower…) live in their own files next to their object: `<name>-blink.svg`, e.g.
+`main/server-blink.svg`. They sit on top of the object, so **if you paint the object as a flat picture, its blinkies
+still blink over your painting**. Don't paint them into the object; leave those spots as they are and the blink
+layer covers them. (A few stay inside their object because the code needs them there: Aether's antenna, the lights
+inside the bedroom closet, and the cursor on opi's terminal.)

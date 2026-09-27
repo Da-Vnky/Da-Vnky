@@ -7,7 +7,7 @@
   <filter id="r-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
   <path d="M1452 300 L1432 560 M1452 300 L1472 560 M1440 400 L1464 400 M1436 480 L1468 480 M1440 400 L1468 480 M1464 400 L1436 480" stroke="#0e1018" stroke-width="3"/>
-  <circle class="blink b1" cx="1452" cy="298" r="3.4" fill="#ff3b2a" filter="url(#r-glow)"/>
-  <circle class="blink b2" cx="1452" cy="420" r="2.4" fill="#ff3b2a" filter="url(#r-glow)"/>
+  
+  
   <rect x="1420" y="290" width="64" height="280" fill="#000" opacity="0"/>
 </svg>

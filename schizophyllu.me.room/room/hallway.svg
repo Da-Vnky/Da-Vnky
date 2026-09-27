@@ -35,6 +35,7 @@
 <rect x="553" y="108" width="14" height="12" fill="#3a3a3a"/>
 <g class="obj" data-id="bulb" id="h-bulbobj" data-art="room/objects/hallway/bulb.svg"></g>
 <g class="obj" data-id="smoke" data-art="room/objects/hallway/smoke.svg"></g>
+<g class="blinks" data-id="smoke-blink" pointer-events="none" data-art="room/objects/hallway/smoke-blink.svg"></g>
 
 <!-- bathroom door -->
 <g class="obj" data-id="bathroom" data-art="room/objects/hallway/bathroom.svg"></g>

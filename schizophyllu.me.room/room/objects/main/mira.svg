@@ -46,8 +46,8 @@
   <!-- sensor halo -->
   <ellipse cx="520" cy="350" rx="46" ry="9" fill="none" stroke="#6dffb0" stroke-opacity=".45" stroke-dasharray="3 5"/>
   <g fill="#aaffd0" filter="url(#f-glow)">
-    <circle r="2.6"><animateMotion dur="9s" repeatCount="indefinite" path="M474 350 a46 9 0 1 0 92 0 a46 9 0 1 0 -92 0"/></circle>
-    <circle r="2"><animateMotion dur="9s" begin="-3s" repeatCount="indefinite" path="M474 350 a46 9 0 1 0 92 0 a46 9 0 1 0 -92 0"/></circle>
-    <circle r="1.6"><animateMotion dur="9s" begin="-6s" repeatCount="indefinite" path="M474 350 a46 9 0 1 0 92 0 a46 9 0 1 0 -92 0"/></circle>
+    
+    
+    
   </g>
 </svg>

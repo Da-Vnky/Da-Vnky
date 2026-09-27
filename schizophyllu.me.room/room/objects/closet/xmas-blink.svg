@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- xmas-blink (closet): the xmas lights, the parts of xmas.svg that blink or move. they sit on top of it, so a painted
+     (flat) xmas keeps them. not clickable. drawn in room coordinates (the whole 1600x900 room). -->
+  <circle class="bulb d0" cx="346" cy="256" r="3" fill="#ff5a4a"/>
+  <circle class="bulb d1" cx="360" cy="246" r="3" fill="#6dffb0"/>
+  <circle class="bulb d2" cx="378" cy="242" r="3" fill="#ffd24a"/>
+  <circle class="bulb d3" cx="396" cy="252" r="3" fill="#6ab0ff"/>
+  <circle class="bulb d0" cx="414" cy="258" r="3" fill="#ff5a4a"/>
+  <circle class="bulb d1" cx="430" cy="248" r="3" fill="#6dffb0"/>
+  <circle class="bulb d2" cx="438" cy="236" r="3" fill="#ffd24a"/>
+</svg>

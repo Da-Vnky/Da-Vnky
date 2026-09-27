@@ -9,7 +9,7 @@
   <rect x="604" y="638" width="3" height="22" fill="#3a3"/><rect x="608" y="638" width="3" height="22" fill="#262"/>
   <rect x="578" y="676" width="34" height="3" fill="#050505"/><rect x="578" y="686" width="34" height="3" fill="#050505"/>
   <rect x="572" y="708" width="44" height="22" fill="#2a2b31"/><g stroke="#16161a"><path d="M576 714h36M576 720h36"/></g>
-  <rect x="613" y="625" width="3" height="3" fill="#6dffb0" class="blink b3"/>
+  
   <rect x="582" y="742" width="26" height="5" fill="#2a6a3a" transform="rotate(-8 595 744)"/><rect x="600" y="748" width="22" height="4" fill="#2a6a3a" transform="rotate(14 611 750)"/>
   <g fill="#aaa"><circle cx="628" cy="746" r="1.5"/><circle cx="634" cy="750" r="1.5"/><circle cx="572" cy="752" r="1.5"/></g>
 </svg>

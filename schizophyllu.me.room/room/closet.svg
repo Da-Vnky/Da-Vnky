@@ -39,6 +39,7 @@
 
 <!-- left shelves: lights, spoingus i, the dead crt, routers -->
 <g class="obj" data-id="xmas" data-art="room/objects/closet/xmas.svg"></g>
+<g class="blinks" data-id="xmas-blink" pointer-events="none" data-art="room/objects/closet/xmas-blink.svg"></g>
 <g class="obj" data-id="spoingus1" data-art="room/objects/closet/spoingus1.svg"></g>
 <g class="obj" data-id="deadcrt" data-art="room/objects/closet/deadcrt.svg"></g>
 <g class="obj" data-id="routers" data-art="room/objects/closet/routers.svg"></g>
