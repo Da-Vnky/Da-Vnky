@@ -417,3 +417,96 @@ export const OPI = {
   // the first time anyone opens it, from the other room
   mira: ['mira', "That one's opi's. Be nice to it."],
 };
+
+// skizy's own: ask her about computers, and she's off. init systems, linux, the Intel ME.
+// (same shape as Mira's and Claube's: a few ways in, the rants branch from there)
+const sk = t => ['mel', t];
+export const ASK_SKIZY = [
+  t('init', 'what init system do you use?', [
+    sk('ok so. paranoia runs arch. arch uses systemd. so i use systemd'),
+    sk('and its FINE. on a desktop its fine. it boots fast, the units are nice, i can read a unit file'),
+    ['-', 'beat'],
+    sk('monad runs devuan though. no systemd. sysvinit. on purpose'),
+  ], [
+    t('why-devuan', 'why devuan on monad, then?', [
+      sk('because monad is a SERVER. a server should do one thing and i should be able to see all of it'),
+      sk('systemd is an init system and also a logger and also a network manager and also dns and also time sync and also a login manager and also a home directory manager and at some point you have to ask what it isnt'),
+      sk('devuan exists because debian went systemd in 2014 and some people said no. i am some people. on the server'),
+      c('She says "on the server" every time. It is load-bearing.'),
+    ], [
+      t('hypocritical', "isn't that a bit hypocritical?", [
+        sk('yes'), ['-', 'beat'],
+        sk('its called being PRAGMATIC. the desktop gets convenience. the server gets to be understood. different jobs'),
+        m("She named WATCHLION after a systemd watchdog."),
+        sk('THAT WAS AN HOMAGE'),
+      ]),
+    ]),
+    t('whats-wrong', "what's actually wrong with systemd?", [
+      sk('nothing is WRONG with it. thats the annoying part. it works'),
+      sk('its just BIG. its pid 1 and pid 1 should be small and boring. if pid 1 dies the whole machine dies. i want pid 1 to be the most boring program on earth'),
+      sk('and journald writes binary logs. i want to grep my logs. i want to cat a text file at 3am like a normal person'),
+      ['-', 'beat'],
+      sk('journalctl is fine. i just want to be MAD about it'),
+      m("She uses journalctl every day."),
+      sk('under protest'),
+    ], [
+      t('alternatives', 'what would you use instead?', [
+        sk('sysvinit if its old and boring. openrc if i want it nice. runit or s6 if im feeling like a little freak'),
+        sk('s6 is beautiful actually. tiny programs that each do one thing. supervision trees. nobody uses it. its perfect'),
+        c("She has explained s6 to me four times. I have filed it four times."),
+      ]),
+    ]),
+  ]),
+  t('linux', 'why arch?', [
+    sk('because i want to know whats on my computer. arch gives you nothing and you add what you need'),
+    sk('the wiki is the best documentation ever written by humans. i will not be taking questions'),
+    sk('rolling release. i update and i get the new thing. sometimes the new thing breaks and i fix it and then i know more than i did'),
+    m("She reads the news page before updating."),
+    sk('SOMETIMES i read the news page'),
+  ], [
+    t('nixos', 'have you tried nixos?', [
+      sk('i have tried nixos'), ['-', 'beat'],
+      sk('its genius. your whole system is one config file and you can roll back anything. its the future'),
+      sk('i lasted a week. i wanted to change one thing and i had to learn a whole programming language to do it'),
+      sk('i will go back. probably. when i am stronger'),
+    ]),
+    t('gnu', 'is it linux or GNU/linux?', [
+      sk("i'd just like to interject for a moment. what you're referring to as linux is in fact"),
+      m('No.'),
+      sk('...GNU plus linux'),
+      m('We have talked about this.'),
+    ]),
+  ]),
+  t('me', "what's the intel ME?", [
+    sk('OK. so. inside every intel chipset since like 2008 theres a second computer. the Management Engine'),
+    sk('it has its own processor and its own firmware and since ME 11 its running MINIX. MINIX! a whole operating system, inside your computer, that you didnt install'),
+    sk('it can see your memory. on the business chips it can talk to the network. it runs when your pc is "off" if its plugged in'),
+    sk('people call it ring -3. ring 0 is the kernel. this is BELOW that. under the floor'),
+    ['-', 'beat'],
+    sk('and you cant just turn it off. intel says you need it'),
+    c('She told me about this on my first day.'),
+  ], [
+    t('off', 'so you can\'t get rid of it?', [
+      sk('SO. me_cleaner. nicola corna wrote it. it goes through the ME firmware and deletes everything it doesnt need to boot'),
+      sk('you cant delete ALL of it. some machines notice the ME is gone and shut themselves off after 30 minutes. so you leave the tiny part that brings the chip up and rip out the rest'),
+      sk('and on the newer ones theres the HAP bit'),
+    ], [
+      t('hap', "what's the HAP bit?", [
+        sk('high assurance platform. in 2017 positive technologies found a hidden switch in the ME that turns it off after the machine boots'),
+        sk('it was there for government computers. for the people who didnt trust it either'),
+        ['-', 'beat'],
+        sk('so the off switch existed the whole time. they just didnt tell us'),
+        m('She has a sticker about this.'),
+        sk('i have THREE stickers about this'),
+      ]),
+    ]),
+    t('flash', 'how do you actually do it?', [
+      sk('you open the laptop. you find the little BIOS chip. you put a SOIC clip on it and plug that into a CH341A'),
+      sk('you read the chip three times and check theyre the same. you keep a backup. you keep TWO backups'),
+      sk('then you run me_cleaner on the image and write it back and pray'),
+      c('The CH341A is in the drawer. I know exactly where it is at all times.'),
+      sk('the praying is technically optional'),
+      m('It is not optional.'),
+    ]),
+  ]),
+];

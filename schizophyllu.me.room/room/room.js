@@ -6,7 +6,7 @@ import {
   JUST_STAY, HOVER_WRITING, NOT_WRITING, SCENE_AFTERNOON, SLEEP_TALK,
 } from './script.js';
 import { NARRATION, ROOMS, PEEPHOLE, FOG, MIRROR, RADIO, CLOSET_FIRST, STAR_RARE } from './narration.js';
-import { RETURNING, MUSIC, AMBIENT_MORE, VIEWER_TALK, FUNGER_WATCHING, AFTERNOON_HUSH, MEDS_TALK, WAKE_UP, ASK_MIRA, ASK_CLAUBE, HEXLEY_SAYS, OPI } from './extra.js';
+import { RETURNING, MUSIC, AMBIENT_MORE, VIEWER_TALK, FUNGER_WATCHING, AFTERNOON_HUSH, MEDS_TALK, WAKE_UP, ASK_MIRA, ASK_CLAUBE, HEXLEY_SAYS, OPI, ASK_SKIZY } from './extra.js';
 import { GUILT, QUIET_NOTES, REMEDY_BACK, RESTORED_FIRST, RESTORED } from './davnky.js';   // (DaV-nky: see the end of this file)
 import { audio } from './audio.js';
 import { music } from './music.js';
@@ -516,6 +516,7 @@ function interact(id) {
       return openMenu(CAST.mel.name, CAST.mel.color, [
         ...(carryingMeds ? [['give her the bottle', () => (DAV.key ? talkMeds() : caption(QUIET_NOTES.notYet))]] : []),
         ['say something', talkToSkizy],
+        ['ask her about computers', () => converse('mel', ASK_SKIZY)],
         ['talk', () => talkBox(bags.mel())],
         ['watch her work', () => talkBox(bags.melWork())],
         ['what is this room?', () => talkBox(WHAT_IS_THIS_ROOM)],
