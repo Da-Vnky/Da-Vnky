@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- glow-bulb (closet): the pull-chain bulb. a glow on its own: paint it however you like.
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes; the room blends it
+     in "screen" mode (light only adds). not clickable.
+     the code looks these ids up, so keep them: #c-bulbglow -->
+<!-- the gradient lives in the room file too; this copy is only so the file previews on its own -->
+<defs class="preview">
+  <radialGradient id="c-bulb"><stop offset="0" stop-color="#ffd89a" stop-opacity=".6"/><stop offset=".35" stop-color="#ffb35a" stop-opacity=".2"/><stop offset="1" stop-color="#ffb35a" stop-opacity="0"/></radialGradient>
+</defs>
+  <ellipse id="c-bulbglow" cx="800" cy="260" rx="700" ry="560" fill="url(#c-bulb)"/>
+</svg>

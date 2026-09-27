@@ -7,7 +7,7 @@
 <g transform="translate(306 0)">
   <rect x="890" y="104" width="260" height="330" fill="#241d19"/>
   <rect x="904" y="118" width="232" height="302" fill="url(#b-sky)"/>
-  <g fill="#dfe8ff"><circle class="twinkle" cx="930" cy="270" r="1.2"/><circle cx="1100" cy="262" r="1"/><circle class="twinkle t2" cx="1010" cy="280" r=".9"/></g>
+  <g fill="#dfe8ff"><circle cx="1100" cy="262" r="1"/></g>
   <!-- the building across the street -->
   <rect x="904" y="292" width="232" height="128" fill="#0b0d18"/>
   <g fill="#1a1d2a">

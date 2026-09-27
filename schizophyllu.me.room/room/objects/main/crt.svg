@@ -26,7 +26,7 @@
   <rect x="668" y="364" width="164" height="123" rx="6" fill="url(#p-scan)"/>
   <text x="652" y="524" font-size="10" fill="#5a5343" letter-spacing="2">PHOSPHOR</text>
   <circle cx="790" cy="522" r="7" fill="#6e6754"/><circle cx="812" cy="522" r="7" fill="#6e6754"/>
-  <circle cx="836" cy="522" r="3.2" fill="#6dffb0" class="blink b1" filter="url(#f-glow)"/>
+  
   <rect x="656" y="542" width="188" height="3" fill="#8c8470"/>
   <rect x="656" y="550" width="188" height="3" fill="#8c8470"/>
   <rect x="656" y="352" width="188" height="147" rx="12" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="6" filter="url(#f-glow)"/>

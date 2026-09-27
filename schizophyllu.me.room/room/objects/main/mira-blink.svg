@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- mira-blink (main): the sparkles circling Mira, the parts of mira.svg that blink or move. they sit on top of it, so a painted
+     (flat) mira keeps them. not clickable. drawn in room coordinates (the whole 1600x900 room). -->
+<defs>
+  <filter id="f-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="2.2" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+  <g fill="#aaffd0" filter="url(#f-glow)">
+    <circle r="2.6"><animateMotion dur="9s" repeatCount="indefinite" path="M474 350 a46 9 0 1 0 92 0 a46 9 0 1 0 -92 0"/></circle>
+    <circle r="2"><animateMotion dur="9s" begin="-3s" repeatCount="indefinite" path="M474 350 a46 9 0 1 0 92 0 a46 9 0 1 0 -92 0"/></circle>
+    <circle r="1.6"><animateMotion dur="9s" begin="-6s" repeatCount="indefinite" path="M474 350 a46 9 0 1 0 92 0 a46 9 0 1 0 -92 0"/></circle>
+  </g>
+</svg>

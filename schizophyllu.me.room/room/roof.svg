@@ -426,6 +426,7 @@
   <rect x="352" y="360" width="70" height="60"/><path d="M348 360 l39 -24 l39 24z"/><path d="M360 420 l-6 60 M414 420 l6 60 M387 420 v60" stroke="#0a0b14" stroke-width="4"/>
 </g>
 <g class="obj" data-id="radiotower" data-art="room/objects/roof/radiotower.svg"></g>
+<g class="blinks" data-id="radiotower-blink" pointer-events="none" data-art="room/objects/roof/radiotower-blink.svg"></g>
 <rect y="560" width="1600" height="60" fill="#ff9a5a" opacity=".06" filter="url(#r-soft)"/>
 
 <!-- the parapet, with skizy's fairy lights on it -->
@@ -464,6 +465,7 @@
 <g class="obj" data-id="hvac" data-art="room/objects/roof/hvac.svg"></g>
 <!-- Mira's rooftop rig -->
 <g class="obj" data-id="rig" data-art="room/objects/roof/rig.svg"></g>
+<g class="blinks" data-id="rig-blink" pointer-events="none" data-art="room/objects/roof/rig-blink.svg"></g>
 <!-- skizy's chair, facing the sky -->
 <g class="obj" data-id="chair" data-art="room/objects/roof/chair.svg"></g>
 <!-- the hatch, back down -->
@@ -471,9 +473,9 @@
 
 <!-- light -->
 <g pointer-events="none" style="mix-blend-mode:screen">
-  <ellipse cx="215" cy="800" rx="200" ry="90" fill="url(#r-hatch)"/>
-  <ellipse cx="1110" cy="700" rx="140" ry="90" fill="url(#r-green)" opacity=".6"/>
-  <ellipse cx="400" cy="620" rx="420" ry="60" fill="#ffb347" opacity=".06"/>
+  <g class="glow" data-id="glow-hatch" data-art="room/objects/roof/glow-hatch.svg"></g>
+  <g class="glow" data-id="glow-rig" data-art="room/objects/roof/glow-rig.svg"></g>
+  <g class="glow" data-id="glow-fairylights" data-art="room/objects/roof/glow-fairylights.svg"></g>
 </g>
 <rect width="1600" height="900" fill="url(#r-vignette)" pointer-events="none"/>
 </svg>

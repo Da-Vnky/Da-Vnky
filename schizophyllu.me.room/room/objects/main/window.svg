@@ -9,16 +9,16 @@
   <rect x="58" y="118" width="284" height="334" fill="#241d19"/>
   <rect x="78" y="138" width="244" height="294" fill="url(#g-sky)"/>
   <g fill="#dfe8ff">
-    <circle class="twinkle" cx="104" cy="170" r="1.4"/><circle cx="150" cy="205" r="1"/><circle class="twinkle t2" cx="182" cy="160" r="1.2"/>
-    <circle cx="240" cy="236" r="1"/><circle class="twinkle t3" cx="118" cy="252" r="1.3"/><circle cx="300" cy="275" r=".9"/>
-    <circle cx="214" cy="190" r=".8"/><circle class="twinkle" cx="166" cy="300" r="1"/>
+    <circle cx="150" cy="205" r="1"/>
+    <circle cx="240" cy="236" r="1"/><circle cx="300" cy="275" r=".9"/>
+    <circle cx="214" cy="190" r=".8"/>
   </g>
   <circle cx="276" cy="186" r="30" fill="#b8ccff" opacity=".12"/>
   <circle cx="276" cy="186" r="17" fill="#e4ebff"/>
   <circle cx="270" cy="182" r="3" fill="#c8d2ee"/><circle cx="281" cy="193" r="2" fill="#c8d2ee"/>
   <path d="M78 432V360h30v-22h26v40h24v-56h34v70h20v-30h30v42h28v-60h22v18h30v70Z" fill="#070a16"/>
   <g fill="#ffcf73" opacity=".8">
-    <rect x="126" y="348" width="4" height="5"/><rect x="170" y="330" width="4" height="5"/><rect x="178" y="352" width="4" height="5" class="blink b3"/>
+    <rect x="126" y="348" width="4" height="5"/><rect x="170" y="330" width="4" height="5"/>
     <rect x="266" y="386" width="4" height="5"/><rect x="236" y="400" width="4" height="5" opacity=".6"/>
   </g>
   <path d="M200 138v294M78 285h244" stroke="#241d19" stroke-width="9"/>

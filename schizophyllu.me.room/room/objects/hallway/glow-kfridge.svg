@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- glow-kfridge (hallway): the proper fridge's light when it's open. a glow on its own: paint it however you like.
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes; the room blends it
+     in "screen" mode (light only adds). not clickable.
+     the code looks these ids up, so keep them: #kf-glow -->
+  <ellipse id="kf-glow" cx="1520" cy="560" rx="240" ry="300" fill="#e8f4ff" opacity=".12" style="display:none;mix-blend-mode:screen"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- glow-star-lamp (main): the star lamp on Mira's sensor shelf. a glow on its own: paint it however you like.
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes; the room blends it
+     in "screen" mode (light only adds). not clickable. -->
+<!-- the gradient lives in the room file too; this copy is only so the file previews on its own -->
+<defs class="preview">
+  <radialGradient id="g-green">
+    <stop offset="0" stop-color="#5dffa0" stop-opacity=".45"/><stop offset=".4" stop-color="#2bd97a" stop-opacity=".13"/><stop offset="1" stop-color="#2bd97a" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+  <ellipse cx="560" cy="266" rx="80" ry="60" fill="url(#g-green)" opacity=".8"/>
+</svg>

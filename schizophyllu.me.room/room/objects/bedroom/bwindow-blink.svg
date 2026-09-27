@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- bwindow-blink (bedroom): the twinkling stars, the parts of bwindow.svg that blink or move. they sit on top of it, so a painted
+     (flat) bwindow keeps them. not clickable. drawn in room coordinates (the whole 1600x900 room). -->
+  <g transform="translate(306 0)"><g fill="#dfe8ff"><circle class="twinkle" cx="930" cy="270" r="1.2"/></g></g>
+  <g transform="translate(306 0)"><g fill="#dfe8ff"><circle class="twinkle t2" cx="1010" cy="280" r=".9"/></g></g>
+</svg>

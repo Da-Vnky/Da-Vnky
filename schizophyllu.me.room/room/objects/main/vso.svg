@@ -20,8 +20,8 @@
   <rect x="417" y="263" width="34" height="14" fill="#04140c"/>
   <path d="M418 272 l5 -4 l5 6 l5 -8 l5 5 l5 -2 l4 3" stroke="#6dffb0" fill="none" stroke-width="1"/>
   <rect x="466" y="266" width="30" height="20" fill="#1c1f27"/>
-  <use href="#ledrow" x="470" y="272"/>
-  <path d="M492 266 l8 -34" stroke="#555" stroke-width="2"/><circle cx="500" cy="231" r="3" fill="#6dffb0" class="blink b1"/>
+  
+  <path d="M492 266 l8 -34" stroke="#555" stroke-width="2"/>
   <rect x="510" y="270" width="18" height="16" fill="#2a2d36"/>
   <g transform="translate(560 266)">
     <path d="M0 -14 L4 -4 L14 -4 L6 2 L9 12 L0 6 L-9 12 L-6 2 L-14 -4 L-4 -4Z" fill="#6dffb0" class="varstar-lamp" filter="url(#f-glow)"/>

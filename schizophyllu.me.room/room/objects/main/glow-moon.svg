@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- glow-moon (main): the moon's glow round the window. a glow on its own: paint it however you like.
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes; the room blends it
+     in "screen" mode (light only adds). not clickable. -->
+<!-- the gradient lives in the room file too; this copy is only so the file previews on its own -->
+<defs class="preview">
+  <radialGradient id="g-moon">
+    <stop offset="0" stop-color="#b8ccff" stop-opacity=".35"/><stop offset="1" stop-color="#b8ccff" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+  <ellipse cx="200" cy="290" rx="230" ry="230" fill="url(#g-moon)"/>
+</svg>

@@ -23,12 +23,12 @@
     <rect x="1206" y="464" width="72" height="44"/><rect x="1206" y="514" width="72" height="30"/>
     <rect x="1206" y="550" width="72" height="30"/><rect x="1206" y="586" width="72" height="86"/>
   </g>
-  <use href="#ledrow" x="1212" y="404"/><use href="#ledrow" x="1212" y="440"/><use href="#ledrow" x="1212" y="480"/>
-  <use href="#ledrow" x="1212" y="526"/><use href="#ledrow" x="1212" y="562"/>
+  
+  
   <g stroke="#0c0c10" stroke-width="2"><path d="M1242 404h30M1242 410h30M1242 440h30M1242 446h30M1242 600h30M1242 608h30M1242 616h30M1242 624h30M1242 632h30"/></g>
   <text x="1212" y="660" font-size="10" fill="#6dffb0" opacity=".8">monad</text>
   <!-- router on top -->
   <rect x="1210" y="362" width="64" height="16" rx="3" fill="#1d3a5a"/>
   <path d="M1218 362 l-6 -30 M1266 362 l6 -30 M1242 362 v-26" stroke="#222" stroke-width="3" stroke-linecap="round"/>
-  <g><rect x="1218" y="368" width="3" height="3" fill="#5dffa0" class="blink b2"/><rect x="1226" y="368" width="3" height="3" fill="#5dffa0" class="blink b1"/><rect x="1234" y="368" width="3" height="3" fill="#5dffa0" class="blink b3"/></g>
+  <g></g>
 </svg>

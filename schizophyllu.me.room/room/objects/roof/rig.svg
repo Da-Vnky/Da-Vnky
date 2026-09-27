@@ -14,7 +14,7 @@
   <path d="M1160 760 v-120" stroke="#5a5a5e" stroke-width="3"/>
   <g class="anemometer"><path d="M1160 636 h-20 M1160 636 h20 M1160 636 v-14" stroke="#8a8e92" stroke-width="2"/><circle cx="1140" cy="636" r="4" fill="#cfd3d8"/><circle cx="1180" cy="636" r="4" fill="#cfd3d8"/><circle cx="1160" cy="622" r="4" fill="#cfd3d8"/></g>
   <rect x="1120" y="720" width="60" height="42" rx="4" fill="#1d2a24"/>
-  <g><rect x="1128" y="730" width="4" height="4" fill="#6dffb0" class="blink b1"/><rect x="1136" y="730" width="4" height="4" fill="#6dffb0" class="blink b2"/><rect x="1144" y="730" width="4" height="4" fill="#ffb347" class="blink b3"/><rect x="1152" y="730" width="4" height="4" fill="#6dffb0"/></g>
+  <g><rect x="1152" y="730" width="4" height="4" fill="#6dffb0"/></g>
   <text x="1126" y="752" font-size="7" fill="#6dffb0" opacity=".8">VSO-1</text>
   <path d="M1120 750 C 900 790 600 760 330 800" stroke="#0a0a0c" stroke-width="3" fill="none"/>
 </svg>

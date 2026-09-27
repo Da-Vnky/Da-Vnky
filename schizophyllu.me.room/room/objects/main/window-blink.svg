@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- window-blink (main): the twinkling stars, the parts of window.svg that blink or move. they sit on top of it, so a painted
+     (flat) window keeps them. not clickable. drawn in room coordinates (the whole 1600x900 room). -->
+  <g fill="#dfe8ff"><circle class="twinkle" cx="104" cy="170" r="1.4"/></g>
+  <g fill="#dfe8ff"><circle class="twinkle t2" cx="182" cy="160" r="1.2"/></g>
+  <g fill="#dfe8ff"><circle class="twinkle t3" cx="118" cy="252" r="1.3"/></g>
+  <g fill="#dfe8ff"><circle class="twinkle" cx="166" cy="300" r="1"/></g>
+  <g fill="#ffcf73" opacity=".8"><rect x="178" y="352" width="4" height="5" class="blink b3"/></g>
+</svg>

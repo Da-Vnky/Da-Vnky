@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- crt-blink (main): the power light, the parts of crt.svg that blink or move. they sit on top of it, so a painted
+     (flat) crt keeps them. not clickable. drawn in room coordinates (the whole 1600x900 room). -->
+<defs>
+  <filter id="f-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="2.2" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+  <circle cx="836" cy="522" r="3.2" fill="#6dffb0" class="blink b1" filter="url(#f-glow)"/>
+</svg>

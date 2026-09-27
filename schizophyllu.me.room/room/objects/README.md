@@ -39,3 +39,25 @@ Keep those ids on whatever you draw for them. Everything else in the file can ch
 Some files have a second `<defs class="preview">` block. Those are copies of gradients and patterns the thing shares with the rest of the room. They're only there so the file looks right when you open it alone. The site ignores them and uses the real ones in the room file, so to change a shared gradient, change it there.
 
 The small invisible `anchor` circles in the room files mark where speech bubbles appear for Mira, skizy and Claube. They live in the room file, not the drawings, so redrawing a character never moves the speech bubbles.
+
+## The glows
+
+The light in each room (the CRT's green, the lamp, the moonbeam, the lava lamp, the hall bulb…) is made of **glows**,
+and each glow has its own file too: `objects/<room>/glow-<name>.svg`. There are 28, and their names say what they are,
+e.g. `main/glow-crt.svg` or `bedroom/glow-lavalamp.svg`. Paint them the same way as the things: the whole room is the
+canvas, and you draw the light where it falls.
+
+- **The room blends them in "screen" mode:** light only adds. Bright colours glow, and black or dark parts simply
+  vanish, so paint them on black or on a see-through background.
+- **They aren't clickable,** and they sit in the room's light layer, above everything else.
+- **A few are switched or animated by the code** (the fridge's light, the lava lamp, the bulbs, the CRT's flicker, the
+  music station's pulse…). Those files say so at the top: keep that id or class on your painted glow.
+
+## The blinkies
+
+The little lights that blink or move (monad's LED rows, the CRT's power light, the stars in the windows, Mira's
+sparkles, the xmas lights, the radio tower…) live in their own files next to their object: `<name>-blink.svg`, e.g.
+`main/server-blink.svg`. They sit on top of the object, so **if you paint the object as a flat picture, its blinkies
+still blink over your painting**. Don't paint them into the object; leave those spots as they are and the blink
+layer covers them. (A few stay inside their object because the code needs them there: Aether's antenna, the lights
+inside the bedroom closet, and the cursor on opi's terminal.)
