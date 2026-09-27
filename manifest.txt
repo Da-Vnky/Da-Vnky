@@ -112,7 +112,7 @@ content/claude/list.txt 169
 content/dungeon/list.txt 124
 content/dungeon/paper.json 163
 content/frames/list.txt 308
-content/living/albums.txt 102
+content/living/albums.txt 123
 content/living/frames.json 150
 content/living/list.txt 382
 content/sea/2026-09-25-hello-world.txt 213
@@ -127,6 +127,7 @@ content/books/book-2/list.txt 113
 content/books/book-3/list.txt 113
 content/books/book-4/list.txt 113
 content/books/grimoire/list.txt 113
+content/living/05-A Stranger to You/list.txt 417
 content/living/bottles/2026-09-24-from-skizy.txt 50
 content/living/bottles/board.json 65
 content/living/bottles/list.txt 174

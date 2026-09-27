@@ -1,0 +1,17 @@
+# written by tools/update-lists.sh: every file in this folder.
+# no need to edit it; it's rewritten each commit.
+01-Entrance.ogg
+02-Block Of Flats.ogg
+03-Fortress Down.ogg
+04-Gemini.ogg
+05-Nothing Like The Knife.ogg
+06-Harder To Pretend.ogg
+07-اثينا.ogg
+08-Revenant.ogg
+09-The Way It Breaks.ogg
+10-Meet My Maker.ogg
+11-Fangs.ogg
+12-The Ladder.ogg
+13-Gifted Every Strength.ogg
+14-No Stranger To You.ogg
+cover.jpg

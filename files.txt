@@ -112,9 +112,9 @@ content/claude/list.txt 169 76452382
 content/dungeon/list.txt 124 1680728230
 content/dungeon/paper.json 163 2584569784
 content/frames/list.txt 308 2092207427
-content/living/albums.txt 102 176666695
+content/living/albums.txt 123 775924658
 content/living/frames.json 150 2267752740
-content/living/list.txt 382 725217127
+content/living/list.txt 382 1595382606
 content/sea/2026-09-25-hello-world.txt 213 4016599039
 content/sea/list.txt 161 3392900003
 content/shame/frames.json 359 3564234737
@@ -127,6 +127,7 @@ content/books/book-2/list.txt 113 3293401086
 content/books/book-3/list.txt 113 3293401086
 content/books/book-4/list.txt 113 3293401086
 content/books/grimoire/list.txt 113 3293401086
+content/living/05-A Stranger to You/list.txt 417 500846178
 content/living/bottles/2026-09-24-from-skizy.txt 50 2780802433
 content/living/bottles/board.json 65 4093162867
 content/living/bottles/list.txt 174 2306364331

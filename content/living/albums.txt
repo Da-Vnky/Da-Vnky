@@ -1,1 +1,2 @@
 # written by tools/update-lists.sh: the record player's albums (folders of songs in content/living/).
+05-A Stranger to You

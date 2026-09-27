@@ -6,9 +6,9 @@
 02-Song on the Beach.ogg
 03-Aerie.jpg
 03-Aerie.ogg
+04-Frame Of Mind.ogg
 04-Frame of Mind.jpg
-04-Frame of Mind.ogg
-05-I'm Upping My P(Doom).gif
-05-I'm Upping My P(Doom).ogg
+06-I'm Upping My P(Doom).gif
+06-I'm Upping My P(Doom).ogg
 albums.txt
 frames.json

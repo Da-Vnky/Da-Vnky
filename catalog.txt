@@ -144,18 +144,18 @@ content/frames/The False God.gif 4458112 3686044716
 content/frames/droolers.png 1117345 4250865322
 content/frames/list.txt 308 2092207427
 content/living/01-where heaven and earth meet.jpg 890805 3644886012
-content/living/01-where heaven and earth meet.ogg 992952 826560047
+content/living/01-where heaven and earth meet.ogg 5245641 2666587994
 content/living/02-Song on the Beach.jpg 412921 54104781
-content/living/02-Song on the Beach.ogg 976945 1864114464
+content/living/02-Song on the Beach.ogg 5696623 3554461221
 content/living/03-Aerie.jpg 248646 1773964025
-content/living/03-Aerie.ogg 786774 2817302222
+content/living/03-Aerie.ogg 8072227 3937702694
+content/living/04-Frame Of Mind.ogg 6578711 2709216259
 content/living/04-Frame of Mind.jpg 122551 761190908
-content/living/04-Frame of Mind.ogg 941654 4046023712
-content/living/05-I'm Upping My P(Doom).gif 5004432 2443245632
-content/living/05-I'm Upping My P(Doom).ogg 2389706 2277024438
-content/living/albums.txt 102 176666695
+content/living/06-I'm Upping My P(Doom).gif 5004432 2443245632
+content/living/06-I'm Upping My P(Doom).ogg 3850549 3391402029
+content/living/albums.txt 123 775924658
 content/living/frames.json 150 2267752740
-content/living/list.txt 382 725217127
+content/living/list.txt 382 1595382606
 content/sea/2026-09-25-hello-world.txt 213 4016599039
 content/sea/2026-09-25-mmmmm.jpg 46663 2745439658
 content/sea/list.txt 161 3392900003
@@ -174,6 +174,22 @@ content/books/book-2/list.txt 113 3293401086
 content/books/book-3/list.txt 113 3293401086
 content/books/book-4/list.txt 113 3293401086
 content/books/grimoire/list.txt 113 3293401086
+content/living/05-A Stranger to You/01-Entrance.ogg 2961469 3250584571
+content/living/05-A Stranger to You/02-Block Of Flats.ogg 7949340 112010628
+content/living/05-A Stranger to You/03-Fortress Down.ogg 4680426 2282653854
+content/living/05-A Stranger to You/04-Gemini.ogg 3661396 2114225256
+content/living/05-A Stranger to You/05-Nothing Like The Knife.ogg 1007288 1211466200
+content/living/05-A Stranger to You/06-Harder To Pretend.ogg 4823037 201848174
+content/living/05-A Stranger to You/07-اثينا.ogg 2993665 3740470467
+content/living/05-A Stranger to You/08-Revenant.ogg 4825049 1596852627
+content/living/05-A Stranger to You/09-The Way It Breaks.ogg 7189623 2440098781
+content/living/05-A Stranger to You/10-Meet My Maker.ogg 5907392 752233988
+content/living/05-A Stranger to You/11-Fangs.ogg 5865027 3745151823
+content/living/05-A Stranger to You/12-The Ladder.ogg 7335034 1772305530
+content/living/05-A Stranger to You/13-Gifted Every Strength.ogg 11225220 922856948
+content/living/05-A Stranger to You/14-No Stranger To You.ogg 6574440 3617579379
+content/living/05-A Stranger to You/cover.jpg 875566 2526375604
+content/living/05-A Stranger to You/list.txt 417 500846178
 content/living/bottles/2026-09-24-from-skizy.txt 50 2780802433
 content/living/bottles/2026-09-24-untitled.png 103361 3665461875
 content/living/bottles/board.json 65 4093162867
