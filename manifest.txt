@@ -98,7 +98,7 @@ assets/countryside/list.txt 117
 assets/fonts/list.txt 117
 assets/hell/list.txt 117
 assets/items/list.txt 117
-assets/living/list.txt 117
+assets/living/list.txt 136
 assets/mel-room/list.txt 117
 assets/resets/index.txt 77
 assets/resets/list.txt 127

@@ -99,7 +99,8 @@ assets/countryside/list.txt 117 55339362
 assets/fonts/list.txt 117 55339362
 assets/hell/list.txt 117 55339362
 assets/items/list.txt 117 55339362
-assets/living/list.txt 117 55339362
+assets/living/list.txt 136 2848213636
+assets/living/vinyl-texture.webp 3298872 1062159737
 assets/mel-room/list.txt 117 55339362
 assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
