@@ -1,0 +1,134 @@
+/* =====================================================================
+   textures.css — the look of sky/textures.js.
+   (it used to be written inside the script, as strings; same rules, now here)
+   ===================================================================== */
+
+.tx-canvas {
+    position: relative;
+}
+.tx-canvas::after {
+    content: "";
+    position: absolute;
+    left: var(--tx-l, 0);
+    top: var(--tx-t, 0);
+    width: var(--tx-w, 100%);
+    height: var(--tx-h, 100%);
+    z-index: 3;
+    pointer-events: none;
+    background: var(--tx-pick) center / 100% 100% no-repeat;
+    mix-blend-mode: multiply;
+    opacity: var(--tx-strength, .9);
+}
+.tx-wrap {
+    position: relative;
+    display: block;
+    line-height: 0;
+}
+.frame-zoom .tx-wrap,
+.vv-zoom .tx-wrap {
+    width: fit-content;
+    margin: 0 auto 12px;
+}
+.frame-zoom .tx-wrap img,
+.vv-zoom .tx-wrap img {
+    margin: 0 !important;
+}
+/* a letter: the sheet is your paper, and whatever's on it is inked into it */
+/* (at least one sheet tall, in your paper's own proportions: --tx-ratio is its width ÷ height) */
+.tx-paper {
+    background: var(--tx-pick) center / 100% 100% no-repeat !important;
+    background-attachment: scroll !important;
+    box-shadow: none !important;
+    aspect-ratio: var(--tx-ratio, .8);
+    filter: drop-shadow(0 14px 22px rgba(0, 0, 0, .5));
+}
+.tx-paper>*,
+.tx-paper .paper>*,
+.tx-paper .u-body>* {
+    mix-blend-mode: multiply;
+}
+.tx-paper .u-foot {
+    border-top-color: transparent !important;
+}
+.tx-paper.pv-sheet::before {
+    display: none;
+}
+/* the notes that open up: exactly one sheet, as big as fits the screen (its width follows the height it's */
+/* allowed, so a short window gets a smaller sheet, not a squashed one). the writing stays off the torn */
+/* edges, and if there's more of it than fits, it scrolls there on the paper */
+/* (--pw is the sheet's width; the margins are measured from it, not from the screen: a percentage */
+/* there would be a share of the whole window, and on a wide one squeeze the writing into a thin strip) */
+.paper-view .pv-sheet.tx-paper {
+    --pw: min(560px, 92vw, calc(86vh * var(--tx-ratio, .8)));
+    width: var(--pw);
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--pw) * .15) calc(var(--pw) * .15) calc(var(--pw) * .13) !important;
+}
+.paper-view .pv-sheet.tx-paper,
+.uncork .u-card.tx-paper,
+.pv-card.tx-paper {
+    box-sizing: border-box;
+}
+/* (so the sheet's shape counts its margins) */
+.paper-view .pv-sheet.tx-paper>* {
+    flex: 0 0 auto;
+}
+.paper-view .pv-sheet.tx-paper .pv-text {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow: auto;
+}
+.uncork .u-card.tx-paper {
+    --pw: min(460px, 86vw, calc(80vh * var(--tx-ratio, .8)));
+    width: var(--pw);
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+    padding: calc(var(--pw) * .1) calc(var(--pw) * .11) calc(var(--pw) * .09);
+}
+.pv-card.tx-paper {
+    --pw: min(520px, calc(100vw - 120px), calc((100vh - 170px) * var(--tx-ratio, .8)));
+    width: var(--pw);
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--pw) * .1) calc(var(--pw) * .11) calc(var(--pw) * .09);
+}
+.pv-card.tx-paper>* {
+    flex: 0 0 auto;
+}
+.pv-card.tx-paper> :first-child {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow: auto;
+}
+@media (max-width: 620px) {
+    .pv-card.tx-paper {
+        --pw: min(calc(100vw - 24px), calc((100vh - 150px) * var(--tx-ratio, .8)));
+    }
+}
+/* pinned on the board, and the homepage's letters: at least one sheet (a very long one grows taller) */
+/* (overflow: clip, not hidden: then the writing sets the least height; with hidden, the paper’s shape wins and a long letter’s end is cut off) */
+.letter .sheet.tx-paper {
+    overflow: clip;
+}
+/* the rolls: on the paper's own top and bottom edge, a little wider than the paper */
+.letter.tx-rolled .curl-top {
+    top: calc(var(--tx-et, 0%) - 12px);
+}
+.letter.tx-rolled .curl-bottom {
+    bottom: calc(var(--tx-eb, 0%) - 12px);
+}
+.letter.tx-rolled .curl {
+    left: calc(var(--tx-el, 0%) - 12px);
+    right: calc(var(--tx-er, 0%) - 12px);
+}
+.bv-card.tx-paper {
+    padding: calc(min(560px, 92vw) * .09) calc(min(560px, 92vw) * .1);
+}
