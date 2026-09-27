@@ -1,8 +1,8 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-city.html 8916 473834348
-index.html 4138 3319084234
-living.html 104672 1062991510
-workshop.html 20641 891064310
+city.html 8916 502590921
+index.html 4138 3638880688
+living.html 104672 1761059021
+workshop.html 20641 3186044543
 sky/attic.js 32463 4171045780
 sky/bathroom.js 26372 537211872
 sky/books.js 13430 1283303218
