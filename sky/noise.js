@@ -48,31 +48,7 @@
     var BADGE = '<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="#56636f" stroke-width="2" stroke-linecap="round">' +
         '<path d="M3 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></g></svg>';
 
-    Sky.css(
-        '.cp .nz-row { display: flex; align-items: center; gap: 8px; margin: 5px 0; }' +
-        '.cp .nz-row .cp-chip { flex: none; width: 128px; justify-content: flex-start; }' +
-        '.cp .nz-row input { flex: 1; }' +
-        '.cp .nz-row.off input { opacity: .45; }' +
-        '.cp .nz-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }' +
-        '.cp .nz-power { font-style: normal !important; }' +
-        // the machine in the room
-        '.noise-machine { cursor: pointer; }' +
-        '.noise-machine .placeholder, .noise-machine > .art { display: block; width: 100%; height: auto; }' +
-        '.noise-machine .nm-on { display: none; position: absolute; inset: 0; width: 100%; height: 100%; }' +
-        '.noise-machine.on.has-on .nm-on { display: block; } .noise-machine.on.has-on > .art, .noise-machine.on.has-on > .placeholder { visibility: hidden; }' +
-        '.noise-machine .nm-lamp { fill: #5a4630; transition: fill .4s; }' +
-        '.noise-machine.on .nm-lamp { fill: #ffd98a; filter: drop-shadow(0 0 3px #ffcf70); }' +
-        '.noise-machine .nm-cloth { transform-box: fill-box; transform-origin: 50% 50%; }' +
-        '.noise-machine.on .nm-cloth { animation: nm-breathe 2.4s ease-in-out infinite; }' +
-        '@keyframes nm-breathe { 50% { transform: scale(1.035); } }' +
-        '.noise-machine .nm-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font-style: italic;' +
-            'font-size: .95rem; color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.6); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
-        '.noise-machine:hover .nm-hint, .noise-machine:focus-visible .nm-hint { opacity: 1; }' +
-        '.noise-machine .nm-wave { position: absolute; left: 30%; top: -8%; font-size: 1rem; color: #cfe0ea; opacity: 0; pointer-events: none; }' +
-        '.noise-machine.on .nm-wave { animation: nm-float 3.6s ease-in-out infinite; } .noise-machine.on .nm-wave.w2 { animation-delay: -1.8s; left: 55%; }' +
-        '@keyframes nm-float { 0% { opacity: 0; transform: translateY(6px); } 30% { opacity: .8; } 100% { opacity: 0; transform: translate(8px, -30px); } }' +
-        '@media (prefers-reduced-motion: reduce) { .noise-machine.on .nm-cloth, .noise-machine.on .nm-wave { animation: none; } }'
-    );
+    // (its look is in sky/css/noise.css, linked from each page's head)
 
     /* ---------------- the mix: which sounds, how loud ---------------- */
     var saved = get(sessionStorage, KEY) || { on: false, levels: get(localStorage, MIX) || {}, master: 0.8 };
