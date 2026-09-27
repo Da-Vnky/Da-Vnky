@@ -464,6 +464,18 @@ export const ASK_SKIZY = [
     m("She reads the news page before updating."),
     sk('SOMETIMES i read the news page'),
   ], [
+    t('mint', 'what did you use before arch?', [
+      sk('mint. i started on mint. mint pissed me off'),
+      sk('vblank was off by default so if you had an AMD card your mouse would just. stutter. across the screen. randomly'),
+      sk('the fix was sitting in a mint PR for like DECADES. the official answer was compile your own kernel'),
+      sk('OR. i figured out that if you keep glxgears open in the background, vblank stays on. no custom kernel'),
+      sk('so i just did that. glxgears. forever. little gears spinning in the corner so my mouse could work'),
+      m('Load-bearing glxgears.'),
+      sk('and it was fine until one day i got a kernel panic because some audio driver i didnt even NEED crashed'),
+      ['-', 'beat'],
+      sk('and i went on the distro hop of a century'),
+      c('I have the distro hop logged. It is a long entry.'),
+    ]),
     t('void', 'have you tried other distros?', [
       sk('i tried to install void once. void linux. runit, no systemd, musl if you want it. perfect on paper'),
       sk('the website was down'),
