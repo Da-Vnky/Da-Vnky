@@ -44,6 +44,44 @@
     deck.insertAdjacentHTML('beforeend', '<span class="tt-record" aria-hidden="true"></span><span class="tt-hint">the record player</span>' +
         '<span class="tt-notes" aria-hidden="true">♪</span><span class="tt-notes n2" aria-hidden="true">♫</span><span class="tt-notes n3" aria-hidden="true">♪</span>');
     var ttRecord = deck.querySelector('.tt-record');
+
+    /* ---------------- the lo-fi slider, on the front of the record player ----------------
+       the bitcrush (sky/music.js, Sky.music.lofi): up is lo-fi, down is the song as it was recorded.
+       click it and the knob slides, and the sound glides with it. slots: assets/living/lofi-fader (the slot
+       it runs in, tall and thin, about 1:3) and assets/living/lofi-knob (the knob, about 5:3); where it sits
+       on the record player: --lofi-x, --lofi-y, --lofi-w, --lofi-h on .turntable (sky/css/records.css) */
+    if (M.lofi && M.lofi.can) {
+        deck.insertAdjacentHTML('beforeend',
+            '<button type="button" class="tt-lofi" aria-pressed="false">' +
+                '<span class="tt-lofi-fader" data-asset="assets/living/lofi-fader"><svg class="placeholder" viewBox="0 0 30 90" preserveAspectRatio="none" aria-hidden="true">' +
+                    '<rect x="1" y="1" width="28" height="88" rx="4" fill="#3b2618" stroke="#7a5132" stroke-width="1.5"/>' +
+                    '<rect x="13" y="10" width="4" height="70" rx="2" fill="#140c08"/>' +
+                    '<g stroke="#c49a52" stroke-width="1.2" opacity=".8"><path d="M5 10 H10 M5 27.5 H9 M5 45 H10 M5 62.5 H9 M5 80 H10 M20 10 H25 M21 27.5 H25 M20 45 H25 M21 62.5 H25 M20 80 H25"/></g>' +
+                '</svg></span>' +
+                '<span class="tt-lofi-knob" data-asset="assets/living/lofi-knob"><svg class="placeholder" viewBox="0 0 50 30" aria-hidden="true">' +
+                    '<rect x="1" y="1" width="48" height="28" rx="4" fill="#c49a52" stroke="#6e4a20" stroke-width="1.5"/>' +
+                    '<rect x="4" y="4" width="42" height="9" rx="2" fill="#f0d488" opacity=".7"/><rect x="3" y="14" width="44" height="2.4" fill="#3a2716"/>' +
+                '</svg></span>' +
+                '<span class="tt-lofi-hint"></span>' +
+            '</button>');
+        var lofiBtn = deck.querySelector('.tt-lofi');
+        var drawLofi = function () {
+            var on = M.lofi.on;
+            lofiBtn.classList.toggle('on', on);
+            lofiBtn.setAttribute('aria-pressed', String(on));
+            lofiBtn.setAttribute('aria-label', 'the lo-fi slider (the bitcrush): ' + (on ? 'on' : 'off'));
+            lofiBtn.querySelector('.tt-lofi-hint').textContent = on ? 'lo-fi · on' : 'lo-fi · off';
+        };
+        lofiBtn.addEventListener('click', function (e) {
+            e.preventDefault(); e.stopPropagation();                         // (not the crate: just the slider)
+            M.lofi.set(!M.lofi.on);
+            if (Sky.sounds) Sky.sounds.sfx('lofi-slide', { or: 'tap', size: 0.3 });
+        });
+        lofiBtn.addEventListener('keydown', function (e) { e.stopPropagation(); });
+        M.on(function (what) { if (what === 'lofi') drawLofi(); });
+        drawLofi();
+        if (Sky.fillAssets) Sky.fillAssets(lofiBtn);
+    }
     // your own art for while it plays (e.g. a spinning GIF): <asset>-playing.(gif|png|webp|svg)
     if (deck.dataset.asset) Sky.findAsset(deck.dataset.asset + '-playing', function (url) {
         if (!url) return;

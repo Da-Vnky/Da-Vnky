@@ -1,8 +1,8 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-city.html 8916 491607978
-index.html 4138 3556007270
-living.html 117352 4153368445
-workshop.html 20641 972113301
+city.html 8916 509702275
+index.html 4138 3800519492
+living.html 117352 4230269452
+workshop.html 20641 2832298202
 sky/attic.js 32988 3082751972
 sky/bathroom.js 26814 783583658
 sky/books.js 13659 1804339263
@@ -28,7 +28,7 @@ sky/loader.js 15448 3284628827
 sky/loot.js 14685 1517415195
 sky/marker.js 7216 276763161
 sky/models.js 5073 954840756
-sky/music.js 38865 2843546171
+sky/music.js 46488 4029923104
 sky/noise.js 11436 2833082593
 sky/notes.js 5723 1695177572
 sky/paint.js 42555 1829217658
@@ -36,7 +36,7 @@ sky/panel.js 63102 3059685798
 sky/peeper.js 29950 688287093
 sky/porch.js 16196 3219425586
 sky/post.js 21396 743501724
-sky/records.js 26903 2036475383
+sky/records.js 29331 877691978
 sky/resets.js 16883 1333798825
 sky/revolver.js 16653 3047642460
 sky/sky.js 111054 303167423
@@ -72,7 +72,7 @@ sky/css/lives.css 3089 2936428613
 sky/css/loot.css 2076 1327473539
 sky/css/marker.css 1560 2393379633
 sky/css/models.css 3444 1051530511
-sky/css/music.css 9811 1393942968
+sky/css/music.css 11247 966794795
 sky/css/noise.css 2783 317061799
 sky/css/notes.css 4294 2819331900
 sky/css/paint.css 6832 133283066
@@ -80,7 +80,7 @@ sky/css/panel.css 6803 4171250261
 sky/css/peeper.css 11229 3690393282
 sky/css/porch.css 10067 875418220
 sky/css/post.css 7339 3412681515
-sky/css/records.css 12344 2133241933
+sky/css/records.css 14047 1963606764
 sky/css/resets.css 3951 2705955383
 sky/css/revolver.css 2343 3734727837
 sky/css/studio.css 11591 946180246

@@ -1120,6 +1120,18 @@
        "optional": true
       },
       {
+       "slot": "assets/living/lofi-fader",
+       "what": "the lo-fi slider on the front of the record player: the slot the knob runs up and down in (up = the bitcrush on, down = off). where it sits: --lofi-x/-y/-w/-h in sky/css/records.css",
+       "size": "tall and thin, about 1:3",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/lofi-knob",
+       "what": "the lo-fi slider’s knob (it slides up and down its slot as the sound changes)",
+       "size": "about 5:3, see-through",
+       "optional": true
+      },
+      {
        "slot": "assets/living/record",
        "what": "the vinyl: square, see-through outside the disc; the sleeve goes on its label",
        "size": "1:1"
@@ -2281,6 +2293,11 @@
       {
        "slot": "assets/sounds/record-in",
        "what": "a found record going into the crate for keeps",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/lofi-slide",
+       "what": "the lo-fi slider being pushed (a short click or slide)",
        "kind": "sound"
       },
       {

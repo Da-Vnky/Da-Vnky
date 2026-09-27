@@ -528,3 +528,85 @@ body.records-open .signpost {
         padding: 30px 70px 30px 8px;
     }
 }
+
+/* the lo-fi slider on the front of the record player (sky/records.js): up = the bitcrush, down = as recorded.
+   where it sits: --lofi-x/-y/-w/-h (shares of the record player's box); move them to suit your own record player */
+.turntable {
+    --lofi-x: 6%;
+    --lofi-y: 57%;
+    --lofi-w: 7.5%;
+    --lofi-h: 38%;
+}
+.turntable .tt-lofi {
+    position: absolute;
+    left: var(--lofi-x);
+    top: var(--lofi-y);
+    width: var(--lofi-w);
+    height: var(--lofi-h);
+    z-index: 4;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+.turntable .tt-lofi-fader {
+    position: absolute;
+    inset: 0;
+}
+.turntable .tt-lofi-fader > svg,
+.turntable .tt-lofi-fader > .art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+/* the knob: at the bottom of its run (off), sliding up to the top (on), in the time the sound takes (--lofi-ms) */
+.turntable .tt-lofi-knob {
+    position: absolute;
+    left: -30%;
+    width: 160%;
+    aspect-ratio: 5 / 3;
+    top: 72%;
+    transform: translateY(-50%);
+    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .55));
+    transition: top var(--lofi-ms, 1200ms) cubic-bezier(.4, 0, .3, 1);
+}
+.turntable .tt-lofi.on .tt-lofi-knob {
+    top: 18%;
+}
+.turntable .tt-lofi-knob > svg,
+.turntable .tt-lofi-knob > .art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.turntable .tt-lofi:hover .tt-lofi-knob,
+.turntable .tt-lofi:focus-visible .tt-lofi-knob {
+    filter: drop-shadow(0 0 4px rgba(255, 220, 150, .9));
+}
+.turntable .tt-lofi:focus-visible {
+    outline: none;
+}
+.turntable .tt-lofi-hint {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 4px);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font: italic .85rem "IM Fell English", Georgia, serif;
+    color: #f3e6c2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+    opacity: 0;
+    transition: opacity .2s;
+    pointer-events: none;
+}
+.turntable .tt-lofi:hover .tt-lofi-hint,
+.turntable .tt-lofi:focus-visible .tt-lofi-hint {
+    opacity: 1;
+}
+/* (pointing at the slider: only its own hint, not the record player's) */
+.turntable:has(.tt-lofi:hover) .tt-hint,
+.turntable:has(.tt-lofi:focus-visible) .tt-hint {
+    opacity: 0;
+}

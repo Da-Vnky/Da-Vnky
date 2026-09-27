@@ -407,3 +407,80 @@ body.music-playing .wobbles {
         animation: none !important;
     }
 }
+
+/* the lo-fi switch (the bitcrush, live): a little fader whose knob slides across as the sound changes
+   (--lofi-ms, set by sky/music.js: the same time the sound takes) */
+.cp .mu-lofi {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin: 10px 0 2px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font: inherit;
+    font-size: .9rem;
+    color: #6e5236;
+    text-align: left;
+}
+.cp .mu-lofi[hidden] {
+    display: none;
+}
+.cp .mu-lofi-track {
+    position: relative;
+    flex: none;
+    width: 58px;
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(#2a1d14, #4a3424);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .6);
+}
+.cp .mu-lofi-track::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    top: 50%;
+    height: 2px;
+    margin-top: -1px;
+    background: repeating-linear-gradient(90deg, rgba(243, 230, 194, .45) 0 2px, transparent 2px 7px);
+}
+.cp .mu-lofi-knob {
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    width: 16px;
+    height: 18px;
+    margin-top: -9px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #c49a52, #f0d488 45%, #9a7430);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .5);
+    transition: left var(--lofi-ms, 1200ms) cubic-bezier(.4, 0, .3, 1);
+}
+.cp .mu-lofi-knob::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 3px;
+    bottom: 3px;
+    width: 2px;
+    margin-left: -1px;
+    background: #6e4a20;
+}
+.cp .mu-lofi.on .mu-lofi-knob {
+    left: calc(100% - 18px);
+}
+.cp .mu-lofi-state {
+    font-style: italic;
+    color: #9a3b1f;
+}
+.cp .mu-lofi:not(.on) .mu-lofi-state {
+    color: #6e5236;
+}
+.cp .mu-lofi:hover .mu-lofi-track,
+.cp .mu-lofi:focus-visible .mu-lofi-track {
+    outline: 2px solid rgba(154, 59, 31, .45);
+    outline-offset: 2px;
+}

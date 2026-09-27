@@ -364,6 +364,26 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (pick the songs, and optionally a picture for the cover, all at once; asks the album's name; songs go on in file-name
   order), album rows with their songs under them (rename, ↑ ↓, take off, "+ songs", drop songs on the row).
 
+## Lo-fi: the bitcrush, live (sky/music.js, 27 Sep)
+
+- Victor used to bitcrush songs himself (VST3 plugins) before uploading. Measured on his "Aerie" / "Aerie-bitcrush"
+  pair: the plugin holds every 4th sample (11025 Hz at 44.1 kHz, zero-order hold) and rounds to 8 bits (no dither), and
+  nothing else (no vinyl noise in that file). The site now does exactly that live: the music's `<audio>` goes through
+  `createMediaElementSource` → an AudioWorklet `dav-lofi` (code in `LOFI_PROC`, loaded from a Blob URL) → the
+  destination, in its own AudioContext at 44.1 kHz (so "every 4th sample" is exact). Rendered through Chromium it
+  matched his file's alias tones to 0.1 dB. `LOFI_RATE`, `LOFI_BITS`, `LOFI_MS` at the top of the section.
+- The `amount` parameter (1 = crushed, 0 = untouched) ramps over `LOFI_MS` (1.2 s): the hold rate climbs from 11025 Hz to
+  the full rate (exponentially) and the bits from 8 to 16, so it glides; the song itself never stops or skips.
+- Routing only happens once the AudioContext is running (routing into a suspended context would silence the song):
+  `lofiThen(fn, gesture)` wraps `start()` and the tap-to-listen handler; `lofiWake()` on the first pointerdown/keydown
+  builds it for a song already playing. No AudioWorklet or not https (e.g. a LAN address): songs play as before, the
+  sliders hide. `audio.volume`, `muted` and `playbackRate` still work through it (checked).
+- Controls: the record player's slider (`.tt-lofi` in records.js: slots `assets/living/lofi-fader`, `lofi-knob`; where it
+  sits: `--lofi-x/-y/-w/-h` on `.turntable`; up = on) and the music panel's switch (`.mu-lofi`). Both animate over
+  `--lofi-ms`. Remembered per visitor (`localStorage records-lofi`, on by default). `Sky.music.lofi = { on, set(bool),
+  can, ms, live, node }`. Sound slot `lofi-slide`.
+- From now on Victor uploads songs clean. Already-crushed uploads sound the same with it on or off.
+
 ## Music and the stars
 
 - While a record plays at night (constellations out: `.sky-links.live`), one constellation (sometimes two)

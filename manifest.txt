@@ -28,7 +28,7 @@ sky/loader.js 15448
 sky/loot.js 14685
 sky/marker.js 7216
 sky/models.js 5073
-sky/music.js 38865
+sky/music.js 46488
 sky/noise.js 11436
 sky/notes.js 5723
 sky/paint.js 42555
@@ -36,7 +36,7 @@ sky/panel.js 63102
 sky/peeper.js 29950
 sky/porch.js 16196
 sky/post.js 21396
-sky/records.js 26903
+sky/records.js 29331
 sky/resets.js 16883
 sky/revolver.js 16653
 sky/sky.js 111054
@@ -72,7 +72,7 @@ sky/css/lives.css 3089
 sky/css/loot.css 2076
 sky/css/marker.css 1560
 sky/css/models.css 3444
-sky/css/music.css 9811
+sky/css/music.css 11247
 sky/css/noise.css 2783
 sky/css/notes.css 4294
 sky/css/paint.css 6832
@@ -80,7 +80,7 @@ sky/css/panel.css 6803
 sky/css/peeper.css 11229
 sky/css/porch.css 10067
 sky/css/post.css 7339
-sky/css/records.css 12344
+sky/css/records.css 14047
 sky/css/resets.css 3951
 sky/css/revolver.css 2343
 sky/css/studio.css 11591

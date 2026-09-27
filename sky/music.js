@@ -12,6 +12,18 @@
 
    While music plays, <body> has the class "music-playing": anything can
    dance along (see .groove in sky.css, and the -dancing pose slots).
+
+   LO-FI (27 Sep, Victor): every song plays through a bitcrush, live: every
+   4th sample held (a quarter of 44.1 kHz) and rounded to 8 bits, the same as
+   Victor's plugin (measured against his "Aerie" / "Aerie-bitcrush": the
+   same tones, to a tenth of a decibel). The lo-fi slider (the record player's,
+   and the music panel's) turns it off and on: over LOFI_MS the sample rate
+   climbs and the bits grow (or the other way), so it glides rather than cuts,
+   and the song never skips (it's the one song, only its sound changes).
+   Remembered per visitor (localStorage records-lofi; on unless they turn it
+   off). Songs uploaded clean come out crushed; ones already crushed sound the
+   same either way. Needs a browser with AudioWorklet on https (every current
+   one); without it, songs just play as they are and the slider hides.
    ===================================================================== */
 
 (function () {
@@ -163,6 +175,104 @@
     }
     function absolute(u) { try { return new URL(u, location.href).href; } catch (e) { return u; } }
 
+    /* ---------------- lo-fi: the bitcrush, live ---------------- */
+    var LOFI_KEY = 'records-lofi', LOFI_MS = 1200;     // how long the slider takes, and the sound with it
+    var LOFI_RATE = 11025, LOFI_BITS = 8;              // Victor's plugin: a quarter of 44.1 kHz, 8 bits
+    // the effect itself, sample by sample (it runs in the browser's audio thread: an AudioWorklet)
+    var LOFI_PROC = [
+        "// the lo-fi effect, sample by sample (runs in the browser's audio thread: an AudioWorklet)",
+        "//   amount 1: every 4th sample held (a quarter of 44.1 kHz: 11025) and rounded to 8 bits, like Victor's plugin",
+        "//   amount 0: the song untouched. in between, the sample rate climbs and the bits grow as the slider comes down",
+        "class DavLofi extends AudioWorkletProcessor {",
+        "    static get parameterDescriptors() { return [{ name: 'amount', defaultValue: 1, minValue: 0, maxValue: 1, automationRate: 'a-rate' }]; }",
+        "    constructor(o) {",
+        "        super();",
+        "        var p = (o && o.processorOptions) || {};",
+        "        this.rate = p.rate || 11025; this.bits = p.bits || 8;",
+        "        this.phase = [1, 1]; this.held = [0, 0];",
+        "    }",
+        "    process(inputs, outputs, params) {",
+        "        var inp = inputs[0], out = outputs[0], am = params.amount, sr = sampleRate;",
+        "        for (var ch = 0; ch < out.length; ch++) {",
+        "            var y = out[ch], x = inp[ch] || inp[0];",
+        "            if (!x) { y.fill(0); continue; }",
+        "            var ph = this.phase[ch], h = this.held[ch];",
+        "            for (var i = 0; i < y.length; i++) {",
+        "                var a = am.length > 1 ? am[i] : am[0];",
+        "                if (a <= 0.0005) { y[i] = x[i]; ph = 1; h = x[i]; continue; }",
+        "                ph += Math.pow(this.rate / sr, a);",
+        "                if (ph >= 1) { ph -= Math.floor(ph); h = x[i]; }",
+        "                var q = 2 / Math.pow(2, 16 - (16 - this.bits) * a);",
+        "                y[i] = Math.round(h / q) * q;",
+        "            }",
+        "            this.phase[ch] = ph; this.held[ch] = h;",
+        "        }",
+        "        return true;",
+        "    }",
+        "}",
+        "registerProcessor('dav-lofi', DavLofi);"
+    ].join('\n');
+    var lofi = { on: true, ctx: null, node: null, ready: null, built: false, failed: false };
+    try { lofi.on = localStorage.getItem(LOFI_KEY) !== '0'; } catch (e) {}
+    function lofiCan() { return !!(window.AudioWorkletNode && window.isSecureContext && (window.AudioContext || window.webkitAudioContext)); }
+    function lofiCtx() {
+        if (lofi.ctx || lofi.failed) return lofi.ctx;
+        var C = window.AudioContext || window.webkitAudioContext;
+        try { lofi.ctx = new C({ sampleRate: 44100, latencyHint: 'playback' }); }              // (44.1 kHz: then "every 4th sample" is exact)
+        catch (e) { try { lofi.ctx = new C(); } catch (e2) { lofi.failed = true; } }
+        return lofi.ctx;
+    }
+    // the song's sound goes through the effect from now on (only once the browser's sound is running: before
+    // that, routing it would silence it)
+    function lofiBuild() {
+        if (lofi.ready) return lofi.ready;
+        var ctx = lofiCtx();
+        if (!ctx) return Promise.resolve(false);
+        lofi.ready = ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([LOFI_PROC], { type: 'application/javascript' }))).then(function () {
+            lofi.node = new AudioWorkletNode(ctx, 'dav-lofi', { outputChannelCount: [2], processorOptions: { rate: LOFI_RATE, bits: LOFI_BITS } });
+            lofi.node.parameters.get('amount').value = lofi.on ? 1 : 0;
+            ctx.createMediaElementSource(audio).connect(lofi.node).connect(ctx.destination);
+            lofi.built = true;
+            return true;
+        }).catch(function () { lofi.failed = true; return false; });
+        return lofi.ready;
+    }
+    // then fn(): once the effect's in place, or straight away if it can't be yet (gesture: we're inside a click or a key,
+    // when the browser lets its sound start)
+    function lofiThen(fn, gesture) {
+        if (!lofiCan() || lofi.failed) return fn();
+        var ctx = lofiCtx();
+        if (!ctx) return fn();
+        if (ctx.state !== 'running') {
+            if (!gesture) return fn();                                         // (not allowed yet: the song asks for a tap as ever)
+            var p = ctx.resume();
+            return p.then(function () { return lofiBuild(); }, function () {}).then(function () { fn(); });
+        }
+        if (lofi.built) return fn();
+        lofiBuild().then(function () { fn(); });
+    }
+    // the first click or key on a page: the browser's sound can start, and the song goes through the effect
+    function lofiWake() {
+        if (!lofiCan() || lofi.failed) return;
+        var ctx = lofiCtx();
+        if (!ctx) return;
+        var go = function () { if (!playing() || lofi.built) return; lofiBuild(); };
+        if (ctx.state !== 'running') ctx.resume().then(go, function () {}); else go();
+    }
+    document.addEventListener('pointerdown', lofiWake, true);
+    document.addEventListener('keydown', lofiWake, true);
+    function setLofi(on) {
+        lofi.on = !!on;
+        try { localStorage.setItem(LOFI_KEY, lofi.on ? '1' : '0'); } catch (e) {}
+        var prm = lofi.node && lofi.node.parameters.get('amount');
+        if (prm) {
+            var t = lofi.ctx.currentTime;
+            if (prm.cancelAndHoldAtTime) prm.cancelAndHoldAtTime(t); else { var v = prm.value; prm.cancelScheduledValues(t); prm.setValueAtTime(v, t); }
+            prm.linearRampToValueAtTime(lofi.on ? 1 : 0, t + LOFI_MS / 1000);
+        }
+        emit('lofi');
+    }
+
     function load(i, play, startAt) {
         if (!tracks.length) return;
         at = (i + tracks.length) % tracks.length;
@@ -187,6 +297,10 @@
     function start() {
         hushed = false;
         wantPlay = true;
+        lofiThen(play1);
+    }
+    function play1() {
+        if (!wantPlay) return;
         var p = audio.play();
         if (p && p.catch) p.catch(function () {
             // this browser wants a tap before sound starts: wait for one, anywhere
@@ -196,7 +310,7 @@
                 document.removeEventListener('pointerdown', go, true);
                 document.removeEventListener('keydown', go, true);
                 document.body.classList.remove('music-waiting');
-                if (wantPlay) audio.play().catch(function () {});
+                if (wantPlay) lofiThen(function () { if (wantPlay) audio.play().catch(function () {}); }, true);
             };
             document.addEventListener('pointerdown', go, true);
             document.addEventListener('keydown', go, true);
@@ -446,6 +560,8 @@
                     '</div>' +
                     '<ol class="mu-album"></ol>' +
                     '<label class="cp-range">volume <input type="range" class="mu-vol" min="0" max="100" aria-label="music volume"></label>' +
+                    '<button type="button" class="mu-lofi" aria-pressed="false"><span class="mu-lofi-name">lo-fi</span>' +
+                        '<span class="mu-lofi-track" aria-hidden="true"><span class="mu-lofi-knob"></span></span><span class="mu-lofi-state"></span></button>' +
                 '</div>';
             ui.body = body;
             ui.disc = body.querySelector('.mu-disc'); ui.title = body.querySelector('.mu-title'); ui.artist = body.querySelector('.mu-artist');
@@ -469,6 +585,10 @@
             ui.seek.addEventListener('input', function () { ui.seeking = true; ui.cur.textContent = mmss(ui.seek.value / 1000 * (audio.duration || 0)); });
             ui.seek.addEventListener('change', function () { if (audio.duration) audio.currentTime = ui.seek.value / 1000 * audio.duration; ui.seeking = false; });
             ui.vol.addEventListener('input', function () { setVolume(ui.vol.value / 100); });
+            ui.lofi = body.querySelector('.mu-lofi');
+            ui.lofi.hidden = !lofiCan();
+            ui.lofi.addEventListener('click', function () { setLofi(!lofi.on); });
+            drawLofi();
             drawLayer('track');
         },
         status: function () {
@@ -572,6 +692,17 @@
     }
     dressGrooves();
 
+    // the panel's lo-fi switch: its knob slides as the sound changes (sky/css/music.css)
+    function drawLofi() {
+        if (!ui.lofi) return;
+        ui.lofi.classList.toggle('on', lofi.on);
+        ui.lofi.setAttribute('aria-pressed', String(lofi.on));
+        ui.lofi.setAttribute('aria-label', 'lo-fi (the bitcrush): ' + (lofi.on ? 'on' : 'off'));
+        ui.lofi.querySelector('.mu-lofi-state').textContent = lofi.on ? 'on' : 'off';
+    }
+    listeners.push(function (what) { if (what === 'lofi') drawLofi(); });
+    document.documentElement.style.setProperty('--lofi-ms', LOFI_MS + 'ms');
+
     Sky.music = {
         audio: audio, disc: disc, readTags: readTags, albumSongs: albumSongs,
         get tracks() { return tracks; }, get at() { return at; },
@@ -579,6 +710,9 @@
         load: load, play: function (i) { if (i === undefined) start(); else load(i, true); },
         pause: pause, toggle: toggle, next: next, prev: prev, stop: stop, hush: hush,
         setTracks: setTracks, setVolume: setVolume, dressGrooves: dressGrooves,
+        // the lo-fi slider: Sky.music.lofi.on, .set(true / false), .can (this browser can do it), .ms (how long it slides)
+        lofi: { get on() { return lofi.on; }, set: setLofi, get can() { return lofiCan(); }, ms: LOFI_MS,
+                get live() { return lofi.built && !!lofi.ctx && lofi.ctx.state === 'running'; }, get node() { return lofi.node; } },
         on: function (fn) { listeners.push(fn); }
     };
 })();
