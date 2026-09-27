@@ -32,41 +32,7 @@
     var TUB_LINES = { cold: 'It’s freezing!', dry: 'There’s no water in here.' };
     var FILL_SECS = 4.5, DRAIN_SECS = 3.2;                           // an empty tub to full, a full one to empty
 
-    Sky.css(
-        // the tap, the water, the stream
-        '.tub-tap { position: absolute; z-index: 3; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%; }' +
-        '.tub-tap:hover, .tub-tap:focus-visible { background: radial-gradient(circle, rgba(255,255,255,.5), transparent 70%); outline: none; }' +
-        '.tub-tap .tt-hint, .tub-plug .tt-hint { position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%); white-space: nowrap; font-style: italic; font-size: .9rem;' +
-            'color: #2a1d14; text-shadow: 0 1px 2px rgba(255,255,255,.7); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
-        '.tub-tap:hover .tt-hint, .tub-tap:focus-visible .tt-hint, .tub-plug:hover .tt-hint, .tub-plug:focus-visible .tt-hint { opacity: 1; }' +
-        '.tub-water { position: absolute; z-index: 1; pointer-events: none; transform-origin: 50% 100%; transform: scaleY(0); border-radius: 40% 40% 6px 6px / 70% 70% 6px 6px;' +
-            'background: linear-gradient(#d4f0f7, #8fc9dc 60%, #6fb2c9); box-shadow: inset 0 2px 0 rgba(255,255,255,.7); opacity: .92; }' +
-        '.tub-water.has-art { background: var(--water-art) center / 100% 100% no-repeat; box-shadow: none; }' +
-        '.tub-water::after { content: ""; position: absolute; left: 10%; right: 10%; top: 18%; height: 12%; border-radius: 50%; background: rgba(255,255,255,.45); animation: tub-ripple 2.6s ease-in-out infinite; }' +
-        '.tub-water.draining::before { content: ""; position: absolute; left: 12%; top: 10%; width: 12%; height: 50%; border-radius: 50%;' +
-            'background: radial-gradient(ellipse, rgba(60,110,130,.55), transparent 70%); animation: tub-swirl .6s linear infinite; }' +
-        '@keyframes tub-swirl { to { transform: rotate(360deg); } }' +
-        '@keyframes tub-ripple { 50% { transform: scaleX(.8) translateX(6%); opacity: .6; } }' +
-        '.tub-stream { position: absolute; z-index: 1; width: 4px; margin-left: -2px; pointer-events: none; border-radius: 2px; opacity: 0; transition: opacity .2s;' +
-            'background: repeating-linear-gradient(#c8ecf6 0 6px, #9fd6e6 6px 12px); background-size: 100% 12px; animation: tub-pour .3s linear infinite; }' +
-        '.tub-stream.on { opacity: .9; }' +
-        '@keyframes tub-pour { to { background-position: 0 12px; } }' +
-        // the plug on its chain: in (just the chain showing over the rim), or out (hanging over the side)
-        '.tub-plug { position: absolute; z-index: 3; padding: 0; border: 0; background: none; cursor: pointer; }' +
-        '.tub-plug > svg, .tub-plug > .art { display: block; width: 100%; height: 100%; object-fit: contain; transition: transform .35s cubic-bezier(.3,1.5,.5,1); transform-origin: 50% 0; }' +
-        '.tub-plug:not(.out) > svg, .tub-plug:not(.out) > .art { transform: translateY(46%) scaleY(.55); }' +
-        '.tub-plug:not(.out) .tp-plug { opacity: 0; }' +
-        '.tub-plug.out > svg, .tub-plug.out > .art { transform: rotate(-14deg); }' +
-        '.tub-plug:hover, .tub-plug:focus-visible { outline: none; filter: drop-shadow(0 0 5px rgba(255,255,255,.8)); }' +
-        '.bath-outlet { position: absolute; z-index: 2; pointer-events: none; }' +
-        '.bath-outlet > svg, .bath-outlet > .art { display: block; width: 100%; height: 100%; }' +
-        // the traveller, held and dropped
-        '.bath-character.held { cursor: grabbing; filter: drop-shadow(0 16px 10px rgba(0,0,0,.35)); z-index: 5 !important; }' +
-        '.bath-character.held:not(.has-held) > .placeholder, .bath-character.held:not(.has-held) > .art { animation: tub-struggle .09s linear infinite alternate; }' +
-        '@keyframes tub-struggle { from { transform: rotate(-7deg) translateX(-2px); } to { transform: rotate(7deg) translateX(2px); } }' +
-        '.bath-character { touch-action: none; cursor: grab; }' +
-        '.bath-character .bubble.shout { color: #9a3b1f; }'
-    );
+    // (its look is in sky/css/tub.css, linked from each page's head)
 
     var OUTLET = '<svg class="placeholder" viewBox="0 0 30 40" aria-hidden="true"><rect x="1" y="1" width="28" height="38" rx="4" fill="#f4f1ea" stroke="#b9b3a6"/>' +
         '<g fill="#3a3530"><rect x="9" y="10" width="3" height="7" rx="1"/><rect x="18" y="10" width="3" height="7" rx="1"/><rect x="9" y="24" width="3" height="7" rx="1"/><rect x="18" y="24" width="3" height="7" rx="1"/></g></svg>';
