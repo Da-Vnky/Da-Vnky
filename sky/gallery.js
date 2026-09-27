@@ -19,54 +19,7 @@
     if (!easel) return;
     var IMG = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'mp4', 'webm'];
 
-    Sky.css(
-        '.easel { cursor: zoom-in; }' +
-        '.easel .easel-art { position: absolute; inset: 0; width: 100%; height: 100%; }' +
-        '.easel .easel-canvas { position: absolute; left: 17%; top: 6%; width: 66%; height: 50%; overflow: hidden;' +
-            'background: #efe3c6; box-shadow: 0 3px 6px rgba(0,0,0,.35), inset 0 0 14px rgba(120,80,30,.25); }' +
-        '.easel .easel-canvas img, .easel .easel-canvas video { width: 100%; height: 100%; object-fit: contain; display: block; }' +
-        '.easel .easel-canvas .blank { position: absolute; inset: 12%; border: 1px dashed rgba(110,82,54,.4); }' +
-        '.easel:hover .easel-canvas { box-shadow: 0 3px 6px rgba(0,0,0,.35), 0 0 16px rgba(255,220,150,.55); }' +
-        '.easel .easel-hint { position: absolute; left: 50%; top: -1.6em; transform: translateX(-50%); white-space: nowrap;' +
-            'font-style: italic; font-size: .95rem; color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.6); opacity: 0; transition: opacity .25s; }' +
-        '.easel:hover .easel-hint { opacity: 1; }' +
-
-        /* the close-up */
-        '.gallery { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center; visibility: hidden;' +
-            'background: radial-gradient(ellipse at 50% 45%, rgba(58,39,22,.72), rgba(14,9,5,.95) 75%); opacity: 0; transition: opacity .5s, visibility 0s .5s; }' +
-        '.gallery.open { visibility: visible; opacity: 1; transition: opacity .5s; }' +
-        '.gallery .pad { position: relative; width: min(78vw, 74vh); height: min(88vh, 84vw); perspective: 1600px; }' +
-        '.gallery .board { position: absolute; inset: 3% -3% -2%; border-radius: 6px;' +
-            'background: repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 22px), linear-gradient(#86583a, #6d4628);' +
-            'box-shadow: 0 30px 60px rgba(0,0,0,.6); }' +
-        '.gallery .clip { position: absolute; left: 50%; top: -1.2%; z-index: 5; width: 34%; height: 5.5%; transform: translateX(-50%);' +
-            'border-radius: 5px 5px 10px 10px; background: linear-gradient(#d8b46a, #9a7434); box-shadow: 0 4px 6px rgba(0,0,0,.45); }' +
-        '.gallery .page { position: absolute; inset: 1.5% 0 0; transform-origin: 50% 0; transform-style: preserve-3d; }' +
-        '.gallery .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;' +
-            'background: #efe3c6 radial-gradient(ellipse at 50% 40%, #f6ecd4, transparent 70%);' +
-            'box-shadow: 0 2px 5px rgba(0,0,0,.25), inset 0 0 40px rgba(120,80,30,.22); }' +
-        '.gallery .back { transform: rotateX(180deg); background: #e2d3b0; }' +
-        '.gallery .face .art { position: absolute; left: 7%; right: 7%; top: 8%; bottom: 15%; display: grid; place-items: center; }' +
-        '.gallery .face .art img, .gallery .face .art video { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 2px 8px rgba(60,40,20,.3); }' +
-        '.gallery .face .caption { position: absolute; left: 7%; right: 7%; bottom: 5%; text-align: center; font-style: italic;' +
-            'color: #3a2716; font-size: clamp(.95rem, 2.2vh, 1.25rem); line-height: 1.3; }' +
-        '.gallery .face .caption small { display: block; color: #6e5236; font-size: .8em; }' +
-        '.gallery .face.empty .art { color: #6e5236; font-style: italic; text-align: center; padding: 0 10%; }' +
-        '.gallery .bar { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 9; display: flex; align-items: center; gap: 6px;' +
-            'padding: 6px 8px; border-radius: 999px; background: #eadcb9; box-shadow: 0 8px 18px rgba(0,0,0,.45), inset 0 0 18px rgba(120,80,30,.25);' +
-            'font: italic 1rem "IM Fell English", Georgia, serif; color: #3a2716; }' +
-        '.gallery .bar button { display: flex; align-items: center; gap: 6px; border: 0; background: none; font: inherit; color: inherit; cursor: pointer;' +
-            'padding: 6px 12px; border-radius: 999px; }' +
-        '.gallery .bar button:hover:not(:disabled) { background: rgba(110,82,54,.14); }' +
-        '.gallery .bar button:disabled { opacity: .35; cursor: default; }' +
-        '.gallery .bar .count { min-width: 4.5em; text-align: center; color: #6e5236; }' +
-        '.gallery .bar svg { width: 16px; height: 16px; fill: currentColor; }' +
-        '.gallery .leave { position: fixed; left: 18px; top: 18px; z-index: 9; display: flex; align-items: center; gap: 8px; border: 0; cursor: pointer;' +
-            'padding: 8px 14px 8px 12px; border-radius: 999px; background: rgba(40,28,18,.8); color: #f3e6c2; font: italic 1rem "IM Fell English", Georgia, serif; }' +
-        '.gallery .leave:hover { background: rgba(40,28,18,.95); }' +
-        'body.gallery-open .signpost, body.gallery-open .polaris { opacity: 0; pointer-events: none; }' +
-        '@media (max-width: 620px) { .gallery .pad { width: 88vw; height: 64vh; } .gallery .bar { bottom: 12px; } }'
-    );
+    // (its look is in sky/css/gallery.css, linked from each page's head)
 
     /* ---------------- the easel on the floor ---------------- */
     var canvas = document.createElement('div');
