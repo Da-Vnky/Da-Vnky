@@ -84,61 +84,7 @@
             '<path d="M760 54 L800 100 L870 104 L930 160" stroke-width="4"/><path d="M120 150 L180 170 L240 164" stroke-width="2"/><path d="M620 170 L690 176 L760 190" stroke-width="2"/></g>' +
         '<g fill="#5a2a14" opacity=".7"><ellipse cx="220" cy="46" rx="40" ry="8"/><ellipse cx="560" cy="44" rx="56" ry="9"/><ellipse cx="880" cy="48" rx="34" ry="7"/></g></svg>';
 
-    Sky.css(
-        '.hell { position: fixed; inset: 0; z-index: 2147481000; overflow: hidden; opacity: 0; transition: opacity 1.6s; pointer-events: all; background: #120000; cursor: default; }' +
-        '.hell.on { opacity: 1; }' +
-        '.hell .hl-sky { position: absolute; inset: 0; background:' +
-            'radial-gradient(ellipse 60% 40% at 30% 30%, rgba(40,0,0,.6), transparent 70%), radial-gradient(ellipse 50% 30% at 75% 22%, rgba(30,0,0,.55), transparent 70%),' +
-            'linear-gradient(#0e0000, #3a0402 30%, #8a1206 62%, #e0461a 78%, #ff8a2a 86%); }' +
-        '.hell .hl-sky > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }' +
-        '.hell .hl-smoke { position: absolute; inset: -10%; background: radial-gradient(ellipse 30% 12% at 20% 60%, rgba(20,0,0,.5), transparent 70%),' +
-            'radial-gradient(ellipse 26% 10% at 70% 52%, rgba(20,0,0,.45), transparent 70%), radial-gradient(ellipse 40% 14% at 50% 70%, rgba(40,4,0,.4), transparent 70%); animation: hl-smoke 22s ease-in-out infinite alternate; }' +
-        '.hell .hl-sky.has-art + .hl-smoke { opacity: .5; }' +
-        '@keyframes hl-smoke { from { transform: translateX(-4%); } to { transform: translateX(4%); } }' +
-        '.hell .hl-ouro { position: absolute; left: 50%; top: 30%; width: min(66vh, 64vw); aspect-ratio: 1; transform: translate(-50%, -50%); filter: drop-shadow(0 0 18px rgba(255,80,20,.5)); }' +
-        '.hell .hl-ouro > svg, .hell .hl-ouro > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
-        '.hell .hl-ouro > svg { animation: hl-turn 40s linear infinite; }' +
-        '@keyframes hl-turn { to { transform: rotate(360deg); } }' +
-        '.hell .hl-eye { position: absolute; left: 50%; top: 30%; width: min(44vh, 44vw); aspect-ratio: 2 / 1; transform: translate(-50%, -50%) scaleY(.04); transition: transform 1.6s cubic-bezier(.3,1.3,.5,1); filter: drop-shadow(0 0 22px rgba(255,60,20,.7)); }' +
-        '.hell .hl-eye > svg, .hell .hl-eye > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
-        '.hell.eye-open .hl-eye { transform: translate(-50%, -50%) scaleY(1); }' +
-        '.hell.eye-open .hl-eye > * { animation: hl-blink 7s ease-in-out 2s infinite; transform-origin: 50% 50%; }' +
-        '@keyframes hl-blink { 0%, 93%, 100% { transform: scaleY(1); } 95.5% { transform: scaleY(.06); } }' +
-        '.hell.eye-shut .hl-eye { transform: translate(-50%, -50%) scaleY(.04); transition-duration: .5s; }' +
-        '.hell .hl-iris { transition: transform .5s ease-out; }' +
-        '.hell.eye-wide .hl-pupil { transform: scale(2.4, .9); transform-origin: 200px 100px; transition: transform .4s; }' +
-        '.hell .hl-floor { position: absolute; left: -2%; right: -2%; bottom: 0; height: 30vh; }' +
-        '.hell .hl-floor > svg, .hell .hl-floor > .art { display: block; width: 100%; height: 100%; object-fit: fill; }' +
-        '.hell .hl-cracks { animation: hl-glow 2.4s ease-in-out infinite; filter: drop-shadow(0 0 4px #ff8a20); }' +
-        '@keyframes hl-glow { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }' +
-        '.hell .hl-ember { position: absolute; bottom: 18vh; width: 4px; height: 4px; border-radius: 50%; background: #ffb040; box-shadow: 0 0 6px 2px rgba(255,110,20,.8); pointer-events: none;' +
-            'animation: hl-ember var(--t, 6s) linear var(--d, 0s) infinite; opacity: 0; }' +
-        '@keyframes hl-ember { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(var(--dx, 20px), -80vh); opacity: 0; } }' +
-        '.hell .hl-me { position: absolute; left: 50%; bottom: calc(30vh - 5vh); height: 25vh; aspect-ratio: 11 / 25; transform: translateX(-50%); }' +
-        '.hell .hl-me > svg, .hell .hl-me > img { display: block; height: 100%; width: auto; margin: 0 auto; }' +
-        '.hell .hl-me.falling { animation: hl-fall .9s cubic-bezier(.55,0,.9,.5) both; }' +
-        '@keyframes hl-fall { from { translate: 0 -125vh; } to { translate: 0 0; } }' +
-        '.hell .hl-me.landed { animation: hl-land .5s ease-out; } @keyframes hl-land { 0% { scale: 1.1 .8; } 100% { scale: 1 1; } }' +
-        '.hell .hl-me.trembling { animation: hl-tremble .14s linear infinite; } @keyframes hl-tremble { 0%, 100% { rotate: -1.5deg; } 50% { rotate: 1.5deg; } }' +
-        '.hell.quake { animation: hl-quake .1s linear infinite; }' +
-        '@keyframes hl-quake { 0% { translate: 0 0; } 20% { translate: -9px 5px; } 40% { translate: 7px -6px; } 60% { translate: -6px -4px; } 80% { translate: 8px 6px; } 100% { translate: 0 0; } }' +
-        '.hell .hl-flash { position: absolute; inset: 0; background: #ff2a10; opacity: 0; mix-blend-mode: screen; pointer-events: none; }' +
-        '.hell.quake .hl-flash { animation: hl-flash .5s steps(2) 4; } @keyframes hl-flash { 0% { opacity: .35; } 100% { opacity: 0; } }' +
-        '.hell .hl-black { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity 1s; pointer-events: none; }' +
-        '.hell.going .hl-black { opacity: 1; }' +
-        // the voice's words: low down, over it all (sky/claubes.js speak, its "voice" look)
-        '.mc-say.voice.low { top: auto; bottom: 7vh; }' +
-        '@media (prefers-reduced-motion: reduce) { .hell.quake, .hell .hl-ouro > svg, .hell .hl-ember { animation: none; } }' +
-        // the white revolver, come down in front of them in the attic
-        '.white-gift { position: absolute; z-index: 6; width: 7vh; min-width: 54px; aspect-ratio: 100 / 60; cursor: pointer; filter: drop-shadow(0 0 10px rgba(255,255,255,.9)) drop-shadow(0 0 22px rgba(255,220,200,.6)); }' +
-        '.white-gift > svg, .white-gift > img { display: block; width: 100%; height: 100%; object-fit: contain; }' +
-        '.white-gift.coming { animation: wg-come 2.6s cubic-bezier(.2,.7,.3,1) both; }' +
-        '@keyframes wg-come { 0% { translate: 0 -40vh; opacity: 0; rotate: -30deg; } 60% { opacity: 1; } 100% { translate: 0 0; opacity: 1; rotate: 0deg; } }' +
-        '.white-gift .wg-hint { position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); white-space: nowrap; font: italic .95rem "IM Fell English", Georgia, serif;' +
-            'color: #f3e6c2; text-shadow: 0 1px 3px #000; opacity: 0; transition: opacity .2s; pointer-events: none; }' +
-        '.white-gift:hover .wg-hint, .white-gift:focus-visible .wg-hint { opacity: 1; }' +
-        '.white-gift:hover, .white-gift:focus-visible { outline: none; transform: translateY(-3px); }'
-    );
+    // (its look is in sky/css/hell.css, linked from each page's head)
 
     /* ---------------- down there ---------------- */
     var hellEl = null, music = null, eyeTrack = null;
