@@ -39,17 +39,11 @@
     var sun = document.querySelector('.sun');
     if (!sun) return;
 
-    Sky.css(
-        '.sun.eye-sun { width: ' + SIZE + '; filter: none !important; }' +
-        '.sun.eye-sun > :not(.eye) { display: none !important; }' +
-        '.eye { position: relative; width: 100%; aspect-ratio: 1; }' +
-        '.eye > canvas, .eye > img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }' +
-        '.eye > .e-lids { z-index: 3; }' +
-        '.eye > .e-pupil { position: absolute; z-index: 2; left: ' + EYE.x + '%; top: ' + EYE.y + '%; width: ' + EYE.size + '%; aspect-ratio: 1;' +
-            'transform: translate(-50%, -50%); transition: transform .35s cubic-bezier(.2,.7,.3,1); pointer-events: none; }' +
-        '.eye .e-pin { width: 100%; height: 100%; }' +                                   // (the part that squashes as it blinks)
-        '.eye .e-pin > img, .eye .e-pin > svg { display: block; width: 100%; height: 100%; object-fit: contain; }'
-    );
+    // its look is in sky/css/eye.css (linked from each page's head); these are the values it takes from here
+    document.documentElement.style.setProperty('--eye-size', SIZE);
+    document.documentElement.style.setProperty('--eye-pupil-x', EYE.x);
+    document.documentElement.style.setProperty('--eye-pupil-y', EYE.y);
+    document.documentElement.style.setProperty('--eye-pupil-size', EYE.size);
 
     // the drawn stand-in pupil: dark, a little soft at the edge, a glint
     var PUPIL = '<svg viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="e-pg" cx=".45" cy=".42" r=".6">' +

@@ -1,0 +1,667 @@
+/* =====================================================================
+   attic.css — the look of sky/attic.js.
+   (it used to be written inside the script, as strings; same rules, now here)
+   ===================================================================== */
+
+/* the lamp you can pull, the hatch, the ladder, the mess */
+/* the cord and its two lights (any reset but 4), or the lamp (reset 4) */
+.hallway .hall-cord,
+.hallway .hall-light {
+    display: none;
+}
+body.hall-cord-on .hallway .hall-cord,
+body.hall-cord-on .hallway .hall-light {
+    display: block;
+}
+body.hall-cord-on .hallway .hall-lamp {
+    display: none;
+}
+.hallway .hall-cord {
+    z-index: 2;
+    cursor: grab;
+    touch-action: none;
+}
+.hallway .hall-cord>svg,
+.hallway .hall-cord>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 0;
+    pointer-events: none;
+}
+.hallway .hall-cord.pulling {
+    cursor: grabbing;
+    animation: none !important;
+    transform-origin: 50% 0;
+}
+.hallway .hall-cord .hc-hint {
+    position: absolute;
+    left: 50%;
+    bottom: -1.6em;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font: italic .95rem "IM Fell English", Georgia, serif;
+    color: #f3e6c2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+    opacity: 0;
+    transition: opacity .2s;
+    pointer-events: none;
+}
+.hallway .hall-cord:hover .hc-hint,
+.hallway .hall-cord:focus-visible .hc-hint {
+    opacity: 1;
+}
+body.ladder-down .hallway .hall-cord .hc-hint {
+    display: none;
+}
+.hallway .hall-cord:focus-visible {
+    outline: none;
+    filter: drop-shadow(0 0 5px rgba(255, 220, 150, .7));
+}
+body.hatch-open .hallway .hall-hatch:not(.open-art) {
+    filter: brightness(.35);
+}
+.hallway .hall-lamp {
+    cursor: grab;
+    touch-action: none;
+}
+.hallway .hall-lamp.pulling {
+    cursor: grabbing;
+    animation: none !important;
+    transition: none;
+    transform-origin: 50% 0;
+}
+body.lamp-down .hallway .hall-lamp {
+    display: none;
+}
+.hallway .hall-hatch {
+    left: 44.5%;
+    top: 0;
+    width: 11%;
+    height: 2.6vh;
+    z-index: 1;
+}
+.hallway .hall-hatch>.art {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+.hallway .hall-ladder {
+    left: 47.2%;
+    top: 0;
+    width: 5.6%;
+    min-width: 40px;
+    height: calc(100% - var(--floor-h) + 8px);
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    z-index: 1;
+    transform: translateY(-101%);
+    visibility: hidden;
+    transition: transform 1.3s cubic-bezier(.5, 0, .3, 1.15), visibility 0s 1.3s;
+}
+.hallway .hall-ladder>svg,
+.hallway .hall-ladder>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+body.ladder-down .hallway .hall-ladder {
+    transform: none;
+    visibility: visible;
+    transition: transform 1.3s cubic-bezier(.5, 0, .3, 1.15), visibility 0s;
+}
+body.hall-still .hallway .hall-ladder {
+    transition: none !important;
+}
+.hallway .hall-ladder:hover,
+.hallway .hall-ladder:focus-visible {
+    outline: none;
+    filter: drop-shadow(0 0 6px rgba(255, 220, 150, .6));
+}
+.hall-ladder .hl-hint,
+.attic-grimoire .ag-hint,
+.attic-hole .ah-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 20%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font: italic .95rem "IM Fell English", Georgia, serif;
+    color: #f3e6c2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+    opacity: 0;
+    transition: opacity .2s;
+    pointer-events: none;
+}
+.attic-grimoire .ag-hint {
+    bottom: 110%;
+}
+.attic-hole .ah-hint {
+    bottom: 105%;
+}
+.hall-ladder:hover .hl-hint,
+.attic-grimoire:hover .ag-hint,
+.attic-hole:hover .ah-hint {
+    opacity: 1;
+}
+.hallway .hall-lamp-broken {
+    left: 42%;
+    bottom: calc(var(--floor-h) - 2.2vh);
+    width: 12%;
+    display: none;
+    pointer-events: none;
+}
+body.lamp-down .hallway .hall-lamp-broken {
+    display: block;
+}
+/* with the lamp gone it's dark in the hallway: only what comes down through the hatch */
+.hallway .hall-dark {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.2s;
+    background: radial-gradient(ellipse 22% 60% at 50% 0%, rgba(0, 0, 0, 0), rgba(4, 3, 2, .55) 70%, rgba(4, 3, 2, .72));
+}
+body.lamp-down .hallway .hall-dark {
+    opacity: 1;
+}
+.glass-bit {
+    position: fixed;
+    z-index: 6;
+    width: 5px;
+    height: 7px;
+    background: rgba(240, 236, 220, .85);
+    clip-path: polygon(0 0, 100% 30%, 40% 100%);
+    pointer-events: none;
+}
+/* the traveller going up and down the ladder */
+.character.up-ladder {
+    animation: at-up .9s ease-in forwards;
+}
+@keyframes at-up {
+    to {
+        translate: 0 -60%;
+        opacity: 0;
+    }
+}
+.character.down-ladder {
+    animation: at-down .9s ease-out both;
+}
+@keyframes at-down {
+    from {
+        translate: 0 -60%;
+        opacity: 0;
+    }
+    to {
+        translate: 0 0;
+        opacity: 1;
+    }
+}
+.character.into-hole {
+    animation: at-sink .8s ease-in forwards;
+}
+@keyframes at-sink {
+    to {
+        translate: 0 70%;
+        clip-path: inset(0 0 70% 0);
+    }
+}
+.character.out-of-hole {
+    animation: at-rise .8s ease-out both;
+}
+@keyframes at-rise {
+    from {
+        translate: 0 70%;
+        clip-path: inset(0 0 70% 0);
+    }
+    to {
+        translate: 0 0;
+        clip-path: inset(0 0 0 0);
+    }
+}
+/* the attic */
+.attic {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    overflow: hidden;
+    transform: translateY(-100%);
+    visibility: hidden;
+    --floor-h: 12vh;
+    background: #1d150f;
+}
+.attic>.art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+.attic>.attic-roof {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+.attic:has(> .art)>.attic-roof {
+    display: none;
+}
+body.in-attic .attic,
+body.attic-panning .attic {
+    visibility: visible;
+    transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s;
+}
+body.in-attic .attic {
+    transform: none;
+}
+body.in-hall .hallway {
+    transition: transform .9s cubic-bezier(.55, 0, .25, 1), translate .9s cubic-bezier(.55, 0, .25, 1), visibility 0s;
+}
+body.in-attic .hallway {
+    translate: 0 100%;
+}
+body.attic-now .attic,
+body.attic-now .hallway {
+    transition: none !important;
+}
+.attic .furnish {
+    position: absolute;
+    z-index: 2;
+}
+.attic .room-floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--floor-h);
+    z-index: 1;
+    pointer-events: none;
+}
+.attic .room-floor .placeholder,
+.attic .room-floor>.art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: fill;
+}
+.attic .room-floor .placeholder {
+    border-top: 8px solid #1a120c;
+    background: repeating-linear-gradient(90deg, #3a2a1e 0 88px, #2e2118 88px 91px), #3a2a1e;
+    box-shadow: inset 0 14px 20px rgba(0, 0, 0, .5);
+}
+.attic .attic-window {
+    left: 46%;
+    top: 11%;
+    width: 8%;
+    min-width: 60px;
+}
+.attic .attic-beam {
+    position: absolute;
+    z-index: 1;
+    left: 42%;
+    top: 20%;
+    width: 26%;
+    height: 80%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    background: linear-gradient(172deg, rgba(190, 205, 255, .14), rgba(190, 205, 255, 0) 85%);
+    clip-path: polygon(24% 0, 40% 0, 100% 100%, 30% 100%);
+}
+.attic .attic-clutter {
+    left: 3%;
+    bottom: calc(var(--floor-h) - 1.4vh);
+    width: 32%;
+    min-width: 220px;
+}
+.attic .attic-lectern {
+    left: 60%;
+    bottom: calc(var(--floor-h) - 1.2vh);
+    height: 26vh;
+    aspect-ratio: 80 / 150;
+}
+.attic .attic-grimoire {
+    left: calc(60% - 1.6vh);
+    bottom: calc(var(--floor-h) - 1.2vh + 26vh * .63);
+    width: 17vh;
+    aspect-ratio: 90 / 40;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    display: none;
+    z-index: 3;
+    filter: drop-shadow(0 0 4px rgba(140, 10, 10, .5));
+    animation: at-pulse 4s ease-in-out infinite;
+}
+.attic.has-grimoire .attic-grimoire {
+    display: block;
+}
+.attic .attic-grimoire>svg,
+.attic .attic-grimoire>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+@keyframes at-pulse {
+    0%,
+    100% {
+        filter: drop-shadow(0 0 3px rgba(140, 10, 10, .4));
+    }
+    50% {
+        filter: drop-shadow(0 0 9px rgba(200, 20, 20, .7));
+    }
+}
+.attic .attic-hole {
+    right: 3%;
+    bottom: .6vh;
+    width: 15%;
+    min-width: 110px;
+    height: calc(var(--floor-h) * .82);
+    z-index: 3;
+    cursor: pointer;
+    padding: 0;
+    background: none !important;
+}
+.attic .attic-hole>svg,
+.attic .attic-hole>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+.attic .attic-hole:hover,
+.attic .attic-hole:focus-visible {
+    outline: none;
+    filter: drop-shadow(0 0 6px rgba(255, 220, 150, .45));
+}
+.attic .attic-character {
+    left: calc(var(--attic-stand) * 1%);
+    bottom: 3vh;
+    height: 25vh;
+    z-index: 4;
+}
+@media (max-width: 620px) {
+    .attic .attic-character {
+        height: 14vh;
+    }
+    .attic .attic-lectern {
+        left: 56%;
+        height: 18vh;
+    }
+    .attic .attic-grimoire {
+        left: calc(56% - 1.2vh);
+        bottom: calc(var(--floor-h) - 1.2vh + 18vh * .63);
+        width: 12vh;
+    }
+    .attic .attic-clutter {
+        width: 46%;
+        min-width: 0;
+    }
+    .hallway .hall-ladder {
+        left: 44%;
+        width: 9%;
+    }
+    .hallway .hall-cord {
+        left: 55.5%;
+    }
+}
+/* the grimoire, open */
+.grim-view {
+    position: fixed;
+    inset: 0;
+    z-index: 9;
+    display: grid;
+    place-items: center;
+    padding: 20px 12px;
+    background: radial-gradient(ellipse at 50% 45%, rgba(40, 4, 4, .86), rgba(4, 1, 1, .96) 75%);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .5s, visibility 0s .5s;
+    font-family: "IM Fell English", Georgia, serif;
+    perspective: 2200px;
+}
+.grim-view.open {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .5s;
+}
+.grim-book {
+    position: relative;
+    width: min(94vw, 124vh);
+    aspect-ratio: 1.46;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 2.2% 2.6%;
+    border-radius: 8px;
+    background: var(--grim-art, linear-gradient(90deg, #120a0a, #241212 49.5%, #0a0606 50%, #241212 50.5%, #120a0a));
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .8), inset 0 0 0 3px rgba(120, 20, 20, .35);
+    transform-style: preserve-3d;
+}
+.grim-page {
+    position: relative;
+    padding: 7% 8%;
+    color: #2a1008;
+    overflow: hidden;
+    background: linear-gradient(90deg, #cdb88e, #e6d5ae 12%, #eadbb6 70%, #d6c296);
+    box-shadow: inset 0 0 40px rgba(90, 40, 10, .35);
+}
+.grim-view.has-art .grim-page {
+    background: none;
+    box-shadow: none;
+}
+.grim-page.left {
+    border-radius: 4px 0 0 4px;
+    box-shadow: inset -18px 0 24px -14px rgba(40, 10, 0, .55), inset 0 0 40px rgba(90, 40, 10, .35);
+}
+.grim-page.right {
+    border-radius: 0 4px 4px 0;
+    transform-origin: 0 50%;
+    box-shadow: inset 18px 0 24px -14px rgba(40, 10, 0, .55), inset 0 0 40px rgba(90, 40, 10, .35);
+    backface-visibility: hidden;
+}
+.grim-page h3 {
+    margin: 0 0 .4em;
+    font: normal clamp(1rem, 2.3vh, 1.6rem) "IM Fell English SC", Georgia, serif;
+    color: #6a0808;
+    text-align: center;
+    letter-spacing: .04em;
+}
+.grim-page p {
+    margin: 0 0 .7em;
+    font-size: clamp(.8rem, 1.75vh, 1.12rem);
+    line-height: 1.45;
+    font-style: italic;
+}
+.grim-page .gr-ritual {
+    position: absolute;
+    inset: 0;
+}
+.grim-page .gr-ritual>img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.grim-page .gr-sigil {
+    display: block;
+    width: 46%;
+    margin: .4em auto .8em;
+    opacity: .85;
+}
+.grim-page .gr-sign {
+    position: relative;
+    margin: 6% 0 4%;
+    height: 42%;
+    border-bottom: 1.5px solid rgba(60, 20, 10, .6);
+    cursor: var(--attic-blood-cursor) 19 7, crosshair;
+    touch-action: none;
+}
+.grim-page .gr-sign canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+.grim-page .gr-sign::after {
+    content: "✕";
+    position: absolute;
+    left: 2%;
+    bottom: 4px;
+    color: rgba(90, 20, 10, .6);
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+.grim-page .gr-acts {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.grim-page button {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid #5a0a0a;
+    background: rgba(90, 10, 10, .12);
+    color: #5a0a0a;
+    cursor: pointer;
+    font: italic 1rem "IM Fell English", Georgia, serif;
+}
+.grim-page button.gr-pact {
+    background: #5a0a0a;
+    color: #f3e6c2;
+}
+.grim-page button.gr-pact:disabled {
+    opacity: .35;
+    cursor: default;
+}
+.grim-view.slam .grim-page.right {
+    animation: gr-slam .42s cubic-bezier(.6, 0, .9, .4) forwards;
+}
+@keyframes gr-slam {
+    to {
+        transform: rotateY(-178deg);
+    }
+}
+.grim-view.slam .grim-book {
+    animation: gr-thud .5s .38s ease-out;
+}
+@keyframes gr-thud {
+    30% {
+        transform: scale(.97) translateY(6px);
+    }
+}
+/* the pact: the book rises in front of them, the hands come up through the floor */
+.pact-book {
+    position: fixed;
+    z-index: 8;
+    pointer-events: none;
+    filter: drop-shadow(0 0 14px rgba(255, 30, 20, .8));
+}
+.pact-book>svg,
+.pact-book>img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.pact-dark {
+    position: fixed;
+    inset: 0;
+    z-index: 7;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.4s;
+    background: radial-gradient(ellipse at 50% 70%, rgba(120, 0, 0, .15), rgba(10, 0, 0, .82) 70%);
+}
+.pact-dark.on {
+    opacity: 1;
+}
+.pact-floor {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 8;
+    overflow: hidden;
+    pointer-events: none;
+}
+/* (the hands show only above the floorboards) */
+.pact-hand {
+    position: absolute;
+    aspect-ratio: 50 / 110;
+    pointer-events: none;
+    transform-origin: 50% 100%;
+}
+.attic.pact .attic-grimoire {
+    visibility: hidden;
+}
+.pact-hand>svg,
+.pact-hand>img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 100%;
+}
+.character.dragged-down {
+    animation: pact-down 1.5s cubic-bezier(.5, 0, .8, .5) forwards;
+}
+@keyframes pact-down {
+    0% {
+        translate: 0 0;
+        clip-path: inset(0 0 0 0);
+    }
+    12% {
+        translate: 0 -3%;
+        clip-path: inset(0 0 0 0);
+    }
+    100% {
+        translate: 0 105%;
+        clip-path: inset(0 0 105% 0);
+    }
+}
+.character.given-back {
+    animation: pact-up 1.6s cubic-bezier(.3, .6, .4, 1) .3s both;
+}
+@keyframes pact-up {
+    0% {
+        translate: 0 105%;
+        clip-path: inset(0 0 105% 0);
+    }
+    85% {
+        translate: 0 -4%;
+        clip-path: inset(0 0 0 0);
+    }
+    100% {
+        translate: 0 0;
+        clip-path: inset(0 0 0 0);
+    }
+}
+.character.writhing {
+    animation: pact-writhe .12s linear infinite;
+}
+@keyframes pact-writhe {
+    0% {
+        rotate: -3deg;
+    }
+    50% {
+        rotate: 3deg;
+    }
+    100% {
+        rotate: -3deg;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .character.writhing {
+        animation: none;
+    }
+}

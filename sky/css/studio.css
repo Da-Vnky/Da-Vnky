@@ -3,16 +3,506 @@
    (it used to be written inside the script, as strings; same rules, now here)
    ===================================================================== */
 
-.studio .st-paint {
-    display: block;
+/* the portfolio by the bench */
+.portfolio {
+    cursor: pointer;
+    filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .45));
+    transition: transform .25s;
 }
-.studio.uploading .st-paint,
-.studio:not(.uploading) .st-upload {
+.portfolio .placeholder,
+.portfolio>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.portfolio:hover {
+    transform: translateY(-3px) rotate(-1deg);
+}
+.portfolio .pf-count {
+    position: absolute;
+    right: 2%;
+    top: 4%;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    background: #9a3b1f;
+    color: #f3e6c2;
+    font: 13px/22px Georgia, serif;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .4);
+}
+.portfolio .pf-count:empty {
     display: none;
 }
-.studio .st-upload .st-drop {
+.portfolio .pf-hint {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 6px);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-style: italic;
+    font-size: .95rem;
+    color: #f3e6c2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .7);
+    opacity: 0;
+    transition: opacity .25s;
+    pointer-events: none;
+}
+.portfolio:hover .pf-hint,
+.portfolio:focus-visible .pf-hint {
+    opacity: 1;
+}
+/* the easel you paint on */
+.paint-easel {
+    transition: transform .25s, filter .25s;
+}
+.paint-easel:hover {
+    transform: translateY(-3px);
+    filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .45)) brightness(1.06);
+}
+.paint-easel .placeholder,
+.paint-easel>.art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+.paint-easel .pe-hint {
+    position: absolute;
+    left: 50%;
+    top: -1.5em;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-style: italic;
+    font-size: .95rem;
+    color: #f3e6c2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .6);
+    opacity: 0;
+    transition: opacity .25s;
+    pointer-events: none;
+}
+.paint-easel:hover .pe-hint,
+.paint-easel:focus-visible .pe-hint {
+    opacity: 1;
+}
+body.art-open .paint-easel,
+body.gallery-open .paint-easel {
+    pointer-events: none;
+}
+/* the button */
+.art-btn {
+    left: 18px;
+    bottom: 18px;
+}
+body.art-open .art-btn,
+body.sky-view .art-btn,
+body.gallery-open .art-btn,
+body.visitors-open .art-btn {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+/* the painting desk */
+.studio {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    display: grid;
+    place-items: center;
+    padding: 12px;
+    overflow: auto;
+    visibility: hidden;
+    opacity: 0;
+    background: radial-gradient(ellipse at 50% 45%, rgba(58, 39, 22, .7), rgba(14, 9, 5, .92) 75%);
+    transition: opacity .4s, visibility 0s .4s;
+    font-family: "IM Fell English", Georgia, serif;
+    color: #3a2716;
+}
+body.art-open .studio {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .4s;
+}
+.st-desk {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.studio h2 {
+    margin: 0;
+    font: normal 1.6rem "IM Fell English SC", Georgia, serif;
+    color: #f3e6c2;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, .6);
+    text-align: center;
+}
+.st-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 6px;
+    border-radius: 999px;
+    background: #eadcb9;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .4), inset 0 0 14px rgba(120, 80, 30, .2);
+    max-width: min(760px, 96vw);
+}
+.st-bar button,
+.st-bar label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 0;
+    background: none;
+    color: #6e5236;
+    cursor: pointer;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font: italic 1rem "IM Fell English", Georgia, serif;
+}
+.st-bar button:hover,
+.st-bar label:hover {
+    background: rgba(110, 82, 54, .14);
+    color: #3a2716;
+}
+.st-bar [aria-pressed=true] {
+    background: #3a2716;
+    color: #f3e6c2;
+}
+.st-bar .sw {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid #eadcb9;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .25);
+}
+.st-bar .sw[aria-pressed=true] {
+    box-shadow: 0 0 0 2px #3a2716;
+}
+.st-bar .st-own {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: conic-gradient(#e8683c, #e8b33c, #6f8f4e, #6fa3c7, #8a5a8c, #e8683c);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .25);
+}
+.st-bar .st-own input {
+    position: absolute;
+    inset: -8px;
+    width: 40px;
+    height: 40px;
+    opacity: 0;
+    cursor: pointer;
+}
+.st-bar .sep {
+    width: 1px;
+    align-self: stretch;
+    background: rgba(110, 82, 54, .3);
+    margin: 2px 2px;
+}
+.st-bar .dot {
+    display: inline-block;
+    border-radius: 50%;
+    background: currentColor;
+}
+.studio.uploading .paint-only {
+    display: none;
+}
+.st-sheet {
+    position: relative;
+    height: min(58vh, 112vw);
+    aspect-ratio: 4 / 5;
+    flex: none;
+    background: var(--studio-paper);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .55), inset 0 0 40px rgba(120, 80, 30, .18);
+    touch-action: none;
+}
+.st-sheet canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+}
+.st-drop {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    text-align: center;
+    padding: 12%;
+    cursor: pointer;
+    color: #6e5236;
+    font-style: italic;
+    background: var(--studio-paper);
+}
+.st-drop img {
+    position: absolute;
+    inset: 6%;
+    width: 88%;
+    height: 88%;
+    object-fit: contain;
+}
+.st-drop img:not([src]) {
+    display: none;
+}
+.st-drop.has-pic span {
+    display: none;
+}
+.studio.uploading .st-drop {
     display: grid;
 }
-.studio .st-desk {
-    max-width: 100%;
+.st-sheet.dragover {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .55), inset 0 0 0 4px rgba(154, 59, 31, .5);
+}
+.st-fields {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 14px;
+}
+.st-fields input[type=text] {
+    width: 13em;
+    max-width: 44vw;
+    padding: 5px 2px;
+    border: 0;
+    border-bottom: 1px dashed rgba(243, 230, 194, .6);
+    background: transparent;
+    outline: none;
+    font: italic 1.08rem "IM Fell English", Georgia, serif;
+    color: #f3e6c2;
+}
+.st-fields input::placeholder {
+    color: rgba(243, 230, 194, .55);
+}
+.st-msg {
+    min-height: 1.3em;
+    font-style: italic;
+    color: #f0c9a8;
+    text-align: center;
+    max-width: 90vw;
+}
+.st-actions {
+    display: flex;
+    gap: 10px;
+}
+.st-actions button {
+    border: 0;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font: italic 1.1rem "IM Fell English", Georgia, serif;
+}
+.st-actions .go {
+    background: #3a2716;
+    color: #f3e6c2;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .4);
+}
+.st-actions .go:hover {
+    background: #9a3b1f;
+}
+.st-actions .go:disabled {
+    opacity: .5;
+    cursor: default;
+}
+.st-actions .no {
+    background: rgba(234, 220, 185, .9);
+    color: #3a2716;
+}
+.st-hp {
+    position: absolute;
+    left: -9999px;
+}
+.studio.sending .st-bar,
+.studio.sending .st-actions,
+.studio.sending .st-fields,
+.studio.sending h2,
+.studio.sending .st-msg {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+}
+.st-flying {
+    position: fixed;
+    z-index: 9;
+    pointer-events: none;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .45);
+}
+.st-toast {
+    position: fixed;
+    left: 50%;
+    top: 92px;
+    z-index: 9;
+    transform: translate(-50%, -10px);
+    max-width: min(560px, 90vw);
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: #eadcb9;
+    color: #3a2716;
+    font: italic 1.05rem/1.4 "IM Fell English", Georgia, serif;
+    text-align: center;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s, transform .4s;
+}
+.st-toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+/* the visitors' portfolio, opened */
+.visitors-view {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    visibility: hidden;
+    opacity: 0;
+    background: rgba(20, 13, 8, .9);
+    transition: opacity .4s, visibility 0s .4s;
+    font-family: "IM Fell English", Georgia, serif;
+}
+body.visitors-open .visitors-view {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .4s;
+}
+.vv-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 74px 18px 60px;
+}
+.vv-title {
+    text-align: center;
+    margin: 0 0 6px;
+    font: normal 1.8rem "IM Fell English SC", Georgia, serif;
+    color: #f3e6c2;
+}
+.vv-sub {
+    text-align: center;
+    margin: 0 0 30px;
+    font-style: italic;
+    color: rgba(243, 230, 194, .7);
+}
+.vv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 26px;
+}
+.vv-card {
+    display: block;
+    width: 100%;
+    padding: 10px 10px 8px;
+    border: 0;
+    cursor: zoom-in;
+    text-align: center;
+    font: inherit;
+    background: #efe3c6;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .45), inset 0 0 26px rgba(120, 80, 30, .2);
+    transition: transform .2s;
+}
+.vv-card:nth-child(3n+1) {
+    transform: rotate(-1.2deg);
+}
+.vv-card:nth-child(3n+2) {
+    transform: rotate(.9deg);
+}
+.vv-card:hover {
+    transform: translateY(-4px) rotate(0);
+}
+.vv-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: contain;
+    background: rgba(110, 82, 54, .06);
+}
+.vv-card b {
+    display: block;
+    margin-top: 7px;
+    font-weight: normal;
+    font-style: italic;
+    color: #3a2716;
+}
+.vv-card small {
+    display: block;
+    color: #6e5236;
+    font-style: italic;
+}
+.vv-empty {
+    text-align: center;
+    font-style: italic;
+    color: rgba(243, 230, 194, .8);
+    padding: 30px 0;
+}
+.vv-close {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 3;
+    border: 0;
+    cursor: pointer;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font: italic 1.05rem "IM Fell English", Georgia, serif;
+    background: #3a2716;
+    color: #f3e6c2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .45);
+}
+.vv-close:hover {
+    background: #9a3b1f;
+}
+.vv-zoom {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    display: none;
+    place-items: center;
+    padding: 60px 16px 20px;
+    background: rgba(10, 7, 4, .9);
+    cursor: zoom-out;
+}
+.vv-zoom.open {
+    display: grid;
+}
+.vv-zoom figure {
+    margin: 0;
+    text-align: center;
+    color: #f3e6c2;
+    font-style: italic;
+}
+.vv-zoom img {
+    display: block;
+    max-width: 92vw;
+    max-height: 78vh;
+    margin: 0 auto 10px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .6);
+    background: #efe3c6;
+}
+body.visitors-open .cp,
+body.art-open .cp {
+    opacity: 0;
+    pointer-events: none;
+}
+@media (max-width: 620px) {
+    .st-bar button,
+    .st-bar label {
+        padding: 5px 8px;
+        font-size: .92rem;
+    }
+    .st-sheet {
+        height: min(50vh, 112vw);
+    }
+    .vv-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
 }

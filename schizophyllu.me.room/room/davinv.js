@@ -56,6 +56,13 @@
       document.head.appendChild(s);
     });
   }
+  // their looks are CSS files now (sky/css/): linked first, where the scripts used to add them
+  function sheet(href) {
+    var l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = ROOT + href;
+    document.head.appendChild(l);
+  }
+  sheet('sky/css/inventory.css'); sheet('sky/css/loot.css');
   window.davInventory = load('sky/inventory.js').then(function () { return load('sky/loot.js'); }).then(function () {
     var I = Sky.inventory;
     if (!I) return null;
