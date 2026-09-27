@@ -206,14 +206,14 @@ schizophyllu.me.room/room/bedroom.svg 10328 71592245
 schizophyllu.me.room/room/closet.svg 8544 4090308002
 schizophyllu.me.room/room/davinv.js 4558 2852525128
 schizophyllu.me.room/room/davnky.js 3848 2547100227
-schizophyllu.me.room/room/extra.js 30356 352975719
+schizophyllu.me.room/room/extra.js 33188 1727594741
 schizophyllu.me.room/room/hallway.svg 7818 2015076887
 schizophyllu.me.room/room/music.js 4978 3071417838
 schizophyllu.me.room/room/narration.js 14155 3237573616
 schizophyllu.me.room/room/radio.js 6517 830110350
 schizophyllu.me.room/room/roof.svg 30757 1371510206
 schizophyllu.me.room/room/room.css 22552 3416318802
-schizophyllu.me.room/room/room.js 79199 1201517453
+schizophyllu.me.room/room/room.js 79632 3263945945
 schizophyllu.me.room/room/room.svg 25481 1688572705
 schizophyllu.me.room/room/script.js 46214 305240998
 schizophyllu.me.room/assets/apartment/claube-drawing.png 452847 3441601832
