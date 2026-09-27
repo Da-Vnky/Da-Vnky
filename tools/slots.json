@@ -3223,6 +3223,14 @@
        "crop": "1121 447 128 82"
       },
       {
+       "slot": "assets/mel-room/closet-opi",
+       "what": "opi's terminal (still on)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/opi.svg",
+       "crop": "960 346 150 120"
+      },
+      {
        "slot": "assets/mel-room/closet-ladder",
        "what": "ladder (roof hatch)",
        "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
@@ -3253,6 +3261,14 @@
        "optional": true,
        "stock": "schizophyllu.me.room/room/objects/closet/sleepbag.svg",
        "crop": "1052 766 255 107"
+      },
+      {
+       "slot": "assets/mel-room/closet-gobag",
+       "what": "hiking pack (packed)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/gobag.svg",
+       "crop": "904 678 160 196"
       },
       {
        "slot": "assets/mel-room/closet-cbulb",

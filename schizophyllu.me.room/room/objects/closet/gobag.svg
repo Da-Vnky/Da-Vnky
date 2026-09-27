@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- gobag (closet): an olive green hiking pack on the floor by the ladder, packed and ready to go
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes. -->
+  <ellipse cx="988" cy="866" rx="70" ry="9" fill="#000" opacity=".45"/>
+  <!-- shoulder straps, round the back -->
+  <path d="M944 742 q-14 50 -6 110 M1030 742 q14 50 6 110" stroke="#46521f" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <!-- the body -->
+  <path d="M934 752 Q930 726 956 720 L1018 720 Q1044 726 1040 752 L1046 850 Q1046 866 1028 866 L946 866 Q928 866 928 850Z" fill="#6b7a3a"/>
+  <path d="M938 760 Q936 740 958 736" stroke="#7d8c48" stroke-width="3" fill="none"/>
+  <!-- the lid, buckled down -->
+  <path d="M932 740 Q930 712 958 708 L1016 708 Q1044 712 1042 740 Q1040 756 1016 758 L958 758 Q934 756 932 740Z" fill="#5a6b2e"/>
+  <g fill="#c9b27a"><rect x="954" y="754" width="6" height="22"/><rect x="1014" y="754" width="6" height="22"/></g>
+  <g fill="#1e1e1e"><rect x="952" y="772" width="10" height="7" rx="1"/><rect x="1012" y="772" width="10" height="7" rx="1"/></g>
+  <!-- the foam sleeping mat, rolled and strapped on top -->
+  <rect x="930" y="684" width="116" height="28" rx="14" fill="#c8733a"/>
+  <path d="M942 686v24M958 685v26M1018 685v26M1034 686v24" stroke="#a85c2a" stroke-width="1.5"/>
+  <ellipse cx="1044" cy="698" rx="6" ry="14" fill="#d98a4e"/><ellipse cx="1044" cy="698" rx="3" ry="8" fill="#a85c2a"/>
+  <g fill="#3a3a2a"><rect x="962" y="682" width="5" height="32"/><rect x="1008" y="682" width="5" height="32"/></g>
+  <!-- compression straps -->
+  <path d="M930 800h116M931 826h114" stroke="#c9b27a" stroke-width="4"/>
+  <!-- the front pocket, with a first aid patch -->
+  <rect x="954" y="804" width="66" height="50" rx="8" fill="#5f6e32"/>
+  <path d="M958 812h58" stroke="#3a4418" stroke-width="1.5"/>
+  <rect x="978" y="820" width="18" height="18" rx="2" fill="#e8e0cc"/>
+  <path d="M987 823v12M981 829h12" stroke="#c0392b" stroke-width="3.5"/>
+  <!-- a steel water bottle in the side pocket -->
+  <rect x="1040" y="770" width="15" height="52" rx="5" fill="#aeb4b8"/>
+  <rect x="1041" y="764" width="13" height="9" rx="2" fill="#5a6066"/>
+  <path d="M1044 778v36" stroke="#dfe4e6" stroke-width="2" opacity=".6"/>
+  <path d="M1036 800 q10 4 22 0 v22 q-10 4 -22 0z" fill="#56642a"/>
+  <!-- a tin mug on a carabiner -->
+  <path d="M932 780 a6 8 0 1 0 0.1 0" stroke="#8a9094" stroke-width="2" fill="none"/>
+  <rect x="916" y="790" width="18" height="16" rx="2" fill="#dcdcd4"/>
+  <path d="M916 794 q-7 4 0 9" stroke="#dcdcd4" stroke-width="2.5" fill="none"/>
+  <rect x="916" y="790" width="18" height="3" fill="#2f5d8a"/>
+  <!-- the tag on the zipper -->
+  <path d="M1008 812 l6 14" stroke="#9a8a6a" stroke-width="1"/>
+  <rect x="1008" y="824" width="16" height="11" rx="1.5" fill="#f4ecd8" transform="rotate(14 1016 830)"/>
+  <path d="M1011 829h9M1011 832h6" stroke="#6a5a4a" stroke-width=".8" transform="rotate(14 1016 830)"/>
+</svg>

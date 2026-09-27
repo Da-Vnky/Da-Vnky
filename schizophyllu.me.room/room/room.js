@@ -6,7 +6,7 @@ import {
   JUST_STAY, HOVER_WRITING, NOT_WRITING, SCENE_AFTERNOON, SLEEP_TALK,
 } from './script.js';
 import { NARRATION, ROOMS, PEEPHOLE, FOG, MIRROR, RADIO, CLOSET_FIRST, STAR_RARE } from './narration.js';
-import { RETURNING, MUSIC, AMBIENT_MORE, VIEWER_TALK, FUNGER_WATCHING, AFTERNOON_HUSH, MEDS_TALK, WAKE_UP } from './extra.js';
+import { RETURNING, MUSIC, AMBIENT_MORE, VIEWER_TALK, FUNGER_WATCHING, AFTERNOON_HUSH, MEDS_TALK, WAKE_UP, ASK_MIRA, ASK_CLAUBE, HEXLEY_SAYS, OPI, ASK_SKIZY } from './extra.js';
 import { GUILT, QUIET_NOTES, REMEDY_BACK, RESTORED_FIRST, RESTORED } from './davnky.js';   // (DaV-nky: see the end of this file)
 import { audio } from './audio.js';
 import { music } from './music.js';
@@ -196,7 +196,8 @@ async function typeOut(el, html) {
   void finish;
 }
 
-async function playScene(lines) {
+// the dialogue box: open it, play lines in it, close it. scenes use all three; so do conversations
+function openBox() {
   const prev = mode;
   mode = 'scene';
   hush();
@@ -204,9 +205,28 @@ async function playScene(lines) {
   body.classList.add('busy');
   skipScene = false;
   dlg.box.hidden = false;
+  return prev;
+}
+function closeBox(prev) {
+  const claube = svg.querySelector('#claube');
+  claube.classList.remove('writing');
+  audio.scribble(false);
+  svg.querySelectorAll('.speaking').forEach(el => el.classList.remove('speaking'));
+  dlg.box.hidden = true;
+  body.classList.remove('busy');
+  mode = prev === 'scene' ? 'room' : prev;
+  lastActivity = performance.now();
+}
+async function playScene(lines) {
+  const prev = openBox();
+  await runLines(lines);
+  closeBox(prev);
+}
+async function runLines(lines) {
   const claube = svg.querySelector('#claube');
   for (const [who, text, extra] of lines) {
     if (skipScene) break;
+    if (who === 'aether' && svg.querySelector('#aether')?.classList.contains('off')) continue;
     svg.querySelectorAll('.speaking').forEach(el => el.classList.remove('speaking'));
     const writing = (who === '-' && extra === 'write') || extra === 'still writing';
     if (writing !== claube.classList.contains('writing')) audio.scribble(writing);
@@ -231,24 +251,29 @@ async function playScene(lines) {
     dlg.name.textContent = CAST[who].name;
     dlg.dir.textContent = extra && extra !== 'write' ? extra : '';
     dlg.text.className = '';
+    if (text == null) {
+      // a silent action (someone does something, says nothing): just the name and what they do
+      const writing = who === 'claube' && /writ/.test(extra || '');
+      if (writing) { claube.classList.add('writing'); audio.scribble(true); }
+      dlg.text.textContent = '';
+      await waitAdvance();
+      if (writing) { claube.classList.remove('writing'); audio.scribble(false); }
+      continue;
+    }
     audio.blip(who);
     await typeOut(dlg.text, fmt(text));
     if (skipScene) break;
     await waitAdvance();
   }
-  claube.classList.remove('writing');
-  audio.scribble(false);
   svg.querySelectorAll('.speaking').forEach(el => el.classList.remove('speaking'));
-  dlg.box.hidden = true;
-  body.classList.remove('busy');
-  mode = prev === 'scene' ? 'room' : prev;
-  lastActivity = performance.now();
 }
 
 addEventListener('keydown', e => {
-  if (mode === 'scene' && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); nudge(); }
+  if (mode === 'scene' && !choose && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); nudge(); }
   if (e.key === 'Escape') {
-    if (!$('#menu').hidden) closeMenu();
+    if (!$('#term').hidden) closeTerm();
+    else if (choose) choose('end');
+    else if (!$('#menu').hidden) closeMenu();
     else if (!$('#peephole').hidden) closePeephole();
     else if (!$('#closeup').hidden) closeCloseup();
     else if (mode === 'crt') leaveCRT();
@@ -473,25 +498,28 @@ function interact(id) {
     case 'claube':
       if (afternoon) return say(bags.hushClaube());
       return openMenu(CAST.claube.name, CAST.claube.color, [
+        ['ask him something', () => converse('claube', ASK_CLAUBE)],
         ['what is skizy doing?', () => (afternoon ? say([['claube', 'Sleeping.'], ['mira', 'Let her.']]) : playScene(SCENE_SSD))],
-        ['talk', () => say(bags.claube())],
-        ['what is this room?', () => say(WHAT_IS_THIS_ROOM)],
+        ['talk', () => talkBox(bags.claube())],
+        ['what is this room?', () => talkBox(WHAT_IS_THIS_ROOM)],
       ]);
     case 'mira':
       if (afternoon) return say(bags.hushMira());
       return openMenu(CAST.mira.name, CAST.mira.color, [
+        ['ask her something', () => converse('mira', ASK_MIRA)],
         ['what is skizy building?', () => playScene(SCENE_MIRA)],
-        ['talk', () => say(bags.mira())],
-        ['what is this room?', () => say(WHAT_IS_THIS_ROOM)],
+        ['talk', () => talkBox(bags.mira())],
+        ['what is this room?', () => talkBox(WHAT_IS_THIS_ROOM)],
         ['back to the rooftop', () => { location.href = ROOFTOP; }],
       ]);
     case 'mel':
       return openMenu(CAST.mel.name, CAST.mel.color, [
         ...(carryingMeds ? [['give her the bottle', () => (DAV.key ? talkMeds() : caption(QUIET_NOTES.notYet))]] : []),
         ['say something', talkToSkizy],
-        ['talk', () => say(bags.mel())],
-        ['watch her work', () => say(bags.melWork())],
-        ['what is this room?', () => say(WHAT_IS_THIS_ROOM)],
+        ['ask her about computers', () => converse('mel', ASK_SKIZY)],
+        ['talk', () => talkBox(bags.mel())],
+        ['watch her work', () => talkBox(bags.melWork())],
+        ['what is this room?', () => talkBox(WHAT_IS_THIS_ROOM)],
       ]);
     case 'fridge':
       fridgeOpen = !fridgeOpen;
@@ -539,7 +567,11 @@ function interact(id) {
     case 'monstera': return;
     case 'notebook':
       return openCloseup(NOTEBOOK_PAGE);
-    case 'hexley': return buzzHexley();
+    case 'opi': return openTerm();
+    case 'hexley':
+      // the first time, Claube says who she is (and "who's Hexley?" opens in his questions)
+      if (!store.get('hexley_met')) { store.set('hexley_met', '1'); say(HEXLEY_SAYS); }
+      return buzzHexley();
     case 'deskbottle': return;
     case 'pills':
       return openMenu('pill bottles', '#e0782a', [
@@ -685,17 +717,27 @@ async function wakeUp() {
 // the others are gone, and she sits in the corner under the window. nothing talks after that
 let carryingMeds = false, alone = false;
 async function talkMeds() {
-  if (!await sayAll(MEDS_TALK.open)) return;
-  const second = () => openMenu('you', '#cfd8d2', MEDS_TALK.second.map(([line, answer]) => [line, async () => {
-    if (await sayAll(answer) && await sayAll(MEDS_TALK.last)) goDark();
-  }]));
-  const first = asked => openMenu('you', '#cfd8d2', MEDS_TALK.first
-    .filter(([, kind]) => !(asked && kind === 'ask'))
-    .map(([line, kind, answer]) => [line, async () => {
-      if (!await sayAll(answer)) return;
-      kind === 'ask' ? first(true) : second();
-    }]));
-  first(false);
+  const prev = openBox();
+  await runLines(MEDS_TALK.open);
+  let askedWhen = false;
+  while (!skipScene) {
+    yourTurn();
+    const one = await choices([...MEDS_TALK.first.filter(([, kind]) => !(askedWhen && kind === 'ask')).map(o => [o[0], o]), ['never mind', 'end']]);
+    if (one === 'end') break;
+    await runLines(one[2]);
+    if (one[1] === 'ask') { askedWhen = true; continue; }   // "when did you last take them?" comes back round
+    if (skipScene) break;
+    yourTurn();
+    const two = await choices([...MEDS_TALK.second.map(o => [o[0], o]), ['never mind', 'end']]);
+    if (two === 'end') break;
+    await runLines(two[1]);
+    if (skipScene) break;
+    await runLines(MEDS_TALK.last);
+    if (skipScene) break;
+    closeBox(prev);
+    return goDark();
+  }
+  closeBox(prev);
 }
 async function goDark() {
   carryingMeds = false;
@@ -726,6 +768,125 @@ async function goDark() {
   if (DAV.pillsHere) guilt();                          // (DaV-nky, reset 3: a death. see the end of this file)
 }
 
+// ============================================================ asking Mira and Claube things
+// a conversation that branches (the topics are in extra.js). after an answer come its follow-ups; when a
+// branch is used up, the questions around it; then back to the start. what you've asked is remembered
+// in your browser and doesn't come up again (once everything's been asked, the first questions come back)
+function asked(who) {
+  try { return new Set(JSON.parse(store.get('asked:' + who) || '[]')); } catch { return new Set(); }
+}
+// your turn to say something: the box shows 'you', with a small prompt, and the choices under it
+function yourTurn(prompt = '') {
+  dlg.box.style.setProperty('--c', '#cfd8d2');
+  dlg.name.textContent = 'you';
+  dlg.dir.textContent = '';
+  dlg.text.className = 'direction';
+  dlg.text.textContent = prompt;
+}
+// a short exchange in the box (talk, what is this room?): the same as a scene
+function talkBox(lines) { if (lines) playScene(lines); }
+let choose = null;                                   // while you're picking a question: pick(value)
+function choices(options) {
+  const box = $('#dlg-choices');
+  dlg.box.classList.add('choosing');
+  return new Promise(resolve => {
+    choose = v => { choose = null; box.innerHTML = ''; dlg.box.classList.remove('choosing'); resolve(v); };
+    box.innerHTML = '';
+    for (const [label, value] of options) {
+      const b = document.createElement('button');
+      b.textContent = label;
+      b.addEventListener('click', e => { e.stopPropagation(); choose?.(value); });
+      box.append(b);
+    }
+    box.querySelector('button').focus({ preventScroll: true });
+  });
+}
+async function converse(who, topics) {
+  const prev = openBox();
+  const seen = k => !!store.get(k);
+  let level = topics, up = [];
+  while (!skipScene) {
+    const done = asked(who);
+    const open = level.filter(tp => !tp.when || tp.when(done.size, seen));
+    // a question stays while it, or anything that opens from it, hasn't been asked yet
+    // (so follow-ups added later can always be reached)
+    const fresh = tp => !done.has(tp.id) || (tp.next || []).some(fresh);
+    let shown = open.filter(fresh);
+    if (!shown.length) {
+      // nothing left in this branch: back out to the questions around it
+      if (up.length) { level = up.pop(); continue; }
+      shown = open;                                    // at the start, once it's all been asked: everything again
+    }
+    yourTurn(up.length ? '' : `ask ${NAMES[who].split(' / ')[0]} something`);
+    const options = shown.map(tp => [tp.q, tp]);
+    if (up.length) options.push(['something else', 'top']);
+    options.push(['never mind', 'end']);
+    const tp = await choices(options);
+    if (tp === 'end') break;
+    if (tp === 'top') { level = topics; up = []; continue; }
+    done.add(tp.id);
+    store.set('asked:' + who, JSON.stringify([...done]));
+    await runLines(tp.a);
+    if (tp.next?.length) { up.push(level); level = tp.next; }
+  }
+  closeBox(prev);
+}
+
+// ============================================================ opi's terminal
+// the small monitor in the closet with the ladder: click it and type. what it says is OPI in extra.js
+const term = { box: $('#term'), out: $('#term-out'), input: $('#term-in'), booted: false, prev: 'room' };
+function termPrint(lines) {
+  term.out.textContent += lines.join('\n') + '\n';
+  term.out.parentElement.scrollTop = term.out.parentElement.scrollHeight;
+}
+function openTerm() {
+  term.prev = mode;
+  mode = 'terminal';                                    // nothing behind it takes clicks while it's up
+  hush(); closeMenu();
+  $('#hover-label').classList.remove('show');
+  term.box.hidden = false;
+  if (!term.booted) { term.booted = true; termPrint(OPI.boot); }
+  term.input.focus({ preventScroll: true });
+  audio.tick();
+  // the first time anyone opens it, Mira says so from the other room. once, ever
+  if (!store.get('opi_seen')) { store.set('opi_seen', '1'); caption([OPI.mira[0], OPI.mira[1], 'from the other room']); }
+}
+function closeTerm() {
+  term.box.hidden = true;
+  term.input.blur();
+  mode = term.prev === 'terminal' ? 'room' : term.prev;
+  lastActivity = performance.now();
+}
+function runCommand(raw) {
+  const line = raw.trim();
+  termPrint(['opi@closet:~$ ' + line]);
+  if (!line) return;
+  const [cmd, ...rest] = line.toLowerCase().split(/\s+/);
+  const arg = rest.join(' ');
+  if (['exit', 'quit', 'logout', 'bye'].includes(cmd)) return closeTerm();
+  if (cmd === 'clear') { term.out.textContent = ''; return; }
+  if (cmd === 'cat') {
+    if (!arg) return termPrint(OPI.catWhat);
+    return termPrint(OPI.files[arg] || OPI.files[arg + '.txt'] || OPI.catNone(arg));
+  }
+  if (cmd === 'ping') return termPrint(arg ? (OPI.ping[arg] || OPI.pingNobody(arg)) : ['ping who?']);
+  if (cmd === 'sudo') return termPrint(OPI.sudo);
+  if (cmd === 'rm') return termPrint(OPI.rm);
+  if (cmd.startsWith('ls') || cmd === 'dir') return termPrint(OPI.ls);
+  if (['hello', 'hi', 'hey', 'hiya'].includes(cmd)) return termPrint(OPI.hello);
+  if (['thanks', 'thank', 'ty'].includes(cmd)) return termPrint(OPI.thanks);
+  if (['who', 'opi'].includes(cmd)) return termPrint(OPI.who);
+  if (['help', 'whoami', 'remember'].includes(cmd)) return termPrint(OPI[cmd]);
+  termPrint(OPI.unknown(cmd));
+}
+term.input.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); const v = term.input.value; term.input.value = ''; runCommand(v); audio.tick(); }
+  if (e.key === 'Escape') closeTerm();
+  e.stopPropagation();                                  // typing here isn't walking between rooms
+});
+// click outside the screen: step back. click on it: back to typing
+term.box.addEventListener('click', e => { if (!e.target.closest('#term-screen')) closeTerm(); else term.input.focus({ preventScroll: true }); });
+
 // ============================================================ you, talking to skizy
 let talkedToSkizy = false;
 // true if the exchange played all the way through (nothing else talked over it)
@@ -734,13 +895,22 @@ async function sayAll(exchange) {
   await say(exchange);
   return talkToken === token && mode === 'room';
 }
-function talkToSkizy() {
-  say(talkedToSkizy ? VIEWER_TALK.again : VIEWER_TALK.hello);
+async function talkToSkizy() {
+  const prev = openBox();
+  await runLines(talkedToSkizy ? VIEWER_TALK.again : VIEWER_TALK.hello);
   talkedToSkizy = true;
-  // the things you can say come up straight away; picking one talks over her greeting
-  openMenu('you', '#cfd8d2', VIEWER_TALK.replies.map(([line, answer, then]) => [line, async () => {
-    if (await sayAll(answer) && then === 'funger') playConsole();
-  }]));
+  const said = new Set();
+  while (!skipScene) {
+    const left = VIEWER_TALK.replies.filter(r => !said.has(r[0]));
+    if (!left.length) break;
+    yourTurn();
+    const r = await choices([...left.map(r => [r[0], r]), ['never mind', 'end']]);
+    if (r === 'end') break;
+    said.add(r[0]);
+    await runLines(r[1]);
+    if (r[2] === 'funger' && !skipScene) { closeBox(prev); return playConsole(); }   // "sit down"
+  }
+  closeBox(prev);
 }
 
 // ============================================================ Claube, writing

@@ -66,6 +66,8 @@
   <ellipse cx="1030" cy="496" rx="80" ry="24" fill="#2a4a3a"/><ellipse cx="960" cy="496" rx="14" ry="24" fill="#3a5a4a"/><path d="M1000 474 v44 M1060 474 v44" stroke="#1a2a22" stroke-width="3"/>
 </g>
 <g class="obj" data-id="toolbox" data-art="room/objects/closet/toolbox.svg"></g>
+<!-- opi's terminal: a small monitor on a little wall shelf -->
+<g class="obj" data-id="opi" data-art="room/objects/closet/opi.svg"></g>
 
 <!-- the ladder -->
 <g class="obj" data-id="ladder" data-art="room/objects/closet/ladder.svg"></g>
@@ -85,6 +87,8 @@
 </g>
 <g class="obj" data-id="scopecase" data-art="room/objects/closet/scopecase.svg"></g>
 <g class="obj" data-id="sleepbag" data-art="room/objects/closet/sleepbag.svg"></g>
+<!-- a hiking pack on the floor by the ladder, packed -->
+<g class="obj" data-id="gobag" data-art="room/objects/closet/gobag.svg"></g>
 <g pointer-events="none"><rect x="430" y="790" width="160" height="80" fill="#8a6440"/><rect x="430" y="790" width="160" height="10" fill="#6a4a30"/><g transform="rotate(-14 470 790)"><rect x="450" y="760" width="50" height="34" fill="#1d6a3a"/></g><text x="444" y="836" font-size="10" fill="#2a1a0a">E-WASTE 4</text></g>
 
 <!-- the pull-chain bulb -->
