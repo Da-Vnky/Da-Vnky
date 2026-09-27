@@ -4,6 +4,9 @@ Victor's personal site, **dav-nky.pleroma.nexus**: a da Vinci–notebook world (
 feel) that's also a small game. Hosted on his friend Mel's server (pleroma.nexus) as a subdomain. Read
 this before changing anything; keep it up to date when something here stops being true.
 
+**Working with Mel (or Mel's Claude)?** Start with `tools/FOR-MEL.md`: the tools on Linux / VS Code (`tools/content.sh`,
+`publish.sh`, `pull.sh`, `preview.sh`, `tools/vscode/tasks.json`), slots, and what's hers. Keep it true too.
+
 ## Working with Victor
 
 - Victor isn't a programmer. Explain in plain words, do the work yourself, and test it before saying
@@ -52,6 +55,11 @@ this before changing anything; keep it up to date when something here stops bein
   rewrites them after. If `tools/content.py` came in, it tells him to restart the content manager.
 - So when saving to Victor's folder: his copy may now hold Mel's pushed changes. Always check before overwriting
   (already the rule), and if Mel changed a file you're about to replace, merge rather than overwrite.
+- Linux / Mac / VS Code versions of Victor's .bat tools (27 Sep, for Mel): `tools/content.sh`, `tools/publish.sh` (the
+  same steps as publish.bat; the content manager's publish button runs it off Windows), `pull.sh`, `preview.sh`,
+  `tools/vscode/tasks.json` (all of them as VS Code tasks, Windows too; copied into `.vscode/` once, see FOR-MEL.md), `tools/mel-room-slots.py` (the "Mel's room" slots
+  written again from her room's files, keeping measured crops). `tools/debug.html` stays gitignored (a cheat page if
+  published): Victor sends Mel the file.
 - `tools/update-lists.sh` runs on every publish (publish.bat, and the pre-commit hook in `tools/hooks`).
   It writes, and you never hand-edit:
   - `assets/<folder>/list.txt`, `content/<scene>/list.txt`, `content/<scene>/<sub>/list.txt`
@@ -67,7 +75,7 @@ this before changing anything; keep it up to date when something here stops bein
 ## The pages
 
 - `index.html` — the sea (homepage): scroll = the day turning; ship you can pick up; dock; bottles.
-- `workshop.html` — the workshop: easel, paint easel, portfolio, frames, notes board, timer, scissors.
+- `workshop.html` — the workshop: easel, paint easel, portfolio, frames, notes board, timer.
 - `city.html` — the rooftop at night-ish: skyline, the telescope (a prop on its tripod just left of the
   traveller, `.roof-telescope` = `.telescope-btn`, slot `assets/city/telescope`; no corner button any more)
   and its peephole (`sky/peeper.js`), Mel's window.
@@ -95,13 +103,13 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 - `panel.js` — the control panel and all sound (`Sky.sounds.sfx(name, { or: 'fallback' })`: plays
   `assets/sounds/<name>.mp3|ogg` if Victor added it, else a synthesised stand-in).
 - `inventory.js` (8-slot hotbar, keys 1–8), `loot.js` (hidden items: `LOOT` table), `revolver.js`,
-  `gore.js` (splat, zap, shot, stab, respawn), `lives.js`, `state.js`, `resets.js`, `forget.js`,
-  `peeper.js`, `bathroom.js` (side rooms + secret wall), `dungeon.js`, `tub.js`, `ground-*.js`,
+  `gore.js` (splat, zap, shot, respawn), `lives.js`, `state.js`, `resets.js`, `forget.js`,
+  `peeper.js`, `bathroom.js` (side rooms + secret wall), `dungeon.js`, `tub.js` (the bathtub), `ground-*.js`,
   `music.js`/`records.js`/`crate.js` (record player), `frames.js`/`gallery.js`/`paint.js`/`studio.js`,
   `letters.js`/`post.js` (bottles, visitor messages), `books.js`, `textures.js`, `claubes.js`, `notes.js`,
   `timer.js`, `weather.js`, `noise.js`, `marker.js`, `models.js`, `eye.js` (the sun's eye, loaded right
   after `sky.js` on every page), `attic.js` (the hallway's cord/lamp, the attic, the grimoire's pact),
-  `kitchen.js` (the kitchen off the hallway, the apple).
+  `kitchen.js` (the kitchen off the hallway, the fridge and the serpent), `hell.js` (reset 4: below, the white revolver).
 
 ## The sky's clock (sky.js: `sunClock`, `sunTimes`, `SKY_AT`)
 
@@ -144,15 +152,47 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
   page, `QUIET` (0.35) once it's only a book. `Sky.books.grimoire({ line, loud, open })`.
 - Reset 4 (`S.live('grimoire')`), on the lectern: the pact page. Ritual on the left (stand-in words + sigil, or
   `grimoire-ritual`), sign on the right in blood (canvas, blood cursor, red ink, drips; "make the pact" after ~140 px of
-  ink). The pact: book slams, floats up in front of them, `pact` sound + `grimoire` drone, they writhe and scream, hands
-  (`pact-hand`, clipped at the floor by `.pact-floor`) drag them down, then `Sky.gore.respawn` (a death). **Once only**:
-  `run:grimoire-pact = 1` is set the moment it's made; after that the lectern's grimoire opens the page-pool book.
+  ink; refused with its `NOT_YET` line while `Sky.lives.locked`, i.e. before reset 4's key). The pact: book slams, floats up
+  in front of them, `pact` sound + `grimoire` drone, they writhe and scream, hands (`pact-hand`, clipped at the floor by
+  `.pact-floor`) drag them down → **below** (`Sky.hell.enter(me, back)`, see *Reset 4: below*) → `giveBack()`: the hands
+  push them back up through the boards (`.given-back`, `pact-up`) → `Sky.hell.gift(me)`. **Not a death** (27 Sep).
+  **Once only**: `run:grimoire-pact = 1` is set the moment it's made; after that the lectern's grimoire opens the
+  page-pool book.
 - The page pool: `content/books/grimoire/` (content manager: your things → the books → the grimoire;
   `SHELVES['book-grimoire']` in content.py), titled "grimoire", darker view, the drone while open. Until Victor adds
   pages, four drawn stand-in pages of words (books.js `STANDIN`). From reset 5 (`S.patched('grimoire')`) it's the fifth
   shelf book in the living space (`.shelf-book.grimoire-book`, `d5`); before that books.js removes it from the shelf.
   Resets 1–3 and 5+ the attic lectern is empty.
 - Debug page: switches for "hallway lamp: pulled down", "attic hatch: open (the cord)", "grimoire's pact: made".
+
+## Reset 4: below (sky/hell.js, 27 Sep)
+
+- **The dungeon's book is missing** in reset 4 until the pact (bathroom.js `bookGone()`: `.shelf-book:not(.decoy)` gets
+  `.missing`; `goTo` for the dungeon, the open wall and `#dungeon` all refuse). So players go looking: the attic.
+- **Below**: a full-screen `.hell` (z 2147481000) built by hell.js: `hl-sky` (red gradient / `assets/hell/sky`), smoke,
+  `hl-ouro` (the ouroboros ring round the eye: drawn one turns, Victor's animated file loops by itself;
+  `assets/hell/ouroboros`), `hl-eye` (`assets/hell/eye`; opens `.eye-open`, blinks, the drawn iris follows the pointer,
+  `.eye-wide` then `.eye-shut`), `hl-floor` (brimstone, glowing cracks; `assets/hell/floor`), embers, the traveller
+  (`assets/characters/hell`, else a copy of the attic one) dropping in from above. Music: channel `hell`
+  (`assets/sounds/hell`, drawn stand-in in panel.js SYNTHS). The voice: `VOICE` lines through `Sky.claubes.speak(lines,
+  done, { who: 'a voice', cls: 'voice low', blip: 'hell-voice', blipOr: 'murmur' })` (speak takes `who`/`cls`/`blip` now).
+  Then `quake` (shake, red flashes, `quake` sfx), black, back to the attic.
+- **The gift** (`gift()`): the dungeon book is back on the shelf (glints), the six pictures round the false god are back
+  in their frames if shot this visit, and **the white revolver** comes down glowing in front of the traveller
+  (`.white-gift`, `run:white-revolver = lying`; picked up → `taken`, re-added to the bag on any page by revolver.js).
+  The voice: "Destroy its disciples and apparitions." (`GIFT_LINE`).
+- **The white revolver** (inventory item `white-revolver`, slot `assets/items/white-revolver`, sound `white-bang`):
+  won't point at the traveller (`WONT` lines). On a Claube worshipping on the diagram (claubes.js `slay`): the absorb
+  effect as before, then it bursts (blood, `claube-giblet-1…4`, `claube-scream`/stand-in `shriek`, `claube-burst`); the
+  rest stop dead and smile (`.claube-crew.menace`, `run:claubes-menace`, slot `mini-claube-menace`). Out in the house
+  they're still warded ("Not up here. Down where they kneel."). **Apparitions**: shame frames 1–5 and 7, shot after the
+  pact (either gun), counted in `run:apparitions` (hell.js) and kept broken for the reset. **The false god** (frame 6)
+  with the white revolver (`Sky.claubes.whiteFrame`): while they worship, absorbed; not all seven dead or pictures left →
+  "Not yet…" and just a hole (the hidden record can still drop); all done → `reflect()`: the bullet comes straight back,
+  splat, `dav:traveller-died` → the one heart → reset 5. In reset 4 frame 6 never bursts for the ordinary revolver (a
+  hole + `dav:shot`, so sky/loot.js still drops the P(Doom) record), and the ordinary revolver's bullets on the diagram are
+  only drunk (capped, never reflected).
+- Debug page: "the white revolver: theirs", "the six pictures … shot", "the pact, now (reset 4: below, and back)".
 
 ## The kitchen (sky/kitchen.js)
 
@@ -175,12 +215,10 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
   cutlery / the junk drawer (**in reset 3 before the key: a note "it's in the fridge."**) / tea towels / recipe cards
   (from reset 3: "every one of them is for apple pie"). Click again to shut. Slots `kitchen-drawer` (every front),
   `kitchen-drawer-1…4` (each one open, from above). The counter's stacking context keeps the bowl/serpent above them.
-- Reset 3 (`DEATHS.apple`): a red apple by the bowl and a serpent coiled round it (hover: "eat. and you will know.").
-  Click: refuse before the key; a line from `WANT`, walk over, the apple to the mouth, two bites, "…it's sweet.", hiss,
-  green vignette, sway, collapse (`lieDown`), black, `respawn` + `getUp`. Another apple appears: repeatable in reset 3.
-  Before reset 3 (`apple-before`): a string of sausages coiled round the bowl where the serpent will be (slot
-  `sausages`, hover "sausages."). After (`apple-gone`): the bowl's replaced by a cornucopia spilling fruit (slot
-  `cornucopia`, hover "a cornucopia. (was it always there?)": the Mandela effect, Fruit of the Loom).
+- The bowl: resets 1–2 a string of sausages coiled round it (slot `sausages`, hover "sausages."); **from reset 3** a
+  serpent (slot `serpent`, hover "eat. and you will know.", a nod to the pie). The first time in each reset from 3, the
+  sausages writhe and turn into it (`bowl-turning` → `bowl-serpent`, `run:serpent-turned`). The apple death and the
+  cornucopia were removed on 27 Sep (one death a reset).
 
 ## The porch (sky/porch.js)
 
@@ -216,7 +254,9 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
   - `ROOFTOP`: the same site / localhost goes next door (`../city.html`), not the live URL.
   - The pills can be taken only in **reset 3** (`DAV.pillsHere`, `run:mel-pills` not set), and given only after the
     key (`QUIET_NOTES.notYet`). After `goDark`: `guilt()` (the visitor's lines, black) → `sessionStorage
-    dav-mel-death` → the rooftop; resets.js `melDeath()` lays the traveller down and respawns them (a death).
+    dav-mel-death` → the rooftop; resets.js `melDeath()`: out of the black the traveller walks to the roof's edge and
+    goes off it (`jumpOff`/`fall`, the street far below), the death (`respawn`), and `localStorage dav-wake-at =
+    living.html#porch` so forget.js `reset()` lands the next reset **on the porch** instead of the homepage.
   - From then (and in every reset from 4): the quiet room (`davQuiet`/`quietRoom`: dark, skizy alone). Click her:
     with the P(Doom) record owned (`loot-owned` has `doom-record`) → "give her the record" → `mel-remedy = 0`
     (forever, not per reset); each later visit +1 (`REMEDY_BACK`: the record plays, lights, Mira, Claube/Aether…);
@@ -341,9 +381,11 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 
 - Seven resets (the seven spheres) and an eighth, the grand mystery. `localStorage["dav-reset"]` =
   resets completed (0 = reset 1). `davSave.reset` → 1…8.
-- Losing the last heart → `Sky.stay.reset()` (white-out) → `davSave.nextReset()`: clears the RUN keys,
+- **One heart, one death a reset** (27 Sep, Victor and Mel: so the easter egg can be reached). lives.js `MAX = 1`.
+- Losing the heart → `Sky.stay.reset()` (white-out) → `davSave.nextReset()`: clears the RUN keys,
   any `run:*` key and sessionStorage; the cache stays. Every reset then starts again **at the homepage**
-  (forget.js `HOME`), not the page it happened on.
+  (forget.js `HOME`), not the page it happened on, unless `localStorage dav-wake-at` says otherwise (reset 3's
+  ending: the porch; forget.js `wakeAt()`, read once).
 - **The reset manager** (forget.js, **localhost only**): a "resets (preview only)" layer in the control panel:
   "the next reset", straight to reset 1–8 (`davSave.goTo`), or "start over: a brand-new visitor" (localStorage
   and the cache cleared). Each plays the real white-out and lands on the homepage.
@@ -359,43 +401,40 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
   **This reset** (`RUN` in state.js, and every `run:*` key): `lives-*`, `suicides`, `dungeon-found`, `run:key`,
   `run:hall-hatch`, `run:grimoire-pact`, `run:mel-pills`, `run:claubes-*`, `run:deja-vu`, `run:porch-watcher` …
   **This visit** (sessionStorage): the bag (`inventory`), the open secret wall, the boards off Mel's window …
-- `RESETS` table: each reset's theme, its two ways to die, and where its hidden key is.
+- `RESETS` table: each reset's theme, its one way to die, and where its hidden key is.
   `DEATHS` table: which resets each death is live in; after its last one it's "patched".
-  - Reset 1 "items": the toaster bath (`tub.js`), the scissors to the neck (`resets.js` + `gore.stab`), and the gun.
-  - Reset 2 "environmental": the boat dropped on the traveller (`ground-sea.js`; it stays where it's dropped, so while
-    it's dragged `keepOnScreen()` holds it inside the screen's edges; it can still reach over the dock), the jump off the roof
-    (`resets.js`, with a street cutscene). The toaster is gone; safety scissors hang on the wall.
-  - Reset 3+: an anchor on the boat (can't be lifted high), guard rails on the roof.
-  - Reset 3 "ingestion": **the pills** (Mel's room: see *Mel's room and reset 3*) and **the apple** (the kitchen).
-    Its key is **stuck in the apple pie in the kitchen fridge** (26 Sep; it used to be dropped by the last Claube).
-  - Reset 4 "dark witchcraft": **the diagram** (the worshipping Claubes' 6th absorbed bullet comes back:
-    `DEATHS.diagram`, claubes.js) and **the grimoire** (the pact in the attic, once: `DEATHS.grimoire`, attic.js).
-    Outside reset 4 the 6th bullet just vanishes and the traveller says "Huh, I thought something cool was
-    gonna happen…" (`LETDOWN`); from reset 5 the grimoire is on the living-room shelf, only a book.
-    (Victor moved the reflection to reset 4 because in reset 3 it would soft-lock the Claube key.)
+  - Reset 1 "items": **the revolver** on yourself (the rooftop's). The toaster (and its tub death), the scissors and
+    safety scissors were removed on 27 Sep. From reset 2 the revolver **always jams** on the traveller (revolver.js
+    `JAMMED` lines), and there's a second one to play with on the living space floor by the plant (`.toy-revolver`, the
+    same `revolver` item).
+  - Reset 2 "environmental": the boat dropped on the traveller (`ground-sea.js`; while dragged `keepOnScreen()` holds it
+    inside the screen). Reset 3+: an anchor on the boat (can't be lifted high).
+  - Reset 3 "ingestion": **Mel's pills** (Mel's room, then off the roof, waking on the porch: see *Mel's room and reset
+    3*). Its key is **stuck in the apple pie in the kitchen fridge**. The roof jump is no longer a death of its own (no
+    edge, no guard rails); it's only this ending.
+  - Reset 4 "dark witchcraft": **the false god's reflected bullet** (`DEATHS.diagram`), reached through the grimoire's
+    pact (`DEATHS.grimoire`, `notDeath`): see *Reset 4: below*. Outside reset 4 the diagram's 6th bullet just vanishes
+    and the traveller says "Huh, I thought something cool was gonna happen…" (`LETDOWN`); from reset 5 the grimoire is on
+    the living-room shelf, only a book.
   - **Resets 5–7 have no themes or deaths yet** (placeholder bubbles stand in) — Victor will supply them.
     Reset 8 ("the grand mystery": the truth) is still to be designed.
 - **From reset 2 the hearts are there from the start** (locked), and **every way to die is off until the key**:
   each death's trigger calls `Sky.lives.refuse(kind)` first; before the key it returns true and the traveller says
-  that death's own line (lives.js `NOT_YET`: revolver, scissors, toaster, boat, roof, grimoire, diagram, placeholder).
-  The diagram still takes bullets but holds at 5 until the key. Why: reset 4's two deaths happen once each, so used up
-  for free before the key the reset could never end (2 deaths + the revolver on the last heart = the 3 hearts).
-  Reset 1 is unchanged (free deaths before the key; the hearts appear after the dungeon + a revolver shot).
-- **Each way to die costs a heart once a reset** (26 Sep: Mel killed herself with the boat over and over). Once the key's
-  found, `refuse(kind)` lets a death through and remembers it (`pending`); the `dav:traveller-died` that follows marks it
-  `run:spent-<kind>` (within 30 s). Tried again that reset, it's refused with its own line (lives.js `DONE`). The
-  revolver never counts (it's the finisher on the last heart). Placeholders count one by one (`placeholder:<id>`).
-  Two death events within 4 s only ever cost one heart. Debug page: "used up this reset", "ways to die: all usable again".
-- **Placeholder deaths**: DEATHS entries with `placeholder: { page, in, left, top }` (r5a/b, r6a/b, r7a/b, r8a/b)
+  that death's own line (lives.js `NOT_YET`: revolver, boat, pills, grimoire, diagram, placeholder). Mel's pills are
+  gated in her room (`DAV.key`). Reset 1 is unchanged (the revolver's free before the key; the heart appears after the
+  dungeon + a revolver shot).
+- (Still there from the three-heart days, harmless with one: `refuse(kind)` remembers a death let through (`pending`)
+  and `run:spent-<kind>` refuses it again that reset with lives.js `DONE`; two death events within 4 s cost one heart.)
+- **Placeholder deaths**: DEATHS entries with `placeholder: { page, in, left, top }` (r5, r6, r7, r8)
   are dashed skull bubbles "a way to die (to come)" (resets.js `placeholders()`): click = zapped (the sea: the
   revolver's death), a real death. So every reset can be finished. Replace each with a real death when designed.
-- Themes (RESETS): 1 items (+ the gun), 2 environmental, 3 ingestion (the pills in Mel's room, the apple in the
-  kitchen), 4 dark witchcraft, 8 the truth; 5–7 to come (placeholder bubbles).
+- Themes (RESETS): 1 items (the gun), 2 environmental (the boat), 3 ingestion (Mel's pills), 4 dark witchcraft (the
+  false god), 8 the truth; 5–7 to come (placeholder bubbles).
 - Hearts (reset 1, `lives.js`): appear after the dungeon's been found **and** a revolver suicide (that one's
   free). They're locked until that reset's hidden key is clicked (`resets.js` → `Sky.lives.unlock()`);
   a key found before the hearts appear means they turn up unlocked.
-  Once unlocked, every death costs a heart (`gore.respawn` fires `dav:traveller-died`), and the revolver
-  says "it's jammed" unless it's the last heart (`Sky.lives.jammed`).
+  Once unlocked, the reset's death takes the heart (`gore.respawn` fires `dav:traveller-died`); in reset 1 the revolver
+  on the last (only) heart skips the death and goes straight to the white-out (`Sky.lives.last` / `final()`).
 - Every death must go through `Sky.gore.respawn(el)` so it's counted. `Sky.gore.lieDown(el)` / `getUp(el)`:
   come to flat on the floor and push up (used after the diagram's bullet).
 - **Revolver** (`revolver.js`): 6 rounds (`ROUNDS`), then a 2.6 s reload (`RELOAD_MS`) during which every
@@ -407,9 +446,10 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
     (`run:claubes-out`, not the visit). Any that are shot, flicked or scatter (the traveller or a record shot)
     are gone for the rest of the reset. (`emptied()` can still make the last one drop a key for a reset whose
     `RESETS` key has `drop: 'claubes'`; none does now.) The debug page's Claubes switch clears all this.
-  - **Reset 4, outside the dungeon** (`warded()`): they can't be harmed (the diagram death needs them). A red ward
-    ellipse at their feet (`body.claube-warded`); bullets stop in it (the absorb effect), flicks just spin them,
-    scatters become a panic; the traveller says `WARD_LINES` ("Something is protecting them.").
+  - **Reset 4, outside the dungeon** (`warded()`): they can't be harmed. A red ward ellipse at their feet
+    (`body.claube-warded`); bullets stop in it (the absorb effect), flicks just spin them (in the dungeon too),
+    scatters become a panic; the traveller says `WARD_LINES` ("Something is protecting them."). Only the white
+    revolver kills them, on the diagram (*Reset 4: below*).
   - Shot outside the dungeon: that one pops, the rest panic (run back and forth ~9 s). All seven shot
     (`sessionStorage["claubes-kills"]`, per group) → once a reset (`run:claubes-massacre`): the house rumbles
     (shake + dust + `rumble`) and the traveller speaks in a typed dialogue box (`speak()`, `MASSACRE_LINES`).
@@ -421,11 +461,10 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
     and on resize. Victor's template: `assets/templates/ophite-diagram-template.svg` (seats marked in a guides layer).
     `--bow`, `CHANTS`; the diagram glows more with each bullet (`--rite`). While they worship, **frame 6 in the
     dungeon ("the false god", Victor's lion-serpent painting) is protected**: a bullet at it is absorbed like the
-    rest and counts toward the sixth (`Sky.claubes.guardFrame`, called from revolver.js). Shots are
-    absorbed; **in reset 4 only** the 6th (`ABSORB`) comes back and kills the traveller → black →
-    `Sky.sides.homeNow()` → wake up on the living-room floor (a death: -1 heart if unlocked). Then
-    `run:claubes-gone`: no Claubes and no callout for the rest of the reset (debug page has a switch).
-    Any other reset: the 6th is swallowed too and the traveller is let down (`LETDOWN`).
+    rest (`Sky.claubes.guardFrame`, called from revolver.js). Shots are absorbed (`absorbFx`); any reset but 4, the
+    6th is swallowed too and the traveller is let down (`LETDOWN`). In reset 4 the ordinary revolver's are only drunk;
+    the ending is the white revolver's (`whiteFrame` → `reflect()`). `run:claubes-gone` (debug switch) still keeps
+    them away for a reset.
   - The hotbar covers the middle of the floor while you hold the gun: Claubes behind it can't be hit
     until they run clear.
 - **Per-reset art**: `assets/resets/reset-<n>/` — `key.*`, `note.json` (the dungeon floor note for that
@@ -488,7 +527,9 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 
 ## Still to do / ideas on hold
 
-- Themes and two deaths each for resets 5–7; reset 8 (the truth). Replace the placeholder bubbles as they're designed.
+- Themes and one death each for resets 5–7; reset 8 (the truth). Replace the placeholder bubbles as they're designed.
+- Reset 4's art: `assets/hell/` (sky, floor, eye, ouroboros), the white revolver, the menacing Claube, giblets, and the
+  sounds (hell, hell-voice, quake, white-appear, white-bang, claube-scream, claube-burst).
 - Ideas Claude suggested (not decided): resets as the soul's climb through the seven spheres, giving up a vice at
   each (Moon, Mercury, Venus, Sun, Mars, Jupiter, Saturn); 5 wrath (storm, lightning on the roof, drowning), 6 greed
   (the bag fills itself), 7 time (the workshop timer, the day/night player); 8 the Ogdoad/pleroma: the wireframe

@@ -1,9 +1,21 @@
 /* =====================================================================
-   revolver.js — the revolver, lying on the rooftop. Pick it up and it's
+   revolver.js — the revolver, lying on the rooftop (and another on the living
+   space's floor, by the plant: something to play with). Pick it up and it's
    in your bag; click it there and you're holding it (Esc puts it away).
    Then click:
      • the traveller — they take it to their own head. bang. back a
-       moment later (-1), like after any other death here
+       moment later, like after any other death here. That's reset 1's death
+       (sky/state.js): once reset 1's key is found it takes the one heart and
+       the world resets. From reset 2 on it always jams on the traveller
+       (JAMMED below): it's someone else's gun by then (reset 4's white
+       revolver, sky/hell.js, is the one that matters)
+   THE WHITE REVOLVER (reset 4, after the pact: sky/hell.js gives it) works the
+   same way, with its own sound (white-bang), and three differences: it won't
+   point at the traveller; at a Claube worshipping on the diagram it kills
+   (sky/claubes.js); and the false god's frame (6) only breaks for it at the
+   very end, when it sends the bullet back (sky/claubes.js whiteFrame).
+   In reset 4 the false god's frame never bursts for the ordinary revolver: a
+   hole, and the hidden record still falls out (sky/loot.js).
      • the record player (while a record's on) — the record is shot to
        pieces, and gone from the crate for the rest of the visit
      • one of the little Claubes (sky/claubes.js) — pop
@@ -19,7 +31,8 @@
 
    slots: assets/city/revolver (the gun: on the roof, in the bag, in their hand),
           assets/ui/bullet-hole (a small transparent PNG)
-   sounds: assets/sounds/bang, shatter, reload
+          assets/items/white-revolver (the white one, reset 4)
+   sounds: assets/sounds/bang, white-bang, shatter, reload
    ===================================================================== */
 
 (function () {
@@ -62,8 +75,9 @@
     var holeArt = HOLE;
     Sky.findAsset('assets/ui/bullet-hole', function (url) { if (url) holeArt = '<img alt="" src="' + url + '">'; });
 
+    var white = false;                                  // (the shot in hand is the white revolver's: sky/hell.js)
     function bang() {
-        sfx('bang');
+        if (white) sfx('white-bang', { or: 'bang' }); else sfx('bang');
         flash.classList.remove('on'); void flash.offsetWidth; flash.classList.add('on');
         body.classList.remove('recoil'); void body.offsetWidth; body.classList.add('recoil');
     }
@@ -175,11 +189,20 @@
         if (!c || c.classList.contains('gore-hidden') || !c.getClientRects().length) return null;
         return c;
     }
-    var dying = false;
+    var dying = false, jamAt = 0;
+    // from reset 2 on, turned on the traveller it only ever jams (a line each time, in turn)
+    var JAMMED = ['it\u2019s jammed.', 'click. nothing. it won\u2019t fire at me any more.', 'jammed again. it only fires at other things now.',
+        'the hammer won\u2019t even come down.', 'click. this isn\u2019t how it ends. not this time.'];
     function takeIt(c) {
         if (dying) return;
+        var S = window.davSave;
+        if (S && !S.live('revolver')) {
+            if (Sky.sounds) Sky.sounds.sfx('jammed', { or: 'tap' });
+            I.say(JAMMED[jamAt++ % JAMMED.length], 2200);
+            return;
+        }
         if (Sky.lives && Sky.lives.refuse('revolver')) return;                    // (from reset 2, not before the key: sky/lives.js)
-        // the lock's off and there's more than one heart left: it won't fire (sky/lives.js)
+        // the lock's off and there's more than one heart left: it won't fire (sky/lives.js; with one heart, never)
         if (Sky.lives && Sky.lives.jammed) {
             if (Sky.sounds) Sky.sounds.sfx('jammed', { or: 'tap' });
             I.say('it’s jammed.', 1600);
@@ -214,23 +237,37 @@
         tell('dav:record-shot', { url: on.url });
     }
 
+    var WONT = ['It won\u2019t turn towards me. It knows what it\u2019s for.', 'My arm won\u2019t do it. This one isn\u2019t for me.', 'No. It\u2019s for them.'], wontAt = 0;
     I.onUse(function (id, e) {
-        if (id !== 'revolver') return false;
+        if (id !== 'revolver' && id !== 'white-revolver') return false;
+        white = id === 'white-revolver';
         var x = e.clientX, y = e.clientY, t = e.target;
         var c = traveller(t);
+        if (c && white) { I.say(WONT[wontAt++ % WONT.length], 2400); return true; }
         if (c) { takeIt(c); return true; }                              // (it counts its own round: a jam doesn't use one)
         var claube = t.closest && t.closest('.mini-claube'), deck = t.closest && t.closest('.turntable'), frame = t.closest && t.closest('.gallery-frame[data-frame]');
         if (!claube && !deck && !frame && t.closest && t.closest('.cp, .place-tabs, .sky-links, .marker-tray, a[href], button')) return false;   // (the controls still work)
         if (!spend()) return true;
-        if (claube && Sky.claubes) { bang(); Sky.claubes.shoot(claube, x, y); return true; }
+        if (claube && Sky.claubes) { bang(); Sky.claubes.shoot(claube, x, y, { white: white }); return true; }
         if (deck) { shootRecord(x, y); return true; }
-        if (frame && frame.dataset.frame === '6' && Sky.claubes && Sky.claubes.guardFrame && Sky.claubes.guardFrame(x, y)) { bang(); return true; }   // (the false god's circle protects it)
+        var god = frame && frame.dataset.frame === '6' && frame.dataset.wall === 'shame';
+        // the white revolver at the false god: the end of reset 4, or not yet (sky/claubes.js)
+        if (god && white && Sky.claubes && Sky.claubes.whiteFrame) { bang(); if (!Sky.claubes.whiteFrame(frame, x, y)) { hole(x, y); tell('dav:shot', { target: t, x: x, y: y }); } return true; }
+        if (god && Sky.claubes && Sky.claubes.guardFrame && Sky.claubes.guardFrame(x, y)) { bang(); return true; }   // (the false god's circle protects it)
+        // reset 4: the false god's frame won't break for the ordinary revolver (a hole; the hidden record still falls out)
+        if (god && window.davSave && window.davSave.live('diagram')) { bang(); hole(x, y); tell('dav:shot', { target: t, x: x, y: y }); return true; }
         if (frame) { shootPainting(frame, x, y); return true; }
         bang();
         hole(x, y);
         tell('dav:shot', { target: t, x: x, y: y });
         return true;
     });
+
+    // the white revolver stays theirs for the rest of reset 4 (the bag itself only lasts the visit)
+    (function () {
+        var S = window.davSave;
+        if (S && S.get('white-revolver') === 'taken' && !I.has('white-revolver')) I.add('white-revolver', { quiet: true });
+    })();
 
     Sky.revolver = { bang: bang, hole: hole, get left() { return reloading ? 0 : ROUNDS - fired(); }, get reloading() { return reloading; } };
 })();

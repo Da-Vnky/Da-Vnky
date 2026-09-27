@@ -92,16 +92,25 @@
     }
     function forget() { whiteOut('assets/ui/forget-screen', '', wipe, HOME); }
     var busy = false;
-    // a reset: the white, the world under it, and then the homepage (how = what changes in the save, while it's white)
+    // a reset: the white, the world under it, and then the homepage (how = what changes in the save, while it's white).
+    // a death can ask for somewhere else to come to (localStorage "dav-wake-at", a page of the site, e.g. reset 3's
+    // "living.html#porch": sky/resets.js melDeath). once only
+    function wakeAt() {
+        var w = null;
+        try { w = localStorage.getItem('dav-wake-at'); localStorage.removeItem('dav-wake-at'); } catch (e) {}
+        if (!w || !/^[a-z0-9-]+\.html(#[a-z0-9-]+)?$/i.test(w)) return HOME;
+        try { return new URL(w, HOME).href; } catch (e) { return HOME; }
+    }
     function reset(how) {
         var S = window.davSave;
         if (busy) return;
         busy = true;
+        var to = wakeAt();
         whiteOut('assets/ui/reset-screen|assets/ui/forget-screen', '', function () {
             if (typeof how === 'function') return Promise.resolve(how());
             if (S) S.nextReset();
             return Promise.resolve();
-        }, HOME);
+        }, to);
     }
 
     /* ---------------- the reset manager: in your preview only ---------------- */

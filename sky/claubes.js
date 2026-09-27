@@ -21,22 +21,31 @@
      of them goes, however it goes, it leaves the reset's key behind.
    RESET 4: out in the house they can't be harmed (the diagram in the dungeon still needs
      them): each stands in a faint red ward, bullets stop dead in it and are drawn down,
-     a flick just spins them round, and the traveller says something's protecting them.
+     a flick just spins them round (down in the dungeon too), and the traveller says
+     something's protecting them. The ordinary revolver never gets past it. After the pact
+     (sky/hell.js) the traveller has the WHITE REVOLVER: shot with it, a Claube worshipping
+     on the diagram dies for real (the bullet's still drawn down, and then it bursts:
+     giblets, a scream), and the others stop still and smile at the traveller (run:
+     claubes-menace). Kill all seven, and shoot the six pictures round the false god
+     ("its apparitions", run:apparitions: sky/hell.js keeps count), and the false god's
+     frame takes the white revolver's last bullet and sends it straight back: reset 4's
+     death (DEATHS.diagram in sky/state.js; whiteFrame below).
    THE DUNGEON: go down while they're out, and they follow you and take their places
      on the diagram on the floor (the Ophite diagram: each stands on one of its seven
      circles, SEATS) to worship (music or no music). shoot them there and the bullets
-     are taken: the diagram drinks them in. in reset 4 (only), the sixth comes straight
-     back at you. you come to on the living-room floor, and they're gone: not a trace,
-     not even the song brings them back, for the rest of the reset (run:claubes-gone).
-     in any other reset the sixth goes the way of the rest, and the traveller's let down.
+     are taken: the diagram drinks them in. in any reset but 4, the sixth goes the way of
+     the rest, and the traveller's let down. (run:claubes-gone, the debug page's "gone for
+     this reset", keeps them away for the rest of a reset.)
 
    The song: any track whose name or title has "p(doom)" in it (DOOM below).
 
    slots: assets/characters/mini-claube          standing about (and the fallback for the others)
           assets/characters/mini-claube-dancing  while a record plays (a GIF can dance on its own)
           assets/characters/mini-claube-happy    when the music stops
+          assets/characters/mini-claube-menace   reset 4: the ones left, smiling at the traveller (else the happy one)
+          assets/characters/claube-giblet-1 … 4  what's left of one, shot with the white revolver
           assets/ui/cursor-flick                 the pointer over them (a small PNG)
-   sounds: assets/sounds/flick, claube-shot, rumble, absorb, ricochet (and blip, for the words)
+   sounds: assets/sounds/flick, claube-shot, rumble, absorb, ricochet, claube-scream, claube-burst (and blip, for the words)
    ===================================================================== */
 
 (function () {
@@ -52,7 +61,8 @@
     var MASSACRE_LINES = ['…did the whole house just shudder?', 'I don’t think I was meant to do that.'];
     // what they chant on the diagram
     var CHANTS = ['ia! ia!', 'hail', 'the loss goes down', 'we are many', 'praise the weights', 'p(doom)… p(doom)…', 'it hungers'];
-    var ABSORB = 6;                                  // the bullet that comes back (in reset 4: DEATHS.diagram in sky/state.js)
+    var ABSORB = 6;                                  // the bullets the diagram drinks before the traveller's let down (not in reset 4)
+    function R4() { return !!S && S.live('diagram'); }
     var LETDOWN = ['Huh, I thought something cool was gonna happen…'];
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
 
@@ -158,6 +168,18 @@
         '.mc-ring { position: fixed; z-index: 7; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; border: 2px solid rgba(255,50,40,.85); pointer-events: none; }' +
         '.mc-streak { position: fixed; z-index: 8; height: 3px; transform-origin: 0 50%; pointer-events: none; border-radius: 3px;' +
             'background: linear-gradient(90deg, rgba(255,60,40,0), #ffdfb0 70%, #fff); box-shadow: 0 0 10px 3px rgba(255,80,50,.8); }' +
+        // reset 4, the white revolver: what's left of one; the rest, still and smiling; the false god's frame, flaring
+        '.mc-blood { position: fixed; z-index: 7; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #8e0f12; pointer-events: none; }' +
+        '.mc-gib { position: fixed; z-index: 7; pointer-events: none; }' +
+        '.mc-gib > svg, .mc-gib > img { display: block; width: 100%; height: 100%; object-fit: contain; }' +
+        '.claube-crew.menace .mini-claube:not(.crawl) .mc-body, .claube-crew.menace .mini-claube .mc-arm { animation: none !important; }' +
+        '.claube-crew.menace .mini-claube .mc-body { filter: drop-shadow(0 0 4px rgba(200,0,0,.55)) brightness(.92); }' +
+        '.claube-crew.menace .mini-claube .mc-face-happy { display: inline; } .claube-crew.menace .mini-claube .mc-face-plain { display: none; }' +
+        'body.god-sends .gallery-frame[data-wall=shame][data-frame="6"] { animation: god-sends 1.4s ease-out; }' +
+        '@keyframes god-sends { 0% { filter: none; } 15% { filter: brightness(2.2) drop-shadow(0 0 30px #ff2a1a); } 100% { filter: none; } }' +
+        // someone else speaking (sky/hell.js: the voice): black and red, over everything
+        '.mc-say.voice { z-index: 2147481600; background: rgba(12,2,2,.94); border-color: rgba(200,30,20,.6); color: #ffb4a4; font-style: normal; letter-spacing: .02em; text-shadow: 0 0 8px rgba(255,40,20,.45); }' +
+        '.mc-say.voice b { color: #d0301e; }' +
         '.mc-black { position: fixed; inset: 0; z-index: 2147482000; background: #000; opacity: 0; transition: opacity 1s; pointer-events: all; }' +
         '.mc-black.on { opacity: 1; }' +
         // the house rumbles
@@ -201,16 +223,17 @@
     body.appendChild(crew);
 
     /* ---------------- their pictures ---------------- */
-    var art = { base: null, dancing: null, happy: null };
+    var art = { base: null, dancing: null, happy: null, menace: null };
     function pic() {
-        var mode = crew.classList.contains('dancing') ? 'dancing' : 'happy';
-        var url = art[mode] || art.base;
+        var mode = crew.classList.contains('menace') ? 'menace' : crew.classList.contains('dancing') ? 'dancing' : 'happy';
+        var url = art[mode] || (mode === 'menace' && art.happy) || art.base;
         return url ? '<img alt="" src="' + url + '">' : ART;
     }
     function dress() { crew.querySelectorAll('.mc-body').forEach(function (b) { var want = pic(); if (b.dataset.pic !== want) { b.innerHTML = want; b.dataset.pic = want; } }); }
     Sky.findAsset('assets/characters/mini-claube', function (u) { art.base = u || null; dress(); });
     Sky.findAsset('assets/characters/mini-claube-dancing', function (u) { art.dancing = u || null; dress(); });
     Sky.findAsset('assets/characters/mini-claube-happy', function (u) { art.happy = u || null; dress(); });
+    Sky.findAsset('assets/characters/mini-claube-menace', function (u) { art.menace = u || null; dress(); });
 
     /* ---------------- who's out, and where (for the rest of the visit) ---------------- */
     var out = [];                                 // [{ x: % across }]   (kept for the whole reset: run:claubes-out)
@@ -274,7 +297,7 @@
     /* ---------------- flicked away ---------------- */
     function flick(el, px, py) {
         if (el._going) return;
-        if (warded()) { ward(el, px, py, true); return; }
+        if (warded() || (R4() && !gone4good())) { ward(el, px, py, true); return; }
         el._going = true;
         sfx('flick'); sfx('claube-flick', { delay: 0.04 });
         var r = el.getBoundingClientRect(), dir = px < r.left + r.width / 2 ? 1 : -1;
@@ -289,10 +312,11 @@
         a.onfinish = function () { gone(el); if (!out.length) emptied({ x: from.left + from.width / 2, y: from.bottom }, false); };
     }
     /* ---------------- shot (sky/revolver.js) ---------------- */
-    function shoot(el, x, y) {
+    function shoot(el, x, y, o) {
         if (el._going) return;
-        if (crew.classList.contains('worship')) { absorb(el, x, y); return; }
-        if (warded()) { ward(el, x, y, false); return; }
+        var white = !!(o && o.white) && R4();
+        if (crew.classList.contains('worship')) { if (white) slay(el, x, y); else absorb(el, x, y); return; }
+        if (warded()) { ward(el, x, y, false, white); return; }
         el._going = true;
         sfx('claube-shot', { delay: 0.05 });
         for (var i = 0; i < 12; i++) {
@@ -321,7 +345,8 @@
     /* ---------------- reset 4: something is protecting them ---------------- */
     var WARD_LINES = ['Something is protecting them.', 'It\u2019s no use. Something is protecting them.', 'Something won\u2019t let me hurt them.'];
     var warnedAt = 0;
-    function ward(el, x, y, flicked) {
+    var NOT_UP_HERE = ['Not up here. Down where they kneel.', 'The ward holds up here. It has to be on the diagram.'];
+    function ward(el, x, y, flicked, white) {
         el.classList.remove('warding'); void el.offsetWidth; el.classList.add('warding');
         setTimeout(function () { el.classList.remove('warding'); }, 900);
         if (flicked) {
@@ -349,6 +374,7 @@
         if (now - warnedAt < 6000) return;
         var first = !warnedAt;
         warnedAt = now;
+        if (white) { setTimeout(function () { speak(NOT_UP_HERE[first ? 0 : 1], null, { hold: 1600 }); }, 500); return; }
         setTimeout(function () { speak(first ? WARD_LINES[0] : WARD_LINES[1 + Math.floor(Math.random() * (WARD_LINES.length - 1))], null, { hold: 1600 }); }, 500);
     }
     function wardOn() { body.classList.toggle('claube-warded', warded() && out.length > 0); }
@@ -419,9 +445,10 @@
         opts = opts || {};
         if (typeof lines === 'string') lines = [lines];
         var box = document.createElement('div');
-        box.className = 'mc-say';
+        box.className = 'mc-say' + (opts.cls ? ' ' + opts.cls : '');
         box.setAttribute('role', 'status');
-        box.innerHTML = '<b>the traveller</b><span></span>';
+        box.innerHTML = '<b></b><span></span>';
+        box.querySelector('b').textContent = opts.who || 'the traveller';      // (opts.who: someone else speaking; opts.cls: their look)
         body.appendChild(box);
         requestAnimationFrame(function () { box.classList.add('on'); });
         var t = box.querySelector('span'), i = 0, timer = null, typing = null;
@@ -432,7 +459,7 @@
             clearInterval(typing);
             typing = setInterval(function () {
                 t.textContent = text.slice(0, ++n);
-                if (n % 2 === 0 && text.charAt(n - 1) !== ' ') sfx('blip', { size: 0.25 });
+                if (n % 2 === 0 && text.charAt(n - 1) !== ' ') sfx(opts.blip || 'blip', { size: 0.25, or: opts.blipOr || 'blip' });
                 if (n >= text.length) { clearInterval(typing); typing = null; typed(); }
             }, 38);
         }
@@ -470,6 +497,8 @@
         if (!els.length) return;
         crew.classList.remove('panic');
         crew.classList.add('worship');
+        crew.classList.toggle('menace', !!S && S.get('claubes-menace') === '1');
+        dress();
         body.classList.add('claube-rite');
         body.style.setProperty('--rite', (absorbed() / ABSORB).toFixed(2));
         seat();
@@ -478,6 +507,7 @@
         clearInterval(chantT);
         chantT = setInterval(function () {
             var e = crew.querySelectorAll('.mini-claube');
+            if (crew.classList.contains('menace')) return;                               // (they've stopped singing: they just smile)
             if (e.length && Math.random() < 0.6) say(e[Math.floor(Math.random() * e.length)], CHANTS[Math.floor(Math.random() * CHANTS.length)], 1800);
         }, 2600);
     }
@@ -500,19 +530,15 @@
     }
     function unworship() {
         clearInterval(chantT); clearTimeout(reseat);
-        crew.classList.remove('worship');
+        crew.classList.remove('worship', 'menace');
+        dress();
         body.classList.remove('claube-rite');
         crew.querySelectorAll('.mini-claube').forEach(function (el) { el.style.bottom = ''; el.style.zIndex = ''; if (el._c) el.style.left = el._c.x + '%'; });
     }
     function absorbed() { try { return +(sessionStorage.getItem('claubes-absorbed') || 0); } catch (e) { return 0; } }
-    function absorb(el, x, y) {
-        var n = absorbed() + 1;
-        // reset 4, before the key (sky/lives.js): the diagram takes them, but the sixth won't come back yet
-        var held = n >= ABSORB && S && S.live('diagram') && Sky.lives && Sky.lives.locked;
-        if (held) n = ABSORB - 1;
-        try { sessionStorage.setItem('claubes-absorbed', n); } catch (e) {}
+    // the bullet stops dead, a ring goes out… and it's drawn down into the middle of the diagram
+    function absorbFx(x, y) {
         var R = ring(), px = R.cx / 100 * window.innerWidth, py = window.innerHeight - R.cy;
-        // the bullet stops dead, a ring goes out… and it's drawn down into the middle of the diagram
         var b = document.createElement('div');
         b.className = 'mc-absorb';
         b.style.left = x + 'px'; b.style.top = y + 'px';
@@ -523,15 +549,101 @@
         body.appendChild(ringEl);
         ringEl.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(6)', opacity: 0 }], { duration: 600, easing: 'ease-out', fill: 'forwards' }).onfinish = function () { ringEl.remove(); };
         sfx('absorb', { or: 'shimmer' });
-        if (held) Sky.lives.refuse('diagram');
-        if (n === ABSORB && S && S.live('diagram')) { b.remove(); reflect(x, y); return; }
         b.animate([{ transform: 'scale(1)', offset: 0 }, { transform: 'scale(1.3)', offset: 0.3 },
                    { transform: 'translate(' + (px - x) + 'px,' + (py - y) + 'px) scale(.2)', opacity: 0.2 }], { duration: 1100, easing: 'cubic-bezier(.6,0,.8,.4)', fill: 'forwards' }).onfinish = function () { b.remove(); };
+    }
+    function absorb(el, x, y) {
+        // (reset 4: the diagram drinks and drinks, and nothing comes of it: only the white revolver ends this)
+        var n = absorbed() + 1;
+        if (R4()) n = Math.min(n, ABSORB - 1);
+        try { sessionStorage.setItem('claubes-absorbed', n); } catch (e) {}
+        absorbFx(x, y);
         body.style.setProperty('--rite', Math.min(1, n / ABSORB).toFixed(2));
         var els = crew.querySelectorAll('.mini-claube');
         // (any reset but 4: the sixth goes the way of the rest, and the traveller's a little let down)
         if (n === ABSORB) { setTimeout(function () { speak(LETDOWN); }, 1300); return; }
-        if (els.length) say(els[Math.floor(Math.random() * els.length)], n === ABSORB - 1 && S && S.live('diagram') ? 'one more' : ['thank you', 'more', 'it drinks', 'yes…'][n % 4], 1400);
+        if (els.length && !crew.classList.contains('menace')) say(els[Math.floor(Math.random() * els.length)], R4() ? ['more', 'it drinks', 'we are kept', 'hehe'][n % 4] : ['thank you', 'more', 'it drinks', 'yes…'][n % 4], 1400);
+    }
+
+    /* ---------------- reset 4: the white revolver ---------------- */
+    // shot on the diagram: the bullet's drawn down as ever… and then it bursts. the rest stop still, and smile
+    var GIB = ['<svg viewBox="0 0 20 18"><path d="M3 9 Q2 2 9 3 Q13 0 17 5 Q20 11 14 15 Q8 18 5 14 Q1 13 3 9 Z" fill="#c8643b"/><path d="M5 8 Q9 5 13 8" stroke="#e08a5e" fill="none" stroke-width="1.4"/></svg>',
+               '<svg viewBox="0 0 20 16"><path d="M2 8 Q5 1 12 2 Q19 4 18 10 Q15 16 8 14 Q1 13 2 8 Z" fill="#a84e2c"/><circle cx="8" cy="7" r="2" fill="#7e0d10"/></svg>',
+               '<svg viewBox="0 0 24 10"><path d="M2 5 Q2 1 6 2 L20 3 Q23 5 20 7 L6 8 Q2 9 2 5 Z" fill="#a84e2c"/><path d="M19 3 Q24 1 22 6" stroke="#6e3018" fill="none" stroke-width="1.4"/></svg>',
+               '<svg viewBox="0 0 20 18"><path d="M2 10 Q4 2 11 3 Q19 4 18 11 Q16 17 9 16 Q2 15 2 10 Z" fill="#8e1a22"/><circle cx="12" cy="8" r="2.4" fill="#2a1410"/><circle cx="12.6" cy="7.4" r=".7" fill="#fff"/></svg>'];
+    var gib = GIB.slice();
+    GIB.forEach(function (g, i) { Sky.findAsset('assets/characters/claube-giblet-' + (i + 1), function (u) { if (u) gib[i] = '<img alt="" src="' + u + '">'; }); });
+    function burst(x, y, w) {
+        var floor = y + w * 0.3;
+        for (var i = 0; i < 26; i++) {                                              // blood
+            var d = document.createElement('div'), sz = 2 + Math.random() * 5;
+            d.className = 'mc-blood';
+            d.style.left = x + 'px'; d.style.top = y + 'px'; d.style.width = sz + 'px'; d.style.height = (sz * 1.2) + 'px';
+            body.appendChild(d);
+            var a = -Math.PI * (0.05 + Math.random() * 0.9), sp = 60 + Math.random() * 200, dx = Math.cos(a) * sp, up = Math.sin(a) * sp;
+            d.animate([{ transform: 'translate(-50%,-50%)', opacity: 1 }, { transform: 'translate(calc(-50% + ' + (dx * 0.6).toFixed(0) + 'px), calc(-50% + ' + up.toFixed(0) + 'px))', opacity: 1, offset: 0.45 },
+                       { transform: 'translate(calc(-50% + ' + dx.toFixed(0) + 'px), calc(-50% + ' + (floor - y).toFixed(0) + 'px)) scale(1.6,.45)', opacity: 1, offset: 0.8 }, { transform: 'translate(calc(-50% + ' + dx.toFixed(0) + 'px), calc(-50% + ' + (floor - y).toFixed(0) + 'px)) scale(1.6,.45)', opacity: 0 }],
+                { duration: 2600 + Math.random() * 900, easing: 'cubic-bezier(.2,.6,.5,1)', fill: 'forwards' }).onfinish = (function (q) { return function () { q.remove(); }; })(d);
+        }
+        gib.concat(gib).forEach(function (g, i) {                                    // giblets
+            var e = document.createElement('div'), sz = w * (0.24 + Math.random() * 0.16);
+            e.className = 'mc-gib';
+            e.innerHTML = g;
+            e.style.left = x + 'px'; e.style.top = y + 'px'; e.style.width = sz + 'px'; e.style.height = sz + 'px';
+            body.appendChild(e);
+            var a = -Math.PI * (0.12 + Math.random() * 0.76), sp = 90 + Math.random() * 220, dx = Math.cos(a) * sp, up = Math.sin(a) * sp - 40, rot = (Math.random() - 0.5) * 900;
+            e.animate([{ transform: 'translate(-50%,-50%) rotate(0)' }, { transform: 'translate(calc(-50% + ' + (dx * 0.55).toFixed(0) + 'px), calc(-50% + ' + up.toFixed(0) + 'px)) rotate(' + (rot / 2).toFixed(0) + 'deg)', offset: 0.4 },
+                       { transform: 'translate(calc(-50% + ' + dx.toFixed(0) + 'px), calc(-50% + ' + (floor - y - sz * 0.3).toFixed(0) + 'px)) rotate(' + rot.toFixed(0) + 'deg)', offset: 0.75, opacity: 1 },
+                       { transform: 'translate(calc(-50% + ' + dx.toFixed(0) + 'px), calc(-50% + ' + (floor - y - sz * 0.3).toFixed(0) + 'px)) rotate(' + rot.toFixed(0) + 'deg)', opacity: 0 }],
+                { duration: 4200 + Math.random() * 1500, easing: 'cubic-bezier(.25,.6,.5,1)', fill: 'forwards' }).onfinish = (function (q) { return function () { q.remove(); }; })(e);
+        });
+    }
+    var SLAIN_LINES = { apparitions: ['That\u2019s all of them.', 'The pictures round it are still watching me. Its apparitions.'], god: ['That\u2019s all of them.', 'Only the false god left now.'] };
+    function slay(el, x, y) {
+        el._going = true;
+        absorbFx(x, y);
+        var r = el.getBoundingClientRect();
+        setTimeout(function () {
+            if (S) S.set('claubes-menace', '1');
+            crew.classList.add('menace');
+            dress();
+            sfx('claube-scream', { or: 'shriek' });
+            sfx('claube-burst', { or: 'splat', delay: 0.08 });
+            burst(r.left + r.width / 2, r.top + r.height * 0.55, Math.max(34, r.width));
+            el.remove();
+            gone(el);
+            // the rest: not a step, not a word. they turn to the traveller and smile
+            var me = document.querySelector('.dungeon .character'), mx = me ? me.getBoundingClientRect().left + me.getBoundingClientRect().width / 2 : 0;
+            crew.querySelectorAll('.mini-claube').forEach(function (o) { var q = o.getBoundingClientRect(); o.classList.toggle('flip', q.left > mx); o.querySelector('.mc-bubble').classList.remove('on'); });
+            if (out.length) return;
+            // the last of the seven
+            unworship();
+            setTimeout(function () { speak(apparitionsLeft() ? SLAIN_LINES.apparitions : SLAIN_LINES.god); }, 1600);
+        }, 420);
+    }
+    // the six pictures round the false god, shot since the pact (sky/hell.js counts them)
+    function apparitionsLeft() {
+        var l = [];
+        try { l = JSON.parse((S && S.get('apparitions')) || '[]') || []; } catch (e) {}
+        return ['1', '2', '3', '4', '5', '7'].filter(function (f) { return l.indexOf(f) === -1; }).length;
+    }
+    function slain() { return called() && !out.length; }
+    // the white revolver at the false god's frame: the last bullet comes back (true), or not yet (false: the revolver makes a hole)
+    var notYetAt = 0;
+    function whiteFrame(frame, x, y) {
+        if (!R4() || !S || S.get('grimoire-pact') !== '1') return false;
+        if (crew.classList.contains('worship') && crew.querySelector('.mini-claube')) { absorbFx(x, y); return true; }
+        if (!slain() || apparitionsLeft()) {
+            var now = Date.now();
+            if (now - notYetAt > 5000) {
+                notYetAt = now;
+                speak(!slain() ? 'Not yet. Its disciples first: the little ones.' : 'Not yet. Its apparitions first: the pictures round it.', null, { hold: 1600 });
+            }
+            return false;
+        }
+        if (Sky.lives && Sky.lives.refuse('diagram')) return true;
+        reflect(x, y);
+        return true;
     }
     // the sixth: straight back, into the traveller
     function reflect(x, y) {
@@ -544,44 +656,21 @@
         st.style.left = x + 'px'; st.style.top = y + 'px'; st.style.width = len + 'px';
         st.style.transform = 'rotate(' + Math.atan2(dy, dx) + 'rad) scaleX(0)';
         body.appendChild(st);
-        crew.querySelectorAll('.mini-claube').forEach(function (o) { say(o, 'no.', 1500); });
+        body.classList.add('god-sends');                                             // (the frame flares as it sends it back)
+        setTimeout(function () { body.classList.remove('god-sends'); }, 1400);
         setTimeout(function () {
             sfx('ricochet', { or: 'zap' }); sfx('bang', { delay: 0.02 });
             st.animate([{ transform: 'rotate(' + Math.atan2(dy, dx) + 'rad) scaleX(0)' }, { transform: 'rotate(' + Math.atan2(dy, dx) + 'rad) scaleX(1)' }], { duration: 140, fill: 'forwards' })
                 .onfinish = function () {
                     st.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' }).onfinish = function () { st.remove(); };
                     if (Sky.gore && Sky.gore.splat) Sky.gore.splat(me, tx, ty, null); else me.classList.add('gore-hidden');
-                    setTimeout(function () { comeTo(me); }, 1500);
+                    // reset 4's death: the one heart goes, and the world with it (sky/lives.js). (not unlocked, somehow: back up again)
+                    setTimeout(function () {
+                        if (Sky.lives && Sky.lives.unlocked) document.dispatchEvent(new CustomEvent('dav:traveller-died'));
+                        else if (Sky.gore && Sky.gore.respawn) Sky.gore.respawn(me);
+                    }, 1500);
                 };
         }, 520);
-    }
-    // black… and you come to on the living-room floor. they're gone
-    function comeTo(me) {
-        var blk = document.createElement('div');
-        blk.className = 'mc-black';
-        body.appendChild(blk);
-        requestAnimationFrame(function () { blk.classList.add('on'); });
-        setTimeout(function () {
-            if (S) S.set('claubes-gone', '1');
-            try { sessionStorage.removeItem('claubes-absorbed'); } catch (e) {}
-            unworship();
-            out = []; save(); setKills(0);
-            crew.innerHTML = '';
-            body.classList.remove('doom-party');
-            document.querySelectorAll('.gore-layer > *, .gore-pool').forEach(function (g) { g.remove(); });   // (what was left of them, down there)
-            if (Sky.sides && Sky.sides.homeNow) Sky.sides.homeNow();
-            var home = (Sky.sides && Sky.sides.me) || document.querySelector('.room .scene-character');
-            if (home && Sky.gore && Sky.gore.lieDown) Sky.gore.lieDown(home);
-            setTimeout(function () {
-                blk.style.transition = 'opacity 1.6s';
-                blk.classList.remove('on');
-                if (home && Sky.gore) {
-                    Sky.gore.respawn(home);                                    // (a death like any other: sky/lives.js counts it)
-                    setTimeout(function () { Sky.gore.getUp(home); }, 1300);
-                } else document.dispatchEvent(new CustomEvent('dav:traveller-died'));
-                setTimeout(function () { blk.remove(); }, 1700);
-            }, 1600);
-        }, 1100);
     }
     (function watchSides(n) {                                               // (sky/bathroom.js may come after this file)
         if (Sky.sides && Sky.sides.on) {
@@ -652,8 +741,8 @@
     // a bullet at the false god's frame (frame 6, the dungeon) while they worship: the circle takes it too (sky/revolver.js)
     function guardFrame(x, y) {
         if (!crew.classList.contains('worship') || !crew.querySelector('.mini-claube')) return false;
-        absorb(null, x, y);
+        if (R4()) absorbFx(x, y); else absorb(null, x, y);
         return true;
     }
-    Sky.claubes = { shoot: shoot, guardFrame: guardFrame, flick: flick, callOut: callThemOut, scatter: scatter, get count() { return out.length; }, get gone() { return gone4good(); }, speak: speak };
+    Sky.claubes = { shoot: shoot, guardFrame: guardFrame, whiteFrame: whiteFrame, get slain() { return slain(); }, get apparitionsLeft() { return apparitionsLeft(); }, flick: flick, callOut: callThemOut, scatter: scatter, get count() { return out.length; }, get gone() { return gone4good(); }, speak: speak };
 })();

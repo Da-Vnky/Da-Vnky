@@ -15,9 +15,10 @@
      A VISIT   sessionStorage (the wall open, what's in the bag …): gone when
                the tab closes, and at every reset
 
-   RESETS below is the plan for each: its theme, the two ways to die that it
-   has (DEATHS: every other reset "patches" them away), and where its key is
-   hidden. Its own art (the key, the mirror, the note, the world getting more
+   RESETS below is the plan for each: its theme, its one way to die (DEATHS:
+   one death a reset, one heart: 27 Sep, Mel and Victor, so the easter egg
+   can be reached), and where its key is hidden (until it's found, every way
+   to die is off: curious clicking can't kill the traveller). Its own art (the key, the mirror, the note, the world getting more
    twisted) lives in assets/resets/reset-<n>/: the content manager's
    "resets" tabs.
 
@@ -34,67 +35,61 @@
 
     // the ways to die that come and go: which resets they're live in (after the last one, they're "patched")
     var DEATHS = {
-        toaster:  { name: 'the toaster in the bath',                live: [1], patch: 'the toaster’s gone',
-                    slots: ['assets/living/toaster'], patchSlots: [] },
-        scissors: { name: 'the scissors in the workshop, to the neck', live: [1], patch: 'safety scissors, hung on the wall',
-                    slots: ['assets/workshop/scissors'], patchSlots: ['assets/workshop/safety-scissors'] },
+        // reset 1: the revolver on yourself (sky/revolver.js). from reset 2 it jams, whoever's holding it (there's one to
+        // play with in the living space, and the one on the roof)
+        revolver: { name: 'the revolver, on yourself',                live: [1], patch: 'it jams: a toy to shoot things with',
+                    slots: ['assets/city/revolver'], patchSlots: [] },
+        // reset 2: the boat dropped on the traveller (sky/ground-sea.js). after it, an anchor
         boat:     { name: 'the boat, dropped on the traveller',       live: [2], patch: 'a heavy anchor: the boat can’t be lifted high',
                     slots: ['assets/sea/ship'], patchSlots: ['assets/sea/anchor'] },
-        roof:     { name: 'a jump off the roof',                     live: [2], patch: 'guard rails along the edge',
-                    slots: ['assets/city/street-below'], patchSlots: ['assets/city/guard-rail'] },
-        // reset 4: the diagram's sixth bullet comes back (while the Claubes worship: sky/claubes.js); and the pact in
-        // the attic's grimoire (sky/attic.js). before and after reset 4 the sixth bullet just vanishes like the rest,
-        // and from reset 5 the grimoire's on the living-room shelf, only a book (sky/books.js)
-        diagram:   { name: 'the sixth bullet, sent back by the diagram', live: [4], patch: 'the diagram just swallows the bullets',
-                    slots: [], patchSlots: [] },
-        grimoire: { name: 'the pact in the grimoire, in the attic',   live: [4], patch: 'the grimoire on the living-room bookshelf, only a book',
-                    slots: ['assets/living/grimoire', 'assets/living/grimoire-open', 'assets/living/pact-hand'], patchSlots: ['assets/living/shelf-grimoire'] },
         // reset 3, ingestion: the pills (Mel's room across the street: take a bottle from her bathroom cabinet and talk her
-        // into them; when the lights go out, the visitor can't live with it. schizophyllu.me.room/room/room.js, the end, and
-        // sky/resets.js melDeath). after reset 3 her room stays quiet until the P(Doom) record brings it back (5 visits).
-        // and the apple (the kitchen, off the hallway: sky/kitchen.js), with the serpent coiled round the bowl
-        // (before reset 3: sausages coiled there instead; after: a cornucopia, the Mandela effect)
-        pills:    { name: 'the pills, in Mel\u2019s room',             live: [3], patch: 'Mel\u2019s room stays quiet (give her the P(Doom) record, and visit)',
+        // into them; when the lights go out, the visitor can't live with it, and goes off the roof. schizophyllu.me.room/
+        // room/room.js, the end, and sky/resets.js melDeath: the next reset starts on the porch). after reset 3 her room
+        // stays quiet until the P(Doom) record brings it back (5 visits). (the kitchen's serpent, from reset 3 on, is only
+        // a serpent: sky/kitchen.js)
+        pills:    { name: 'the pills, in Mel\u2019s room (then the roof)', live: [3], patch: 'Mel\u2019s room stays quiet (give her the P(Doom) record, and visit)',
                     slots: [], patchSlots: [] },
-        apple:    { name: 'the red apple in the kitchen',            live: [3], patch: 'the fruit spills from a cornucopia (was it always there?)',
-                    slots: ['assets/living/apple', 'assets/living/serpent'], patchSlots: ['assets/living/cornucopia'] },
-        // PLACEHOLDERS: the ways to die still to be designed. each is a bubble on a page (a dashed circle with a skull:
-        // sky/resets.js) that kills the traveller when clicked, so every reset can be played through to its end.
+        // reset 4: the book that opens the dungeon is missing; the grimoire in the attic: the pact, dragged down to the
+        // brimstone and the voice (sky/hell.js), back with a white revolver; the Claubes and the six pictures round the
+        // false god; and the false god sends the last bullet back (sky/claubes.js). only that bullet is the death
+        diagram:  { name: 'the last bullet, sent back by the false god', live: [4], patch: 'the diagram just swallows the bullets',
+                    slots: [], patchSlots: [] },
+        // (not a death: the way in to reset 4's. from reset 5 the grimoire's on the living-room shelf, only a book)
+        grimoire: { name: 'the pact in the grimoire, in the attic (reset 4: the way to the false god)', live: [4], notDeath: true,
+                    patch: 'the grimoire on the living-room bookshelf, only a book',
+                    slots: ['assets/living/grimoire', 'assets/living/grimoire-open', 'assets/living/pact-hand'], patchSlots: ['assets/living/shelf-grimoire'] },
+        // PLACEHOLDERS: the ways to die still to be designed, one a reset. each is a bubble on a page (a dashed circle with
+        // a skull: sky/resets.js) that kills the traveller when clicked, so every reset can be played through to its end.
         // page: sea, workshop, city, living; in: which part of the page; left/top: where in it (%).
         // when you design the real one, give it its own entry above and take the placeholder out.
-        r5a: { name: 'reset 5, the first way to die (to come)',  live: [5], placeholder: { page: 'city',     in: 'body',  left: 40, top: 42 } },
-        r5b: { name: 'reset 5, the second way to die (to come)', live: [5], placeholder: { page: 'living',   in: '.room', left: 24, top: 26 } },
-        r6a: { name: 'reset 6, the first way to die (to come)',  live: [6], placeholder: { page: 'workshop', in: '.room', left: 38, top: 30 } },
-        r6b: { name: 'reset 6, the second way to die (to come)', live: [6], placeholder: { page: 'sea',      in: 'body',  left: 30, top: 42 } },
-        r7a: { name: 'reset 7, the first way to die (to come)',  live: [7], placeholder: { page: 'living',   in: '.room', left: 24, top: 26 } },
-        r7b: { name: 'reset 7, the second way to die (to come)', live: [7], placeholder: { page: 'city',     in: 'body',  left: 40, top: 42 } },
-        r8a: { name: 'reset 8, the first way to die (to come)',  live: [8], placeholder: { page: 'sea',      in: 'body',  left: 30, top: 42 } },
-        r8b: { name: 'reset 8, the second way to die (to come)', live: [8], placeholder: { page: 'living',   in: '.room', left: 24, top: 26 } }
+        r5: { name: 'reset 5’s way to die (to come)', live: [5], placeholder: { page: 'city',     in: 'body',  left: 40, top: 42 } },
+        r6: { name: 'reset 6’s way to die (to come)', live: [6], placeholder: { page: 'workshop', in: '.room', left: 38, top: 30 } },
+        r7: { name: 'reset 7’s way to die (to come)', live: [7], placeholder: { page: 'living',   in: '.room', left: 24, top: 26 } },
+        r8: { name: 'reset 8’s way to die (to come)', live: [8], placeholder: { page: 'sea',      in: 'body',  left: 30, top: 42 } }
     };
     Object.keys(DEATHS).forEach(function (k) { var d = DEATHS[k]; d.patch = d.patch || ''; d.slots = d.slots || []; d.patchSlots = d.patchSlots || []; });
-    // (always there, every reset: the revolver on yourself ("the gun"), but only on the last heart once the key's found.
-    //  from reset 2, every way to die is off until the key: sky/lives.js)
+    // (one heart: sky/lives.js. every way to die is off until the reset's key is found; each reset's is its only one)
 
     // key: where the reset's key is hidden. page: sea, workshop, city, living; in: which part of the page
     // (a selector); left/top: where in it; where: said in the content manager.
     // or drop: something in the game drops it instead ('claubes': sky/claubes.js), wherever that happens
     var RESETS = [
-        { n: 1, name: 'items',       theme: 'things around the house (and the gun)', deaths: ['toaster', 'scissors'],
+        { n: 1, name: 'items',       theme: 'the gun',                                deaths: ['revolver'],
           key: { page: 'workshop', in: '.room',     left: 12,   top: 55.4, where: 'the workshop, between the jars on the shelf' } },
-        { n: 2, name: 'environmental', theme: 'the world itself',             deaths: ['boat', 'roof'],
+        { n: 2, name: 'environmental', theme: 'the world itself: the boat',           deaths: ['boat'],
           key: { page: 'city',     in: 'body',      left: 69.4, top: 89.6, where: 'the rooftop, by the potted plant' } },
-        { n: 3, name: 'ingestion',   theme: 'the pills, and the apple',       deaths: ['pills', 'apple'],
+        { n: 3, name: 'ingestion',   theme: 'the pills (and the fall)',               deaths: ['pills'],
           // (stuck in the apple pie in the kitchen fridge, its ring sticking out: sky/kitchen.js. the junk drawer has a hint)
           key: { page: 'living',   in: '.kitchen-pie', left: 40, top: 30, where: 'the kitchen, in the fridge: stuck in the apple pie' } },
-        { n: 4, name: 'dark witchcraft', theme: 'the diagram and the grimoire', deaths: ['diagram', 'grimoire'],
+        { n: 4, name: 'dark witchcraft', theme: 'the grimoire, the Claubes and the false god', deaths: ['diagram'],
           key: { page: 'living',   in: '.bathroom', left: 88,   top: 93,   where: 'the bathroom, in the corner by the tub' } },
-        { n: 5, name: '',            theme: '',                               deaths: ['r5a', 'r5b'],
+        { n: 5, name: '',            theme: '',                               deaths: ['r5'],
           key: { page: 'workshop', in: '.room',     left: 93.5, top: 61,   where: 'the workshop, on top of the notes board' } },
-        { n: 6, name: '',            theme: '',                               deaths: ['r6a', 'r6b'],
+        { n: 6, name: '',            theme: '',                               deaths: ['r6'],
           key: { page: 'living',   in: '.hallway',  left: 70,   top: 94,   where: 'the hallway, on the floor' } },
-        { n: 7, name: '',            theme: '',                               deaths: ['r7a', 'r7b'],
+        { n: 7, name: '',            theme: '',                               deaths: ['r7'],
           key: { page: 'living',   in: '.dungeon',  left: 83,   top: 93,   where: 'the dungeon, under the rack' } },
-        { n: 8, name: 'the grand mystery', tab: 'mystery', theme: 'the truth',                deaths: ['r8a', 'r8b'],
+        { n: 8, name: 'the grand mystery', tab: 'mystery', theme: 'the truth',                deaths: ['r8'],
           key: { page: 'city',     in: 'body',      left: 9,    top: 76.5, where: 'the rooftop, on top of the chimney' } }
     ];
 

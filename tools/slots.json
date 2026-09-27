@@ -456,7 +456,7 @@
       },
       {
        "slot": "assets/city/revolver",
-       "what": "the revolver: on the rooftop, in the bag, in the traveller’s hand",
+       "what": "the revolver: on the rooftop, on the living space’s floor (a toy to play with), in the bag, in the traveller’s hand",
        "size": "about 10:6"
       },
       {
@@ -748,16 +748,6 @@
        "slot": "assets/workshop/metronome-dancing",
        "what": "the metronome ticking (a GIF)",
        "optional": true
-      },
-      {
-       "slot": "assets/workshop/scissors",
-       "what": "the scissors on the bench (reset 1: taken to the neck)",
-       "size": "about 5:2, lying flat, see-through"
-      },
-      {
-       "slot": "assets/workshop/safety-scissors",
-       "what": "the safety scissors hung on the wall, from reset 2 on",
-       "size": "about 5:2 (it's turned upright on the wall), see-through"
       }
      ]
     },
@@ -935,13 +925,8 @@
       },
       {
        "slot": "assets/city/street-below",
-       "what": "the street far below, in the jump off the roof (reset 2)",
+       "what": "the street far below, in the jump off the roof (reset 3, back from Mel’s room)",
        "size": "1920 x 1080, the ground about 88% down"
-      },
-      {
-       "slot": "assets/city/guard-rail",
-       "what": "the guard rails along the roof's edge, from reset 3 on (repeats sideways)",
-       "size": "a strip about 400 x 60, see-through"
       }
      ]
     },
@@ -1056,11 +1041,6 @@
        "slot": "assets/living/arrow",
        "what": "the see-through arrow to the bathroom (pointing right; flipped for the way back)",
        "size": "1:1, e.g. 120 x 120"
-      },
-      {
-       "slot": "assets/living/toaster",
-       "what": "the toaster on the floor by the plant (take it to the bathroom…)",
-       "size": "about 10:7"
       },
       {
        "slot": "assets/living/shelf-book",
@@ -1417,13 +1397,61 @@
       },
       {
        "slot": "assets/living/pact-hand",
-       "what": "one of the hands that come up through the floor and drag the traveller down",
+       "what": "one of the hands that come up through the floor and drag the traveller down (and push them back up, after)",
        "size": "about 250 x 550, the wrist at the bottom, see-through"
       },
       {
        "slot": "assets/ui/cursor-blood",
        "what": "the pointer while signing in blood (a pricked fingertip): its tip at 19, 7",
        "size": "32 x 32"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hell",
+   "name": "below (reset 4)",
+   "note": "where the grimoire’s pact drags the traveller, in reset 4 (sky/hell.js). the red sky, the brimstone floor, the eye in the sky with the serpent round it, and a voice. then back up to the attic, with a white revolver.",
+   "groups": [
+    {
+     "name": "down there",
+     "slots": [
+      {
+       "slot": "assets/hell/sky",
+       "what": "the red sky behind everything",
+       "size": "1920 x 1080 (the whole screen)"
+      },
+      {
+       "slot": "assets/hell/floor",
+       "what": "the brimstone floor along the bottom, fire in its cracks",
+       "size": "1920 x 360, see-through along the top edge"
+      },
+      {
+       "slot": "assets/hell/eye",
+       "what": "the great eye in the sky (the page opens it, blinks it and shuts it)",
+       "size": "about 2:1, see-through"
+      },
+      {
+       "slot": "assets/hell/ouroboros",
+       "what": "the ouroboros, the serpent eating its tail: a ring round the eye. an animated GIF or WebP loops by itself (the drawn stand-in just turns)",
+       "size": "square, see-through, the eye fits inside the middle two thirds"
+      },
+      {
+       "slot": "assets/characters/hell",
+       "what": "the traveller down there (else the attic’s picture)",
+       "size": "like the other scenes’ traveller",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "the white revolver (back in the attic, after)",
+     "slots": [
+      {
+       "slot": "assets/items/white-revolver",
+       "what": "the white revolver: glowing on the attic floor, in the bag, in the traveller’s hand. it kills the Claubes on the diagram, breaks the six pictures round the false god, and the false god sends its last bullet back",
+       "size": "about 10:6, see-through"
       }
      ]
     }
@@ -1503,24 +1531,14 @@
        "size": "about 120:60, see-through"
       },
       {
-       "slot": "assets/living/apple",
-       "what": "reset 3: the red apple by the bowl (click it: a death)",
-       "size": "about 40:44, see-through"
-      },
-      {
        "slot": "assets/living/serpent",
-       "what": "reset 3: the serpent coiled round the bowl, laid over it (\"eat. and you will know.\")",
+       "what": "from reset 3 on: the serpent coiled round the bowl, laid over it (\"eat. and you will know.\"). the first time in, the sausages turn into it",
        "size": "about 160:90, see-through"
       },
       {
        "slot": "assets/living/sausages",
-       "what": "before reset 3: a string of sausages coiled round the fruit bowl, where the serpent will be (laid over the bowl)",
+       "what": "resets 1 and 2: a string of sausages coiled round the fruit bowl, where the serpent will be (laid over the bowl)",
        "size": "about 160:90, see-through"
-      },
-      {
-       "slot": "assets/living/cornucopia",
-       "what": "after reset 3: a cornucopia with the fruit spilling out, in place of the bowl (the Mandela effect)",
-       "size": "about 200:110, see-through"
       },
       {
        "slot": "assets/characters/kitchen",
@@ -1930,6 +1948,36 @@
        "optional": true
       },
       {
+       "slot": "assets/characters/mini-claube-menace",
+       "what": "reset 4: the Claubes left on the diagram once one’s been killed, standing still and smiling at the traveller (else the happy one)",
+       "size": "same canvas",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/claube-giblet-1",
+       "what": "what’s left of a Claube shot with the white revolver: a bit that flies off (1 of 4)",
+       "size": "small, about 1:1, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/claube-giblet-2",
+       "what": "what’s left of a Claube shot with the white revolver: a bit that flies off (2 of 4)",
+       "size": "small, about 1:1, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/claube-giblet-3",
+       "what": "what’s left of a Claube shot with the white revolver: a bit that flies off (3 of 4)",
+       "size": "small, about 1:1, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/claube-giblet-4",
+       "what": "what’s left of a Claube shot with the white revolver: a bit that flies off (4 of 4)",
+       "size": "small, about 1:1, see-through",
+       "optional": true
+      },
+      {
        "slot": "assets/ui/disco-ball",
        "what": "the disco ball that comes down for the P(Doom) party lights (see-through)",
        "size": "1:1, e.g. 200 x 200",
@@ -1984,6 +2032,11 @@
       {
        "slot": "assets/sounds/grimoire",
        "what": "the grimoire open (the attic one, and the one on the shelf): looped, low and wrong",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/hell",
+       "what": "below, in reset 4 (sky/hell.js): the music down there, looped, ambient and scary",
        "kind": "sound"
       }
      ]
@@ -2223,10 +2276,6 @@
        "what": "the revolver, jammed (more than one heart left)"
       },
       {
-       "slot": "assets/sounds/stab",
-       "what": "the scissors going in"
-      },
-      {
        "slot": "assets/sounds/key",
        "what": "picking up a reset's key"
       },
@@ -2366,6 +2415,36 @@
       {
        "slot": "assets/sounds/dread",
        "what": "a low swell of dread (the porch’s watcher, getting closer)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/hell-voice",
+       "what": "the voice below, as each letter of its words comes (very short)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/quake",
+       "what": "the ground shaking below, as the voice finishes (about 2.5 s)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/white-appear",
+       "what": "the white revolver coming down in front of the traveller in the attic",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/white-bang",
+       "what": "the white revolver firing",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/claube-scream",
+       "what": "a Claube’s terrible scream, shot with the white revolver",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/claube-burst",
+       "what": "a Claube bursting into bits",
        "kind": "sound"
       }
      ]

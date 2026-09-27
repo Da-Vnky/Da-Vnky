@@ -11,10 +11,11 @@ change, in your browser:
   - assets: every picture and sound slot on the site, to fill, replace or clear
 
     on Windows: double-click tools\\content.bat
+    mac/linux:  sh tools/content.sh   (or VS Code: Terminal > Run Task > "DaV-nky: content manager")
     anywhere:   python tools/content.py
 
 It opens http://localhost:8001/ . Everything stays on your computer until you
-press "publish" (or run tools\\publish.bat). Close the black window to stop it.
+press "publish" (or run tools\\publish.bat, or sh tools/publish.sh). Close the black window to stop it.
 """
 import datetime, hashlib, http.server, json, os, re, subprocess, sys, threading, unicodedata, urllib.error, urllib.parse, urllib.request, webbrowser
 
@@ -1631,7 +1632,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     subprocess.Popen(['cmd', '/c', bat, 'content push'], cwd=ROOT, env=dict(os.environ, PUBLISH_MSG='content push'),
                                      creationflags=getattr(subprocess, 'CREATE_NEW_CONSOLE', 0))
                     return self.reply({'ok': True})
-                return self.reply({'error': 'run tools/publish.bat (or git add, commit and push) to publish'}, 400)
+                sh = os.path.join(HERE, 'publish.sh')             # mac / linux: tools/publish.sh, its words in this terminal
+                if os.name != 'nt' and os.path.exists(sh):
+                    subprocess.Popen(['sh', sh, 'content push'], cwd=ROOT, env=dict(os.environ, PUBLISH_MSG='content push'), stdin=subprocess.DEVNULL)
+                    return self.reply({'ok': True})
+                return self.reply({'error': 'run tools/publish.bat (or tools/publish.sh, or git add, commit and push) to publish'}, 400)
         except Exception as e:
             return self.reply({'error': str(e)}, 400)
         return self.reply({'error': 'unknown'}, 404)

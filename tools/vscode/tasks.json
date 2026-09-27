@@ -1,0 +1,60 @@
+{
+    // DaV-nky's tools as VS Code tasks: Terminal > Run Task… (or Ctrl+Shift+P, "Tasks: Run Task"), then pick one.
+    // the same tools as the double-click .bat files in tools/, on linux, mac and windows alike (see tools/FOR-MEL.md).
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "DaV-nky: content manager",
+            "detail": "letters, your things, visitors, notes, and every picture and sound slot (the asset manager): http://localhost:8001/",
+            "type": "shell",
+            "command": "sh tools/content.sh",
+            "windows": { "command": "tools\\content.bat" },
+            "isBackground": true,
+            "problemMatcher": [],
+            "presentation": { "reveal": "always", "panel": "dedicated" }
+        },
+        {
+            "label": "DaV-nky: preview the site",
+            "detail": "the site as it is in this folder, at http://localhost:8000/",
+            "type": "shell",
+            "command": "sh tools/preview.sh",
+            "windows": { "command": "tools\\preview.bat" },
+            "isBackground": true,
+            "problemMatcher": [],
+            "presentation": { "reveal": "always", "panel": "dedicated" }
+        },
+        {
+            "label": "DaV-nky: pull (get the latest from Forgejo)",
+            "detail": "whatever the others have pushed. a file changed on both sides: yours is kept in _your-versions/",
+            "type": "shell",
+            "command": "sh tools/pull.sh",
+            "windows": { "command": "tools\\pull.bat" },
+            "problemMatcher": [],
+            "presentation": { "reveal": "always", "panel": "shared" }
+        },
+        {
+            "label": "DaV-nky: publish",
+            "detail": "pull, rewrite the lists, commit everything and push: the live site updates in a minute or two",
+            "type": "shell",
+            "command": "sh tools/publish.sh",
+            "windows": { "command": "tools\\publish.bat" },
+            "problemMatcher": [],
+            "presentation": { "reveal": "always", "panel": "shared", "focus": true }
+        },
+        {
+            "label": "DaV-nky: rewrite the lists",
+            "detail": "every list.txt, catalog.txt, albums.txt … (publishing does this anyway)",
+            "type": "shell",
+            "command": "sh tools/update-lists.sh",
+            "problemMatcher": []
+        },
+        {
+            "label": "DaV-nky: Mel's room slots (after adding things to the room)",
+            "detail": "the asset manager's \"Mel's room\" slots, written again from the room's own files",
+            "type": "shell",
+            "command": "python3 tools/mel-room-slots.py",
+            "windows": { "command": "py tools\\mel-room-slots.py" },
+            "problemMatcher": []
+        }
+    ]
+}

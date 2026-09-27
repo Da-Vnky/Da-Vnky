@@ -261,6 +261,14 @@
         livingTab.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && inSide && inSide.name !== 'bath') { e.preventDefault(); goHome(); } });
     }
     var homeAt = home ? leftPct(home) : 34, busy = false, inSide = null;
+    // reset 4: the book that opens the dungeon isn't on the shelf, until the grimoire's pact is made in the attic
+    // (sky/attic.js, sky/hell.js). the way down's shut while it's gone: no book, no wall opening, no #dungeon
+    var DS = window.davSave;
+    function bookGone() { return !!DS && DS.reset === 4 && DS.get('grimoire-pact') !== '1'; }
+    var theBook = document.querySelector('.shelf-book:not(.decoy)');
+    if (theBook && bookGone()) theBook.classList.add('missing');
+    Sky.css('.shelf-book.missing { display: none !important; }' +
+        '.shelf-book.back-again { animation: sb-back 2.4s ease-out 3; } @keyframes sb-back { 0%, 100% { filter: none; } 40% { filter: drop-shadow(0 0 6px #ffd98a) drop-shadow(0 0 12px rgba(255,200,120,.8)); } }');
     SIDES.forEach(function (sd) {
         sd.me = sd.el.querySelector('.character');
         sd.back = sd.el.querySelector('.room-arrow');
@@ -302,11 +310,12 @@
         };
         if (home) walk(home, at, shut); else shut();
     }
-    try { if (sessionStorage.getItem('secret-open') === '1' || location.hash === '#dungeon') openDoor(true); } catch (e) {}
+    try { if (!bookGone() && (sessionStorage.getItem('secret-open') === '1' || location.hash === '#dungeon')) openDoor(true); } catch (e) {}
     function bookAt() { return (sd0().go.offsetLeft + sd0().go.offsetWidth / 2 - home.offsetWidth / 2) / (room.clientWidth || window.innerWidth) * 100; }
     function sd0() { return SIDES.filter(function (x) { return x.dir === 0; })[0]; }
     function goTo(sd, instant) {
         if (busy || inSide) return;
+        if (sd.dir === 0 && bookGone()) return;
         busy = true; inSide = sd;
         body.classList.add('side-walking');
         homeAt = home ? leftPct(home) : homeAt;

@@ -203,6 +203,37 @@
                 }
             };
         },
+        // down there (reset 4, sky/hell.js): a vast low drone that swells and sinks, a choir of wrong voices far off,
+        // fire crackling under everything, and now and then a boom from deep below (your own: assets/sounds/hell, loops)
+        hell: function (out) {
+            [[36.7, 'sawtooth', 0.07], [38.9, 'sawtooth', 0.06], [55, 'triangle', 0.08], [73.4, 'sine', 0.05]].forEach(function (v, i) {
+                var o = ctx.createOscillator(), g = gain(v[2]), lf = ctx.createOscillator(), lg = gain(v[2] * 0.8);
+                o.type = v[1]; o.frequency.value = v[0]; o.detune.value = (i - 1.5) * 9;
+                lf.frequency.value = 0.04 + i * 0.023; lf.connect(lg); lg.connect(g.gain);
+                chain(o, filter('lowpass', 260, 2.5), g, out);
+                o.start(); lf.start();
+            });
+            [[220, 233.1], [329.6, 349.2], [440, 466.2]].forEach(function (pr, i) {        // the far choir: close, beating pairs, breathing in and out
+                var cg = gain(0), clf = ctx.createOscillator(), clg = gain(0.018);
+                clf.frequency.value = 0.07 + i * 0.05; clf.connect(clg); clg.connect(cg.gain);
+                pr.forEach(function (f) { var o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; chain(o, filter('bandpass', f * 2.2, 6), cg); o.start(); });
+                chain(cg, filter('lowpass', 1400, 0.7), out); clf.start();
+            });
+            chain(loop('crackle', 6), filter('bandpass', 900, 0.6), gain(0.5), out);
+            chain(loop('brown', 5), filter('lowpass', 180), gain(0.8), out);
+            return function (level) {
+                if (level < 0.02 || !ctx) return;
+                var t0 = ctx.currentTime;
+                if (Math.random() < 0.1) { tone(out, t0 + Math.random(), 'sine', 48, 22, 2.4, 0.5 * level); }          // a boom, far below
+                if (Math.random() < 0.18) {                                                                     // a moan, rising
+                    var o = ctx.createOscillator(), g = gain(0), f0 = 140 + Math.random() * 120, at = t0 + Math.random() * 0.6;
+                    o.type = 'triangle'; o.frequency.setValueAtTime(f0, at); o.frequency.linearRampToValueAtTime(f0 * 1.5, at + 2.2);
+                    chain(o, filter('lowpass', 800, 3), g, out);
+                    g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.05 * level, at + 1.1); g.gain.exponentialRampToValueAtTime(0.0001, at + 2.4);
+                    o.start(at); o.stop(at + 2.5);
+                }
+            };
+        },
         storm: function (out, ch) {
             chain(loop('white', 3), filter('highpass', 350), filter('lowpass', 5200), gain(0.7), out);
             chain(loop('brown', 5), filter('lowpass', 420), gain(1.0), out);
@@ -333,7 +364,7 @@
     var SFX_KEY = 'sfx-volume', sfxVol = 0.7;
     try { var sv = localStorage.getItem(SFX_KEY); if (sv !== null) sfxVol = Math.max(0, Math.min(1, +sv)); } catch (e) {}
     var sfxFiles = {};
-    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry', 'unnerve', 'scare', 'typing', 'sparkle', 'bang', 'flick', 'shatter', 'book', 'claube-flick', 'claube-shot', 'loot', 'record-in', 'page-turn', 'flashbang', 'life-lost', 'lives-found', 'wall-slide', 'jammed', 'stab', 'key', 'boat-crash', 'fall-wind'].forEach(function (n) {
+    ['cork-pop', 'cork-in', 'paper-unroll', 'paper-roll', 'throw', 'splash', 'surface', 'climb-out', 'land', 'twinkle', 'wish', 'portfolio', 'brush', 'step', 'blip', 'shimmer', 'chime', 'knock', 'crack', 'scream', 'splat', 'zap', 'respawn', 'pickup', 'tap', 'fizz', 'door', 'door-metal', 'angry', 'unnerve', 'scare', 'typing', 'sparkle', 'bang', 'flick', 'shatter', 'book', 'claube-flick', 'claube-shot', 'loot', 'record-in', 'page-turn', 'flashbang', 'life-lost', 'lives-found', 'wall-slide', 'jammed', 'key', 'boat-crash', 'fall-wind'].forEach(function (n) {
         Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { sfxFiles[n] = url || null; });
     });
     function env(g, t, peak, attack, decay) {
@@ -657,6 +688,30 @@
         },
         'blip': function (out, t) {                                    // one letter of a text box typing out
             tone(out, t, 'square', 330, 330, 0.035, 0.05);
+        },
+        // a Claube, shot with the white revolver: a shriek that tears and falls away (about 1.5 s)
+        'shriek': function (out, t) {
+            [[1400, 0.22], [1870, 0.14], [2640, 0.08]].forEach(function (h, i) {
+                var o = ctx.createOscillator(), g = gain(0), vib = ctx.createOscillator(), vg = gain(h[0] * 0.06);
+                o.type = 'sawtooth'; o.frequency.setValueAtTime(h[0], t); o.frequency.exponentialRampToValueAtTime(h[0] * 1.25, t + 0.25); o.frequency.exponentialRampToValueAtTime(h[0] * 0.3, t + 1.4);
+                vib.frequency.value = 23 + i * 7; vib.connect(vg); vg.connect(o.frequency);
+                chain(o, filter('bandpass', h[0] * 1.4, 2), g, out);
+                g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(h[1], t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+                o.start(t); vib.start(t); o.stop(t + 1.6); vib.stop(t + 1.6);
+            });
+            noiseHit(out, t, 0.6, 'bandpass', 3000, 1.2, 0.25, 0.01);
+        },
+        // the ground shaking (hell, as the voice finishes): a long deep roll, cracks in it (about 2.5 s)
+        'quake': function (out, t) {
+            var f = noiseHit(out, t, 2.3, 'lowpass', 140, 1.5, 0.9, 0.25);
+            f.frequency.setValueAtTime(90, t); f.frequency.linearRampToValueAtTime(220, t + 1.2); f.frequency.linearRampToValueAtTime(70, t + 2.4);
+            tone(out, t, 'sine', 38, 24, 2.4, 0.8);
+            for (var i = 0; i < 6; i++) noiseHit(out, t + 0.2 + Math.random() * 2, 0.08, 'bandpass', 600 + Math.random() * 900, 1, 0.3, 0.003);
+        },
+        // the voice's words, typed out: a low murmur a letter (a stand-in for assets/sounds/hell-voice)
+        'murmur': function (out, t) {
+            tone(out, t, 'sawtooth', 70 + Math.random() * 18, 58, 0.09, 0.12);
+            noiseHit(out, t, 0.07, 'bandpass', 380 + Math.random() * 200, 3, 0.06, 0.01);
         },
         'shimmer': function (out, t) {                                 // looking into the mirror: a glassy shimmer
             [1318, 1760, 2349, 3136].forEach(function (f, i) { tone(out, t + i * 0.07, 'sine', f, f * 1.003, 1.2 - i * 0.15, 0.06); });

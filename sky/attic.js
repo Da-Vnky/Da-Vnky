@@ -16,12 +16,16 @@
    lectern. Before it opens the traveller says how wrong it feels, and it opens with
    a horrible sound (sky/books.js: VIBES, QUIET). Open it, the first time: a ritual on
    the left page, and on the right a place to sign in your own blood (the pointer's a
-   pricked finger; the ink runs red). "make the pact" and the book slams shut, rises in
-   front of the traveller, something answers, they scream, and hands come up through
-   the floor and drag them down. A death like any other (sky/gore.js respawn), and it
-   happens once: after that (run:grimoire-pact) the grimoire is just a book of your
-   pages (content/books/grimoire/, sky/books.js), a quieter sound as it opens, and the
-   ritual page is gone. From reset 5 it's on the living-room bookshelf instead.
+   pricked finger; the ink runs red). "make the pact" (only once reset 4's key is found)
+   and the book slams shut, rises in front of the traveller, something answers, they
+   scream, and hands come up through the floor and drag them down: to the brimstone,
+   the red sky, the eye, and the voice (sky/hell.js). Not a death. The ground shakes,
+   and the hands push them back up through the attic floor (giveBack below); a white
+   revolver appears in front of them, and the book that opens the dungeon is back on
+   the living-room shelf. It happens once: after that (run:grimoire-pact) the grimoire
+   is just a book of your pages (content/books/grimoire/, sky/books.js), a quieter sound
+   as it opens, and the ritual page is gone. From reset 5 it's on the living-room
+   bookshelf instead.
 
    slots (assets/living/): hall-cord, hall-light, hall-hatch, hall-hatch-open, attic-ladder, hall-lamp-broken, attic-wall,
           attic-floor, attic-window, attic-clutter, attic-lectern, attic-hole,
@@ -161,6 +165,7 @@
         '.attic.pact .attic-grimoire { visibility: hidden; }' +
         '.pact-hand > svg, .pact-hand > img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; }' +
         '.character.dragged-down { animation: pact-down 1.5s cubic-bezier(.5,0,.8,.5) forwards; } @keyframes pact-down { 0% { translate: 0 0; clip-path: inset(0 0 0 0); } 12% { translate: 0 -3%; clip-path: inset(0 0 0 0); } 100% { translate: 0 105%; clip-path: inset(0 0 105% 0); } }' +
+        '.character.given-back { animation: pact-up 1.6s cubic-bezier(.3,.6,.4,1) .3s both; } @keyframes pact-up { 0% { translate: 0 105%; clip-path: inset(0 0 105% 0); } 85% { translate: 0 -4%; clip-path: inset(0 0 0 0); } 100% { translate: 0 0; clip-path: inset(0 0 0 0); } }' +
         '.character.writhing { animation: pact-writhe .12s linear infinite; } @keyframes pact-writhe { 0% { rotate: -3deg; } 50% { rotate: 3deg; } 100% { rotate: -3deg; } }' +
         '@media (prefers-reduced-motion: reduce) { .character.writhing { animation: none; } }'
     );
@@ -510,13 +515,14 @@
     Sky.findAsset('assets/living/pact-hand', function (u) { if (u) handArt = '<img alt="" src="' + u + '">'; });
     pactBtn.addEventListener('click', function () {
         if (pactBtn.disabled || pactMade()) return;
-        if (Sky.lives && Sky.lives.refuse('grimoire')) return;              // (not before the key: sky/lives.js)
+        if (Sky.lives && Sky.lives.locked) { Sky.lives.refuse('grimoire'); return; }   // (not before the key: sky/lives.js)
         pactBtn.disabled = true;
         set('grimoire-pact', '1');                                          // (it's made: this can't happen again this reset)
         grim.classList.add('slam');
         setTimeout(function () { sfx('book-slam', { or: 'land', size: 1 }); }, 380);
         setTimeout(function () { grim.classList.remove('open'); body.classList.remove('book-open'); rise(); }, 900);
     });
+    var dk = null;                                                           // (the dark that comes down with the pact)
     function rise() {
         climbing = true;
         var r = me.getBoundingClientRect();
@@ -532,7 +538,7 @@
         fb.animate([{ transform: 'translateY(40px) rotate(-8deg)', opacity: 0 }, { transform: 'translateY(-10px) rotate(3deg)', opacity: 1, offset: 0.5 }, { transform: 'translateY(0) rotate(-2deg)', opacity: 1 }],
             { duration: 1200, easing: 'ease-out', fill: 'forwards' });
         var bob = setTimeout(function () { fb.animate([{ transform: 'translateY(0) rotate(-2deg)' }, { transform: 'translateY(-8px) rotate(2deg)' }], { duration: 900, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' }); }, 1200);
-        var dk = document.createElement('div');
+        dk = document.createElement('div');
         dk.className = 'pact-dark';
         body.appendChild(dk);
         requestAnimationFrame(function () { dk.classList.add('on'); });
@@ -576,16 +582,53 @@
             fb.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(30px)' }], { duration: 700, fill: 'forwards' }).onfinish = function () { fb.remove(); };
             hands.forEach(function (h) { h.remove(); });
             under.remove();
-            dk.classList.remove('on');
             hum(0);
-            setTimeout(function () {
-                dk.remove();
+            // down there (sky/hell.js), and then back up, the hands pushing them up through the boards
+            var back = function () {
                 attic.classList.remove('pact');
-                climbing = false;
-                if (Sky.gore && Sky.gore.respawn) Sky.gore.respawn(me);           // (a death like any other: sky/lives.js counts it)
-                else { me.classList.remove('gore-hidden'); document.dispatchEvent(new CustomEvent('dav:traveller-died')); }
-            }, 1500);
+                giveBack(function () {
+                    dk.classList.remove('on');
+                    setTimeout(function () { dk.remove(); }, 1400);
+                    climbing = false;
+                    if (Sky.hell && Sky.hell.gift) Sky.hell.gift(me);
+                });
+            };
+            if (Sky.hell && Sky.hell.enter) Sky.hell.enter(me, back); else setTimeout(back, 1500);
         }, 4200);
+    }
+    // the hands, the other way: up through the boards, the traveller held up in them, and back down without them
+    function giveBack(done) {
+        dk.classList.add('on');
+        me.classList.remove('gore-hidden');
+        me.classList.add('given-back');
+        var mr = me.getBoundingClientRect(), floorY = mr.bottom - Math.max(2, mr.height * 0.02);
+        var under = document.createElement('div'), hands = [];
+        under.className = 'pact-floor';
+        under.style.height = floorY + 'px';
+        body.appendChild(under);
+        sfx('hands', { or: 'crack' });
+        [-0.62, -0.2, 0.3, 0.75].forEach(function (k, i) {
+            var h = document.createElement('div');
+            h.className = 'pact-hand';
+            h.innerHTML = handArt;
+            var hw = Math.max(26, mr.height * 0.26);
+            h.style.width = hw + 'px'; h.style.height = (hw * 2.2) + 'px';
+            h.style.left = (mr.left + mr.width / 2 + k * mr.width - hw / 2) + 'px';
+            h.style.top = (floorY - hw * 2.2) + 'px';
+            h.style.transform = 'rotate(' + (k * -18) + 'deg)';
+            under.appendChild(h);
+            h.animate([{ translate: '0 120%' }, { translate: '0 10%', offset: 0.55 }, { translate: '0 22%' }], { duration: 1500, easing: 'cubic-bezier(.3,.7,.4,1)', fill: 'forwards' });
+            hands.push(h);
+        });
+        setTimeout(function () {
+            sfx('hands', { or: 'crack', delay: 0.4 });
+            hands.forEach(function (h, i) { h.animate([{ translate: '0 22%' }, { translate: '0 125%' }], { duration: 900 + i * 80, delay: 700, easing: 'cubic-bezier(.5,0,.8,.5)', fill: 'forwards' }); });
+        }, 1500);
+        setTimeout(function () {
+            me.classList.remove('given-back');
+            under.remove();
+            if (done) done();
+        }, 3300);
     }
 
     Sky.attic = { up: function () { return up; }, open: function () { openAttic(true); }, climbDown: climbDown, openBook: openBook, get lamp() { return LAMP; } };

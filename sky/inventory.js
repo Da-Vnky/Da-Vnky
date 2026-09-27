@@ -2,8 +2,8 @@
    inventory.js — the hotbar (bottom middle, every page): eight slots,
    numbered 1 to 8, like Minecraft's. Things you pick up go in the next
    free slot and stay with you from page to page for the rest of the visit:
-     the toaster (living space floor), the marker (the workshop's bench),
-     the revolver (the rooftop), a bottle of Mel's pills (her bathroom, in
+     the marker (the workshop's bench), the revolver (the rooftop, and a
+     toy one in the living space), a bottle of Mel's pills (her bathroom, in
      reset 3), and whatever turns up from the hidden loot (sky/loot.js).
    Click a slot, or press its number, to hold that thing (or, for the
    marker and anything else you switch on, to switch it on); press it
@@ -19,7 +19,7 @@
    slots: assets/ui/inventory (the little bag at the hotbar's left end),
           assets/ui/hotbar-slot (one slot's box, square; optional),
           assets/ui/cursor-reticle (the pointer while holding the revolver);
-          each thing's own picture is its slot (assets/living/toaster, …)
+          each thing's own picture is its slot (assets/city/revolver, …)
    ===================================================================== */
 
 (function () {
@@ -33,10 +33,6 @@
     // (toggle: clicking it switches it on and off rather than putting it in your hand;
     //  cursor: what the pointer turns into while you hold it: 'art' (the thing itself) or 'reticle')
     var ITEMS = {
-        toaster: { name: 'the toaster', slot: 'assets/living/toaster', hint: 'click the bathroom to let go of it',
-            art: '<svg viewBox="0 0 100 70" aria-hidden="true"><rect x="8" y="14" width="84" height="50" rx="14" fill="#c9ccd0" stroke="#8d939a" stroke-width="2"/>' +
-                 '<rect x="24" y="10" width="22" height="8" rx="2" fill="#2a2420"/><rect x="54" y="10" width="22" height="8" rx="2" fill="#2a2420"/>' +
-                 '<path d="M26 12 Q35 2 44 12 Z M56 12 Q65 3 74 12 Z" fill="#d8a25a"/><circle cx="76" cy="46" r="4" fill="#9a3b1f"/></svg>' },
         marker: { name: 'the marker', slot: 'assets/workshop/marker', toggle: true, hint: 'draw on anything. Esc to stop.',
             art: '<svg viewBox="0 0 100 30" aria-hidden="true"><rect x="10" y="6" width="62" height="18" rx="4" fill="#2a2a2e"/><rect x="72" y="8" width="16" height="14" rx="2" fill="#1a1a1c"/>' +
                  '<path d="M88 11 L98 15 L88 19 Z" fill="#111"/><rect x="18" y="10" width="36" height="10" rx="2" fill="#f3e6c2"/><text x="36" y="18" text-anchor="middle" font-size="7" font-family="Arial" font-weight="bold" fill="#2a2a2e">PERM</text></svg>' },
@@ -49,7 +45,13 @@
         revolver: { name: 'the revolver', slot: 'assets/city/revolver', hint: 'aim and click. Esc to put it away.', cursor: 'reticle', keep: true,
             art: '<svg viewBox="0 0 100 60" aria-hidden="true"><path d="M8 14 H70 V26 H8 Z" fill="#4a4f57"/><rect x="4" y="15" width="6" height="10" fill="#2f3339"/>' +
                  '<rect x="46" y="12" width="26" height="22" rx="5" fill="#5b616a"/><circle cx="52" cy="23" r="2" fill="#2f3339"/><circle cx="60" cy="23" r="2" fill="#2f3339"/><circle cx="68" cy="23" r="2" fill="#2f3339"/>' +
-                 '<path d="M66 30 L86 30 L94 56 L76 58 Z" fill="#6e4a30"/><path d="M58 32 Q60 44 70 42" fill="none" stroke="#2f3339" stroke-width="3"/><rect x="70" y="8" width="6" height="6" fill="#2f3339"/></svg>' }
+                 '<path d="M66 30 L86 30 L94 56 L76 58 Z" fill="#6e4a30"/><path d="M58 32 Q60 44 70 42" fill="none" stroke="#2f3339" stroke-width="3"/><rect x="70" y="8" width="6" height="6" fill="#2f3339"/></svg>' },
+        // reset 4 only: the white revolver, given back with the traveller after the pact (sky/hell.js, sky/revolver.js). it's for
+        // the Claubes, the pictures round the false god, and the false god: it won't point at the traveller
+        'white-revolver': { name: 'the white revolver', slot: 'assets/items/white-revolver', hint: 'aim and click. it\u2019s for them, not for you. Esc to put it away.', cursor: 'reticle', keep: true,
+            art: '<svg viewBox="0 0 100 60" aria-hidden="true"><path d="M8 14 H70 V26 H8 Z" fill="#f4f1ea" stroke="#b9b2a2" stroke-width="1"/><rect x="4" y="15" width="6" height="10" fill="#d8d2c4"/>' +
+                 '<rect x="46" y="12" width="26" height="22" rx="5" fill="#fbf9f4" stroke="#b9b2a2" stroke-width="1"/><circle cx="52" cy="23" r="2" fill="#8a1a14"/><circle cx="60" cy="23" r="2" fill="#8a1a14"/><circle cx="68" cy="23" r="2" fill="#8a1a14"/>' +
+                 '<path d="M66 30 L86 30 L94 56 L76 58 Z" fill="#ebe5d8" stroke="#b9b2a2" stroke-width="1"/><path d="M79 38 L85 50" stroke="#8a1a14" stroke-width="1.4"/><path d="M58 32 Q60 44 70 42" fill="none" stroke="#c9c2b2" stroke-width="3"/><rect x="70" y="8" width="6" height="6" fill="#d8d2c4"/></svg>' }
     };
     var BAG = '<svg class="placeholder" viewBox="0 0 40 40" aria-hidden="true"><path d="M8 14 Q20 8 32 14 L35 34 Q20 40 5 34 Z" fill="#8a5a34"/><path d="M14 13 Q20 3 26 13" stroke="#5a3a24" stroke-width="3" fill="none"/>' +
         '<path d="M9 18 Q20 22 31 18" stroke="#5a3a24" stroke-width="2" fill="none"/><circle cx="20" cy="21" r="2.2" fill="#c49a52"/></svg>';
