@@ -54,25 +54,7 @@
     var LOCK = '<svg viewBox="0 0 20 24" aria-hidden="true"><path d="M5 10 V7 A5 5 0 0 1 15 7 V10" fill="none" stroke="#9aa0a8" stroke-width="2.6"/>' +
         '<rect x="2" y="10" width="16" height="12" rx="2" fill="#c49a52" stroke="#6e4a10" stroke-width="1"/><circle cx="10" cy="15" r="2" fill="#3a2716"/><path d="M10 16 V19" stroke="#3a2716" stroke-width="1.6"/></svg>';
 
-    Sky.css(
-        '.lives { position: fixed; left: 14px; top: 14px; z-index: 7; display: none; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 999px;' +
-            'background: rgba(30,21,14,.8) var(--lives-frame, none) center / 100% 100% no-repeat; box-shadow: 0 4px 12px rgba(0,0,0,.4); }' +
-        'body[data-page=home] .lives { top: 78px; }' +
-        '.lives.on { display: flex; }' +
-        '.lives.arrive { animation: lives-arrive .9s cubic-bezier(.3,1.6,.5,1); }' +
-        '@keyframes lives-arrive { from { transform: scale(.2) rotate(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }' +
-        '.lives .lf { position: relative; width: 26px; height: 24px; }' +
-        '.lives .lf > svg, .lives .lf > img { width: 100%; height: 100%; display: block; object-fit: contain; }' +
-        '.lives .lf.gone.just { animation: life-gone .9s ease-out; }' +
-        '@keyframes life-gone { 0% { transform: scale(1.5); filter: brightness(2); } 40% { transform: scale(.8) rotate(-15deg); } 100% { transform: none; } }' +
-        '.lives .l-lock { width: 20px; height: 24px; margin-left: 4px; }' +
-        '.lives .l-lock > svg, .lives .l-lock > img { width: 100%; height: 100%; display: block; object-fit: contain; }' +
-        '.lives.unlocked .l-lock { display: none; }' +
-        'body.leaving .lives, body.sky-view .lives, body.peep-view .lives, body.peep-close .lives, body.mirror-open .lives, body.paint-open .lives { opacity: 0; pointer-events: none; }' +
-        '.lives-note { position: fixed; left: 50%; top: 38%; z-index: 9; transform: translate(-50%, -50%); padding: 10px 22px; border-radius: 12px; background: rgba(20,10,10,.9);' +
-            'color: #f3e6c2; font: italic 1.3rem "IM Fell English", Georgia, serif; text-align: center; pointer-events: none; animation: lives-note 3.2s ease-out forwards; }' +
-        '@keyframes lives-note { 0% { opacity: 0; } 12%, 75% { opacity: 1; } 100% { opacity: 0; } }'
-    );
+    // (its look is in sky/css/lives.css, linked from each page's head)
 
     var el = document.createElement('div');
     el.className = 'lives';
@@ -184,10 +166,7 @@
         return true;
     }
 
-    Sky.css('.lives .l-lock.rattle { animation: lock-rattle .5s ease-in-out; }' +
-        '@keyframes lock-rattle { 0%, 100% { transform: none; } 20% { transform: rotate(-14deg); } 45% { transform: rotate(11deg); } 70% { transform: rotate(-6deg); } }' +
-        '.lives .l-lock.popping { animation: lock-pop .8s ease-in forwards; }' +
-        '@keyframes lock-pop { 0% { transform: none; } 30% { transform: translateY(-6px) rotate(-12deg); } 100% { transform: translate(14px, 40px) rotate(70deg); opacity: 0; } }');
+    // (its look is in sky/css/lives.css, linked from each page's head)
     Sky.lives = {
         get left() { return left(); }, get shown() { return shown(); }, get unlocked() { return unlocked(); },
         // the key (sky/resets.js): the lock comes off, and from now on they can die for real
