@@ -1,0 +1,18 @@
+/* =====================================================================
+   studio.css — the look of sky/studio.js.
+   (it used to be written inside the script, as strings; same rules, now here)
+   ===================================================================== */
+
+.studio .st-paint {
+    display: block;
+}
+.studio.uploading .st-paint,
+.studio:not(.uploading) .st-upload {
+    display: none;
+}
+.studio .st-upload .st-drop {
+    display: grid;
+}
+.studio .st-desk {
+    max-width: 100%;
+}

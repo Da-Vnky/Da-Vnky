@@ -244,12 +244,7 @@
             '<div class="st-actions"><button type="button" class="no">never mind</button><button type="button" class="go">send it to the workshop</button></div>' +
         '</div>';
     document.body.appendChild(st);
-    Sky.css(
-        '.studio .st-paint { display: block; }' +
-        '.studio.uploading .st-paint, .studio:not(.uploading) .st-upload { display: none; }' +
-        '.studio .st-upload .st-drop { display: grid; }' +
-        '.studio .st-desk { max-width: 100%; }'
-    );
+    // (its look is in sky/css/studio.css, linked from each page's head)
 
     var sheet = st.querySelector('.st-upload');
     var drop = st.querySelector('.st-drop'), dropImg = drop.querySelector('img'), fileIn = st.querySelector('.m-upload input');
