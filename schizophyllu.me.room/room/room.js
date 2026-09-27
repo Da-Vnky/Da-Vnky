@@ -872,7 +872,11 @@ function runCommand(raw) {
   if (cmd === 'ping') return termPrint(arg ? (OPI.ping[arg] || OPI.pingNobody(arg)) : ['ping who?']);
   if (cmd === 'sudo') return termPrint(OPI.sudo);
   if (cmd === 'rm') return termPrint(OPI.rm);
-  if (cmd.startsWith('ls') || cmd === 'dir') return termPrint(OPI.ls);
+  if (cmd.startsWith('ls') || cmd === 'dir') return termPrint(/-\w*a/.test(arg) ? OPI.lsAll : OPI.ls);
+  if (cmd === 'neofetch' || cmd === 'fastfetch') return termPrint(OPI.neofetch);
+  if (cmd === 'fortune') { const [line, who] = OPI.fortunes[Math.floor(Math.random() * OPI.fortunes.length)]; return termPrint([line, '    — ' + who]); }
+  if (cmd === 'man') return termPrint(!arg ? OPI.manWhat : OPI.man[arg] || OPI.manNone(arg));
+  if (cmd === 'date' || cmd === 'uptime') return termPrint(OPI.date);
   if (['hello', 'hi', 'hey', 'hiya'].includes(cmd)) return termPrint(OPI.hello);
   if (['thanks', 'thank', 'ty'].includes(cmd)) return termPrint(OPI.thanks);
   if (['who', 'opi'].includes(cmd)) return termPrint(OPI.who);
