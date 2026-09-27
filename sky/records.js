@@ -31,11 +31,13 @@
    (Victor, 27 Sep):
      • resets 1-3: an empty slot, "???" under it, until it's found (sky/loot.js: behind the
        false god's picture); then P(Doom) sits in it, plain, its name underneath.
-     • reset 4: P(Doom) goes missing. In its place its INVERTED twin, glowing red and evil
-       (colours turned inside out; a red staticky light instead of the party; its Claubes
-       wear black robes, pull the book and run down to the dungeon: sky/claubes.js). So
-       reset 4 always has the record that calls the Claubes: nobody gets stuck. It plays the
-       same song, or assets/sounds/doom-inverted if Victor adds one.
+     • reset 4: P(Doom) goes missing, and the slot's empty ("???"), until the grimoire's pact
+       (run:grimoire-pact). From then its INVERTED twin is there, glowing red and evil (colours
+       turned inside out; a red staticky light instead of the party; its Claubes wear black
+       robes, pull the book and run down to the dungeon: sky/claubes.js). So reset 4 always has
+       the record that calls the Claubes, and only once they can be dealt with: nobody gets
+       stuck. It plays Victor's reversed song, assets/sounds/evilrecord (.ogg or .mp3), or
+       until he adds one, P(Doom) played backwards, made in the browser (sky/music.js).
      • reset 5 on: P(Doom) is back, found or not, purified: glowing rainbow, a rainbow ring
        on the record. Now it can be given to Mel (her room sets localStorage mel-remedy):
        then it's at her place, and the slot's empty, "at Mel's" under it.
@@ -50,7 +52,7 @@
     var DOOM = /p\s*\(\s*doom\s*\)/i;
     function doomGiven() { try { return localStorage.getItem('mel-remedy') !== null; } catch (e) { return false; } }
     var invertedSong = null;
-    Sky.findAsset('assets/sounds/doom-inverted.mp3|assets/sounds/doom-inverted.ogg', function (u) { invertedSong = u || null; if (doomEntry) refill(); });
+    Sky.findAsset('assets/sounds/evilrecord.ogg|assets/sounds/evilrecord.mp3', function (u) { invertedSong = u || null; if (doomEntry) refill(); });
     var LABELS = ['#9a3b1f', '#c49a52', '#3f5a55', '#6e2f24', '#56636f', '#8a3f6e', '#b88c5e', '#28323b'];
 
     // (its look is in sky/css/records.css, linked from each page's head)
@@ -435,8 +437,11 @@
             if (pure()) return doomGiven() || wasShot(doomEntry.url) ? null : same(doomEntry);      // (back, found or not; unless she has it)
             return showing(doomEntry) ? same(doomEntry) : null;                                    // (resets 1-3: once it's found)
         }
+        // reset 4: missing until the grimoire's pact; then the inverted twin
+        if (!window.davSave || window.davSave.get('grimoire-pact') !== '1') return null;
         var inv = { kind: 'single', special: 'inverted', discCls: 'inverted', name: doomEntry.name, artist: '',
                     url: invertedSong || doomEntry.url + '#inverted', pic: doomEntry.pic, color: '#1a0606',
+                    reverse: !invertedSong, from: invertedSong ? '' : doomEntry.url,
                     title: '\u202E' + doomEntry.title + '\u202C' };
         return wasShot(inv.url) ? null : same(inv);
     }

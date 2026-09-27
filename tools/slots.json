@@ -2637,8 +2637,8 @@
        "kind": "sound"
       },
       {
-       "slot": "assets/sounds/doom-inverted",
-       "what": "the inverted P(Doom) record's song (optional: without it, it plays P(Doom) itself). a whole song, .mp3 or .ogg",
+       "slot": "assets/sounds/evilrecord",
+       "what": "the evil (inverted) P(Doom) record's song, reset 4: P(Doom) reversed, a whole song (.ogg or .mp3). until it's here, the site reverses P(Doom) itself as it plays",
        "kind": "sound",
        "optional": true
       },

@@ -410,9 +410,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   - **resets 1-3**: a plain slot with **"???"** under it (`.rp-special-name`, always showing) until it's found (sky/loot.js,
     behind the false god's picture; `LOOT.resets: [1, 2, 3]`: it can't be found in any other reset); then P(Doom) in it,
     its name underneath. No glow.
-  - **reset 4**: P(Doom) is missing; its **inverted twin** is in the slot, glowing red and evil (`special: 'inverted'`,
-    url = the P(Doom) file + `#inverted` or `assets/sounds/doom-inverted`, mirrored title with U+202E, `.rp-disc.inverted` =
-    invert + hue-rotate, the slot's red throbbing flicker). It's the only time the inverted record exists.
+  - **reset 4**: P(Doom) is missing and the slot's empty ("???") **until the grimoire's pact** (`run:grimoire-pact`; hell.js
+    `gift()` calls `Sky.records.reload()`); from then its **inverted twin** is in the slot, glowing red and evil (`special:
+    'inverted'`, mirrored title with U+202E, `.rp-disc.inverted` = invert + hue-rotate, the slot's red throbbing flicker). It's
+    the only time the inverted record exists. Its song: `assets/sounds/evilrecord.ogg|mp3` (Victor's reversed P(Doom)), else
+    url = the P(Doom) file + `#inverted` with `reverse: true, from: <P(Doom)>`: music.js `srcFor`/`reversedOf` decode it
+    (OfflineAudioContext), turn the samples back to front into a 16-bit WAV blob (once per page, a few seconds; the next page
+    makes it again and carries on where it was), and play that; if it can't, it plays forwards. `reverse`/`from` are kept in
+    the `music-now` save.
   - **reset 5 on**: P(Doom) is back **found or not**, purified: the slot glows rainbow (`.pure`) and its record has the
     turning rainbow ring (`discCls: 'doom'` only then). From now it can be given to Mel (her room: `DAV.hasRecord = reset >= 5`;
     reset 4 with it found says `QUIET_NOTES.notNow`). **Given to Mel** (`localStorage mel-remedy`): gone from the crate (and

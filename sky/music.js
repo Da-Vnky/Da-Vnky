@@ -226,7 +226,7 @@
         try {
             if (!t) { sessionStorage.removeItem(KEY); return; }
             sessionStorage.setItem(KEY, JSON.stringify({
-                tracks: tracks.map(function (x) { return { url: x.url, title: x.title, artist: x.artist || '', color: x.color, pic: /^blob:/.test(x.pic || '') ? '' : (x.pic || ''), skin: x.skin || '', discCls: x.discCls || '', special: x.special || '',
+                tracks: tracks.map(function (x) { return { url: x.url, title: x.title, artist: x.artist || '', color: x.color, pic: /^blob:/.test(x.pic || '') ? '' : (x.pic || ''), skin: x.skin || '', discCls: x.discCls || '', special: x.special || '', reverse: !!x.reverse, from: x.from || '',
                                                            album: x.album ? { key: x.album.key, title: x.album.title } : null }; }),
                 at: at, time: audio.currentTime || 0, playing: playing() || wantPlay || (hushed && hushedOn), savedAt: Date.now()
             }));
@@ -336,15 +336,51 @@
         if (!tracks.length) return;
         at = (i + tracks.length) % tracks.length;
         var t = tracks[at];
-        if (audio.src !== absolute(t.url)) audio.src = t.url;
-        if (startAt) {
-            var go = function () { try { audio.currentTime = Math.min(startAt, (audio.duration || startAt + 1) - 0.5); } catch (e) {} };
-            if (audio.readyState >= 1) go(); else audio.addEventListener('loadedmetadata', go, { once: true });
-        }
         media(t);
         emit('track');
-        if (play) start();
         save();
+        srcFor(t, function (src) {
+            if (tracks[at] !== t) return;                                  // (moved on while it was being made)
+            if (audio.src !== absolute(src)) audio.src = src;
+            if (startAt) {
+                var go = function () { try { audio.currentTime = Math.min(startAt, (audio.duration || startAt + 1) - 0.5); } catch (e) {} };
+                if (audio.readyState >= 1) go(); else audio.addEventListener('loadedmetadata', go, { once: true });
+            }
+            if (play) start();
+        });
+    }
+    /* ---------------- a song played backwards (the inverted P(Doom) record, sky/records.js) ----------------
+       a track with reverse: true and from: <the song's file> is made here, in the browser: the file is decoded, every
+       sample turned round, and it's played from memory (a WAV, made once per page). if the browser can't (or the file
+       won't decode), it plays forwards. Victor's own reversed file (assets/sounds/evilrecord) makes all this unneeded */
+    var backwards = {};
+    function srcFor(t, done) {
+        if (!t.reverse || !t.from) { done(t.url); return; }
+        reversedOf(t.from).then(done, function () { done(t.from); });
+    }
+    function reversedOf(src) {
+        if (backwards[src]) return backwards[src];
+        var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        if (!OAC) return Promise.reject();
+        backwards[src] = fetch(src).then(function (r) { if (!r.ok) throw new Error('no file'); return r.arrayBuffer(); }).then(function (buf) {
+            var ctx = new OAC(2, 44100, 44100);
+            return new Promise(function (ok, no) { var p = ctx.decodeAudioData(buf, ok, no); if (p && p.catch) p.catch(no); });
+        }).then(function (ab) {
+            var n = ab.length, ch = Math.min(2, ab.numberOfChannels), rate = ab.sampleRate;
+            var data = [], c, i;
+            for (c = 0; c < ch; c++) data.push(ab.getChannelData(c));
+            // a 16-bit WAV, the samples back to front
+            var out = new DataView(new ArrayBuffer(44 + n * ch * 2)), o = 44;
+            function str(at, s) { for (var k = 0; k < s.length; k++) out.setUint8(at + k, s.charCodeAt(k)); }
+            str(0, 'RIFF'); out.setUint32(4, 36 + n * ch * 2, true); str(8, 'WAVE'); str(12, 'fmt ');
+            out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, ch, true); out.setUint32(24, rate, true);
+            out.setUint32(28, rate * ch * 2, true); out.setUint16(32, ch * 2, true); out.setUint16(34, 16, true);
+            str(36, 'data'); out.setUint32(40, n * ch * 2, true);
+            for (i = n - 1; i >= 0; i--) for (c = 0; c < ch; c++) { var v = Math.max(-1, Math.min(1, data[c][i])); out.setInt16(o, v < 0 ? v * 0x8000 : v * 0x7fff, true); o += 2; }
+            return URL.createObjectURL(new Blob([out.buffer], { type: 'audio/wav' }));
+        });
+        backwards[src].catch(function () { delete backwards[src]; });
+        return backwards[src];
     }
     // hushed: silenced for a while (the dungeon has its own sound) without forgetting it was on
     var hushed = false, hushedOn = false;

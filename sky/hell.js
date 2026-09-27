@@ -320,6 +320,7 @@
     function gift(me) {
         bookBack();
         apparitionsBack();
+        if (Sky.records && Sky.records.reload) Sky.records.reload();       // (the inverted record's in the record player now)
         if (get('white-revolver') !== 'taken') {                           // (it's normally in their bag by now: taken down there)
             set('white-revolver', 'lying');
             placeGift(true);
