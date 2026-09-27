@@ -464,11 +464,13 @@ export const ASK_SKIZY = [
     m("She reads the news page before updating."),
     sk('SOMETIMES i read the news page'),
   ], [
-    t('nixos', 'have you tried nixos?', [
-      sk('i have tried nixos'), ['-', 'beat'],
-      sk('its genius. your whole system is one config file and you can roll back anything. its the future'),
-      sk('i lasted a week. i wanted to change one thing and i had to learn a whole programming language to do it'),
-      sk('i will go back. probably. when i am stronger'),
+    t('void', 'have you tried other distros?', [
+      sk('i tried to install void once. void linux. runit, no systemd, musl if you want it. perfect on paper'),
+      sk('the website was down'),
+      ['-', 'beat'],
+      sk('i took it as a sign'),
+      c('I filed it as an incident.'),
+      sk('it was not an incident claude it was a website'),
     ]),
     t('gnu', 'is it linux or GNU/linux?', [
       sk("i'd just like to interject for a moment. what you're referring to as linux is in fact"),
