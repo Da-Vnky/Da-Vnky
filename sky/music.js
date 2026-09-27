@@ -35,6 +35,16 @@
         '.cp .mu-i-pause, body.music-playing .cp .mu-i-play { display: none; }' +
         'body.music-playing .cp .mu-i-pause { display: block; }' +
         '.cp .mu-empty { display: none; }' +
+        // an album on: its songs, one click away
+        '.cp .mu-songs { display: none; width: auto; padding: 0 10px; border-radius: 999px; font: italic .9rem "IM Fell English", Georgia, serif; color: #6e5236; }' +
+        '.cp .mu-layer.on-album .mu-songs { display: inline-flex; align-items: center; }' +
+        '.cp .mu-album { display: none; list-style: none; margin: 8px 0 2px; padding: 4px; max-height: 190px; overflow: auto; border-radius: 10px;' +
+            'background: rgba(110,82,54,.1); box-shadow: inset 0 0 0 1px rgba(196,154,82,.55); }' +
+        '.cp .mu-layer.on-album.album-open .mu-album { display: block; }' +
+        '.cp .mu-album li { display: flex; gap: 8px; padding: 4px 8px; border-radius: 7px; cursor: pointer; font-size: .92rem; line-height: 1.25; }' +
+        '.cp .mu-album li span { flex: none; min-width: 1.4em; color: #9a7a4a; font-variant-numeric: tabular-nums; }' +
+        '.cp .mu-album li:hover { background: rgba(110,82,54,.16); }' +
+        '.cp .mu-album li.on { color: #9a3b1f; font-style: italic; }' +
         '.cp .mu-layer.empty .mu-empty { display: block; } .cp .mu-layer.empty .mu-full { display: none; }' +
         '@media (prefers-reduced-motion: reduce) { body.music-playing .cp .mu-disc svg { animation: none; } }'
     );
@@ -45,14 +55,32 @@
     // the sleeve's picture is laid on its label, the middle third)
     var recordArt = null;
     Sky.findAsset('assets/living/record', function (url) { if (url) { recordArt = url; emit('track'); } });
-    function disc(color, pic, cls) {
+    // an album (a record with a whole album on it) has a gold ring just inside its edge, and round its label:
+    // brushed metal, light and dark bands round it, a bright rim outside and a shadow line inside
+    function goldRing(id) {
+        return '<defs><linearGradient id="' + id + 'g" x1="0" y1="0" x2="1" y2="1">' +
+                '<stop offset="0" stop-color="#6e4c14"/><stop offset=".14" stop-color="#e9c96a"/><stop offset=".26" stop-color="#fff4c8"/>' +
+                '<stop offset=".38" stop-color="#b8892e"/><stop offset=".52" stop-color="#f6dd8e"/><stop offset=".64" stop-color="#8a6320"/>' +
+                '<stop offset=".78" stop-color="#ffeaa8"/><stop offset=".9" stop-color="#c29636"/><stop offset="1" stop-color="#5e400e"/></linearGradient>' +
+            '<linearGradient id="' + id + 'h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff8dc" stop-opacity=".9"/><stop offset=".5" stop-color="#fff8dc" stop-opacity="0"/></linearGradient></defs>' +
+            '<g class="rp-gold" fill="none">' +
+                '<circle cx="50" cy="50" r="46.4" stroke="url(#' + id + 'g)" stroke-width="2.6"/>' +
+                '<circle cx="50" cy="50" r="47.75" stroke="rgba(255,244,200,.45)" stroke-width=".35"/>' +
+                '<circle cx="50" cy="50" r="45.05" stroke="rgba(50,32,6,.75)" stroke-width=".4"/>' +
+                '<path d="M14 30 A40 40 0 0 1 40 6.5" stroke="url(#' + id + 'h)" stroke-width="1.6" stroke-linecap="round" transform="translate(0 0)"/>' +
+                '<circle cx="50" cy="50" r="17.7" stroke="url(#' + id + 'g)" stroke-width="1.3"/>' +
+                '<circle cx="50" cy="50" r="18.45" stroke="rgba(50,32,6,.6)" stroke-width=".3"/>' +
+            '</g>';
+    }
+    function disc(color, pic, cls, album) {
         var id = 'mdisc' + (++uid);
-        if (recordArt) return '<svg class="rp-disc ' + (cls || '') + '" viewBox="0 0 100 100" aria-hidden="true" data-slot="assets/living/record">' +
+        if (recordArt) return '<svg class="rp-disc ' + (cls || '') + (album ? ' album' : '') + '" viewBox="0 0 100 100" aria-hidden="true" data-slot="assets/living/record">' +
             '<defs><clipPath id="' + id + '"><circle cx="50" cy="50" r="17"/></clipPath></defs>' +
             '<image href="' + recordArt + '" x="0" y="0" width="100" height="100"/>' +
             (pic ? '<image href="' + pic + '" x="33" y="33" width="34" height="34" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/>' : '') +
+            (album ? goldRing(id) : '') +
             '</svg>';
-        return '<svg class="rp-disc ' + (cls || '') + '" viewBox="0 0 100 100" aria-hidden="true" data-slot="assets/living/record">' +
+        return '<svg class="rp-disc ' + (cls || '') + (album ? ' album' : '') + '" viewBox="0 0 100 100" aria-hidden="true" data-slot="assets/living/record">' +
             '<defs><clipPath id="' + id + '"><circle cx="50" cy="50" r="17"/></clipPath>' +
             '<radialGradient id="' + id + 's" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#3a3a3f"/><stop offset=".6" stop-color="#151518"/><stop offset="1" stop-color="#0c0c0e"/></radialGradient></defs>' +
             '<circle cx="50" cy="50" r="49" fill="url(#' + id + 's)"/>' +
@@ -63,6 +91,7 @@
             '<circle cx="50" cy="50" r="17" fill="' + (color || '#9a3b1f') + '"/>' +
             (pic ? '<image href="' + pic + '" x="33" y="33" width="34" height="34" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/>' : '') +
             '<circle cx="50" cy="50" r="17" fill="none" stroke="rgba(0,0,0,.25)"/>' +
+            (album ? goldRing(id) : '') +
             '<circle cx="50" cy="50" r="2" fill="#0c0c0e"/>' +
             '</svg>';
     }
@@ -143,6 +172,8 @@
     try { var v0 = localStorage.getItem('records-volume'); if (v0 !== null) audio.volume = Math.max(0, Math.min(1, v0 / 100)); } catch (e) {}
 
     function emit(what) { listeners.forEach(function (fn) { try { fn(what); } catch (e) {} }); }
+    // the songs on the same album as t (in playing order), or [] for a single
+    function albumSongs(t) { return t && t.album ? tracks.filter(function (x) { return x.album && x.album.key === t.album.key; }) : []; }
     function current() { return tracks[at] || null; }
     function playing() { return !audio.paused && !audio.ended; }
 
@@ -151,7 +182,8 @@
         try {
             if (!t) { sessionStorage.removeItem(KEY); return; }
             sessionStorage.setItem(KEY, JSON.stringify({
-                tracks: tracks.map(function (x) { return { url: x.url, title: x.title, artist: x.artist || '', color: x.color, pic: /^blob:/.test(x.pic || '') ? '' : (x.pic || '') }; }),
+                tracks: tracks.map(function (x) { return { url: x.url, title: x.title, artist: x.artist || '', color: x.color, pic: /^blob:/.test(x.pic || '') ? '' : (x.pic || ''),
+                                                           album: x.album ? { key: x.album.key, title: x.album.title } : null }; }),
                 at: at, time: audio.currentTime || 0, playing: playing() || wantPlay || (hushed && hushedOn), savedAt: Date.now()
             }));
         } catch (e) {}
@@ -395,7 +427,7 @@
     function media(t) {
         if (!('mediaSession' in navigator) || !t) return;
         try {
-            navigator.mediaSession.metadata = new MediaMetadata({ title: t.title, artist: t.artist || 'DaV-nky', album: 'the living space',
+            navigator.mediaSession.metadata = new MediaMetadata({ title: t.title, artist: t.artist || 'DaV-nky', album: t.album ? t.album.title : 'the living space',
                 artwork: t.pic && !/^blob:/.test(t.pic) ? [{ src: absolute(t.pic) }] : [] });
             navigator.mediaSession.setActionHandler('play', start);
             navigator.mediaSession.setActionHandler('pause', pause);
@@ -439,8 +471,10 @@
                         '<button type="button" class="cp-btn mu-prev" aria-label="previous song"><svg viewBox="0 0 20 20"><path d="M4 4h2v12H4zM16 4 L7 10 L16 16 Z"/></svg></button>' +
                         '<button type="button" class="cp-btn big mu-play" aria-label="play or pause"><svg class="mu-i-play" viewBox="0 0 20 20"><path d="M6 4 L16 10 L6 16 Z"/></svg><svg class="mu-i-pause" viewBox="0 0 20 20"><path d="M5 4h3.5v12H5zM11.5 4H15v12h-3.5z"/></svg></button>' +
                         '<button type="button" class="cp-btn mu-next" aria-label="next song"><svg viewBox="0 0 20 20"><path d="M14 4h2v12h-2zM4 4 L13 10 L4 16 Z"/></svg></button>' +
+                        '<button type="button" class="cp-btn mu-songs" aria-label="the album’s songs" aria-expanded="false">songs ▾</button>' +
                         '<button type="button" class="cp-btn mu-stop" aria-label="stop the music">stop ✕</button>' +
                     '</div>' +
+                    '<ol class="mu-album"></ol>' +
                     '<label class="cp-range">volume <input type="range" class="mu-vol" min="0" max="100" aria-label="music volume"></label>' +
                 '</div>';
             ui.body = body;
@@ -452,6 +486,16 @@
             body.querySelector('.mu-next').addEventListener('click', next);
             body.querySelector('.mu-prev').addEventListener('click', prev);
             body.querySelector('.mu-stop').addEventListener('click', stop);
+            ui.songsBtn = body.querySelector('.mu-songs'); ui.album = body.querySelector('.mu-album');
+            ui.songsBtn.addEventListener('click', function () {
+                var open = !ui.body.classList.contains('album-open');
+                ui.body.classList.toggle('album-open', open);
+                ui.songsBtn.setAttribute('aria-expanded', String(open));
+            });
+            ui.album.addEventListener('click', function (e) {
+                var li = e.target.closest('li[data-i]');
+                if (li) load(+li.dataset.i, true);
+            });
             ui.seek.addEventListener('input', function () { ui.seeking = true; ui.cur.textContent = mmss(ui.seek.value / 1000 * (audio.duration || 0)); });
             ui.seek.addEventListener('change', function () { if (audio.duration) audio.currentTime = ui.seek.value / 1000 * audio.duration; ui.seeking = false; });
             ui.vol.addEventListener('input', function () { setVolume(ui.vol.value / 100); });
@@ -476,9 +520,15 @@
             return;
         }
         if (t) {
-            ui.disc.innerHTML = disc(t.color, t.pic);
+            ui.disc.innerHTML = disc(t.color, t.pic, '', !!t.album);
             ui.title.textContent = t.title;
-            ui.artist.textContent = t.artist || '';
+            var songs = albumSongs(t);
+            ui.artist.textContent = songs.length ? (t.artist ? t.artist + ' · ' : '') + t.album.title + ' · ' + (songs.indexOf(t) + 1) + ' of ' + songs.length : (t.artist || '');
+            ui.body.classList.toggle('on-album', songs.length > 1);
+            ui.album.innerHTML = songs.map(function (x, n) {
+                return '<li data-i="' + tracks.indexOf(x) + '"' + (x === t ? ' class="on" aria-current="true"' : '') + '><span>' + (n + 1) + '</span></li>';
+            }).join('');
+            ui.album.querySelectorAll('li').forEach(function (li, n) { li.appendChild(document.createTextNode(songs[n].title)); });
         }
         if (Sky.panel) Sky.panel.refresh('music');
     }
@@ -605,7 +655,7 @@
     dressGrooves();
 
     Sky.music = {
-        audio: audio, disc: disc, readTags: readTags,
+        audio: audio, disc: disc, readTags: readTags, albumSongs: albumSongs,
         get tracks() { return tracks; }, get at() { return at; },
         current: current, playing: playing,
         load: load, play: function (i) { if (i === undefined) start(); else load(i, true); },

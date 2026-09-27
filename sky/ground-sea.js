@@ -421,12 +421,22 @@
         ship.classList.add('held');
         tween({ s: 1.12, dip: 0 }, 180, easeOut, ++tweenId);
     });
+    // it stays on the screen: since reset 2 it stays where it's dropped, so it can't be dragged off either side
+    // (on the right it can still reach over the dock: that's where the traveller stands at night)
+    function keepOnScreen() {
+        var r = ship.getBoundingClientRect(), W = document.documentElement.clientWidth || window.innerWidth, m = Math.max(8, W * 0.01);
+        if (r.right > W - m) drag.x -= r.right - (W - m);
+        else if (r.left < m) drag.x += m - r.left;
+        else return;
+        placeShip();
+    }
     ship.addEventListener('pointermove', function (e) {
         if (!held) return;
         drag.x = e.clientX - grab.x;
         drag.y = e.clientY - grab.y;
         if (ship.classList.contains('anchored')) drag.y = Math.max(-ANCHOR_LIFT, drag.y);     // (too heavy)
         placeShip();
+        keepOnScreen();
     });
     function release() {
         if (!held) return;

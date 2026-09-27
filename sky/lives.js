@@ -40,6 +40,17 @@
         apple:       'I pick it up\u2026 and put it back. Not yet. There\u2019s something I haven\u2019t found.',
         placeholder: 'Not yet. There\u2019s something I have to find first.'
     };
+    // each way to die costs a heart once a reset. tried again after that, it doesn't happen, and the traveller says why
+    var DONE = {
+        scissors:    'Not the scissors again. Once was enough, and it didn\u2019t take.',
+        toaster:     'Not the bath again. It didn\u2019t work the first time.',
+        boat:        'Not the boat again. It didn\u2019t stick the first time.',
+        roof:        'I\u2019ve already jumped. The ground just gave me back.',
+        grimoire:    'The pact\u2019s already made. The book has nothing more to ask.',
+        diagram:     'The circle already took what it wanted.',
+        apple:       'I\u2019ve already had a bite. I won\u2019t fall for it twice.',
+        placeholder: 'Not that one again. It has to be something else.'
+    };
     function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function put(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
@@ -116,7 +127,19 @@
     // every death (the revolver, a fall, the toaster, the scissors …) costs a life,
     // but only once the lock's off (this reset's hidden key): until then they're safe
     function unlocked() { return get('lives-unlocked') === '1'; }
-    document.addEventListener('dav:traveller-died', function () { if (shown() && unlocked()) lose(300); });
+    // the way to die that's just been let through (refuse() below), so the death that follows can use it up for the reset
+    var pending = null, lastDeath = 0;
+    function kindOf(k) { return String(k || '').replace(/[^a-z0-9:-]/gi, ''); }
+    function spent(kind) { return !!S && S.get('spent-' + kindOf(kind)) === '1'; }
+    document.addEventListener('dav:traveller-died', function () {
+        if (!(shown() && unlocked())) return;
+        var now = Date.now();
+        if (now - lastDeath < 4000) return;                           // (one death, one heart: never two for the same fall)
+        lastDeath = now;
+        if (pending && now - pending.at < 30000 && S) S.set('spent-' + kindOf(pending.kind), '1');
+        pending = null;
+        lose(300);
+    });
     var resetting = false;
     function lose(after) {
         if (resetting) return;
@@ -146,13 +169,21 @@
     draw();
     // a way to die, tried before the key (from reset 2): it doesn't happen, and the traveller says why
     var saidAt = 0;
+    // (and once the key's found: a way to die that's already cost a heart this reset is off too, with its own line)
     function refuse(kind) {
-        if (!ALWAYS || unlocked()) return false;
+        var counts = shown() && unlocked(), base = String(kind || '').split(':')[0];
+        if (counts && kind !== 'revolver' && spent(kind)) return no(DONE[base] || DONE.placeholder);
+        if (!ALWAYS || unlocked()) {
+            if (counts && kind !== 'revolver') pending = { kind: kind, at: Date.now() };
+            return false;
+        }
+        return no(NOT_YET[base] || NOT_YET.placeholder);
+    }
+    function no(line) {
         var now = Date.now();
         if (now - saidAt > 2500) {
             saidAt = now;
             document.querySelectorAll('.mc-say').forEach(function (b) { b.remove(); });   // (this matters more than whatever they were saying)
-            var line = NOT_YET[kind] || NOT_YET.placeholder;
             if (Sky.claubes && Sky.claubes.speak) Sky.claubes.speak(line, null, { hold: 1800 });
             else if (Sky.inventory && Sky.inventory.say) Sky.inventory.say(line, 3000);
             var lk = el.querySelector('.l-lock');                           // (and the lock on the hearts gives a little shake)

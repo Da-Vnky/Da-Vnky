@@ -1,8 +1,8 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-city.html 7710 2379070308
-index.html 2868 273967421
-living.html 105560 2654800713
-workshop.html 19407 1982735402
+city.html 7710 1951172118
+index.html 2868 3060808361
+living.html 105560 3280897987
+workshop.html 19407 4058156779
 sky/attic.js 43749 30995443
 sky/bathroom.js 41961 3080096843
 sky/books.js 17675 1423934026
@@ -16,17 +16,17 @@ sky/gallery.js 15077 3219970737
 sky/gore.js 29736 2449003616
 sky/ground-city.js 26668 2330969156
 sky/ground-countryside.js 13833 642858024
-sky/ground-sea.js 54266 950476150
+sky/ground-sea.js 54825 1049862518
 sky/ground-view.js 6631 1730141118
 sky/inventory.js 21557 3091494983
 sky/kitchen.js 29152 2379150716
 sky/letters.js 24342 1362896008
-sky/lives.js 12980 3390867880
+sky/lives.js 14867 1615914691
 sky/loader.js 15448 3284628827
 sky/loot.js 16128 2332404378
 sky/marker.js 8207 444656591
 sky/models.js 7807 287414390
-sky/music.js 42325 2904867432
+sky/music.js 47034 2740869384
 sky/noise.js 13535 2803187658
 sky/notes.js 9342 2828812493
 sky/paint.js 47856 3321309787
@@ -34,8 +34,8 @@ sky/panel.js 63554 1604886247
 sky/peeper.js 39569 3678045172
 sky/porch.js 24933 747081681
 sky/post.js 27542 100469044
-sky/records.js 30255 2143094409
-sky/resets.js 26614 1196687943
+sky/records.js 37755 2111082554
+sky/resets.js 26682 2607461089
 sky/revolver.js 15115 933686295
 sky/sky.js 110611 2439298702
 sky/state.js 14831 536835879
@@ -69,8 +69,9 @@ content/claude/list.txt 169 76452382
 content/dungeon/list.txt 124 1680728230
 content/dungeon/paper.json 163 2584569784
 content/frames/list.txt 308 2092207427
+content/living/albums.txt 102 176666695
 content/living/frames.json 150 2267752740
-content/living/list.txt 371 735336346
+content/living/list.txt 382 725217127
 content/sea/2026-09-25-hello-world.txt 213 4016599039
 content/sea/list.txt 161 3392900003
 content/shame/frames.json 359 3564234737

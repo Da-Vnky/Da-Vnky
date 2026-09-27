@@ -17,6 +17,14 @@
 
    title & artist: from the song's own tags when it has them, otherwise
    the file name ("01-my-song.mp3" → "my song"). order: by file name.
+
+   ALBUMS: a folder of songs in the same folder is one record with a whole
+   album on it (content/living/albums.txt lists them: publishing and the
+   content manager write it):
+       06-my album/01-first song.mp3, 02-second song.mp3 …  + cover.jpg
+   its sleeve and its record have a gold ring just inside the edge. while
+   an album plays, its songs pop up under the player (pick one), and the
+   usual ⏮ ⏭ (and the phone's media keys) go from song to song.
    ===================================================================== */
 
 (function () {
@@ -109,6 +117,28 @@
         '.rp-sleeve.on .sl-cover::after { content: "♪ on"; position: absolute; right: 6px; top: 6px; padding: 1px 7px; border-radius: 999px;' +
             'background: rgba(42,29,20,.82); color: #f3e6c2; font-size: .8rem; font-style: italic; }' +
         '.rp-sleeve.lifted { visibility: hidden; }' +
+        // an album's sleeve: a gold border just inside its edge (brushed metal: light and dark bands, a bevel)
+        '.rp-sleeve.album .sl-cover::before { content: ""; position: absolute; inset: 5%; z-index: 1; pointer-events: none; border: 3px solid transparent;' +
+            'border-image: linear-gradient(135deg, #6e4c14, #e9c96a 14%, #fff4c8 24%, #b8892e 38%, #f6dd8e 52%, #8a6320 64%, #ffeaa8 78%, #c29636 90%, #5e400e) 1;' +
+            'box-shadow: 0 0 0 1px rgba(50,32,6,.45), inset 0 0 0 1px rgba(50,32,6,.45), 0 0 6px rgba(255,220,120,.25); }' +
+        '.rp-sleeve.album .sl-cover::after { z-index: 2; }' +
+        '.rp-sleeve .sl-count { position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%); z-index: 2; padding: 0 7px; border-radius: 999px;' +
+            'background: rgba(42,29,20,.78); color: #f6dd8e; font-size: .72rem; font-style: italic; white-space: nowrap; }' +
+        // the album's songs, while it plays
+        '.rp-album { margin: 14px 0 0; padding: 10px 12px 8px; border-radius: 12px; background: rgba(110,82,54,.08); position: relative;' +
+            'box-shadow: inset 0 0 0 1.5px rgba(196,154,82,.7), inset 0 0 0 3px rgba(255,240,190,.35); transform-origin: 50% 0; }' +
+        '.rp-album[hidden] { display: none; }' +
+        '.rp-album.pop { animation: rp-pop .35s cubic-bezier(.3,1.4,.5,1); }' +
+        '@keyframes rp-pop { from { opacity: 0; transform: scaleY(.6) translateY(-8px); } to { opacity: 1; transform: none; } }' +
+        '.rp-album h3 { margin: 0 0 6px; font: italic 1rem "IM Fell English", Georgia, serif; color: #8a6320; }' +
+        '.rp-album ol { list-style: none; margin: 0; padding: 0; max-height: 200px; overflow: auto; columns: 2 220px; column-gap: 12px; }' +
+        '.rp-album li { break-inside: avoid; }' +
+        '.rp-album button { display: flex; gap: 8px; width: 100%; padding: 5px 8px; border: 0; border-radius: 8px; background: none; text-align: left; cursor: pointer;' +
+            'font: inherit; font-size: .98rem; color: #3a2716; line-height: 1.25; }' +
+        '.rp-album button:hover, .rp-album button:focus-visible { background: rgba(110,82,54,.16); outline: none; }' +
+        '.rp-album button span { flex: none; min-width: 1.5em; color: #9a7a4a; font-variant-numeric: tabular-nums; }' +
+        '.rp-album button.on { color: #9a3b1f; font-style: italic; }' +
+        '.rp-album button.on span::before { content: "♪"; margin-right: 2px; }' +
         '.rp-fly { position: fixed; inset: 0; z-index: 9; pointer-events: none; }' +
         '.rp-fly > * { position: absolute; left: 0; top: 0; transform-origin: 50% 50%; }' +
         '.rp-fly .fly-disc svg { width: 100%; height: 100%; display: block; }' +
@@ -151,7 +181,7 @@
         if (labelDot) labelDot.setAttribute('fill', t ? t.color : '#9a3b1f');
         if (labelArt) { if (t && t.pic) labelArt.setAttribute('href', t.pic); else labelArt.removeAttribute('href'); }
         ttRecord.classList.toggle('on', !!t);
-        ttRecord.innerHTML = t ? M.disc(t.color, t.pic) : '';
+        ttRecord.innerHTML = t ? M.disc(t.color, t.pic, '', !!t.album) : '';
     }
 
     /* ---------------- the player ---------------- */
@@ -176,23 +206,51 @@
                 '</div>' +
             '</div>' +
         '</div>' +
+        '<div class="rp-album" hidden><h3></h3><ol></ol></div>' +
         '<div class="rp-crate-title">the crate: pick a record</div>' +
         '<div class="rp-sleeves"></div>';
     document.body.appendChild(box);
 
-    var tracks = [], seeking = false;
+    // entries: the crate, in order (songs on their own, and albums: { kind: 'album', songs: […] });
+    // tracks: every song in playing order (an album's songs one after another), the list the player plays through
+    var entries = [], tracks = [], seeking = false;
+    function songsOf(e) { return e.kind === 'album' ? e.songs : [e]; }
+    function flatten() { tracks = []; entries.forEach(function (e) { songsOf(e).forEach(function (t) { tracks.push(t); }); }); }
+    var albumBox = null;
     var nowDisc = box.querySelector('.rp-now-disc'), titleEl = box.querySelector('.rp-title'), artistEl = box.querySelector('.rp-artist');
     var seek = box.querySelector('.rp-seek input'), cur = box.querySelector('.rp-cur'), dur = box.querySelector('.rp-dur');
     var vol = box.querySelector('.rp-vol input'), sleeves = box.querySelector('.rp-sleeves'), playBtn = box.querySelector('.rp-play');
     vol.value = Math.round(audio.volume * 100);
 
     function mmss(t) { if (!isFinite(t)) return '0:00'; t = Math.floor(t); return Math.floor(t / 60) + ':' + ('0' + t % 60).slice(-2); }
+    var shownAlbum = null;
     function drawNow() {
-        var t = M.current();
-        nowDisc.innerHTML = M.disc(t ? t.color : '#6e5236', t && t.pic);
+        var t = M.current(), songs = M.albumSongs ? M.albumSongs(t) : [];
+        nowDisc.innerHTML = M.disc(t ? t.color : '#6e5236', t && t.pic, '', !!(t && t.album));
         titleEl.textContent = t ? t.title : 'no record on';
-        artistEl.textContent = t ? (t.artist || '') : (tracks.length ? 'pick one from the crate' : '');
-        sleeves.querySelectorAll('.rp-sleeve').forEach(function (s, i) { s.classList.toggle('on', !!t && tracks[i] === t); });
+        artistEl.textContent = t ? (songs.length ? (t.artist ? t.artist + ' · ' : '') + t.album.title + ' · ' + (songs.indexOf(t) + 1) + ' of ' + songs.length : (t.artist || ''))
+                                 : (tracks.length ? 'pick one from the crate' : '');
+        sleeves.querySelectorAll('.rp-sleeve').forEach(function (s, i) { s.classList.toggle('on', !!t && !!entries[i] && songsOf(entries[i]).indexOf(t) !== -1); });
+        // an album on: its songs pop up, to pick from
+        albumBox = albumBox || box.querySelector('.rp-album');
+        var key = songs.length > 1 ? t.album.key : null;
+        albumBox.hidden = !key;
+        if (key) {
+            if (key !== shownAlbum) { albumBox.classList.remove('pop'); void albumBox.offsetWidth; albumBox.classList.add('pop'); }
+            albumBox.querySelector('h3').textContent = 'on this record: ' + t.album.title;
+            var ol = albumBox.querySelector('ol');
+            ol.innerHTML = '';
+            songs.forEach(function (x, n) {
+                var li = document.createElement('li'), b = document.createElement('button');
+                b.type = 'button'; b.className = x === t ? 'on' : '';
+                b.innerHTML = '<span>' + (n + 1) + '</span>';
+                b.appendChild(document.createTextNode(x.title));
+                b.setAttribute('aria-label', 'play ' + x.title);
+                b.addEventListener('click', function () { if (x !== M.current()) M.load(M.tracks.indexOf(x), true); else if (!M.playing()) M.play(); });
+                li.appendChild(b); ol.appendChild(li);
+            });
+        }
+        shownAlbum = key;
         drawDeck();
     }
     function coverHTML(t) {
@@ -204,18 +262,20 @@
             sleeves.innerHTML = '<p class="rp-empty">the crate is empty. put .mp3 files in content/living/ and they turn up here as records.</p>';
             return;
         }
-        tracks.forEach(function (t, i) {
+        entries.forEach(function (t, i) {
+            var album = t.kind === 'album';
             var s = document.createElement('button');
             s.type = 'button';
-            s.className = 'rp-sleeve';
+            s.className = 'rp-sleeve' + (album ? ' album' : '');
             s.style.zIndex = i + 1;
-            s.style.setProperty('--tilt', (((Sky.hashStr(t.url) % 7) - 3) * 0.8).toFixed(1) + 'deg');
+            s.style.setProperty('--tilt', (((Sky.hashStr(t.url || t.key || t.title) % 7) - 3) * 0.8).toFixed(1) + 'deg');
             s.style.setProperty('--sl', t.color);
-            s.innerHTML = '<span class="sl-disc">' + M.disc(t.color, t.pic) + '</span><span class="sl-cover">' + coverHTML(t) + '</span><span class="sl-name"></span>';
+            s.innerHTML = '<span class="sl-disc">' + M.disc(t.color, t.pic, '', album) + '</span><span class="sl-cover">' + coverHTML(t) +
+                (album ? '<span class="sl-count">' + t.songs.length + ' songs</span>' : '') + '</span><span class="sl-name"></span>';
             var plain = s.querySelector('.sl-plain');
             if (plain) plain.textContent = t.title;
-            s.querySelector('.sl-name').textContent = t.artist ? t.title + ' · ' + t.artist : t.title;
-            s.setAttribute('aria-label', 'play ' + t.title);
+            s.querySelector('.sl-name').textContent = album ? t.title + ' · the album' : t.artist ? t.title + ' · ' + t.artist : t.title;
+            s.setAttribute('aria-label', (album ? 'play the album ' : 'play ') + t.title);
             s.addEventListener('click', function () { pick(i, s); });
             sleeves.appendChild(s);
         });
@@ -232,9 +292,10 @@
         return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width };
     }
     function pick(i, sleeve) {
-        var t = tracks[i];
-        if (busy) return;
-        if (M.current() === t) { if (!M.playing()) M.play(); return; }
+        var e = entries[i], songs = songsOf(e), on = M.current();
+        if (busy || !songs.length) return;
+        if (songs.indexOf(on) !== -1) { if (!M.playing()) M.play(); return; }         // (already on: an album carries on where it was)
+        var t = songs[0];
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { M.load(M.tracks.indexOf(t), true); return; }
         busy = true;
         var a = sleeve.getBoundingClientRect();
@@ -242,12 +303,12 @@
         layer.className = 'rp-fly';
         var d = document.createElement('div');
         d.className = 'fly-disc';
-        d.innerHTML = M.disc(t.color, t.pic);
+        d.innerHTML = M.disc(e.color, e.pic, '', e.kind === 'album');
         var c = document.createElement('div');
-        c.className = 'rp-sleeve fly-cover';
-        c.style.setProperty('--sl', t.color);
-        c.innerHTML = '<span class="sl-cover">' + coverHTML(t) + '</span>';
-        if (c.querySelector('.sl-plain')) c.querySelector('.sl-plain').textContent = t.title;
+        c.className = 'rp-sleeve fly-cover' + (e.kind === 'album' ? ' album' : '');
+        c.style.setProperty('--sl', e.color);
+        c.innerHTML = '<span class="sl-cover">' + coverHTML(e) + '</span>';
+        if (c.querySelector('.sl-plain')) c.querySelector('.sl-plain').textContent = e.title;
         var w = a.width, dw = w * 0.9;
         c.style.width = c.style.height = w + 'px';
         d.style.width = d.style.height = dw + 'px';
@@ -386,48 +447,65 @@
     function wasShot(url) { try { return (JSON.parse(sessionStorage.getItem('records-shot') || '[]')).indexOf(abs(url)) !== -1; } catch (e) { return false; } }
     // what's in the crate: not a record shot to bits this visit (sky/revolver.js), and not a hidden
     // record you haven't found yet (sky/loot.js: the P(Doom) one's behind a picture in the hall of shame)
-    var allTracks = [];
+    var allEntries = [];
     function showing(t) { return !wasShot(t.url) && !(Sky.loot && Sky.loot.trackHidden(t.url, t.title)); }
+    // the crate as it stands: without the shot and the still-hidden songs (an album with none left goes too).
+    // the song that's on is the same record wherever it's listed: that one object, so the player knows it
+    function visible() {
+        var on = M.current();
+        function same(t) { if (on && abs(on.url) === abs(t.url)) { if (!on.album && t.album) on.album = t.album; if (!on.pic) on.pic = t.pic; return on; } return t; }
+        return allEntries.map(function (e) {
+            if (e.kind !== 'album') return showing(e) ? same(e) : null;
+            var songs = e.songs.filter(showing).map(same);
+            return songs.length ? Object.assign({}, e, { songs: songs }) : null;
+        }).filter(Boolean);
+    }
+    function refill() { entries = visible(); flatten(); M.setTracks(tracks.slice()); drawSleeves(); drawNow(); }
     Sky.records = {
-        reload: function () {
-            var on = M.current();
-            tracks = allTracks.filter(showing).map(function (t) { return on && abs(on.url) === abs(t.url) ? on : t; });
-            M.setTracks(tracks.slice());
-            drawSleeves(); drawNow();
-        },
+        reload: refill,
+        // shot: the whole record's gone (an album: every song on it)
         forget: function (url) {
-            try { var l = JSON.parse(sessionStorage.getItem('records-shot') || '[]'); if (l.indexOf(abs(url)) === -1) l.push(abs(url)); sessionStorage.setItem('records-shot', JSON.stringify(l)); } catch (e) {}
-            tracks = tracks.filter(function (t) { return abs(t.url) !== abs(url); });
-            M.setTracks(tracks.slice());
-            drawSleeves(); drawNow();
+            var hit = allEntries.filter(function (e) { return songsOf(e).some(function (t) { return abs(t.url) === abs(url); }); })[0];
+            var urls = hit ? songsOf(hit).map(function (t) { return abs(t.url); }) : [abs(url)];
+            try { var l = JSON.parse(sessionStorage.getItem('records-shot') || '[]'); urls.forEach(function (u) { if (l.indexOf(u) === -1) l.push(u); }); sessionStorage.setItem('records-shot', JSON.stringify(l)); } catch (e) {}
+            refill();
         },
         deck: deck
     };
 
-    /* ---------------- fill the crate from the folder ---------------- */
+    /* ---------------- fill the crate from the folder (and its albums) ---------------- */
     drawNow();
-    Sky.listFolder(deck.dataset.folder, AUDIO.concat(PICS), function (files) {
+    var folder = deck.dataset.folder.replace(/\/?$/, '/');
+    function listed(dir) { return new Promise(function (ok) { Sky.listFolder(dir, AUDIO.concat(PICS), ok); }); }
+    function picsOf(files) {
         var pics = {};
-        files.forEach(function (f) {
-            if (/\.(jpe?g|png|webp|gif)$/i.test(f.name)) pics[f.name.replace(/\.[^.]+$/, '').toLowerCase()] = f.url;
-        });
-        tracks = Sky.sortByName(files.filter(function (f) { return /\.(mp3|ogg)$/i.test(f.name); })).map(function (f) {
+        files.forEach(function (f) { if (/\.(jpe?g|png|webp|gif)$/i.test(f.name)) pics[f.name.replace(/\.[^.]+$/, '').toLowerCase()] = f.url; });
+        return pics;
+    }
+    function songsIn(files, pics, fallback, album, color) {
+        return Sky.sortByName(files.filter(function (f) { return /\.(mp3|ogg)$/i.test(f.name); })).map(function (f) {
             var base = f.name.replace(/\.[^.]+$/, '');
-            return {
-                url: f.url,
-                title: Sky.fileTitle(f.name),
-                artist: '',
-                pic: pics[base.toLowerCase()] || null,
-                color: LABELS[Sky.hashStr(f.name) % LABELS.length]
-            };
+            return { url: f.url, title: Sky.fileTitle(f.name), artist: '', pic: pics[base.toLowerCase()] || fallback || null,
+                     color: color || LABELS[Sky.hashStr(f.name) % LABELS.length], album: album || null, name: f.name };
         });
-        allTracks = tracks.slice();
-        tracks = tracks.filter(showing);
-        M.setTracks(tracks.slice());
-        // the song that was already on (from another page) is the same record: use this crate's copy
-        var on = M.current();
-        if (on) tracks.forEach(function (t, i) { if (new URL(t.url, location.href).href === new URL(on.url, location.href).href) { tracks[i] = on; if (!on.pic) on.pic = t.pic; } });
-        drawSleeves();
+    }
+    var albumNames = fetch(folder + 'albums.txt', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; })
+        .then(function (t) { return /<html/i.test(t) ? [] : t.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(function (l) { return l && l.charAt(0) !== '#'; }); });
+    Promise.all([listed(folder), albumNames]).then(function (got) {
+        var files = got[0], singles = songsIn(files, picsOf(files)).map(function (t) { t.kind = 'single'; return t; });
+        return Promise.all(got[1].map(function (name) {
+            return listed(folder + encodeURIComponent(name) + '/').then(function (fs) {
+                var pics = picsOf(fs), cover = pics.cover || (fs.filter(function (f) { return /\.(jpe?g|png|webp|gif)$/i.test(f.name); })[0] || {}).url || null;
+                var title = name.replace(/^\d+[-_. ]+/, '').replace(/[_]+/g, ' ').trim() || name;
+                var color = LABELS[Sky.hashStr(name) % LABELS.length], album = { key: name, title: title };
+                var songs = songsIn(fs, pics, cover, album, color);
+                return songs.length ? { kind: 'album', name: name, key: name, title: title, pic: cover, color: color, songs: songs } : null;
+            });
+        })).then(function (albums) { return Sky.sortByName(singles.concat(albums.filter(Boolean))); });
+    }).then(function (all) {
+        allEntries = all;
+        refill();
+        // their own tags: title, artist, a picture (an album's cover stays its cover)
         tracks.forEach(function (t) {
             if (!/\.mp3$/i.test(t.url)) return;
             M.readTags(t.url).then(function (tags) {
@@ -435,7 +513,7 @@
                 if (tags.title) t.title = tags.title;
                 if (tags.artist) t.artist = tags.artist;
                 if (tags.bpm) t.tagBpm = tags.bpm;
-                if (tags.picture && !t.pic) t.pic = tags.picture;
+                if (tags.picture && !t.pic) { t.pic = tags.picture; if (t.kind === 'single') t.pic = tags.picture; }
                 drawSleeves();
             });
         });

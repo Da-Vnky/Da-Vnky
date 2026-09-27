@@ -5,6 +5,21 @@
 # (the git hook in tools/hooks runs it for you on every commit)
 # run from the top of the site (or from anywhere: it finds its way there)
 [ -f tools/update-lists.sh ] || cd "$(dirname "$0")/.." || exit 1
+# the record player's albums: every folder of songs in content/living/ (not the bottles): content/living/albums.txt
+# (first, so content/living/list.txt below has it too)
+if [ -d content/living ]; then
+    {
+        echo "# written by tools/update-lists.sh: the record player's albums (folders of songs in content/living/)."
+        for dir in content/living/*/; do
+            [ -d "$dir" ] || continue
+            name=$(basename "$dir")
+            case "$name" in bottles|.*|_*|~*) continue ;; esac
+            ls "$dir" | grep -qiE '\.(mp3|ogg)$' || continue
+            echo "$name"
+        done
+    } > content/living/albums.txt
+fi
+
 for dir in content/*/ content/*/*/; do
     [ -d "$dir" ] || continue
     list="${dir}list.txt"

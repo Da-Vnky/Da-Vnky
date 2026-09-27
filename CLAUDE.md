@@ -23,8 +23,8 @@ this before changing anything; keep it up to date when something here stops bein
   manager if `tools/content.py` changed…).
 - Change only what the task needs. Victor (or Mel) may have edited a file since you last read it: read it again
   before changing it, and never overwrite their edits.
-- **Never write** `list.txt` (any), `catalog.txt`, `files.txt`, `manifest.txt` or `assets/resets/index.txt`:
-  publishing writes those (`tools/update-lists.sh`).
+- **Never write** `list.txt` (any), `catalog.txt`, `files.txt`, `manifest.txt`, `assets/resets/index.txt` or
+  `content/living/albums.txt`: publishing writes those (`tools/update-lists.sh`).
 - After changing anything in `sky/`, **bump the `?v=` string on every page** (same string everywhere).
 - Every new picture or sound is a **slot with a stand-in**, described in `tools/slots.json`.
 - `schizophyllu.me.room/` is **Mel's**: only integration edits there, and list exactly what you changed so
@@ -56,6 +56,7 @@ this before changing anything; keep it up to date when something here stops bein
   It writes, and you never hand-edit:
   - `assets/<folder>/list.txt`, `content/<scene>/list.txt`, `content/<scene>/<sub>/list.txt`
   - `assets/resets/index.txt` (every file the resets have of their own)
+  - `content/living/albums.txt` (the record player's albums: every folder of songs in content/living/ but `bottles`)
   - `catalog.txt` (every file + size + checksum: the loader's source of truth)
   - `files.txt` / `manifest.txt` (pages and code only, for visitors still on an old loading screen)
 - Local preview: `tools\preview.bat` (http://localhost:8000) or the content manager `tools\content.bat`
@@ -262,6 +263,30 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 - The traveller's dialogue box (`Sky.claubes.speak`) sits near the top, not over the traveller (it used to eat clicks
   meant for them).
 
+## The record player: singles and albums (records.js, music.js; the content manager's "record player" tab)
+
+- A **single** is one song file in `content/living/` (`01-title.ogg` + its sleeve `01-title.jpg`). An **album** is a
+  numbered folder there (`06-album title/01-song.mp3, 02-…` + `cover.jpg`), numbered in the same sequence as the
+  singles (the crate's order). `content/living/albums.txt` lists the album folders (generated: update-lists.sh, and
+  content.py's `write_albums()` via `write_list(SONGS)`; also in pull.sh's GENERATED and `.gitattributes` merge=regen).
+- records.js: `entries` = the crate (singles and `{ kind: 'album', key, title, pic, color, songs }`), `tracks` = every
+  song flattened in playing order, handed to `Sky.music.setTracks`, so ⏮ ⏭, the end of a song and the phone's media
+  keys go song to song through an album and on to the next record. Album songs carry `album: { key, title }` (kept in
+  the `music-now` save, so it survives page changes); `Sky.music.albumSongs(t)`.
+- Look: `Sky.music.disc(color, pic, cls, album)` draws a **gold metallic ring** just inside the record's edge and round
+  its label (`goldRing`: banded gradient, bright rim, shadow line; also over Victor's own `assets/living/record`).
+  Album sleeves get a gold border inside the edge (`.rp-sleeve.album`, border-image) and "N songs".
+- While an album plays: the player shows **"on this record"** (`.rp-album`, pops in) with its songs to pick; the
+  control panel's music layer has a "songs ▾" button with the same list (on every page). Shooting the record
+  (revolver) takes the whole album (`Sky.records.forget`).
+- Content manager (content.py): `tracks()` returns singles (`kind: 'single'`) and albums (`kind: 'album'`, `songs`);
+  `renumber`/`rename_song`/`finish_renames` take a `folder` and handle album folders (`stem_of`: a folder name is
+  all name, dots and all). Routes: `/__records/album-new` {title}, `/__records/album-add` (X-Album, file),
+  `/__records/album-song` {album, song, do: move|rename|delete}; `/__records/sleeve` and `sleeve-link` put an album's
+  cover in its folder as `cover.<ext>`; `/__records/delete` removes a whole album. assets.html: "+ add an album"
+  (pick the songs, and optionally a picture for the cover, all at once; asks the album's name; songs go on in file-name
+  order), album rows with their songs under them (rename, ↑ ↓, take off, "+ songs", drop songs on the row).
+
 ## Music and the stars
 
 - While a record plays at night (constellations out: `.sky-links.live`), one constellation (sometimes two)
@@ -337,7 +362,8 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
 - `RESETS` table: each reset's theme, its two ways to die, and where its hidden key is.
   `DEATHS` table: which resets each death is live in; after its last one it's "patched".
   - Reset 1 "items": the toaster bath (`tub.js`), the scissors to the neck (`resets.js` + `gore.stab`), and the gun.
-  - Reset 2 "environmental": the boat dropped on the traveller (`ground-sea.js`), the jump off the roof
+  - Reset 2 "environmental": the boat dropped on the traveller (`ground-sea.js`; it stays where it's dropped, so while
+    it's dragged `keepOnScreen()` holds it inside the screen's edges; it can still reach over the dock), the jump off the roof
     (`resets.js`, with a street cutscene). The toaster is gone; safety scissors hang on the wall.
   - Reset 3+: an anchor on the boat (can't be lifted high), guard rails on the roof.
   - Reset 3 "ingestion": **the pills** (Mel's room: see *Mel's room and reset 3*) and **the apple** (the kitchen).
@@ -355,6 +381,11 @@ Vanilla JS, one IIFE per file, everything hung on `window.Sky`. `Sky.css(text)` 
   The diagram still takes bullets but holds at 5 until the key. Why: reset 4's two deaths happen once each, so used up
   for free before the key the reset could never end (2 deaths + the revolver on the last heart = the 3 hearts).
   Reset 1 is unchanged (free deaths before the key; the hearts appear after the dungeon + a revolver shot).
+- **Each way to die costs a heart once a reset** (26 Sep: Mel killed herself with the boat over and over). Once the key's
+  found, `refuse(kind)` lets a death through and remembers it (`pending`); the `dav:traveller-died` that follows marks it
+  `run:spent-<kind>` (within 30 s). Tried again that reset, it's refused with its own line (lives.js `DONE`). The
+  revolver never counts (it's the finisher on the last heart). Placeholders count one by one (`placeholder:<id>`).
+  Two death events within 4 s only ever cost one heart. Debug page: "used up this reset", "ways to die: all usable again".
 - **Placeholder deaths**: DEATHS entries with `placeholder: { page, in, left, top }` (r5a/b, r6a/b, r7a/b, r8a/b)
   are dashed skull bubbles "a way to die (to come)" (resets.js `placeholders()`): click = zapped (the sea: the
   revolver's death), a real death. So every reset can be finished. Replace each with a real death when designed.

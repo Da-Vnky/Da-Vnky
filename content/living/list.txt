@@ -10,4 +10,5 @@
 04-Frame of Mind.ogg
 05-I'm Upping My P(Doom).gif
 05-I'm Upping My P(Doom).ogg
+albums.txt
 frames.json

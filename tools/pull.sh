@@ -9,7 +9,8 @@
 #     puts the file back as it was at your last publish, and pulls: then both versions are in the folder, for
 #     Claude to put together. (publish.bat's pull, --quiet, just stops instead; so does a pull while you have a
 #     publish that didn't get pushed)
-#   - the lists (every list.txt, catalog.txt, files.txt, manifest.txt, assets/resets/index.txt) are written
+#   - the lists (every list.txt, catalog.txt, files.txt, manifest.txt, assets/resets/index.txt,
+#     content/living/albums.txt) are written
 #     by tools/update-lists.sh, never by hand, so they can't clash: they're simply written again afterwards
 #
 # usage: sh tools/pull.sh            (from the top of the site, or anywhere: it finds its way there)
@@ -21,7 +22,7 @@ QUIET=
 say() { [ -n "$QUIET" ] || echo "$@"; }
 
 # the lists: made by update-lists.sh, so on a clash just keep either and write them again after
-GENERATED='(^|/)list\.txt$|^catalog\.txt$|^files\.txt$|^manifest\.txt$|^assets/resets/index\.txt$'
+GENERATED='(^|/)list\.txt$|^catalog\.txt$|^files\.txt$|^manifest\.txt$|^assets/resets/index\.txt$|^content/living/albums\.txt$'
 git config merge.regen.driver true
 git config merge.regen.name "the site's lists: written again by update-lists.sh after a pull"
 # (.gitattributes marks the lists "merge=regen"; this tells git what that means, on this computer)

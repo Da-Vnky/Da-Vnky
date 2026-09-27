@@ -111,6 +111,8 @@ def read(name):
 
 def write_list(folder=SEA):
     """<folder>/list.txt, the same as tools/update-lists.sh writes it"""
+    if os.path.normcase(os.path.abspath(folder)) == os.path.normcase(os.path.abspath(SHELVES['music'][0])):
+        write_albums()                                 # (the record player's folder: its albums.txt first, so list.txt has it)
     names = sorted(n for n in os.listdir(folder)
                    if os.path.isfile(os.path.join(folder, n)) and n != 'list.txt'
                    and not n.lower().startswith('readme') and not n.startswith(('.', '_')))
@@ -1054,16 +1056,71 @@ def found_slots():
 
 
 # ---------------- the record player: content/living/, numbered 01-name.mp3, 02-name.mp3 … ----------------
-def tracks():
-    if not os.path.isdir(SONGS):
-        return []
-    files = [n for n in os.listdir(SONGS) if os.path.isfile(os.path.join(SONGS, n))]
-    songs = sorted((n for n in files if n.lower().endswith(('.mp3', '.ogg'))), key=lambda n: n.lower())
+AUDIO_EXT = ('.mp3', '.ogg')
+
+
+def album_dir(name):
+    """a folder in content/living/ that's an album (not the bottles, not hidden)"""
+    return bool(name) and os.path.basename(name) == name and name != 'bottles' and not name.startswith(('.', '_', '~')) \
+        and os.path.isdir(os.path.join(SONGS, name))
+
+
+def album_songs(name):
+    d = os.path.join(SONGS, name)
+    files = sorted((n for n in os.listdir(d) if os.path.isfile(os.path.join(d, n)) and n.lower().endswith(AUDIO_EXT)), key=lambda n: n.lower())
     out = []
-    for n in songs:
+    for n in files:
         stem = os.path.splitext(n)[0]
         m = NUMBERED.match(stem)
-        item = {'name': n, 'url': '/content/living/' + urllib.parse.quote(n), 'number': int(m.group(1)) if m else None,
+        out.append({'name': n, 'url': '/content/living/' + urllib.parse.quote(name) + '/' + urllib.parse.quote(n),
+                    'number': int(m.group(1)) if m else None, 'title': (m.group(2) if m else stem), 'size': os.path.getsize(os.path.join(d, n))})
+    return out
+
+
+def album_cover(name):
+    d = os.path.join(SONGS, name)
+    pics = sorted(n for n in os.listdir(d) if os.path.splitext(n)[1][1:].lower() in PICS)
+    for n in pics:
+        if os.path.splitext(n)[0].lower() == 'cover':
+            return n
+    return pics[0] if pics else None
+
+
+def write_albums():
+    """content/living/albums.txt, the same as tools/update-lists.sh writes it: every album folder with songs in it"""
+    if not os.path.isdir(SONGS):
+        return
+    names = sorted((n for n in os.listdir(SONGS) if album_dir(n)
+                    and any(x.lower().endswith(AUDIO_EXT) for x in os.listdir(os.path.join(SONGS, n)))), key=lambda n: n.lower())
+    with open(os.path.join(SONGS, 'albums.txt'), 'w', encoding='utf-8', newline='\n') as f:
+        f.write("# written by tools/update-lists.sh: the record player's albums (folders of songs in content/living/).\n")
+        for n in names:
+            f.write(n + '\n')
+
+
+def tracks():
+    """every record in the crate, in playing order: songs on their own (singles) and albums (a folder of songs)"""
+    if not os.path.isdir(SONGS):
+        return []
+    entries = os.listdir(SONGS)
+    files = [n for n in entries if os.path.isfile(os.path.join(SONGS, n))]
+    songs = [n for n in files if n.lower().endswith(AUDIO_EXT)]
+    albums = [n for n in entries if album_dir(n) and (NUMBERED.match(n) or album_songs(n))]
+    out = []
+    for n in sorted(songs + albums, key=lambda n: n.lower()):
+        if n in albums:
+            m = NUMBERED.match(n)
+            ss = album_songs(n)
+            item = {'kind': 'album', 'name': n, 'url': ss[0]['url'] if ss else '', 'number': int(m.group(1)) if m else None,
+                    'title': (m.group(2) if m else n), 'size': sum(x['size'] for x in ss), 'songs': ss}
+            c = album_cover(n)
+            if c:
+                item['sleeve'] = '/content/living/' + urllib.parse.quote(n) + '/' + urllib.parse.quote(c)
+            out.append(item)
+            continue
+        stem = os.path.splitext(n)[0]
+        m = NUMBERED.match(stem)
+        item = {'kind': 'single', 'name': n, 'url': '/content/living/' + urllib.parse.quote(n), 'number': int(m.group(1)) if m else None,
                 'title': (m.group(2) if m else stem), 'size': os.path.getsize(os.path.join(SONGS, n))}
         for e in PICS:
             if stem + '.' + e in files:
@@ -1078,34 +1135,49 @@ def song_stem(number, title, width=2):
     return str(number).zfill(width) + '-' + title[:80]
 
 
-def rename_song(old, new_stem):
-    """rename a song and everything that goes with it (its sleeve)"""
+def stem_of(name, folder=None):
+    """a record's name without its type (an album's folder name is all name: "06-Vol. 2" stays whole)"""
+    return name if os.path.isdir(os.path.join(folder or SONGS, name)) else os.path.splitext(name)[0]
+
+
+def rename_song(old, new_stem, folder=None):
+    """rename a song and everything that goes with it (its sleeve), or an album's folder"""
+    folder = folder or SONGS
+    if os.path.isdir(os.path.join(folder, old)):
+        if old != new_stem:
+            os.replace(os.path.join(folder, old), os.path.join(folder, '~' + new_stem + '.tmp'))
+        return new_stem
     old_stem, ext = os.path.splitext(old)
     if old_stem == new_stem:
         return old
-    for n in os.listdir(SONGS):
+    for n in os.listdir(folder):
         st, e = os.path.splitext(n)
-        if st == old_stem:
-            os.replace(os.path.join(SONGS, n), os.path.join(SONGS, '~' + new_stem + e + '.tmp'))
+        if st == old_stem and os.path.isfile(os.path.join(folder, n)):
+            os.replace(os.path.join(folder, n), os.path.join(folder, '~' + new_stem + e + '.tmp'))
     return new_stem + ext
 
 
-def finish_renames():
-    for n in os.listdir(SONGS):
+def finish_renames(folder=None):
+    folder = folder or SONGS
+    for n in os.listdir(folder):
         if n.startswith('~') and n.endswith('.tmp'):
-            os.replace(os.path.join(SONGS, n), os.path.join(SONGS, n[1:-4]))
+            os.replace(os.path.join(folder, n), os.path.join(folder, n[1:-4]))
 
 
-def renumber(order):
-    """number the songs 01, 02 … in this order (a list of file names)"""
+def renumber(order, folder=None):
+    """number the records (or an album's songs) 01, 02 … in this order (a list of file or folder names)"""
+    folder = folder or SONGS
     width = max(2, len(str(len(order))))
     names = []
     for i, n in enumerate(order):
-        title = NUMBERED.match(os.path.splitext(n)[0])
-        title = title.group(2) if title else os.path.splitext(n)[0]
-        names.append(rename_song(n, song_stem(i + 1, title, width)))
-    finish_renames()
-    write_list(SONGS)
+        st = stem_of(n, folder)
+        title = NUMBERED.match(st)
+        title = title.group(2) if title else st
+        names.append(rename_song(n, song_stem(i + 1, title, width), folder))
+    finish_renames(folder)
+    write_list(folder)
+    if folder != SONGS:
+        write_list(SONGS)
     return names
 
 
@@ -1115,12 +1187,7 @@ def track_add(name, raw):
         raise ValueError('that file is over 30 MB')
     m = NUMBERED.match(stem)
     title = m.group(2) if m else stem
-    have = tracks()
-    if any(t['number'] is None for t in have):          # number the ones that aren't yet, in the order they play now
-        renumber([t['name'] for t in have])
-        have = tracks()
-    nxt = max([t['number'] or 0 for t in have] + [len(have)]) + 1
-    width = max(2, len(str(nxt)), max([len(re.match(r'\d*', t['name']).group(0)) for t in have if t['number']] + [0]))
+    nxt, width = next_number()
     final = song_stem(nxt, title, width) + ext
     if os.path.exists(os.path.join(SONGS, final)):
         raise ValueError(final + ' is already there')
@@ -1155,8 +1222,103 @@ def track_rename(name, title):
 
 
 def track_delete(name):
-    shelf_delete('music', name)
+    if album_dir(name):                                # an album: the whole folder, songs, cover and all
+        import shutil
+        shutil.rmtree(os.path.join(SONGS, name))
+    else:
+        shelf_delete('music', name)
     return renumber([t['name'] for t in tracks()])
+
+
+# ---------------- albums: a folder of songs in content/living/, "06-the album's title/01-first song.mp3" … ----------------
+def next_number():
+    have = tracks()
+    if any(t['number'] is None for t in have):          # number the ones that aren't yet, in the order they play now
+        renumber([t['name'] for t in have])
+        have = tracks()
+    nxt = max([t['number'] or 0 for t in have] + [len(have)]) + 1
+    width = max(2, len(str(nxt)), max([len(re.match(r'\d*', t['name']).group(0)) for t in have if t['number']] + [0]))
+    return nxt, width
+
+
+def album_new(title):
+    title = re.sub(r'[\\/:*?"<>|]+', '', title or '').strip().strip('.') or 'an album'
+    nxt, width = next_number()
+    name = song_stem(nxt, title, width)
+    if os.path.exists(os.path.join(SONGS, name)):
+        raise ValueError(name + ' is already there')
+    os.makedirs(os.path.join(SONGS, name))
+    write_list(SONGS)
+    return name
+
+
+def album_add(album, name, raw):
+    """one more song on an album: the next number"""
+    if not album_dir(album):
+        raise ValueError('that album isn\'t there')
+    stem, ext = clean_name(name, ['mp3', 'ogg'])
+    if len(raw) > UPLOAD_LIMIT:
+        raise ValueError('that file is over 30 MB')
+    m = NUMBERED.match(stem)
+    title = m.group(2) if m else stem
+    d = os.path.join(SONGS, album)
+    have = album_songs(album)
+    nxt = max([x['number'] or 0 for x in have] + [len(have)]) + 1
+    final = song_stem(nxt, title, max(2, len(str(nxt)))) + ext
+    if os.path.exists(os.path.join(d, final)):
+        raise ValueError(final + ' is already there')
+    with open(os.path.join(d, final), 'wb') as f:
+        f.write(raw)
+    write_list(d)
+    write_list(SONGS)
+    return final
+
+
+def album_cover_put(album, name, raw):
+    if not album_dir(album):
+        raise ValueError('that album isn\'t there')
+    ext = os.path.splitext(name or '')[1].lower()
+    if ext[1:] not in PICS:
+        raise ValueError('a sleeve is a picture (png, jpg, webp, gif)')
+    d = os.path.join(SONGS, album)
+    for n in os.listdir(d):
+        if os.path.splitext(n)[1][1:].lower() in PICS:
+            os.remove(os.path.join(d, n))
+    with open(os.path.join(d, 'cover' + ext), 'wb') as f:
+        f.write(raw)
+    write_list(d)
+    return 'cover' + ext
+
+
+def album_song(album, song):
+    if not album_dir(album) or song not in [x['name'] for x in album_songs(album)]:
+        raise ValueError('that song isn\'t on that album')
+    return os.path.join(SONGS, album)
+
+
+def album_song_move(album, song, by):
+    d = album_song(album, song)
+    order = [x['name'] for x in album_songs(album)]
+    i = order.index(song)
+    j = max(0, min(len(order) - 1, i + (1 if by > 0 else -1)))
+    order[i], order[j] = order[j], order[i]
+    return renumber(order, d)
+
+
+def album_song_rename(album, song, title):
+    d = album_song(album, song)
+    x = [x for x in album_songs(album) if x['name'] == song][0]
+    num = x['number'] if x['number'] is not None else len(album_songs(album))
+    new = rename_song(song, song_stem(num, title, max(2, len(re.match(r'\d*', song).group(0)))), d)
+    finish_renames(d)
+    write_list(d)
+    return new
+
+
+def album_song_delete(album, song):
+    d = album_song(album, song)
+    os.remove(os.path.join(d, song))
+    return renumber([x['name'] for x in album_songs(album)], d)
 
 
 def track_sleeve_link(name, link):
@@ -1164,6 +1326,8 @@ def track_sleeve_link(name, link):
     if name not in [t['name'] for t in tracks()]:
         raise ValueError('that song isn\'t there')
     data, ext, title = sleeve.fetch_cover((link or '').strip())
+    if album_dir(name):                                # an album's cover: inside its folder
+        return {'sleeve': album_cover_put(name, 'cover' + ext, data), 'title': title, 'bytes': len(data)}
     stem = os.path.splitext(name)[0]
     for e in PICS:
         p = os.path.join(SONGS, stem + '.' + e)
@@ -1409,8 +1573,26 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'removed': asset_clear(json.loads(raw or b'{}').get('slot'))})
             if url.path == '/__records/add':
                 return self.reply({'name': track_add(urllib.parse.unquote(self.headers.get('X-Name', '')), raw)})
+            if url.path == '/__records/album-new':
+                return self.reply({'name': album_new(json.loads(raw or b'{}').get('title'))})
+            if url.path == '/__records/album-add':
+                return self.reply({'name': album_add(urllib.parse.unquote(self.headers.get('X-Album', '')), urllib.parse.unquote(self.headers.get('X-Name', '')), raw)})
+            if url.path == '/__records/album-song':
+                d = json.loads(raw or b'{}')
+                a, s_, what = d.get('album'), d.get('song'), d.get('do')
+                if what == 'move':
+                    return self.reply({'names': album_song_move(a, s_, int(d.get('by') or 1))})
+                if what == 'rename':
+                    return self.reply({'name': album_song_rename(a, s_, d.get('title'))})
+                if what == 'delete':
+                    return self.reply({'names': album_song_delete(a, s_)})
+                raise ValueError('do what?')
             if url.path == '/__records/sleeve':
                 song = urllib.parse.unquote(self.headers.get('X-Song', ''))
+                if album_dir(song):
+                    if len(raw) > 1024 * 1024:
+                        raise ValueError('a sleeve has to be under 1 MB (the "from Spotify" button shrinks them for you)')
+                    return self.reply({'name': album_cover_put(song, urllib.parse.unquote(self.headers.get('X-Name', '')), raw)})
                 if song not in [t['name'] for t in tracks()]:
                     raise ValueError('that song isn\'t there')
                 if len(raw) > 1024 * 1024:

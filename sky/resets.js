@@ -328,7 +328,7 @@
             b.addEventListener('click', function (e) {
                 e.preventDefault(); e.stopPropagation();
                 if (busy || busyHands()) return;
-                if (Sky.lives && Sky.lives.refuse('placeholder')) return;
+                if (Sky.lives && Sky.lives.refuse('placeholder:' + id)) return;             // (each bubble its own way to die: once a reset)
                 // the sea's traveller has a death of its own (the revolver's); anywhere else, a stand-in: zapped
                 if (PAGE === 'sea') { if (Sky.sea && Sky.sea.kill && Sky.sea.kill()) pop(); return; }
                 var ch = Array.prototype.filter.call(document.querySelectorAll('.scene-character:not(.gore-hidden)'), function (c) { return c.getClientRects().length && c.getBoundingClientRect().right > 0 && c.getBoundingClientRect().left < window.innerWidth; })[0];

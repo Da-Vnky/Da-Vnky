@@ -11,3 +11,4 @@ catalog.txt               merge=regen
 files.txt                 merge=regen
 manifest.txt              merge=regen
 assets/resets/index.txt   merge=regen
+content/living/albums.txt merge=regen

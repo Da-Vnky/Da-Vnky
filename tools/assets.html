@@ -108,6 +108,17 @@
     .row input.title:focus { outline: none; border-bottom-color: var(--red); background: rgba(255,255,255,.4); }
     .row audio { height: 32px; width: 240px; max-width: 100%; }
     .row .btns { display: flex; gap: 5px; flex-wrap: wrap; }
+    /* an album: its sleeve with a gold border inside the edge, and its songs listed under it */
+    .row.album .sleeve { position: relative; }
+    .row.album .sleeve::after { content: ""; position: absolute; inset: 4px; border: 2px solid transparent; pointer-events: none;
+        border-image: linear-gradient(135deg, #6e4c14, #e9c96a 14%, #fff4c8 24%, #b8892e 38%, #f6dd8e 52%, #8a6320 64%, #ffeaa8 78%, #c29636 90%, #5e400e) 1; }
+    .row .main span.kind { display: inline-block; font-style: italic; color: #3a2716; margin-left: 6px; padding: 0 8px; border-radius: 999px; background: linear-gradient(135deg, #b8892e, #f6dd8e 45%, #b8892e); color: #3a2716;
+        font: italic .78rem "IM Fell English", Georgia, serif; vertical-align: middle; margin: 0 6px 0 0; }
+    .row .songs { flex-basis: 100%; margin: 4px 0 2px 48px; padding: 4px 12px; border-left: 3px solid #c29636; background: rgba(196,154,82,.08); }
+    .row .songs .row { padding: 5px 0; }
+    .row .songs .num { width: 26px; font-size: 1rem; }
+    .row .songs input.title { font-size: .98rem; }
+    .row .songs audio { width: 200px; }
     .empty { font-style: italic; color: rgba(243,230,194,.55); }
     .sheet .empty { color: #8a7258; padding: 8px 0; }
     .opts { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin: 6px 0 4px; font-size: .95rem; font-style: italic; color: rgba(243,230,194,.75); }
@@ -489,18 +500,24 @@
 
     /* ---------------- the record player ---------------- */
     function drawRecords() {
-        var d = intro('every song in content/living/ is a record, played in number order: 01-, 02-, … new ones get the next number. ↑ ↓ renumber them all. a sleeve is the record’s cover (under 1 MB).', 'living.html');
+        var d = intro('every song in content/living/ is a record, played in number order: 01-, 02-, … new ones get the next number. ↑ ↓ renumber them all. a sleeve is the record’s cover (under 1 MB). an album is several songs on one record (a folder of them): its record and sleeve have a gold ring, and its songs play one after another.', 'living.html');
         main.appendChild(d);
         var h = el('h2', '', 'the records <small>' + STATE.tracks.length + '</small>');
         main.appendChild(h);
         var addB = btn('+ add songs', function () { pick('.mp3,.ogg,audio/mpeg,audio/ogg', true, addSongs); }, 'btn main');
         addB.style.marginLeft = '10px';
+        addB.title = 'each song its own record (a single)';
         h.appendChild(addB);
+        var albB = btn('+ add an album', function () { pick('.mp3,.ogg,audio/mpeg,audio/ogg,image/png,image/jpeg,image/webp,image/gif', true, addAlbum); }, 'btn main');
+        albB.style.marginLeft = '8px';
+        albB.title = 'several songs on one record (pick them all at once, and its cover picture too if you have one)';
+        h.appendChild(albB);
         var sheet = el('div', 'sheet');
         droppable(sheet, addSongs);
         if (!STATE.tracks.length) sheet.appendChild(el('p', 'empty', 'no records yet. add an .mp3 (or drop some here).'));
         STATE.tracks.forEach(function (t, i) {
-            var r = el('div', 'row');
+            var album = t.kind === 'album';
+            var r = el('div', 'row' + (album ? ' album' : ''));
             r.appendChild(el('span', 'num', t.number != null ? String(t.number).padStart(2, '0') : '–'));
             var sl = el('div', 'sleeve', t.sleeve ? '<img alt="" src="' + t.sleeve + '?t=' + Date.now() + '">' : 'no sleeve');
             r.appendChild(sl);
@@ -515,14 +532,16 @@
             ti.addEventListener('keydown', function (e) { if (e.key === 'Enter') ti.blur(); if (e.key === 'Escape') { ti.value = t.title; ti.blur(); } });
             ti.addEventListener('blur', rename);
             m.appendChild(ti);
-            m.appendChild(el('span', '', esc(t.name) + ' · ' + kb(t.size)));
+            m.appendChild(el('span', '', album ? '<span class="kind">album · ' + t.songs.length + (t.songs.length === 1 ? ' song' : ' songs') + '</span>' + esc(t.name) + '/ · ' + kb(t.size)
+                                               : esc(t.name) + ' · ' + kb(t.size)));
             r.appendChild(m);
-            var au = el('audio'); au.controls = true; au.preload = 'none'; au.src = t.url; r.appendChild(au);
+            if (!album) { var au = el('audio'); au.controls = true; au.preload = 'none'; au.src = t.url; r.appendChild(au); }
             var b = el('div', 'btns');
             b.appendChild(btn('↑', function () { move(t, -1); })); if (i === 0) b.lastChild.disabled = true;
             b.appendChild(btn('↓', function () { move(t, 1); })); if (i === STATE.tracks.length - 1) b.lastChild.disabled = true;
+            if (album) b.appendChild(btn('+ songs', function () { pick('.mp3,.ogg,audio/mpeg,audio/ogg', true, function (fs) { addToAlbum(t.name, fs); }); }));
             b.appendChild(btn('sleeve from Spotify', function () {
-                var link = prompt('paste the Spotify link for ' + t.title + ' (in Spotify: Share → Copy Song Link). a link to any picture works too.');
+                var link = prompt('paste the Spotify link for ' + t.title + (album ? ' (in Spotify: Share → Copy Album Link).' : ' (in Spotify: Share → Copy Song Link).') + ' a link to any picture works too.');
                 if (!link) return;
                 say('fetching the cover…');
                 api('/__records/sleeve-link', { name: t.name, link: link }).then(function (x) {
@@ -532,10 +551,13 @@
             }, 'yes'));
             b.appendChild(btn(t.sleeve ? 'new sleeve' : 'upload a sleeve', function () { pick('image/png,image/jpeg,image/webp,image/gif', false, function (fs) { sleeveUpload(t, fs[0]); }); }));
             b.appendChild(btn('delete', function () {
-                if (!confirm('delete ' + t.name + ' (and its sleeve)? the songs after it move up a number.')) return;
+                if (!confirm(album ? 'delete the whole album ' + t.title + ' (all ' + t.songs.length + ' songs, and its cover)? the records after it move up a number.'
+                                   : 'delete ' + t.name + ' (and its sleeve)? the songs after it move up a number.')) return;
                 api('/__records/delete', { name: t.name }).then(function (x) { if (x.error) say(x.error, true); else say('deleted ' + t.name + '.'); load(); });
             }, 'no'));
             r.appendChild(b);
+            if (album) r.appendChild(albumSongs(t));
+            if (album) droppable(r, function (fs) { addToAlbum(t.name, fs); });
             sheet.appendChild(r);
         });
         main.appendChild(sheet);
@@ -555,6 +577,72 @@
             return p.then(function () { return send('/__records/add', f).then(function (x) { if (x.error) errs.push(f.name + ': ' + x.error); else added.push(x.name); }); });
         }, Promise.resolve()).then(function () {
             say((added.length ? 'added ' + added.join(', ') + '. publish when you’re ready.' : '') + (errs.length ? ' ' + errs.join('; ') : ''), errs.length && !added.length);
+            load();
+        });
+    }
+    // an album's songs, under it: rename, reorder, take one off
+    function albumSongs(t) {
+        var box = el('div', 'songs');
+        if (!t.songs.length) box.appendChild(el('p', 'empty', 'no songs on it yet: “+ songs”, or drop some here.'));
+        t.songs.forEach(function (x, i) {
+            var r = el('div', 'row');
+            r.appendChild(el('span', 'num', x.number != null ? String(x.number).padStart(2, '0') : '–'));
+            var m = el('div', 'main');
+            var ti = el('input', 'title'); ti.value = x.title; ti.setAttribute('aria-label', 'song title'); ti.maxLength = 80;
+            ti.addEventListener('keydown', function (e) { if (e.key === 'Enter') ti.blur(); if (e.key === 'Escape') { ti.value = x.title; ti.blur(); } });
+            ti.addEventListener('blur', function () {
+                var v = ti.value.trim();
+                if (!v || v === x.title) { ti.value = x.title; return; }
+                api('/__records/album-song', { album: t.name, song: x.name, do: 'rename', title: v }).then(function (y) { if (y.error) say(y.error, true); else say('renamed to ' + y.name + '.'); load(); });
+            });
+            m.appendChild(ti);
+            m.appendChild(el('span', '', esc(x.name) + ' · ' + kb(x.size)));
+            r.appendChild(m);
+            var au = el('audio'); au.controls = true; au.preload = 'none'; au.src = x.url; r.appendChild(au);
+            var b = el('div', 'btns');
+            function mv(by) { api('/__records/album-song', { album: t.name, song: x.name, do: 'move', by: by }).then(function (y) { if (y.error) say(y.error, true); else say('moved.'); load(); }); }
+            b.appendChild(btn('↑', function () { mv(-1); })); if (i === 0) b.lastChild.disabled = true;
+            b.appendChild(btn('↓', function () { mv(1); })); if (i === t.songs.length - 1) b.lastChild.disabled = true;
+            b.appendChild(btn('take off', function () {
+                if (!confirm('take ' + x.title + ' off the album (it’s deleted)? the songs after it move up a number.')) return;
+                api('/__records/album-song', { album: t.name, song: x.name, do: 'delete' }).then(function (y) { if (y.error) say(y.error, true); else say('taken off.'); load(); });
+            }, 'no'));
+            r.appendChild(b);
+            box.appendChild(r);
+        });
+        return box;
+    }
+    // a new album: songs (and a cover picture, if one was picked with them) all at once
+    function addAlbum(files) {
+        var songs = files.filter(function (f) { return /\.(mp3|ogg)$/i.test(f.name); }).sort(function (a, b) { return a.name.localeCompare(b.name, undefined, { numeric: true }); });
+        var cover = files.filter(function (f) { return PICS.test(f.name); })[0];
+        if (songs.length < 2) return say('an album is two songs or more (.mp3 or .ogg), picked all at once. one song? “+ add songs”.', true);
+        var title = prompt('what’s the album called? (' + songs.length + ' songs' + (cover ? ', and ' + cover.name + ' for its cover' : '') + ')', '');
+        if (title === null) return;
+        title = title.trim() || 'an album';
+        say('making the album…');
+        api('/__records/album-new', { title: title }).then(function (x) {
+            if (x.error) return say(x.error, true);
+            return addToAlbum(x.name, songs, cover);
+        });
+    }
+    function addToAlbum(name, files, cover) {
+        var songs = files.filter(function (f) { return /\.(mp3|ogg)$/i.test(f.name); }).sort(function (a, b) { return a.name.localeCompare(b.name, undefined, { numeric: true }); });
+        cover = cover || files.filter(function (f) { return PICS.test(f.name); })[0];
+        if (!songs.length && !cover) return say('songs are .mp3 or .ogg files.', true);
+        var added = [], errs = [];
+        say('adding ' + songs.length + (songs.length === 1 ? ' song' : ' songs') + ' to ' + name + '…');
+        return songs.reduce(function (p, f, i) {
+            return p.then(function () {
+                say('adding ' + (i + 1) + ' of ' + songs.length + ': ' + f.name + '…');
+                return send('/__records/album-add', f, { 'X-Album': name }).then(function (x) { if (x.error) errs.push(f.name + ': ' + x.error); else added.push(x.name); });
+            });
+        }, Promise.resolve()).then(function () {
+            if (!cover) return;
+            return send('/__records/sleeve', cover, { 'X-Song': name }).then(function (x) { if (x.error) errs.push(cover.name + ': ' + x.error); });
+        }).then(function () {
+            say((added.length ? name + ': ' + added.length + (added.length === 1 ? ' song' : ' songs') + ' on it' + (cover ? ', with its cover' : '') + '. publish when you’re ready.' : '') +
+                (errs.length ? ' ' + errs.join('; ') : ''), errs.length && !added.length);
             load();
         });
     }
@@ -609,6 +697,8 @@
                 api('/__noise/remove', { name: n.name }).then(function (x) { if (x.error) say(x.error, true); else say('removed.'); load(); });
             }, 'no'));
             r.appendChild(b);
+            if (album) r.appendChild(albumSongs(t));
+            if (album) droppable(r, function (fs) { addToAlbum(t.name, fs); });
             sheet.appendChild(r);
         });
         main.appendChild(sheet);
