@@ -149,13 +149,13 @@ content/living/02-Song on the Beach.jpg 412921 54104781
 content/living/02-Song on the Beach.ogg 5696623 3554461221
 content/living/03-Aerie.jpg 248646 1773964025
 content/living/03-Aerie.ogg 8072227 3937702694
-content/living/04-Frame Of Mind.ogg 6578711 2709216259
 content/living/04-Frame of Mind.jpg 122551 761190908
+content/living/04-Frame of Mind.ogg 6578711 2709216259
 content/living/06-I'm Upping My P(Doom).gif 5004432 2443245632
 content/living/06-I'm Upping My P(Doom).ogg 3850549 3391402029
 content/living/albums.txt 123 775924658
 content/living/frames.json 150 2267752740
-content/living/list.txt 382 1595382606
+content/living/list.txt 382 703812112
 content/sea/2026-09-25-hello-world.txt 213 4016599039
 content/sea/2026-09-25-mmmmm.jpg 46663 2745439658
 content/sea/list.txt 161 3392900003

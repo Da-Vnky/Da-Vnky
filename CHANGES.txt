@@ -17,6 +17,9 @@ How it works
 
 == published ==
 
+2026-09-27 09:58 · V
+- typo
+
 2026-09-27 09:04 · V
 - the lo-fi slider: songs now get the bitcrush live, on the site (every 4th sample held, 8 bits: measured to match Victor's plugin on Aerie). Upload songs clean from now on; ones already crushed sound the same either way. A slider on the front of the record player and a lo-fi switch in the music panel glide it off and on over 1.2 s without the song skipping; each visitor's choice is remembered (localStorage records-lofi). sky/music.js (LOFI_*, an AudioWorklet), sky/records.js, sky/css/music.css, sky/css/records.css; slots assets/living/lofi-fader, lofi-knob, assets/sounds/lofi-slide
 
