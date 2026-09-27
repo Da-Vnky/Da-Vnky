@@ -33,64 +33,7 @@
     };
     function svg(n, s) { return '<svg viewBox="0 0 20 20" width="' + (s || 20) + '" height="' + (s || 20) + '" fill="currentColor" aria-hidden="true">' + ICON[n] + '</svg>'; }
 
-    Sky.css(
-        '.pt { display: grid; grid-template-columns: auto auto 250px; gap: 12px; align-items: start; font: 1rem "IM Fell English", Georgia, serif; color: #3a2716; }' +
-        '.pt button { font: inherit; color: inherit; }' +
-        '.pt-tools { display: flex; flex-direction: column; gap: 4px; padding: 6px; border-radius: 14px; background: #eadcb9; box-shadow: 0 6px 14px rgba(0,0,0,.4), inset 0 0 14px rgba(120,80,30,.2); }' +
-        '.pt-tools button { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 10px; background: none; cursor: pointer; color: #6e5236; }' +
-        '.pt-tools button:hover { background: rgba(110,82,54,.14); color: #3a2716; }' +
-        '.pt-tools button[aria-pressed=true] { background: #3a2716; color: #f3e6c2; }' +
-        '.pt-tools button:disabled { opacity: .35; cursor: default; }' +
-        '.pt-tools .sep { height: 1px; margin: 3px 4px; background: rgba(110,82,54,.3); }' +
-        '.pt-stage { position: relative; height: min(66vh, 112vw); aspect-ratio: var(--pt-ar, 4 / 5); touch-action: none;' +
-            'box-shadow: 0 16px 40px rgba(0,0,0,.55); background: #f6ecd4; }' +
-        '.pt-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: none; }' +
-        '.pt-ring { position: absolute; left: 0; top: 0; border-radius: 50%; pointer-events: none; display: none; border: 1px solid rgba(0,0,0,.65);' +
-            'box-shadow: 0 0 0 1px rgba(255,255,255,.75); transform: translate(-50%, -50%); }' +
-        '.pt-ring.dot::after { content: ""; position: absolute; left: 50%; top: 50%; width: 2px; height: 2px; margin: -1px; background: #000; }' +
-        '.pt-stage:hover .pt-ring { display: block; }' +
-        '.pt-side { display: flex; flex-direction: column; gap: 10px; max-height: min(66vh, 112vw); overflow-y: auto; padding: 10px 12px; border-radius: 14px;' +
-            'background: #eadcb9; box-shadow: 0 6px 14px rgba(0,0,0,.4), inset 0 0 14px rgba(120,80,30,.2); }' +
-        '.pt-side h3 { margin: 2px 0 0; font: normal .95rem "IM Fell English SC", Georgia, serif; color: #6e5236; }' +
-        '.pt-colour { display: flex; align-items: center; gap: 8px; }' +
-        '.pt-now { flex: none; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: none; box-shadow: 0 0 0 2px #f8f0dc, 0 0 0 3px rgba(58,39,22,.45), 0 1px 4px rgba(0,0,0,.35); }' +
-        '.pt-now span { display: block; width: 100%; height: 100%; border-radius: 50%; }' +
-        '.pt-hexin { width: 6.2em; padding: 3px 6px; border: 1px solid rgba(110,82,54,.35); border-radius: 6px; background: #f8f0dc; font: .85rem ui-monospace, Menlo, monospace; color: #3a2716; }' +
-        '.pt-tri { display: grid; place-items: center; padding: 4px 0; }' +
-        '.pt-tri[hidden] { display: none; }' +
-        '.pt-tri canvas { width: 200px; height: 200px; max-width: 100%; aspect-ratio: 1; cursor: crosshair; touch-action: none; }' +
-        '.pt-stage.lassoing canvas { cursor: crosshair; }' +
-        '.pt-stage.lassoing .pt-ring { display: none !important; }' +
-        '.pt-hex { font-size: .85rem; color: #6e5236; font-family: ui-monospace, Menlo, monospace; }' +
-        '.pt-sw { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }' +
-        '.pt-sw button { aspect-ratio: 1; border: 0; border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 1px rgba(0,0,0,.25); padding: 0; }' +
-        '.pt-sw button:hover { transform: scale(1.12); }' +
-        '.pt-recent:empty::before { content: "colours you use appear here"; font-size: .8rem; font-style: italic; color: rgba(110,82,54,.7); grid-column: 1 / -1; }' +
-        '.pt-slider { display: grid; grid-template-columns: 70px 1fr 38px; align-items: center; gap: 6px; font-size: .9rem; color: #6e5236; }' +
-        '.pt-slider input { width: 100%; accent-color: #9a3b1f; }' +
-        '.pt-slider output { text-align: right; font-size: .82rem; }' +
-        '.pt-layers { display: flex; flex-direction: column; gap: 4px; }' +
-        '.pt-layer { display: grid; grid-template-columns: 26px 34px 1fr; align-items: center; gap: 6px; padding: 4px; border-radius: 8px; cursor: pointer; background: rgba(255,250,235,.5); }' +
-        '.pt-layer.on { background: #3a2716; color: #f3e6c2; }' +
-        '.pt-layer .eye { display: grid; place-items: center; width: 26px; height: 26px; border: 0; background: none; cursor: pointer; border-radius: 6px; }' +
-        '.pt-layer .eye:hover { background: rgba(110,82,54,.2); }' +
-        '.pt-layer canvas { width: 34px; height: 42px; background: #f6ecd4; box-shadow: 0 0 0 1px rgba(0,0,0,.2); display: block; }' +
-        '.pt-layer .nm { font-size: .9rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
-        '.pt-lbtns { display: flex; flex-wrap: wrap; gap: 4px; }' +
-        '.pt-lbtns button { flex: 1 1 auto; white-space: nowrap; padding: 4px 6px; border: 1px solid rgba(110,82,54,.35); border-radius: 999px; background: #f8f0dc; cursor: pointer; font-size: .85rem; font-style: italic; }' +
-        '.pt-lbtns button:hover { background: #fff8e6; }' +
-        '.pt-lbtns button:disabled { opacity: .4; cursor: default; }' +
-        '.pt-help { font-size: .8rem; color: #6e5236; }' +
-        '.pt-help summary { cursor: pointer; font-style: italic; }' +
-        '.pt-help kbd { display: inline-block; min-width: 1.4em; padding: 0 4px; border-radius: 4px; background: rgba(110,82,54,.14); font: .78rem ui-monospace, Menlo, monospace; text-align: center; }' +
-        '@media (max-width: 900px) {' +
-            '.pt { grid-template-columns: 1fr; justify-items: center; }' +
-            '.pt-tools { flex-direction: row; flex-wrap: wrap; justify-content: center; }' +
-            '.pt-tools .sep { width: 1px; height: auto; margin: 4px 3px; }' +
-            '.pt-stage { height: auto; width: min(92vw, 60vh * .8); }' +
-            '.pt-side { width: min(92vw, 520px); max-height: none; }' +
-        '}'
-    );
+    // (its look is in sky/css/paint.css, linked from each page's head)
 
     Sky.paint = function (host, opts) {
         opts = opts || {};
