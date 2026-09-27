@@ -141,11 +141,11 @@ schizophyllu.me.room/assets/font.css 30693 1584298999
 schizophyllu.me.room/room/audio.js 15818 4103357033
 schizophyllu.me.room/room/davinv.js 4641 2995940873
 schizophyllu.me.room/room/davnky.js 4021 4102858809
-schizophyllu.me.room/room/extra.js 30882 2569712650
+schizophyllu.me.room/room/extra.js 33782 11088993
 schizophyllu.me.room/room/music.js 4978 3071417838
 schizophyllu.me.room/room/narration.js 14420 3403870155
 schizophyllu.me.room/room/radio.js 6517 830110350
-schizophyllu.me.room/room/room.css 23069 2177606081
-schizophyllu.me.room/room/room.js 81216 3004019641
-schizophyllu.me.room/room/script.js 46214 305240998
+schizophyllu.me.room/room/room.css 24479 2584604817
+schizophyllu.me.room/room/room.js 82971 1152105678
+schizophyllu.me.room/room/script.js 47501 3643087694
 schizophyllu.me.room/assets/playlist/playlist.json 677 2065717457
