@@ -1,4 +1,6 @@
 #!/bin/sh
+# (every machine sorts the lists the same way: plain byte order, capitals first, like Git Bash on Windows)
+export LC_ALL=C
 # update-lists.sh — writes content/<scene>/list.txt and assets/<folder>/list.txt, naming every file in that folder,
 # so the site knows what's there. Run it from the top of the site:
 #     sh tools/update-lists.sh
@@ -79,7 +81,7 @@ mkdir -p assets/resets
 # screens bring themselves up to date without downloading everything first, and then they're replaced.
 {
     echo "# written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum."
-    for f in *.html sky/*.js sky/*.css assets/*/* assets/resets/*/* assets/resets/*/*/* content/*/* content/*/*/* \
+    for f in *.html sky/*.js sky/*.css sky/css/*.css assets/*/* assets/resets/*/* assets/resets/*/*/* content/*/* content/*/*/* \
              schizophyllu.me.room/* schizophyllu.me.room/*/* schizophyllu.me.room/*/*/* schizophyllu.me.room/*/*/*/*; do
         [ -f "$f" ] || continue
         name=$(basename "$f")
