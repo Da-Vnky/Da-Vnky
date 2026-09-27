@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- glow-smoke (hallway): the smoke detector's red light. a glow on its own: paint it however you like.
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes; the room blends it
+     in "screen" mode (light only adds). not clickable. -->
+<!-- the gradient lives in the room file too; this copy is only so the file previews on its own -->
+<defs class="preview">
+  <radialGradient id="h-red"><stop offset="0" stop-color="#ff3b2a" stop-opacity=".4"/><stop offset="1" stop-color="#ff3b2a" stop-opacity="0"/></radialGradient>
+</defs>
+  <ellipse cx="1574" cy="252" rx="40" ry="24" fill="url(#h-red)"/>
+</svg>

@@ -471,9 +471,9 @@
 
 <!-- light -->
 <g pointer-events="none" style="mix-blend-mode:screen">
-  <ellipse cx="215" cy="800" rx="200" ry="90" fill="url(#r-hatch)"/>
-  <ellipse cx="1110" cy="700" rx="140" ry="90" fill="url(#r-green)" opacity=".6"/>
-  <ellipse cx="400" cy="620" rx="420" ry="60" fill="#ffb347" opacity=".06"/>
+  <g class="glow" data-id="glow-hatch" data-art="room/objects/roof/glow-hatch.svg"></g>
+  <g class="glow" data-id="glow-rig" data-art="room/objects/roof/glow-rig.svg"></g>
+  <g class="glow" data-id="glow-fairylights" data-art="room/objects/roof/glow-fairylights.svg"></g>
 </g>
 <rect width="1600" height="900" fill="url(#r-vignette)" pointer-events="none"/>
 </svg>

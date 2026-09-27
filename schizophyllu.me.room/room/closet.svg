@@ -97,8 +97,8 @@
 
 <!-- light -->
 <g pointer-events="none" style="mix-blend-mode:screen">
-  <ellipse id="c-bulbglow" cx="800" cy="260" rx="700" ry="560" fill="url(#c-bulb)"/>
-  <ellipse cx="800" cy="80" rx="240" ry="140" fill="url(#c-moon)" opacity=".7"/>
+  <g class="glow" data-id="glow-bulb" data-art="room/objects/closet/glow-bulb.svg"></g>
+  <g class="glow" data-id="glow-hatch-moon" data-art="room/objects/closet/glow-hatch-moon.svg"></g>
 </g>
 <rect id="c-darkness" width="1600" height="900" fill="#02030a" opacity=".7" pointer-events="none" style="display:none"/>
 <rect width="1600" height="900" fill="url(#c-vignette)" pointer-events="none"/>

@@ -54,7 +54,8 @@ def main():
         slots = [{'slot': 'assets/mel-room/' + room,
                   'what': 'the backdrop of ' + title.split(' (')[0] + ': walls, floor, furniture, everything that isn’t something to click. the lights and darks the scenes switch stay on top of it',
                   'size': '1600 x 900 (the whole room)', 'optional': True, 'stock': R + file}]
-        for m in re.finditer(r'<g class="obj[^"]*" data-id="([^"]+)"[^>]*data-art="room/objects/' + room + r'/([a-z0-9-]+)\.svg"', txt):
+        # the things to click (class "obj") and, from 27 Sep, the glows in the rooms' light (class "glow")
+        for m in re.finditer(r'<g class="(?:obj|glow)[^"]*" data-id="([^"]+)"[^>]*data-art="room/objects/' + room + r'/([a-z0-9-]+)\.svg"', txt):
             did, name = m.group(1), m.group(2)
             art = R + 'objects/' + room + '/' + name + '.svg'
             if not os.path.exists(os.path.join(ROOT, art)):
@@ -62,9 +63,13 @@ def main():
             a = read(art)
             need = re.search(r'the code looks these ids up, so keep them:\s*([^\n>]*?)\s*(?:-->|\n)', a)
             ids = [x.strip() for x in need.group(1).split(',')] if need else []
-            inside = [i for i in ids if ('id="%s"' % i.lstrip('#')) in a]
+            # (an id, or a class the page looks up: a glow's .stationglow, say)
+            inside = [i for i in ids if re.search(r'(?:id|class)="(?:[^"]*\s)?%s(?:\s[^"]*)?"' % re.escape(i.lstrip('#.')), a)]
             key = '%s-%s' % (room, name)
             what = NICER.get(key) or labels.get(did) or labels.get(name) or did
+            glow = re.match(r'glow-[a-z0-9-]+', did) and re.search(r'<!-- glow-[a-z0-9-]+ \([a-z]+\): (.*?)\. a glow on its own', a)
+            if glow:
+                what = 'glow: ' + glow.group(1) + ' (light only: it\'s blended in "screen" mode, so dark parts vanish)'
             s = {'slot': 'assets/mel-room/' + key, 'what': what, 'size': '1600 x 900: the whole room, see-through, the thing drawn where it sits',
                  'optional': True, 'stock': art}
             if inside:

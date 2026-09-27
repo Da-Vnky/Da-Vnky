@@ -125,12 +125,12 @@
 
 <!-- light -->
 <g pointer-events="none" style="mix-blend-mode:screen">
-  <polygon points="1210,440 1442,440 1566,900 1086,900" fill="url(#b-beam)"/>
-  <ellipse cx="1326" cy="260" rx="220" ry="200" fill="url(#b-moon)"/>
-  <ellipse class="stationglow" cx="690" cy="450" rx="220" ry="170" fill="url(#b-green)"/>
-  <ellipse cx="418" cy="487" rx="80" ry="40" fill="url(#b-red)"/>
-  <ellipse id="lavaglow" cx="1105" cy="590" rx="230" ry="200" fill="url(#b-purple)"/>
-  <ellipse cx="1340" cy="560" rx="140" ry="90" fill="url(#b-blue)" opacity=".7"/>
+  <g class="glow" data-id="glow-moonbeam" data-art="room/objects/bedroom/glow-moonbeam.svg"></g>
+  <g class="glow" data-id="glow-moon" data-art="room/objects/bedroom/glow-moon.svg"></g>
+  <g class="glow" data-id="glow-station" data-art="room/objects/bedroom/glow-station.svg"></g>
+  <g class="glow" data-id="glow-clock-radio" data-art="room/objects/bedroom/glow-clock-radio.svg"></g>
+  <g class="glow" data-id="glow-lavalamp" data-art="room/objects/bedroom/glow-lavalamp.svg"></g>
+  <g class="glow" data-id="glow-laptop" data-art="room/objects/bedroom/glow-laptop.svg"></g>
 </g>
 <rect width="1600" height="900" fill="url(#b-vignette)" pointer-events="none"/>
 </svg>

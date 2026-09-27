@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- glow-vram (main): the VRAM monitor (amber). a glow on its own: paint it however you like.
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes; the room blends it
+     in "screen" mode (light only adds). not clickable. -->
+<!-- the gradient lives in the room file too; this copy is only so the file previews on its own -->
+<defs class="preview">
+  <radialGradient id="g-amber">
+    <stop offset="0" stop-color="#ffb347" stop-opacity=".6"/><stop offset=".35" stop-color="#ff9a2e" stop-opacity=".2"/><stop offset="1" stop-color="#ff9a2e" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+  <ellipse cx="940" cy="480" rx="100" ry="80" fill="url(#g-amber)" opacity=".35"/>
+</svg>

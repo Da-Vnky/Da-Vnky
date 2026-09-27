@@ -140,8 +140,8 @@
   <ellipse cx="1074" cy="744" rx="80" ry="7" opacity=".5"/><ellipse cx="1378" cy="744" rx="60" ry="6" opacity=".5"/>
 </g>
 <g pointer-events="none" style="mix-blend-mode:screen">
-  <ellipse class="t-flicker" cx="800" cy="260" rx="720" ry="520" fill="url(#t-tube)"/>
-  <ellipse cx="1382" cy="170" rx="160" ry="120" fill="url(#t-tube)" opacity=".5"/>
+  <g class="glow" data-id="glow-tube" data-art="room/objects/bathroom/glow-tube.svg"></g>
+  <g class="glow" data-id="glow-tube-2" data-art="room/objects/bathroom/glow-tube-2.svg"></g>
 </g>
 <g pointer-events="none" opacity=".5">
   <rect x="0" y="660" width="1600" height="40" fill="#2a2a14" opacity=".5" filter="url(#t-soft)"/>

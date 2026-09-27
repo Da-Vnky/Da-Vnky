@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- glow-tube (bathroom): the flickering tube light. a glow on its own: paint it however you like.
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes; the room blends it
+     in "screen" mode (light only adds). not clickable.
+     the code looks these ids up, so keep them: .t-flicker -->
+<!-- the gradient lives in the room file too; this copy is only so the file previews on its own -->
+<defs class="preview">
+  <radialGradient id="t-tube"><stop offset="0" stop-color="#dffff4" stop-opacity=".42"/><stop offset=".4" stop-color="#bfeee0" stop-opacity=".14"/><stop offset="1" stop-color="#bfeee0" stop-opacity="0"/></radialGradient>
+</defs>
+  <ellipse class="t-flicker" cx="800" cy="260" rx="720" ry="520" fill="url(#t-tube)"/>
+</svg>

@@ -82,7 +82,7 @@
 
 <!-- ======================================== the proper fridge -->
 <g class="obj" data-id="kfridge" id="kfridge" data-art="room/objects/hallway/kfridge.svg"></g>
-<g pointer-events="none"><ellipse id="kf-glow" cx="1520" cy="560" rx="240" ry="300" fill="#e8f4ff" opacity=".12" style="display:none;mix-blend-mode:screen"/></g>
+<g pointer-events="none"><g class="glow" data-id="glow-kfridge" data-art="room/objects/hallway/glow-kfridge.svg"></g></g>
 
 <!-- boxes on top of the cabinets -->
 <g class="obj" data-id="eboards" data-art="room/objects/hallway/eboards.svg"></g>
@@ -95,10 +95,10 @@
 <rect id="h-darkness" width="1600" height="900" fill="#02030a" opacity=".6" pointer-events="none" style="display:none"/>
 <!-- light -->
 <g pointer-events="none" style="mix-blend-mode:screen">
-  <ellipse id="h-bulbglow" cx="560" cy="200" rx="560" ry="460" fill="url(#h-bulb)"/>
-  <ellipse class="ovenglow" cx="1368" cy="660" rx="200" ry="130" fill="url(#h-oven)"/>
-  <ellipse class="underdoor" cx="200" cy="710" rx="140" ry="40" fill="url(#h-cyan)"/>
-  <ellipse cx="1574" cy="252" rx="40" ry="24" fill="url(#h-red)"/>
+  <g class="glow" data-id="glow-bulb" data-art="room/objects/hallway/glow-bulb.svg"></g>
+  <g class="glow" data-id="glow-oven" data-art="room/objects/hallway/glow-oven.svg"></g>
+  <g class="glow" data-id="glow-underdoor" data-art="room/objects/hallway/glow-underdoor.svg"></g>
+  <g class="glow" data-id="glow-smoke" data-art="room/objects/hallway/glow-smoke.svg"></g>
 </g>
 <rect width="1600" height="900" fill="url(#h-vignette)" pointer-events="none"/>
 </svg>

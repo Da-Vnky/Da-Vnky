@@ -2874,6 +2874,79 @@
        "crop": "1416 762 184 138"
       },
       {
+       "slot": "assets/mel-room/main-glow-moonbeam",
+       "what": "glow: the moonlight falling from the window to the floor (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/glow-moonbeam.svg"
+      },
+      {
+       "slot": "assets/mel-room/main-glow-moon",
+       "what": "glow: the moon's glow round the window (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/glow-moon.svg"
+      },
+      {
+       "slot": "assets/mel-room/main-glow-crt",
+       "what": "glow: the Phosphor Artifact's green glow (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: .crtglow)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/glow-crt.svg",
+       "kind": "svg"
+      },
+      {
+       "slot": "assets/mel-room/main-glow-mira",
+       "what": "glow: Mira's own green glow (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/glow-mira.svg"
+      },
+      {
+       "slot": "assets/mel-room/main-glow-star-lamp",
+       "what": "glow: the star lamp on Mira's sensor shelf (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/glow-star-lamp.svg"
+      },
+      {
+       "slot": "assets/mel-room/main-glow-monitors",
+       "what": "glow: skizy's desk monitors (cyan) (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/glow-monitors.svg"
+      },
+      {
+       "slot": "assets/mel-room/main-glow-vram",
+       "what": "glow: the VRAM monitor (amber) (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/glow-vram.svg"
+      },
+      {
+       "slot": "assets/mel-room/main-glow-lamp",
+       "what": "glow: the floor lamp by Claube's chair (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: .lampglow)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/glow-lamp.svg",
+       "kind": "svg"
+      },
+      {
+       "slot": "assets/mel-room/main-glow-lamp-floor",
+       "what": "glow: the lamp's pool of light on the floor (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/glow-lamp-floor.svg"
+      },
+      {
+       "slot": "assets/mel-room/main-glow-fridge",
+       "what": "glow: the fridge's light when it's open (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: #fridgeglow)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/glow-fridge.svg",
+       "kind": "svg"
+      },
+      {
        "slot": "assets/mel-room/main-alone",
        "what": "skizy alone in the corner (the quiet room, from reset 3 on)",
        "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
@@ -2990,6 +3063,50 @@
        "stock": "schizophyllu.me.room/room/objects/bedroom/station.svg",
        "kind": "svg",
        "crop": "238 282 696 400"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-glow-moonbeam",
+       "what": "glow: the moonlight falling from the window (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/glow-moonbeam.svg"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-glow-moon",
+       "what": "glow: the moon's glow round the window (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/glow-moon.svg"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-glow-station",
+       "what": "glow: the music station's green glow (it pulses with the music) (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: .stationglow)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/glow-station.svg",
+       "kind": "svg"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-glow-clock-radio",
+       "what": "glow: the clock radio's red 3:47 (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/glow-clock-radio.svg"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-glow-lavalamp",
+       "what": "glow: the lava lamp's purple glow (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: #lavaglow)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/glow-lavalamp.svg",
+       "kind": "svg"
+      },
+      {
+       "slot": "assets/mel-room/bedroom-glow-laptop",
+       "what": "glow: the laptop on the bed (blue) (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/glow-laptop.svg"
       }
      ]
     },
@@ -3103,6 +3220,14 @@
        "crop": "1433 265 167 508"
       },
       {
+       "slot": "assets/mel-room/hallway-glow-kfridge",
+       "what": "glow: the proper fridge's light when it's open (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: #kf-glow)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/glow-kfridge.svg",
+       "kind": "svg"
+      },
+      {
        "slot": "assets/mel-room/hallway-eboards",
        "what": "circuit boards",
        "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
@@ -3125,6 +3250,37 @@
        "optional": true,
        "stock": "schizophyllu.me.room/room/objects/hallway/htrash.svg",
        "crop": "883 627 130 186"
+      },
+      {
+       "slot": "assets/mel-room/hallway-glow-bulb",
+       "what": "glow: the hall bulb (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: #h-bulbglow)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/glow-bulb.svg",
+       "kind": "svg"
+      },
+      {
+       "slot": "assets/mel-room/hallway-glow-oven",
+       "what": "glow: the oven, preheating (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: .ovenglow)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/glow-oven.svg",
+       "kind": "svg"
+      },
+      {
+       "slot": "assets/mel-room/hallway-glow-underdoor",
+       "what": "glow: the light under the front door (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: .underdoor)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/glow-underdoor.svg",
+       "kind": "svg"
+      },
+      {
+       "slot": "assets/mel-room/hallway-glow-smoke",
+       "what": "glow: the smoke detector's red light (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/hallway/glow-smoke.svg"
       }
      ]
     },
@@ -3227,6 +3383,21 @@
        "optional": true,
        "stock": "schizophyllu.me.room/room/objects/bathroom/btrash.svg",
        "crop": "1314 594 154 167"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-glow-tube",
+       "what": "glow: the flickering tube light (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: .t-flicker)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/glow-tube.svg",
+       "kind": "svg"
+      },
+      {
+       "slot": "assets/mel-room/bathroom-glow-tube-2",
+       "what": "glow: the tube light reaching the far wall (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bathroom/glow-tube-2.svg"
       }
      ]
     },
@@ -3336,6 +3507,21 @@
        "stock": "schizophyllu.me.room/room/objects/closet/cbulb.svg",
        "kind": "svg",
        "crop": "772 110 61 121"
+      },
+      {
+       "slot": "assets/mel-room/closet-glow-bulb",
+       "what": "glow: the pull-chain bulb (light only: it's blended in \"screen\" mode, so dark parts vanish) (SVG only: the page switches parts of it, so keep these ids: #c-bulbglow)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/glow-bulb.svg",
+       "kind": "svg"
+      },
+      {
+       "slot": "assets/mel-room/closet-glow-hatch-moon",
+       "what": "glow: moonlight down through the roof hatch (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/closet/glow-hatch-moon.svg"
       }
      ]
     },
@@ -3420,6 +3606,27 @@
        "optional": true,
        "stock": "schizophyllu.me.room/room/objects/roof/hatch.svg",
        "crop": "81 621 274 258"
+      },
+      {
+       "slot": "assets/mel-room/roof-glow-hatch",
+       "what": "glow: the light coming up through the hatch (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/glow-hatch.svg"
+      },
+      {
+       "slot": "assets/mel-room/roof-glow-rig",
+       "what": "glow: Mira's rooftop rig (green) (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/glow-rig.svg"
+      },
+      {
+       "slot": "assets/mel-room/roof-glow-fairylights",
+       "what": "glow: skizy's fairy lights along the parapet (light only: it's blended in \"screen\" mode, so dark parts vanish)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/roof/glow-fairylights.svg"
       }
      ]
     }

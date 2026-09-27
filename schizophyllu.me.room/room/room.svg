@@ -339,16 +339,16 @@
 
 <!-- ================================================= LIGHT (non-interactive) -->
 <g id="light" pointer-events="none" style="mix-blend-mode:screen">
-  <polygon points="80,452 330,452 580,900 140,900" fill="url(#g-beam)"/>
-  <ellipse cx="200" cy="290" rx="230" ry="230" fill="url(#g-moon)"/>
-  <ellipse class="crtglow" cx="750" cy="430" rx="270" ry="240" fill="url(#g-green)"/>
-  <ellipse cx="520" cy="470" rx="140" ry="270" fill="url(#g-green)" opacity=".7"/>
-  <ellipse cx="560" cy="266" rx="80" ry="60" fill="url(#g-green)" opacity=".8"/>
-  <ellipse cx="1090" cy="470" rx="220" ry="180" fill="url(#g-cyan)"/>
-  <ellipse cx="940" cy="480" rx="100" ry="80" fill="url(#g-amber)" opacity=".35"/>
-  <ellipse class="lampglow" cx="1300" cy="360" rx="340" ry="330" fill="url(#g-amber)"/>
-  <ellipse cx="1340" cy="760" rx="240" ry="50" fill="url(#g-amber)" opacity=".8"/>
-  <ellipse id="fridgeglow" cx="1540" cy="600" rx="220" ry="280" fill="url(#g-fridgelight)" style="display:none"/>
+  <g class="glow" data-id="glow-moonbeam" data-art="room/objects/main/glow-moonbeam.svg"></g>
+  <g class="glow" data-id="glow-moon" data-art="room/objects/main/glow-moon.svg"></g>
+  <g class="glow" data-id="glow-crt" data-art="room/objects/main/glow-crt.svg"></g>
+  <g class="glow" data-id="glow-mira" data-art="room/objects/main/glow-mira.svg"></g>
+  <g class="glow" data-id="glow-star-lamp" data-art="room/objects/main/glow-star-lamp.svg"></g>
+  <g class="glow" data-id="glow-monitors" data-art="room/objects/main/glow-monitors.svg"></g>
+  <g class="glow" data-id="glow-vram" data-art="room/objects/main/glow-vram.svg"></g>
+  <g class="glow" data-id="glow-lamp" data-art="room/objects/main/glow-lamp.svg"></g>
+  <g class="glow" data-id="glow-lamp-floor" data-art="room/objects/main/glow-lamp-floor.svg"></g>
+  <g class="glow" data-id="glow-fridge" data-art="room/objects/main/glow-fridge.svg"></g>
 </g>
 <!-- the afternoon: sun through the window instead of the moon -->
 <g id="daylight" pointer-events="none" style="display:none">

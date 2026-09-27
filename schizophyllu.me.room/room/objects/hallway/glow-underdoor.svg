@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900">
+<!-- glow-underdoor (hallway): the light under the front door. a glow on its own: paint it however you like.
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes; the room blends it
+     in "screen" mode (light only adds). not clickable.
+     the code looks these ids up, so keep them: .underdoor -->
+<!-- the gradient lives in the room file too; this copy is only so the file previews on its own -->
+<defs class="preview">
+  <radialGradient id="h-cyan"><stop offset="0" stop-color="#bfe6ff" stop-opacity=".5"/><stop offset="1" stop-color="#bfe6ff" stop-opacity="0"/></radialGradient>
+</defs>
+  <ellipse class="underdoor" cx="200" cy="710" rx="140" ry="40" fill="url(#h-cyan)"/>
+</svg>
