@@ -23,6 +23,7 @@ export const QUIET_NOTES = {
   gift: ['note', "you set the record down next to her. “I'm Upping My P(Doom)”. she doesn't look up. but she doesn't push it away, either."],
   sit: ['note', "you sit with her for a while. neither of you says anything."],
   listening: ['note', "the record's playing, very quietly. she's listening. you think she's listening."],
+  notNow: ['note', "you think of the record, the one she'd want to hear. but back across the street it isn't itself right now: something's turned it inside out. not yet."],
 };
 
 // each visit after the record, a little more comes back (the fifth: all of it)

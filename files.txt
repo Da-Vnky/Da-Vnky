@@ -1,13 +1,13 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-city.html 9158 935033496
-index.html 4380 3237048515
-living.html 126953 1329181186
-workshop.html 20911 189476563
+city.html 9158 4009240307
+index.html 4380 1702813629
+living.html 126953 4011469739
+workshop.html 20911 183104729
 sky/ambient.js 5052 82158972
 sky/attic.js 34415 1479863069
 sky/bathroom.js 27366 739340607
 sky/books.js 13659 1804339263
-sky/claubes.js 52428 2937051909
+sky/claubes.js 52495 1675983867
 sky/crate.js 37063 2096077191
 sky/dungeon.js 9873 3965424695
 sky/eye.js 14593 2872946407
@@ -26,7 +26,7 @@ sky/kitchen.js 18201 2594308600
 sky/letters.js 22640 3463426875
 sky/lives.js 12193 2946024089
 sky/loader.js 15448 3284628827
-sky/loot.js 14685 1517415195
+sky/loot.js 14817 391651511
 sky/marker.js 7216 276763161
 sky/models.js 5073 954840756
 sky/music.js 57629 851952873
@@ -37,9 +37,9 @@ sky/panel.js 66074 3878551620
 sky/peeper.js 29950 688287093
 sky/porch.js 16196 3219425586
 sky/post.js 21396 743501724
-sky/records.js 32765 2880640883
+sky/records.js 33943 891150172
 sky/resets.js 16799 4292073354
-sky/revolver.js 16851 465766834
+sky/revolver.js 17327 1638942978
 sky/sky.js 111054 303167423
 sky/state.js 14017 937058248
 sky/static.js 3162 463019308
@@ -83,7 +83,7 @@ sky/css/panel.css 6803 4171250261
 sky/css/peeper.css 11229 3690393282
 sky/css/porch.css 10056 874630671
 sky/css/post.css 7339 3412681515
-sky/css/records.css 16250 556806130
+sky/css/records.css 18208 2941435370
 sky/css/resets.css 3951 2705955383
 sky/css/revolver.css 2343 3734727837
 sky/css/static.css 2048 3969825649
@@ -140,12 +140,12 @@ schizophyllu.me.room/index.html 5276 852549564
 schizophyllu.me.room/assets/font.css 30693 1584298999
 schizophyllu.me.room/room/audio.js 15818 4103357033
 schizophyllu.me.room/room/davinv.js 4641 2995940873
-schizophyllu.me.room/room/davnky.js 3848 2547100227
+schizophyllu.me.room/room/davnky.js 4021 4102858809
 schizophyllu.me.room/room/extra.js 30882 2569712650
 schizophyllu.me.room/room/music.js 4978 3071417838
 schizophyllu.me.room/room/narration.js 14420 3403870155
 schizophyllu.me.room/room/radio.js 6517 830110350
 schizophyllu.me.room/room/room.css 23069 2177606081
-schizophyllu.me.room/room/room.js 80975 2771460556
+schizophyllu.me.room/room/room.js 81216 3004019641
 schizophyllu.me.room/room/script.js 46214 305240998
 schizophyllu.me.room/assets/playlist/playlist.json 677 2065717457

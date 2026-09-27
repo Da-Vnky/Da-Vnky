@@ -27,13 +27,18 @@
    usual ⏮ ⏭ (and the phone's media keys) go from song to song.
 
    P(DOOM)'S OWN SLOT: the record "I'm Upping My P(Doom)" (any song with p(doom) in
-   its name) isn't with the others: it has a slot of its own at the end of the crate,
-   glowing rainbow. Empty (a faint outline) until it's found (sky/loot.js). Once it's
-   been given to Mel (her room sets localStorage mel-remedy) it's at her place, not
-   here: the slot holds its INVERTED twin instead (colours turned inside out, a red,
-   staticky light instead of the party; its Claubes wear black robes, pull the book
-   and run down to the dungeon: sky/claubes.js). The inverted record plays the same
-   song, or assets/sounds/doom-inverted if Victor adds one.
+   its name) isn't with the others: it has a slot of its own at the end of the crate
+   (Victor, 27 Sep):
+     • resets 1-3: an empty slot, "???" under it, until it's found (sky/loot.js: behind the
+       false god's picture); then P(Doom) sits in it, plain, its name underneath.
+     • reset 4: P(Doom) goes missing. In its place its INVERTED twin, glowing red and evil
+       (colours turned inside out; a red staticky light instead of the party; its Claubes
+       wear black robes, pull the book and run down to the dungeon: sky/claubes.js). So
+       reset 4 always has the record that calls the Claubes: nobody gets stuck. It plays the
+       same song, or assets/sounds/doom-inverted if Victor adds one.
+     • reset 5 on: P(Doom) is back, found or not, purified: glowing rainbow, a rainbow ring
+       on the record. Now it can be given to Mel (her room sets localStorage mel-remedy):
+       then it's at her place, and the slot's empty, "at Mel's" under it.
    ===================================================================== */
 
 (function () {
@@ -210,19 +215,23 @@
         drawSpecial();
         drawNow();
     }
-    // P(Doom)'s own slot, at the end: the record (found, still here), its inverted twin (she has it), or waiting (not found yet)
+    // P(Doom)'s own slot, at the end: P(Doom), or its inverted twin (empty only if the one there was shot to pieces this visit)
     function drawSpecial() {
         if (!doomEntry) return;
         var box = document.createElement('div');
-        box.className = 'rp-special' + (special ? ' ' + special.special : ' waiting');
+        box.className = 'rp-special' + (special ? ' ' + special.special : ' waiting') + (pure() ? ' pure' : '');
         box.innerHTML = '<span class="rp-special-mark" aria-hidden="true">✦</span>';
         if (special) box.appendChild(sleeveFor(special, 0));
         else {
             var e = document.createElement('span');
             e.className = 'rp-special-empty';
-            e.title = doomGiven() ? '' : 'something goes here';
             box.appendChild(e);
         }
+        // its caption, always showing: the record's name, or ??? until it's found (at Mel's, once she has it)
+        var cap = document.createElement('span');
+        cap.className = 'rp-special-name';
+        cap.textContent = special ? special.title : doomGiven() && pure() ? 'at Mel\u2019s' : '???';
+        box.appendChild(cap);
         sleeves.appendChild(box);
     }
     function sleeveFor(t, i) {
@@ -416,10 +425,16 @@
         if (on && abs(on.url) === abs(t.url)) { if (!on.album && t.album) on.album = t.album; if (!on.pic) on.pic = t.pic; on.skin = t.skin; on.discCls = t.discCls; on.special = t.special; on.title = t.title; return on; }
         return t;
     }
-    // the special slot: P(Doom) while it's theirs (found, not shot this visit), its inverted twin once Mel has it
+    // the special slot: P(Doom) while it's theirs (found, not given, not shot this visit) and it isn't reset 4; else its inverted twin
+    function resetNo() { return window.davSave ? window.davSave.reset : 1; }
+    function pure() { return resetNo() >= 5; }                        // (after reset 4: purified, glowing rainbow)
     function specialNow() {
         if (!doomEntry) return null;
-        if (!doomGiven()) return showing(doomEntry) ? same(doomEntry) : null;
+        if (resetNo() !== 4) {
+            doomEntry.discCls = pure() ? 'doom' : '';
+            if (pure()) return doomGiven() || wasShot(doomEntry.url) ? null : same(doomEntry);      // (back, found or not; unless she has it)
+            return showing(doomEntry) ? same(doomEntry) : null;                                    // (resets 1-3: once it's found)
+        }
         var inv = { kind: 'single', special: 'inverted', discCls: 'inverted', name: doomEntry.name, artist: '',
                     url: invertedSong || doomEntry.url + '#inverted', pic: doomEntry.pic, color: '#1a0606',
                     title: '\u202E' + doomEntry.title + '\u202C' };
@@ -480,7 +495,7 @@
     }).then(function (all) {
         // P(Doom) leaves the row for its own slot
         doomEntry = all.filter(function (e) { return e.kind !== 'album' && DOOM.test(e.title + ' ' + e.name); })[0] || null;
-        if (doomEntry) { doomEntry.special = 'doom'; doomEntry.discCls = 'doom'; all = all.filter(function (e) { return e !== doomEntry; }); }
+        if (doomEntry) { doomEntry.special = 'doom'; all = all.filter(function (e) { return e !== doomEntry; }); }
         allEntries = all;
         refill();
         // their own tags: title, artist, a picture (an album's cover stays its cover)

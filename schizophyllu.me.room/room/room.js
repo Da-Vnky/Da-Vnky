@@ -1596,7 +1596,7 @@ main();
 //     reset's key is found. in reset 3 it's one of the ways to die: after the lights go out, the visitor
 //     can't live with what they talked her into. back to the rooftop, where it counts (DaV-nky's resets.js)
 //   · after that (and in every reset from 4 on) the room stays quiet: the ending's dark room, skizy alone
-//     in the corner. give her the P(Doom) record (it's the visitor's once they've found it on DaV-nky) and
+//     in the corner. give her the P(Doom) record (the visitor's to give from reset 5, when it's back in DaV-nky's record player) and
 //     every visit after brings a little more back. on the fifth it's all back, and they're glad of it
 const DAV = (() => {
   const reset = Math.min(8, (+store.get('dav-reset') || 0) + 1);
@@ -1606,7 +1606,8 @@ const DAV = (() => {
   return {
     reset,
     key: store.get('lives-unlocked') === '1',
-    hasRecord: loot.includes('doom-record'),
+    ownsRecord: loot.includes('doom-record'),
+    hasRecord: reset >= 5,   // (the record's the visitor's to give from reset 5: back in DaV-nky's record player then, found or not. reset 4 it's missing)
     run, setRun: (k, v) => store.set('run:' + k, v),
     get pillsHere() { return reset === 3 && run('mel-pills') !== '1'; },
   };
@@ -1681,7 +1682,7 @@ function aloneClicked() {
       ['sit with her', () => quietNote(QUIET_NOTES.sit)],
     ]);
   }
-  quietNote(gifted ? QUIET_NOTES.listening : QUIET_NOTES.noRecord);
+  quietNote(gifted ? QUIET_NOTES.listening : DAV.reset === 4 && DAV.ownsRecord ? QUIET_NOTES.notNow : QUIET_NOTES.noRecord);
 }
 // the record, playing very quietly (DaV-nky's own copy: content/living/, the track with p(doom) in its name)
 let record = null;

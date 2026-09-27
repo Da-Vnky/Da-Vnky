@@ -622,9 +622,10 @@ body.records-open .signpost {
     margin: -9px 0 0 84px;
     border-radius: 10px;
 }
-/* its glow: every colour, turning */
+/* its glow (reset 5 on, .pure: purified): every colour, turning. before reset 4 it's just a slot of its own */
 .rp-special::before {
     content: "";
+    display: none;
     position: absolute;
     inset: -9px;
     border-radius: 14px;
@@ -642,6 +643,43 @@ body.records-open .signpost {
     background: rgba(243, 230, 194, .9);
     box-shadow: inset 0 0 0 1.5px rgba(154, 59, 31, .25);
     z-index: 0;
+}
+.rp-special.pure::before,
+.rp-special.inverted::before {
+    display: block;
+}
+.rp-special .rp-special-mark {
+    display: none;
+}
+.rp-special.pure .rp-special-mark,
+.rp-special.inverted .rp-special-mark {
+    display: block;
+}
+/* its caption, always showing: the name, or ??? until it's found */
+.rp-special .rp-special-name {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 6px);
+    transform: translateX(-50%);
+    z-index: 3;
+    width: max-content;
+    max-width: 190px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: .92rem;
+    font-style: italic;
+    color: #6e5236;
+}
+.rp-special.waiting:not(.pure) .rp-special-name {
+    letter-spacing: .3em;
+    color: #8a7258;
+}
+.rp-special.inverted .rp-special-name {
+    color: #9a0a0a;
+}
+.rp-special>.rp-sleeve .sl-name {
+    display: none;
 }
 @keyframes rp-special-glow {
     to {
@@ -664,7 +702,7 @@ body.records-open .signpost {
     animation: rp-special-glow 4s linear infinite;
 }
 /* not found yet: a faint outline, somewhere a record should be */
-.rp-special.waiting::before {
+.rp-special.waiting.pure::before {
     opacity: .28;
 }
 .rp-special .rp-special-empty {
@@ -675,16 +713,54 @@ body.records-open .signpost {
     border: 2px dashed rgba(110, 82, 54, .35);
     border-radius: 3px;
 }
-/* the inverted twin (P(Doom) is at Mel's): red, staticky */
+/* the inverted twin: a red, evil glow. it throbs like something breathing, and it flickers */
 .rp-special.inverted::before {
-    background: conic-gradient(#ff1a1a, #3a0000, #ff3a2a, #120000, #ff1a1a);
-    animation: rp-special-flicker .22s steps(2) infinite;
+    inset: -24px;
+    border-radius: 30px;
+    background: radial-gradient(closest-side, #3a0000 0 58%, #ff1408 72%, rgba(170, 0, 0, .7) 86%, transparent);
+    filter: blur(8px);
+    opacity: .95;
+    animation: rp-evil-throb 2.4s ease-in-out infinite, rp-evil-flicker 3.7s steps(1) infinite;
 }
-@keyframes rp-special-flicker {
-    50% {
-        opacity: .5;
-        filter: blur(12px);
+.rp-special.inverted::after {
+    background: radial-gradient(ellipse at 50% 50%, #2a0404, #0a0000 80%);
+    box-shadow: inset 0 0 18px rgba(255, 0, 0, .55), inset 0 0 0 1.5px rgba(160, 0, 0, .8);
+}
+@keyframes rp-evil-throb {
+    0%, 100% {
+        transform: scale(.96);
     }
+    45% {
+        transform: scale(1.08);
+    }
+    55% {
+        transform: scale(1.03);
+    }
+}
+@keyframes rp-evil-flicker {
+    0%, 100% {
+        opacity: .95;
+    }
+    31% {
+        opacity: .35;
+    }
+    32% {
+        opacity: .95;
+    }
+    74% {
+        opacity: .5;
+    }
+    75% {
+        opacity: 1;
+    }
+}
+.rp-special.inverted .rp-special-mark {
+    color: #ff1a0a;
+    text-shadow: 0 0 6px #600, 0 0 12px #f00;
+    animation: rp-evil-flicker 3.7s steps(1) infinite;
+}
+.rp-special.inverted .rp-sleeve .sl-cover {
+    box-shadow: 0 0 14px rgba(255, 0, 0, .6), 0 6px 12px rgba(0, 0, 0, .5);
 }
 .rp-sleeve.inverted .sl-cover {
     filter: invert(1) hue-rotate(180deg) contrast(1.1);
@@ -694,7 +770,8 @@ body.records-open .signpost {
 }
 @media (prefers-reduced-motion: reduce) {
     .rp-special::before,
-    .rp-special .rp-special-mark {
+    .rp-special .rp-special-mark,
+    .rp-special.inverted::before {
         animation: none;
     }
 }

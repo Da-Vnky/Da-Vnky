@@ -7,7 +7,7 @@ sky/ambient.js 5052
 sky/attic.js 34415
 sky/bathroom.js 27366
 sky/books.js 13659
-sky/claubes.js 52428
+sky/claubes.js 52495
 sky/crate.js 37063
 sky/dungeon.js 9873
 sky/eye.js 14593
@@ -26,7 +26,7 @@ sky/kitchen.js 18201
 sky/letters.js 22640
 sky/lives.js 12193
 sky/loader.js 15448
-sky/loot.js 14685
+sky/loot.js 14817
 sky/marker.js 7216
 sky/models.js 5073
 sky/music.js 57629
@@ -37,9 +37,9 @@ sky/panel.js 66074
 sky/peeper.js 29950
 sky/porch.js 16196
 sky/post.js 21396
-sky/records.js 32765
+sky/records.js 33943
 sky/resets.js 16799
-sky/revolver.js 16851
+sky/revolver.js 17327
 sky/sky.js 111054
 sky/state.js 14017
 sky/static.js 3162
@@ -83,7 +83,7 @@ sky/css/panel.css 6803
 sky/css/peeper.css 11229
 sky/css/porch.css 10056
 sky/css/post.css 7339
-sky/css/records.css 16250
+sky/css/records.css 18208
 sky/css/resets.css 3951
 sky/css/revolver.css 2343
 sky/css/static.css 2048
@@ -140,12 +140,12 @@ schizophyllu.me.room/index.html 5276
 schizophyllu.me.room/assets/font.css 30693
 schizophyllu.me.room/room/audio.js 15818
 schizophyllu.me.room/room/davinv.js 4641
-schizophyllu.me.room/room/davnky.js 3848
+schizophyllu.me.room/room/davnky.js 4021
 schizophyllu.me.room/room/extra.js 30882
 schizophyllu.me.room/room/music.js 4978
 schizophyllu.me.room/room/narration.js 14420
 schizophyllu.me.room/room/radio.js 6517
 schizophyllu.me.room/room/room.css 23069
-schizophyllu.me.room/room/room.js 80975
+schizophyllu.me.room/room/room.js 81216
 schizophyllu.me.room/room/script.js 46214
 schizophyllu.me.room/assets/playlist/playlist.json 677

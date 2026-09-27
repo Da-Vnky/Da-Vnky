@@ -41,7 +41,8 @@
 
    ONCE P(DOOM) IS MEL'S (given to her in her room: localStorage mel-remedy), it's gone
    from the crate and it calls nobody (and the party lights never come on for it: Mel
-   asked for that). Its INVERTED TWIN takes its slot (sky/records.js, special 'inverted'):
+   asked for that). In RESET 4 P(Doom) is missing: its INVERTED TWIN is in its slot instead
+   (sky/records.js, special 'inverted'; the only time it exists):
    played, the light goes red and staticky (sky/static.js) instead of the party, and the
    Claubes that come out wear BLACK ROBES (run:claubes-robed). They don't dance: they
    make for the bookshelf, pull the book (the wall opens: Sky.sides.pullBook) and run down

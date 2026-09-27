@@ -43,6 +43,7 @@
     var LOOT = [
         { id: 'doom-record', kind: 'record', name: 'the record “I’m Upping My P(Doom)”', label: 'a record, in its sleeve', slot: 'assets/items/doom-record',
           track: /p\s*\(\s*doom\s*\)/i, keep: 'forever', page: 'living', shoot: '.gallery-frame[data-wall=shame][data-frame="6"]',
+          resets: [1, 2, 3],          // (only to be found in resets 1-3: missing in reset 4, back by itself from reset 5: sky/records.js)
           say: 'something slides out from behind the picture…', hint: 'take it to the record player',
           art: '<svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="40" cy="30" r="19" fill="#141416"/><circle cx="40" cy="30" r="13" fill="none" stroke="rgba(255,255,255,.12)"/>' +
                '<circle cx="40" cy="30" r="6" fill="#c8643b"/><rect x="4" y="8" width="44" height="44" rx="2" fill="#2a1d2e"/><rect x="4" y="8" width="44" height="44" rx="2" fill="none" stroke="#8a3b6a" stroke-width="1.4"/>' +
@@ -71,7 +72,8 @@
     // the hidden records: out of the crate until they're yours (sky/records.js asks)
     function trackHidden(url, title) {
         var name = String(title || '') + ' ' + (function () { try { return decodeURIComponent(url || ''); } catch (e) { return url || ''; } })();
-        return LOOT.some(function (L) { return L.kind === 'record' && L.track && L.track.test(name) && !owned(L.id); });
+        var r = window.davSave ? window.davSave.reset : 1;
+        return LOOT.some(function (L) { return L.kind === 'record' && L.track && L.track.test(name) && !owned(L.id) && !(L.resets && r > Math.max.apply(null, L.resets) + 1); });
     }
 
     /* ---------------- into the hotbar ---------------- */
@@ -118,6 +120,7 @@
     }
     function drop(L, from) {
         if (!I || spent(L)) return;
+        if (L.resets && window.davSave && L.resets.indexOf(window.davSave.reset) === -1) return;
         markFound(L.id);
         var host = hostOf(from), hr = host.getBoundingClientRect(), fr = from.getBoundingClientRect();
         var xPct = Math.max(4, Math.min(96, (fr.left + fr.width / 2 - hr.left) / (hr.width || window.innerWidth) * 100));

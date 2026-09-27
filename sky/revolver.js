@@ -249,6 +249,14 @@
         return true;
     });
 
+    // reset 4 (27 Sep, Victor: so nothing can go wrong): the only revolver is the white one, from the grimoire's pact.
+    // the ordinary one isn't on the rooftop or on the living-room floor, and isn't in the bag
+    (function () {
+        var S = window.davSave;
+        if (!S || S.reset !== 4) return;
+        document.querySelectorAll('.pickup[data-item="revolver"]').forEach(function (p) { p.remove(); });
+        if (I.has('revolver')) I.remove('revolver');
+    })();
     // the white revolver stays theirs for the rest of reset 4 (the bag itself only lasts the visit)
     (function () {
         var S = window.davSave;

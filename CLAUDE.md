@@ -221,9 +221,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   pact (either gun), counted in `run:apparitions` (hell.js) and kept broken for the reset. **The false god** (frame 6)
   with the white revolver (`Sky.claubes.whiteFrame`): while they worship, absorbed; not all seven dead or pictures left →
   "Not yet…" and just a hole (the hidden record can still drop); all done → `reflect()`: the bullet comes straight back,
-  splat, `dav:traveller-died` → the one heart → reset 5. In reset 4 frame 6 never bursts for the ordinary revolver (a
-  hole + `dav:shot`, so sky/loot.js still drops the P(Doom) record), and the ordinary revolver's bullets on the diagram are
-  only drunk (capped, never reflected).
+  splat, `dav:traveller-died` → the one heart → reset 5. There's no ordinary revolver in reset 4 any more (27 Sep);
+  the code that kept frame 6 whole for it, and capped its bullets on the diagram, is still there but unused. P(Doom) can't
+  drop in reset 4 (loot.js `resets`).
 - Debug page: "the white revolver: theirs", "the six pictures … shot", "the pact, now (reset 4: below, and back)".
 
 ## The kitchen (sky/kitchen.js)
@@ -311,7 +311,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     goes off it (`jumpOff`/`fall`, the street far below), the death (`respawn`), and `localStorage dav-wake-at =
     living.html#porch` so forget.js `reset()` lands the next reset **on the porch** instead of the homepage.
   - From then (and in every reset from 4): the quiet room (`davQuiet`/`quietRoom`: dark, skizy alone). Click her:
-    with the P(Doom) record owned (`loot-owned` has `doom-record`) → "give her the record" → `mel-remedy = 0`
+    with the P(Doom) record owned (`loot-owned` has `doom-record`) and not in reset 4 → "give her the record" → `mel-remedy = 0`
     (forever, not per reset); each later visit +1 (`REMEDY_BACK`: the record plays, lights, Mira, Claube/Aether…);
     at 5 it's all back, `RESTORED_FIRST` once (`mel-restored-said`), then `RESTORED` talk joins her ambient lines
     (happy to have each other; the record; hints at what happened). The record plays from content/living/ (p(doom)).
@@ -406,11 +406,20 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   gives `vinyl`; `rename_song` moves `<stem>.vinyl.*` along; `album_cover` / `album_cover_put` ignore `vinyl.*`; shelf_delete
   removes it with the song. assets.html: a round checkerboard thumbnail per row, "upload a vinyl" / "new vinyl" / "✕ vinyl".
 - **P(Doom)** (any single with p(doom) in its name) is pulled out of the row into its own slot at the end (`drawSpecial`,
-  `.rp-special`, rainbow glow; `special: 'doom'`, `discCls: 'doom'` → a turning rainbow ring on the record). Not found yet:
-  an empty dashed outline. **Given to Mel** (`localStorage mel-remedy` set by her room): gone from the crate (and from a
-  saved `music-now`), claubes.js `isDoom` is false for it (no Claubes, no party lights: Mel's wish), and its **inverted twin**
-  takes the slot (`special: 'inverted'`, url = the P(Doom) file + `#inverted` or `assets/sounds/doom-inverted`, mirrored title
-  with U+202E, `.rp-disc.inverted` = invert + hue-rotate). `special` is kept in the `music-now` save.
+  `.rp-special`; `specialNow()`), per reset (Victor, 27 Sep):
+  - **resets 1-3**: a plain slot with **"???"** under it (`.rp-special-name`, always showing) until it's found (sky/loot.js,
+    behind the false god's picture; `LOOT.resets: [1, 2, 3]`: it can't be found in any other reset); then P(Doom) in it,
+    its name underneath. No glow.
+  - **reset 4**: P(Doom) is missing; its **inverted twin** is in the slot, glowing red and evil (`special: 'inverted'`,
+    url = the P(Doom) file + `#inverted` or `assets/sounds/doom-inverted`, mirrored title with U+202E, `.rp-disc.inverted` =
+    invert + hue-rotate, the slot's red throbbing flicker). It's the only time the inverted record exists.
+  - **reset 5 on**: P(Doom) is back **found or not**, purified: the slot glows rainbow (`.pure`) and its record has the
+    turning rainbow ring (`discCls: 'doom'` only then). From now it can be given to Mel (her room: `DAV.hasRecord = reset >= 5`;
+    reset 4 with it found says `QUIET_NOTES.notNow`). **Given to Mel** (`localStorage mel-remedy`): gone from the crate (and
+    from a saved `music-now`), the slot says "at Mel's", and claubes.js `isDoom` is false for it (no Claubes, no party lights:
+    Mel's wish). `special` is kept in the `music-now` save.
+- **Reset 4 has no ordinary revolver** (revolver.js removes the rooftop's and the living-room floor's pickups and takes it
+  out of the bag): the only gun is the white one from below. So nothing can be shot or broken the wrong way.
 - The inverted record playing: `body.doom-inverted` (a red, stepping wash instead of beams/ball) + static. Its Claubes are
   **robed** (`run:claubes-robed`; stand-in `ROBED`, slots `mini-claube-robed`, `-robed-pulling`, `-robed-running`): `robedGo()`
   sends them to the shelf book (`.running`), they haul on it (`.pulling`), `Sky.sides.pullBook()` opens the wall (bathroom.js;

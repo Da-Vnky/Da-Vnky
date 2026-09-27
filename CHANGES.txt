@@ -17,6 +17,9 @@ How it works
 
 == published ==
 
+2026-09-27 12:47 · V
+- P(Doom), per reset (Victor): resets 1-3 its slot is plain, with "???" under it until it's found (it can only be found in resets 1-3); reset 4 it goes missing and the inverted record takes its place, glowing red (the only time the inverted record exists); from reset 5 it's back whether it was found or not, purified, glowing rainbow, and can be given to Mel (then the slot says "at Mel's"). Reset 4 has no ordinary revolver at all (not on the rooftop, not on the living-room floor, not in the bag): only the white one from below. Mel's room: the record can be given from reset 5 (room/room.js DAV.hasRecord = reset >= 5; reset 4 with it found shows the "not yet" line)
+
 2026-09-27 12:22 · V
 - records can have their own vinyl: the content manager's record player tab has "upload a vinyl" beside the sleeve (png or webp keep the see-through parts; leave the middle see-through and the sleeve shows as its label). A single's is 01-name.vinyl.png beside the song, an album's vinyl.png in its folder; they follow the song when it's renamed or moved. Every record now has light on it that stays still while it turns (grooves and sheen; slot assets/living/vinyl-texture for your own .webp). sky/music.js disc()/discOf(), sky/records.js, tools/content.py (/__records/vinyl, vinyl-remove), tools/assets.html
 - content manager: renaming or moving records is patient on Windows (waits for a song or folder something has open, then says so plainly) and mends a rename cut short, so an album can't hide the next uploads (tools/content.py replace_hard, finish_renames); a script error on the noise machine tab fixed
