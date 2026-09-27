@@ -318,6 +318,20 @@ body.closet-dark #c-bulbglass { filter: none; }
 @keyframes peepblink { 0%, 100% { opacity: 1; } 60% { opacity: .92; } }
 .peep-note { position: absolute; bottom: 5vh; width: 100%; text-align: center; color: #cfd8d2; line-height: 1.6; }
 
+/* opi's terminal (the small monitor in the closet) */
+#term { position: fixed; inset: 0; z-index: 55; background: rgba(0, 0, 0, .88); display: grid; place-items: center; cursor: pointer; }
+#term-screen {
+  width: min(92vw, 720px); height: min(70vh, 460px); overflow-y: auto; cursor: text;
+  font-family: 'IBM VGA', monospace; font-size: clamp(12px, 2.2vw, 17px); line-height: 1.5; color: #6dffb0;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0 1px, transparent 1px 3px), #04140c;
+  border: 2px solid #1d3327; border-radius: 10px; padding: 1.2em 1.4em;
+  text-shadow: 0 0 6px rgba(109, 255, 176, .55); box-shadow: 0 0 30px rgba(109, 255, 176, .12), inset 0 0 24px rgba(0, 0, 0, .8);
+}
+#term-out { margin: 0; white-space: pre-wrap; font: inherit; }
+#term-line { display: flex; }
+#term-in { flex: 1; min-width: 0; background: none; border: 0; outline: none; padding: 0; color: inherit; font: inherit; text-shadow: inherit; caret-color: #6dffb0; }
+#term .peep-note { position: absolute; bottom: 5vh; }
+
 /* close-ups (the notebook on the floor) */
 #closeup { position: fixed; inset: 0; z-index: 55; background: rgba(0, 0, 0, .88); cursor: pointer; display: grid; place-items: center; }
 #closeup-page { width: min(92vw, 820px); transform: rotate(-1.5deg); filter: drop-shadow(0 10px 30px rgba(0, 0, 0, .8)); }
@@ -473,6 +487,11 @@ body.zoomed #hud-top { opacity: 0; }
 #dlg-dir:not(:empty)::after { content: ')'; }
 #dlg-text { min-height: 2.9em; }
 #dlg-text.direction { color: var(--dim); font-style: italic; }
+/* conversations: your questions, in the box */
+#dlg-choices button { display: block; text-align: left; width: 100%; padding: 3px 6px; }
+#dlg-choices button::before { content: '> '; color: var(--dim); }
+#dialogue.choosing { cursor: default; }
+#dialogue.choosing #dlg-foot { display: none; }
 #dlg-foot { display: flex; justify-content: flex-end; align-items: center; gap: 8px; font-size: .75em; margin-top: 6px; }
 #dlg-foot .dim { margin-right: auto; }
 
