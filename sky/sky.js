@@ -32,17 +32,21 @@
     // previewing on your own computer (tools/preview): home stays on your computer too
     if (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)$/.test(location.hostname)) HOME = 'index.html';
 
-    // every place on the site. on the homepage each gets a wooden sign on the
-    // signpost (right side, on the dock); on every other page it's a tab on the
+    // every place on the site. on every page but the homepage it's a tab on the
     // right edge with a little picture of the place (slot: assets/ui/place-<id>;
-    // a new place without one gets a plain door).
+    // a new place without one gets a plain door). the homepage has a signpost
+    // instead (right side, on the dock): a wooden sign for each place that isn't
+    // tabOnly. since 27 Sep (Victor) that's just the sea and "visit home", which
+    // takes you to the front of the house (living.html#front, sky/front.js): the
+    // workshop, the rooftop and the rooms are reached from inside the house.
+    //   tabOnly: a tab, but no sign on the homepage    signOnly: a sign, but no tab
     // to add a place: add a line here, in the order you want them.
     var PLACES = [
         { id: 'sea',      name: 'the sea',          href: HOME },
-        { id: 'workshop', name: 'the workshop',     href: 'workshop.html' },
-        { id: 'city',     name: 'the rooftop',      href: 'city.html' },
-        { id: 'living',   name: 'the living space', href: 'living.html' },
-        // (a tab of its own, but no plank on the homepage's signpost: it's a room of the living space)
+        { id: 'home',     name: 'visit home',       href: 'living.html#front', signOnly: true },
+        { id: 'workshop', name: 'the workshop',     href: 'workshop.html', tabOnly: true },
+        { id: 'city',     name: 'the rooftop',      href: 'city.html', tabOnly: true },
+        { id: 'living',   name: 'the living space', href: 'living.html', tabOnly: true },
         { id: 'kitchen',  name: 'the kitchen',      href: 'living.html#kitchen', tabOnly: true }
     ];
 
@@ -456,7 +460,7 @@
     var tabs = document.createElement('nav');
     tabs.className = 'place-tabs';
     tabs.setAttribute('aria-label', 'places');
-    PLACES.forEach(function (pl) {
+    PLACES.filter(function (pl) { return !pl.signOnly; }).forEach(function (pl) {
         var el = document.createElement(pl.id === here ? 'span' : 'a');
         el.className = 'place-tab' + (pl.id === here ? ' here' : '');
         el.dataset.place = pl.id;

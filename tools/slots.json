@@ -1633,6 +1633,40 @@
    ]
   },
   {
+   "id": "front",
+   "name": "the front of the house",
+   "page": "living.html#front",
+   "note": "where the homepage’s \"visit home\" sign brings you (sky/front.js). every picture here is the whole 1600 x 900 canvas, drawn from the bottom up: the screen always shows its full width and bottom, and on tall screens the sides are cut. leave the sky see-through: the site’s own sky shows there.",
+   "groups": [
+    {
+     "name": "the house from the garden path",
+     "slots": [
+      {
+       "slot": "assets/living/front-house",
+       "what": "the house, the garden, the path and the fence: everything but the door (see-through where the sky is)",
+       "size": "1600 x 900, see-through sky"
+      },
+      {
+       "slot": "assets/living/front-door",
+       "what": "the front door, shut: drawn where it sits on the 1600 x 900 canvas (770 to 830 across, 492 to 612 down), see-through everywhere else. click it to go in",
+       "size": "1600 x 900, see-through but the door"
+      },
+      {
+       "slot": "assets/living/front-door-open",
+       "what": "the front door, open (the same place), as the traveller goes in",
+       "size": "1600 x 900, see-through but the door"
+      },
+      {
+       "slot": "assets/characters/front",
+       "what": "the traveller out here, on the path (and front-walking, as they walk up to the door)",
+       "size": "like the other scenes’ traveller",
+       "optional": true
+      }
+     ]
+    }
+   ]
+  },
+  {
    "id": "dungeon",
    "name": "the dungeon",
    "groups": [

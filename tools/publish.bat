@@ -5,7 +5,9 @@ rem  changes on the live site. it
 rem    1. fetches anything new from Forgejo (Mel's changes, songs you
 rem       uploaded there): tools/pull.sh, the same as pull.bat
 rem    2. rewrites every list.txt, so new files appear and deleted ones go
-rem    3. asks what you changed, commits, and pushes
+rem    3. commits and pushes. the message: the lines waiting in CHANGES.txt
+rem       ("not published yet"), which then move down into its log; if
+rem       there aren't any, it asks what you changed
 rem  preview first with preview.bat if you like.
 rem  (the content manager runs it with a message, e.g. publish.bat "content push":
 rem   then it doesn't ask, and closes itself when it's done)
@@ -38,12 +40,24 @@ echo  2. updating the file lists...
 echo.
 git status --short
 echo.
+rem  3. the message: what's waiting in CHANGES.txt (tools/changes.py), or else what you type
 set "MSG=%~1"
 if defined PUBLISH_MSG set "MSG=%PUBLISH_MSG%"
-if not defined MSG set /p "MSG=  3. what did you change? (a few words, then Enter): "
+set "PY="
+where py >nul 2>nul && set "PY=py"
+if not defined PY where python >nul 2>nul && set "PY=python"
+set "HAVE="
+if defined PY %PY% tools\changes.py waiting >nul 2>nul && set "HAVE=1"
+if not defined HAVE if not defined MSG set /p "MSG=  3. what did you change? (a few words, then Enter): "
 if not defined MSG set "MSG=update"
+set "USEFILE="
+if defined PY %PY% tools\changes.py take --also "%MSG%" && set "USEFILE=1"
 git add -A
-git commit -m "%MSG%" --no-verify
+if defined USEFILE (
+    git commit -F .git\PUBLISH_MSG --no-verify
+) else (
+    git commit -m "%MSG%" --no-verify
+)
 git push
 if errorlevel 1 (
     echo.

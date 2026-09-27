@@ -31,6 +31,7 @@ STOPS = [
     ('the hallway', 'living.html#hallway'),
     ('the kitchen', 'living.html#kitchen'),
     ('the porch', 'living.html#porch'),
+    ('the front of the house', 'living.html#front'),
     ('the attic', 'living.html#attic'),
     ('the dungeon', 'living.html#dungeon'),
     ('the template', 'template.html'),

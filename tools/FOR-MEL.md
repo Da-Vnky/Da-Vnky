@@ -94,6 +94,12 @@ replaces the stand-in. There's no code to change for this.
 
 ## 6. Never edit by hand, and a few habits
 
+- **What's changed: `CHANGES.txt`** at the top of the repo, newest first. Read it when you start, to see what Victor
+  (and his Claude) changed since you last looked. When you change something, add a line under "not published yet"
+  (`python3 tools/changes.py add "what changed"`). `publish.sh` turns those lines into the commit message and moves
+  them into the log. For a pull request: `python3 tools/changes.py take --who Mel`, then commit with
+  `git commit -F .git/PUBLISH_MSG`. Two people adding lines never clash (it merges with `union`).
+
 - **Written by the tools, never by hand:** every `list.txt`, `catalog.txt`, `files.txt`, `manifest.txt`,
   `assets/resets/index.txt` and `content/living/albums.txt`. `update-lists.sh` writes them, on every publish and
   through the commit hook.

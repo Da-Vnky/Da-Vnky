@@ -12,3 +12,6 @@ files.txt                 merge=regen
 manifest.txt              merge=regen
 assets/resets/index.txt   merge=regen
 content/living/albums.txt merge=regen
+
+# the change log: two people adding lines at once keep both (never a clash)
+CHANGES.txt               merge=union

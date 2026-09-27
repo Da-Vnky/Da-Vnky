@@ -1,0 +1,45 @@
+DaV-nky: what's changed, newest first.
+For Victor, Mel, and any Claude working on this repo: read this to catch up on what's been done and why.
+CLAUDE.md is the full manual; this is the diary.
+
+How it works
+- Changed something? Add a line under "not published yet" below, starting with "- ". Plain words: what a
+  visitor would notice, or what a Claude working here needs to know (a file that moved, a rule that changed).
+  (python tools/changes.py add "what changed" does it for you.)
+- Publishing (tools/publish.bat, tools/publish.sh, the content manager's publish button) turns those lines
+  into the commit's message and moves them down into the log, under the date and who published.
+- A pull request: add your lines, run "python tools/changes.py take --who <your name>" before the last
+  commit, and commit with "git commit -F .git/PUBLISH_MSG". The lines land in the log the same way.
+- Two people adding lines at once never clash here (.gitattributes: merge=union keeps both).
+
+== not published yet ==
+(write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+
+== published ==
+
+2026-09-27 08:41 · V
+- the homepage's signpost: only "the sea" and "visit home" now. "visit home" goes to the front of the house (living.html#front, sky/front.js + sky/css/front.css); the workshop, rooftop and rooms are reached from inside. Their tabs stay on every other page (sky.js PLACES: tabOnly / signOnly)
+- the front of the house: the house from the garden path under the site's sky, one 1600 x 900 picture (slots assets/living/front-house, front-door, front-door-open, assets/characters/front); click the door, the traveller walks up the path and into the hallway
+- when the heart goes it now says "No more lives left" (lives.js GONE); the revolver on the last heart waits 2.2 s so it can be read
+- tools/smoke.py checks the front of the house too
+- this change log: CHANGES.txt, tools/changes.py, and the publish scripts use it for their message
+
+2026-09-27 (catch-up: everything below was written afterwards, from the work itself)
+- Mel's clean-up (#5): every piece's CSS moved out of the JavaScript into sky/css/<name>.css, linked in each page's head. New styles go there, never as strings in the JS (CLAUDE.md "Where the styles go"). tools/smoke.py: every page in a hidden browser
+- Mel's room (#6): conversations in the dialogue box (Mira, Claube, skizy), opi's terminal and the packed bag in the ladder closet, four more songs; (#2) ?afternoonIn=N to test the afternoon's real trigger
+- one heart, one death a reset (so the ending can be reached): reset 1 the revolver, 2 the boat, 3 Mel's pills, 4 the false god's bullet; 5-8 placeholder skull bubbles. The toaster, the scissors, the poisoned apple, the cornucopia and the roof jump (and its guard rails) are gone
+- from reset 2 the revolver always jams on the traveller; a second revolver lies on the living-room floor by the plant, to play with
+- the kitchen bowl: sausages in resets 1-2, a serpent from 3 on (the first time in each reset, the sausages turn into it)
+- reset 3's ending: back from Mel's room after the pills, the traveller walks off the roof, and the next reset starts on the porch (localStorage dav-wake-at, forget.js)
+- reset 4: the book that opens the dungeon is missing until the grimoire's pact. The pact drags the traveller below (sky/hell.js: red sky, brimstone, the eye in the ouroboros, a voice: "Kill the Claubes"), the hands push them back up, and a white revolver appears ("Destroy its disciples and apparitions"). On the diagram it kills the Claubes (giblets, screams; the rest stand still and smile). Kill all seven, shoot the six pictures round the false god, and the false god sends the last bullet back: the end of reset 4
+- slots for all of that in the asset manager ("below (reset 4)", the white revolver, the menacing Claube, giblets, the new sounds); the debug page has switches for it
+- tools for Mel (tools/FOR-MEL.md): content.sh, publish.sh, mel-room-slots.py, VS Code tasks in tools/vscode/tasks.json (copy into .vscode/)
+
+2026-09-26 (catch-up)
+- tools/pull.bat and pull.sh: get what others pushed; on a clash your copy is kept in _your-versions/. publish stops rather than overwrite
+- Mel's room: the pills cabinet is empty before reset 3; Hexley the bee buzzes when clicked; Victor's own pictures for her room from the asset manager ("Mel's room")
+- the bottle letters: the paper grows to fit the letter, and the rolls sit on the paper's edge
+- the kitchen: off the hallway's left, with its own tab; drawers that open; reset 3's key stuck in the apple pie in the fridge
+- the porch (out of the hallway's front door): the street and the sky; from reset 3 the watcher comes closer each time, and other uncanny things happen
+- the record player: albums as well as singles (a gold ring on the vinyl, a song picker), and album uploads in the content manager
+- the boat can't be dragged off the screen

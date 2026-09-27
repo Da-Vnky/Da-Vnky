@@ -35,6 +35,13 @@ this before changing anything; keep it up to date when something here stops bein
 - Never read out, commit or send anything from `.inbox/`.
 - Don't commit or push unless Victor asks: publishing (`tools\publish.bat`) is his. The repo is public.
 - When something big is finished, **update this file** so the next conversation knows.
+- **Every change goes in `CHANGES.txt`** (27 Sep, Victor): a line each under "not published yet", in plain words
+  (what a visitor would notice, or what the next Claude needs to know: a file that moved, a rule that changed).
+  `python tools/changes.py add "…"` or edit the file. Publishing uses those lines as the commit message and moves
+  them into the log under the date and who published (`tools/changes.py take`, called by publish.bat / publish.sh /
+  the content manager's publish button; nothing waiting = it asks as before). A pull request: `take --who <name>`
+  before the last commit, then `git commit -F .git/PUBLISH_MSG`. `.gitattributes` has `CHANGES.txt merge=union`.
+  **Read CHANGES.txt first when you come back to this repo**: it's how you learn what others changed.
 
 ## Hosting and publishing
 
@@ -74,7 +81,10 @@ this before changing anything; keep it up to date when something here stops bein
 
 ## The pages
 
-- `index.html` — the sea (homepage): scroll = the day turning; ship you can pick up; dock; bottles.
+- `index.html` — the sea (homepage): scroll = the day turning; ship you can pick up; dock; bottles. Its signpost
+  has only two signs since 27 Sep (Victor): "the sea" and **"visit home"** (→ `living.html#front`, the front of the
+  house). The workshop, rooftop and rooms are reached from inside the house (the hallway's doors), and still have
+  their tabs on every other page. sky.js `PLACES`: `tabOnly` = a tab but no sign, `signOnly` = a sign but no tab.
 - `workshop.html` — the workshop: easel, paint easel, portfolio, frames, notes board, timer.
 - `city.html` — the rooftop at night-ish: skyline, the telescope (a prop on its tripod just left of the
   traveller, `.roof-telescope` = `.telescope-btn`, slot `assets/city/telescope`; no corner button any more)
@@ -231,6 +241,21 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   serpent (slot `serpent`, hover "eat. and you will know.", a nod to the pie). The first time in each reset from 3, the
   sausages writhe and turn into it (`bowl-turning` → `bowl-serpent`, `run:serpent-turned`). The apple death and the
   cornucopia were removed on 27 Sep (one death a reset).
+
+## The front of the house (sky/front.js, 27 Sep)
+
+- `living.html#front` (the homepage's "visit home" sign): the house seen from the garden path, over everything
+  (`.front`, z 4; `body.in-front` hides `.room`, the living room's side arrows and `.ground-view`; the constellations
+  show). One 1600 x 900 picture (`.front-stage`: `width: max(100vw, 177.78vh)`, 16:9, bottom-anchored and centred, so
+  the full width always shows and tall screens cut the sides): `front-house` (the house, garden, path, fence; sky
+  see-through), `front-door` / `front-door-open` (whole-canvas overlays, the door at 770–830 × 492–612). The click
+  target `.front-door-hit` sits on those coordinates in % (front.css). Windows and the porch lamp glow with `--dusk`.
+- Click the door: the traveller walks over, then up the path (one animation, scaled down to the door's height), the
+  door opens, they fade in → `Sky.sides.goNow('hall')` and the garden fades away (`body.front-leaving`); the hall
+  traveller steps in from the front door (`.hall-out`) and walks to 44%. Any side room or the living space's tab
+  while out here just leaves the garden (`close()`). `Sky.front = { open, close, goIn, here }`. "Home." the first time.
+- Slots: `assets/living/front-house`, `front-door`, `front-door-open`, `assets/characters/front` (+ `front-walking`);
+  asset manager scene "the front of the house". Not linked from the porch (yet): only the homepage comes here.
 
 ## The porch (sky/porch.js)
 
@@ -394,6 +419,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - Seven resets (the seven spheres) and an eighth, the grand mystery. `localStorage["dav-reset"]` =
   resets completed (0 = reset 1). `davSave.reset` → 1…8.
 - **One heart, one death a reset** (27 Sep, Victor and Mel: so the easter egg can be reached). lives.js `MAX = 1`.
+  When it goes, the note says **"No more lives left"** (lives.js `GONE`, Victor's words), in `lose()` and in
+  `final()` (the revolver on the last heart, which now waits 2.2 s for it before the white-out).
 - Losing the heart → `Sky.stay.reset()` (white-out) → `davSave.nextReset()`: clears the RUN keys,
   any `run:*` key and sessionStorage; the cache stays. Every reset then starts again **at the homepage**
   (forget.js `HOME`), not the page it happened on, unless `localStorage dav-wake-at` says otherwise (reset 3's

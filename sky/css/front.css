@@ -1,0 +1,131 @@
+/* =====================================================================
+   front.css — the look of sky/front.js: the front of the house (living.html#front).
+   ===================================================================== */
+
+/* over everything else on the page while you're out here; the top is open, so the site's own sky shows */
+.front {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+    visibility: hidden;
+    opacity: 0;
+    --pd: calc(1 - .55 * var(--dusk, 0));
+}
+body.in-front .front {
+    visibility: visible;
+    opacity: 1;
+}
+body.front-leaving .front {
+    visibility: visible;
+    opacity: 0;
+    transition: opacity .9s ease-in, visibility 0s .9s;
+}
+/* the living space, its arrows and the garden seen through its window: not out here */
+body.in-front .room,
+body.in-front .room-arrow.to-hall,
+body.in-front .room-arrow.to-bath,
+body.in-front .ground-view {
+    visibility: hidden;
+}
+body.in-front .sky-links,
+body.in-front .sky-links * {
+    visibility: visible !important;
+}
+
+/* the 1600 x 900 picture: always the full width, and at least the full height, from the bottom up */
+.front .front-stage {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: max(100vw, 177.78vh);
+    aspect-ratio: 16 / 9;
+    transform: translateX(-50%);
+    filter: brightness(var(--pd));
+}
+.front .front-house,
+.front .front-door,
+.front .front-door-open {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.front .front-house > svg,
+.front .front-house > .art,
+.front .front-door > svg,
+.front .front-door > .art,
+.front .front-door-open > svg,
+.front .front-door-open > .art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+.front .front-door-open {
+    visibility: hidden;
+}
+.front.door-open .front-door {
+    visibility: hidden;
+}
+.front.door-open .front-door-open {
+    visibility: visible;
+}
+/* the windows light up as it gets dark */
+.front .fh-glow {
+    opacity: calc(.08 + .8 * var(--dusk, 0));
+}
+.front .fh-lamp {
+    opacity: calc(.3 + .7 * var(--dusk, 0));
+}
+
+/* where the door is on the picture (770-830 across, 492-612 down, of 1600 x 900): click it */
+.front .front-door-hit {
+    position: absolute;
+    left: 47.6%;
+    top: 53.6%;
+    width: 4.8%;
+    height: 15.4%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    border-radius: 3px;
+}
+.front .front-door-hit:hover,
+.front .front-door-hit:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 220, 150, .7), 0 0 18px rgba(255, 220, 150, .55);
+}
+.front .kh-hint {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 6px);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    z-index: 6;
+    font: italic .95rem "IM Fell English", Georgia, serif;
+    color: #f3e6c2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+    opacity: 0;
+    transition: opacity .2s;
+    pointer-events: none;
+}
+.front .front-door-hit:hover .kh-hint,
+.front .front-door-hit:focus-visible .kh-hint {
+    opacity: 1;
+}
+
+/* the traveller, on the path by the gate */
+.front .front-character {
+    position: absolute;
+    left: calc(var(--front-stand) * 1%);
+    bottom: 3vh;
+    height: 25vh;
+    z-index: 5;
+    filter: brightness(var(--pd));
+}
+@media (max-width: 620px) {
+    .front .front-character {
+        height: 15vh;
+    }
+}

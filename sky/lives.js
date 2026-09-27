@@ -76,6 +76,7 @@
         el.innerHTML = h + '<span class="l-lock" title="locked">' + art.lock + '</span>';
         el.setAttribute('aria-label', MAX === 1 ? (n ? 'your life' : 'no life left') : n + ' of ' + MAX + ' lives');
     }
+    var GONE = 'No more lives left';                                   // what it says as the last one goes (Victor's words)
     function say(t) {
         var d = document.createElement('div');
         d.className = 'lives-note';
@@ -125,7 +126,7 @@
             if (n > 0) { say(n === 1 ? 'one life left.' : n + ' lives left.'); return; }
             // the last one: everything goes
             resetting = true;
-            say('no life left.');
+            say(GONE);
             setTimeout(function () {                                   // and on to the next reset (sky/state.js, sky/forget.js)
                 if (Sky.stay && Sky.stay.reset) Sky.stay.reset();
                 else if (window.davSave) { window.davSave.nextReset(); location.reload(); }
@@ -188,8 +189,12 @@
             resetting = true;
             put('lives-left', 0);
             draw(0);
-            if (Sky.stay && Sky.stay.reset) Sky.stay.reset();
-            else if (window.davSave) { window.davSave.nextReset(); location.reload(); }
+            sfx('life-lost', { or: 'crack' });
+            say(GONE);                                                     // (and a moment to read it before the world goes)
+            setTimeout(function () {
+                if (Sky.stay && Sky.stay.reset) Sky.stay.reset();
+                else if (window.davSave) { window.davSave.nextReset(); location.reload(); }
+            }, 2200);
         },
         give: function (k) { put('lives-left', Math.min(MAX, left() + (k || 1))); draw(); }
     };
