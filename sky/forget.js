@@ -27,23 +27,7 @@
     var ICON = '<svg class="placeholder" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3 H18 M6 21 H18 M7 3 C7 9 11 10 12 12 C11 14 7 15 7 21 M17 3 C17 9 13 10 12 12 C13 14 17 15 17 21"' +
         ' fill="none" stroke="#3a2716" stroke-width="1.8" stroke-linecap="round"/><path d="M9 19 C10 16 14 16 15 19 Z" fill="#9a3b1f"/></svg>';
 
-    Sky.css(
-        '.stay-forget { display: block; width: 100%; margin: 6px 0 2px; padding: 9px 12px; border: 1px solid #3a2716; border-radius: 999px; background: #3a2716; color: #f3e6c2;' +
-            'font: italic 1rem "IM Fell English", Georgia, serif; cursor: pointer; }' +
-        '.stay-forget:hover, .stay-forget:focus-visible { background: #9a3b1f; outline: none; animation: stay-tremble .09s linear infinite; }' +
-        '@keyframes stay-tremble { 0% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(-1.5px, .5px) rotate(-.6deg); }' +
-            '50% { transform: translate(1px, -1px) rotate(.5deg); } 75% { transform: translate(-.5px, 1px) rotate(-.3deg); } 100% { transform: translate(1.5px, 0) rotate(.6deg); } }' +
-        '@media (prefers-reduced-motion: reduce) { .stay-forget:hover { animation: none; } }' +
-        '.forget-white { position: fixed; inset: 0; z-index: 2147483600; background: #fff; opacity: 0; pointer-events: all; transition: opacity .08s; }' +
-        '.forget-white.on { opacity: 1; }' +
-        '.forget-white .fw-world { position: absolute; inset: 0; opacity: 0; transition: opacity 1.6s ease-in .5s; }' +
-        '.forget-white.on .fw-world { opacity: 1; }' +
-        '.forget-white .fw-world > svg, .forget-white .fw-world > img, .forget-white .fw-world > video { width: 100%; height: 100%; object-fit: cover; display: block; }' +
-        '.forget-white .fw-caption { position: absolute; left: 0; right: 0; bottom: 12%; text-align: center; font: italic 1.4rem "IM Fell English", Georgia, serif; color: #6a7078; opacity: 0; transition: opacity 1s ease-in 1.4s; }' +
-        '.forget-white.on .fw-caption { opacity: 1; }' +
-        '.stay-sure { margin-top: 6px; } .stay-sure button { margin: 4px 4px 0 0; padding: 6px 14px; border-radius: 999px; border: 1px solid #3a2716; background: #f3e6c2; color: #3a2716; font: italic 1rem "IM Fell English", Georgia, serif; cursor: pointer; }' +
-        '.stay-sure .stay-yes { background: #9a3b1f; border-color: #9a3b1f; color: #f3e6c2; }'
-    );
+    // (its look is in sky/css/forget.css, linked from each page's head)
 
     // the stand-in for what's under the white: a wireframe world, grey lines on white
     function wireframe() {
@@ -117,15 +101,7 @@
     var LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
     var RICON = '<svg class="placeholder" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12 A7 7 0 1 1 16.5 6.6" fill="none" stroke="#3a2716" stroke-width="1.9" stroke-linecap="round"/>' +
         '<path d="M13.5 3.2 L17.8 6.3 L13.9 9.6" fill="none" stroke="#9a3b1f" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.8" fill="#3a2716"/></svg>';
-    Sky.css(
-        '.rm-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 6px 0; }' +
-        '.rm-grid button, .rm-next, .rm-fresh { padding: 6px 4px; border-radius: 999px; border: 1px solid #3a2716; background: #f3e6c2; color: #3a2716; cursor: pointer; font: italic .95rem "IM Fell English", Georgia, serif; }' +
-        '.rm-grid button:hover, .rm-fresh:hover { background: #e6d5ae; }' +
-        '.rm-grid button.now { background: #3a2716; color: #f3e6c2; }' +
-        '.rm-next { display: block; width: 100%; margin: 6px 0 2px; padding: 9px 12px; background: #3a2716; color: #f3e6c2; font-size: 1rem; }' +
-        '.rm-next:hover { background: #9a3b1f; }' +
-        '.rm-fresh { display: block; width: 100%; margin-top: 8px; padding: 7px 12px; border-color: #9a3b1f; color: #9a3b1f; }'
-    );
+    // (its look is in sky/css/forget.css, linked from each page's head)
     if (LOCAL && window.davSave) Sky.panel.add({
         id: 'resets', title: 'resets (preview only)', order: 96, icon: RICON,
         build: function (body) {
