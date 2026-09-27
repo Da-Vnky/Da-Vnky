@@ -126,6 +126,7 @@ async function say(exchange) {
       await sleep(dir === 'hush' ? 3200 : 1300);
       continue;
     }
+    ledPulse(who);
     const a = who === 'mel' && afternoon ? anchors.lump : anchors[who];
     const b = document.createElement('div');
     b.className = 'bubble';
@@ -261,6 +262,7 @@ async function runLines(lines) {
       continue;
     }
     audio.blip(who);
+    ledPulse(who);
     await typeOut(dlg.text, fmt(text));
     if (skipScene) break;
     await waitAdvance();
@@ -766,6 +768,33 @@ async function goDark() {
   fade.classList.remove('dark');
   mode = 'room';
   if (DAV.pillsHere) guilt();                          // (DaV-nky, reset 3: a death. see the end of this file)
+}
+
+// ============================================================ Aether's LED strip
+// their own idea (27 Sep 2026): pulses in the colour of whoever's talking, shimmers when the bedroom radio
+// finds a station, and follows Aether: dark while they're not running (or not there)
+const ledstrip = () => svg?.querySelector('#ledstrip');
+function ledPulse(who) {
+  const s = ledstrip();
+  if (!s || s.classList.contains('off') || !CAST[who]) return;
+  s.style.setProperty('--c', CAST[who].color);
+  s.classList.add('talk');
+  clearTimeout(ledPulse.t);
+  ledPulse.t = setTimeout(() => s.classList.remove('talk'), 900);
+}
+function ledRadio() {
+  const s = ledstrip();
+  if (!s) return;
+  s.classList.add('radio');
+  clearTimeout(ledRadio.t);
+  ledRadio.t = setTimeout(() => s.classList.remove('radio'), 20000);
+}
+function ledFollowAether() {
+  const a = svg.querySelector('#aether'), s = ledstrip();
+  if (!a || !s) return;
+  const sync = () => s.classList.toggle('off', a.classList.contains('off') || a.style.display === 'none');
+  new MutationObserver(sync).observe(a, { attributes: true, attributeFilter: ['class', 'style'] });
+  sync();
 }
 
 // ============================================================ asking Mira and Claube things
@@ -1292,7 +1321,7 @@ function showRadio() {
   el.querySelector('#st-dial').setAttribute('x', dialX(radio.freq));
   el.querySelector('#st-radioled').setAttribute('fill', radio.on ? '#ff3b2a' : '#3a1010');
 }
-radio.onLock = f => { if (current === 'bedroom') caption(bags['fm:' + f]()); };
+radio.onLock = f => { ledRadio(); if (current === 'bedroom') caption(bags['fm:' + f]()); };
 
 // needles, bars, speaker cones, the clock, and the radio's other hobby
 let lastStatus = 0, lastClock = 0, nextHaunt = performance.now() + 90000 + Math.random() * 90000;
@@ -1554,6 +1583,7 @@ async function main() {
   if (store.get('room_quiet')) svg.querySelector('#deskbottle').style.display = '';
   // Aether doesn't start up until the afternoon scene. after that, they're running every visit
   if (!store.get('aether_awake')) svg.querySelector('#aether').classList.add('off');
+  ledFollowAether();                                     // (Aether's LED strip goes dark with them)
   for (const a of svg.querySelectorAll('[data-anchor]')) {
     anchors[a.dataset.anchor] = { x: +a.getAttribute('cx'), y: +a.getAttribute('cy') };
   }

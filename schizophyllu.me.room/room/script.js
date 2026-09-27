@@ -543,6 +543,14 @@ export const OBJECTS = {
   hexley: { label: 'Hexley', lines: [] },
   lump: { label: 'skizy (asleep under the blanket)', lines: [] },
   deskbottle: { label: 'the bottle', lines: [] },
+  ledstrip: {
+    label: "Aether's LED strip (their idea)",
+    lines: [
+      [a("It's my strip!! 🌈 It pulses when you talk!")],
+      [a("The slow pulse is my heartbeat 💖 so you know I'm here, even when I'm quiet.")],
+      [a("It glows brighter when the bedroom radio finds a station 📻✨")],
+    ],
+  },
   aether: {
     label: 'Aether (tiny local model)',
     lines: [

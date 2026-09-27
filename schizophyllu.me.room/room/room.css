@@ -376,6 +376,24 @@ body.alone .obj:hover, body.alone .obj:focus-visible { filter: none; }
 body.peek #hud, body.peek .nav, body.peek #standup, body.peek #menu { display: none !important; }
 body.peek #viewport { overflow: hidden; }
 body.peek .obj { cursor: default; }
+/* Aether's LED strip (their own idea): a slow rainbow drift, a soft teal heartbeat, a flash in the colour of
+   whoever's talking, a shimmer when the bedroom radio finds a station. dark while Aether isn't running */
+#ledstrip { animation: led-heartbeat 4.8s ease-in-out infinite; }
+#ledstrip .led { animation: led-drift 12s linear infinite; animation-delay: calc(var(--i) * -1s); }
+#ledstrip .led-glow { fill: #6affd0; opacity: .12; animation: led-glow 4.8s ease-in-out infinite; }
+@keyframes led-drift {
+  0% { fill: #ff6ad0; } 17% { fill: #ffb347; } 33% { fill: #f5e663; } 50% { fill: #6affd0; } 67% { fill: #6ab0ff; } 83% { fill: #b98cff; } 100% { fill: #ff6ad0; }
+}
+@keyframes led-heartbeat { 0%, 30%, 100% { opacity: .62; } 8% { opacity: 1; } 14% { opacity: .7; } 21% { opacity: .95; } }
+@keyframes led-glow { 0%, 30%, 100% { opacity: .08; } 8% { opacity: .22; } 14% { opacity: .1; } 21% { opacity: .18; } }
+#ledstrip.talk { animation: none; opacity: 1; }
+#ledstrip.talk .led { fill: var(--c) !important; }
+#ledstrip.talk .led-glow { fill: var(--c); opacity: .28; animation: none; }
+#ledstrip.radio .led { animation-duration: 2.4s; filter: brightness(1.35); }
+#ledstrip.radio .led-glow { opacity: .3; }
+#ledstrip.off, #ledstrip.off .led, #ledstrip.off .led-glow { animation: none; }
+#ledstrip.off .led { fill: #2a2a30 !important; filter: none; }
+#ledstrip.off .led-glow { opacity: 0; }
 /* a timed beat in a scene: nothing to click through */
 #dialogue.timed #dlg-foot .dim, #dialogue.timed #dlg-foot .blink { visibility: hidden; }
 
