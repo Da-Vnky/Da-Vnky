@@ -808,7 +808,10 @@ async function converse(who, topics) {
   while (!skipScene) {
     const done = asked(who);
     const open = level.filter(tp => !tp.when || tp.when(done.size, seen));
-    let shown = open.filter(tp => !done.has(tp.id));
+    // a question stays while it, or anything that opens from it, hasn't been asked yet
+    // (so follow-ups added later can always be reached)
+    const fresh = tp => !done.has(tp.id) || (tp.next || []).some(fresh);
+    let shown = open.filter(fresh);
     if (!shown.length) {
       // nothing left in this branch: back out to the questions around it
       if (up.length) { level = up.pop(); continue; }
