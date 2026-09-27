@@ -17,6 +17,9 @@ How it works
 
 == published ==
 
+2026-09-27 13:18 · V
+- asset manager: the evilrecord sound and the wretched scream were filed under Mel's room by mistake; now evilrecord is on the record player tab (and the living space's music group) and the scream with the other sound effects (tools/slots.json, tools/assets.html)
+
 2026-09-27 13:00 · V
 - reset 4: the evil (inverted) record only turns up after the grimoire's pact; before that P(Doom)'s slot is empty, so the robed Claubes can't be called too early. It plays P(Doom) backwards, reversed by the site as it loads (a few seconds the first time on each page), until Victor adds his own reversed song: the asset manager's sound slot "evilrecord" (assets/sounds/evilrecord.ogg). sky/records.js, sky/music.js (srcFor, reversedOf), sky/hell.js
 

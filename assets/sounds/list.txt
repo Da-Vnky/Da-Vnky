@@ -5,6 +5,7 @@ cork-pop.ogg
 door-metal.ogg
 door.ogg
 dungeon.ogg
+evilrecord.ogg
 hobo.ogg
 paper-roll.ogg
 paper-unroll.ogg

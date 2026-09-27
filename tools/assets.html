@@ -576,7 +576,7 @@
         });
         main.appendChild(sheet);
         var slots = [];
-        SCENES.forEach(function (sc) { sc.groups.forEach(function (g) { g.slots.forEach(function (s) { if (/^assets\/living\/(turntable|turntable-playing|record|vinyl-texture|lofi-fader|lofi-knob)$/.test(s.slot)) slots.push(s); }); }); });
+        SCENES.forEach(function (sc) { sc.groups.forEach(function (g) { g.slots.forEach(function (s) { if (/^assets\/living\/(turntable|turntable-playing|record|vinyl-texture|lofi-fader|lofi-knob)$/.test(s.slot) || s.slot === 'assets/sounds/evilrecord') slots.push(s); }); }); });
         main.appendChild(el('h2', '', 'the record player itself'));
         var grid = el('div', 'grid');
         slots.forEach(function (s) { grid.appendChild(card(s)); });

@@ -1148,6 +1148,12 @@
        "optional": true
       },
       {
+       "slot": "assets/sounds/evilrecord",
+       "what": "the evil (inverted) P(Doom) record's song, reset 4: P(Doom) reversed, a whole song (.ogg or .mp3). until it's here, the site reverses P(Doom) itself as it plays",
+       "kind": "sound",
+       "optional": true
+      },
+      {
        "slot": "assets/living/noise-machine",
        "what": "the white noise machine",
        "size": "about 3:2"
@@ -2609,6 +2615,11 @@
        "slot": "assets/sounds/claube-burst",
        "what": "a Claube bursting into bits",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/wretched-scream",
+       "what": "reset 4's end: the wretched scream as the false god sends the bullet back (plays twice, overlapping)",
+       "kind": "sound"
       }
      ]
     }
@@ -2630,17 +2641,6 @@
        "size": "1600 x 900 (the whole room)",
        "optional": true,
        "stock": "schizophyllu.me.room/room/room.svg"
-      },
-      {
-       "slot": "assets/sounds/wretched-scream",
-       "what": "reset 4's end: the wretched scream as the false god sends the bullet back (plays twice, overlapping)",
-       "kind": "sound"
-      },
-      {
-       "slot": "assets/sounds/evilrecord",
-       "what": "the evil (inverted) P(Doom) record's song, reset 4: P(Doom) reversed, a whole song (.ogg or .mp3). until it's here, the site reverses P(Doom) itself as it plays",
-       "kind": "sound",
-       "optional": true
       },
       {
        "slot": "assets/mel-room/main-poster",

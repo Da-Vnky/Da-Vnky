@@ -118,8 +118,9 @@ assets/sounds/cork-pop.ogg 19745 496428143
 assets/sounds/door-metal.ogg 40243 525939556
 assets/sounds/door.ogg 38593 2514500049
 assets/sounds/dungeon.ogg 9042074 3983005707
+assets/sounds/evilrecord.ogg 2395055 1207379049
 assets/sounds/hobo.ogg 282187 3952305689
-assets/sounds/list.txt 228 1129530370
+assets/sounds/list.txt 243 1819917398
 assets/sounds/paper-roll.ogg 18779 2371072433
 assets/sounds/paper-unroll.ogg 21868 3550942193
 assets/sounds/rain.ogg 867714 3232814227

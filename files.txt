@@ -104,7 +104,7 @@ assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
 assets/sea/list.txt 117 55339362
 assets/sky/list.txt 236 543906976
-assets/sounds/list.txt 228 1129530370
+assets/sounds/list.txt 243 1819917398
 assets/textures/list.txt 152 1347949450
 assets/ui/list.txt 117 55339362
 assets/workshop/list.txt 117 55339362
