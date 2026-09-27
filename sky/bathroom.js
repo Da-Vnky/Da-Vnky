@@ -37,147 +37,7 @@
         var h = document.createElement('span'); h.className = 'door-hint'; h.textContent = d.dataset.hint; d.appendChild(h);
     });
 
-    Sky.css(
-        // the arrows: see-through until you point at them
-        '.room-arrow, .room-arrow:hover { padding: 0; background: none; text-shadow: none; }' +
-        '.room-arrow { position: fixed; z-index: 5; width: 54px; height: 54px; display: block; opacity: .5; transition: opacity .25s, transform .25s, visibility 0s;' +
-            'filter: drop-shadow(0 2px 4px rgba(0,0,0,.45)); -webkit-tap-highlight-color: transparent; }' +
-        '.room-arrow:hover, .room-arrow:focus-visible { opacity: 1; transform: translateX(4px); outline: none; }' +
-        '.room-arrow > svg, .room-arrow > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
-        '.room-arrow.to-bath { right: 14px; top: 60vh; }' +
-        '.room-arrow.to-hall { left: 14px; top: 60vh; }' +
-        '.room-arrow.to-hall > svg, .room-arrow.to-hall > .art { transform: scaleX(-1); }' +
-        '.room-arrow.to-hall:hover, .room-arrow.to-hall:focus-visible { transform: translateX(-4px); }' +
-        '.room-arrow.to-living { position: absolute; left: 14px; top: 50%; margin-top: -27px; }' +
-        '.room-arrow.to-living > svg, .room-arrow.to-living > .art { transform: scaleX(-1); }' +
-        '.room-arrow.to-living:hover, .room-arrow.to-living:focus-visible { transform: translateX(-4px); }' +
-        '.room-arrow.back-right { position: absolute; right: 14px; top: 74%; margin-top: -27px; }' +
-        'body.in-side .room-arrow.to-bath, body.in-side .room-arrow.to-hall, body.side-walking .room-arrow, body.leaving .room-arrow, body.sky-view .room-arrow, body.is-outside .room-arrow,' +
-        'body.gallery-open .room-arrow, body.records-open .room-arrow, body.crate-open .room-arrow, body.frame-open .room-arrow, body.mirror-open .room-arrow,' +
-        'body.art-open .room-arrow, body.visitors-open .room-arrow { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility 0s .3s; }' +
-
-        // the bathroom: waits off to the right, slides in as the living space slides out
-        // (where they wait, hidden, is in sky/sky.css, so they're in place from the very first frame;
-        //  the slide is only switched on once the page is ready: body.sides-ready)
-        'body.sides-ready .bathroom, body.sides-ready .hallway { transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s .9s; }' +
-        '.bathroom { position: fixed; inset: 0; z-index: 3; overflow: hidden; transform: translateX(100%); visibility: hidden;' +
-            '--bath-wall: #a9bfb6; --bath-tile: #e9ece5; --bath-grout: rgba(90,110,105,.35); --floor-h: 10vh;' +
-            'background: linear-gradient(transparent 55%, rgba(0,0,0,.18) 55%, rgba(0,0,0,.18) calc(55% + 6px), transparent calc(55% + 6px)),' +
-            'linear-gradient(var(--bath-wall) 55%, transparent 55%),' +
-            'repeating-linear-gradient(to right, transparent 0 58px, var(--bath-grout) 58px 60px),' +
-            'repeating-linear-gradient(to bottom, transparent 0 38px, var(--bath-grout) 38px 40px), var(--bath-tile); }' +
-        '.bathroom > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }' +
-        '.bathroom::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;' +
-            'background: linear-gradient(rgba(10,14,30,calc(.4 * var(--dusk))), rgba(10,14,30,calc(.4 * var(--dusk)))); }' +
-        'body.in-bath .bathroom { transform: none; visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
-        'body.in-bath .room { transform: translateX(-100%); }' +
-        'body.bath-panning .bathroom { visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
-        'body.in-side .sky-links, body.in-side .sky-links * { visibility: hidden !important; }' +      // (no sky through these walls)
-        // the hallway: waits off to the left
-        '.hallway { position: fixed; inset: 0; z-index: 3; overflow: hidden; transform: translateX(-100%); visibility: hidden; --floor-h: 11vh;' +
-            'background: linear-gradient(transparent 62%, #3a2a1f 62%, #3a2a1f calc(62% + 10px), transparent calc(62% + 10px)),' +
-            'repeating-linear-gradient(90deg, transparent 0 88px, rgba(0,0,0,.22) 88px 91px) 0 62% / 100% 38% no-repeat,' +
-            'linear-gradient(#4d3a2c 62%, #5b4331 62%),' +
-            'repeating-linear-gradient(90deg, rgba(255,230,190,.05) 0 26px, transparent 26px 52px); }' +
-        '.hallway > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }' +
-        '.hallway::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;' +
-            'background: radial-gradient(ellipse at 50% 12%, rgba(255,200,120,calc(.18 + .12 * var(--dusk))), transparent 55%), linear-gradient(rgba(10,14,30,calc(.35 * var(--dusk))), rgba(10,14,30,calc(.35 * var(--dusk)))); }' +
-        'body.in-hall .hallway { transform: none; visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
-        'body.in-hall .room { transform: translateX(100%); }' +
-        'body.hall-panning .hallway { visibility: visible; transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
-        // the dungeon: waits underneath; the living space rises away as it comes up
-        'body.sides-ready .dungeon { transition: transform 1.1s cubic-bezier(.55, 0, .25, 1), visibility 0s 1.1s; }' +
-        'body.in-dungeon .dungeon { transform: none; visibility: visible; transition: transform 1.1s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
-        'body.in-dungeon .room { transform: translateY(-100%); transition: transform 1.1s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
-        'body.dungeon-panning .dungeon { visibility: visible; transition: transform 1.1s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
-        'body.dungeon-panning .room { transition: transform 1.1s cubic-bezier(.55, 0, .25, 1), visibility 0s; }' +
-        '.room.rumble { animation: dg-rumble .09s linear infinite alternate; }' +
-        '@keyframes dg-rumble { from { transform: translate(-1px, 1px); } to { transform: translate(1px, -1px); } }' +
-        '.shelf-book { cursor: pointer; z-index: 3; transform-origin: 50% 100%; transition: transform .5s cubic-bezier(.3,1.6,.5,1), filter .25s; }' +
-        '.shelf-book > svg, .shelf-book > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
-        '.shelf-book:hover, .shelf-book:focus-visible { filter: drop-shadow(0 0 6px rgba(255,220,150,.7)); outline: none; }' +
-        '.shelf-book.pulled { transform: rotate(-24deg) translateX(-12%); }' +
-        '.shelf-book .sb-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font-style: italic; font-size: .9rem;' +
-            'color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.8); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
-        '.shelf-book:hover .sb-hint, .shelf-book:focus-visible .sb-hint { opacity: 1; }' +
-        // the secret door: a panel of wall that slides away (behind the rest of the wall) on the stairs down
-        '.secret-door .sd-hole, .secret-door .sd-panel { position: absolute; inset: 0; }' +
-        '.secret-door .sd-hole > svg, .secret-door .sd-hole > .art, .secret-door .sd-panel > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: block; }' +
-        // closed, it's just the wall (and a hairline seam, if you look). opening, the wall slides away to the left,
-        // uncovering the stairwell behind it. (your own panel picture, if you give one, covers it until it slides)
-        '.secret-door .sd-hole { clip-path: inset(0 0 0 100%); transition: clip-path 2.4s cubic-bezier(.6,0,.35,1); }' +
-        '.secret-door.open .sd-hole { clip-path: inset(0 0 0 0); }' +
-        '.secret-door .sd-panel { transition: transform 2.4s cubic-bezier(.6,0,.35,1); z-index: 1; pointer-events: none; }' +
-        '.secret-door .sd-panel > .placeholder { position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.14); }' +
-        '.secret-door .sd-panel::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: linear-gradient(90deg, rgba(0,0,0,.45), transparent); opacity: 0; transition: opacity .4s; }' +
-        '.secret-door.open .sd-panel { transform: translateX(-100%); }' +
-        '.secret-door.open .sd-panel > .placeholder { box-shadow: none; }' +
-        '.secret-door.open { cursor: pointer; box-shadow: inset 0 0 0 3px #1f1610; }' +
-        '.secret-door .sd-flame { position: absolute; left: 22.6%; top: 13%; width: 5%; aspect-ratio: 1 / 2.2; border-radius: 50% 50% 50% 50% / 64% 64% 36% 36%; opacity: 0;' +
-            'background: radial-gradient(ellipse at 50% 72%, #fff8d8 0 18%, #ffd36a 34%, #ff8a2a 62%, rgba(255,90,20,0) 72%); filter: blur(.3px) drop-shadow(0 0 4px #ff9a40);' +
-            'transform-origin: 50% 90%; animation: sd-flame 1.6s ease-in-out infinite; transition: opacity 1s 1.4s; }' +
-        '.secret-door.open .sd-flame { opacity: 1; }' +
-        '.secret-door .sd-hole.has-art .sd-flame, .secret-door .sd-hole:has(.art) ~ .sd-flame { display: none; }' +
-        '@keyframes sd-flame { 0%, 100% { transform: rotate(-3deg) scaleY(1); } 33% { transform: rotate(3deg) scaleY(1.1); } 66% { transform: rotate(-1deg) scaleY(.92); } }' +
-        // going down the stairs, and coming back up them
-        '.room .scene-character.descending { animation: sd-down .9s ease-in forwards; }' +
-        '.room .scene-character.ascending { animation: sd-down .9s ease-out .5s reverse both; }' +
-        '@keyframes sd-down { from { translate: 0 0; scale: 1; opacity: 1; } to { translate: 0 6%; scale: .82; opacity: 0; } }' +
-        '.room-arrow.to-upstairs { position: absolute; left: 14px; top: 50%; margin-top: -27px; }' +
-        '.room-arrow.to-upstairs > svg, .room-arrow.to-upstairs > .art { transform: rotate(-90deg); }' +
-        '.room-arrow.to-upstairs:hover, .room-arrow.to-upstairs:focus-visible { transform: translateY(-4px); }' +
-        '.hallway .furnish { position: absolute; z-index: 2; }' +
-        '.hallway .room-floor { position: absolute; left: 0; right: 0; bottom: 0; height: var(--floor-h); min-height: 34px; z-index: 1; pointer-events: none; }' +
-        '.hallway .room-floor .placeholder, .hallway .room-floor > .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: fill; }' +
-        '.hallway .room-floor .placeholder { border-top: 9px solid #2e2118; box-shadow: 0 -3px 8px rgba(0,0,0,.3);' +
-            'background: linear-gradient(rgba(0,0,0,.3), transparent 45%), repeating-linear-gradient(to bottom, transparent 0 13px, rgba(0,0,0,.3) 13px 15px), repeating-linear-gradient(to right, transparent 0 138px, rgba(0,0,0,.22) 138px 140px), #4a3322; }' +
-        '.side-door, .side-door:hover { padding: 0; background: none; text-shadow: none; cursor: pointer; }' +
-        '.side-door > svg, .side-door > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
-        '.side-door .leaf { transform-box: fill-box; transform-origin: 0 50%; transition: transform .45s cubic-bezier(.5,0,.3,1); }' +
-        '.side-door.open .leaf { transform: scaleX(.14); }' +
-        '.side-door.open:not(.has-open) > .art { opacity: .35; transition: opacity .4s; }' +
-        '.side-door .door-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font-style: italic;' +
-            'font-size: .95rem; color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.7); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
-        '.side-door:hover .door-hint, .side-door:focus-visible .door-hint { opacity: 1; }' +
-        '.side-door:hover, .side-door:focus-visible { filter: drop-shadow(0 0 10px rgba(255,220,150,.45)); outline: none; }' +
-        '.hall-character { transition-property: left; transition-timing-function: linear; }' +
-        '.bathroom .furnish { position: absolute; z-index: 2; }' +
-        '.bathroom .room-floor { position: absolute; left: 0; right: 0; bottom: 0; height: var(--floor-h); min-height: 34px; z-index: 1; pointer-events: none; }' +
-        '.bathroom .room-floor .placeholder, .bathroom .room-floor > .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: fill; }' +
-        '.bathroom .room-floor .placeholder { border-top: 7px solid #d5d9d2; box-shadow: 0 -3px 8px rgba(0,0,0,.2);' +
-            'background: linear-gradient(rgba(0,0,0,.22), transparent 45%), repeating-conic-gradient(#e4e0d4 0 25%, #3d3b36 0 50%) 0 0 / 44px 44px; }' +
-        '.bath-mirror { cursor: zoom-in; filter: drop-shadow(0 6px 8px rgba(0,0,0,.35)); transition: transform .25s; }' +
-        '.bath-mirror:hover, .bath-mirror:focus-visible { transform: translateY(-2px); outline: none; }' +
-        '.bath-mirror > svg, .bath-mirror > .art { display: block; width: 100%; height: 100%; object-fit: contain; }' +
-        '.bath-mirror .bm-hint { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; font-style: italic;' +
-            'font-size: .9rem; color: #2a1d14; text-shadow: 0 1px 2px rgba(255,255,255,.6); opacity: 0; transition: opacity .25s; pointer-events: none; }' +
-        '.bath-mirror:hover .bm-hint, .bath-mirror:focus-visible .bm-hint { opacity: 1; }' +
-        '.bath-character { transition-property: left; transition-timing-function: linear; }' +
-        '.room .scene-character { transition-property: left; transition-timing-function: linear; }' +
-
-        // the mirror, up close
-        '.mirror-view { position: fixed; inset: 0; z-index: 9; background: #000; display: grid; place-items: center; padding: 4vh 16px 26vh;' +
-            'visibility: hidden; opacity: 0; transition: opacity .6s, visibility 0s .6s; cursor: pointer; }' +
-        '.mirror-view.open { visibility: visible; opacity: 1; transition: opacity .6s; }' +
-        '.mv-mirror { position: relative; height: min(62vh, 120vw); aspect-ratio: 3 / 4; }' +
-        '.mv-glass { position: absolute; inset: 0; overflow: hidden; border-radius: 50% 50% 6px 6px / 38% 38% 6px 6px; border: 14px solid #b8862e;' +
-            'box-shadow: inset 0 0 0 2px #7a5418, 0 0 60px rgba(255,255,255,.08); background: linear-gradient(160deg, #cfe0e2, #6f8f96); }' +
-        '.mirror-view.has-frame .mv-glass { border: 0; box-shadow: none; inset: var(--mirror-inset, 12%); }' +
-        '.mv-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }' +
-        '.mv-reflection { position: absolute; left: 50%; bottom: 0; height: 86%; transform: translateX(-50%); }' +
-        '.mv-reflection > svg, .mv-reflection > .art { display: block; height: 100%; width: auto; }' +
-        '.mv-glass::after { content: ""; position: absolute; inset: 0; pointer-events: none;' +
-            'background: linear-gradient(125deg, transparent 20%, rgba(255,255,255,.22) 26%, transparent 34%, transparent 44%, rgba(255,255,255,.12) 48%, transparent 54%); }' +
-        '.mv-text { position: absolute; left: 50%; bottom: 5vh; transform: translateX(-50%); width: min(880px, calc(100vw - 32px)); box-sizing: border-box; min-height: 7.2em;' +
-            'padding: 22px 30px; background: #000; border: 5px solid #fff; color: #fff; text-align: left;' +
-            'font: 1.7rem/1.45 "mirror", "VT323", "Courier New", monospace; letter-spacing: .02em; }' +
-        '.mv-text .mv-words::before { content: "* "; }' +
-        '.mv-text .mv-more { position: absolute; right: 14px; bottom: 8px; font-size: 1rem; opacity: 0; transition: opacity .4s; }' +
-        '.mirror-view.done .mv-more { opacity: .6; }' +
-        'body.mirror-open .place-tabs, body.mirror-open .cp { opacity: 0; pointer-events: none; }' +
-        '@media (max-width: 620px) { .mv-text { font-size: 1.25rem; padding: 16px 18px; } }' +
-        '@media (prefers-reduced-motion: reduce) { .room.rumble { animation: none; } .bathroom, .hallway, .dungeon, .bath-character, .hall-character, .room .scene-character { transition-duration: 0s !important; } }'
-    );
+    // (its look is in sky/css/bathroom.css, linked from each page's head)
 
     /* ---------------- the arrows sit just under the tabs (the hallway's on the left) ---------------- */
     function placeArrows() {
@@ -267,8 +127,7 @@
     function bookGone() { return !!DS && DS.reset === 4 && DS.get('grimoire-pact') !== '1'; }
     var theBook = document.querySelector('.shelf-book:not(.decoy)');
     if (theBook && bookGone()) theBook.classList.add('missing');
-    Sky.css('.shelf-book.missing { display: none !important; }' +
-        '.shelf-book.back-again { animation: sb-back 2.4s ease-out 3; } @keyframes sb-back { 0%, 100% { filter: none; } 40% { filter: drop-shadow(0 0 6px #ffd98a) drop-shadow(0 0 12px rgba(255,200,120,.8)); } }');
+    // (its look is in sky/css/bathroom.css, linked from each page's head)
     SIDES.forEach(function (sd) {
         sd.me = sd.el.querySelector('.character');
         sd.back = sd.el.querySelector('.room-arrow');
