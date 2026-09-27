@@ -1,0 +1,482 @@
+/* =====================================================================
+   kitchen.css — the look of sky/kitchen.js.
+   (it used to be written inside the script, as strings; same rules, now here)
+   ===================================================================== */
+
+/* the arrow on the hallway's left: this way to the kitchen (flipped: the arrow's drawn pointing right) */
+.hallway .room-arrow.hall-to-kitchen>svg,
+.hallway .room-arrow.hall-to-kitchen>.art {
+    transform: scaleX(-1);
+}
+.hallway .room-arrow.hall-to-kitchen:hover,
+.hallway .room-arrow.hall-to-kitchen:focus-visible {
+    transform: translateX(-4px);
+}
+.room-arrow .ra-hint {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .2s;
+    font: italic .95rem "IM Fell English", Georgia, serif;
+    color: #f3e6c2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+}
+.room-arrow .ra-hint {
+    left: calc(100% + 8px);
+}
+.room-arrow.back-right .ra-hint {
+    left: auto;
+    right: calc(100% + 8px);
+}
+.room-arrow:hover .ra-hint,
+.room-arrow:focus-visible .ra-hint {
+    opacity: 1;
+}
+.kitchen .kh-hint {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 6px);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font: italic .95rem "IM Fell English", Georgia, serif;
+    color: #f3e6c2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+    opacity: 0;
+    transition: opacity .2s;
+    pointer-events: none;
+    z-index: 6;
+}
+.kitchen .kitchen-serpent:hover .kh-hint {
+    opacity: 1;
+}
+.kitchen .kitchen-serpent .kh-hint {
+    color: #c8e0a0;
+}
+/* the kitchen: over the hallway, sliding in from the left */
+.kitchen {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    overflow: hidden;
+    transform: translateX(-100%);
+    visibility: hidden;
+    --floor-h: 12vh;
+    background: #b8a98a;
+}
+.kitchen>.art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+.kitchen>.kitchen-wall {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+.kitchen:has(> .art)>.kitchen-wall {
+    display: none;
+}
+body.in-kitchen .kitchen,
+body.kitchen-panning .kitchen {
+    visibility: visible;
+    transition: transform .9s cubic-bezier(.55, 0, .25, 1), visibility 0s;
+}
+body.in-kitchen .kitchen {
+    transform: none;
+}
+body.in-kitchen .hallway {
+    translate: 100% 0;
+}
+body.in-hall .hallway {
+    transition: transform .9s cubic-bezier(.55, 0, .25, 1), translate .9s cubic-bezier(.55, 0, .25, 1), visibility 0s;
+}
+body.kitchen-now .kitchen,
+body.kitchen-now .hallway {
+    transition: none !important;
+}
+.kitchen .furnish {
+    position: absolute;
+    z-index: 2;
+}
+.kitchen .room-floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--floor-h);
+    z-index: 1;
+    pointer-events: none;
+}
+.kitchen .room-floor .placeholder,
+.kitchen .room-floor>.art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: fill;
+}
+.kitchen .room-floor .placeholder {
+    border-top: 6px solid #5a4a3a;
+    background: repeating-conic-gradient(#e8e0cc 0 25%, #6a5a4a 0 50%) 0 0 / 64px 64px;
+    box-shadow: inset 0 14px 20px rgba(0, 0, 0, .3);
+}
+.kitchen .kitchen-window {
+    left: 38%;
+    top: 12%;
+    width: 17%;
+    min-width: 120px;
+}
+.kitchen .kitchen-fridge {
+    left: 3%;
+    bottom: calc(var(--floor-h) - 1vh);
+    height: 58vh;
+    aspect-ratio: 120 / 300;
+    z-index: 3;
+}
+.kitchen .kitchen-fridge>.kf-inside,
+.kitchen .kitchen-fridge>.kf-door {
+    position: absolute;
+    inset: 0;
+}
+.kitchen .kf-inside>svg,
+.kitchen .kf-inside>.art,
+.kitchen .kf-door>svg,
+.kitchen .kf-door>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+.kitchen .kf-door {
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    z-index: 2;
+    transform-origin: 0 50%;
+    transition: transform .55s cubic-bezier(.5, 0, .3, 1), filter .25s;
+}
+.kitchen .kf-door:hover,
+.kitchen .kf-door:focus-visible {
+    outline: none;
+    filter: drop-shadow(0 0 8px rgba(255, 220, 150, .55));
+}
+.kitchen .kf-door:hover .kh-hint,
+.kitchen .kf-door:focus-visible .kh-hint {
+    opacity: 1;
+}
+.kitchen .kitchen-fridge.open .kf-door {
+    transform: perspective(900px) rotateY(-78deg);
+}
+.kitchen .kitchen-fridge.open .kf-door .kh-hint {
+    display: none;
+}
+.kitchen .kitchen-fridge:not(.open) .kf-inside,
+.kitchen .kitchen-fridge:not(.open) .kitchen-pie {
+    visibility: hidden;
+}
+.kitchen .kf-inside {
+    cursor: pointer;
+}
+/* the pie, on the bottom shelf (and in reset 3 the key, stuck in it: its ring out, the rest of it in the pie) */
+.kitchen .kitchen-pie {
+    position: absolute;
+    left: 16%;
+    width: 68%;
+    bottom: 21.6%;
+    aspect-ratio: 100 / 44;
+    z-index: 1;
+    cursor: pointer;
+}
+.kitchen .kitchen-pie>svg,
+.kitchen .kitchen-pie>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 100%;
+}
+.kitchen .kitchen-pie:hover .kh-hint {
+    opacity: 1;
+}
+.kitchen .kitchen-pie .reset-key {
+    width: 34%;
+    transform: translate(-50%, -50%) rotate(78deg);
+    clip-path: inset(0 42% 0 0);
+}
+.kitchen .kitchen-pie .reset-key::after {
+    left: 12%;
+    top: 18%;
+}
+.kitchen .kitchen-counter {
+    left: 22%;
+    right: 12%;
+    bottom: calc(var(--floor-h) - 1vh);
+    height: 24vh;
+}
+.kitchen .kc-body {
+    position: absolute;
+    inset: 0;
+}
+.kitchen .kc-body>svg,
+.kitchen .kc-body>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+/* the drawers, in the strip under the worktop. open: the front comes out towards you, and you see into it */
+.kitchen .kitchen-drawer {
+    position: absolute;
+    top: 10.2%;
+    height: 25.4%;
+    width: 22.6%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    z-index: 2;
+}
+.kitchen .kitchen-drawer.d1 {
+    left: 2.3%;
+}
+.kitchen .kitchen-drawer.d2 {
+    left: 26.1%;
+}
+.kitchen .kitchen-drawer.d3 {
+    left: 49.9%;
+}
+.kitchen .kitchen-drawer.d4 {
+    left: 73.7%;
+}
+.kitchen .kd-front {
+    position: absolute;
+    inset: 0;
+    transition: transform .4s cubic-bezier(.4, 0, .3, 1);
+    z-index: 2;
+}
+.kitchen .kd-front>svg,
+.kitchen .kd-front>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+.kitchen .kd-inside {
+    position: absolute;
+    left: -3%;
+    right: -3%;
+    top: -34%;
+    height: 118%;
+    z-index: 1;
+    clip-path: inset(100% 0 0 0);
+    transition: clip-path .4s cubic-bezier(.4, 0, .3, 1);
+    pointer-events: none;
+}
+.kitchen .kd-inside>svg,
+.kitchen .kd-inside>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+.kitchen .kitchen-drawer.open {
+    z-index: 5;
+}
+.kitchen .kitchen-drawer.open .kd-front {
+    transform: translateY(78%) scale(1.08);
+}
+.kitchen .kitchen-drawer.open .kd-inside {
+    clip-path: inset(0 0 0 0);
+}
+.kitchen .kitchen-drawer:hover .kd-front,
+.kitchen .kitchen-drawer:focus-visible .kd-front {
+    filter: drop-shadow(0 0 6px rgba(255, 220, 150, .6));
+}
+.kitchen .kitchen-drawer:focus-visible {
+    outline: none;
+}
+.kitchen .kitchen-drawer:hover .kh-hint {
+    opacity: 1;
+}
+.kitchen .kitchen-drawer.open .kh-hint {
+    display: none;
+}
+.kitchen .kitchen-bowl {
+    left: 44%;
+    bottom: calc(var(--floor-h) - 1vh + 24vh * .93);
+    width: 9vw;
+    min-width: 80px;
+    aspect-ratio: 120 / 60;
+    z-index: 3;
+}
+.kitchen .kitchen-bowl>svg,
+.kitchen .kitchen-bowl>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 100%;
+}
+.kitchen .kitchen-serpent {
+    left: calc(44% - 2.2vw);
+    bottom: calc(var(--floor-h) - 1vh + 24vh * .93 - 1.2vh);
+    width: 13.5vw;
+    min-width: 120px;
+    aspect-ratio: 160 / 90;
+    z-index: 4;
+    display: none;
+}
+.kitchen .kitchen-serpent>svg,
+.kitchen .kitchen-serpent>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 100%;
+}
+.kitchen .kitchen-serpent .ks-eye {
+    animation: ks-glint 5s ease-in-out infinite;
+}
+@keyframes ks-glint {
+    0%,
+    86%,
+    100% {
+        fill: #f0d040;
+    }
+    90% {
+        fill: #fff8c0;
+    }
+}
+/* before reset 3: sausages where the serpent will be */
+.kitchen .kitchen-sausages {
+    left: calc(44% - 2.2vw);
+    bottom: calc(var(--floor-h) - 1vh + 24vh * .93 - 1.2vh);
+    width: 13.5vw;
+    min-width: 120px;
+    aspect-ratio: 160 / 90;
+    z-index: 4;
+    display: none;
+}
+.kitchen .kitchen-sausages>svg,
+.kitchen .kitchen-sausages>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 100%;
+}
+.kitchen .kitchen-sausages:hover .kh-hint {
+    opacity: 1;
+}
+.kitchen.bowl-serpent .kitchen-serpent,
+.kitchen.bowl-sausages .kitchen-sausages,
+.kitchen.bowl-turning .kitchen-sausages,
+.kitchen.bowl-turning .kitchen-serpent {
+    display: block;
+}
+/* (reset 3 on, the first time in: the sausages writhe, and they're a serpent) */
+.kitchen.bowl-turning .kitchen-serpent {
+    opacity: 0;
+}
+.kitchen.bowl-turning.turn .kitchen-sausages {
+    animation: ks-writhe 2.6s ease-in forwards;
+}
+.kitchen.bowl-turning.turn .kitchen-serpent {
+    animation: ks-become 2.6s ease-in forwards;
+}
+@keyframes ks-writhe {
+    0% {
+        transform: none;
+        filter: none;
+    }
+    20% {
+        transform: skewX(4deg);
+    }
+    40% {
+        transform: skewX(-5deg) scaleY(1.05);
+        filter: hue-rotate(60deg);
+    }
+    70% {
+        transform: skewX(3deg);
+        opacity: .6;
+        filter: hue-rotate(90deg) saturate(.6);
+    }
+    100% {
+        opacity: 0;
+        filter: hue-rotate(100deg);
+    }
+}
+@keyframes ks-become {
+    0%,
+    35% {
+        opacity: 0;
+        transform: skewX(-4deg);
+    }
+    70% {
+        opacity: .8;
+        transform: skewX(3deg);
+    }
+    100% {
+        opacity: 1;
+        transform: none;
+    }
+}
+.kitchen .kitchen-back {
+    position: absolute;
+    right: 14px;
+    top: 74%;
+    margin-top: -27px;
+    border: 0;
+    cursor: pointer;
+}
+.kitchen .kitchen-character {
+    left: calc(var(--kitchen-enter) * 1%);
+    bottom: 3vh;
+    height: 25vh;
+    z-index: 5;
+}
+@media (max-width: 620px) {
+    .kitchen .kitchen-character {
+        height: 14vh;
+    }
+    .kitchen .kitchen-counter {
+        left: 26%;
+        right: 4%;
+        height: 18vh;
+    }
+    .kitchen .kitchen-bowl {
+        bottom: calc(var(--floor-h) - 1vh + 18vh * .93);
+    }
+    .kitchen .kitchen-serpent,
+    .kitchen .kitchen-sausages {
+        bottom: calc(var(--floor-h) - 1vh + 18vh * .93 - 1vh);
+    }
+    .kitchen .kitchen-bowl {
+        left: 40%;
+        width: 20vw;
+    }
+    .kitchen .kitchen-serpent,
+    .kitchen .kitchen-sausages {
+        left: calc(40% - 5vw);
+        width: 30vw;
+    }
+    .kitchen .kitchen-fridge {
+        height: 40vh;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .kitchen.bowl-turning.turn .kitchen-sausages,
+    .kitchen.bowl-turning.turn .kitchen-serpent {
+        animation-duration: .01s;
+    }
+}

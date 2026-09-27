@@ -17,70 +17,7 @@
     var INKS = [['ink', '#3a2716'], ['red chalk', '#9a3b1f'], ['sea', '#36526a']];
     var SIZES = [['fine', 0.004], ['broad', 0.010]];
 
-    Sky.css(
-        '.post-btn { left: 18px; bottom: 18px; }' +
-        '.post-btn .ui-icon svg { width: 30px; height: 30px; }' +
-        'body.post-open .post-btn, body.sky-view .post-btn { opacity: 0; visibility: hidden; pointer-events: none; }' +
-
-        '.post { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center; padding: 16px; visibility: hidden; opacity: 0;' +
-            'background: radial-gradient(ellipse at 50% 45%, rgba(20,30,45,.55), rgba(8,12,20,.85) 75%); transition: opacity .4s, visibility 0s .4s;' +
-            'font-family: "IM Fell English", Georgia, serif; color: #3a2716; }' +
-        'body.post-open .post { visibility: visible; opacity: 1; transition: opacity .4s; }' +
-        '.post-desk { display: flex; flex-direction: column; align-items: center; gap: 12px; max-height: 100%; }' +
-        '.post h2 { margin: 0; font: normal 1.6rem "IM Fell English SC", Georgia, serif; color: #f3e6c2; text-shadow: 0 2px 6px rgba(0,0,0,.6); }' +
-        '.post-tools { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 6px; border-radius: 999px; background: #eadcb9;' +
-            'box-shadow: 0 6px 14px rgba(0,0,0,.4), inset 0 0 14px rgba(120,80,30,.2); }' +
-        '.post-tools button, .post-tools label { display: flex; align-items: center; gap: 6px; border: 0; background: none; color: #6e5236; cursor: pointer;' +
-            'padding: 6px 12px; border-radius: 999px; font: italic 1rem "IM Fell English", Georgia, serif; }' +
-        '.post-tools button:hover, .post-tools label:hover { background: rgba(110,82,54,.14); color: #3a2716; }' +
-        '.post-tools [aria-pressed=true] { background: #3a2716; color: #f3e6c2; }' +
-        '.post-tools .ink { width: 18px; height: 18px; padding: 0; border-radius: 50%; border: 2px solid #eadcb9; box-shadow: 0 0 0 1px rgba(0,0,0,.25); }' +
-        '.post-tools .ink[aria-pressed=true] { box-shadow: 0 0 0 2px #3a2716; }' +
-        '.post-tools .sep { width: 1px; align-self: stretch; background: rgba(110,82,54,.3); margin: 2px 2px; }' +
-        '.post-tools .draw-only { display: none; } .post.drawing .post-tools .draw-only { display: flex; }' +
-        '.post-tools input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; }' +
-
-        '.note { position: relative; width: min(480px, 88vw); height: min(620px, 62vh); flex: none; overflow: hidden; touch-action: none;' +
-            'background: #efe3c6 radial-gradient(ellipse at 40% 30%, #f6ecd4, transparent 70%);' +
-            'box-shadow: 0 16px 40px rgba(0,0,0,.55), inset 0 0 50px rgba(120,80,30,.25); }' +
-        '.note::before { content: ""; position: absolute; inset: 0; pointer-events: none;' +
-            'background: repeating-linear-gradient(to bottom, transparent 0 33px, rgba(110,82,54,.12) 33px 34px); background-position: 0 58px; }' +
-        '.note-pic { position: absolute; left: 8%; right: 8%; top: 6%; height: 38%; display: none; }' +
-        '.note-pic img { display: block; margin: 0 auto; max-width: 100%; max-height: 100%; box-shadow: 0 2px 8px rgba(60,40,20,.35); }' +
-        '.note-pic button { position: absolute; right: -6px; top: -8px; width: 26px; height: 26px; border: 0; border-radius: 50%; cursor: pointer;' +
-            'background: #3a2716; color: #f3e6c2; font-size: 14px; line-height: 26px; }' +
-        '.note.has-pic .note-pic { display: block; }' +
-        '.note-text { position: absolute; left: 8%; right: 8%; top: 6%; bottom: 13%; resize: none; border: 0; outline: none; background: transparent;' +
-            'font: 20px/34px "IM Fell English", Georgia, serif; color: #3a2716; padding: 0; }' +
-        '.note.has-pic .note-text { top: 47%; }' +
-        '.note-text::placeholder { color: rgba(110,82,54,.55); font-style: italic; }' +
-        '.note-draw { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }' +
-        '.post.drawing .note-draw { pointer-events: auto; cursor: crosshair; }' +
-        '.note-from { position: absolute; right: 8%; bottom: 4%; display: flex; gap: 6px; align-items: baseline; font-style: italic; color: #6e5236; }' +
-        '.note-from input { width: 11em; border: 0; border-bottom: 1px dashed rgba(110,82,54,.5); background: transparent; outline: none;' +
-            'font: italic 1.05rem "IM Fell English", Georgia, serif; color: #3a2716; }' +
-        '.note-count { position: absolute; left: 8%; bottom: 4.4%; font-size: .8rem; font-style: italic; color: rgba(110,82,54,.7); }' +
-        '.note.dragover { box-shadow: 0 16px 40px rgba(0,0,0,.55), inset 0 0 0 4px rgba(154,59,31,.5); }' +
-        '.post-actions { display: flex; gap: 10px; }' +
-        '.post-actions button { border: 0; cursor: pointer; padding: 10px 20px; border-radius: 999px; font: italic 1.1rem "IM Fell English", Georgia, serif; }' +
-        '.post-actions .go { background: #3a2716; color: #f3e6c2; box-shadow: 0 6px 14px rgba(0,0,0,.4); }' +
-        '.post-actions .go:hover { background: #9a3b1f; }' +
-        '.post-actions .no { background: rgba(234,220,185,.9); color: #3a2716; }' +
-        '.post-actions .go:disabled { opacity: .5; cursor: default; }' +
-        '.post-hp { position: absolute; left: -9999px; }' +
-        '.post.sending .post-tools, .post.sending .post-actions, .post.sending h2 { opacity: 0; pointer-events: none; transition: opacity .3s; }' +
-
-        '.post-toast { position: fixed; left: 50%; top: 92px; z-index: 9; transform: translate(-50%, -10px); max-width: min(560px, 90vw); padding: 10px 18px;' +
-            'border-radius: 12px; background: #eadcb9; color: #3a2716; font: italic 1.05rem/1.4 "IM Fell English", Georgia, serif; text-align: center;' +
-            'box-shadow: 0 8px 18px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .4s, transform .4s; }' +
-        '.post-toast.show { opacity: 1; transform: translate(-50%, 0); }' +
-        'body.post-open .bottle-hint { opacity: 0; transition: opacity .4s; }' +
-        'body.tossing .letters, body.tossing .credit, body.tossing .bottle-hint { opacity: 0; transition: opacity .6s ease; }' +
-        '.letters, .credit { transition: opacity 1.2s ease; }' +
-        '.tossed-bottle { position: fixed; z-index: 9; width: 150px; pointer-events: none; filter: drop-shadow(0 6px 6px rgba(0,0,0,.4)); }' +
-        '.drifting-bottle { position: absolute; width: 110px; pointer-events: none; filter: drop-shadow(0 4px 4px rgba(0,0,0,.35)); }' +
-        '@media (max-width: 620px) { .note { height: 56vh; } .note-text { font-size: 18px; } .post-tools button, .post-tools label { padding: 6px 9px; } }'
-    );
+    // (its look is in sky/css/post.css, linked from each page's head)
 
     /* ---------------- the button ---------------- */
     var btn = document.createElement('button');

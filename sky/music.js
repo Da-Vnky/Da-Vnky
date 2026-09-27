@@ -20,34 +20,7 @@
     var KEY = 'music-now';
     var LIVING = 'living.html';                 // where the record player lives
 
-    Sky.css(
-        '@keyframes rp-spin { to { transform: rotate(360deg); } }' +
-        '.cp .mu-now { display: flex; gap: 12px; align-items: center; }' +
-        '.cp .mu-disc { flex: none; width: 64px; height: 64px; }' +
-        '.cp .mu-disc svg { width: 100%; height: 100%; display: block; }' +
-        'body.music-playing .cp .mu-disc svg { animation: rp-spin 4.5s linear infinite; }' +
-        '.cp .mu-info { flex: 1; min-width: 0; line-height: 1.25; }' +
-        '.cp .mu-title { font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' +
-        '.cp .mu-artist { font-size: .88rem; font-style: italic; color: #6e5236; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.1em; }' +
-        '.cp .mu-seek { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: .8rem; color: #6e5236; font-variant-numeric: tabular-nums; }' +
-        '.cp .mu-controls { display: flex; align-items: center; gap: 4px; margin-top: 6px; }' +
-        '.cp .mu-controls .mu-stop { margin-left: auto; width: auto; padding: 0 10px; border-radius: 999px; font: italic .9rem "IM Fell English", Georgia, serif; color: #6e5236; }' +
-        '.cp .mu-i-pause, body.music-playing .cp .mu-i-play { display: none; }' +
-        'body.music-playing .cp .mu-i-pause { display: block; }' +
-        '.cp .mu-empty { display: none; }' +
-        // an album on: its songs, one click away
-        '.cp .mu-songs { display: none; width: auto; padding: 0 10px; border-radius: 999px; font: italic .9rem "IM Fell English", Georgia, serif; color: #6e5236; }' +
-        '.cp .mu-layer.on-album .mu-songs { display: inline-flex; align-items: center; }' +
-        '.cp .mu-album { display: none; list-style: none; margin: 8px 0 2px; padding: 4px; max-height: 190px; overflow: auto; border-radius: 10px;' +
-            'background: rgba(110,82,54,.1); box-shadow: inset 0 0 0 1px rgba(196,154,82,.55); }' +
-        '.cp .mu-layer.on-album.album-open .mu-album { display: block; }' +
-        '.cp .mu-album li { display: flex; gap: 8px; padding: 4px 8px; border-radius: 7px; cursor: pointer; font-size: .92rem; line-height: 1.25; }' +
-        '.cp .mu-album li span { flex: none; min-width: 1.4em; color: #9a7a4a; font-variant-numeric: tabular-nums; }' +
-        '.cp .mu-album li:hover { background: rgba(110,82,54,.16); }' +
-        '.cp .mu-album li.on { color: #9a3b1f; font-style: italic; }' +
-        '.cp .mu-layer.empty .mu-empty { display: block; } .cp .mu-layer.empty .mu-full { display: none; }' +
-        '@media (prefers-reduced-motion: reduce) { body.music-playing .cp .mu-disc svg { animation: none; } }'
-    );
+    // (its look is in sky/css/music.css, linked from each page's head)
 
     /* ---------------- a record, drawn: grooves, a label (your sleeve's picture), spindle hole ---------------- */
     var uid = 0;
@@ -393,10 +366,7 @@
     /* ---------------- the stars keep time too ----------------
        at night (once the constellations are out), while a record plays, one of them (now and then two)
        pulses on every beat of the song: a quick swell and a glow, a different one each time */
-    Sky.css('.sky-link .sl-art { transform-origin: 50% 50%; }' +
-        '.sky-link.sl-beat .sl-art { animation: sl-beat var(--sl-beat, .45s) cubic-bezier(.2,.8,.3,1); }' +
-        '@keyframes sl-beat { 0% { transform: scale(1); filter: none; } 16% { transform: scale(1.17); filter: brightness(1.9) drop-shadow(0 0 7px rgba(255,244,200,.95)); } 100% { transform: scale(1); filter: none; } }' +
-        '@media (prefers-reduced-motion: reduce) { .sky-link.sl-beat .sl-art { animation: none; } }');
+    // (its look is in sky/css/music.css, linked from each page's head)
     var starBeat = -1, lastStar = null;
     (function starsOnTheBeat() {
         requestAnimationFrame(starsOnTheBeat);
@@ -589,59 +559,7 @@
             '<rect x="2" y="56" width="40" height="6" fill="#5a3a24"/>' +
             '</svg>' }
     };
-    Sky.css(
-        '.groove { position: absolute; pointer-events: none; z-index: 2; }' +
-        '.groove .placeholder, .groove > .art { display: block; width: 100%; height: auto; overflow: visible; }' +
-        '.groove g { transform-box: view-box; }' +
-        '.groove .pose { display: none; }' +
-        'body.music-playing .groove.has-dancing > .pose-dancing { display: block; width: 100%; height: auto; }' +
-        'body.music-playing .groove.has-dancing > .placeholder, body.music-playing .groove.has-dancing > .art { display: none; }' +
-        // the moves (about 120 beats a minute)
-        'body.music-playing .groove .g-head { animation: g-nod .5s ease-in-out infinite alternate; }' +
-        'body.music-playing .groove .g-tail { animation: g-swish 1s ease-in-out infinite alternate; }' +
-        'body.music-playing .groove .g-sway { animation: g-sway 1s ease-in-out infinite alternate; }' +
-        'body.music-playing .groove .g-claw { animation: g-claw .25s ease-in-out infinite alternate; }' +
-        'body.music-playing .groove .g-claw.r { animation-delay: -.25s; }' +
-        'body.music-playing .groove .g-arm { animation: g-arm .5s ease-in-out infinite alternate; }' +
-        'body.music-playing .groove .g-arm.r { animation-name: g-arm-r; }' +
-        'body.music-playing .groove .g-leg { animation: g-leg .5s ease-in-out infinite alternate; }' +
-        'body.music-playing .groove .g-leg.r { animation-delay: -.5s; }' +
-        'body.music-playing .groove .g-tick { animation: g-tick .5s ease-in-out infinite alternate; }' +
-        'body.music-playing .groove[data-move="bob"]:not(.has-dancing) { animation: g-bob .5s ease-in-out infinite alternate; }' +
-        'body.music-playing .groove[data-move="sway"]:not(.has-dancing) { animation: g-sway 1s ease-in-out infinite alternate; transform-origin: 50% 100%; }' +
-        'body.music-playing .groove[data-move="hop"]:not(.has-dancing) { animation: g-hop .5s cubic-bezier(.3,.6,.4,1) infinite alternate; }' +
-        'body.music-playing .groove[data-move="step"]:not(.has-dancing) { animation: g-step 1s ease-in-out infinite alternate; }' +
-        'body.music-playing .groove[data-move="wobble"]:not(.has-dancing) { animation: g-wobble 1s ease-in-out infinite alternate; transform-origin: 50% 0; }' +
-        '@keyframes g-nod { from { transform: rotate(0); } to { transform: rotate(12deg) translateY(2px); } }' +
-        '@keyframes g-swish { from { transform: rotate(-14deg); } to { transform: rotate(16deg); } }' +
-        '@keyframes g-sway { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }' +
-        '@keyframes g-claw { from { transform: rotate(-18deg); } to { transform: rotate(10deg); } }' +
-        '@keyframes g-arm { from { transform: rotate(10deg); } to { transform: rotate(150deg); } }' +
-        '@keyframes g-arm-r { from { transform: rotate(-10deg); } to { transform: rotate(-150deg); } }' +
-        '@keyframes g-leg { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }' +
-        '@keyframes g-tick { from { transform: rotate(-26deg); } to { transform: rotate(26deg); } }' +
-        '@keyframes g-bob { from { transform: translateY(0); } to { transform: translateY(-6%); } }' +
-        '@keyframes g-hop { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-12%) rotate(3deg); } }' +
-        '@keyframes g-step { from { transform: translateX(-10px); } to { transform: translateX(10px); } }' +
-        '@keyframes g-wobble { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }' +
-        // everyone who stands still in a scene sways along (unless they have a -dancing pose of their own)
-        'body.music-playing .scene-character:not(.has-dancing):not(.walking):not(.held) > .placeholder,' +
-        'body.music-playing .scene-character:not(.has-dancing):not(.walking):not(.held) > .art,' +
-        'body.music-playing .sea-char:not(.has-dancing):not(.walking):not(.held):not(.startled) > .placeholder,' +
-        'body.music-playing .sea-char:not(.has-dancing):not(.walking):not(.held):not(.startled) > .art { animation: char-groove 1s ease-in-out infinite; transform-origin: 50% 100%; }' +
-        '@keyframes char-groove { 0%, 100% { transform: translateY(0) rotate(-3deg); } 25% { transform: translateY(-4%) rotate(0); } 50% { transform: translateY(0) rotate(3deg); } 75% { transform: translateY(-4%) rotate(0); } }' +
-        'body.music-playing .character.face-left:not(.has-dancing) > .placeholder { animation-name: char-groove-left; }' +
-        '@keyframes char-groove-left { 0%, 100% { transform: scaleX(-1) translateY(0) rotate(-3deg); } 25% { transform: scaleX(-1) translateY(-4%); } 50% { transform: scaleX(-1) rotate(3deg); } 75% { transform: scaleX(-1) translateY(-4%); } }' +
-        'body.music-playing .character.has-dancing:not(.walking) > .pose-dancing { display: block; }' +
-        'body.music-playing .character.has-dancing:not(.walking) > .placeholder, body.music-playing .character.has-dancing:not(.walking) > .art { display: none; }' +
-        // anything else in a room can join in: class="sways" or "wobbles"
-        'body.music-playing .sways { animation: g-sway 1s ease-in-out infinite alternate; transform-origin: 50% 100%; }' +
-        // (a light that hangs from the ceiling swings from its top, like a pendulum: class="sways hangs")
-        'body.music-playing .sways.hangs { transform-origin: 50% 0; }' +
-        'body.music-playing .wobbles { animation: g-wobble 1s ease-in-out infinite alternate; transform-origin: 50% 0; }' +
-        '@media (prefers-reduced-motion: reduce) { body.music-playing .groove, body.music-playing .groove *, body.music-playing .sways, body.music-playing .wobbles,' +
-            'body.music-playing .character > * { animation: none !important; } }'
-    );
+    // (its look is in sky/css/music.css, linked from each page's head)
     function dressGrooves(scope) {
         (scope || document).querySelectorAll('.groove[data-groove]').forEach(function (el) {
             var g = GROOVES[el.dataset.groove];

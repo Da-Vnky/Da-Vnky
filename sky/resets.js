@@ -33,37 +33,7 @@
     function say(t, ms) { if (Sky.inventory && Sky.inventory.say) Sky.inventory.say(t, ms || 2400); }
     function busyHands() { return body.classList.contains('inv-holding'); }
 
-    Sky.css(
-        '.reset-key { position: absolute; z-index: 4; width: 26px; cursor: pointer; transform: translate(-50%, -100%) rotate(-24deg); filter: drop-shadow(0 2px 2px rgba(0,0,0,.45)); }' +
-        '.reset-key.fixed { position: fixed; }' +
-        '.reset-key > svg, .reset-key > .art, .reset-key > img { display: block; width: 100%; height: auto; }' +
-        '.reset-key::after { content: ""; position: absolute; left: 20%; top: 10%; width: 5px; height: 5px; border-radius: 50%; background: #fff; box-shadow: 0 0 6px 2px #fff6c0;' +
-            'opacity: 0; animation: key-glint 7s ease-in-out infinite; }' +
-        '@keyframes key-glint { 0%, 92%, 100% { opacity: 0; transform: scale(.3); } 95% { opacity: 1; transform: scale(1.2); } }' +
-        '.reset-key:hover { filter: drop-shadow(0 2px 2px rgba(0,0,0,.45)) drop-shadow(0 0 6px rgba(255,220,140,.9)); }' +
-        '.reset-key.taken { transition: left .8s cubic-bezier(.5,0,.3,1), top .8s cubic-bezier(.5,-.6,.3,1), opacity .3s .6s, width .8s; opacity: 0; pointer-events: none; }' +
-        // a way to die, still to be designed: a dashed bubble with a skull
-        '.death-bubble { position: absolute; z-index: 6; width: 86px; height: 86px; margin: -43px 0 0 -43px; padding: 0; border-radius: 50%; cursor: pointer;' +
-            'border: 2px dashed rgba(154,59,31,.8); background: radial-gradient(circle at 38% 32%, rgba(255,250,235,.9), rgba(243,230,194,.72) 60%, rgba(220,190,150,.6));' +
-            'box-shadow: 0 4px 14px rgba(0,0,0,.35); color: #3a2716; display: grid; place-items: center; align-content: center; gap: 1px; animation: db-bob 3.2s ease-in-out infinite; }' +
-        '.death-bubble.fixed { position: fixed; }' +
-        '.death-bubble svg { width: 30px; height: 30px; display: block; }' +
-        '.death-bubble .db-t { font: italic .72rem/1.05 "IM Fell English", Georgia, serif; text-align: center; }' +
-        '.death-bubble:hover, .death-bubble:focus-visible { outline: none; border-style: solid; box-shadow: 0 4px 16px rgba(0,0,0,.35), 0 0 0 4px rgba(154,59,31,.2); }' +
-        '.death-bubble.popping { animation: db-pop .35s ease-in forwards; pointer-events: none; }' +
-        '@keyframes db-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }' +
-        '@keyframes db-pop { to { transform: scale(1.4); opacity: 0; } }' +
-        'body.leaving .death-bubble, body.sky-view .death-bubble, body.peep-view .death-bubble, body.in-side .room .death-bubble { opacity: 0; pointer-events: none; }' +
-        '@media (prefers-reduced-motion: reduce) { .death-bubble { animation: none; } }' +
-        // off the roof: the street far below (reset 3's end)
-        '.roof-fall { position: fixed; inset: 0; z-index: 5; background: #111; opacity: 0; transition: opacity .35s; overflow: hidden; }' +
-        '.roof-fall.on { opacity: 1; }' +
-        '.roof-fall .rf-street { position: absolute; inset: 0; }' +
-        '.roof-fall .rf-street > svg, .roof-fall .rf-street > img { width: 100%; height: 100%; object-fit: cover; display: block; }' +
-        '.roof-fall .rf-body { position: absolute; left: 50%; top: -30%; transform: translateX(-50%); }' +
-        '.roof-fall .rf-body > * { display: block; height: 100%; width: auto; }' +
-        'body.cutscene .place-tabs, body.cutscene .inv-bar, body.cutscene .lives, body.cutscene .cp-toggle { opacity: 0; pointer-events: none; }'
-    );
+    // (its look is in sky/css/resets.css, linked from each page's head)
 
     /* ---------------- the key ---------------- */
     var KEY = '<svg viewBox="0 0 60 24" aria-hidden="true"><circle cx="11" cy="12" r="8.5" fill="none" stroke="#c49a52" stroke-width="4.5"/>' +

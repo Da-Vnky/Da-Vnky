@@ -79,22 +79,7 @@
         if (I) I.define(L.id, { name: L.name, label: L.label, slot: L.slot, art: L.art, hint: L.hint, wear: L.kind === 'wearable' });
     });
 
-    Sky.css(
-        '.loot-drop { position: absolute; z-index: 4; width: 5vw; min-width: 44px; max-width: 80px; aspect-ratio: 1; }' +
-        '.loot-drop.falling { pointer-events: none; }' +
-        '.loot-drop > svg, .loot-drop > img { width: 100%; height: 100%; display: block; object-fit: contain; }' +
-        '.loot-drop::before { content: ""; position: absolute; inset: -30%; z-index: -1; border-radius: 50%; pointer-events: none;' +
-            'background: radial-gradient(circle, rgba(255,230,150,.45), transparent 65%); animation: loot-glow 1.8s ease-in-out infinite alternate; }' +
-        '@keyframes loot-glow { from { opacity: .35; transform: scale(.85); } to { opacity: .9; transform: scale(1.1); } }' +
-        // wearing the suit: every traveller on the page goes black and shiny, with a zipped mask
-        'body.wearing-gimp .scene-character > .art, body.wearing-gimp .scene-character > .placeholder, body.wearing-gimp .scene-character > .pose,' +
-        'body.wearing-gimp .sea-char > .art, body.wearing-gimp .sea-char > .placeholder, body.wearing-gimp .sea-char > .pose { filter: brightness(.16) saturate(0) contrast(1.4) drop-shadow(0 0 1px rgba(255,255,255,.35)); }' +
-        '.gimp-worn { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; display: none; z-index: 1; }' +
-        'body.wearing-gimp .gimp-worn { display: block; }' +
-        '.gimp-worn > svg, .gimp-worn > img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; }' +
-        '.gimp-worn.own ~ .art, .gimp-worn.own ~ .placeholder { visibility: hidden; }' +
-        '.character.face-left .gimp-worn, .sea-char.face-left .gimp-worn { transform: scaleX(-1); }'
-    );
+    // (its look is in sky/css/loot.css, linked from each page's head)
 
     /* ---------------- turning up: it falls to the floor of whatever room it's in, and waits there ---------------- */
     function hostOf(el) { return (el && el.closest && el.closest('.dungeon, .hallway, .bathroom, .room')) || body; }

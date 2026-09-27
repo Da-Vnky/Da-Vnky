@@ -86,12 +86,7 @@
             document.body.classList.add(k[1]);
         });
     });
-    Sky.css(
-        'body.has-letter-paper .sheet { background: var(--letter-paper) center / 100% 100% no-repeat; }' +
-        'body.has-ink-blot .marks .blot, body.has-ink-star .marks .star { background: center / contain no-repeat; }' +
-        'body.has-ink-blot .marks .blot { background-image: var(--ink-blot); } body.has-ink-blot .marks .blot use { display: none; }' +
-        'body.has-ink-star .marks .star { background-image: var(--ink-star); } body.has-ink-star .marks .star use { display: none; }'
-    );
+    // (its look is in sky/css/letters.css, linked from each page's head)
 
     var MARKS = ['blot-a', 'blot-b', 'splatter', 'star-pen', 'star-twinkle', 'star-asterisk', 'star-pen', 'star-twinkle'];
 
@@ -162,24 +157,7 @@
        and is read right there (the day and the ship stay just where they are).
        read, it goes onto the board on the dock, where all of them can be read.
        ====================================================================== */
-    Sky.css(
-        '.letter-open, .letters-view { position: fixed; inset: 0; z-index: 8; overflow-y: auto; overscroll-behavior: contain; visibility: hidden; opacity: 0;' +
-            'transition: opacity .45s, visibility 0s .45s; }' +
-        '.letter-open.open, .letters-view.open { visibility: visible; opacity: 1; transition: opacity .45s; }' +
-        '.letter-open { background: radial-gradient(ellipse at 50% 42%, rgba(18,22,32,.3), rgba(8,10,16,.72) 80%); }' +
-        '.letters-view { background: rgba(12,16,24,.84); }' +
-        '.lo-inner, .lv-list { padding: 74px 16px 60px; }' +
-        '.letter-open .letter, .letters-view .letter { margin: 0 auto 70px; }' +
-        '.lo-close, .lv-close { position: fixed; top: 16px; left: 16px; z-index: 3; border: 0; cursor: pointer; padding: 8px 18px;' +
-            'border-radius: 999px; font: italic 1.05rem "IM Fell English", Georgia, serif; background: #3a2716; color: #f3e6c2; box-shadow: 0 4px 12px rgba(0,0,0,.45); }' +
-        '.lo-close:hover, .lv-close:hover { background: #9a3b1f; }' +
-        '.lv-title { text-align: center; margin: 0 0 34px; font: normal 1.8rem "IM Fell English SC", Georgia, serif; color: #f3e6c2; text-shadow: 0 2px 6px rgba(0,0,0,.6); }' +
-        'body.letter-reading .signpost, body.letter-reading .post-btn, body.letter-reading .cp { opacity: 0; pointer-events: none; transition: opacity .3s; }' +
-        '.flying-scroll { z-index: 9 !important; }' +
-        '.letters[hidden] { display: none; }' +
-        '.letters-btn { left: 18px; top: 18px; bottom: auto; }' +
-        'body.letter-reading .letters-btn, body.post-open .letters-btn, body.sky-view .letters-btn { opacity: 0; visibility: hidden; pointer-events: none; }'
-    );
+    // (its look is in sky/css/letters.css, linked from each page's head)
     section.hidden = true;
 
     // the credit goes to the very end of the voyage (and at the foot of the letters)

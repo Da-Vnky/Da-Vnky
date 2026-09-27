@@ -43,26 +43,8 @@
     var ROUNDS = 6, RELOAD_MS = 2600;                  // six in the cylinder; how long it takes to load six more
     function tell(name, detail) { try { document.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch (e) {} }
 
-    Sky.css(
-        '.shot-layer { position: fixed; inset: 0; z-index: 6; pointer-events: none; overflow: hidden; }' +
-        '.bullet-hole.reloading { transition: opacity ' + RELOAD_MS + 'ms linear; opacity: 0; }' +
-        '.bullet-hole { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; transition: opacity 2s; }' +
-        '.bullet-hole > svg, .bullet-hole > img { display: block; width: 100%; height: 100%; }' +
-        '.shot-flash { position: fixed; inset: 0; z-index: 7; pointer-events: none; background: #fff6d0; opacity: 0; }' +
-        '.shot-flash.on { animation: shot-flash .14s ease-out; }' +
-        '@keyframes shot-flash { from { opacity: .45; } to { opacity: 0; } }' +
-        // a painting shot to bits: the empty frame it leaves (for the rest of the visit)
-        '.gallery-frame.shot { cursor: default; }' +
-        '.gallery-frame.shot .gf-pic > * { visibility: hidden; }' +
-        '.gallery-frame.shot .gf-pic { background: radial-gradient(circle at var(--hx, 50%) var(--hy, 45%), #050303 0 5%, #2a1d14 6%, #1a120c 40%, #120c08) !important;' +
-            'clip-path: polygon(0 0, 18% 4%, 30% 0, 52% 6%, 70% 1%, 100% 0, 96% 22%, 100% 48%, 94% 70%, 100% 100%, 72% 95%, 50% 100%, 26% 94%, 0 100%, 5% 72%, 0 46%, 4% 22%); }' +
-        '.painting-bit { position: fixed; z-index: 7; pointer-events: none; background-repeat: no-repeat; box-shadow: 0 2px 4px rgba(0,0,0,.4); }' +
-        '.shard { position: absolute; width: 16px; height: 16px; background: #141416; clip-path: polygon(0 0, 100% 30%, 40% 100%); }' +
-        '.shard.label { background: #9a3b1f; }' +
-        'body.recoil { animation: shot-recoil .16s ease-out; }' +
-        '@keyframes shot-recoil { 0% { translate: 0 0; } 30% { translate: -3px 2px; } 100% { translate: 0 0; } }' +
-        '@media (prefers-reduced-motion: reduce) { body.recoil { animation: none; } .shot-flash.on { animation: none; } }'
-    );
+    // its look is in sky/css/revolver.css (linked from each page's head); these are the values it takes from here
+    document.documentElement.style.setProperty('--revolver-reload-ms', RELOAD_MS);
     var layer = document.createElement('div');
     layer.className = 'shot-layer';
     layer.setAttribute('aria-hidden', 'true');

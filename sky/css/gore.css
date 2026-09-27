@@ -1,0 +1,309 @@
+/* =====================================================================
+   gore.css — the look of sky/gore.js.
+   (it used to be written inside the script, as strings; same rules, now here)
+   ===================================================================== */
+
+.gore-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
+    overflow: hidden;
+}
+.gore-bit {
+    position: absolute;
+    left: 0;
+    top: 0;
+    will-change: transform;
+}
+.gore-bit.drop {
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: #8e0f12;
+    box-shadow: inset -1px -2px 0 rgba(0, 0, 0, .25);
+}
+.gore-bit>svg,
+.gore-bit>img {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.gore-bit.stuck {
+    transition: opacity 1.4s;
+}
+.gore-splat {
+    position: absolute;
+    transform: translate(-50%, -60%);
+    transition: opacity 1.6s;
+}
+.gore-splat>svg,
+.gore-splat>img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.gore-hidden {
+    visibility: hidden !important;
+}
+.gore-flash {
+    position: fixed;
+    inset: 0;
+    z-index: 7;
+    pointer-events: none;
+    background: #fff;
+    opacity: 0;
+}
+.gore-flash.on {
+    animation: gore-flash .12s steps(1) 6;
+}
+@keyframes gore-flash {
+    0% {
+        opacity: .55;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+/* electrocution: the character flickers between itself and its x-ray, sparks all round */
+.gore-zap {
+    position: absolute;
+    pointer-events: none;
+}
+.gore-zap .gz-skel {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    width: auto;
+}
+.gore-zap .gz-sparks {
+    position: absolute;
+    inset: -20% -40%;
+}
+.gore-zap .gz-sparks path {
+    fill: none;
+    stroke: #fff27a;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 3px #fff6a0) drop-shadow(0 0 6px #7fd0ff);
+}
+.gore-zap.flicker .gz-skel {
+    animation: gz-flick .09s steps(1) infinite;
+}
+@keyframes gz-flick {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+.gore-zap .gz-smoke {
+    position: absolute;
+    left: 30%;
+    bottom: 80%;
+    width: 40%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba(90, 90, 90, .55);
+    filter: blur(6px);
+    opacity: 0;
+}
+.gore-zap.done .gz-smoke {
+    animation: gz-smoke 2.2s ease-out forwards;
+}
+@keyframes gz-smoke {
+    0% {
+        opacity: .8;
+        transform: translateY(0) scale(.6);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-120%) scale(2.2);
+    }
+}
+.gore-zapping {
+    animation: gz-shake .05s linear infinite alternate;
+}
+@keyframes gz-shake {
+    from {
+        translate: -2px 0;
+    }
+    to {
+        translate: 2px -1px;
+    }
+}
+/* coming back: a puff, and a -1 heart floating up */
+.gore-back {
+    animation: gore-back .5s cubic-bezier(.3, 1.6, .5, 1);
+}
+@keyframes gore-back {
+    from {
+        opacity: 0;
+        transform: scale(.4);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+.life-lost {
+    position: absolute;
+    z-index: 9;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    font: bold 1.3rem "IM Fell English", Georgia, serif;
+    color: #c0182a;
+    text-shadow: 0 1px 0 #fff, 0 2px 4px rgba(0, 0, 0, .45);
+    animation: life-lost 2.2s ease-out forwards;
+}
+.life-lost .heart {
+    width: 1.4em;
+    height: 1.4em;
+    display: block;
+}
+.life-lost .heart>svg,
+.life-lost .heart>img {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+@keyframes life-lost {
+    0% {
+        opacity: 0;
+        translate: 0 10px;
+        scale: .6;
+    }
+    15% {
+        opacity: 1;
+        translate: 0 0;
+        scale: 1.15;
+    }
+    25% {
+        scale: 1;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        translate: 0 -46px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .gore-zapping,
+    .gore-zap.flicker .gz-skel {
+        animation: none;
+    }
+    .gore-flash.on {
+        animation: none;
+    }
+}
+
+.gore-gun {
+    position: absolute;
+    pointer-events: none;
+    z-index: 9;
+    transform-origin: 90% 80%;
+    transition: transform .35s cubic-bezier(.3, 1.4, .5, 1), opacity .3s;
+}
+.gore-gun>svg,
+.gore-gun>img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.gore-shot {
+    transition: transform .7s cubic-bezier(.6, 0, .9, .6) !important;
+}
+.gore-muzzle {
+    position: absolute;
+    z-index: 9;
+    pointer-events: none;
+    width: 60px;
+    height: 60px;
+    margin: -30px 0 0 -30px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 15%, #ffe27a 30%, rgba(255, 150, 40, .6) 50%, transparent 70%);
+    animation: gore-muzzle .18s ease-out forwards;
+}
+@keyframes gore-muzzle {
+    from {
+        transform: scale(.4);
+        opacity: 1;
+    }
+    to {
+        transform: scale(1.4);
+        opacity: 0;
+    }
+}
+.gore-pool {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scaleX(.2);
+    transform-origin: 50% 50%;
+    transition: transform 2.2s ease-out, opacity 1.4s;
+}
+.gore-pool.spread {
+    transform: translate(-50%, -50%) scaleX(1);
+}
+.gore-pool>svg,
+.gore-pool>img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.character.lying,
+.scene-character.lying {
+    rotate: -86deg;
+    translate: 0 -14%;
+    transform-origin: 50% 100%;
+}
+.character.getting-up,
+.scene-character.getting-up {
+    transform-origin: 50% 100%;
+    animation: gore-get-up 1.9s cubic-bezier(.4, 0, .3, 1) both;
+}
+@keyframes gore-get-up {
+    0% {
+        rotate: -86deg;
+        translate: 0 -14%;
+    }
+    22% {
+        rotate: -86deg;
+        translate: 0 -14%;
+    }
+    34% {
+        rotate: -74deg;
+        translate: 0 -12%;
+    }
+    46% {
+        rotate: -78deg;
+        translate: 0 -12%;
+    }
+    66% {
+        rotate: -32deg;
+        translate: 0 -4%;
+    }
+    82% {
+        rotate: 7deg;
+        translate: 0 0;
+    }
+    92% {
+        rotate: -3deg;
+    }
+    100% {
+        rotate: 0deg;
+        translate: 0 0;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .character.getting-up,
+    .scene-character.getting-up {
+        animation-duration: .01s;
+    }
+}

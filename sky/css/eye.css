@@ -1,0 +1,51 @@
+/* =====================================================================
+   eye.css — the look of sky/eye.js.
+   (it used to be written inside the script, as strings; same rules, now here)
+   ===================================================================== */
+
+.sun.eye-sun {
+    width: var(--eye-size);
+    filter: none !important;
+}
+.sun.eye-sun> :not(.eye) {
+    display: none !important;
+}
+.eye {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+}
+.eye>canvas,
+.eye>img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.eye>.e-lids {
+    z-index: 3;
+}
+.eye>.e-pupil {
+    position: absolute;
+    z-index: 2;
+    left: calc(var(--eye-pupil-x) * 1%);
+    top: calc(var(--eye-pupil-y) * 1%);
+    width: calc(var(--eye-pupil-size) * 1%);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    transition: transform .35s cubic-bezier(.2, .7, .3, 1);
+    pointer-events: none;
+}
+.eye .e-pin {
+    width: 100%;
+    height: 100%;
+}
+/* (the part that squashes as it blinks) */
+.eye .e-pin>img,
+.eye .e-pin>svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

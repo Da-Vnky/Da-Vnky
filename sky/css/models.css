@@ -1,0 +1,148 @@
+/* =====================================================================
+   models.css — the look of sky/models.js.
+   (it used to be written inside the script, as strings; same rules, now here)
+   ===================================================================== */
+
+.model-shelf {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 0 2%;
+    z-index: 2;
+}
+.model-shelf .ms-board {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -10px;
+    height: 16px;
+    pointer-events: none;
+    z-index: -1;
+}
+.model-shelf .ms-board>.art,
+.model-shelf .ms-board .placeholder {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.model-shelf .model {
+    position: relative;
+    flex: none;
+    height: 92%;
+    width: auto;
+    aspect-ratio: 1;
+    cursor: zoom-in;
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .4));
+    transition: transform .25s;
+}
+.model-shelf .model:hover {
+    transform: translateY(-3px);
+}
+.model-shelf .model>.art,
+.model-shelf .model>video,
+.model-shelf .model .placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.model-shelf .model .placeholder {
+    overflow: visible;
+}
+.model-shelf .model .spin {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: model-turn 7s linear infinite;
+}
+@keyframes model-turn {
+    0% {
+        transform: scaleX(1);
+    }
+    25% {
+        transform: scaleX(.35);
+    }
+    50% {
+        transform: scaleX(-1);
+    }
+    75% {
+        transform: scaleX(-.35);
+    }
+    100% {
+        transform: scaleX(1);
+    }
+}
+.model-shelf .model .m-hint {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 4px);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-style: italic;
+    font-size: .85rem;
+    color: #f3e6c2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .7);
+    opacity: 0;
+    transition: opacity .25s;
+    pointer-events: none;
+}
+.model-shelf .model:hover .m-hint {
+    opacity: 1;
+}
+.model-zoom {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    display: grid;
+    place-items: center;
+    padding: 60px 16px 24px;
+    visibility: hidden;
+    opacity: 0;
+    cursor: zoom-out;
+    background: radial-gradient(ellipse at 50% 45%, rgba(58, 39, 22, .75), rgba(14, 9, 5, .95) 75%);
+    transition: opacity .35s, visibility 0s .35s;
+    font-family: "IM Fell English", Georgia, serif;
+}
+.model-zoom.open {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .35s;
+}
+.model-zoom figure {
+    margin: 0;
+    text-align: center;
+    color: #f3e6c2;
+    font-style: italic;
+}
+.model-zoom .mz-pic {
+    width: min(70vw, 70vh);
+    aspect-ratio: 1;
+    margin: 0 auto 10px;
+    position: relative;
+}
+.model-zoom .mz-pic>* {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+body.model-open .place-tabs,
+body.model-open .cp {
+    opacity: 0;
+    pointer-events: none;
+}
+.model-zoom .spin {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: model-turn 7s linear infinite;
+}
+.model-zoom .placeholder * {
+    vector-effect: non-scaling-stroke;
+    stroke-width: 2.5px;
+}
+@media (prefers-reduced-motion: reduce) {
+    .model-shelf .model .spin {
+        animation: none;
+    }
+}

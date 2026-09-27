@@ -20,14 +20,7 @@
     var me = document.currentScript;
     var base = (me && me.dataset.view) || 'assets/view';
 
-    Sky.css(
-        '.ground-view { height: 42vh; min-height: 240px; }' +
-        '.ground-view .view-art { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }' +
-        '.ground-view .view-night { opacity: 0; }' +
-        '.ground-view .garden { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; overflow: visible; }' +
-        '.ground-view .g-glow { fill: url(#garden-glow); }' +
-        '.ground-view .g-lamp { fill: #ffd98a; }'
-    );
+    // (its look is in sky/css/ground-view.css, linked from each page's head)
 
     var ground = document.createElement('div');
     ground.className = 'ground ground-view';
