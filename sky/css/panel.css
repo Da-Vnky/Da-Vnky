@@ -1,0 +1,326 @@
+/* =====================================================================
+   panel.css — the look of sky/panel.js.
+   (it used to be written inside the script, as strings; same rules, now here)
+   ===================================================================== */
+
+.cp {
+    position: fixed;
+    right: 14px;
+    top: 14px;
+    z-index: 7;
+    font-family: "IM Fell English", Georgia, serif;
+    color: #3a2716;
+}
+.cp-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 44px;
+    padding: 0 12px 0 6px;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    background: #eadcb9;
+    color: #3a2716;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .35), inset 0 0 16px rgba(120, 80, 30, .2);
+    font: inherit;
+}
+.cp-toggle:hover {
+    background: #f1e5c6;
+}
+.cp-toggle .cp-ic {
+    width: 32px;
+    height: 32px;
+}
+.cp-ic {
+    display: inline-block;
+    flex: none;
+    width: 24px;
+    height: 24px;
+}
+.cp-ic .placeholder,
+.cp-ic>.art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.cp-badges {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+.cp-badges:empty {
+    display: none;
+}
+.cp-badges svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+.cp .spin {
+    animation: rp-spin 4.5s linear infinite;
+}
+@keyframes rp-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+.cp-wait {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    white-space: nowrap;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: .85rem;
+    font-style: italic;
+    background: rgba(42, 29, 20, .85);
+    color: #f3e6c2;
+    display: none;
+    pointer-events: none;
+}
+.cp.waiting:not(.open) .cp-wait {
+    display: block;
+    animation: cp-nudge 1.6s ease-in-out infinite;
+}
+@keyframes cp-nudge {
+    50% {
+        transform: translateY(2px);
+        opacity: .75;
+    }
+}
+.cp-box {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    width: min(350px, calc(100vw - 28px));
+    max-height: calc(100vh - 90px);
+    overflow: auto;
+    border-radius: 16px;
+    background: #eadcb9;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .45), inset 0 0 30px rgba(120, 80, 30, .22);
+    transform-origin: 100% 0;
+    transform: scale(.9);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform .25s cubic-bezier(.3, .7, .3, 1.2), opacity .2s, visibility 0s .25s;
+    overscroll-behavior: contain;
+}
+.cp.open .cp-box {
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    transition: transform .3s cubic-bezier(.3, .7, .3, 1.2), opacity .2s;
+}
+.cp-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 12px 6px 16px;
+}
+.cp-head h2 {
+    flex: 1;
+    margin: 0;
+    font: normal 1.2rem "IM Fell English SC", Georgia, serif;
+}
+.cp button.cp-x {
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: #6e5236;
+    font: italic .95rem "IM Fell English", Georgia, serif;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+.cp button.cp-x:hover {
+    background: rgba(110, 82, 54, .14);
+}
+.cp-layer {
+    margin: 0 8px 8px;
+    border-radius: 12px;
+    background: rgba(255, 250, 235, .45);
+    box-shadow: inset 0 0 0 1px rgba(110, 82, 54, .15);
+}
+.cp-lh {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    border-radius: 12px;
+}
+.cp-lh:hover {
+    background: rgba(110, 82, 54, .08);
+}
+.cp-lt {
+    flex: 1;
+    min-width: 0;
+}
+.cp-lt b {
+    display: block;
+    font-weight: normal;
+    font-size: 1.05rem;
+}
+.cp-lt i {
+    display: block;
+    font-size: .85rem;
+    color: #6e5236;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cp-layer.on .cp-lt b::after {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-left: 7px;
+    border-radius: 50%;
+    background: #9a3b1f;
+    vertical-align: middle;
+}
+.cp-chev {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    transition: transform .25s;
+    color: #6e5236;
+}
+.cp-layer.open .cp-chev {
+    transform: rotate(180deg);
+}
+.cp-lb {
+    display: none;
+    padding: 2px 12px 12px;
+}
+.cp-layer.open .cp-lb {
+    display: block;
+}
+/* bits the layers share */
+.cp .cp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+}
+.cp .cp-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 2px;
+    font-size: .9rem;
+    color: #6e5236;
+}
+.cp input[type=range] {
+    flex: 1;
+    accent-color: #9a3b1f;
+    min-width: 0;
+}
+.cp .cp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 6px 0;
+}
+.cp .cp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    background: rgba(110, 82, 54, .12);
+    color: #3a2716;
+    font: italic .92rem "IM Fell English", Georgia, serif;
+}
+.cp .cp-chip:hover {
+    background: rgba(110, 82, 54, .22);
+}
+.cp .cp-chip[aria-pressed="true"] {
+    background: #3a2716;
+    color: #f3e6c2;
+}
+.cp .cp-chip svg {
+    width: 16px;
+    height: 16px;
+}
+.cp .cp-btn {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    color: #3a2716;
+}
+.cp .cp-btn:hover {
+    background: rgba(110, 82, 54, .14);
+}
+.cp .cp-btn.big {
+    width: 42px;
+    height: 42px;
+    background: #3a2716;
+    color: #f3e6c2;
+}
+.cp .cp-btn.big:hover {
+    background: #9a3b1f;
+}
+.cp .cp-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+.cp .cp-note {
+    font-size: .85rem;
+    font-style: italic;
+    color: #6e5236;
+    margin: 6px 0 0;
+}
+.cp .cp-note a {
+    color: #9a3b1f;
+}
+.cp .cp-link {
+    border: 0;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    color: #9a3b1f;
+    font: italic .85rem "IM Fell English", Georgia, serif;
+    text-decoration: underline;
+}
+body.sky-view .cp {
+    top: 14px;
+}
+@media (max-width: 620px) {
+    .cp {
+        right: 10px;
+        top: 10px;
+    }
+    .cp-toggle {
+        height: 40px;
+    }
+    .cp-toggle .cp-ic {
+        width: 28px;
+        height: 28px;
+    }
+    .cp-badges svg {
+        width: 17px;
+        height: 17px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .cp .spin {
+        animation: none;
+    }
+}
