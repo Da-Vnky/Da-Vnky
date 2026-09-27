@@ -5,6 +5,7 @@ skybox-dusk.jpg
 skybox-golden.jpg
 skybox-night.jpg
 skybox-sunset.jpg
+sun-eyeball.gif
 sun-glow.gif
 sun-pupil.png
-sun.gif
+sun.png

@@ -103,7 +103,7 @@ assets/mel-room/list.txt 117
 assets/resets/index.txt 77
 assets/resets/list.txt 127
 assets/sea/list.txt 117
-assets/sky/list.txt 236
+assets/sky/list.txt 252
 assets/sounds/list.txt 243
 assets/textures/list.txt 152
 assets/ui/list.txt 117
