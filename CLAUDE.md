@@ -60,6 +60,12 @@ this before changing anything; keep it up to date when something here stops bein
   an unpushed commit. The generated lists never count as a clash: `.gitattributes` marks them `merge=regen`
   (pull.sh sets `git config merge.regen.driver true`), local list edits are reset first, and update-lists.sh
   rewrites them after. If `tools/content.py` came in, it tells him to restart the content manager.
+- **Mel's pull requests** (Forgejo) often say "changes conflicting with the target branch" only because both sides rewrote
+  the lists (catalog/files/manifest: Forgejo's server doesn't know `merge=regen`). `tools\merge-prs.bat` (asks for the
+  numbers, oldest first; runs `tools/merge-prs.sh 7 8 …`) merges them on Victor's computer instead: stops if he has
+  unpublished changes, pulls, fetches `refs/pull/N/head`, merges each (`--no-ff`), and if a real file clashes aborts that one
+  and stops; then writes the lists again, commits and pushes. Forgejo marks them merged if its "autodetect manual merge"
+  setting is on, else he closes them. Rehearsed on a throwaway repo (lists-only clash: merged; a real clash: stopped cleanly).
 - So when saving to Victor's folder: his copy may now hold Mel's pushed changes. Always check before overwriting
   (already the rule), and if Mel changed a file you're about to replace, merge rather than overwrite.
 - Linux / Mac / VS Code versions of Victor's .bat tools (27 Sep, for Mel): `tools/content.sh`, `tools/publish.sh` (the
@@ -401,6 +407,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   so a see-through middle shows the sleeve), and **the light** (`.rp-light`: `assets/living/vinyl-texture`, else drawn grooves +
   two blurred sheen wedges) which **counter-rotates** (records.js sets `--spin` on the spinning svg; music.css turns `.rp-light`
   back), so the sheen stays still like real light. Don't name anything `GROOVES` in music.js: that's the dancers table.
+  Victor's texture (27 Sep, 2048 px) is a whole opaque black vinyl with a see-through label hole (r ≈ 16 of 100): on the
+  drawn stand-in vinyl it's laid on as it is (it IS the vinyl); over a record's own skin or `assets/living/record` it's blended
+  (`.rp-light.blend`, mix-blend-mode soft-light) so the skin keeps its colours and gains the grooves. The gold/rainbow rings
+  go on top of it. The drawn turntable's platter (`.tt-disc` in living.html's stand-in) holds the real record now too:
+  records.js `drawDeck` puts `discOf(t)` in it as a nested 108-wide svg (it turns with the platter, `--spin` set on it).
 - A record's own vinyl: singles `01-name.vinyl.png|webp|…` beside the song, albums `vinyl.*` in the folder. content.py:
   `vinyl_of`, `vinyl_put`, `vinyl_remove`, routes `/__records/vinyl` (X-Song, X-Name) and `/__records/vinyl-remove`; `tracks()`
   gives `vinyl`; `rename_song` moves `<stem>.vinyl.*` along; `album_cover` / `album_cover_put` ignore `vinyl.*`; shelf_delete

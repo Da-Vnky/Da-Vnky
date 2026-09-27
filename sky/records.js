@@ -125,10 +125,16 @@
         labelArt.setAttribute('clip-path', 'url(#tt-label-clip)');
         labelDot.after(labelArt);
     }
+    // the drawn turntable's own record: the real one (the record's vinyl, your vinyl texture, its sleeve on the label), laid into
+    // the drawing's platter (a record-sized svg inside it, 108 across: the platter's size), turning with it
+    var ttDisc = deck.querySelector('.tt-disc');
     function drawDeck() {
         var t = M.current();
-        if (labelDot) labelDot.setAttribute('fill', t ? t.color : '#9a3b1f');
-        if (labelArt) { if (t && t.pic) labelArt.setAttribute('href', t.pic); else labelArt.removeAttribute('href'); }
+        if (ttDisc && ttDisc.ownerSVGElement) ttDisc.innerHTML = M.discOf(t).replace('<svg ', '<svg x="-54" y="-54" width="108" height="108" ');
+        else {
+            if (labelDot) labelDot.setAttribute('fill', t ? t.color : '#9a3b1f');
+            if (labelArt) { if (t && t.pic) labelArt.setAttribute('href', t.pic); else labelArt.removeAttribute('href'); }
+        }
         ttRecord.classList.toggle('on', !!t);
         ttRecord.innerHTML = t ? M.discOf(t) : '';
     }
@@ -349,7 +355,7 @@
         spin.angle = (spin.angle + spin.speed * dt) % 360;
         var r = 'rotate(' + spin.angle.toFixed(2) + 'deg)';
         var a = deck.querySelector('.tt-disc'), b = ttRecord.querySelector('svg'), c = nowDisc.querySelector('svg');
-        if (a) a.style.transform = r;
+        if (a) { a.style.transform = r; a.style.setProperty('--spin', spin.angle.toFixed(2)); }
         if (b) { b.style.transform = r; b.style.setProperty('--spin', spin.angle.toFixed(2)); }       // (the light on it stays still: --spin)
         if (c) { c.style.transform = r; c.style.setProperty('--spin', spin.angle.toFixed(2)); }
         if (!playing && spin.speed === 0) { spin.on = false; audio.muted = false; audio.playbackRate = 1; return; }

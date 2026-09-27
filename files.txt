@@ -1,8 +1,8 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-city.html 9158 125020258
-index.html 4380 1112826529
-living.html 126953 1354924834
-workshop.html 20911 240426986
+city.html 9158 3920791692
+index.html 4380 278115614
+living.html 126953 2192818477
+workshop.html 20911 243659503
 sky/ambient.js 5052 82158972
 sky/attic.js 34415 1479863069
 sky/bathroom.js 27366 739340607
@@ -29,7 +29,7 @@ sky/loader.js 15448 3284628827
 sky/loot.js 14817 391651511
 sky/marker.js 7216 276763161
 sky/models.js 5073 954840756
-sky/music.js 60308 517319171
+sky/music.js 60653 1863365191
 sky/noise.js 11436 2833082593
 sky/notes.js 5723 1695177572
 sky/paint.js 42555 1829217658
@@ -37,7 +37,7 @@ sky/panel.js 66074 3878551620
 sky/peeper.js 29950 688287093
 sky/porch.js 16196 3219425586
 sky/post.js 21396 743501724
-sky/records.js 34407 1891397606
+sky/records.js 34932 3998463537
 sky/resets.js 16799 4292073354
 sky/revolver.js 17327 1638942978
 sky/sky.js 111054 303167423
@@ -75,7 +75,7 @@ sky/css/lives.css 3089 2936428613
 sky/css/loot.css 2076 1327473539
 sky/css/marker.css 1560 2393379633
 sky/css/models.css 3444 1051530511
-sky/css/music.css 12725 3485975576
+sky/css/music.css 12786 1152388714
 sky/css/noise.css 2783 317061799
 sky/css/notes.css 4294 2819331900
 sky/css/paint.css 6832 133283066

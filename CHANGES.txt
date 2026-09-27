@@ -17,6 +17,10 @@ How it works
 
 == published ==
 
+2026-09-27 16:28 · V
+- the record player in the living room now spins the real record: your vinyl texture, with a record's own vinyl blended under it when it has one, and the sleeve on the label (it used to spin a drawn stand-in). On records with their own vinyl the texture is blended in (soft light) so their colours show through with the grooves; the gold and rainbow rings sit on top. sky/records.js drawDeck, sky/music.js disc(), sky/css/music.css
+- tools/merge-prs.bat (+ merge-prs.sh): merges pull requests that Forgejo won't ("conflicting" only because both sides rewrote catalog.txt / files.txt / manifest.txt): asks for their numbers, merges them here, writes the lists again and publishes. Stops without changing anything if something real clashes
+
 2026-09-27 13:18 · V
 - asset manager: the evilrecord sound and the wretched scream were filed under Mel's room by mistake; now evilrecord is on the record player tab (and the living space's music group) and the scream with the other sound effects (tools/slots.json, tools/assets.html)
 

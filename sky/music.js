@@ -124,13 +124,16 @@
             (pic ? '<image href="' + pic + '" x="33" y="33" width="34" height="34" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/>' : '');
         else vinyl = '<circle cx="50" cy="50" r="49" fill="url(#' + id + 's)"/>' + label;
         var light = textureArt ? '<image href="' + textureArt + '" x="0" y="0" width="100" height="100"/>' : drawnLight(id + 'l');
+        // your texture on a vinyl of the record's own (or your usual record): blended in (soft light), so it gives the vinyl its
+        // grooves and shine without covering its colours. on the drawn stand-in vinyl it's laid on as it is: it IS the vinyl then
+        var blend = textureArt && (skin || recordArt) ? ' blend' : '';
         return '<svg class="rp-disc ' + (cls || '') + (album ? ' album' : '') + (o.cls ? ' ' + o.cls : '') + (skin ? ' own-vinyl' : '') +
                 '" viewBox="0 0 100 100" aria-hidden="true" data-slot="' + (skin ? 'its own vinyl' : 'assets/living/record') + '">' +
             '<defs><clipPath id="' + id + '"><circle cx="50" cy="50" r="17"/></clipPath>' + (skin || recordArt ? '' : drawnVinyl(id)) + '</defs>' +
             vinyl +
+            '<g class="rp-light' + blend + '" data-slot="assets/living/vinyl-texture">' + light + '</g>' +
             (album ? goldRing(id) : '') +
             (/\bdoom\b/.test(o.cls || '') ? RAINBOW : '') +
-            '<g class="rp-light" data-slot="assets/living/vinyl-texture">' + light + '</g>' +
             (skin || recordArt ? '' : '<circle cx="50" cy="50" r="2" fill="#0c0c0e"/>') +
             '</svg>';
     }

@@ -516,6 +516,9 @@ body.music-playing .wobbles {
     transform: rotate(calc(var(--spin, 0) * -1deg));
     pointer-events: none;
 }
+.rp-disc .rp-light.blend {
+    mix-blend-mode: soft-light;
+}
 
 /* P(Doom)'s record: its ring of colours turns through the rainbow. its inverted twin: turned inside out, and red */
 .rp-disc .rp-rainbow {
