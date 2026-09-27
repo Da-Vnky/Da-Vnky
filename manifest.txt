@@ -141,7 +141,7 @@ schizophyllu.me.room/room/extra.js 33188
 schizophyllu.me.room/room/music.js 4978
 schizophyllu.me.room/room/narration.js 14155
 schizophyllu.me.room/room/radio.js 6517
-schizophyllu.me.room/room/room.css 22552
-schizophyllu.me.room/room/room.js 79632
-schizophyllu.me.room/room/script.js 46214
+schizophyllu.me.room/room/room.css 23944
+schizophyllu.me.room/room/room.js 80920
+schizophyllu.me.room/room/script.js 46531
 schizophyllu.me.room/assets/playlist/playlist.json 648

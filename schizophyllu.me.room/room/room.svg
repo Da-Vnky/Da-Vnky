@@ -264,6 +264,8 @@
 
 <!-- ================================================= SERVER: monad -->
 <g class="obj" data-id="server" id="server" data-art="room/objects/main/server.svg"></g>
+<!-- Aether's LED strip: their own idea -->
+<g class="obj" data-id="ledstrip" id="ledstrip" data-art="room/objects/main/ledstrip.svg"></g>
 <g class="obj char" data-id="aether" id="aether" data-art="room/objects/main/aether.svg"></g>
 <circle class="anchor" data-anchor="aether" cx="1228" cy="312" r="1" opacity="0"/>
 

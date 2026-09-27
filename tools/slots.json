@@ -2722,6 +2722,13 @@
        "crop": "1168 300 149 469"
       },
       {
+       "slot": "assets/mel-room/main-ledstrip",
+       "what": "Aether's LED strip (their idea)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/ledstrip.svg"
+      },
+      {
        "slot": "assets/mel-room/main-aether",
        "what": "Aether (tiny local model)",
        "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",

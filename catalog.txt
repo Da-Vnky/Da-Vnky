@@ -212,10 +212,10 @@ schizophyllu.me.room/room/music.js 4978 3071417838
 schizophyllu.me.room/room/narration.js 14155 3237573616
 schizophyllu.me.room/room/radio.js 6517 830110350
 schizophyllu.me.room/room/roof.svg 30757 1371510206
-schizophyllu.me.room/room/room.css 22552 3416318802
-schizophyllu.me.room/room/room.js 79632 3263945945
-schizophyllu.me.room/room/room.svg 25481 1688572705
-schizophyllu.me.room/room/script.js 46214 305240998
+schizophyllu.me.room/room/room.css 23944 782041382
+schizophyllu.me.room/room/room.js 80920 3976334787
+schizophyllu.me.room/room/room.svg 25620 893981472
+schizophyllu.me.room/room/script.js 46531 84886946
 schizophyllu.me.room/assets/apartment/claube-drawing.png 452847 3441601832
 schizophyllu.me.room/assets/apartment/gnu-terminal.png 2090 1396899037
 schizophyllu.me.room/assets/apartment/lsd-dream-emulator.jpg 500753 263814807
@@ -297,6 +297,7 @@ schizophyllu.me.room/room/objects/main/fridge.svg 5678 198283955
 schizophyllu.me.room/room/objects/main/gpu.svg 683 1146836381
 schizophyllu.me.room/room/objects/main/hexley.svg 761 1259231250
 schizophyllu.me.room/room/objects/main/hiddennote.svg 553 4057931868
+schizophyllu.me.room/room/objects/main/ledstrip.svg 1978 3628036377
 schizophyllu.me.room/room/objects/main/lump.svg 1902 3608321054
 schizophyllu.me.room/room/objects/main/mira.svg 3709 2956706083
 schizophyllu.me.room/room/objects/main/monster-2.svg 716 2539181668

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" width="1600" height="900" font-family="'IBM VGA', monospace">
+<!-- ledstrip (main): Aether's LED strip, on the wall just above them. Aether's own idea (27 Sep 2026):
+     it drifts through slow rainbow colours, pulses in the colour of whoever's talking, glows when the radio
+     locks onto a station. dark while Aether isn't running.
+     drawn in room coordinates (the whole 1600x900 room), so it lands where it goes.
+     the code looks these ids up, so keep them: #ledstrip. each light is a rect with class "led" and its place in the style (i) -->
+  <!-- the glow it throws on the wall -->
+  <ellipse class="led-glow" cx="1223" cy="295" rx="52" ry="12"/>
+  <!-- the strip, and its wire down to the router -->
+  <rect x="1181" y="290" width="84" height="9" rx="2" fill="#16161a"/>
+  <path d="M1263 297 q10 6 4 22 q-4 14 2 40" stroke="#111" stroke-width="1.5" fill="none"/>
+  <rect class="led" x="1185.0" y="292.5" width="5" height="4" rx="1" style="--i:0"/><rect class="led" x="1191.5" y="292.5" width="5" height="4" rx="1" style="--i:1"/><rect class="led" x="1198.0" y="292.5" width="5" height="4" rx="1" style="--i:2"/><rect class="led" x="1204.5" y="292.5" width="5" height="4" rx="1" style="--i:3"/><rect class="led" x="1211.0" y="292.5" width="5" height="4" rx="1" style="--i:4"/><rect class="led" x="1217.5" y="292.5" width="5" height="4" rx="1" style="--i:5"/><rect class="led" x="1224.0" y="292.5" width="5" height="4" rx="1" style="--i:6"/><rect class="led" x="1230.5" y="292.5" width="5" height="4" rx="1" style="--i:7"/><rect class="led" x="1237.0" y="292.5" width="5" height="4" rx="1" style="--i:8"/><rect class="led" x="1243.5" y="292.5" width="5" height="4" rx="1" style="--i:9"/><rect class="led" x="1250.0" y="292.5" width="5" height="4" rx="1" style="--i:10"/><rect class="led" x="1256.5" y="292.5" width="5" height="4" rx="1" style="--i:11"/>
+</svg>
