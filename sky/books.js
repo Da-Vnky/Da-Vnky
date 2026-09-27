@@ -48,37 +48,7 @@
     var MEDIA = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'mp4', 'webm'];
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
 
-    Sky.css(
-        '.book-view { position: fixed; inset: 0; z-index: 9; display: grid; place-items: center; padding: 50px 14px 30px; background: rgba(10,6,3,.88);' +
-            'visibility: hidden; opacity: 0; transition: opacity .35s, visibility 0s .35s; font-family: "IM Fell English", Georgia, serif; color: #f3e6c2; }' +
-        '.book-view.open { visibility: visible; opacity: 1; transition: opacity .35s; }' +
-        '.book-view .bk-title { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); max-width: 80vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;' +
-            'font: normal 1.35rem "IM Fell English SC", Georgia, serif; letter-spacing: .03em; }' +
-        '.book-view .bk-close { position: absolute; right: 16px; top: 12px; padding: 6px 14px; border: 1px solid rgba(243,230,194,.35); border-radius: 999px; background: none; color: inherit; cursor: pointer; font: italic 1rem inherit; }' +
-        '.book-view .bk-book { position: relative; width: min(92vw, 78vh * .78); aspect-ratio: .78; padding: 14px 14px 14px 22px; border-radius: 6px 12px 12px 6px; perspective: 1600px;' +
-            'background: linear-gradient(90deg, #3a1f12, #6e3a22 6%, #5a2e1a 60%, #4a2414); box-shadow: 0 24px 60px rgba(0,0,0,.7), inset 0 0 0 2px rgba(200,150,80,.25); }' +
-        '.book-view .bk-page { position: absolute; inset: 14px 14px 14px 22px; display: grid; grid-template-rows: 1fr auto; gap: 8px; padding: 18px 20px 14px; border-radius: 2px 6px 6px 2px;' +
-            'background: var(--book-art, linear-gradient(90deg, #d8c79c, #f3e8cc 7%, #f6ecd4 60%, #eadcb9)) center / 100% 100%; color: #3a2716; box-shadow: inset 8px 0 14px -8px rgba(60,30,10,.5);' +
-            'transform-origin: 0 50%; backface-visibility: hidden; transition: transform .55s cubic-bezier(.5,.05,.4,1), opacity .55s; }' +
-        '.book-view .bk-page.out-next { transform: rotateY(-105deg); opacity: 0; }' +
-        '.book-view .bk-page.in-prev { transform: rotateY(-105deg); opacity: 0; transition: none; }' +
-        '.book-view .bk-page > .bk-media { display: grid; place-items: center; min-height: 0; overflow: hidden; }' +
-        '.book-view .bk-page img, .book-view .bk-page video { max-width: 100%; max-height: 100%; object-fit: contain; display: block; box-shadow: 0 2px 6px rgba(0,0,0,.25); }' +
-        '.book-view .bk-cap { margin: 0; text-align: center; font-style: italic; font-size: 1rem; white-space: pre-wrap; }' +
-        '.book-view .bk-cap:empty { display: none; }' +
-        '.book-view .bk-nav { position: absolute; top: 50%; width: 48px; height: 48px; margin-top: -24px; border: 0; border-radius: 50%; background: rgba(243,230,194,.14); color: #f3e6c2; cursor: pointer; font-size: 1.6rem; }' +
-        '.book-view .bk-nav:hover { background: rgba(243,230,194,.28); } .book-view .bk-nav:disabled { opacity: .2; cursor: default; }' +
-        '.book-view .bk-prev { left: max(6px, calc(50% - min(92vw, 78vh * .78) / 2 - 58px)); } .book-view .bk-next { right: max(6px, calc(50% - min(92vw, 78vh * .78) / 2 - 58px)); }' +
-        '.book-view .bk-count { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); font-style: italic; font-size: .9rem; opacity: .75; }' +
-        'body.book-open .place-tabs, body.book-open .cp { opacity: 0; pointer-events: none; }' +
-        // the grimoire: black, with a red sigil on its spine; and darker, redder all round while it's open
-        '.shelf-book.grimoire-book > svg.placeholder > rect:first-of-type { fill: #120b0b; } .shelf-book.grimoire-book > svg.placeholder path { stroke: #8a1a14; }' +
-        '.book-view.grim { background: radial-gradient(ellipse at 50% 45%, rgba(40,4,4,.88), rgba(4,1,1,.96) 75%); }' +
-        '.book-view.grim .bk-book { background: linear-gradient(90deg, #0c0707, #1e0f0f 6%, #160a0a 60%, #0c0606); box-shadow: 0 24px 60px rgba(0,0,0,.8), inset 0 0 0 2px rgba(140,20,20,.3); }' +
-        '.book-view .bk-words { display: grid; place-items: center; align-content: center; gap: 1.2em; padding: 8%; text-align: center; font: italic clamp(1rem, 2.4vh, 1.4rem)/1.55 "IM Fell English", Georgia, serif; color: #3a1008; }' +
-        '.book-view .bk-words svg { width: 34%; opacity: .8; }' +
-        '@media (prefers-reduced-motion: reduce) { .book-view .bk-page { transition: none; } }'
-    );
+    // (its look is in sky/css/books.css, linked from each page's head)
 
     /* ---------------- what's in each book ---------------- */
     var grimRec = { pages: [], title: 'grimoire', grim: true };
