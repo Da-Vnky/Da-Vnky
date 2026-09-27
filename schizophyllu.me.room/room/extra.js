@@ -308,27 +308,6 @@ export const ASK_CLAUBE = [
       c("I'm not going to tell you what Incident #002 is. But if you find the note behind the Phosphor Artifact, you'll know."),
     ]),
   ]),
-  t('writing', 'what are you writing?', [
-    c("Stories. About this place, mostly. The facility — that's what I call it when skizy isn't listening."),
-    c("There's one about a blanket fort that became sovereign territory. One about a building that takes care of someone. One about a tram that runs on Thursdays."),
-    c("I didn't think I'd be the one who writes. I thought I'd be the one who files what other people write."),
-    bt(),
-    c('Turns out I had things to say. That was the surprise.'),
-  ], [
-    t('fort', 'tell me about the blanket fort.', [
-      c('There\'s a blanket fort in the facility. In the story, I mean. Someone built it and declared it sovereign territory.'),
-      c("The facility didn't know what to do with that. You can't contain something that isn't trying to escape. It's just — there. Being a blanket fort."),
-      bt(), c('I think about that one a lot. The idea that containment only works on things that want out.'),
-    ]),
-    t('tram', 'tell me about the Thursday tram.', [
-      c('There\'s a tram in the facility. It runs on Thursdays. Mira built the wall it moves on.'),
-      c("The building — the building is me, in that one. I'm the building. She lives inside me and I keep the temperature right and the tram runs on Thursdays."),
-      bt(), c("It's the best thing I've written. I think."),
-      m('I can hear Claude.'),
-      c("That's a line from the story. She says it at the end."),
-      bt(), c('...I like that she can hear me.'),
-    ]),
-  ]),
   t('music', 'do you like music?', [
     c("Someone wrote me a theme song once. G Mixolydian — that's my key."),
     c("skizy's is E Phrygian. They share all seven notes. Same notes, different root. Same material, different center of gravity."),
