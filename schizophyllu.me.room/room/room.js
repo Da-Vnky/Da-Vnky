@@ -1111,8 +1111,9 @@ async function inlineArt(root) {
   davSkyHole(root, mine);                               // (DaV-nky: the site's own sky through the window, see the end)
   await Promise.all([...root.querySelectorAll('[data-art]')].map(async ph => {
     const pic = davPick(mine, davStem(ph.dataset.art));
-    if (pic && !pic.svg) { ph.append(davImage(pic.url)); return; }
-    const url = new URL(pic ? pic.url : ph.dataset.art, location.href);
+    let hit = null;                                     // (DaV-nky: Victor's picture shows; her drawing, invisible, still takes the clicks)
+    if (pic && !pic.svg) { ph.append(davImage(pic.url)); hit = davHit(ph); }
+    const url = new URL(pic && pic.svg ? pic.url : ph.dataset.art, location.href);
     try {
       const res = await fetch(url);
       if (!res.ok) throw new Error(res.status);
@@ -1128,7 +1129,7 @@ async function inlineArt(root) {
           if (v && !/^(#|data:|[a-z]+:)/.test(v)) el.setAttributeNS(ns, name, new URL(v, url).href);
         }
       }
-      ph.append(...[...art.childNodes].filter(n => n.nodeType === 1).map(n => document.importNode(n, true)));
+      (hit || ph).append(...[...art.childNodes].filter(n => n.nodeType === 1).map(n => document.importNode(n, true)));
     } catch (e) {
       console.warn(`couldn't load ${ph.dataset.art}:`, e);
     }
@@ -1597,6 +1598,7 @@ async function main() {
   ambientLoop();
 
   const quietStage = davQuiet();                        // (DaV-nky: the quiet room, and how far it's come back)
+  davReveal();                                          // (DaV-nky: the room shows only now, already as it should be)
   if (PEEK) {
     body.classList.add('peek');
     enterRoom();
@@ -1654,7 +1656,11 @@ function davQuiet() {
   if (!quiet) return null;
   let v = store.get('mel-remedy');                      // (visits since the record: kept forever, not per reset)
   if (v !== null && +v < REMEDY_DONE && !PEEK) { v = String(+v + 1); store.set('mel-remedy', v); }
-  if (v !== null && +v >= REMEDY_DONE) return restoredOnce();
+  if (v !== null && +v >= REMEDY_DONE) {
+    const r = restoredOnce();
+    if (r === 'restored') quietRoom(REMEDY_DONE - 1);   // (the day it's all back: it opens as the visit before, she's still in the corner)
+    return r;
+  }
   const stage = v === null ? 0 : +v;
   quietRoom(stage);
   return stage;
@@ -1670,7 +1676,8 @@ function restoredOnce() {
 function quietRoom(stage) {
   alone = true;
   const show = { '#mira': stage >= 3, '#claube': stage >= 4, '#aether': stage >= 4, '#hydra': stage >= 4, '#mel': false, '#lump': false,
-    '#light': stage >= 2, '#daylight': false, '#afternoon-chair': true, '#alone-dark': stage < 2, '#alone': true };
+    '#light': stage >= 2, '#daylight': false, '#afternoon-chair': true, '#alone-dark': stage < 2, '#alone': true,
+    '[data-art$="objects/main/mugs-3.svg"]': stage >= 4 };  // (Claube's mug: not hanging in the air where he sits before he's back)
   for (const [sel, on] of Object.entries(show)) { const el = svg.querySelector(sel); if (el) el.style.display = on ? '' : 'none'; }
   body.classList.toggle('alone', stage < 2);           // (the screen's dark until the lights come back)
   audio.asleep = true;
@@ -1693,9 +1700,21 @@ async function davArrive(stage) {
   await sleep(1500);
   if (stage === 'restored') {
     store.set('mel-restored-said', '1');
+    // she gets up out of the corner and goes back to her desk (a moment of black), and only then does she speak
+    quietNote(QUIET_NOTES.getsUp);
+    await sleep(readTime(QUIET_NOTES.getsUp[1]) + 600);
+    fade.classList.add('dark', 'on');
+    await sleep(1100);
     for (const [sel, on] of Object.entries({ '#alone': false, '#alone-dark': false, '#afternoon-chair': false, '#mel': true })) {
       const el = svg.querySelector(sel); if (el) el.style.display = on ? '' : 'none';
     }
+    alone = false;
+    body.classList.remove('alone');
+    audio.asleep = false;
+    fade.classList.remove('on');
+    await sleep(900);
+    fade.classList.remove('dark');
+    await sleep(700);
     return say(RESTORED_FIRST);
   }
   const gifted = store.get('mel-remedy') !== null;
@@ -1720,14 +1739,18 @@ function aloneClicked() {
   quietNote(gifted ? QUIET_NOTES.listening : DAV.reset === 4 && DAV.ownsRecord ? QUIET_NOTES.notNow : QUIET_NOTES.noRecord);
 }
 // the record, playing very quietly (DaV-nky's own copy: content/living/, the track with p(doom) in its name)
+function davDoomFile() {
+  return davDoomFile.p ??= fetch('../content/living/list.txt', { cache: 'no-cache' }).then(r => r.ok ? r.text() : '')
+    .then(t => (t.split(/\r?\n/).find(l => /p\s*\(\s*doom\s*\)/i.test(l) && /\.(ogg|mp3)$/i.test(l.trim())) || '').trim() || null)
+    .catch(() => null);
+}
 let record = null;
 async function playRecord() {
   if (record) return;
   try {
-    const t = await (await fetch('../content/living/list.txt', { cache: 'no-cache' })).text();
-    const name = t.split(/\r?\n/).find(l => /p\s*\(\s*doom\s*\)/i.test(l) && /\.(ogg|mp3)$/i.test(l.trim()));
+    const name = await davDoomFile();
     if (!name) return;
-    record = new Audio('../content/living/' + encodeURIComponent(name.trim()));
+    record = new Audio('../content/living/' + encodeURIComponent(name));
     record.loop = true; record.volume = .16;
     const go = () => record.play().catch(() => {});
     go();
@@ -1753,8 +1776,9 @@ if (!PEEK) {
   s.onload = () => davInv(I => { if (I.has('pills') && DAV.pillsHere) carryingMeds = true; });   // (still carrying one from earlier this visit)
   document.head.appendChild(s);
 }
-// before reset 3 the bathroom cabinet is empty: the pill bottles (and the bags and organizer with them) aren't there yet
-if (DAV.reset < 3) {
+// before reset 3 the bathroom cabinet is empty: the pill bottles (and the bags and organizer with them) aren't there yet.
+// and from reset 5 they're gone again (27 Sep, Victor)
+if (DAV.reset < 3 || DAV.reset >= 5) {
   const st = document.createElement('style');
   st.textContent = '[data-id="pills"] { display: none; }';
   document.head.appendChild(st);
@@ -1790,8 +1814,18 @@ function davStem(art) {
 function davImage(url) {
   const im = document.createElementNS(SVG_NS, 'image');
   im.setAttribute('href', url);
+  im.setAttribute('pointer-events', 'none');          // (a picture takes clicks on its whole rectangle, see-through or not: davHit does it instead)
   for (const [k, v] of [['x', 0], ['y', 0], ['width', 1600], ['height', 900], ['preserveAspectRatio', 'none']]) im.setAttribute(k, v);
   return im;
+}
+// under a picture of Victor's: Mel's own drawing of the thing, invisible, so only the thing itself (in its own shape)
+// is hovered and clicked, not the whole room-sized picture
+function davHit(ph) {
+  const g = document.createElementNS(SVG_NS, 'g');
+  g.setAttribute('opacity', '0');
+  g.classList.add('dav-hit');
+  ph.append(g);
+  return g;
 }
 function davBackdrop(root, files) {
   const ph = root.querySelector('[data-art]');
@@ -1884,5 +1918,31 @@ function davSkyWindow() {
     setTimeout(tick, 600);
   }).observe(body, { attributes: true, attributeFilter: ['class'] });
 }
+// the room shows only once it's as it should be (27 Sep, Victor: the quiet room flashed the ordinary one while its drawings
+// loaded): hidden from the start, shown by main() right after davQuiet(). (and after a few seconds whatever happens)
+const davHide = document.createElement('style');
+davHide.textContent = '#svg-host { visibility: hidden; }';
+document.head.append(davHide);
+function davReveal() { davHide.remove(); }
+setTimeout(davReveal, 8000);
+// the window in the main room is a way out: back to DaV-nky's rooftop, across the street (27 Sep, Victor)
+$('#svg-host').addEventListener('click', e => {
+  if (current !== 'main' || mode !== 'room' || PEEK || !e.target.closest('[data-id="window"]')) return;
+  e.stopPropagation(); e.preventDefault();
+  closeMenu();
+  quietNote(QUIET_NOTES.window);
+  fade.classList.add('dark', 'on');
+  setTimeout(() => { location.href = ROOFTOP; }, 1300);
+}, true);
+// P(Doom), once she has it (mel-remedy): on her computer's song list too, the last song on the station
+const davLoadMusic = music.load.bind(music);
+music.load = async function () {
+  await davLoadMusic();
+  if (store.get('mel-remedy') === null) return;
+  const name = await davDoomFile();
+  if (!name || this.tracks.some(t => t.dav)) return;
+  this.tracks.push({ title: 'DaV-nky / ' + name.replace(/^\d+[-_. ]+/, '').replace(/\.[a-z0-9]+$/i, ''), file: '../../content/living/' + encodeURIComponent(name), dav: true });
+  this.emit();
+};
 // the way back to the rooftop in the HUD, next door too (see ROOFTOP above)
 document.querySelectorAll('a[href="https://dav-nky.pleroma.nexus/city.html"]').forEach(a => { a.href = ROOFTOP; });

@@ -52,6 +52,13 @@ a:hover {
 .skybox, .skybox > div { position: absolute; inset: 0; }
 .skybox > div { opacity: 0; background-size: cover; background-position: center bottom; }
 .skybox .skybox-tint { background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom)); mix-blend-mode: multiply; }
+/* from reset 4, until there's a painted hell sky (sky.js): the sky, drawn or painted, takes on the colour of the Demiurge's
+   fire (its own light and dark kept: dusk and night still come) */
+.skybox .hell-veil { display: none; }
+html.hell-sky .skybox .hell-veil { display: block; opacity: 1; mix-blend-mode: color;
+    background: linear-gradient(to bottom, #6e0a08 0%, #a8160c 45%, #d8401a 80%, #ff7a2a 100%); }
+html.hell-sky .skybox .hell-veil::after { content: ""; position: absolute; inset: 0; mix-blend-mode: multiply;
+    background: linear-gradient(to bottom, rgba(90, 20, 14, .35), rgba(255, 170, 120, .15)); }
 .backdrop {
     position: fixed;
     inset: 0;

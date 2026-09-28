@@ -211,15 +211,26 @@
     function standAt(ch, x) { return x - (ch.offsetWidth / 2) / (ch.parentNode.clientWidth || window.innerWidth) * 100; }
     function walk(ch, x, done) { if (Sky.sides && Sky.sides.walk) Sky.sides.walk(ch, x, done); else { ch.style.left = x + '%'; if (done) setTimeout(done, 300); } }
     function place(ch, x, left) { if (Sky.sides && Sky.sides.place) Sky.sides.place(ch, x, left); else ch.style.left = x + '%'; }
+    // the trip from room to room, and changing your mind on the way (sky/bathroom.js: "a trip from room to room")
+    var T = function () { return Sky.sides || {}; };
+    function ask(fn) { if (T().ask) T().ask(fn); else fn(); }
+    function setOff(cancel) { if (T().setOff) T().setOff(cancel); }
+    function through() { if (T().through) T().through(); }
+    function land(el, to, settle) { if (T().land) T().land(el, to, settle); else if (el) walk(el, to, settle); else settle(); }
+    function stop(el) { if (T().stop) T().stop(el); }
+    function headFor(where, fallback) { ask(function () { if (T().nav) T().nav(where); else fallback(); }); }
     function climbUp() {
         if (climbing || up || !body.classList.contains('in-hall') || (Sky.sides && Sky.sides.busy)) return;
         climbing = true;
         var go = function () {
+            through();
             if (hallMe) { hallMe.classList.remove('face-left'); hallMe.classList.add('up-ladder'); }
             var n = 0, steps = setInterval(function () { sfx('step', { size: 0.35 }); if (++n > 3) clearInterval(steps); }, 220);
             setTimeout(function () { openAttic(false); }, 750);
         };
-        if (hallMe) walk(hallMe, standAt(hallMe, pctOf(ladder, hall)), go); else go();
+        if (!hallMe) { go(); return; }
+        setOff(function () { stop(hallMe); climbing = false; });
+        walk(hallMe, standAt(hallMe, pctOf(ladder, hall)), go);
     }
     function openAttic(now) {
         up = true;
@@ -242,12 +253,13 @@
             body.classList.remove('attic-panning');
             if (hallMe) hallMe.classList.remove('up-ladder');
             me.classList.remove('out-of-hole');
-            walk(me, STAND, function () { me.classList.remove('face-left'); climbing = false; });
+            land(me, STAND, function () { me.classList.remove('face-left'); climbing = false; });
         }, 950);
     }
     function climbDown(now) {
         if (!up || (climbing && !now)) return;
         var shut = function () {
+            if (!now) through();
             up = false;
             if (now) body.classList.add('attic-now');
             body.classList.remove('in-attic');
@@ -258,23 +270,25 @@
             try { history.replaceState(null, '', body.classList.contains('in-hall') ? '#hallway' : location.pathname + location.search); } catch (e) {}
             if (now) { setTimeout(function () { body.classList.remove('attic-now'); climbing = false; }, 60); return; }
             if (hallMe) { place(hallMe, standAt(hallMe, pctOf(ladder, hall))); hallMe.classList.add('down-ladder'); }
-            setTimeout(function () { body.classList.remove('attic-panning'); if (hallMe) hallMe.classList.remove('down-ladder'); climbing = false; }, 950);
+            setTimeout(function () { body.classList.remove('attic-panning'); if (hallMe) hallMe.classList.remove('down-ladder'); land(null, 0, function () { climbing = false; }); }, 950);
         };
         if (now) { shut(); return; }
         climbing = true;
+        setOff(function () { stop(me); climbing = false; });
         walk(me, standAt(me, pctOf(hole, attic)), function () {
+            through();
             me.classList.add('into-hole');
             sfx('step', { size: 0.35 });
             setTimeout(shut, 650);
         });
     }
-    if (ladder) ladder.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); climbUp(); });
-    if (hole) hole.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); climbDown(false); });
+    if (ladder) ladder.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); headFor('attic', climbUp); });
+    if (hole) hole.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); headFor('hall', function () { climbDown(false); }); });
     document.addEventListener('keydown', function (e) {                    // (Escape up here: back down the hole, not all the way home)
         if (e.key !== 'Escape' || !up) return;
         if (body.classList.contains('inv-holding')) return;
         e.stopImmediatePropagation();
-        if (grim.classList.contains('open')) closeBook(); else climbDown(false);
+        if (grim.classList.contains('open')) closeBook(); else headFor('hall', function () { climbDown(false); });
     }, true);
     // off out of the hallway some other way (the place tabs): the attic's shut behind them
     (function hookSides(n) {
@@ -549,5 +563,5 @@
         }, 3300);
     }
 
-    Sky.attic = { up: function () { return up; }, open: function () { openAttic(true); }, climbDown: climbDown, openBook: openBook, get lamp() { return LAMP; } };
+    Sky.attic = { up: function () { return up; }, open: function () { openAttic(true); }, climbDown: climbDown, climbUp: climbUp, openBook: openBook, get lamp() { return LAMP; } };
 })();

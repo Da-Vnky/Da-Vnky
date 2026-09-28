@@ -1,6 +1,6 @@
 /* =====================================================================
-   revolver.js — the revolver, lying on the rooftop (and another on the living
-   space's floor, by the plant: something to play with). Pick it up and it's
+   revolver.js — the revolver: on the rooftop in reset 1, hung on the living
+   space's wall from reset 2 (never both; none in reset 4). Pick it up and it's
    in your bag; click it there and you're holding it (Esc puts it away).
    Then click:
      • the traveller — they take it to their own head. bang. back a
@@ -249,13 +249,15 @@
         return true;
     });
 
-    // reset 4 (27 Sep, Victor: so nothing can go wrong): the only revolver is the white one, from the grimoire's pact.
-    // the ordinary one isn't on the rooftop or on the living-room floor, and isn't in the bag
+    // where the ordinary revolver is (27 Sep, Victor): only ever one. reset 1: on the rooftop. from reset 2: hung on the
+    // living-room wall (.wall-revolver, on its rack), where it only jams on the traveller: a thing to shoot things with.
+    // reset 4 (so nothing can go wrong): nowhere, and not in the bag: the only revolver is the white one, from the pact
     (function () {
-        var S = window.davSave;
-        if (!S || S.reset !== 4) return;
-        document.querySelectorAll('.pickup[data-item="revolver"]').forEach(function (p) { p.remove(); });
-        if (I.has('revolver')) I.remove('revolver');
+        var S = window.davSave, r = S ? S.reset : 1;
+        document.querySelectorAll('.pickup[data-item="revolver"]').forEach(function (p) {
+            if (r === 4 || (r === 1) === p.classList.contains('wall-revolver')) p.remove();
+        });
+        if (r === 4 && I.has('revolver')) I.remove('revolver');
     })();
     // the white revolver stays theirs for the rest of reset 4 (the bag itself only lasts the visit)
     (function () {

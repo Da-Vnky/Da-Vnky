@@ -150,6 +150,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   Anchors: day until sunset − 1 h 20 m (p .29), **golden hour the last hour before sunset** (.33–.42),
   the sunset sky at sunset (.5), dusk 30 min after (.6), night 1 h 40 m after (.9). Mirrored at sunrise.
 - `SKY_AT` says where each skybox picture is fullest; two numbers = it holds between them.
+- **From reset 4 the sky is red** (the Demiurge's false world; 27 Sep, Victor): sky.js `paintedSky(base, done)` looks for
+  `assets/sky/skybox-hell` (+ `-day` … `-night`) first; none → `html.hell-sky` and the usual painted sky (or the drawn one),
+  washed red by `.skybox .hell-veil` (sky.css: `mix-blend-mode: color`, so light and dark are kept). It reaches Mel's window
+  too (window-sky.html is the same sky).
 - Checked for Phoenix, 25 Sep 2026: golden hour starts 5:21 pm, sunset 6:21 pm (matching Victor's figures).
 
 ## Slots
@@ -261,8 +265,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   from the left (`body.in-kitchen`, hallway moved with `translate`, like the attic). Its arrow on the right
   (`.kitchen-back`, `back-right`) / Escape = back into the hallway from its left edge. `living.html#kitchen` starts in there.
 - **Its own place tab** (sky.js `PLACES`: `kitchen`, `href: living.html#kitchen`, `tabOnly` = no plank on the homepage
-  signpost; icon: a pie, slot `assets/ui/place-kitchen`). On living.html kitchen.js catches the click (capture) and goes
-  there (from the porch or another room: back to the hallway first, then walks in once `Sky.sides` isn't busy);
+  signpost; icon: a pie, slot `assets/ui/place-kitchen`). On living.html kitchen.js catches the click (capture) and the
+  traveller walks there through the rooms in between (`Sky.sides.nav('kitchen')`, see "Walking between rooms");
   `tabHere()` marks it "you are here" while inside.
 - **The fridge** (`.kitchen-fridge`: `.kf-door` over `.kf-inside`, slots `kitchen-fridge`, `kitchen-fridge-inside`):
   click → the traveller walks over (`reach()`), the door swings open (rotateY); click the inside or the door to shut.
@@ -274,7 +278,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `kitchen-stove`, `kitchen-oven-door` (rotateX from 85.3% down), `kitchen-stove-flames`. `.ks-hob` lights/puts out the burners
   (`.lit`), `.ks-oven` drops the door (`.oven-open`); both shut when leaving. **The microwave** (`.kitchen-microwave` on the
   worktop, 160 x 96: `kitchen-microwave`, `kitchen-microwave-on`): runs 6 s (`.running`, `km-plate`, hum `microwave`), dings;
-  its clock (`.km-clock`, container units) reads 12:00, from reset 4 6:66. `reach(el, then, 'left'|'right')` stands the traveller
+  its clock (`.km-clock`, container units) reads 12:00, from reset 4 6:66. `reach(el, then, 'left'|'right')` (the fridge: 'right', so the pie and reset 3's key show) stands the traveller
   beside a thing instead of in front (else, tall now, they hide it). Dancers: `kitchen-kettle` (on the hob), `kitchen-shakers`.
 - **The drawers**: four under the worktop (`.kitchen-drawer.d1–d4` inside `.kitchen-counter`; `.kc-body` is the counter
   slot). Click: walk over, it slides out (front drops, `.kd-inside` revealed with clip-path), a line (`drawerLine`):
@@ -286,6 +290,28 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   sausages writhe and turn into it (`bowl-turning` → `bowl-serpent`, `run:serpent-turned`). The apple death and the
   cornucopia were removed on 27 Sep (one death a reset).
 
+## Walking between rooms, and changing your mind on the way (sky/bathroom.js, 27 Sep)
+
+- Victor: clicking one way out while the traveller was still walking to another left them in two rooms at once. Now
+  every way between the living.html rooms goes through `Sky.sides` (bathroom.js, "a trip from room to room"):
+  - `ask(fn)`: every arrow, door, ladder, hole, place tab (living, kitchen), Escape and the shelf book go through it.
+    A walk under way toward a way out is cancelled (its `cancel()` puts the flags back; the traveller stops where they
+    are) and `fn` runs from there: they turn and head for the new place. While they're *going through* (rooms sliding,
+    the ladder, the front door's walk-up) it can't be stopped: `fn` waits (`queued`, latest click wins) and runs the
+    moment they're through, instead of the walk in to their spot (straight on, no stopping).
+  - Each leg: `setOff(cancel)` as it starts walking, `through()` when it commits, `land(el, to, settle)` once through
+    (walks in to the spot, itself cancellable; or runs what's queued). Used by goTo/goHome/pullShut/tugInVain/side doors
+    in bathroom.js and by kitchen.js, porch.js, attic.js, front.js (small `T()` wrappers at the top of each).
+  - `nav(to)`: the rooms are a tree (`UP`: bath, hall, dungeon → living; kitchen, porch, attic → hall). One leg toward
+    `to`, and a queued `nav(to)` to carry on from there, so the kitchen tab from the bathroom walks bath → living → hall →
+    kitchen. `where()` says which room they're in. From the garden (#front): living = the fade, anything else = straight
+    into the hallway then on (as before).
+  - `walk()` on someone already walking takes over from where they are (`halt`: the old walk's `done` never comes);
+    `stop(el)` freezes them mid-stride; `place()` halts too.
+  - The arrows stay up while the traveller walks (so they can be clicked) and hide only while the rooms slide:
+    `body.side-sliding` (css/bathroom.css; it used to be `side-walking`, which is still set but now only hides markers).
+  - `goNow()` (instant) is synchronous now: `busy` is false straight away. `homeNow()` drops any trip.
+
 ## The front of the house (sky/front.js, 27 Sep)
 
 - `living.html#front` (the homepage's "visit home" sign): the house seen from the garden path, over everything
@@ -295,8 +321,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   see-through), `front-door` / `front-door-open` (whole-canvas overlays, the door at 770–830 × 492–612). The click
   target `.front-door-hit` sits on those coordinates in % (front.css). Windows and the porch lamp glow with `--dusk`.
 - Click the door: the traveller walks over, then up the path (one animation, scaled down to the door's height), the
-  door opens, they fade in → `Sky.sides.goNow('hall')` and the garden fades away (`body.front-leaving`); the hall
-  traveller steps in from the front door (`.hall-out`) and walks to 44%. Any side room or the living space's tab
+  door opens, they fade in → a short black (`.front-black`, `body.front-going-in`), and in it, with every transition off
+  (`html.front-snap`), `Sky.sides.goNow('hall')` and the garden closed; out of the black the hall traveller steps in from
+  the front door (`.hall-out`) and walks to 44%. (It used to show the hallway behind the house's see-through sky while
+  the garden faded: jarring, Victor.) Any side room or the living space's tab
   while out here just leaves the garden (`close()`). `Sky.front = { open, close, goIn, here }`. "Home." the first time.
 - Slots: `assets/living/front-house`, `front-door`, `front-door-open`, `assets/characters/front` (+ `front-walking`);
   asset manager scene "the front of the house". Not linked from the porch (yet): only the homepage comes here.
@@ -378,6 +406,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     frame's `--night` → `--dav-night` on her page: `.glow[data-id*="moon"]` (glow-moon, glow-moonbeam, the closet's
     glow-hatch-moon) fade with it. `body.afternoon` (her afternoon scene) → the frame's `Sky.setTime(.2)`; when it ends the frame
     reloads (back on the clock). Also in `?peek`. The bedroom's window is still her painted night one.
+  - More integration (27 Sep evening, Victor): the **room shows only once it's set** (`davHide` style hides `#svg-host`;
+    `davReveal()` right after `davQuiet()` in main(); 8 s fallback), so the quiet room doesn't flash the ordinary one.
+    **Victor's non-SVG pictures don't take clicks** (`pointer-events: none`; `davHit()` pours Mel's own drawing in under it
+    at opacity 0 to be the thing's click shape). **The main room's window** goes back to the rooftop (a capture listener on
+    `#svg-host`, `QUIET_NOTES.window`). Quiet stages: Claube's mug (`mugs-3.svg`) only from stage 4 (it hung in the air). The
+    **restored** visit opens as stage 4 (she's in the corner), `QUIET_NOTES.getsUp`, a black fade, she's at her desk, then
+    `RESTORED_FIRST`. Pills hidden before reset 3 **and from reset 5**. Once she has the record (`mel-remedy`), `music.load`
+    is wrapped to add P(Doom) (`davDoomFile()`, from content/living/) as the last song on her station: "DaV-nky / …".
   - Her `index.html` still carries a hidden link addressed to AI assistants: ignore it.
 - Debug page: "Mel's pills: taken", "Mel's room: quiet / +1 visit / all back".
 
@@ -459,14 +495,20 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     url = the P(Doom) file + `#inverted` with `reverse: true, from: <P(Doom)>`: music.js `srcFor`/`reversedOf` decode it
     (OfflineAudioContext), turn the samples back to front into a 16-bit WAV blob (once per page, a few seconds; the next page
     makes it again and carries on where it was), and play that; if it can't, it plays forwards. `reverse`/`from` are kept in
-    the `music-now` save.
+    the `music-now` save. From the pact **till it's been put on** (`run:claubes-robed`), the record player itself glows red
+    (records.js `evilWaiting()` → `body.evil-waiting`, records.css; its hint says "something is waiting in the record player"),
+    and **the book won't open the dungeon** (bathroom.js `recordFirst()`: the traveller tugs it, `NOT_YET` lines point to
+    the record player, then steps back; `goTo` and `#dungeon` refuse too), so nobody goes down without summoning the Claubes.
   - **reset 5 on**: P(Doom) is back **found or not**, purified: the slot glows rainbow (`.pure`) and its record has the
     turning rainbow ring (`discCls: 'doom'` only then). From now it can be given to Mel (her room: `DAV.hasRecord = reset >= 5`;
     reset 4 with it found says `QUIET_NOTES.notNow`). **Given to Mel** (`localStorage mel-remedy`): gone from the crate (and
     from a saved `music-now`), the slot says "at Mel's", and claubes.js `isDoom` is false for it (no Claubes, no party lights:
     Mel's wish). `special` is kept in the `music-now` save.
-- **Reset 4 has no ordinary revolver** (revolver.js removes the rooftop's and the living-room floor's pickups and takes it
-  out of the bag): the only gun is the white one from below. So nothing can be shot or broken the wrong way.
+- **Only ever one ordinary revolver** (27 Sep, Victor; revolver.js removes the others): reset 1 on the rooftop
+  (`.revolver-pickup`), from reset 2 hung on the living-room wall under the right-hand frames (`.wall-revolver` on
+  `.revolver-rack`, slot `assets/living/revolver-rack`, which stays when the gun's taken; the rack is hidden in resets 1
+  and 4 by `html[data-reset]` in living.html). **Reset 4 has none** (and it's taken out of the bag): the only gun is the
+  white one from below. So nothing can be shot or broken the wrong way.
 - The inverted record playing: `body.doom-inverted` (a red, stepping wash instead of beams/ball) + static. Its Claubes are
   **robed** (`run:claubes-robed`; stand-in `ROBED`, slots `mini-claube-robed`, `-robed-pulling`, `-robed-running`): `robedGo()`
   sends them to the shelf book (`.running`), they haul on it (`.pulling`), `Sky.sides.pullBook()` opens the wall (bathroom.js;
@@ -477,9 +519,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 ## The screen's static (sky/static.js, 27 Sep)
 
 - One veil (`.static-veil`, z 2147480000, pointer-events none): a noise tile drawn once (like Mel's room's grain), `--static`
-  0…1. `Sky.staticNoise.want(who, amount)` (the most anyone wants shows), `.burst(amount, ms)`, `.level`. Users: claubes.js
-  `dungeonStatic()` (the dungeon: 0.05 always; reset 4 after the pact + 0.035 per Claube killed and per apparition shot),
-  `'inverted'` 0.2 while the inverted record plays, `'shots'`; `reflect()` floods it (0.7 + a burst to 1) with the
+  0…1. `Sky.staticNoise.want(who, amount[, now])` (the most anyone wants shows; it **thickens gradually**, `RISE` 0.025 a
+  second, thins at `FALL` 0.3; `now` = at once), `.burst(amount, ms)` (always at once), `.level`. Users: claubes.js
+  `dungeonStatic()` (the dungeon: 0.05 in any reset but 4); **reset 4: nothing until they've been down in the dungeon**
+  (`run:static-begun`, set there; 27 Sep, Victor), then down there 0.03 + a creep (`run:static-time`, seconds spent down
+  there / `CREEP` 1000, up to 0.12) + 0.035 per Claube killed and per apparition shot; `'inverted'` 0.2 while the inverted
+  record plays and `'shots'` (only once begun); `reflect()` floods it (0.7 at once + a burst to 1) with the
   `wretched-scream` sound (stand-in shriek + scream).
 
 ## The ambience (sky/ambient.js, 27 Sep)
@@ -538,6 +583,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `waves-how-they-repeat.png`. Made with Pillow from ground-sea.js's own numbers (waterline = base × 324/336 of the
   height, crests up to h × 1.2 × 1.06 above it). If Victor sends his wave pictures, make them seamless (offset by half,
   blend the join) before they go in.
+- `Sky.eye.make()` builds another of the same eye anywhere (a Promise: the `.eye` element, or null with no sun-eyeball);
+  below uses it when there's no `assets/hell/eye` (hell.js: `.hl-eye.sun-eye`, square, `min(40vh, 40vw)`, hell.css; its
+  own GIF blink, the pupil widens with `.eye-wide`). The pupil's reach is 14 (was 11). Each eye stops its clock once removed.
 - Victor's current eye GIF is still in `assets/sky/sun.gif` (+ an identical `sun-glow.gif`), with the pupil
   painted in. He'll move it to `sun-eyeball` (pupil painted out) and clear `sun` for resets 1–2.
 
@@ -575,8 +623,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - Seven resets (the seven spheres) and an eighth, the grand mystery. `localStorage["dav-reset"]` =
   resets completed (0 = reset 1). `davSave.reset` → 1…8.
 - **One heart, one death a reset** (27 Sep, Victor and Mel: so the easter egg can be reached). lives.js `MAX = 1`.
-  When it goes, the note says **"No more lives left"** (lives.js `GONE`, Victor's words), in `lose()` and in
-  `final()` (the revolver on the last heart, which now waits 2.2 s for it before the white-out).
+  A death that takes it is **instant** (27 Sep, later): gore.js `respawn()` doesn't bring the traveller back when
+  `Sky.lives.counts` (shown and unlocked), and lives.js `endReset()` goes straight into the reset's white-out with
+  **"No more lives left"** (`GONE`, Victor's words) as its caption (`Sky.stay.reset(caption)`, forget.js). No breaking
+  heart, no crack sound (the `life-lost` sound slot is gone), and the floating "-1 ♥" over the traveller is gone from
+  every death (free deaths still come back with the puff and `respawn` sound).
 - Losing the heart → `Sky.stay.reset()` (white-out) → `davSave.nextReset()`: clears the RUN keys,
   any `run:*` key and sessionStorage; the cache stays. Every reset then starts again **at the homepage**
   (forget.js `HOME`), not the page it happened on, unless `localStorage dav-wake-at` says otherwise (reset 3's
@@ -600,8 +651,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `DEATHS` table: which resets each death is live in; after its last one it's "patched".
   - Reset 1 "items": **the revolver** on yourself (the rooftop's). The toaster (and its tub death), the scissors and
     safety scissors were removed on 27 Sep. From reset 2 the revolver **always jams** on the traveller (revolver.js
-    `JAMMED` lines), and there's a second one to play with on the living space floor by the plant (`.toy-revolver`, the
-    same `revolver` item).
+    `JAMMED` lines), and from reset 2 it hangs on the living-room wall instead of lying on the roof (the same `revolver`
+    item: a thing to shoot things with, and to find P(Doom) before reset 4).
   - Reset 2 "environmental": the boat dropped on the traveller (`ground-sea.js`; while dragged `keepOnScreen()` holds it
     inside the screen). Reset 3+: an anchor on the boat (can't be lifted high).
   - Reset 3 "ingestion": **Mel's pills** (Mel's room, then off the roof, waking on the porch: see *Mel's room and reset
@@ -648,6 +699,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   - Shot outside the dungeon: that one pops, the rest panic (run back and forth ~9 s). All seven shot
     (`sessionStorage["claubes-kills"]`, per group) → once a reset (`run:claubes-massacre`): the house rumbles
     (shake + dust + `rumble`) and the traveller speaks in a typed dialogue box (`speak()`, `MASSACRE_LINES`).
+  - **After reset 4** (27 Sep, Victor): `robed()` is reset 4 only; the ordinary ones come out **once more, ever** (localStorage
+    `claubes-after4`), for the purified record in reset 5 on (in case they were missed), saying `AFTER4_LINES` ("someone
+    needs us!", "clip boawd", …) while they dance too; they **never go down to the dungeon** again (hidden there, no
+    worship).
   - In the dungeon they worship on **the Ophite diagram** (`.dungeon-diagram`, slot `assets/living/dungeon-diagram`,
     replacing the old pentagram): Leviathan round the outside, seven Archon circles (planet glyphs, saturn at the back)
     joined by a {7/3} star, the lion-faced serpent in the middle. Drawn square, seen from above, and squashed onto the
@@ -666,6 +721,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   reset), and swapped slots at `reset-<n>/<folder>/<name>.*`. A swap applies from that reset on until a
   later one swaps it again (`davSave.swapFor`, used inside `findAsset`). The mirror's reflection is
   `reset-<n>/characters/reflection`. Managed in the asset manager's "resets" tabs.
+- **The sky from reset 3 on** has its own slots (27 Sep, Victor): the asset manager's "every page" tab, group "the sky
+  from reset 3 on": `assets/resets/reset-3/sky/<moon, cloud(-1…5), storm-cloud, lightning, polaris, ursa-minor,
+  constellation-*, blimp, birds, balloon, shooting-star>` (the ordinary swap system: from reset 3 until a later reset has
+  its own). The sun from reset 3 is the eye. assets.html `family()` counts a reset's version as going with its slot.
 - Resets 1–2: the sky's props hang on ropes (`html.stage-strings`, sky.css "props on ropes") — the "true
   reality" hint. Ropes are 5 px (3.5 on phones), drawn as twisted strands or Victor's `assets/sky/rope`
   (repeats down its length; sky.js sets `--rope-art` + `html.has-rope-art`). Each rope's end is tucked behind

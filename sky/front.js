@@ -64,11 +64,17 @@
     }
 
     // the front door: up the path, the door opens, and in they go (to the hallway)
+    // the trip from room to room, and changing your mind on the way (sky/bathroom.js: "a trip from room to room")
+    var T = function () { return Sky.sides || {}; };
+    function ask(fn) { if (T().ask) T().ask(fn); else fn(); }
     function goIn() {
         if (!here || busy) return;
         busy = true;
         var r = me.getBoundingClientRect(), d = hit.getBoundingClientRect();
+        // (somewhere else instead, on the way to the path: they stop where they are)
+        if (T().setOff) T().setOff(function () { if (T().stop) T().stop(me); busy = false; });
         walk(me, standAt(me, pctOf(hit)), function () {
+            if (T().through) T().through();
             r = me.getBoundingClientRect();
             var scale = Math.max(0.2, Math.min(1, d.height * 0.95 / r.height));
             var dx = (d.left + d.width / 2) - (r.left + r.width / 2), dy = d.bottom - r.bottom;
@@ -86,18 +92,34 @@
             };
         });
     }
+    // in through the door (27 Sep, Victor: the hallway used to show up behind the see-through sky of the house while
+    // the garden faded, and things slid): a short black, the hallway set up in it with nothing moving, and out of the
+    // black the traveller steps in from the front door
+    var black = document.createElement('div');
+    black.className = 'front-black';
+    black.setAttribute('aria-hidden', 'true');
+    body.appendChild(black);
     function inside() {
-        // the hallway, underneath; the garden fades away over it
-        if (Sky.sides && Sky.sides.goNow) Sky.sides.goNow('hall');
-        close(true);
-        if (!hallMe) return;
-        var at = out ? standAt(hallMe, pctOf(out)) : 50;
+        body.classList.add('front-going-in');
         setTimeout(function () {
-            place(hallMe, at);
-            setTimeout(function () { sfx('door', { size: 0.4 }); walk(hallMe, 44, function () { hallMe.classList.remove('face-left'); }); }, 500);
-        }, 60);
+            var root = document.documentElement;
+            root.classList.add('front-snap');                              // (no transitions while it's all put in place)
+            if (Sky.sides && Sky.sides.goNow) Sky.sides.goNow('hall');
+            close(false);
+            if (hallMe) place(hallMe, out ? standAt(hallMe, pctOf(out)) : 50);
+            requestAnimationFrame(function () { requestAnimationFrame(function () {
+                root.classList.remove('front-snap');
+                body.classList.remove('front-going-in');
+                busy = false;
+                var settle = function () { if (hallMe) hallMe.classList.remove('face-left'); };
+                setTimeout(function () {
+                    if (hallMe) sfx('door', { size: 0.4 });
+                    if (T().land) T().land(hallMe, 44, settle); else if (hallMe) walk(hallMe, 44, settle);
+                }, 350);
+            }); });
+        }, 500);
     }
-    if (hit) hit.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); goIn(); });
+    if (hit) hit.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); ask(goIn); });
 
     // off somewhere else (a side room, a place tab): the garden's left behind
     (function hookSides(n) {
@@ -109,8 +131,12 @@
         var t = e.target.closest && e.target.closest('.place-tab[data-place=living]');
         if (!t || !here) return;
         e.preventDefault(); e.stopPropagation();
-        close(true);
-        try { history.replaceState(null, '', location.pathname + location.search); } catch (err) {}
+        // (on the way in through the door already: into the hallway first, then on to the living space)
+        ask(function () {
+            if (!here) { if (T().nav) T().nav('living'); return; }
+            close(true);
+            try { history.replaceState(null, '', location.pathname + location.search); } catch (err) {}
+        });
     }, true);
 
     if (location.hash === '#front') open();

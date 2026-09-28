@@ -85,12 +85,12 @@
         if (!w || !/^[a-z0-9-]+\.html(#[a-z0-9-]+)?$/i.test(w)) return HOME;
         try { return new URL(w, HOME).href; } catch (e) { return HOME; }
     }
-    function reset(how) {
+    function reset(how, caption) {
         var S = window.davSave;
         if (busy) return;
         busy = true;
         var to = wakeAt();
-        whiteOut('assets/ui/reset-screen|assets/ui/forget-screen', '', function () {
+        whiteOut('assets/ui/reset-screen|assets/ui/forget-screen', caption || '', function () {
             if (typeof how === 'function') return Promise.resolve(how());
             if (S) S.nextReset();
             return Promise.resolve();
@@ -138,5 +138,5 @@
         status: function () { return ''; }
     });
 
-    Sky.stay = { forget: forget, reset: function () { reset(); }, get resets() { return window.davSave ? window.davSave.reset : 1; } };
+    Sky.stay = { forget: forget, reset: function (caption) { reset(null, caption); }, get resets() { return window.davSave ? window.davSave.reset : 1; } };
 })();

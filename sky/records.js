@@ -458,7 +458,20 @@
             return songs.length ? Object.assign({}, e, { songs: songs }) : null;
         }).filter(Boolean);
     }
-    function refill() { entries = visible(); special = specialNow(); flatten(); M.setTracks(tracks.slice()); drawSleeves(); drawNow(); }
+    function refill() { entries = visible(); special = specialNow(); flatten(); M.setTracks(tracks.slice()); drawSleeves(); drawNow(); evilGlow(); }
+    // reset 4, once the pact's made and till the inverted record's been put on (27 Sep, Victor): the record player glows red
+    // and evil, calling them to it (body.evil-waiting, records.css). putting it on calls the robed Claubes out (sky/claubes.js),
+    // and until then the book won't open the dungeon (sky/bathroom.js says why)
+    function evilWaiting() {
+        var S = window.davSave;
+        return resetNo() === 4 && !!S && S.get('grimoire-pact') === '1' && S.get('claubes-robed') !== '1' && !!special && special.special === 'inverted';
+    }
+    function evilGlow() {
+        var on = evilWaiting(), hint = deck && deck.querySelector('.tt-hint');
+        document.body.classList.toggle('evil-waiting', on);
+        if (hint) hint.textContent = on ? 'something is waiting in the record player' : 'the record player';
+    }
+    setInterval(evilGlow, 1500);
     Sky.records = {
         reload: refill,
         // shot: the whole record's gone (an album: every song on it)

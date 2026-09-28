@@ -58,18 +58,29 @@
     }
 
     /* ---------------- through the doorway, and back ---------------- */
-    var busy = false, inside = false;
+    var busy = false, inside = false, leaving = false;
     function pctOf(el, host) { var r = el.getBoundingClientRect(), hr = host.getBoundingClientRect(); return (r.left + r.width / 2 - hr.left) / (hr.width || window.innerWidth) * 100; }
     function standAt(ch, x) { return x - (ch.offsetWidth / 2) / (ch.parentNode.clientWidth || window.innerWidth) * 100; }
     function walk(ch, x, done) { if (Sky.sides && Sky.sides.walk) Sky.sides.walk(ch, x, done); else { ch.style.left = x + '%'; if (done) setTimeout(done, 300); } }
     function place(ch, x, left) { if (Sky.sides && Sky.sides.place) Sky.sides.place(ch, x, left); else ch.style.left = x + '%'; }
     function sidesBusy() { return !!(Sky.sides && Sky.sides.busy); }
+    // the trip from room to room, and changing your mind on the way (sky/bathroom.js: "a trip from room to room")
+    var T = function () { return Sky.sides || {}; };
+    function ask(fn) { if (T().ask) T().ask(fn); else fn(); }
+    function setOff(cancel) { if (T().setOff) T().setOff(cancel); }
+    function through() { if (T().through) T().through(); }
+    function land(el, to, settle) { if (T().land) T().land(el, to, settle); else if (el) walk(el, to, settle); else settle(); }
+    function stop(el) { if (T().stop) T().stop(el); }
     function goIn() {
         if (busy || inside || !body.classList.contains('in-hall') || sidesBusy() || body.classList.contains('in-attic') || (Sky.porch && Sky.porch.outside)) return;
         busy = true;
-        body.classList.add('side-walking');                                // (the arrows hide while they walk)
+        body.classList.add('side-walking');
+        if (!hallMe) { openKitchen(false); return; }
         // off the hallway's left edge; the kitchen slides in as they reach it
-        if (hallMe) { walk(hallMe, -14); setTimeout(function () { openKitchen(false); }, 650); } else openKitchen(false);
+        var secs = T().walkSecs ? T().walkSecs(hallMe, -14) : 1, timer;
+        setOff(function () { clearTimeout(timer); stop(hallMe); busy = false; body.classList.remove('side-walking'); });
+        walk(hallMe, -14);
+        timer = setTimeout(function () { openKitchen(false); }, Math.max(650, (secs - 0.8) * 1000));
     }
     // its tab, among the place tabs on the right: "you are here" while you're in here
     function tab() { return document.querySelector('.place-tab[data-place=kitchen]'); }
@@ -81,24 +92,14 @@
         if (nm) nm.textContent = 'the kitchen' + (on ? ' · you are here' : '');
         if (on) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current');
     }
-    // the tab, clicked while on this page: straight here (from the hallway, walking; from anywhere else, the hallway first)
+    // the tab, clicked while on this page: the traveller makes their way here, through the rooms in between
+    // (27 Sep: they used to jump straight to the hallway; now they walk, and a click on the way sends them elsewhere)
     window.addEventListener('click', function (e) {
         var a = e.target.closest && e.target.closest('.place-tab[data-place=kitchen]');
         if (!a) return;
         e.preventDefault(); e.stopPropagation();
-        if (inside || busy) return;
-        if (Sky.porch && Sky.porch.outside) Sky.porch.inNow();
-        else if (!body.classList.contains('in-hall') && Sky.sides) {
-            if (Sky.sides.inSide && Sky.sides.homeNow) Sky.sides.homeNow();
-            if (Sky.sides.goNow) Sky.sides.goNow('hall');
-        }
-        // (once the traveller's settled in the hallway: they may still be walking in)
-        var tries = 0;
-        (function tryIn() {
-            if (inside) return;
-            if (body.classList.contains('in-hall') && !sidesBusy() && !busy) goIn();
-            else if (tries++ < 30) setTimeout(tryIn, 150);
-        })();
+        if (inside && !leaving) return;                                    // (here already, or on the way in)
+        ask(function () { if (T().nav) T().nav('kitchen'); else goIn(); });
     }, true);
     function openKitchen(now) {
         inside = true;
@@ -110,15 +111,17 @@
         if (Sky.fillAssets) Sky.fillAssets(kit);
         turnSerpent();
         if (now) { place(me, ENTER - 20); setTimeout(function () { body.classList.remove('kitchen-now'); busy = false; }, 60); return; }
+        through();
         place(me, 96, true);
         setTimeout(function () {
-            body.classList.remove('kitchen-panning', 'side-walking');
-            walk(me, ENTER - 14, function () { busy = false; });
+            body.classList.remove('kitchen-panning');
+            land(me, ENTER - 14, function () { busy = false; body.classList.remove('side-walking'); me.classList.remove('face-left'); });
         }, 900);
     }
     function goOut(now) {
         if (!inside || (busy && !now)) return;
         var shut = function () {
+            leaving = false;
             inside = false;
             tabHere(false);
             shutAll(true);
@@ -128,24 +131,26 @@
             try { history.replaceState(null, '', body.classList.contains('in-hall') ? '#hallway' : location.pathname + location.search); } catch (e) {}
             if (now) { if (hallMe) place(hallMe, 30); setTimeout(function () { body.classList.remove('kitchen-panning', 'kitchen-now'); busy = false; }, 60); return; }
             // back into the hallway from its left edge
+            through();
             if (hallMe) place(hallMe, -6);
             body.classList.add('side-walking');
             setTimeout(function () {
                 body.classList.remove('kitchen-panning');
-                var done = function () { busy = false; body.classList.remove('side-walking'); if (hallMe) hallMe.classList.remove('face-left'); };
-                if (hallMe) walk(hallMe, 30, done); else done();
+                land(hallMe, 30, function () { busy = false; body.classList.remove('side-walking'); if (hallMe) hallMe.classList.remove('face-left'); });
             }, 900);
         };
         if (now) { shut(); return; }
-        busy = true;
+        busy = true; leaving = true;
+        setOff(function () { stop(me); busy = false; leaving = false; });
         walk(me, 94, function () { sfx('step', { size: 0.35 }); shut(); });
     }
-    if (door) door.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); goIn(); });
-    if (back) back.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); goOut(false); });
+    function toHall() { ask(function () { if (T().nav) T().nav('hall'); else goOut(false); }); }
+    if (door) door.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); ask(function () { if (T().nav) T().nav('kitchen'); else goIn(); }); });
+    if (back) back.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); toHall(); });
     document.addEventListener('keydown', function (e) {                   // (Escape in here: back to the hallway, not all the way home)
         if (e.key !== 'Escape' || !inside || body.classList.contains('inv-holding')) return;
         e.stopImmediatePropagation();
-        goOut(false);
+        toHall();
     }, true);
     (function hookSides(n) {                                                // (off out of the hallway some other way: shut behind them)
         if (Sky.sides && Sky.sides.on) Sky.sides.on(function (what, name) { if (name === 'hall' && what === 'leave' && inside) goOut(true); });
@@ -180,7 +185,7 @@
         fridge.querySelector('.kf-door').addEventListener('click', function (e) {
             e.preventDefault(); e.stopPropagation();
             if (fridge.classList.contains('open')) { fridgeOpen(false); return; }
-            reach(fridge, function () { fridgeOpen(true); });
+            reach(fridge, function () { fridgeOpen(true); }, 'right');                  // (beside it, so the pie (and reset 3's key) can be seen)
         });
         fridge.querySelector('.kf-inside').addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); fridgeOpen(false); });
     }

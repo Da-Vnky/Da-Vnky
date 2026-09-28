@@ -17,7 +17,9 @@
    Kept in the visitor's browser between visits (localStorage), until the next reset.
    slots: assets/ui/heart (the life), assets/ui/heart-empty (lost),
           assets/ui/lives-lock (the lock on it), assets/ui/lives-frame (behind it)
-   sounds: assets/sounds/life-lost, lives-found (the page makes a chime and a crack until then)
+   sounds: assets/sounds/lives-found (the page makes a chime until then)
+   A death that takes the heart is instant (27 Sep, Victor): straight into the reset's white-out, "No more lives
+   left" written on it (sky/forget.js). Deaths that don't count (before the key) bring the traveller back.
    ===================================================================== */
 
 (function () {
@@ -113,25 +115,25 @@
         lastDeath = now;
         if (pending && now - pending.at < 30000 && S) S.set('spent-' + kindOf(pending.kind), '1');
         pending = null;
-        lose(300);
+        lose();
     });
+    // the heart goes, and the world with it, there and then (27 Sep, Victor: an instant death, straight into the reset's
+    // white-out, "No more lives left" written on it; no breaking heart, no wait)
     var resetting = false;
-    function lose(after) {
+    function lose() {
         if (resetting) return;
         var n = left() - 1;
         put('lives-left', Math.max(0, n));
-        setTimeout(function () {
-            draw(Math.max(0, n));
-            sfx('life-lost', { or: 'crack' });
-            if (n > 0) { say(n === 1 ? 'one life left.' : n + ' lives left.'); return; }
-            // the last one: everything goes
-            resetting = true;
-            say(GONE);
-            setTimeout(function () {                                   // and on to the next reset (sky/state.js, sky/forget.js)
-                if (Sky.stay && Sky.stay.reset) Sky.stay.reset();
-                else if (window.davSave) { window.davSave.nextReset(); location.reload(); }
-            }, 2600);
-        }, after);
+        draw();
+        if (n > 0) { say(n === 1 ? 'one life left.' : n + ' lives left.'); return; }
+        endReset();
+    }
+    function endReset() {
+        resetting = true;
+        put('lives-left', 0);
+        draw();
+        if (Sky.stay && Sky.stay.reset) Sky.stay.reset(GONE);             // on to the next reset (sky/state.js, sky/forget.js)
+        else if (window.davSave) { window.davSave.nextReset(); location.reload(); }
     }
     document.addEventListener('dav:dungeon-found', function () { maybeShow(); });
     // from reset 2: there from the first page of the reset
@@ -184,18 +186,9 @@
         // from reset 2, until the key: every way to die is off (true = refused, and the traveller's said why)
         get locked() { return ALWAYS && !unlocked(); },
         refuse: refuse,
-        final: function () {
-            if (resetting) return;
-            resetting = true;
-            put('lives-left', 0);
-            draw(0);
-            sfx('life-lost', { or: 'crack' });
-            say(GONE);                                                     // (and a moment to read it before the world goes)
-            setTimeout(function () {
-                if (Sky.stay && Sky.stay.reset) Sky.stay.reset();
-                else if (window.davSave) { window.davSave.nextReset(); location.reload(); }
-            }, 2200);
-        },
+        final: function () { if (!resetting) endReset(); },
+        // a death now would take the heart (and end the reset): sky/gore.js doesn't bring them back for it
+        get counts() { return shown() && unlocked(); },
         give: function (k) { put('lives-left', Math.min(MAX, left() + (k || 1))); draw(); }
     };
 })();

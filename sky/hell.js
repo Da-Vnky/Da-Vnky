@@ -125,6 +125,17 @@
         if (from) { var c = from.cloneNode(true); c.classList.add('placeholder'); c.classList.remove('art'); who.appendChild(c); }
         Sky.findAsset('assets/characters/hell', function (u) { if (u) who.innerHTML = '<img alt="" src="' + u + '">'; });
         if (Sky.fillAssets) Sky.fillAssets(h);
+        // no eye of its own for down here (assets/hell/eye)? then the sun's eye (sky/eye.js: sun-eyeball, sun-pupil), if
+        // it's drawn: the same one, its pupil following the pointer (27 Sep, Victor)
+        Sky.findAsset('assets/hell/eye', function (u) {
+            if (u || !Sky.eye || !Sky.eye.make) return;
+            Sky.eye.make().then(function (e) {
+                if (!e) return;
+                var box = h.querySelector('.hl-eye');
+                box.classList.add('sun-eye');
+                box.appendChild(e);
+            });
+        });
         // the eye (the drawn one) looks at whatever moves
         var iris = h.querySelector('.hl-iris');
         eyeTrack = function (e) {

@@ -477,11 +477,13 @@
     }
     function slotInfo(slot) { return allSlots().filter(function (x) { return x.slot === slot; })[0] || { slot: slot, what: '', kind: kindOf(slot) }; }
     function short(slot) { return slot.split('/').pop(); }
-    // the slots that go with one: its other states and poses (fridge + fridge-inside, frame-1 + frame), its glow twin
+    // the slots that go with one: its other states and poses (fridge + fridge-inside, frame-1 + frame), its glow twin, its reset versions
     function family(slot, pool) {
         var out = [];
+        function plain(x) { return x.replace(/^assets\/resets\/reset-[1-8]\//, 'assets/'); }   // (a reset's own version goes with it too)
         pool.forEach(function (s) {
             if (s.slot === slot) return;
+            if (plain(s.slot) === plain(slot)) { out.push(s); return; }
             var a = s.slot.length < slot.length ? s.slot : slot, b = a === slot ? s.slot : slot;
             if (b.indexOf(a + '-') !== 0 || /^assets\/mel-room\/[a-z]+$/.test(a)) return;    // (Mel's room: the backdrop isn't every thing's family)
             out.push(s);

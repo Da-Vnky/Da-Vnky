@@ -57,16 +57,26 @@
         return !body.classList.contains('in-hall') || body.classList.contains('in-attic') || body.classList.contains('in-kitchen') ||
                (Sky.sides && Sky.sides.busy) || (Sky.kitchen && Sky.kitchen.inside);
     }
+    // the trip from room to room, and changing your mind on the way (sky/bathroom.js: "a trip from room to room")
+    var T = function () { return Sky.sides || {}; };
+    function ask(fn) { if (T().ask) T().ask(fn); else fn(); }
+    function setOff(cancel) { if (T().setOff) T().setOff(cancel); }
+    function through() { if (T().through) T().through(); }
+    function land(el, to, settle) { if (T().land) T().land(el, to, settle); else if (el) walk(el, to, settle); else settle(); }
+    function stop(el) { if (T().stop) T().stop(el); }
     function goOut() {
         if (busy || outside || elsewhere()) return;
         busy = true;
         body.classList.add('side-walking');
         var step = function () {
+            through();
             if (hallMe) hallMe.classList.add('stepping-out');
             sfx('door', { size: 0.5 });
             setTimeout(function () { openPorch(false); }, 450);
         };
-        if (hallMe) walk(hallMe, standAt(hallMe, pctOf(out, hall)), function () { hallMe.classList.remove('face-left'); step(); }); else step();
+        if (!hallMe) { step(); return; }
+        setOff(function () { stop(hallMe); busy = false; body.classList.remove('side-walking'); });
+        walk(hallMe, standAt(hallMe, pctOf(out, hall)), function () { hallMe.classList.remove('face-left'); step(); });
     }
     function openPorch(now) {
         outside = true;
@@ -80,15 +90,17 @@
             setTimeout(function () { body.classList.remove('porch-now', 'side-walking'); busy = false; arrived(); }, 60);
             return;
         }
+        through();
         place(me, DOOR);
         setTimeout(function () {
             body.classList.remove('porch-panning');
-            walk(me, STAND, function () { busy = false; body.classList.remove('side-walking'); arrived(); });
+            land(me, STAND, function () { busy = false; body.classList.remove('side-walking'); me.classList.remove('face-left'); arrived(); });
         }, 900);
     }
     function goIn(now) {
         if (!outside || (busy && !now)) return;
         var shut = function () {
+            if (!now) through();
             outside = false;
             quiet();
             body.classList.add(now ? 'porch-now' : 'porch-panning');
@@ -100,22 +112,23 @@
             if (now) { setTimeout(function () { body.classList.remove('porch-panning', 'porch-now', 'side-walking'); busy = false; }, 60); return; }
             setTimeout(function () {
                 body.classList.remove('porch-panning');
-                var done = function () { busy = false; body.classList.remove('side-walking'); if (hallMe) hallMe.classList.remove('face-left'); };
-                if (hallMe) walk(hallMe, 44, done); else done();
+                land(hallMe, 44, function () { busy = false; body.classList.remove('side-walking'); if (hallMe) hallMe.classList.remove('face-left'); });
             }, 900);
         };
         if (now) { shut(); return; }
         busy = true;
         body.classList.add('side-walking');
+        setOff(function () { stop(me); busy = false; body.classList.remove('side-walking'); });
         walk(me, DOOR, function () { sfx('door', { size: 0.5 }); shut(); });
     }
-    if (out) out.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); goOut(); });
-    if (back) back.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); goIn(false); });
-    if (door) door.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); goIn(false); });
+    function headFor(where, fallback) { ask(function () { if (T().nav) T().nav(where); else fallback(); }); }
+    if (out) out.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); headFor('porch', goOut); });
+    if (back) back.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); headFor('hall', function () { goIn(false); }); });
+    if (door) door.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); headFor('hall', function () { goIn(false); }); });
     document.addEventListener('keydown', function (e) {                   // (Escape out here: back into the hallway)
         if (e.key !== 'Escape' || !outside || body.classList.contains('inv-holding')) return;
         e.stopImmediatePropagation();
-        goIn(false);
+        headFor('hall', function () { goIn(false); });
     }, true);
     (function hookSides(n) {                                                // (out of the hallway some other way: back in behind them)
         if (Sky.sides && Sky.sides.on) Sky.sides.on(function (what, name) { if (name === 'hall' && what === 'leave' && outside) goIn(true); });

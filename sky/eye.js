@@ -16,6 +16,9 @@
                    close over it. without it, the pupil squashes and hides itself
                    in step with the blink instead (BLINK below).
 
+   Sky.eye.make() builds another of the same eye, anywhere (below, in reset 4:
+   sky/hell.js uses it when there's no assets/hell/eye of its own).
+
    A web page can't ask a GIF which frame it's showing, so this reads the GIF's
    frames itself and plays them, one clock for the eyeball, the pupil and the
    lids: they can never drift apart.
@@ -31,17 +34,16 @@
     var START = 192, GROWN = 320, STEPS = 4;
     // the pupil: its centre in the eye (% across, % down), its width (% of the eye's width),
     // and how far it can look (% of the eye's width)
-    var EYE = { x: 50, y: 50, size: 34, reach: 11 };
+    var EYE = { x: 50, y: 50, size: 34, reach: 14 };          // (reach: a little more room to look about, 27 Sep, Victor)
     // without eyelids: how tall the pupil is on each frame, counting from 1 as your animation program
     // does (1 = open, 0 = hidden). frames that aren't listed: open.
     var BLINK = { 4: 0.45, 5: 0.12, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0.5 };
 
     var S = window.davSave;
-    if (S && S.reset < FROM) { Sky.eye = { on: false }; return; }
+    var sunOn = !(S && S.reset < FROM);                  // (the eye in the sky; Sky.eye.make() builds one anywhere, in any reset: below, sky/hell.js)
     var grown = Math.min(1, Math.max(0, ((S && S.reset) || FROM) - FROM) / STEPS), px = Math.round(START + (GROWN - START) * grown);
     var SIZE = 'min(' + px + 'px, ' + (px / 12).toFixed(1) + 'vw)';
     var sun = document.querySelector('.sun');
-    if (!sun) return;
 
     // its look is in sky/css/eye.css (linked from each page's head); these are the values it takes from here
     document.documentElement.style.setProperty('--eye-size', SIZE);
@@ -180,10 +182,22 @@
     }
 
     /* ---------------- the eye ---------------- */
-    Promise.all([find('assets/sky/sun-eyeball'), find('assets/sky/sun-pupil'), find('assets/sky/sun-eyelids')]).then(function (u) {
-        if (!u[0]) { Sky.eye = { on: false }; return; }                             // no eye drawn yet: the ordinary sun
-        var isGif = function (x) { return x && /\.gif(\?|$)/i.test(x); };
-        return Promise.all([isGif(u[0]) ? fetchGif(u[0]) : null, isGif(u[2]) ? fetchGif(u[2]) : null]).then(function (g) { build(u, g[0], g[1]); });
+    // its pictures, found and read once; make() builds an eye from them (null: no eye drawn yet), as often as it's wanted
+    var parts = null;
+    function load() {
+        return parts || (parts = Promise.all([find('assets/sky/sun-eyeball'), find('assets/sky/sun-pupil'), find('assets/sky/sun-eyelids')]).then(function (u) {
+            if (!u[0]) return null;
+            var isGif = function (x) { return x && /\.gif(\?|$)/i.test(x); };
+            return Promise.all([isGif(u[0]) ? fetchGif(u[0]) : null, isGif(u[2]) ? fetchGif(u[2]) : null]).then(function (g) { return { u: u, ball: g[0], lids: g[1] }; });
+        }));
+    }
+    function make() { return load().then(function (p) { return p ? build(p.u, p.ball, p.lids) : null; }); }
+    Sky.eye = { on: false, make: make, EYE: EYE, BLINK: BLINK };
+    if (sunOn && sun) make().then(function (eye) {                               // (no eye drawn yet: the ordinary sun)
+        if (!eye) return;
+        sun.appendChild(eye);
+        sun.classList.add('eye-sun');
+        Sky.eye.on = true;
     });
 
     function build(u, ballGif, lidsGif) {
@@ -200,13 +214,13 @@
         var lids = lidsGif ? gifPlayer(lidsGif, 'e-lids') : null;
         if (lids) eye.appendChild(lids.el);
         else if (u[2] && !lidsGif) eye.appendChild(Object.assign(document.createElement('img'), { className: 'e-lids', alt: '', src: u[2] }));
-        sun.appendChild(eye);
-        sun.classList.add('eye-sun');
 
         // one clock for all of it: the eyeball's own frame timing
         if (ball) {
             var fr = 0, due = 0, last = 0;
             var tick = function (now) {
+                if (eye.isConnected) eye._shown = true;
+                else if (eye._shown) return;                                       // (taken away again: stop)
                 if (!last) { last = now; due = now + ballGif.frames[0].delay; }
                 if (now - last > 2000) due = now;                                  // (back from another tab: carry on from here)
                 last = now;
@@ -236,6 +250,7 @@
         document.addEventListener('pointerdown', function (e) { aim(e.clientX, e.clientY); }, { passive: true });
         document.addEventListener('mouseleave', function () { want = null; pupil.style.transform = ''; });
         Sky.onFrame(function () { if (want && !queued) { queued = true; requestAnimationFrame(look); } });
-        Sky.eye = { on: true, frames: ballGif ? ballGif.frames.length : 1, EYE: EYE, BLINK: BLINK };
+        Sky.eye.frames = ballGif ? ballGif.frames.length : 1;
+        return eye;
     }
 })();

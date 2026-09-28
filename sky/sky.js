@@ -245,7 +245,10 @@
          assets/sky/skybox-sunset   sunset                   assets/sky/skybox-dusk     after sunset
          assets/sky/skybox-night    midnight
        or just one, assets/sky/skybox: it's tinted toward evening and night by itself.
-       wide pictures (1920 x 1080 or bigger) that can be cropped at the sides; horizon low. */
+       wide pictures (1920 x 1080 or bigger) that can be cropped at the sides; horizon low.
+       FROM RESET 4 (27 Sep, Victor): the sky of the Demiurge's false world, red as his fire. your own: the same names
+       with -hell (assets/sky/skybox-hell, or skybox-hell-day … skybox-hell-night). until there's one, whatever sky
+       there is (painted or drawn) is washed red (html.hell-sky, sky.css). */
     var SKYBOX = [['day', 0], ['golden', 0.33], ['sunset', 0.5], ['dusk', 0.6], ['night', 0.9]];
     // where each picture is at its fullest, on the sky's time (0 = noon, 0.5 = sunset, 1 = midnight). two numbers:
     // it holds between them. on the visitor's real clock: day until an hour and 20 minutes before sunset, golden
@@ -253,27 +256,43 @@
     var SKY_AT = { day: [0, 0.29], golden: [0.33, 0.42], sunset: [0.5], dusk: [0.6], night: [0.9] };
     var skybox = document.createElement('div');
     skybox.className = 'skybox';
-    skybox.innerHTML = SKYBOX.map(function (k) { return '<div data-sky="' + k[0] + '"></div>'; }).join('') + '<div data-sky="one"></div><div class="skybox-tint"></div>';
+    skybox.innerHTML = SKYBOX.map(function (k) { return '<div data-sky="' + k[0] + '"></div>'; }).join('') + '<div data-sky="one"></div><div class="skybox-tint"></div><div class="hell-veil"></div>';
     backdrop.insertBefore(skybox, backdrop.firstChild);
     var skyLayers = [], skyOne = null;
-    SKYBOX.forEach(function (k) {
-        findAsset('assets/sky/skybox-' + k[0], function (url) {
-            if (!url) return;
-            var el = skybox.querySelector('[data-sky="' + k[0] + '"]');
-            el.style.backgroundImage = 'url("' + new URL(url, location.href).href + '")';
-            SKY_AT[k[0]].forEach(function (at) { skyLayers.push({ el: el, at: at }); });
-            skyLayers.sort(function (a, b) { return a.at - b.at; });
-            body.classList.add('has-skybox');
-            kick();
+    // one set of painted skies (base: assets/sky/skybox or assets/sky/skybox-hell); done(found any) once all are looked for
+    function paintedSky(base, done) {
+        var left = SKYBOX.length + 1, found = false;
+        function one(url) { if (url) found = true; if (--left === 0 && done) done(found); }
+        SKYBOX.forEach(function (k) {
+            findAsset(base + '-' + k[0], function (url) {
+                if (url) {
+                    var el = skybox.querySelector('[data-sky="' + k[0] + '"]');
+                    el.style.backgroundImage = 'url("' + new URL(url, location.href).href + '")';
+                    SKY_AT[k[0]].forEach(function (at) { skyLayers.push({ el: el, at: at }); });
+                    skyLayers.sort(function (a, b) { return a.at - b.at; });
+                    body.classList.add('has-skybox');
+                    kick();
+                }
+                one(url);
+            });
         });
-    });
-    findAsset('assets/sky/skybox', function (url) {
-        if (!url) return;
-        skyOne = skybox.querySelector('[data-sky="one"]');
-        skyOne.style.backgroundImage = 'url("' + new URL(url, location.href).href + '")';
-        body.classList.add('has-skybox');
-        kick();
-    });
+        findAsset(base, function (url) {
+            if (url) {
+                skyOne = skybox.querySelector('[data-sky="one"]');
+                skyOne.style.backgroundImage = 'url("' + new URL(url, location.href).href + '")';
+                body.classList.add('has-skybox');
+                kick();
+            }
+            one(url);
+        });
+    }
+    if (window.davSave && window.davSave.reset >= 4) {
+        paintedSky('assets/sky/skybox-hell', function (found) {
+            if (found) return;
+            document.documentElement.classList.add('hell-sky');           // (no hell sky painted yet: the usual one, washed red)
+            paintedSky('assets/sky/skybox');
+        });
+    } else paintedSky('assets/sky/skybox');
     function paintSkybox(p) {
         if (skyLayers.length) {                                       // the two nearest times of day, blended
             var lo = skyLayers[0], hi = null;

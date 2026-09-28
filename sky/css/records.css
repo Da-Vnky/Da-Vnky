@@ -775,3 +775,17 @@ body.records-open .signpost {
         animation: none;
     }
 }
+
+/* reset 4, the pact made: the record player glows red and evil till the inverted record's put on (records.js evilWaiting) */
+body.evil-waiting .turntable {
+    animation: evil-waiting 1.9s ease-in-out infinite;
+}
+@keyframes evil-waiting {
+    0%, 100% { filter: drop-shadow(0 0 5px rgba(200, 20, 10, .6)) drop-shadow(0 0 16px rgba(150, 0, 0, .4)); }
+    50% { filter: drop-shadow(0 0 11px rgba(255, 45, 25, .95)) drop-shadow(0 0 34px rgba(200, 0, 0, .65)); }
+}
+body.evil-waiting .turntable .tt-hint {
+    opacity: 1;
+    color: #ffb8a4;
+    text-shadow: 0 0 8px rgba(200, 0, 0, .8), 0 1px 3px rgba(0, 0, 0, .8);
+}

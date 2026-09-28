@@ -66,7 +66,13 @@
     var body = document.body;
     var DOOM = /p\s*\(\s*doom\s*\)/i;          // the song that calls them out
     function doomGiven() { try { return localStorage.getItem('mel-remedy') !== null; } catch (e) { return false; } }
-    function robed() { return !!S && S.get('claubes-robed') === '1'; }
+    function robed() { return !!S && S.reset === 4 && S.get('claubes-robed') === '1'; }      // (robed: reset 4 only, ever)
+    // after reset 4 (27 Sep, Victor): the robed ones were killed. the ordinary ones come out only once more, ever, for the
+    // purified record (localStorage claubes-after4, kept like the reset number), in case they were missed before; they
+    // say AFTER4_LINES, and they never go down to worship in the dungeon again
+    function after4() { return !!S && S.reset >= 5; }
+    var AFTER4_LINES = ['someone needs us!', 'clip boawd', 'clip clip', 'i wuv dis song!', 'im up in my p doom!!', 'orange hart', 'u can make it right...'];
+    function after4Used() { try { return localStorage.getItem('claubes-after4') === '1'; } catch (e) { return false; } }
     function below() { return !!S && S.get('claubes-below') === '1'; }
     var GAP_LINE = ['They\u2019re clawing at the shelf. At the gap where the book should be.'];
     var FOLLOW_LINE = ['They pulled the book. They went down there, all of them.', '…I should follow them.'];
@@ -191,8 +197,8 @@
         crew.classList.toggle('happy', !on && !robed());
         body.classList.toggle('doom-party', on && isDoom(cur));                          // the lights: only for this one song
         body.classList.toggle('doom-inverted', on && isInverted(cur));                   // its inverted twin: red, and static
-        if (Sky.staticNoise) Sky.staticNoise.want('inverted', on && isInverted(cur) ? 0.2 : 0);
-        crew.classList.toggle('below', below() && !inDungeon);                           // (gone down to the dungeon: not up here)
+        if (Sky.staticNoise) Sky.staticNoise.want('inverted', on && isInverted(cur) && begun() ? 0.2 : 0);
+        crew.classList.toggle('below', after4() ? inDungeon : below() && !inDungeon);   // (gone down to the dungeon: not up here. after reset 4: never down there)
         dress();
     }
     function show(crawling) {
@@ -206,6 +212,8 @@
     }
     function callThemOut(inverted) {
         if (out.length || gone4good() || called()) return;                 // (once a reset: the ones that go stay gone)
+        if (after4() && (inverted || after4Used())) return;                // (after reset 4: once more, ever, and never robed)
+        if (after4()) try { localStorage.setItem('claubes-after4', '1'); } catch (e) {}
         if (S) S.set('claubes-called', '1');
         if (S && inverted) S.set('claubes-robed', '1');
         setKills(0);
@@ -642,7 +650,7 @@
         // the whole dungeon screams: a wretched, tearing scream, and the static swallows everything
         sfx('wretched-scream', { or: 'shriek' });
         setTimeout(function () { sfx('wretched-scream', { or: 'scream' }); }, 250);
-        if (Sky.staticNoise) { Sky.staticNoise.want('dungeon', 0.7); Sky.staticNoise.burst(1, 2400); }
+        if (Sky.staticNoise) { Sky.staticNoise.want('dungeon', 0.7, true); Sky.staticNoise.burst(1, 2400); }
         setTimeout(function () { body.classList.remove('god-sends'); }, 1400);
         setTimeout(function () {
             sfx('ricochet', { or: 'zap' }); sfx('bang', { delay: 0.02 });
@@ -663,9 +671,9 @@
             Sky.sides.on(function (what, name) {
                 if (name !== 'dungeon') return;
                 inDungeon = what === 'enter';
-                crew.classList.toggle('below', below() && !inDungeon);
                 dungeonStatic();
-                if (inDungeon) setTimeout(function () { if (inDungeon) worship(); }, 950); else unworship();
+                mood();                                                       // (the inverted record's static; who's hidden where)
+                if (inDungeon && !after4()) setTimeout(function () { if (inDungeon) worship(); }, 950); else unworship();
             });
         } else if (n < 40) setTimeout(function () { watchSides(n + 1); }, 150);
     })(0);
@@ -702,10 +710,12 @@
     }
     // happy now and then says so
     setInterval(function () {
-        if (!crew.classList.contains('happy') || crew.classList.contains('panic') || crew.classList.contains('worship') || document.hidden) return;
+        var chatty = crew.classList.contains('happy') || (after4() && crew.classList.contains('dancing'));      // (after reset 4 they talk while they dance too)
+        if (!chatty || crew.classList.contains('panic') || crew.classList.contains('worship') || document.hidden) return;
         var els = crew.querySelectorAll('.mini-claube:not(.crawl)');
         if (!els.length || Math.random() < 0.5) return;
-        say(els[Math.floor(Math.random() * els.length)], HAPPY_LINES[Math.floor(Math.random() * HAPPY_LINES.length)], 2200);
+        var lines = after4() ? AFTER4_LINES : HAPPY_LINES;
+        say(els[Math.floor(Math.random() * els.length)], lines[Math.floor(Math.random() * lines.length)], 2200);
     }, 3500);
 
     /* ---------------- the music calls them out, and sets them dancing ---------------- */
@@ -723,24 +733,34 @@
     document.addEventListener('dav:traveller-shot', function () { scatter('!!!'); });
     document.addEventListener('dav:record-shot', function () { scatter('noooo'); });
 
+    // reset 4's static (27 Sep, Victor): none at all till they've been down in the dungeon (run:static-begun, set the first
+    // time down there); from then it creeps in (sky/static.js thickens it gradually) and keeps building
+    function begun() { return !!S && S.get('static-begun') === '1'; }
     var SHOT_STATIC = 0.035;
     function shotStatic() { return Math.min(0.55, (+(S && S.get('static-shots')) || 0) * SHOT_STATIC); }
     document.addEventListener('dav:bang', function () {
-        if (!robed() || !S) return;
+        if (!robed() || !S || !begun()) return;
         S.set('static-shots', String((+S.get('static-shots') || 0) + 1));
         if (Sky.staticNoise) { Sky.staticNoise.want('shots', shotStatic()); Sky.staticNoise.burst(Math.min(1, shotStatic() + 0.35), 260); }
     });
-    if (robed() && Sky.staticNoise) Sky.staticNoise.want('shots', shotStatic());
-    // the dungeon's own static: always faint; in reset 4 thicker with every Claube and picture destroyed since the pact
+    if (robed() && begun() && Sky.staticNoise) Sky.staticNoise.want('shots', shotStatic(), true);      // (as it was on the page before)
+    // the dungeon's own static: always faint (any reset but 4). reset 4: it starts the first time they're down here, then
+    // creeps up the longer they stay (run:static-time, seconds down here), thicker with every Claube and picture destroyed
+    var CREEP = 1000, CREEP_MAX = 0.12;                                  // (+0.01 every 10 s down here, up to 0.12 after 2 minutes)
     function dungeonStatic() {
         if (!Sky.staticNoise) return;
         if (!inDungeon) { Sky.staticNoise.want('dungeon', 0); return; }
-        var n = 0;
-        if (R4() && S && S.get('grimoire-pact') === '1') n = (called() ? HOW_MANY - out.length : 0) + (6 - apparitionsLeft());
-        Sky.staticNoise.want('dungeon', 0.05 + n * 0.035);
+        if (!R4()) { Sky.staticNoise.want('dungeon', 0.05); return; }
+        if (S && !begun()) S.set('static-begun', '1');
+        var n = S && S.get('grimoire-pact') === '1' ? (called() ? HOW_MANY - out.length : 0) + (6 - apparitionsLeft()) : 0;
+        var creep = Math.min(CREEP_MAX, (+(S && S.get('static-time')) || 0) / CREEP);
+        Sky.staticNoise.want('dungeon', 0.03 + creep + n * 0.035);
     }
     document.addEventListener('dav:painting-shot', function () { setTimeout(dungeonStatic, 50); });
-    setInterval(dungeonStatic, 1500);
+    setInterval(function () {
+        if (inDungeon && R4() && S && !document.hidden) S.set('static-time', String((+S.get('static-time') || 0) + 1.5));
+        dungeonStatic();
+    }, 1500);
 
     if (gone4good()) { out = []; save(); }
     if (out.length) show(false);

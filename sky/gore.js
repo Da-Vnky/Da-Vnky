@@ -3,7 +3,7 @@
      Sky.gore.splat(el, x, y, done)   a fall from too high: blood, giblets, a splat
      Sky.gore.zap(el, done)           electrocuted: sparks, an x-ray flicker, a skeleton
      Sky.gore.shot(el, done)          the revolver: a bang, they topple over, a pool of blood
-     Sky.gore.respawn(el)             back again, with a -1 heart floating up
+     Sky.gore.respawn(el)             back again (or, if the death takes the heart, the reset ends: sky/lives.js)
    (x, y = where they hit, on screen). Load after sky/sky.js and sky/panel.js.
 
    slots (everything here is a stand-in until you add yours):
@@ -54,7 +54,6 @@
         '<path d="M22 96 Q30 92 38 96 L36 102 H24 Z"/>' +                                                                                  // pelvis
         '<path d="M25 102 L23 118 M35 102 L37 118" fill="none" stroke-width="2.8" stroke-linecap="round"/>' +                             // legs
         '<path d="M18 118 H27 M33 118 H42" stroke="#24170c" stroke-width="3"/></g></svg>';
-    var HEART = '<svg viewBox="0 0 20 18" aria-hidden="true"><path d="M10 17 L2.5 9.5 Q-.5 6 2 3 Q5 0 8 2.5 L10 4.5 L12 2.5 Q15 0 18 3 Q20.5 6 17.5 9.5 Z" fill="#d11f33" stroke="#7a0d18" stroke-width="1"/><path d="M5 4 Q3.5 5 4 7" stroke="#fff" stroke-width="1.2" fill="none" opacity=".7"/></svg>';
 
     var gibArt = GIBLETS.slice();                                    // your own giblets replace the stand-ins' places
     GIBLETS.forEach(function (g, i) { Sky.findAsset('assets/characters/giblet-' + (i + 1), function (url) { if (url) gibArt[i] = '<img alt="" src="' + url + '">'; }); });
@@ -239,21 +238,16 @@
 
     /* ---------------- respawn ---------------- */
     function respawn(el) {
-        el.classList.remove('gore-hidden', 'gore-back');
-        el.style.visibility = '';
-        void el.offsetWidth;
-        el.classList.add('gore-back');
-        setTimeout(function () { el.classList.remove('gore-back'); }, 600);
-        sfx('respawn');
-        var host = el.offsetParent || document.body, r = el.getBoundingClientRect(), hr = host.getBoundingClientRect();
-        var t = document.createElement('div');
-        t.className = 'life-lost';
-        t.innerHTML = '<span>-1</span><span class="heart">' + HEART + '</span>';
-        t.style.left = (r.left - hr.left + r.width / 2) + 'px';
-        t.style.top = (r.top - hr.top - 46) + 'px';
-        host.appendChild(t);
-        Sky.findAsset('assets/ui/heart', function (url) { if (url) t.querySelector('.heart').innerHTML = '<img alt="" src="' + url + '">'; });
-        setTimeout(function () { t.remove(); }, 2300);
+        // a death that takes the heart: they don't come back, the reset's white-out comes at once (sky/lives.js). any other:
+        // back again (the "-1" heart that used to float up is gone, 27 Sep, Victor: with one heart it only ever misled)
+        if (!(Sky.lives && Sky.lives.counts)) {
+            el.classList.remove('gore-hidden', 'gore-back');
+            el.style.visibility = '';
+            void el.offsetWidth;
+            el.classList.add('gore-back');
+            setTimeout(function () { el.classList.remove('gore-back'); }, 600);
+            sfx('respawn');
+        }
         try { var n = +(localStorage.getItem('lives-lost') || 0) + 1; localStorage.setItem('lives-lost', n); } catch (e) {}
         document.dispatchEvent(new CustomEvent('dav:traveller-died'));     // (every death ends here: sky/lives.js counts them)
     }

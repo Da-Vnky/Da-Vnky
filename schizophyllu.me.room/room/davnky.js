@@ -24,6 +24,10 @@ export const QUIET_NOTES = {
   sit: ['note', "you sit with her for a while. neither of you says anything."],
   listening: ['note', "the record's playing, very quietly. she's listening. you think she's listening."],
   notNow: ['note', "you think of the record, the one she'd want to hear. but back across the street it isn't itself right now: something's turned it inside out. not yet."],
+  // the day it's all back: before anyone says anything
+  getsUp: ['note', "she looks up. she looks at you for a long moment. then she gets up, slowly, and goes back to her desk."],
+  // the main room's window: the way back across the street (DaV-nky's rooftop)
+  window: ['note', "you climb back out of the window, onto the roof across the street."],
 };
 
 // each visit after the record, a little more comes back (the fifth: all of it)

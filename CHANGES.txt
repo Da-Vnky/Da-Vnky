@@ -17,6 +17,19 @@ How it works
 
 == published ==
 
+2026-09-27 23:49 · V
+- Only one ordinary revolver now: on the rooftop in reset 1, then from reset 2 hung on a rack on the living-room wall (under the pictures on the right). It only jams on the traveller by then: it's for shooting things (and finding P(Doom) before reset 4). None in reset 4, as before. The rack is a new slot: assets/living/revolver-rack.
+- Reset 4: the static doesn't start until you've been down in the dungeon, and then it builds up slowly the longer you stay. After the pact the record player glows red ("something is waiting in the record player") until the inverted record is put on. Until then the book won't open the dungeon: the traveller says to check the record player. So nobody can go down without summoning the Claubes.
+- After reset 4: the robed Claubes never come back (they were killed). The ordinary ones come out once more, only once ever, for the rainbow record, in case they were missed before. They chatter things like "clip boawd" and "im up in my p doom!!", and they never go down to worship in the dungeon again.
+- Mel's room: nothing flashes the ordinary room before the quiet one shows. Claube's mug no longer hangs in the air before he's back. On the day it's all back she gets up out of the corner first, and only then speaks. Her main room's window climbs back out to the rooftop. The pill bottles are gone from her bathroom from reset 5. Once she has P(Doom), it's the last song on her computer's music station. Victor's pictures for her room no longer catch clicks across the whole room (her own drawing, invisible, takes the clicks).
+- The kitchen: opening the fridge, the traveller stands beside it, so the pie (and reset 3's key) can be seen.
+- Below (reset 4): the eye is Victor's sun eye (blinking, its pupil following the pointer) until there's an eye of its own for down there (assets/hell/eye). The eye's pupil can look a little further, in the sky too.
+- From reset 4 the sky is red: the Demiurge's false world. New slots: assets/sky/skybox-hell (and -day … -night if wanted). Until one's added, the sky is washed red.
+- Sky pictures for reset 3 on: every sky object (the moon, the clouds, storm clouds, lightning, Polaris, Ursa Minor, the constellations, the things that fly past) has its own slot for resets 3 to 8, in the asset manager's "every page" tab. The sun from reset 3 is the eye.
+- Through the front door: a short black, then the hallway, with the traveller stepping in from the front door. Nothing slides about behind the house any more.
+- A death that takes the heart is instant: straight into the white-out to the next reset, with "No more lives left" on it. No more floating "-1" heart or heart-breaking sound (the life-lost sound slot is gone). Deaths that don't count still bring the traveller back.
+- Walking between rooms: click another way out while the traveller's still walking and they stop, turn round and head there instead (no more ending up in two rooms at once). Clicks while the rooms are sliding wait, then the traveller carries straight on. The arrows now stay clickable while the traveller walks. The kitchen tab walks you there through the rooms in between.
+
 2026-09-27 19:30 · V
 - The sky: the sun and the moon are twice the size, and so are the fair-weather clouds. The moon's rope ties on a little further right. The eye that replaces the sun from reset 3 starts at the ordinary sun's size and grows a little every reset, till reset 7, where it's two thirds of what it was.
 - Wave templates in assets/templates/: waves-template.png (all four rows as they overlap, with their waterlines and crest lines), a see-through guide for each wave (wave-1-guide.png … wave-4-guide.png), and waves-how-they-repeat.png. The wave slots in the asset manager say how to use them.

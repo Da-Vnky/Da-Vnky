@@ -428,3 +428,21 @@ body.in-hell .reset-key {
     width: 40px;
     filter: drop-shadow(0 0 6px rgba(255, 230, 160, .95)) drop-shadow(0 0 16px rgba(255, 170, 60, .7));
 }
+
+/* the sun's eye, down here (no assets/hell/eye of its own: sky/eye.js makes it, hell.js puts it in .hl-eye) */
+.hell .hl-eye.sun-eye {
+    aspect-ratio: 1;
+    width: min(40vh, 40vw);
+}
+.hell .hl-eye.sun-eye>svg {
+    display: none;
+}
+.hell.eye-open .hl-eye.sun-eye>* {
+    animation: none;                                    /* (it blinks by itself: the GIF) */
+}
+.hell .hl-eye.sun-eye .e-pin {
+    transition: scale .4s;
+}
+.hell.eye-wide .hl-eye.sun-eye .e-pin {
+    scale: 1.7;                                          /* (the pupil widens, as the drawn one does) */
+}

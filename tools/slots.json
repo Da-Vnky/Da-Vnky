@@ -204,6 +204,41 @@
        "what": "midnight",
        "size": "1920 x 1080 or bigger",
        "optional": true
+      },
+      {
+       "slot": "assets/sky/skybox-hell",
+       "what": "from reset 4 on: the sky of the Demiurge’s false world (red as his fire), one picture tinted toward night by itself. until you add one, whatever sky there is gets washed red",
+       "size": "1920 x 1080 or bigger, horizon low"
+      },
+      {
+       "slot": "assets/sky/skybox-hell-day",
+       "what": "from reset 4 on: the hell sky at noon (instead of the one picture)",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/skybox-hell-golden",
+       "what": "from reset 4 on: the hell sky at late afternoon (instead of the one picture)",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/skybox-hell-sunset",
+       "what": "from reset 4 on: the hell sky at sunset (instead of the one picture)",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/skybox-hell-dusk",
+       "what": "from reset 4 on: the hell sky at after sunset (instead of the one picture)",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
+      },
+      {
+       "slot": "assets/sky/skybox-hell-night",
+       "what": "from reset 4 on: the hell sky at midnight (instead of the one picture)",
+       "size": "1920 x 1080 or bigger",
+       "optional": true
       }
      ]
     },
@@ -270,6 +305,145 @@
        "slot": "assets/sky/shooting-star",
        "what": "a streak of light at night, head at the right end",
        "size": "600 x 160"
+      }
+     ]
+    },
+    {
+     "name": "the sky from reset 3 on (the real one: no more strings)",
+     "sub": "each its own picture for resets 3 to 8 (a later reset’s own, in its tab, takes over from there). the sun is the eye from reset 3: sun-eyeball, above",
+     "slots": [
+      {
+       "slot": "assets/resets/reset-3/sky/moon",
+       "what": "from reset 3 on (the real sky, no strings): the moon. until you add one, the ordinary one",
+       "size": "400 x 400, centred",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/cloud",
+       "what": "from reset 3 on (the real sky, no strings): every fair-weather cloud. until you add one, the ordinary one",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/cloud-1",
+       "what": "from reset 3 on (the real sky, no strings): cloud 1. until you add one, the ordinary one",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/cloud-2",
+       "what": "from reset 3 on (the real sky, no strings): cloud 2. until you add one, the ordinary one",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/cloud-3",
+       "what": "from reset 3 on (the real sky, no strings): cloud 3. until you add one, the ordinary one",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/cloud-4",
+       "what": "from reset 3 on (the real sky, no strings): cloud 4. until you add one, the ordinary one",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/cloud-5",
+       "what": "from reset 3 on (the real sky, no strings): cloud 5. until you add one, the ordinary one",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/storm-cloud",
+       "what": "from reset 3 on (the real sky, no strings): the heavy grey clouds of rain and storms. until you add one, the ordinary one",
+       "size": "800 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/lightning",
+       "what": "from reset 3 on (the real sky, no strings): one bolt, top at the top, see-through around it. until you add one, the ordinary one",
+       "size": "e.g. 300 x 900",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/polaris",
+       "what": "from reset 3 on (the real sky, no strings): the north star, top centre at night. until you add one, the ordinary one",
+       "size": "200 x 200, centred",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/ursa-minor",
+       "what": "from reset 3 on (the real sky, no strings): the Little Dipper under Polaris. until you add one, the ordinary one",
+       "size": "240 x 228 (or 960 x 912)",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/constellation-pleroma",
+       "what": "from reset 3 on (the real sky, no strings): the pleroma constellation. until you add one, the ordinary one",
+       "size": "600 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/constellation-wish",
+       "what": "from reset 3 on (the real sky, no strings): the wish constellation. until you add one, the ordinary one",
+       "size": "600 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/constellation-lantern",
+       "what": "from reset 3 on (the real sky, no strings): the lantern constellation. until you add one, the ordinary one",
+       "size": "600 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/constellation-harp",
+       "what": "from reset 3 on (the real sky, no strings): the harp constellation. until you add one, the ordinary one",
+       "size": "600 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/constellation-kite",
+       "what": "from reset 3 on (the real sky, no strings): the kite constellation. until you add one, the ordinary one",
+       "size": "600 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/constellation-whale",
+       "what": "from reset 3 on (the real sky, no strings): the whale constellation. until you add one, the ordinary one",
+       "size": "600 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/constellation-key",
+       "what": "from reset 3 on (the real sky, no strings): the key constellation. until you add one, the ordinary one",
+       "size": "600 x 360",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/blimp",
+       "what": "from reset 3 on (the real sky, no strings): a steampunk airship by day. until you add one, the ordinary one",
+       "size": "920 x 460",
+       "optional": true,
+       "glow": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/birds",
+       "what": "from reset 3 on (the real sky, no strings): a little flock. until you add one, the ordinary one",
+       "size": "480 x 240",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/balloon",
+       "what": "from reset 3 on (the real sky, no strings): a hot-air balloon. until you add one, the ordinary one",
+       "size": "300 x 450",
+       "optional": true
+      },
+      {
+       "slot": "assets/resets/reset-3/sky/shooting-star",
+       "what": "from reset 3 on (the real sky, no strings): a streak of light at night, head at the right end. until you add one, the ordinary one",
+       "size": "600 x 160",
+       "optional": true
       }
      ]
     },
@@ -1106,6 +1280,11 @@
        "slot": "assets/living/shelf-grimoire",
        "what": "the grimoire's spine on the bookshelf (from reset 5 on)",
        "size": "a book's spine, like shelf-book"
+      },
+      {
+       "slot": "assets/living/revolver-rack",
+       "what": "the rack on the wall the revolver hangs on, from reset 2 (the gun itself is assets/city/revolver). it stays when the gun is taken",
+       "size": "160:100, see-through round it"
       }
      ]
     },
@@ -2483,10 +2662,6 @@
        "slot": "assets/sounds/flashbang",
        "what": "forgetting your stay: the flashbang (the ringing after is part of it)",
        "kind": "sound"
-      },
-      {
-       "slot": "assets/sounds/life-lost",
-       "what": "losing a life"
       },
       {
        "slot": "assets/sounds/lives-found",
