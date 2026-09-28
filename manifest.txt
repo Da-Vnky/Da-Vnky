@@ -11,7 +11,7 @@ sky/books.js 13659
 sky/claubes.js 52495
 sky/crate.js 37063
 sky/dungeon.js 9873
-sky/eye.js 14593
+sky/eye.js 14996
 sky/forget.js 9746
 sky/frames.js 7474
 sky/front.js 6535
@@ -41,7 +41,7 @@ sky/post.js 21396
 sky/records.js 34932
 sky/resets.js 16799
 sky/revolver.js 17327
-sky/sky.js 111189
+sky/sky.js 111352
 sky/state.js 16311
 sky/static.js 3162
 sky/studio.js 18269
@@ -50,7 +50,7 @@ sky/timer.js 9185
 sky/tub.js 13651
 sky/weather.js 25611
 sky/paper.css 7388
-sky/sky.css 48117
+sky/sky.css 48152
 sky/css/ambient.css 435
 sky/css/attic.css 16069
 sky/css/bathroom.css 17498
@@ -105,7 +105,7 @@ assets/mel-room/list.txt 134
 assets/resets/index.txt 77
 assets/resets/list.txt 127
 assets/sea/list.txt 117
-assets/sky/list.txt 252
+assets/sky/list.txt 338
 assets/sounds/list.txt 243
 assets/textures/list.txt 152
 assets/ui/list.txt 117

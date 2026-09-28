@@ -26,7 +26,9 @@
     if (!Sky || Sky.eye) return;
 
     var FROM = 3;                                  // the first reset the eye is in
-    var SIZE = 'min(480px, 40vw)';                 // how big the eye is in the sky
+    // how big the eye is in the sky (27 Sep, Victor): in reset 3 the size of the ordinary sun it replaces, then a
+    // little bigger every reset after, till it's GROWN (from reset FROM + STEPS on). the width of the screen caps it too
+    var START = 192, GROWN = 320, STEPS = 4;
     // the pupil: its centre in the eye (% across, % down), its width (% of the eye's width),
     // and how far it can look (% of the eye's width)
     var EYE = { x: 50, y: 50, size: 34, reach: 11 };
@@ -36,6 +38,8 @@
 
     var S = window.davSave;
     if (S && S.reset < FROM) { Sky.eye = { on: false }; return; }
+    var grown = Math.min(1, Math.max(0, ((S && S.reset) || FROM) - FROM) / STEPS), px = Math.round(START + (GROWN - START) * grown);
+    var SIZE = 'min(' + px + 'px, ' + (px / 12).toFixed(1) + 'vw)';
     var sun = document.querySelector('.sun');
     if (!sun) return;
 

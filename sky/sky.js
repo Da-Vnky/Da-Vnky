@@ -230,8 +230,9 @@
         // slots: assets/sky/sun (+ sun-glow, the setting sun), assets/sky/moon, assets/sky/cloud (or cloud-1 … cloud-5)
         '<div class="sun" data-asset="assets/sky/sun"><svg class="placeholder" viewBox="-50 -50 100 100"><g fill="currentColor"><circle r="24"/>' + rays + '</g></svg></div>' +
         '<div class="moon" data-asset="assets/sky/moon"><svg class="placeholder" viewBox="0 0 60 60"><path fill="currentColor" d="M30 2 A28 28 0 0 0 30 58 A36 36 0 0 1 30 2 Z"/></svg></div>' +
-        [['', '-1', 'left:3%;  top:14%; width:190px'], ['', '1', 'right:5%; top:26%; width:150px'], [' hide-small', '1', 'left:24%; top:5%;  width:130px'],
-         [' hide-small', '-1', 'right:22%; top:9%; width:170px'], [' hide-small', '-1', 'left:12%; top:34%; width:110px']].map(function (c, i) {
+        // (their widths: twice what they were, 27 Sep, Victor; never more than a share of a narrow screen)
+        [['', '-1', 'left:3%;  top:14%; width:min(380px, 58vw)'], ['', '1', 'right:5%; top:26%; width:min(300px, 46vw)'], [' hide-small', '1', 'left:24%; top:5%;  width:min(260px, 40vw)'],
+         [' hide-small', '-1', 'right:22%; top:9%; width:min(340px, 52vw)'], [' hide-small', '-1', 'left:12%; top:34%; width:min(220px, 34vw)']].map(function (c, i) {
             return '<div class="cloud' + c[0] + '" data-dir="' + c[1] + '" style="' + c[2] + '" data-asset="assets/sky/cloud-' + (i + 1) + '|assets/sky/cloud">' +
                    '<svg class="placeholder" viewBox="0 0 200 90"><use href="#sky-cloud"/></svg></div>';
         }).join('');
@@ -783,7 +784,7 @@
         clouds.forEach(function (c) {
             if (!c.offsetWidth) return;
             var cw = c.offsetWidth, home = c.offsetLeft;
-            var k = 0.55 + cw / 340;                               // bigger clouds are nearer, so faster
+            var k = 0.55 + cw / 680;                               // bigger clouds are nearer, so faster
             var span = W + cw * 2;
             var x = ((home + cw + drift * k) % span + span) % span - cw;
             c.style.transform = 'translateX(' + (x - home).toFixed(1) + 'px)';

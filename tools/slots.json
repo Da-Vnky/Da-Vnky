@@ -552,23 +552,23 @@
      "slots": [
       {
        "slot": "assets/sea/wave-1",
-       "what": "the back row of waves: a strip as tall as the sea that repeats left to right",
-       "size": "e.g. 1200 x 800"
+       "what": "the back row of waves: a strip as tall as the whole sea that repeats left to right, so its left and right edges must match. its crests sit on their own line: lay assets/templates/wave-1-guide.png over your canvas (all four together: waves-template.png; how they repeat: waves-how-they-repeat.png)",
+       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests"
       },
       {
        "slot": "assets/sea/wave-2",
-       "what": "the second row of waves",
-       "size": "e.g. 1200 x 800"
+       "what": "the second row of waves: a strip as tall as the whole sea that repeats left to right, so its left and right edges must match. its crests sit on their own line: lay assets/templates/wave-2-guide.png over your canvas (all four together: waves-template.png; how they repeat: waves-how-they-repeat.png)",
+       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests"
       },
       {
        "slot": "assets/sea/wave-3",
-       "what": "the third row of waves",
-       "size": "e.g. 1200 x 800"
+       "what": "the third row of waves: a strip as tall as the whole sea that repeats left to right, so its left and right edges must match. its crests sit on their own line: lay assets/templates/wave-3-guide.png over your canvas (all four together: waves-template.png; how they repeat: waves-how-they-repeat.png)",
+       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests"
       },
       {
        "slot": "assets/sea/wave-4",
-       "what": "the front row of waves",
-       "size": "e.g. 1200 x 800"
+       "what": "the front row of waves: a strip as tall as the whole sea that repeats left to right, so its left and right edges must match. its crests sit on their own line: lay assets/templates/wave-4-guide.png over your canvas (all four together: waves-template.png; how they repeat: waves-how-they-repeat.png)",
+       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests"
       },
       {
        "slot": "assets/sea/ship",

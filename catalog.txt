@@ -1,9 +1,9 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-city.html 9158 821155047
-index.html 4380 3038517856
-living.html 126953 579885188
-window-sky.html 1273 1127655659
-workshop.html 20911 254224613
+city.html 9158 2972978435
+index.html 4380 227156458
+living.html 126953 340045255
+window-sky.html 1273 994426135
+workshop.html 20911 219229182
 sky/ambient.js 5052 82158972
 sky/attic.js 34415 1479863069
 sky/bathroom.js 27366 739340607
@@ -11,7 +11,7 @@ sky/books.js 13659 1804339263
 sky/claubes.js 52495 1675983867
 sky/crate.js 37063 2096077191
 sky/dungeon.js 9873 3965424695
-sky/eye.js 14593 2872946407
+sky/eye.js 14996 2698261263
 sky/forget.js 9746 3429228995
 sky/frames.js 7474 2788128642
 sky/front.js 6535 2715469177
@@ -41,7 +41,7 @@ sky/post.js 21396 743501724
 sky/records.js 34932 3998463537
 sky/resets.js 16799 4292073354
 sky/revolver.js 17327 1638942978
-sky/sky.js 111189 4151761835
+sky/sky.js 111352 951254496
 sky/state.js 16311 2660482399
 sky/static.js 3162 463019308
 sky/studio.js 18269 1634499513
@@ -50,7 +50,7 @@ sky/timer.js 9185 3062746802
 sky/tub.js 13651 4150689255
 sky/weather.js 25611 1827516348
 sky/paper.css 7388 392067971
-sky/sky.css 48117 3070371748
+sky/sky.css 48152 2066688185
 sky/css/ambient.css 435 4199751144
 sky/css/attic.css 16069 3015271617
 sky/css/bathroom.css 17498 2681064975
@@ -108,7 +108,14 @@ assets/mel-room/main-window.webp 10718 3012613204
 assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
 assets/sea/list.txt 117 55339362
-assets/sky/list.txt 252 390338659
+assets/sky/cloud-1.webp 37490 3352307145
+assets/sky/cloud-2.webp 35010 3142914853
+assets/sky/cloud-3.webp 48514 32872620
+assets/sky/cloud-4.webp 37152 764510579
+assets/sky/cloud-5.webp 41906 2625160310
+assets/sky/cloud.webp 37490 3352307145
+assets/sky/list.txt 338 1066595130
+assets/sky/moon.webp 20958 550342124
 assets/sky/skybox-day.jpg 507563 3898106660
 assets/sky/skybox-dusk.jpg 936292 1272459089
 assets/sky/skybox-golden.jpg 675239 272661867

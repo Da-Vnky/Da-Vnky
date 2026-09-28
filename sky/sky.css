@@ -113,12 +113,12 @@ a:hover {
 
 .sun, .moon { position: absolute; transform: translate(-50%, -50%); }
 .sun {
-    width: 96px;
+    width: min(192px, 30vw);
     color: #f7d35e;
     filter: drop-shadow(0 3px 5px rgba(0,0,0,.25)) drop-shadow(0 0 18px rgba(255,210,120,.5));
 }
 .moon {
-    width: 62px;
+    width: min(124px, 20vw);
     color: #efe6c8;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,.35)) drop-shadow(0 0 16px rgba(240,230,200,.45));
 }
@@ -1005,7 +1005,7 @@ body.visitors-open .room-arrow, body.frame-open .room-arrow, body.model-open .ro
 body:not([data-page=home]):not(.sky-view) .polaris { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
 
 /* ================= a reset's own sun (sky/state.js: assets/resets/reset-<n>/sky/sun): twice the size ================= */
-.sun:has(> img[src*="assets/resets/"]) { width: 192px; }
+.sun:has(> img[src*="assets/resets/"]) { width: min(384px, 60vw); }
 
 /* ================= a painted sky, mirrored in the morning ================= */
 /* the golden, sunset and dusk skies are painted with the sun going down on the right; while it's
@@ -1038,7 +1038,7 @@ html.stage-strings.has-rope-art .flyer-balloon::before, html.stage-strings.has-r
     background: var(--rope-art) center bottom / 100% auto repeat-y;
 }
 /* where each rope ties on (its bottom end, tucked behind the prop) */
-html.stage-strings .moon::before { left: 20%; }                 /* (onto the crescent itself, not the empty middle) */
+html.stage-strings .moon::before { left: 27%; }                 /* (onto the crescent itself, not the empty middle) */
 html.stage-strings .cloud::before { left: 30%; bottom: 40%; }
 html.stage-strings .cloud::after { left: 70%; bottom: 40%; }
 html.stage-strings .flyer-blimp::before { left: 32%; bottom: 60%; }

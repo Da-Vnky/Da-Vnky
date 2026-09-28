@@ -17,6 +17,10 @@ How it works
 
 == published ==
 
+2026-09-27 19:30 · V
+- The sky: the sun and the moon are twice the size, and so are the fair-weather clouds. The moon's rope ties on a little further right. The eye that replaces the sun from reset 3 starts at the ordinary sun's size and grows a little every reset, till reset 7, where it's two thirds of what it was.
+- Wave templates in assets/templates/: waves-template.png (all four rows as they overlap, with their waterlines and crest lines), a see-through guide for each wave (wave-1-guide.png … wave-4-guide.png), and waves-how-they-repeat.png. The wave slots in the asset manager say how to use them.
+
 2026-09-27 17:57 · V
 - The asset manager: each scene now opens on a map of it: the page itself, with every picture's place outlined (red dashes: still the stand-in, green: yours). Click one, or drop a picture on it, to put yours in, and it shows there straight away. Scenes with states (the kitchen's fridge open, Mel's other rooms, the sky at night) have a 'show' menu, and any reset can be picked. The list of slots is still underneath.
 - Template pictures for your art program: every scene at 1920 x 1080 with each slot outlined, named and measured, plus the outlines alone on a see-through layer. Download them from each scene's map. They're made by tools/templates.py (the map's 'make them again' runs it) into tools/templates/, which stays on your computer.

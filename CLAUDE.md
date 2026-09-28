@@ -526,8 +526,18 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - eye.js decodes the GIFs itself (its own small GIF reader) and plays the frames on one clock, so the
   pupil and lids never drift from the eyeball (a page can't ask an `<img>` GIF which frame it's on).
 - Without lids, `BLINK` squashes/hides the pupil per frame (Victor's eye: closing from frame 4, shut 6–12,
-  open again by 14; 72 frames at 12 fps). `EYE` = pupil centre, size, reach. `SIZE` = min(480px, 40vw)
-  (Victor asked for the eye/pupil at least 5× the old size).
+  open again by 14; 72 frames at 12 fps). `EYE` = pupil centre, size, reach. Its size grows
+  with the resets (27 Sep, Victor): `START` 192 px in reset 3 (the ordinary sun's size), +32 px a reset, `GROWN` 320 px
+  from reset 7 (2/3 of the old 480), capped at px/12 vw.
+- Sizes in the sky (27 Sep, Victor: doubled): the sun `min(192px, 30vw)`, the moon `min(124px, 20vw)`, a reset's own sun
+  twice the sun; the five fair-weather clouds 220–380 px (sky.js, capped in vw; their sailing speed `0.55 + cw / 680`,
+  so they move as fast as before). The storm clouds (weather.js) are unchanged. The moon's rope ties on at 27% across.
+- The waves (assets/sea/wave-1…4: a strip the sea's height, `background-repeat: repeat-x`, `auto 100%`): templates in
+  `assets/templates/`: `waves-template.png` (3024 × 1008, the four stand-in waves overlapping with each one's waterline and
+  crest line), `wave-1…4-guide.png` (see-through: that wave's lines, the part hidden by the wave in front, the seam),
+  `waves-how-they-repeat.png`. Made with Pillow from ground-sea.js's own numbers (waterline = base × 324/336 of the
+  height, crests up to h × 1.2 × 1.06 above it). If Victor sends his wave pictures, make them seamless (offset by half,
+  blend the join) before they go in.
 - Victor's current eye GIF is still in `assets/sky/sun.gif` (+ an identical `sun-glow.gif`), with the pupil
   painted in. He'll move it to `sun-eyeball` (pupil painted out) and clear `sun` for resets 1–2.
 
