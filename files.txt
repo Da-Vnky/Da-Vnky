@@ -1,10 +1,10 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-city.html 9200 2228795222
-index.html 4425 2788335189
-living.html 128736 2376823281
-window-sky.html 1278 28037791
-workshop.html 20899 3671897458
-sky/ambient.js 5052 82158972
+city.html 9254 1624057071
+index.html 4479 4048607290
+living.html 128790 3970988915
+window-sky.html 1332 1794781746
+workshop.html 20953 2699476472
+sky/ambient.js 5339 303504477
 sky/attic.js 33508 658131175
 sky/bathroom.js 26154 2951866537
 sky/books.js 13679 1574652656
@@ -35,13 +35,14 @@ sky/music.js 61616 3148296891
 sky/noise.js 11584 92264384
 sky/notes.js 5688 2301167232
 sky/paint.js 42532 2903009853
-sky/panel.js 66016 2515382266
+sky/panel.js 69074 2126572728
 sky/peeper.js 29422 1675908202
 sky/porch.js 14442 1560668200
 sky/post.js 21225 714105047
 sky/records.js 36049 1435555556
 sky/resets.js 16685 421718036
 sky/revolver.js 18303 1761212564
+sky/ropes.js 5604 1786338978
 sky/sky.js 116065 3728953090
 sky/state.js 16311 2660482399
 sky/static.js 4269 3444067866
@@ -51,7 +52,7 @@ sky/timer.js 9127 880985794
 sky/tub.js 13930 131283833
 sky/weather.js 26163 3677054639
 sky/paper.css 7388 392067971
-sky/sky.css 50442 251164325
+sky/sky.css 50992 3095914540
 sky/css/ambient.css 435 4199751144
 sky/css/attic.css 16069 3015271617
 sky/css/bathroom.css 17498 1224456772

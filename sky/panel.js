@@ -264,6 +264,50 @@
                 }
             };
         },
+        // reset 1's ambience (sky/ambient.js; 28 Sep, Victor): bright and cheerful, a world that looks lovely on the surface.
+        // a warm major pad (C, G, A minor, F: two bars each), a plucked arpeggio on the eighths, a soft bass on the beat, a
+        // shaker on the off-beats and a sparkle up high now and then. (your own: assets/sounds/ambient-bright, loops)
+        'ambient-bright': function (out) {
+            var BEAT = 0.6, STEP = BEAT / 2;                                        // 100 beats a minute
+            var CHORDS = [[261.63, 329.63, 392.00], [246.94, 293.66, 392.00], [220.00, 261.63, 329.63], [220.00, 261.63, 349.23]];
+            var BASS = [130.81, 98.00, 110.00, 87.31];
+            var SPARKLE = [1046.5, 1174.7, 1318.5, 1568.0, 1760.0, 2093.0];
+            var ARP = [0, 1, 2, 1, 0, 2, 1, 2];
+            var pad = filter('lowpass', 1700, 0.6);
+            lfo(0.07, 500, pad.frequency);
+            chain(pad, gain(1), out);
+            var voices = CHORDS[0].concat([BASS[0] * 2]).map(function (f, i) {
+                var o = ctx.createOscillator(), g = gain(i === 3 ? 0.04 : 0.032);
+                o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f; o.detune.value = (i - 1.5) * 5;
+                chain(o, g, pad);
+                o.start();
+                return o;
+            });
+            chain(loop('pink', 6), filter('bandpass', 5200, 0.4), gain(0.006), out);   // a little air
+            var next = 0, step = 0;
+            return function (level) {
+                if (level < 0.02 || !ctx) { next = 0; return; }
+                var t0 = ctx.currentTime, v = 0.5 + level;
+                if (!next || next < t0) { next = t0 + 0.08; }
+                while (next < t0 + 1.35) {                                           // the next second or so, note by note
+                    var bar = Math.floor(step / 8), c = Math.floor(bar / 2) % CHORDS.length, ch = CHORDS[c], i = step % 8;
+                    if (step % 16 === 0) voices.forEach(function (o, k) { o.frequency.setTargetAtTime(k === 3 ? BASS[c] * 2 : ch[k], next, 0.35); });
+                    var t = next + (i % 2 ? 0.028 : 0);                             // (a little swing)
+                    var f = ch[ARP[i]] * 2;
+                    tone(out, t, 'triangle', f, f * 0.998, 0.28, 0.05 * v);         // the pluck
+                    tone(out, t, 'sine', f * 2, f * 1.996, 0.12, 0.013 * v);        // its shine
+                    if (i === 0 || i === 4) tone(out, next, 'sine', BASS[c], BASS[c] * 0.99, 0.5, 0.09 * v);
+                    if (i % 2) noiseHit(out, t, 0.045, 'highpass', 7200, 0, 0.016 * v);
+                    if (i % 4 === 2 && Math.random() < 0.3) {
+                        var sp = SPARKLE[Math.floor(Math.random() * SPARKLE.length)];
+                        tone(out, t, 'sine', sp, sp, 1.2, 0.014 * v);
+                        tone(out, t, 'sine', sp * 3, sp * 3, 0.4, 0.003 * v);
+                    }
+                    step++;
+                    next += STEP;
+                }
+            };
+        },
         storm: function (out, ch) {
             chain(loop('white', 3), filter('highpass', 350), filter('lowpass', 5200), gain(0.7), out);
             chain(loop('brown', 5), filter('lowpass', 420), gain(1.0), out);

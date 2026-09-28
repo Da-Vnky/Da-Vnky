@@ -17,6 +17,10 @@ How it works
 
 == published ==
 
+2026-09-28 16:22 · V
+- Resets 1 and 2: the ropes the sky's props hang from swing a little now. The sun and moon lag and sway as you scroll, a breeze (and the weather's wind) keeps everything gently moving, and brushing the pointer past one gives it a nudge.
+- Reset 1 has its own soundtrack now: bright, upbeat and cheerful (the false world at its loveliest). The current one plays from reset 2 on. New slot for your own: assets/sounds/ambient-bright (a drawn stand-in plays until then).
+
 2026-09-28 12:00 · V
 - One press of Escape now closes just one thing (the top-most): it used to close the control panel and put the gun away at once, shut a painting and walk out of the dungeon, or climb down from the attic leaving the grimoire open with its drone playing.
 - The house's rooms have one core now (sky/house.js): every room registers itself, and every way of going somewhere (arrows, doors, ladder, place tabs, Escape) goes through it. The kitchen, porch, attic and garden no longer carry their own copies of the walking code.

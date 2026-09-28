@@ -11,6 +11,9 @@
    YOUR OWN: assets/sounds/ambient.mp3 (or .ogg), made to loop. Until then,
    a drawn stand-in (panel.js SYNTHS.ambient: slow warm chords, the hush of
    the house, a far-off note now and then). Icon in the panel: assets/ui/ambient.
+   Reset 1 has its own (28 Sep, Victor): bright and cheerful, the false world at
+   its loveliest: assets/sounds/ambient-bright (stand-in: SYNTHS['ambient-bright']).
+   From reset 2 on, it's the one above.
    It keeps quiet wherever the music does (the dungeon, below, the grimoire:
    they have their own sound), and while the browser waits for a first click.
    ===================================================================== */
@@ -26,7 +29,8 @@
     var state = { on: saved.on !== false, volume: typeof saved.volume === 'number' ? saved.volume : 0.45 };
     function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
 
-    var ch = Sky.sounds.channel('ambient');
+    var S = window.davSave, NAME = !S || S.reset <= 1 ? 'ambient-bright' : 'ambient';
+    var ch = Sky.sounds.channel(NAME);
     var M = Sky.music, hushed = 0;                      // (hushed: a place asking for quiet, besides the music's own hush)
     function recordOn() { return !!(M && (M.busy || M.hushed)); }
     function level() { return state.on && !hushed && !recordOn() ? state.volume : 0; }

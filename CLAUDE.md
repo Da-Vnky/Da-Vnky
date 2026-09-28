@@ -134,7 +134,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `assets/sounds/<name>.mp3|ogg` if Victor added it, else a synthesised stand-in).
 - `inventory.js` (8-slot hotbar, keys 1–8), `loot.js` (hidden items: `LOOT` table), `revolver.js`,
   `gore.js` (splat, zap, shot, respawn), `lives.js`, `state.js`, `resets.js`, `forget.js`,
-  `peeper.js`, `house.js` (the house's rooms and walking between them), `bathroom.js` (side rooms, secret wall, mirror), `dungeon.js`, `tub.js` (the bathtub), `ground-*.js`,
+  `peeper.js`, `ropes.js` (resets 1–2: the sky's props swing on their ropes), `house.js` (the house's rooms and walking between them), `bathroom.js` (side rooms, secret wall, mirror), `dungeon.js`, `tub.js` (the bathtub), `ground-*.js`,
   `music.js`/`records.js`/`crate.js` (record player), `frames.js`/`gallery.js`/`paint.js`/`studio.js`,
   `letters.js`/`post.js` (bottles, visitor messages), `books.js`, `textures.js`, `claubes.js`, `notes.js`,
   `timer.js`, `weather.js`, `noise.js`, `marker.js`, `models.js`, `eye.js` (the sun's eye, loaded right
@@ -573,6 +573,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   below, the grimoire: music.js now emits 'hush'), back when the record ends. Control panel layer "ambience" (order 20): on/off,
   volume, `localStorage ambient`. `Sky.ambient = { on, set, hush, channel }`. It makes the panel's "tap anywhere to hear it"
   show for a first-time visitor until their first click (browsers need one before any sound).
+- **Reset 1 has its own** (28 Sep, Victor): bright, upbeat and cheerful, "the false reality that looks great on the surface":
+  `assets/sounds/ambient-bright`, else panel.js `SYNTHS['ambient-bright']` (C, G, Am, F, two bars each, at 100 bpm: a warm
+  pad, plucked arpeggios on the eighths with a little swing, a soft bass on the beat, a shaker on the off-beats, a sparkle
+  up high now and then; its tick schedules the next second or so of notes each time). From reset 2 on it's the one above
+  (Victor loves it). ambient.js picks the channel by `davSave.reset`.
 
 ## Lo-fi: the bitcrush, live (sky/music.js, 27 Sep)
 
@@ -764,6 +769,13 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   from reset 3 on": `assets/resets/reset-3/sky/<moon, cloud(-1…5), storm-cloud, lightning, polaris, ursa-minor,
   constellation-*, blimp, birds, balloon, shooting-star>` (the ordinary swap system: from reset 3 until a later reset has
   its own). The sun from reset 3 is the eye. assets.html `family()` counts a reset's version as going with its slot.
+- **The ropes swing** (28 Sep, Victor: "slight physics"): `sky/ropes.js` (every page, after eye.js), resets 1–2 only. Each
+  prop is a damped pendulum hung from above the top of the screen: carried along (the sun and moon as you scroll, a flyer
+  setting off) it lags and swings back; the weather's wind and a faint breeze push it; the pointer brushing past nudges it.
+  It moves the prop with the CSS `translate` property (not `transform`, which sky.js uses to place the clouds and flyers) and
+  sets `--rope-a` (each rope tilts about where it's tied) and, for the sun and moon (one rope each), `--prop-tilt` (their
+  pictures tilt with it); sky.css "props on ropes". The numbers (swing time, how fast it settles, breeze, wind, nudge, the
+  furthest it goes) are at the top of ropes.js. Big swings ease off (tanh) rather than hitting a wall.
 - Resets 1–2: the sky's props hang on ropes (`html.stage-strings`, sky.css "props on ropes") — the "true
   reality" hint. Ropes are 5 px (3.5 on phones), drawn as twisted strands or Victor's `assets/sky/rope`
   (repeats down its length; sky.js sets `--rope-art` + `html.has-rope-art`). Each rope's end is tucked behind

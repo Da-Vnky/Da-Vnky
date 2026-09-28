@@ -1052,6 +1052,12 @@ html.stage-strings .flyer-blimp::before { left: 32%; bottom: 60%; }
 html.stage-strings .flyer-blimp::after { left: 68%; bottom: 60%; }
 html.stage-strings .flyer-balloon::before { bottom: 62%; }
 html.stage-strings .flyer-birds::before { bottom: 55%; }
+/* and they swing (sky/ropes.js sets --rope-a, and moves the prop sideways): each rope tilts about where it's tied,
+   and the sun and moon, each on one rope, tilt with theirs (--prop-tilt) */
+html.stage-strings :is(.sun, .moon, .cloud, .flyer-blimp, .flyer-balloon, .flyer-birds)::before,
+html.stage-strings :is(.cloud, .flyer-blimp)::after { transform: rotate(var(--rope-a, 0rad)); transform-origin: 50% 100%; }
+html.stage-strings :is(.sun, .moon) > * { rotate: var(--prop-tilt, 0rad); }
+html.stage-strings .moon > * { transform-origin: 27% 50%; }
 /* the shadows the props throw on the backdrop (the flyers already have a filter of their own: it's added to) */
 html.stage-strings :is(.sun, .moon, .cloud) > :is(.art:not(.glow-layer), .placeholder) { filter: drop-shadow(var(--stage-shadow)); }
 /* with your picture (and its -glow twin fading in over it at dusk), the shadow's cast by the prop as a whole: one shadow

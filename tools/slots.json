@@ -2410,7 +2410,12 @@
       },
       {
        "slot": "assets/sounds/ambient",
-       "what": "the house’s own soundtrack: plays (looped, quietly) on every page whenever no record is on, and fades away when one is (sky/ambient.js). make its ends meet",
+       "what": "the house’s own soundtrack, from reset 2 on: plays (looped, quietly) on every page whenever no record is on, and fades away when one is (sky/ambient.js). make its ends meet",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/ambient-bright",
+       "what": "reset 1’s soundtrack instead: bright, upbeat and cheerful, the false world at its loveliest (the same: looped, quietly, whenever no record is on). until yours is in, a drawn stand-in plays (a major-key pad, plucked arpeggios, a sparkle now and then)",
        "kind": "sound"
       },
       {
