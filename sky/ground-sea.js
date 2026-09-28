@@ -5,6 +5,7 @@
 
 (function () {
     var Sky = window.Sky;
+    var sfx = Sky && Sky.sfx;
 
     // (its look is in sky/css/ground-sea.css, linked from each page's head)
 
@@ -524,7 +525,6 @@
         var r = sea.getBoundingClientRect();
         splashAt(r.left + crew.x + mateW() / 2, r.bottom - (sea.clientHeight * 0.47), size, mateW() * 2.4, quiet ? false : 0.5);
     }
-    function sfx(name, opts) { if (Sky.sounds) Sky.sounds.sfx(name, opts); }
 
     // move to a spot (which may itself be moving, like the bobbing ship): hop, walk or fall
     function moveTo(spot, ms, hop, run, done, fall) {

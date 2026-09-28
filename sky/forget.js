@@ -23,7 +23,7 @@
 (function () {
     var Sky = window.Sky;
     if (!Sky || !Sky.panel || Sky.stay) return;
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
+    var sfx = Sky.sfx;
     var ICON = '<svg class="placeholder" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3 H18 M6 21 H18 M7 3 C7 9 11 10 12 12 C11 14 7 15 7 21 M17 3 C17 9 13 10 12 12 C13 14 17 15 17 21"' +
         ' fill="none" stroke="#3a2716" stroke-width="1.8" stroke-linecap="round"/><path d="M9 19 C10 16 14 16 15 19 Z" fill="#9a3b1f"/></svg>';
 

@@ -72,10 +72,10 @@
         sheet.querySelector('.ns-body').innerHTML = html;
     });
 
-    function openSheet() { sheet.classList.add('open'); document.body.classList.add('notes-open'); if (Sky.sounds) Sky.sounds.sfx('paper-unroll'); }
+    function openSheet() { sheet.classList.add('open'); document.body.classList.add('notes-open'); Sky.sfx('paper-unroll'); }
     function closeSheet() { if (!sheet.classList.contains('open')) return; sheet.classList.remove('open'); document.body.classList.remove('notes-open'); }
     board.addEventListener('click', openSheet);
     board.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSheet(); } });
     sheet.addEventListener('click', function (e) { if (e.target === sheet || e.target.closest('.ns-x')) closeSheet(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+    Sky.escape(function () { return sheet.classList.contains('open'); }, closeSheet);
 })();

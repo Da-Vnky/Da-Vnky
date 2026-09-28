@@ -136,6 +136,30 @@ def visit(page, base, url, trouble):
         page.remove_listener(ev, fn)
 
 
+def check_pages():
+    """each page's list of code and styles (the <script src="sky/…"> and <link href="sky/…"> lines), checked against
+    each other: nothing twice, and each part's styles (sky/css/<name>.css) linked wherever its code is, and only there"""
+    import re
+    out = []
+    css_dir = os.path.join(ROOT, 'sky', 'css')
+    has_css = set(os.path.splitext(n)[0] for n in os.listdir(css_dir)) if os.path.isdir(css_dir) else set()
+    for page in sorted(n for n in os.listdir(ROOT) if n.endswith('.html')):
+        with open(os.path.join(ROOT, page), encoding='utf-8') as f:
+            html = re.sub(r'<!--.*?-->', '', f.read(), flags=re.S)          # (not the ones only mentioned in comments)
+        js = re.findall(r'<script[^>]*\ssrc="sky/([\w-]+)\.js[?"]', html)
+        css = re.findall(r'<link[^>]*href="sky/css/([\w-]+)\.css[?"]', html)
+        for kind, l in (('code', js), ('styles', css)):
+            for n in sorted(set(x for x in l if l.count(x) > 1)):
+                out.append('%s: sky/%s%s.%s is there twice' % (page, 'css/' if kind == 'styles' else '', n, 'css' if kind == 'styles' else 'js'))
+        for n in js:
+            if n in has_css and n not in css:
+                out.append('%s: loads sky/%s.js, but not its styles (sky/css/%s.css)' % (page, n, n))
+        for n in css:
+            if n not in js and os.path.exists(os.path.join(ROOT, 'sky', n + '.js')):
+                out.append('%s: has the styles sky/css/%s.css, but not sky/%s.js' % (page, n, n))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(description='open every page in a hidden browser and report anything that goes wrong')
     ap.add_argument('--resets', default='1', help='which resets: 1, 1-8, 3,4 … (default: 1)')
@@ -149,6 +173,10 @@ def main():
     except ImportError:
         sys.exit('this needs Playwright:  pip install playwright   then   python -m playwright install chromium')
 
+    lint = check_pages()
+    print('the pages\' lists of code and styles:', 'ok' if not lint else '')
+    for t in lint:
+        print('  x  ' + t)
     stops = [s for s in STOPS if not args.only or args.only.lower() in s[0]]
     server, base = serve()
     problems = 0
@@ -185,6 +213,7 @@ def main():
             ctx.close()
         browser.close()
     server.shutdown()
+    problems += len(lint)
     print('\n%s' % ('all good.' if not problems else '%d thing%s went wrong.' % (problems, '' if problems == 1 else 's')))
     sys.exit(1 if problems else 0)
 

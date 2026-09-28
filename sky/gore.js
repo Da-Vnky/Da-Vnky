@@ -28,7 +28,7 @@
     var flash = document.createElement('div');
     flash.className = 'gore-flash';
     document.body.appendChild(flash);
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
+    var sfx = Sky.sfx;
     function art(slot, fallback, cb) { Sky.findAsset(slot, function (url) { cb(url ? '<img alt="" src="' + url + '">' : fallback); }); }
 
     /* ---------------- the stand-ins ---------------- */

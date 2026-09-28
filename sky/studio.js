@@ -28,7 +28,7 @@
     var FOLDER = folio.dataset.visitors.replace(/\/?$/, '/');
     var TYPES = { 'image/png': '.png', 'image/jpeg': '.jpg', 'image/gif': '.gif', 'image/webp': '.webp' };
     var SHOW = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'];
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
+    var sfx = Sky.sfx;
 
     // its look is in sky/css/studio.css (linked from each page's head); these are the values it takes from here
     document.documentElement.style.setProperty('--studio-paper', PAPER);
@@ -231,11 +231,8 @@
         close();
     });
     st.addEventListener('pointerdown', function (e) { if (e.target === st && painter.isEmpty()) close(); });
-    document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        if (document.body.classList.contains('art-open')) { e.stopImmediatePropagation(); close(); }
-        else if (document.body.classList.contains('visitors-open')) { e.stopImmediatePropagation(); if (zoom.classList.contains('open')) zoom.classList.remove('open'); else closeFolio(); }
-    }, true);
+    Sky.escape(function () { return document.body.classList.contains('art-open'); }, close);
+    Sky.escape(function () { return document.body.classList.contains('visitors-open'); }, function () { if (zoom.classList.contains('open')) zoom.classList.remove('open'); else closeFolio(); });
 
     /* ---------------- sending it ---------------- */
     function slug(t) {

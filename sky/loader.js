@@ -159,7 +159,7 @@
                 return dropped.then(function () {
                     remember(now);
                     // what they're looking at right now came from the old copy if it's among the changes
-                    var stale = !first && changed.some(function (p) { return p === here || /^sky\//.test(p); });
+                    var stale = !first && changed.some(function (p) { return p === here || /^(sky|assets)\//.test(p) || /\.txt$/.test(p); });   // (the code, the art, the folder lists)
                     // the skeleton, whatever of it isn't kept yet
                     var shell = files.filter(skeleton);
                     return Promise.all(shell.map(function (f) { return cache.match(abs(f.url), { ignoreSearch: true }).then(function (hit) { return hit ? null : f; }); }))

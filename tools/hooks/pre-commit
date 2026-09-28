@@ -1,11 +1,12 @@
 #!/bin/sh
-# before each commit: refresh every content/<scene>/list.txt and assets/<folder>/list.txt, and include them in the commit.
+# before each commit: refresh every content/<scene>/list.txt and assets/<folder>/list.txt (and the pages' ?v= stamps),
+# and include them in the commit.
 # turn it on once, from the top of the site:   git config core.hooksPath tools/hooks
 root=$(git rev-parse --show-toplevel) || exit 0
 cd "$root" || exit 0
 # (tr strips windows line endings, in case they crept in)
 tr -d '\r' < tools/update-lists.sh | sh
-for f in "$root"/assets/resets/index.txt "$root"/content/living/albums.txt "$root"/catalog.txt "$root"/manifest.txt "$root"/files.txt "$root"/content/*/list.txt "$root"/content/*/*/list.txt "$root"/assets/*/list.txt; do
+for f in "$root"/assets/resets/index.txt "$root"/content/living/albums.txt "$root"/catalog.txt "$root"/manifest.txt "$root"/files.txt "$root"/content/*/list.txt "$root"/content/*/*/list.txt "$root"/assets/*/list.txt "$root"/*.html; do
     [ -f "$f" ] && git add "$f"
 done
 exit 0

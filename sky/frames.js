@@ -92,7 +92,7 @@
     document.body.appendChild(zoom);
     function closeZoom() { zoom.classList.remove('open'); document.body.classList.remove('frame-open'); }
     zoom.addEventListener('click', closeZoom);
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && zoom.classList.contains('open')) closeZoom(); });
+    Sky.escape(function () { return zoom.classList.contains('open'); }, closeZoom);
 
     var walls = {};
     frames.forEach(function (f) { walls[wallOf(f)] = 1; });

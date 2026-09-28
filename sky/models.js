@@ -43,7 +43,7 @@
     document.body.appendChild(zoom);
     function close() { zoom.classList.remove('open'); document.body.classList.remove('model-open'); var v = zoom.querySelector('video'); if (v) v.pause(); }
     zoom.addEventListener('click', close);
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && zoom.classList.contains('open')) close(); });
+    Sky.escape(function () { return zoom.classList.contains('open'); }, close);
 
     shelf.querySelectorAll('.model[data-model]').forEach(function (m, i) {
         var n = m.dataset.model, base = 'assets/' + room + '/model-' + n, name = m.getAttribute('title') || 'a model';

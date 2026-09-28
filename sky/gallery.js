@@ -157,10 +157,10 @@
     nextBtn.addEventListener('click', next);
     prevBtn.addEventListener('click', prev);
     gal.addEventListener('click', function (e) { if (e.target === gal) close(); });
+    Sky.escape(function () { return gal.classList.contains('open'); }, close);
     document.addEventListener('keydown', function (e) {
         if (!gal.classList.contains('open')) return;
-        if (e.key === 'Escape') { e.stopPropagation(); close(); }
-        else if (e.key === 'ArrowUp' || e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); next(); }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); next(); }
         else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
     }, true);
     // the mouse wheel and swipes flip pages too (swipe up = next)

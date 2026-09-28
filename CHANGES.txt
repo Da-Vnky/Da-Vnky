@@ -17,6 +17,17 @@ How it works
 
 == published ==
 
+2026-09-28 12:00 · V
+- One press of Escape now closes just one thing (the top-most): it used to close the control panel and put the gun away at once, shut a painting and walk out of the dungeon, or climb down from the attic leaving the grimoire open with its drone playing.
+- The house's rooms have one core now (sky/house.js): every room registers itself, and every way of going somewhere (arrows, doors, ladder, place tabs, Escape) goes through it. The kitchen, porch, attic and garden no longer carry their own copies of the walking code.
+- Fixed: the marker kept kitchen, porch and attic drawings as the hallway's; a traveller dropped in the bath walked out floating; walking to the fridge or the lectern couldn't be interrupted; the grimoire's pact page could open after you'd climbed down; reopening a book mid page-turn showed it empty; a quick Escape after uncorking a bottle caused an error.
+- Fixed: looking into Mel's room through the telescope left her room running hidden for the rest of the visit (it could use up her once-only afternoon scene, and play P(Doom) on the rooftop). It's closed when you stop looking now.
+- Fixed: in reset 4, going back up to the attic after the pact put the dungeon's apparitions back in their frames, undoing the ones already shot. The pictures' hover names come back too.
+- Fixed: the music could start under the hell's sound when the pact was made (and show 'tap to listen'); places that hush the music now each hold the hush by name. The weather no longer redraws the whole screen every frame on a clear day, and the sun's eye below doesn't pile up after several trips.
+- Fixed: the first page after a publish could show old art or lists; the pill bottle's hint in Mel's room ('give it to her') was being ignored; the workshop loaded one stylesheet twice.
+- The ?v= on every page is now stamped automatically when you publish (a checksum of the sky/ folder), so it no longer needs bumping by hand. The smoke test also checks each page's list of code and styles.
+- Tidy-up: the traveller's speech box (Sky.speak) moved from claubes.js into sky.js, a few shared helpers replace copies in ~20 files, and some dead code is gone. Nothing should look different: before-and-after pictures of every page in resets 1-5 match.
+
 2026-09-27 23:49 · V
 - Only one ordinary revolver now: on the rooftop in reset 1, then from reset 2 hung on a rack on the living-room wall (under the pictures on the right). It only jams on the traveller by then: it's for shooting things (and finding P(Doom) before reset 4). None in reset 4, as before. The rack is a new slot: assets/living/revolver-rack.
 - Reset 4: the static doesn't start until you've been down in the dungeon, and then it builds up slowly the longer you stay. After the pact the record player glows red ("something is waiting in the record player") until the inverted record is put on. Until then the book won't open the dungeon: the traveller says to check the record player. So nobody can go down without summoning the Claubes.

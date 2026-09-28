@@ -326,6 +326,7 @@
     function leaveScene(quiet) {
         var wasMel = scene.classList.contains('mel');
         melRun++;
+        viewEl.querySelectorAll('.mel-live').forEach(function (b) { b.remove(); });   // (her room, live: closed, not left running out of sight)
         scene.querySelectorAll('.mel-climb').forEach(function (b) { b.remove(); });
         scene.classList.remove('climbing');
         document.body.classList.remove('peep-mel');
@@ -346,7 +347,7 @@
     try { if (sessionStorage.getItem('mel-in') === '1') { melState.off = MEL.boards; document.body.classList.add('mel-in'); } } catch (e) {}
     var melRun = 0;
     function later(run, ms, fn) { setTimeout(function () { if (run === melRun && scene.classList.contains('mel')) fn(); }, ms); }
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
+    var sfx = Sky.sfx;
     function art(slot, fallback, box) {
         box.innerHTML = fallback;
         box.dataset.slot = slot;                                      // (where it sits: the asset manager's map)
@@ -449,12 +450,12 @@
         boards.forEach(function (b) { if (!b.classList.contains('gone')) { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); } });
         melState.knocks++;
         if (melState.knocks === 1) {                                // the first time, just a knock
-            if (Sky.sounds) Sky.sounds.sfx('knock');
+            Sky.sfx('knock');
             note.textContent = MEL.first;
             return;
         }
         var board = boards[melState.off];                            // then a board comes off with each one, from the top
-        if (Sky.sounds) Sky.sounds.sfx('crack');
+        Sky.sfx('crack');
         var fall = (melState.off % 2 ? 1 : -1);
         board.style.transform = 'translate(' + (fall * 30) + '%, 260%) rotate(' + (fall * (40 + Math.random() * 30)) + 'deg)';
         board.classList.add('gone');
@@ -490,18 +491,6 @@
         return windowAt(e.clientX, e.clientY);
     }
     Sky.peeper = { windowAt: windowAt, look: function (t) { lookThrough(t); } };
-    // back out of Mel's room with "look through the telescope again" (schizophyllu.me.room/): the telescope comes
-    // straight up, aimed at her window
-    try {
-        if (sessionStorage.getItem('dav-peek-mel') === '1') {
-            sessionStorage.removeItem('dav-peek-mel');
-            (function wait(n) {
-                var fr = frontInfo();
-                if (fr && fr.mel && state === 'off') lookThrough({ win: fr.mel, then: melPeek });
-                else if (n < 60) setTimeout(function () { wait(n + 1); }, 150);
-            })(0);
-        }
-    } catch (e) {}
     document.addEventListener('click', function (e) {
         var t = offTarget(e);
         if (!t) return;
@@ -516,11 +505,7 @@
     });
     ui.querySelector('.pu-leave').addEventListener('click', function () { state === 'scene' ? leaveScene() : lower(); });
     ui.querySelector('.pu-up').addEventListener('click', function () { if (state === 'scene') leaveScene(true); lookUp(); });
-    document.addEventListener('keydown', function (e) {
-        if (state === 'looking' || state === 'scene') {
-            if (e.key === 'Escape') { e.stopImmediatePropagation(); state === 'scene' ? leaveScene() : lower(); }
-        }
-    }, true);
+    Sky.escape(function () { return state === 'looking' || state === 'scene'; }, function () { state === 'scene' ? leaveScene() : lower(); });
     // the leave button's words follow what you're doing
     var leaveBtn = ui.querySelector('.pu-leave');
     new MutationObserver(function () {

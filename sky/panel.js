@@ -960,7 +960,7 @@
     toggleBtn.addEventListener('click', function () { setOpen(!root.classList.contains('open')); });
     root.querySelector('.cp-x').addEventListener('click', function () { setOpen(false); });
     document.addEventListener('pointerdown', function (e) { if (root.classList.contains('open') && !root.contains(e.target) && !e.target.closest('[data-opens-panel]')) setOpen(false); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('open')) { e.stopPropagation(); setOpen(false); } }, true);
+    Sky.escape(function () { return root.classList.contains('open'); }, function () { setOpen(false); }, Sky.ESC.panel);
     setInterval(refreshAll, 2000);
 
     // the sound effects (corks, paper, splashes): just a volume

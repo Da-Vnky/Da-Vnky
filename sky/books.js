@@ -46,7 +46,7 @@
     ];
     var body = document.body;
     var MEDIA = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'mp4', 'webm'];
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
+    var sfx = Sky.sfx;
 
     // (its look is in sky/css/books.css, linked from each page's head)
 
@@ -142,7 +142,7 @@
             busy = true;
             bookEl.insertBefore(el, old);
             requestAnimationFrame(function () { old.classList.add('out-next'); });
-            setTimeout(function () { old.remove(); busy = false; }, 560);
+            turning = setTimeout(function () { old.remove(); busy = false; }, 560);
             sfx('page-turn');
         } else {                                                   // back: the page before turns back over it
             busy = true;
@@ -150,7 +150,7 @@
             bookEl.appendChild(el);
             void el.offsetWidth;
             el.style.transition = ''; el.classList.remove('in-prev');
-            setTimeout(function () { old.remove(); busy = false; }, 560);
+            turning = setTimeout(function () { old.remove(); busy = false; }, 560);
             sfx('page-turn');
         }
         view.querySelector('.bk-prev').disabled = i === 0;
@@ -161,8 +161,10 @@
         if (b === grimRec || (b.classList && b.classList.contains('grimoire-book'))) { if (now) return show1(grimRec); return grimoire(); }
         return show1(b._book);
     }
+    var turning = 0;
     function show1(bk) {
         if (!bk || !bk.pages.length) return false;
+        clearTimeout(turning); busy = false;                        // (shut mid-turn last time: a fresh book, all the same)
         cur = bk;
         view.querySelector('.bk-title').textContent = bk.title || '';
         bookEl.innerHTML = '';
@@ -178,7 +180,7 @@
     function hum(on) {
         if (!drone && Sky.sounds && Sky.sounds.channel) drone = Sky.sounds.channel('grimoire');
         if (drone) drone.set(on || 0, on ? 1.2 : 0.8);
-        if (Sky.music && Sky.music.hush) Sky.music.hush(!!on);
+        if (Sky.music && Sky.music.hush) Sky.music.hush(!!on, 'book');
     }
     function close() {
         if (!view.classList.contains('open')) return;
@@ -192,9 +194,9 @@
     view.querySelector('.bk-prev').addEventListener('click', function () { show(at - 1, -1); });
     view.querySelector('.bk-next').addEventListener('click', function () { show(at + 1, 1); });
     view.addEventListener('click', function (e) { if (e.target === view) close(); });
+    Sky.escape(function () { return view.classList.contains('open'); }, close);
     document.addEventListener('keydown', function (e) {
         if (!view.classList.contains('open')) return;
-        if (e.key === 'Escape') { e.stopImmediatePropagation(); close(); }
         if (e.key === 'ArrowRight') show(at + 1, 1);
         if (e.key === 'ArrowLeft') show(at - 1, -1);
     }, true);
@@ -215,15 +217,13 @@
         var line = o.line || VIBES[Math.floor(Math.random() * VIBES.length)];
         var go = function () {
             remarking = false;
-            if (sfxOK()) sfx('grimoire-open', { or: 'dread', volume: o.loud ? 1 : QUIET });
+            if (o.still && !o.still()) return;                        // (they've gone meanwhile: down the hole)
+            sfx('grimoire-open', { or: 'dread', volume: o.loud ? 1 : QUIET });
             if (o.open) o.open(); else show1(grimRec);
         };
-        var speak = Sky.claubes && Sky.claubes.speak;
-        if (speak) speak(line, null, { hold: 700, typed: function () { setTimeout(go, 600); } });
-        else { if (Sky.inventory && Sky.inventory.say) Sky.inventory.say(line, 2400); setTimeout(go, 1500); }
+        Sky.speak(line, null, { hold: 700, typed: function () { setTimeout(go, 600); } });
         return true;
     }
-    function sfxOK() { return !!Sky.sounds; }
 
     Sky.books = { open: open, close: close, grimoire: grimoire, get remarking() { return remarking; } };
 })();

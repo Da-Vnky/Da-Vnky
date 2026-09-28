@@ -49,7 +49,7 @@
     try { color = sessionStorage.getItem('marker-color') || color; } catch (e) {}
     function save() { try { sessionStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {} }
     // each scene keeps its own drawings: this page, and (in the living space) which room of it
-    function scene() { return location.pathname.replace(/.*\//, '') + '#' + ((Sky.sides && Sky.sides.inSide) || 'main'); }
+    function scene() { var w = Sky.house ? Sky.house.where() : 'living'; return location.pathname.replace(/.*\//, '') + '#' + (w === 'living' ? 'main' : w); }
     function lines() { var k = scene(); return all[k] || (all[k] = []); }
 
     var W = 0, H = 0, dpr = 1;
@@ -79,7 +79,7 @@
     function redraw() { g.clearRect(0, 0, cv.width, cv.height); lines().forEach(stroke); }
     size();
     window.addEventListener('resize', size);
-    if (Sky.sides && Sky.sides.on) Sky.sides.on(function () { setTimeout(redraw, 950); });   // (a different room: its own drawings, once it's slid in)
+    if (Sky.house) Sky.house.on(function () { redraw(); setTimeout(redraw, 950); });   // (a different room: its own drawings)
 
     /* ---------------- drawing ---------------- */
     var on = false, cur = null;
@@ -99,7 +99,7 @@
         cur = { c: color, w: WIDTH, p: [e.clientX / W, e.clientY / H] };
         lines().push(cur);
         stroke(cur);
-        if (Sky.sounds) Sky.sounds.sfx('brush', { size: 0.1 });
+        Sky.sfx('brush', { size: 0.1 });
     });
     cv.addEventListener('pointermove', function (e) {
         if (!cur) return;

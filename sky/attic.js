@@ -38,7 +38,8 @@
 (function () {
     var Sky = window.Sky, S = window.davSave;
     var body = document.body, hall = document.querySelector('.hallway'), attic = document.querySelector('.attic');
-    if (!Sky || !hall || !attic || Sky.attic) return;
+    if (!Sky || !Sky.house || !hall || !attic || Sky.attic) return;
+    var H = Sky.house;
     var ladder = hall.querySelector('.hall-ladder'), cord = hall.querySelector('.hall-cord');
     var LAMP_RESETS = [4];                                 // the resets with the lamp that comes away (any other: the cord)
     var LAMP = !!S && LAMP_RESETS.indexOf(S.reset) !== -1;
@@ -47,8 +48,8 @@
     var hole = attic.querySelector('.attic-hole'), book = attic.querySelector('.attic-grimoire');
     var TUG = 0.42;                                        // how far (a share of the lamp's height) it stretches before it comes away
     var STAND = 30;                                        // where the traveller stands up here (% across)
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
-    function say(t, ms) { if (Sky.inventory && Sky.inventory.say) Sky.inventory.say(t, ms || 2600); }
+    var sfx = Sky.sfx;
+    function say(t, ms) { Sky.say(t, ms || 2600); }
     function get(k) { return S ? S.get(k) : null; }
     function set(k, v) { if (S) S.set(k, v); }
 
@@ -84,7 +85,7 @@
     }
     function ladderDown() { sfx('ladder', { or: 'wall-slide' }); body.classList.add('ladder-down'); }
     var pull = null;
-    function busy() { return (Sky.sides && Sky.sides.busy) || climbing; }
+    function busy() { return H.busy || climbing; }
     function lampOf(e) { return e.target.closest && e.target.closest('.hall-lamp'); }       // (a picture of yours takes the drawn lamp's place, so it's looked for each time)
     hall.addEventListener('pointerdown', function (e) {
         var lamp = lampOf(e);
@@ -205,31 +206,20 @@
         };
     }
 
-    /* ---------------- up the ladder, down the hole ---------------- */
+    /* ---------------- up the ladder, down the hole (the trip between rooms: sky/house.js) ---------------- */
     var climbing = false, up = false;
-    function pctOf(el, host) { var r = el.getBoundingClientRect(), hr = host.getBoundingClientRect(); return (r.left + r.width / 2 - hr.left) / (hr.width || window.innerWidth) * 100; }
-    function standAt(ch, x) { return x - (ch.offsetWidth / 2) / (ch.parentNode.clientWidth || window.innerWidth) * 100; }
-    function walk(ch, x, done) { if (Sky.sides && Sky.sides.walk) Sky.sides.walk(ch, x, done); else { ch.style.left = x + '%'; if (done) setTimeout(done, 300); } }
-    function place(ch, x, left) { if (Sky.sides && Sky.sides.place) Sky.sides.place(ch, x, left); else ch.style.left = x + '%'; }
-    // the trip from room to room, and changing your mind on the way (sky/bathroom.js: "a trip from room to room")
-    var T = function () { return Sky.sides || {}; };
-    function ask(fn) { if (T().ask) T().ask(fn); else fn(); }
-    function setOff(cancel) { if (T().setOff) T().setOff(cancel); }
-    function through() { if (T().through) T().through(); }
-    function land(el, to, settle) { if (T().land) T().land(el, to, settle); else if (el) walk(el, to, settle); else settle(); }
-    function stop(el) { if (T().stop) T().stop(el); }
-    function headFor(where, fallback) { ask(function () { if (T().nav) T().nav(where); else fallback(); }); }
+    var walk = H.walk, place = H.place, stop = H.stop, pctOf = H.pctOf, standAt = H.standAt;
     function climbUp() {
-        if (climbing || up || !body.classList.contains('in-hall') || (Sky.sides && Sky.sides.busy)) return;
+        if (climbing || up) return;
         climbing = true;
         var go = function () {
-            through();
+            H.through();
             if (hallMe) { hallMe.classList.remove('face-left'); hallMe.classList.add('up-ladder'); }
             var n = 0, steps = setInterval(function () { sfx('step', { size: 0.35 }); if (++n > 3) clearInterval(steps); }, 220);
             setTimeout(function () { openAttic(false); }, 750);
         };
         if (!hallMe) { go(); return; }
-        setOff(function () { stop(hallMe); climbing = false; });
+        H.setOff(function () { stop(hallMe); climbing = false; });
         walk(hallMe, standAt(hallMe, pctOf(ladder, hall)), go);
     }
     function openAttic(now) {
@@ -240,6 +230,7 @@
         attic.setAttribute('aria-hidden', 'false');
         try { history.replaceState(null, '', '#attic'); } catch (e) {}
         if (Sky.fillAssets) Sky.fillAssets(attic);
+        H.fire('enter', 'attic');
         var holeX = standAt(me, pctOf(hole, attic));
         if (now) {
             place(me, STAND);
@@ -253,50 +244,38 @@
             body.classList.remove('attic-panning');
             if (hallMe) hallMe.classList.remove('up-ladder');
             me.classList.remove('out-of-hole');
-            land(me, STAND, function () { me.classList.remove('face-left'); climbing = false; });
+            H.land(me, STAND, function () { me.classList.remove('face-left'); climbing = false; });
         }, 950);
     }
-    function climbDown(now) {
-        if (!up || (climbing && !now)) return;
+    function climbDown() {
+        if (!up || climbing) return;
         var shut = function () {
-            if (!now) through();
+            H.through();
             up = false;
-            if (now) body.classList.add('attic-now');
             body.classList.remove('in-attic');
-            if (!now) body.classList.add('attic-panning');
+            body.classList.add('attic-panning');
             attic.setAttribute('aria-hidden', 'true');
             me.classList.remove('into-hole');
             closeBook(true);
-            try { history.replaceState(null, '', body.classList.contains('in-hall') ? '#hallway' : location.pathname + location.search); } catch (e) {}
-            if (now) { setTimeout(function () { body.classList.remove('attic-now'); climbing = false; }, 60); return; }
+            try { history.replaceState(null, '', '#hallway'); } catch (e) {}
+            H.fire('leave', 'attic');
             if (hallMe) { place(hallMe, standAt(hallMe, pctOf(ladder, hall))); hallMe.classList.add('down-ladder'); }
-            setTimeout(function () { body.classList.remove('attic-panning'); if (hallMe) hallMe.classList.remove('down-ladder'); land(null, 0, function () { climbing = false; }); }, 950);
+            setTimeout(function () { body.classList.remove('attic-panning'); if (hallMe) hallMe.classList.remove('down-ladder'); H.land(null, 0, function () { climbing = false; }); }, 950);
         };
-        if (now) { shut(); return; }
         climbing = true;
-        setOff(function () { stop(me); climbing = false; });
+        H.setOff(function () { stop(me); climbing = false; });
         walk(me, standAt(me, pctOf(hole, attic)), function () {
-            through();
+            H.through();
             me.classList.add('into-hole');
             sfx('step', { size: 0.35 });
             setTimeout(shut, 650);
         });
     }
-    if (ladder) ladder.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); headFor('attic', climbUp); });
-    if (hole) hole.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); headFor('hall', function () { climbDown(false); }); });
-    document.addEventListener('keydown', function (e) {                    // (Escape up here: back down the hole, not all the way home)
-        if (e.key !== 'Escape' || !up) return;
-        if (body.classList.contains('inv-holding')) return;
-        e.stopImmediatePropagation();
-        if (grim.classList.contains('open')) closeBook(); else headFor('hall', function () { climbDown(false); });
-    }, true);
-    // off out of the hallway some other way (the place tabs): the attic's shut behind them
-    (function hookSides(n) {
-        if (Sky.sides && Sky.sides.on) Sky.sides.on(function (what, name) { if (name === 'hall' && what === 'leave' && up) climbDown(true); });
-        else if (n < 40) setTimeout(function () { hookSides(n + 1); }, 150);
-    })(0);
+    H.room('attic', { parent: 'hall', here: function () { return up; }, busy: function () { return climbing; }, enter: climbUp, leave: climbDown });
+    if (ladder) ladder.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('attic'); });
+    if (hole) hole.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('hall'); });
     // living.html#attic: start up there (the debug page's preview)
-    if (location.hash === '#attic') setTimeout(function () { if (Sky.sides && Sky.sides.goNow) Sky.sides.goNow('hall'); setTimeout(function () { openAttic(true); }, 80); }, 120);
+    if (location.hash === '#attic') setTimeout(function () { if (Sky.sides) Sky.sides.goNow('hall'); setTimeout(function () { openAttic(true); }, 80); }, 120);
 
     /* ---------------- the grimoire ---------------- */
     var hasBook = !!S && S.live('grimoire');
@@ -335,7 +314,7 @@
     function hum(on) {
         if (!drone && Sky.sounds && Sky.sounds.channel) drone = Sky.sounds.channel('grimoire');
         if (drone) drone.set(on ? on : 0, on ? 1.2 : 0.8);
-        if (Sky.music && Sky.music.hush) Sky.music.hush(!!on);
+        if (Sky.music && Sky.music.hush) Sky.music.hush(!!on, 'grimoire');
     }
 
     // signing: the pointer draws in blood
@@ -399,7 +378,7 @@
     pad.addEventListener('pointercancel', lift);
 
     function openBook() {
-        if (!hasBook || climbing || pactMade() || grim.classList.contains('open')) return;
+        if (!hasBook || !up || climbing || pactMade() || grim.classList.contains('open')) return;
         grim.classList.remove('slam');
         grim.classList.add('open');
         body.classList.add('book-open');
@@ -416,26 +395,28 @@
     }
     grim.querySelector('.gr-shut').addEventListener('click', function () { closeBook(); });
     grim.addEventListener('click', function (e) { if (e.target === grim) closeBook(); });
+    Sky.escape(function () { return grim.classList.contains('open') && !grim.classList.contains('slam'); }, function () { closeBook(); });
     if (book) book.addEventListener('click', function (e) {
         e.preventDefault(); e.stopPropagation();
-        if (!hasBook || climbing || body.classList.contains('inv-holding')) return;
+        if (!hasBook || !up || climbing || H.going || body.classList.contains('inv-holding')) return;
         if (Sky.books && Sky.books.remarking) return;
-        climbing = true;
+        // over to the lectern (down the hole instead, on the way: that's fine)
+        H.setOff(function () { stop(me); });
         walk(me, standAt(me, pctOf(book, attic)) - 6, function () {
+            H.drop();
             me.classList.remove('face-left');
-            climbing = false;
             // a word first (sky/books.js), then it opens: the ritual, loud, if its pact is still to be made; else only a book
             var first = get('grimoire-looked') !== '1';
             set('grimoire-looked', '1');
             // the pact's made but they came back up without the key (a reload down there): it pulls them straight back
             if (Sky.hell && Sky.hell.owed && !Sky.hell.open) {
                 if (Sky.inventory) Sky.inventory.say(PULLED, 2600);
-                setTimeout(rise, 1400);
+                setTimeout(function () { if (up && !H.going) rise(); }, 1400);
                 return;
             }
             if (!Sky.books || !Sky.books.grimoire) { if (!pactMade()) openBook(); return; }
             if (pactMade()) Sky.books.grimoire();
-            else Sky.books.grimoire({ line: first ? FIRST_LOOK : null, loud: true, open: openBook });
+            else Sky.books.grimoire({ line: first ? FIRST_LOOK : null, loud: true, open: openBook, still: function () { return up && !H.going; } });
         });
     });
 
@@ -563,5 +544,5 @@
         }, 3300);
     }
 
-    Sky.attic = { up: function () { return up; }, open: function () { openAttic(true); }, climbDown: climbDown, climbUp: climbUp, openBook: openBook, get lamp() { return LAMP; } };
+    Sky.attic = { up: function () { return up; }, openBook: openBook, get lamp() { return LAMP; } };
 })();

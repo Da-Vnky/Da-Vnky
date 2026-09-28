@@ -666,7 +666,7 @@ const SCENE_CUES = {
   },
 };
 async function startAfternoon() {
-  if (afternoon || alone || mode !== 'room' || current !== 'main') return;
+  if (afternoon || alone || mode !== 'room' || current !== 'main' || PEEK) return;   // (DaV-nky: never in the view through the window)
   afternoon = true;
   store.set('afternoon_seen', '1');
   mode = 'moving';
@@ -1746,7 +1746,7 @@ function davDoomFile() {
 }
 let record = null;
 async function playRecord() {
-  if (record) return;
+  if (record || PEEK) return;                            // (DaV-nky: the view through the window makes no sound)
   try {
     const name = await davDoomFile();
     if (!name) return;

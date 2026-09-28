@@ -264,7 +264,7 @@
         if (uncorked || !current) return;
         uncorked = true;
         markSeen(current.id);
-        if (Sky.sounds) Sky.sounds.sfx('cork-pop');
+        Sky.sfx('cork-pop');
         var fx = corkDrag ? corkDrag.dx : 0, fy = corkDrag ? corkDrag.dy : 0;
         corkDrag = null;
         cork.animate([
@@ -284,7 +284,8 @@
         return b;
     }
     function read() {
-        if (Sky.sounds) Sky.sounds.sfx('paper-unroll');
+        if (!current || !un.classList.contains('open')) return;           // (put back while it was still unrolling)
+        Sky.sfx('paper-unroll');
         cardBody.innerHTML = '';
         cardBody.appendChild(messageEl(current));
         cardFrom.textContent = fromLine(current, {});
@@ -303,7 +304,7 @@
     // the letter flies to the board or onto the pile (owner)
     function flyTo(target, to) {
         var id = current.id;
-        if (Sky.sounds) Sky.sounds.sfx('paper-roll');
+        Sky.sfx('paper-roll');
         if (!target) { move(id, to); closeUncork(); return; }
         var a = card.getBoundingClientRect(), b = target.getBoundingClientRect();
         card.animate([
@@ -318,8 +319,8 @@
     }
     // rolled back up and back in the crate
     function putBack() {
-        if (Sky.sounds) Sky.sounds.sfx('paper-roll');
-        if (Sky.sounds) Sky.sounds.sfx('cork-in', { delay: 0.5 });
+        Sky.sfx('paper-roll');
+        Sky.sfx('cork-in', { delay: 0.5 });
         var a = card.getBoundingClientRect(), b = crate.getBoundingClientRect();
         card.animate([
             { transform: 'translate(-50%,-50%)', opacity: 1 },
@@ -493,16 +494,13 @@
         pileEl.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && onPile().length) { e.preventDefault(); openPile(); } });
     }
     document.addEventListener('keydown', function (e) {
-        if (pv.classList.contains('open')) {
-            if (e.key === 'Escape') { e.stopImmediatePropagation(); closePile(); }
-            else if (e.key === 'ArrowRight') flip(1);
-            else if (e.key === 'ArrowLeft') flip(-1);
-            return;
-        }
-        if (e.key !== 'Escape') return;
-        if (bv.classList.contains('open')) { e.stopImmediatePropagation(); closeBoard(); }
-        else if (un.classList.contains('open')) { e.stopImmediatePropagation(); uncorked ? putBack() : closeUncork(); }
+        if (!pv.classList.contains('open')) return;
+        if (e.key === 'ArrowRight') flip(1);
+        else if (e.key === 'ArrowLeft') flip(-1);
     }, true);
+    Sky.escape(function () { return pv.classList.contains('open'); }, closePile);
+    Sky.escape(function () { return bv.classList.contains('open'); }, closeBoard);
+    Sky.escape(function () { return un.classList.contains('open'); }, function () { un.classList.contains('read') ? putBack() : closeUncork(); });
 
     /* ---------------- owner mode: publishing the board ---------------- */
     var bar = null, pb = null;

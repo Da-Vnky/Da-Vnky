@@ -188,13 +188,17 @@
             Object.keys(have).forEach(function (p) { if (p.indexOf(pre) === 0 && p.slice(pre.length).indexOf('/') === -1) names[p.slice(pre.length)] = 1; });
             return names;
         });
-        if (!assetDirs[dir]) assetDirs[dir] = Promise.all([
-            fetch(dir + 'list.txt', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; }),
-            new Promise(function (done) { listFolder(dir, EXTS.concat(['jpeg', 'json', 'mp3', 'ogg', 'webm', 'mp4', 'woff', 'woff2', 'ttf', 'otf']), done); })
-        ]).then(function (r) {
-            var known = !!r[0] && !/<html/i.test(r[0]), names = {};
-            r[1].forEach(function (f) { names[f.name] = 1; });
-            return (known || r[1].length) ? names : null;             // null: we don't know, so try each file
+        // (the folder's list.txt, once; without one, asked around: sky.js listFolder)
+        if (!assetDirs[dir]) assetDirs[dir] = fetch(dir + 'list.txt', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; }).then(function (t) {
+            var names = {};
+            if (t && !/<html/i.test(t)) {
+                t.split(/\r?\n/).forEach(function (l) { l = l.trim(); if (l && l.charAt(0) !== '#' && l !== 'list.txt') names[l] = 1; });
+                return names;
+            }
+            return new Promise(function (done) { listFolder(dir, EXTS.concat(['jpeg', 'json', 'mp3', 'ogg', 'webm', 'mp4', 'woff', 'woff2', 'ttf', 'otf']), done); }).then(function (files) {
+                files.forEach(function (f) { names[f.name] = 1; });
+                return files.length ? names : null;                   // null: we don't know, so try each file
+            });
         });
         return assetDirs[dir];
     }
@@ -1014,8 +1018,8 @@
         if (v.onClose) v.onClose();
     }
     exitBtn.addEventListener('click', closeSkyView);
+    escape(function () { return !!view; }, closeSkyView);
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeSkyView();
         if (view && e.key === ' ' && e.target === body) { e.preventDefault(); setPlaying(!clock.playing); }
     });
 
@@ -1339,15 +1343,7 @@
     // open any page with ?slots on the end (…/city.html?slots) to get a list of its slots
     function showSlots() {
         if (!/[?&]slots\b/.test(location.search)) return;
-        body.classList.add('show-slots');
-        css(
-            'body.show-slots [data-asset], body.show-slots [data-slot] { outline: 2px dashed rgba(255,70,140,.9); outline-offset: 2px; }' +
-            'body.show-slots .has-art[data-asset], body.show-slots .has-art[data-slot] { outline-color: rgba(60,220,140,.95); }' +
-            '.slot-panel { position: fixed; left: 12px; bottom: 12px; z-index: 50; max-height: 60vh; overflow: auto; padding: 10px 14px; border-radius: 8px;' +
-                'background: rgba(20,16,12,.92); color: #f3e6c2; font: 13px/1.5 ui-monospace, Menlo, monospace; box-shadow: 0 6px 20px rgba(0,0,0,.5); }' +
-            '.slot-panel b { display: block; font: italic 15px Georgia, serif; margin-bottom: 4px; }' +
-            '.slot-panel .on { color: #7fe0a8; } .slot-panel .off { color: #c9b89a; opacity: .8; }'
-        );
+        body.classList.add('show-slots');                               // (its look: sky.css, "?slots")
         var panel = document.createElement('div');
         panel.className = 'slot-panel';
         body.appendChild(panel);
@@ -1398,10 +1394,6 @@
         el.addEventListener('click', toggle);
         el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
     }
-    // an arrow or a door that leads to another page (<a class="room-arrow exit" href="living.html#hallway">): the send-offs play first
-    var ARROW_ART = '<svg class="placeholder" viewBox="0 0 60 60" aria-hidden="true">' +
-        '<circle cx="30" cy="30" r="27" fill="rgba(243,230,194,.16)" stroke="rgba(243,230,194,.55)" stroke-width="2"/>' +
-        '<path d="M22 16 L38 30 L22 44" fill="none" stroke="#f3e6c2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     // walking about: a character strolls sideways from where it stands (dx px; 0 = back to its spot).
     // works however the page places it, since it only nudges it with a transform
     function stroll(el, dx, done) {
@@ -1782,7 +1774,78 @@
         root.classList.add('has-rope-art');
     });
 
+    /* ---------------- the traveller's words, typed out in a box near the top; click (or wait) to move on ----------------
+       Sky.speak(lines, done, opts): lines a string or a list of them. its look: .mc-say in sky.css (it used to live in
+       sky/claubes.js, so everything that talked needed the Claubes) */
+    // (opts.hold: how long the last line stays up once it's typed, in ms; opts.typed: called the moment it's all typed)
+    function speak(lines, done, opts) {
+        opts = opts || {};
+        if (typeof lines === 'string') lines = [lines];
+        var box = document.createElement('div');
+        box.className = 'mc-say' + (opts.cls ? ' ' + opts.cls : '');
+        box.setAttribute('role', 'status');
+        box.innerHTML = '<b></b><span></span>';
+        box.querySelector('b').textContent = opts.who || 'the traveller';      // (opts.who: someone else speaking; opts.cls: their look)
+        body.appendChild(box);
+        requestAnimationFrame(function () { box.classList.add('on'); });
+        var t = box.querySelector('span'), i = 0, timer = null, typing = null;
+        function line() {
+            if (i >= lines.length) { box.classList.remove('on'); setTimeout(function () { box.remove(); if (done) done(); }, 400); return; }
+            var text = lines[i++], n = 0;
+            t.textContent = '';
+            clearInterval(typing);
+            typing = setInterval(function () {
+                t.textContent = text.slice(0, ++n);
+                if (n % 2 === 0 && text.charAt(n - 1) !== ' ') sfx(opts.blip || 'blip', { size: 0.25, or: opts.blipOr || 'blip' });
+                if (n >= text.length) { clearInterval(typing); typing = null; typed(); }
+            }, 38);
+        }
+        function typed() {
+            var last = i >= lines.length;
+            clearTimeout(timer);
+            timer = setTimeout(line, last && opts.hold !== undefined ? opts.hold : 2600 + lines[i - 1].length * 30);
+            if (last && opts.typed) { var f = opts.typed; opts.typed = null; f(); }
+        }
+        box.addEventListener('click', function () {
+            if (typing) { clearInterval(typing); typing = null; t.textContent = lines[i - 1]; typed(); }
+            else { clearTimeout(timer); line(); }
+        });
+        line();
+    }
+
+    // everything being said, stopped (something more important to say: sky/lives.js)
+    speak.hush = function () { Array.prototype.forEach.call(document.querySelectorAll('.mc-say'), function (b) { b.remove(); }); };
+
+    /* ---------------- Escape: one press, one thing ----------------
+       (28 Sep: each view used to listen for Escape on its own, so one press could close the control panel and put the
+       gun away, or shut a painting and walk out of the dungeon.) now each thing that Escape can close says so here:
+           Sky.escape(isOpen, close, level)
+       and a press closes only the open one on the highest level (the same level: the one added last). the levels:
+           Sky.ESC.panel (the control panel, over everything) › view (something looked at up close: a book, a painting,
+           the record player, a letter …) › hand (something held: the revolver) › room (the house: back the way you came) */
+    var escapes, ESC = { room: 0, hand: 10, view: 20, panel: 30 };
+    function escape(isOpen, close, level) {
+        escapes = escapes || [];                              // (this file uses it before it gets down here)
+        escapes.push({ open: isOpen, close: close, level: level === undefined ? 20 : level, n: escapes.length });
+        escapes.sort(function (a, b) { return b.level - a.level || b.n - a.n; });
+    }
+    window.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape' || e.defaultPrevented || !escapes) return;
+        for (var i = 0; i < escapes.length; i++) {
+            var x = escapes[i], on = false;
+            try { on = x.open(); } catch (err) {}
+            if (!on) continue;
+            e.preventDefault(); e.stopImmediatePropagation();
+            x.close(e);
+            return;
+        }
+    }, true);
+    // the little things nearly every script wants: a sound effect (sky/panel.js), and a line said (sky/inventory.js)
+    function sfx(name, opts) { if (window.Sky && Sky.sounds) return Sky.sounds.sfx(name, opts); }
+    function say(text, ms) { if (window.Sky && Sky.inventory && Sky.inventory.say) Sky.inventory.say(text, ms); }
+
     window.Sky = {
+        escape: escape, ESC: ESC, sfx: sfx, say: say, speak: speak, ARROW_ART: ARROW_ART,
         // run fn(p) every frame the scene changes; p goes 0 (noon) → 1 (midnight)
         onFrame: function (fn) { hooks.push(fn); fn(shown); },
         // run fn(go) when a sign or constellation is clicked; return true and
@@ -1823,7 +1886,7 @@
         svgArt: svgArt, layerArt: layerArt, fitLayerArt: fitLayerArt, setCloudiness: setCloudiness,
         repoApi: REPO_API,
         findAsset: findAsset,
-        setupCharacters: setupCharacters, stroll: stroll, restX: restX,
+        setupCharacters: setupCharacters, restX: restX,
         save: window.davSave,
         figure: FIGURE,
         places: PLACES,

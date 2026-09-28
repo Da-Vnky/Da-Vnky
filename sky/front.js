@@ -17,17 +17,14 @@
 (function () {
     var Sky = window.Sky;
     var body = document.body, front = document.querySelector('.front');
-    if (!Sky || !front || Sky.front) return;
+    if (!Sky || !Sky.house || !front || Sky.front) return;
+    var H = Sky.house, sfx = Sky.sfx, walk = H.walk, place = H.place, standAt = H.standAt;
     var me = front.querySelector('.front-character'), hit = front.querySelector('.front-door-hit');
     var hall = document.querySelector('.hallway'), hallMe = hall && hall.querySelector('.hall-character');
     var out = hall && hall.querySelector('.hall-out');
     var STAND = 44;                                        // where the traveller stands on the path (% across)
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
-    function say(t, ms) { if (Sky.inventory && Sky.inventory.say) Sky.inventory.say(t, ms || 2600); }
-    function place(ch, x, left) { if (Sky.sides && Sky.sides.place) Sky.sides.place(ch, x, left); else ch.style.left = x + '%'; }
-    function walk(ch, x, done) { if (Sky.sides && Sky.sides.walk) Sky.sides.walk(ch, x, done); else { ch.style.left = x + '%'; if (done) setTimeout(done, 300); } }
-    function standAt(ch, x) { return x - (ch.offsetWidth / 2) / (ch.parentNode.clientWidth || window.innerWidth) * 100; }
-    function pctOf(el) { var r = el.getBoundingClientRect(); return (r.left + r.width / 2) / window.innerWidth * 100; }
+    function say(t, ms) { Sky.say(t, ms || 2600); }
+    function pctOf(el) { return H.pctOf(el); }             // (across the whole window: the garden's the whole screen)
 
     // its look is in sky/css/front.css; this is the value it takes from here
     document.documentElement.style.setProperty('--front-stand', STAND);
@@ -39,9 +36,10 @@
         front.setAttribute('aria-hidden', 'false');
         if (Sky.fillAssets) Sky.fillAssets(front);
         place(me, STAND);
+        H.fire('enter', 'front');
         if (!open.said) { open.said = true; setTimeout(function () { if (here && !busy) say('Home.', 2200); }, 1400); }
     }
-    // gone somewhere else: the garden's left behind (instantly, or fading as the hallway shows)
+    // gone somewhere else: the garden's left behind (instantly, or fading as the living space shows)
     function close(fade) {
         if (!here) return;
         here = false;
@@ -55,6 +53,7 @@
             front.classList.remove('door-open');
             resetMe();
         }
+        H.fire('leave', 'front');
     }
     function resetMe() {
         me.getAnimations().forEach(function (a) { a.cancel(); });
@@ -64,17 +63,14 @@
     }
 
     // the front door: up the path, the door opens, and in they go (to the hallway)
-    // the trip from room to room, and changing your mind on the way (sky/bathroom.js: "a trip from room to room")
-    var T = function () { return Sky.sides || {}; };
-    function ask(fn) { if (T().ask) T().ask(fn); else fn(); }
     function goIn() {
         if (!here || busy) return;
         busy = true;
         var r = me.getBoundingClientRect(), d = hit.getBoundingClientRect();
         // (somewhere else instead, on the way to the path: they stop where they are)
-        if (T().setOff) T().setOff(function () { if (T().stop) T().stop(me); busy = false; });
+        H.setOff(function () { H.stop(me); busy = false; });
         walk(me, standAt(me, pctOf(hit)), function () {
-            if (T().through) T().through();
+            H.through();
             r = me.getBoundingClientRect();
             var scale = Math.max(0.2, Math.min(1, d.height * 0.95 / r.height));
             var dx = (d.left + d.width / 2) - (r.left + r.width / 2), dy = d.bottom - r.bottom;
@@ -104,8 +100,8 @@
         setTimeout(function () {
             var root = document.documentElement;
             root.classList.add('front-snap');                              // (no transitions while it's all put in place)
-            if (Sky.sides && Sky.sides.goNow) Sky.sides.goNow('hall');
             close(false);
+            if (Sky.sides) Sky.sides.goNow('hall');
             if (hallMe) place(hallMe, out ? standAt(hallMe, pctOf(out)) : 50);
             requestAnimationFrame(function () { requestAnimationFrame(function () {
                 root.classList.remove('front-snap');
@@ -114,32 +110,25 @@
                 var settle = function () { if (hallMe) hallMe.classList.remove('face-left'); };
                 setTimeout(function () {
                     if (hallMe) sfx('door', { size: 0.4 });
-                    if (T().land) T().land(hallMe, 44, settle); else if (hallMe) walk(hallMe, 44, settle);
+                    H.land(hallMe, 44, settle);
                 }, 350);
             }); });
         }, 500);
     }
-    if (hit) hit.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); ask(goIn); });
-
-    // off somewhere else (a side room, a place tab): the garden's left behind
-    (function hookSides(n) {
-        if (Sky.sides && Sky.sides.on) Sky.sides.on(function (what) { if (what === 'enter' && here && !busy) close(false); });
-        else if (n < 40) setTimeout(function () { hookSides(n + 1); }, 150);
-    })(0);
-    // the living space's own tab, clicked out here: into the living space
-    document.addEventListener('click', function (e) {
-        var t = e.target.closest && e.target.closest('.place-tab[data-place=living]');
-        if (!t || !here) return;
-        e.preventDefault(); e.stopPropagation();
-        // (on the way in through the door already: into the hallway first, then on to the living space)
-        ask(function () {
-            if (!here) { if (T().nav) T().nav('living'); return; }
-            close(true);
-            try { history.replaceState(null, '', location.pathname + location.search); } catch (err) {}
-        });
-    }, true);
+    // the garden is outside the house, through its front door (into the hallway). anywhere else: a place tab, and the
+    // garden's just left behind (the living space's: fading into it; the kitchen's: straight to the hallway, and on)
+    H.room('front', { parent: 'hall', here: function () { return here; }, busy: function () { return busy; }, leave: goIn,
+                      away: function (to) {
+                          if (to === 'hall') return false;
+                          close(to === 'living');
+                          if (to === 'living') { try { history.replaceState(null, '', location.pathname + location.search); } catch (err) {} return true; }
+                          if (Sky.sides) Sky.sides.goNow('hall');
+                          H.nav(to);
+                          return true;
+                      } });
+    if (hit) hit.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('hall'); });
 
     if (location.hash === '#front') open();
 
-    Sky.front = { open: open, close: close, goIn: goIn, get here() { return here; } };
+    Sky.front = { open: open, close: close, get here() { return here; } };
 })();

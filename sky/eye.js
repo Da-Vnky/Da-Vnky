@@ -245,11 +245,21 @@
             var d = Math.sqrt(dx * dx + dy * dy) || 1, k = Math.min(1, d / 260) * r.width * EYE.reach / 100 / d;
             pupil.style.transform = 'translate(calc(-50% + ' + (dx * k).toFixed(1) + 'px), calc(-50% + ' + (dy * k).toFixed(1) + 'px))';
         }
+        // (an eye taken off the page again, like the one below in reset 4 (sky/hell.js), stops listening: no pile of them)
+        var seen = false, dead = false;
+        function alive() {
+            if (dead) return false;
+            if (eye.isConnected) return (seen = true);
+            if (seen) { dead = true; document.removeEventListener('pointermove', onMove); document.removeEventListener('pointerdown', onMove); document.removeEventListener('mouseleave', onLeave); }
+            return false;
+        }
         function aim(x, y) { want = [x, y]; if (!queued) { queued = true; requestAnimationFrame(look); } }
-        document.addEventListener('pointermove', function (e) { aim(e.clientX, e.clientY); }, { passive: true });
-        document.addEventListener('pointerdown', function (e) { aim(e.clientX, e.clientY); }, { passive: true });
-        document.addEventListener('mouseleave', function () { want = null; pupil.style.transform = ''; });
-        Sky.onFrame(function () { if (want && !queued) { queued = true; requestAnimationFrame(look); } });
+        function onMove(e) { if (alive()) aim(e.clientX, e.clientY); }
+        function onLeave() { want = null; pupil.style.transform = ''; }
+        document.addEventListener('pointermove', onMove, { passive: true });
+        document.addEventListener('pointerdown', onMove, { passive: true });
+        document.addEventListener('mouseleave', onLeave);
+        Sky.onFrame(function () { if (want && !queued && alive()) { queued = true; requestAnimationFrame(look); } });
         Sky.eye.frames = ballGif ? ballGif.frames.length : 1;
         return eye;
     }

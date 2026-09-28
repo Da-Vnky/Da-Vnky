@@ -47,7 +47,7 @@
     };
     function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function put(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
+    var sfx = Sky.sfx;
 
     var HEART = '<svg viewBox="0 0 20 18" aria-hidden="true"><path d="M10 17 L2.5 9.5 Q-.5 6 2 3 Q5 0 8 2.5 L10 4.5 L12 2.5 Q15 0 18 3 Q20.5 6 17.5 9.5 Z" fill="#d11f33" stroke="#5a0a12" stroke-width="1"/>' +
         '<path d="M5 4 Q3.5 5 4 7" stroke="#fff" stroke-width="1.2" fill="none" opacity=".7"/></svg>';
@@ -160,9 +160,8 @@
         var now = Date.now();
         if (now - saidAt > 2500) {
             saidAt = now;
-            document.querySelectorAll('.mc-say').forEach(function (b) { b.remove(); });   // (this matters more than whatever they were saying)
-            if (Sky.claubes && Sky.claubes.speak) Sky.claubes.speak(line, null, { hold: 1800 });
-            else if (Sky.inventory && Sky.inventory.say) Sky.inventory.say(line, 3000);
+            Sky.speak.hush();                                              // (this matters more than whatever they were saying)
+            Sky.speak(line, null, { hold: 1800 });
             var lk = el.querySelector('.l-lock');                           // (and the lock on the hearts gives a little shake)
             if (lk) { lk.classList.remove('rattle'); void lk.offsetWidth; lk.classList.add('rattle'); }
         }

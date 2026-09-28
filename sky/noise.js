@@ -55,7 +55,7 @@
     var state = { on: !!saved.on, levels: saved.levels || {}, master: typeof saved.master === 'number' ? saved.master : 0.8 };
     var chans = {}, avail = {};
     function save() { put(sessionStorage, KEY, state); put(localStorage, MIX, state.levels); }
-    var hushed = false;                      // (the dungeon quiets it for a while, without switching it off)
+    var hushed = false, holds = {};                      // (the dungeon quiets it for a while, without switching it off)
     function anyOn() { return state.on && SOUNDS.some(function (s) { return avail[s.name] && state.levels[s.name] > 0; }); }
     function apply() {
         SOUNDS.forEach(function (s) {
@@ -181,6 +181,6 @@
         get on() { return anyOn(); },
         set: function (name, level) { state.levels[name] = level; state.on = true; save(); apply(); },
         stop: function () { state.on = false; save(); apply(); },
-        hush: function (on) { hushed = !!on; apply(); }
+        hush: function (on, who) { holds[who || 'place'] = !!on; hushed = Object.keys(holds).some(function (k) { return holds[k]; }); apply(); }   // (each place by name, like Sky.music.hush)
     };
 })();

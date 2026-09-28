@@ -317,7 +317,8 @@
     /* ---------------- every frame ---------------- */
     var now = {}, goal = KINDS[state.kind];
     for (var k in goal) if (typeof goal[k] === 'number') now[k] = goal[k];    // a new page starts where it was
-    var last = performance.now(), drift = 0;
+    var last = performance.now(), drift = 0, cloudW = null, painted = true;
+    window.addEventListener('resize', function () { cloudW = null; });
     var fairShown = MODE === 'off' || state.source === 'off' ? 1 : (now.fair || 0);
     function frame(t) {
         var dt = Math.min(0.1, (t - last) / 1000);
@@ -334,14 +335,20 @@
         tint.style.opacity = now.tint.toFixed(3);
         fog.style.opacity = now.fog.toFixed(3);
         drift += dt * (10 + now.wind * 50);
-        cloudEls.forEach(function (c, i) {
-            var cw = c.offsetWidth || 300, span = window.innerWidth + cw * 2, home = CLOUDS[i][0] / 100 * window.innerWidth;
-            var x = ((home + cw + drift * (0.7 + i * 0.08)) % span + span) % span - cw;
-            c.style.transform = 'translateX(' + x.toFixed(1) + 'px)';
-        });
+        // (28 Sep: only the work there is. a clear sky used to cost a full redraw every frame)
+        if (now.cloud > 0.003) {
+            if (!cloudW) cloudW = cloudEls.map(function (c) { return c.offsetWidth || 300; });     // (measured once, and again on resize)
+            cloudEls.forEach(function (c, i) {
+                var cw = cloudW[i], span = window.innerWidth + cw * 2, home = CLOUDS[i][0] / 100 * window.innerWidth;
+                var x = ((home + cw + drift * (0.7 + i * 0.08)) % span + span) % span - cw;
+                c.style.transform = 'translateX(' + x.toFixed(1) + 'px)';
+            });
+        }
 
-        ctx.clearRect(0, 0, W, H);
-        var night = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--night')) || 0;
+        var falling = now.rain > 0.001 || now.snow > 0.001 || drops.length || flakes.length;
+        if (falling || painted) ctx.clearRect(0, 0, W, H);
+        painted = falling;
+        var night = falling ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--night')) || 0 : 0;
         // rain
         var want = Math.round(now.rain * Math.min(420, W * 0.28));
         while (drops.length < want) drops.push({ x: Math.random() * (W + 200) - 100, y: drops.length ? -Math.random() * H : Math.random() * H, len: 10 + Math.random() * 16, v: 650 + Math.random() * 450 });
@@ -382,7 +389,7 @@
             strike();
             nextBolt = t + 7000 + Math.random() * 16000;
         }
-        var inside = indoors(), heard = document.body.classList.contains('in-dungeon') ? 0 : volume;   // (not a sound of it down in the dungeon)
+        var inside = indoors(), heard = /\bin-(dungeon|hell)\b/.test(document.body.className) ? 0 : volume;   // (not a sound of it down below)
         if (rainCh) rainCh.set((inside ? 0 : 1) * now.rain * heard, 0.6);
         if (paneCh) paneCh.set((inside ? 1 : 0) * now.rain * heard, 0.6);
         if (windCh) windCh.set(Math.max(0, now.wind - 0.2) * 0.9 * heard);

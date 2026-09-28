@@ -45,7 +45,7 @@
     var body = document.body, attic = document.querySelector('.attic');
     if (!Sky || Sky.hell || !attic) return;
     var R4 = !!S && S.live('diagram');
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
+    var sfx = Sky.sfx;
     function get(k) { return S ? S.get(k) : null; }
     function set(k, v) { if (S) S.set(k, v); }
 
@@ -149,7 +149,7 @@
     }
     function voice(lines, done, low) {
         var o = { who: WHO, cls: 'voice' + (low ? ' low' : ''), blip: 'hell-voice', blipOr: 'murmur', hold: 2400 };
-        if (Sky.claubes && Sky.claubes.speak) { Sky.claubes.speak(lines, done, o); return; }
+        if (Sky.speak) { Sky.speak(lines, done, o); return; }
         if (typeof lines === 'string') lines = [lines];
         if (Sky.inventory) Sky.inventory.say(lines.join(' '), 6000);
         if (done) setTimeout(done, 6000);
@@ -160,8 +160,8 @@
         hellEl = build(me);
         body.appendChild(hellEl);
         body.classList.add('in-hell');
-        if (Sky.music && Sky.music.hush) Sky.music.hush(true);
-        if (Sky.noise && Sky.noise.hush) Sky.noise.hush(true);
+        if (Sky.music && Sky.music.hush) Sky.music.hush(true, 'hell');
+        if (Sky.noise && Sky.noise.hush) Sky.noise.hush(true, 'hell');
         if (!music && Sky.sounds && Sky.sounds.channel) music = Sky.sounds.channel('hell');
         if (music) music.set(0.85, 2.5);
         var who = hellEl.querySelector('.hl-me');
@@ -198,7 +198,7 @@
     }
     function hint() {
         if (!hellEl || get('hell-eye') === 'shot') return;
-        setTimeout(function () { if (hellEl && Sky.claubes && Sky.claubes.speak) Sky.claubes.speak(EYE_HINT); }, 900);
+        setTimeout(function () { if (hellEl) Sky.speak(EYE_HINT); }, 900);
     }
     // shot, down here (sky/revolver.js): the eye, with the white revolver, bursts and gives up the key
     function shootEye(x, y, white) {
@@ -262,8 +262,8 @@
             h.remove();
             hellEl = null;
             body.classList.remove('in-hell');
-            if (Sky.noise && Sky.noise.hush) Sky.noise.hush(false);
-            if (Sky.music && Sky.music.hush) Sky.music.hush(false);
+            if (Sky.noise && Sky.noise.hush) Sky.noise.hush(false, 'hell');
+            if (Sky.music && Sky.music.hush) Sky.music.hush(false, 'hell');
             if (back) back();
         }, 3900);
     }
@@ -315,18 +315,10 @@
         setTimeout(function () { b.classList.remove('back-again'); }, 7500);
     }
     // the apparitions: back in their frames, to be shot again (any broken this visit before the pact)
+    // (only before any's been counted: coming back up again later, say through the lectern, doesn't undo the ones shot since)
     function apparitionsBack() {
-        set('apparitions', null);
-        var l = [];
-        try { l = JSON.parse(sessionStorage.getItem('paintings-shot') || '[]') || []; } catch (e) {}
-        l = l.filter(function (k) { var p = k.split('|'); return !(p[1] === 'shame' && APPARITIONS.indexOf(p[2]) !== -1); });
-        try { sessionStorage.setItem('paintings-shot', JSON.stringify(l)); } catch (e) {}
-        APPARITIONS.forEach(function (n) {
-            var f = document.querySelector('.gallery-frame[data-wall=shame][data-frame="' + n + '"]');
-            if (!f) return;
-            f.classList.remove('shot');
-            var hint = f.querySelector('.gf-hint'); if (hint && hint.textContent === 'shot to pieces') hint.textContent = '';
-        });
+        if (shotOnes().length) return;
+        if (Sky.revolver && Sky.revolver.mend) Sky.revolver.mend(function (wall, frame) { return wall === 'shame' && APPARITIONS.indexOf(frame) !== -1; });
     }
     function gift(me) {
         bookBack();
@@ -348,9 +340,9 @@
         if (l.indexOf(f.dataset.frame) !== -1) return;
         l.push(f.dataset.frame);
         set('apparitions', JSON.stringify(l));
-        if (l.length < APPARITIONS.length || !(Sky.claubes && Sky.claubes.speak)) return;
+        if (l.length < APPARITIONS.length) return;
         setTimeout(function () {
-            Sky.claubes.speak(Sky.claubes.slain ? 'That was the last of the pictures. Only the false god left now.' : 'That was the last of the pictures. Now the little ones.');
+            Sky.speak(Sky.claubes && Sky.claubes.slain ? 'That was the last of the pictures. Only the false god left now.' : 'That was the last of the pictures. Now the little ones.');
         }, 1400);
     });
 

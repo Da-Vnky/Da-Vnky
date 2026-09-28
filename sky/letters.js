@@ -229,7 +229,7 @@
         var a = reading;
         if (!a) return;
         reading = null;
-        if (Sky.sounds) Sky.sounds.sfx('paper-roll');
+        Sky.sfx('paper-roll');
         markAllSeen();
         var wasHidden = !board.classList.contains('show');
         board.classList.add('show');
@@ -259,11 +259,8 @@
     }
     lo.querySelector('.lo-close').addEventListener('click', closeLetter);
     lo.addEventListener('click', function (e) { if (e.target === lo || e.target === inner) closeLetter(); });
-    document.addEventListener('keydown', function (e) {
-        if (e.key !== 'Escape') return;
-        if (lo.classList.contains('open')) { e.stopImmediatePropagation(); closeLetter(); }
-        else if (lv.classList.contains('open')) { e.stopImmediatePropagation(); closeAll(); }
-    }, true);
+    Sky.escape(function () { return lv.classList.contains('open'); }, closeAll);
+    Sky.escape(function () { return lo.classList.contains('open'); }, closeLetter);          // (the letter, over the pile)
 
     if (!bottled) { markAllSeen(); return; }
 
@@ -323,7 +320,7 @@
             { transform: 'translate(' + (fx + 70) + 'px, ' + (fy - 110) + 'px) rotate(460deg)', opacity: 0 }
         ], { duration: 800, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' });
         hint.style.opacity = 0;
-        if (Sky.sounds) Sky.sounds.sfx('cork-pop');
+        Sky.sfx('cork-pop');
         // 2. the rolled letter slides out of the neck (right where you are: the day doesn't change)
         rolled.animate([{ transform: 'translateX(0px)' }, { transform: 'translateX(120px)' }],
             { duration: 650, easing: 'ease-in', fill: 'forwards' }).onfinish = function () {
@@ -371,7 +368,7 @@
         end = Math.min(end, window.innerHeight + 28);
         var from = Math.max(0, top + 12 - lr.top), to = Math.max(0, lr.bottom - (end + 12));   // (how much is still rolled up, from the bottom)
         var dur = 1150, ease = 'cubic-bezier(.45,.05,.35,1)';
-        if (Sky.sounds) Sky.sounds.sfx('paper-unroll');
+        Sky.sfx('paper-unroll');
         var reveal = letter.animate([
             { clipPath: 'inset(-40px -100px ' + (lr.height - from).toFixed(1) + 'px -100px)' },
             { clipPath: 'inset(-40px -100px ' + to.toFixed(1) + 'px -100px)' }

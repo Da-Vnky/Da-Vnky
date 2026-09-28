@@ -1,0 +1,5 @@
+/* mel-inventory.css: the bag (sky/inventory.js) in Mel's room (schizophyllu.me.room/room/davinv.js links it):
+   the room's own font; out of the way of the room's own boxes, and gone while you're at a screen */
+.hotbar, .inv-note { font-family: inherit; }
+body.zoomed .hotbar, body.zoomed .inv-note, body.peek .hotbar { opacity: 0; pointer-events: none; }
+.hotbar { z-index: 25; }

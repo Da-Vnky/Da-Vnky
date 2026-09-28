@@ -39,7 +39,7 @@
     var Sky = window.Sky;
     if (!Sky || !Sky.inventory || Sky.revolver) return;
     var body = document.body, I = Sky.inventory;
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
+    var sfx = Sky.sfx;
     var ROUNDS = 6, RELOAD_MS = 2600;                  // six in the cylinder; how long it takes to load six more
     function tell(name, detail) { try { document.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch (e) {} }
 
@@ -157,10 +157,23 @@
         f.style.setProperty('--hx', ((x - r.left) / r.width * 100).toFixed(0) + '%');
         f.style.setProperty('--hy', ((y - r.top) / r.height * 100).toFixed(0) + '%');
         f.classList.add('shot');
-        f.querySelector('.gf-hint') && (f.querySelector('.gf-hint').textContent = 'shot to pieces');
+        var hint = f.querySelector('.gf-hint');
+        if (hint) { f.dataset.hintWas = hint.textContent; hint.textContent = 'shot to pieces'; }
         var l = shotList(), k = frameKey(f);
         if (l.indexOf(k) === -1) { l.push(k); try { sessionStorage.setItem(SHOT_KEY, JSON.stringify(l)); } catch (e) {} }
         tell('dav:painting-shot', { frame: f, x: x, y: y });
+    }
+    // paintings put back together (sky/hell.js: the apparitions, back in their frames): which(wall, frame) says which
+    function mend(which) {
+        var here = location.pathname.replace(/.*\//, '');
+        var l = shotList().filter(function (k) { var p = k.split('|'); return !which(p[1], p[2], p[0]); });
+        try { sessionStorage.setItem(SHOT_KEY, JSON.stringify(l)); } catch (e) {}
+        Array.prototype.forEach.call(document.querySelectorAll('.gallery-frame.shot'), function (f) {
+            if (!which(f.dataset.wall || '', f.dataset.frame, here)) return;
+            f.classList.remove('shot');
+            var hint = f.querySelector('.gf-hint');
+            if (hint && f.dataset.hintWas !== undefined) hint.textContent = f.dataset.hintWas;
+        });
     }
     // (a shot painting can't be looked at up close any more)
     document.addEventListener('click', function (e) { var f = e.target.closest && e.target.closest('.gallery-frame.shot'); if (f && !body.classList.contains('inv-holding')) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
@@ -180,14 +193,14 @@
         if (dying) return;
         var S = window.davSave;
         if (S && !S.live('revolver')) {
-            if (Sky.sounds) Sky.sounds.sfx('jammed', { or: 'tap' });
+            Sky.sfx('jammed', { or: 'tap' });
             I.say(JAMMED[jamAt++ % JAMMED.length], 2200);
             return;
         }
         if (Sky.lives && Sky.lives.refuse('revolver')) return;                    // (from reset 2, not before the key: sky/lives.js)
         // the lock's off and there's more than one heart left: it won't fire (sky/lives.js; with one heart, never)
         if (Sky.lives && Sky.lives.jammed) {
-            if (Sky.sounds) Sky.sounds.sfx('jammed', { or: 'tap' });
+            Sky.sfx('jammed', { or: 'tap' });
             I.say('it’s jammed.', 1600);
             return;
         }
@@ -265,5 +278,5 @@
         if (S && S.get('white-revolver') === 'taken' && !I.has('white-revolver')) I.add('white-revolver', { quiet: true });
     })();
 
-    Sky.revolver = { bang: bang, hole: hole, get left() { return reloading ? 0 : ROUNDS - fired(); }, get reloading() { return reloading; } };
+    Sky.revolver = { bang: bang, hole: hole, mend: mend, get left() { return reloading ? 0 : ROUNDS - fired(); }, get reloading() { return reloading; } };
 })();

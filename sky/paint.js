@@ -354,7 +354,7 @@
             push(paintEntry(L, { x: 0, y: 0, w: W, h: H }, before));
             dirty = true; use(state.colour);
             render(); thumb(L); onChange();
-            if (Sky.sounds) Sky.sounds.sfx('brush');
+            Sky.sfx('brush');
         }
 
         /* ---------------- the controls ---------------- */

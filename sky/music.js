@@ -231,7 +231,7 @@
             sessionStorage.setItem(KEY, JSON.stringify({
                 tracks: tracks.map(function (x) { return { url: x.url, title: x.title, artist: x.artist || '', color: x.color, pic: /^blob:/.test(x.pic || '') ? '' : (x.pic || ''), skin: x.skin || '', discCls: x.discCls || '', special: x.special || '', reverse: !!x.reverse, from: x.from || '',
                                                            album: x.album ? { key: x.album.key, title: x.album.title } : null }; }),
-                at: at, time: audio.currentTime || 0, playing: playing() || wantPlay || (hushed && hushedOn), savedAt: Date.now()
+                at: at, time: audio.currentTime || 0, playing: playing() || wantPlay || (isHushed() && hushedOn), savedAt: Date.now()
             }));
         } catch (e) {}
     }
@@ -385,29 +385,43 @@
         backwards[src].catch(function () { delete backwards[src]; });
         return backwards[src];
     }
-    // hushed: silenced for a while (the dungeon has its own sound) without forgetting it was on
-    var hushed = false, hushedOn = false;
-    function hush(on) {
-        if (on === hushed) return;
-        if (on) { hushedOn = playing() || wantPlay; hushed = true; wantPlay = false; audio.pause(); save(); }
-        else { hushed = false; if (hushedOn) start(); hushedOn = false; }
-        emit('hush');
+    // hushed: silenced for a while (the dungeon, the grimoire, below: each has its own sound) without forgetting it was
+    // on. each place holds the hush by name, hush(true, 'dungeon'), and the music comes back once every one's let go
+    // (28 Sep: it used to be one switch, so one place letting go started the music under another)
+    var holds = {}, hushedOn = false;
+    function isHushed() { return Object.keys(holds).length > 0; }
+    function hush(on, who) {
+        who = who || 'place';
+        var was = isHushed();
+        if (on) holds[who] = true; else delete holds[who];
+        if (isHushed() === was) return;
+        if (on) { hushedOn = playing() || wantPlay; wantPlay = false; audio.pause(); save(); emit('hush'); return; }
+        setTimeout(function () {                                       // (a moment later: one letting go as another takes hold isn't a restart)
+            if (isHushed()) return;
+            if (hushedOn) start();
+            hushedOn = false;
+            emit('hush');
+        }, 0);
     }
     function start() {
-        hushed = false;
+        holds = {};                                                    // (played on purpose: whatever hushed it, it's on)
         wantPlay = true;
         lofiThen(play1);
     }
+    var waiting = false;
     function play1() {
         if (!wantPlay) return;
         var p = audio.play();
-        if (p && p.catch) p.catch(function () {
+        if (p && p.catch) p.catch(function (err) {
+            if ((err && err.name === 'AbortError') || waiting) return;     // (paused again straight away, or already waiting for a tap)
             // this browser wants a tap before sound starts: wait for one, anywhere
+            waiting = true;
             document.body.classList.add('music-waiting');
             emit('waiting');
             var go = function () {
                 document.removeEventListener('pointerdown', go, true);
                 document.removeEventListener('keydown', go, true);
+                waiting = false;
                 document.body.classList.remove('music-waiting');
                 if (wantPlay) lofiThen(function () { if (wantPlay) audio.play().catch(function () {}); }, true);
             };
@@ -866,7 +880,7 @@
         get tracks() { return tracks; }, get at() { return at; },
         current: current, playing: playing,
         // (for the ambience, sky/ambient.js: a record is on or about to be, and whether a place has hushed the music)
-        get busy() { return playing() || wantPlay; }, get hushed() { return hushed; },
+        get busy() { return playing() || wantPlay; }, get hushed() { return isHushed(); },
         load: load, play: function (i) { if (i === undefined) start(); else load(i, true); },
         pause: pause, toggle: toggle, next: next, prev: prev, stop: stop, hush: hush,
         setTracks: setTracks, setVolume: setVolume, dressGrooves: dressGrooves,

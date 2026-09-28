@@ -165,3 +165,8 @@ body.cutscene .cp-toggle {
     opacity: 0;
     pointer-events: none;
 }
+
+/* back from Mel's room after the pills (resets.js melDeath): out of the black, onto the roof */
+.mel-black { position: fixed; inset: 0; z-index: 2147482000; background: #000; opacity: 1; transition: opacity 2.4s; pointer-events: all; }
+.mel-black.lifting { opacity: 0; }
+.mel-black.gone { pointer-events: none; }

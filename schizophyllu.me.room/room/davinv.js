@@ -62,22 +62,10 @@
     l.rel = 'stylesheet'; l.href = ROOT + href;
     document.head.appendChild(l);
   }
-  sheet('sky/css/inventory.css'); sheet('sky/css/loot.css');
+  sheet('sky/css/inventory.css'); sheet('sky/css/loot.css'); sheet('sky/css/mel-inventory.css');
   window.davInventory = load('sky/inventory.js').then(function () { return load('sky/loot.js'); }).then(function () {
-    var I = Sky.inventory;
-    if (!I) return null;
-    Sky.css(
-      // (in the room: its font; out of the way of the room's own boxes, and gone while you're at a screen)
-      '.hotbar, .inv-note { font-family: inherit; }' +
-      'body.zoomed .hotbar, body.zoomed .inv-note, body.peek .hotbar { opacity: 0; pointer-events: none; }' +
-      '.hotbar { z-index: 25; }'
-    );
-    I.define('pills', {
-      name: 'a bottle of skizy’s pills', label: 'a pill bottle', hint: 'give it to her: click skizy',
-      art: '<svg viewBox="0 0 40 60" aria-hidden="true"><rect x="8" y="4" width="24" height="10" rx="2" fill="#f3f0e6" stroke="#9a968a"/>' +
-        '<rect x="6" y="14" width="28" height="42" rx="4" fill="#e0782a" opacity=".92"/><rect x="10" y="24" width="20" height="18" fill="#f8f4ea"/>' +
-        '<path d="M13 30 H27 M13 35 H24" stroke="#8a8a8a" stroke-width="1.6"/><path d="M10 18 V52" stroke="#f7b070" stroke-width="2" opacity=".6"/></svg>'
-    });
-    return I;
+    // (the pill bottle is sky/inventory.js's own; in here its hint says to give it to her. the bag's look in the room:
+    // sky/css/mel-inventory.css)
+    return Sky.inventory || null;
   });
 })();

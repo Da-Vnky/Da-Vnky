@@ -29,8 +29,8 @@
     if (!Sky || !S || Sky.resets) return;
     var body = document.body;
     var PAGE = (location.pathname.replace(/.*\//, '').replace(/\.html$/, '') || 'index').replace(/^index$/, 'sea');
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
-    function say(t, ms) { if (Sky.inventory && Sky.inventory.say) Sky.inventory.say(t, ms || 2400); }
+    var sfx = Sky.sfx;
+    function say(t, ms) { Sky.say(t, ms || 2400); }
     function busyHands() { return body.classList.contains('inv-holding'); }
 
     // (its look is in sky/css/resets.css, linked from each page's head)
@@ -158,7 +158,7 @@
 
     /* ---------------- déjà vu: the start of every reset after the first ----------------
        the first page they see in a new reset, the traveller says it (typed out, in the box at the bottom:
-       sky/claubes.js speak). once a reset (run:deja-vu). one line per reset, 2 to 8: */
+       Sky.speak, sky/sky.js). once a reset (run:deja-vu). one line per reset, 2 to 8: */
     var DEJA = {
         2: 'Huh. I could swear I\u2019ve been here before.',
         3: 'This again? Why does all of this feel so\u2026 familiar?',
@@ -173,11 +173,11 @@
         if (!line || S.get('deja-vu') === '1') return;
         var tries = 0;
         (function when() {                                           // (after the loading screen, if there is one)
-            if (document.getElementById('dav-loader') || !(Sky.claubes && Sky.claubes.speak)) { if (++tries < 80) setTimeout(when, 250); return; }
+            if (document.getElementById('dav-loader')) { if (++tries < 120) setTimeout(when, 250); return; }
             setTimeout(function () {
                 if (S.get('deja-vu') === '1') return;
                 S.set('deja-vu', '1');
-                Sky.claubes.speak(line);
+                Sky.speak(line);
             }, 1800);
         })();
     }
@@ -227,18 +227,18 @@
         if (!was || PAGE !== 'city') return;
         var ch = document.querySelector('.scene-character');
         var blk = document.createElement('div');
-        blk.className = 'mc-black on';
-        blk.style.cssText = 'position:fixed;inset:0;z-index:2147482000;background:#000;opacity:1;transition:opacity 2.4s;pointer-events:all';
+        blk.className = 'mel-black';                                     // (its look: sky/css/resets.css)
         body.appendChild(blk);
+        var wake = function () { if (Sky.lives && Sky.lives.unlocked) { try { localStorage.setItem('dav-wake-at', 'living.html#porch'); } catch (e) {} } };   // (they come to on the porch)
         setTimeout(function () {
-            blk.style.opacity = '0';
+            blk.classList.add('lifting');
             setTimeout(function () {
-                blk.style.pointerEvents = 'none';
-                if (!ch || !Sky.gore || !Sky.stroll) { document.dispatchEvent(new CustomEvent('dav:traveller-died')); blk.remove(); return; }
+                blk.classList.add('gone');
+                if (!ch || !Sky.gore || !Sky.stroll) { wake(); if (ch && Sky.gore) Sky.gore.respawn(ch); else document.dispatchEvent(new CustomEvent('dav:traveller-died')); blk.remove(); return; }
                 body.classList.add('cutscene');
                 var x = window.innerWidth * (Sky.restX(ch) < window.innerWidth * 0.5 ? 0.58 : 0.42);
                 jumpOff(ch, x, function () {
-                    if (Sky.lives && Sky.lives.unlocked) { try { localStorage.setItem('dav-wake-at', 'living.html#porch'); } catch (e) {} }   // (they come to on the porch)
+                    wake();
                     Sky.gore.respawn(ch);                                                           // (a death: sky/lives.js)
                     blk.remove();
                 });

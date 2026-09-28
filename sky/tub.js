@@ -24,8 +24,7 @@
     var me = bath.querySelector('.bath-character');
     function T() { return bath.querySelector('.bath-tub'); }        // (your art replaces the drawing, so look it up each time)
     var tub = T();
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
-    function say(t, ms) { if (I) I.say(t, ms); }
+    var sfx = Sky.sfx, say = Sky.say;
 
     // what the traveller says while held up (the words are all here)
     var HELD_LINES = ['Hey! Put me down!', 'Not the bath!', 'I SAID PUT ME DOWN!'];
@@ -150,7 +149,7 @@
     function hush(ms) { setTimeout(function () { me.classList.remove('talking'); }, ms || 0); }
 
     me.addEventListener('pointerdown', function (e) {
-        if (me.classList.contains('gore-hidden') || !body.classList.contains('in-bath') || (Sky.sides && Sky.sides.busy)) return;
+        if (me.classList.contains('gore-hidden') || !body.classList.contains('in-bath') || (Sky.house && Sky.house.busy)) return;
         e.preventDefault();
         me.setPointerCapture(e.pointerId);
         pick = { x: e.clientX, y: e.clientY, on: false };
@@ -203,6 +202,14 @@
             if (k < 1) requestAnimationFrame(f); else if (done) done();
         })(t0);
     }
+    // off somewhere (sky/house.js walks them): out of the tub (or down off wherever they were dropped) first
+    me.beforeWalk = function () {
+        if (!me.style.bottom && !st.inTub) return;
+        fallId++;
+        if (st.inTub) sfx('land', { size: 0.4 });
+        st.inTub = false;
+        me.style.bottom = ''; me.style.zIndex = '';
+    };
     function drop() {
         var r = hostRect(), mr = me.getBoundingClientRect(), cx = mr.left + mr.width / 2, tr = T().getBoundingClientRect();
         var overTub = cx > tr.left + tr.width * 0.08 && cx < tr.right - tr.width * 0.12 && mr.bottom < tr.top + tr.height * 0.35;

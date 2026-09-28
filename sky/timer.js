@@ -108,7 +108,7 @@
         save();
         draw();
         if (quiet) return;
-        if (Sky.sounds) Sky.sounds.sfx('chime');
+        Sky.sfx('chime');
         el.classList.remove('ringing'); void el.offsetWidth; el.classList.add('ringing');
     }
     // a timer that ran out while you were away just shows it's done (no bell out of nowhere)
@@ -124,7 +124,7 @@
     function reset() { st.endAt = 0; st.left = LEN[st.mode]; st.done = false; save(); draw(); }
     function pick(mode) { st.mode = mode; st.endAt = 0; st.left = LEN[mode]; st.done = false; save(); draw(); }
 
-    panel.querySelector('.go').addEventListener('click', function () { running() ? pause() : start(); if (Sky.sounds) Sky.sounds.sfx('land', { size: 0.25 }); });
+    panel.querySelector('.go').addEventListener('click', function () { running() ? pause() : start(); Sky.sfx('land', { size: 0.25 }); });
     panel.querySelector('.reset').addEventListener('click', function () {
         if (st.mode === 'focus' && !running() && st.left === LEN.focus) st.rounds = 0;   // reset twice: start the set over
         reset();
@@ -145,7 +145,7 @@
     el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
     panel.querySelector('.pp-x').addEventListener('click', close);
     document.addEventListener('click', function (e) { if (panel.classList.contains('open') && !panel.contains(e.target) && !el.contains(e.target)) close(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    Sky.escape(function () { return panel.classList.contains('open'); }, close);
     window.addEventListener('resize', function () { if (panel.classList.contains('open')) place(); });
     draw();
 })();

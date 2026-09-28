@@ -87,7 +87,7 @@
     var ABSORB = 6;                                  // the bullets the diagram drinks before the traveller's let down (not in reset 4)
     function R4() { return !!S && S.live('diagram'); }
     var LETDOWN = ['Huh, I thought something cool was gonna happen…'];
-    function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
+    var sfx = Sky.sfx, speak = Sky.speak;                         // (speak: the traveller's words in a box: sky/sky.js)
 
     // the stand-in: a little round terracotta fellow; the happy face shows when the music stops
     var ART = '<svg class="placeholder" viewBox="0 0 40 52" aria-hidden="true">' +
@@ -427,43 +427,6 @@
         setTimeout(function () { body.classList.remove('mc-rumble'); }, 2300);
         setTimeout(function () { speak(MASSACRE_LINES); }, 2600);
     }
-    // the traveller's words, typed out in a box at the bottom; click (or wait) to move on
-    // (opts.hold: how long the last line stays up once it's typed, in ms; opts.typed: called the moment it's all typed)
-    function speak(lines, done, opts) {
-        opts = opts || {};
-        if (typeof lines === 'string') lines = [lines];
-        var box = document.createElement('div');
-        box.className = 'mc-say' + (opts.cls ? ' ' + opts.cls : '');
-        box.setAttribute('role', 'status');
-        box.innerHTML = '<b></b><span></span>';
-        box.querySelector('b').textContent = opts.who || 'the traveller';      // (opts.who: someone else speaking; opts.cls: their look)
-        body.appendChild(box);
-        requestAnimationFrame(function () { box.classList.add('on'); });
-        var t = box.querySelector('span'), i = 0, timer = null, typing = null;
-        function line() {
-            if (i >= lines.length) { box.classList.remove('on'); setTimeout(function () { box.remove(); if (done) done(); }, 400); return; }
-            var text = lines[i++], n = 0;
-            t.textContent = '';
-            clearInterval(typing);
-            typing = setInterval(function () {
-                t.textContent = text.slice(0, ++n);
-                if (n % 2 === 0 && text.charAt(n - 1) !== ' ') sfx(opts.blip || 'blip', { size: 0.25, or: opts.blipOr || 'blip' });
-                if (n >= text.length) { clearInterval(typing); typing = null; typed(); }
-            }, 38);
-        }
-        function typed() {
-            var last = i >= lines.length;
-            clearTimeout(timer);
-            timer = setTimeout(line, last && opts.hold !== undefined ? opts.hold : 2600 + lines[i - 1].length * 30);
-            if (last && opts.typed) { var f = opts.typed; opts.typed = null; f(); }
-        }
-        box.addEventListener('click', function () {
-            if (typing) { clearInterval(typing); typing = null; t.textContent = lines[i - 1]; typed(); }
-            else { clearTimeout(timer); line(); }
-        });
-        line();
-    }
-
     /* ---------------- the dungeon: on the diagram, worshipping ---------------- */
     var inDungeon = false, chantT = null;
     // where each of them stands on the diagram: the middles of its seven circles, as shares of its box
@@ -659,24 +622,17 @@
                     st.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' }).onfinish = function () { st.remove(); };
                     if (Sky.gore && Sky.gore.splat) Sky.gore.splat(me, tx, ty, null); else me.classList.add('gore-hidden');
                     // reset 4's death: the one heart goes, and the world with it (sky/lives.js). (not unlocked, somehow: back up again)
-                    setTimeout(function () {
-                        if (Sky.lives && Sky.lives.unlocked) document.dispatchEvent(new CustomEvent('dav:traveller-died'));
-                        else if (Sky.gore && Sky.gore.respawn) Sky.gore.respawn(me);
-                    }, 1500);
+                    setTimeout(function () { if (Sky.gore && Sky.gore.respawn) Sky.gore.respawn(me); }, 1500);   // (every death goes through respawn)
                 };
         }, 520);
     }
-    (function watchSides(n) {                                               // (sky/bathroom.js may come after this file)
-        if (Sky.sides && Sky.sides.on) {
-            Sky.sides.on(function (what, name) {
-                if (name !== 'dungeon') return;
-                inDungeon = what === 'enter';
-                dungeonStatic();
-                mood();                                                       // (the inverted record's static; who's hidden where)
-                if (inDungeon && !after4()) setTimeout(function () { if (inDungeon) worship(); }, 950); else unworship();
-            });
-        } else if (n < 40) setTimeout(function () { watchSides(n + 1); }, 150);
-    })(0);
+    if (Sky.house) Sky.house.on(function (what, name) {                    // (the house: living.html only)
+        if (name !== 'dungeon') return;
+        inDungeon = what === 'enter';
+        dungeonStatic();
+        mood();                                                           // (the inverted record's static; who's hidden where)
+        if (inDungeon && !after4()) setTimeout(function () { if (inDungeon) worship(); }, 950); else unworship();
+    });
     /* ---------------- all of them, running for it ---------------- */
     function scatter(line) {
         var els = crew.querySelectorAll('.mini-claube');

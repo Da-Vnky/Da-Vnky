@@ -95,7 +95,7 @@
         lofiBtn.addEventListener('click', function (e) {
             e.preventDefault(); e.stopPropagation();                         // (not the crate: just the slider)
             M.lofi.set(!M.lofi.on);
-            if (Sky.sounds) Sky.sounds.sfx('lofi-slide', { or: 'tap', size: 0.3 });
+            Sky.sfx('lofi-slide', { or: 'tap', size: 0.3 });
         });
         lofiBtn.addEventListener('keydown', function (e) { e.stopPropagation(); });
         M.on(function (what) { if (what === 'lofi') drawLofi(); });
@@ -320,7 +320,10 @@
                         { transform: 'translate(' + mx + 'px,' + my + 'px) scale(' + ((s1 + s2) / 2) + ', ' + ((s1 + s2 * 0.3) / 2) + ') rotate(200deg)', offset: .55 },
                         { transform: 'translate(' + ex + 'px,' + ey + 'px) scale(' + s2 + ', ' + (s2 * 0.3) + ') rotate(360deg)' }
                     ], { duration: 950, easing: 'cubic-bezier(.45,.05,.3,1)', fill: 'forwards' }).onfinish = function () {
-                        M.load(M.tracks.indexOf(t), true);
+                        // (by the song's address: the list may have been drawn afresh while it flew)
+                        var i = -1;
+                        M.tracks.some(function (x, k) { if (abs(x.url) === abs(t.url)) { i = k; return true; } });
+                        if (i !== -1) M.load(i, true);
                         drawNow();
                         setTimeout(function () { layer.remove(); sleeve.classList.remove('lifted'); busy = false; }, 60);
                     };
@@ -410,10 +413,10 @@
     deck.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
     deck.addEventListener('asset', drawDeck);
     box.querySelector('.rp-close').addEventListener('click', close);
+    Sky.escape(function () { return box.classList.contains('open'); }, close);
     document.addEventListener('keydown', function (e) {
         if (!box.classList.contains('open')) return;
-        if (e.key === 'Escape') { e.stopPropagation(); close(); }
-        else if (e.key === ' ' && (e.target === document.body || e.target === playBtn)) { e.preventDefault(); if (e.target !== playBtn) M.toggle(); }
+        if (e.key === ' ' && (e.target === document.body || e.target === playBtn)) { e.preventDefault(); if (e.target !== playBtn) M.toggle(); }
     }, true);
     document.addEventListener('pointerdown', function (e) {
         if (box.classList.contains('open') && !box.contains(e.target) && !deck.contains(e.target)) close();

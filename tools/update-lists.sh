@@ -73,6 +73,16 @@ mkdir -p assets/resets
     done
 } > assets/resets/index.txt
 
+# the version on every page's code and styles (sky/…?v=…): a checksum of everything in sky/, so a visitor's browser
+# fetches them fresh whenever they've changed, and only then. (it used to be changed by hand on every page)
+v=$(cat sky/*.js sky/*.css sky/css/*.css 2>/dev/null | tr -d '\r' | cksum | cut -d' ' -f1)
+for p in *.html; do
+    [ -f "$p" ] || continue
+    grep -q 'sky/[^"]*?v=' "$p" || continue
+    sed "s#\(sky/[A-Za-z0-9/_.-]*\.[a-z]*\)?v=[A-Za-z0-9]*#\1?v=$v#g" "$p" > "$p.tmp"
+    if cmp -s "$p" "$p.tmp"; then rm -f "$p.tmp"; else mv "$p.tmp" "$p"; fi       # (only rewritten if it changed)
+done
+
 # and a catalogue of the whole site for sky/loader.js: every file a visitor's browser might load, with
 # its size and a checksum, so on a later visit it can forget just the ones you've changed since (they're
 # fetched fresh the next time they're needed): catalog.txt.

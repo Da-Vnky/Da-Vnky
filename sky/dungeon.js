@@ -86,14 +86,14 @@
                 sg.textContent = d.sign ? '\u2014 ' + d.sign : ''; sg.hidden = !d.sign;
                 pv.classList.add('open');
                 body.classList.add('paper-open');
-                if (Sky.sounds) Sky.sounds.sfx('paper-unroll');
+                Sky.sfx('paper-unroll');
             });
         };
-        var closePaper = function () { if (!pv.classList.contains('open')) return; pv.classList.remove('open'); body.classList.remove('paper-open'); if (Sky.sounds) Sky.sounds.sfx('paper-roll'); };
+        var closePaper = function () { if (!pv.classList.contains('open')) return; pv.classList.remove('open'); body.classList.remove('paper-open'); Sky.sfx('paper-roll'); };
         paperEl.addEventListener('click', function (e) { if (body.classList.contains('inv-holding')) return; e.stopPropagation(); readPaper(); });
         paperEl.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); readPaper(); } });
         pv.addEventListener('click', function (e) { if (!e.target.closest('.pv-sheet')) closePaper(); });
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pv.classList.contains('open')) { e.stopImmediatePropagation(); closePaper(); } }, true);
+        Sky.escape(function () { return pv.classList.contains('open'); }, closePaper);
     }
 
     /* ---------------- the decoy books on the shelf: just books ---------------- */
@@ -112,7 +112,7 @@
             e.preventDefault();
             if (Sky.books && Sky.books.open(b)) return;
             b.classList.remove('nudge'); void b.offsetWidth; b.classList.add('nudge');
-            if (Sky.sounds) Sky.sounds.sfx('land', { size: 0.12 });
+            Sky.sfx('land', { size: 0.12 });
             if (Sky.inventory) Sky.inventory.say(BOOK_LINES[Math.floor(Math.random() * BOOK_LINES.length)], 1600);
         });
     });
@@ -125,18 +125,18 @@
         down = true;
         try { if (localStorage.getItem('dungeon-found') !== '1') { localStorage.setItem('dungeon-found', '1'); document.dispatchEvent(new CustomEvent('dav:dungeon-found')); } } catch (e) {}
         placeGlows();
-        if (Sky.music && Sky.music.hush) Sky.music.hush(true);
-        if (Sky.noise && Sky.noise.hush) Sky.noise.hush(true);
+        if (Sky.music && Sky.music.hush) Sky.music.hush(true, 'dungeon');
+        if (Sky.noise && Sky.noise.hush) Sky.noise.hush(true, 'dungeon');
         if (ch) ch.set(LOUD, 0.05);
     }
     function leave() {
         if (!down) return;
         down = false;
         if (ch) ch.set(0, 0.5);
-        if (Sky.noise && Sky.noise.hush) Sky.noise.hush(false);
-        if (Sky.music && Sky.music.hush) Sky.music.hush(false);
+        if (Sky.noise && Sky.noise.hush) Sky.noise.hush(false, 'dungeon');
+        if (Sky.music && Sky.music.hush) Sky.music.hush(false, 'dungeon');
     }
-    if (Sky.sides && Sky.sides.on) Sky.sides.on(function (what, name) {
+    if (Sky.house) Sky.house.on(function (what, name) {
         if (name !== 'dungeon') return;
         if (what === 'enter') enter(); else leave();
     });

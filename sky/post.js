@@ -191,9 +191,7 @@
     btn.addEventListener('click', open);
     post.querySelector('.no').addEventListener('click', close);
     post.addEventListener('pointerdown', function (e) { if (e.target === post) close(); });
-    document.addEventListener('keydown', function (e) {
-        if (document.body.classList.contains('post-open') && e.key === 'Escape') { e.stopImmediatePropagation(); close(); }
-    }, true);
+    Sky.escape(function () { return document.body.classList.contains('post-open'); }, close);
     window.addEventListener('resize', function () { if (document.body.classList.contains('post-open')) fitCanvas(); });
 
     /* ---------------- packing the note into one picture ---------------- */
@@ -303,7 +301,7 @@
     function toss(delivered) {
         var nr = note.getBoundingClientRect();
         // 1. the note rolls up into a scroll
-        if (Sky.sounds) Sky.sounds.sfx('paper-roll');
+        Sky.sfx('paper-roll');
         var roll = note.animate([
             { transform: 'none', borderRadius: '0' },
             { transform: 'scaleY(.06)', borderRadius: '999px', offset: .7 },
@@ -321,7 +319,7 @@
             var inner = b.querySelector('.b-scroll'), cork = b.querySelector('.b-cork');
             inner.animate([{ transform: 'translateX(140px)', opacity: 0 }, { transform: 'translateX(140px)', opacity: 1, offset: .2 }, { transform: 'none', opacity: 1 }],
                 { duration: 700, easing: 'ease-in-out' });
-            if (Sky.sounds) Sky.sounds.sfx('cork-in', { delay: 0.7 });
+            Sky.sfx('cork-in', { delay: 0.7 });
             cork.animate([{ transform: 'translate(40px,-30px) rotate(-60deg)', opacity: 0 }, { transform: 'translate(40px,-30px) rotate(-60deg)', opacity: 1, offset: .6 }, { transform: 'none', opacity: 1 }],
                 { duration: 1100, easing: 'ease-in' });
             b.animate([{ opacity: 0, transform: 'scale(.8)' }, { opacity: 1, transform: 'none' }], { duration: 300, fill: 'forwards' });
@@ -338,7 +336,7 @@
         var land = { x: window.innerWidth * (0.42 + Math.random() * 0.16), y: sea.top + sea.height * 0.5 };
         var dx = land.x - (br.left + br.width / 2), dy = land.y - (br.top + br.height / 2);
         // 3. over the side: a high arc, spinning, out to sea
-        if (Sky.sounds) Sky.sounds.sfx('throw');
+        Sky.sfx('throw');
         b.animate([
             { transform: 'translate(0,0) rotate(0deg) scale(1)' },
             { transform: 'translate(' + dx * .3 + 'px,' + (dy * .3 - 260) + 'px) rotate(-200deg) scale(.85)', offset: .35 },

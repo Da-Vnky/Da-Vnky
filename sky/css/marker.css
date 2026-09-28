@@ -14,7 +14,7 @@ body.marker-on .marker-layer {
     pointer-events: auto;
     touch-action: none;
 }
-body.side-walking .marker-layer,
+body.side-sliding .marker-layer,
 body.leaving .marker-layer {
     opacity: 0;
 }

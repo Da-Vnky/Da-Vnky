@@ -36,9 +36,10 @@
         marker: { name: 'the marker', slot: 'assets/workshop/marker', toggle: true, hint: 'draw on anything. Esc to stop.',
             art: '<svg viewBox="0 0 100 30" aria-hidden="true"><rect x="10" y="6" width="62" height="18" rx="4" fill="#2a2a2e"/><rect x="72" y="8" width="16" height="14" rx="2" fill="#1a1a1c"/>' +
                  '<path d="M88 11 L98 15 L88 19 Z" fill="#111"/><rect x="18" y="10" width="36" height="10" rx="2" fill="#f3e6c2"/><text x="36" y="18" text-anchor="middle" font-size="7" font-family="Arial" font-weight="bold" fill="#2a2a2e">PERM</text></svg>' },
-        // a bottle of Mel's pills, taken from her bathroom cabinet (reset 3: schizophyllu.me.room/room/davinv.js has the
-        // same). it goes where you go for the rest of the visit, but it's only any use back in her room
-        pills: { name: 'a bottle of skizy\u2019s pills', label: 'a pill bottle', slot: 'assets/items/pills', hint: 'it rattles. it\u2019s for skizy.',
+        // a bottle of Mel's pills, taken from her bathroom cabinet (reset 3). it goes where you go for the rest of the
+        // visit, but it's only any use back in her room (schizophyllu.me.room/room/davinv.js brings this bag in there)
+        pills: { name: 'a bottle of skizy\u2019s pills', label: 'a pill bottle', slot: 'assets/items/pills',
+            hint: /schizophyllu\.me\.room/.test(location.pathname) ? 'give it to her: click skizy' : 'it rattles. it\u2019s for skizy.',
             art: '<svg viewBox="0 0 40 60" aria-hidden="true"><rect x="8" y="4" width="24" height="10" rx="2" fill="#f3f0e6" stroke="#9a968a"/>' +
                  '<rect x="6" y="14" width="28" height="42" rx="4" fill="#e0782a" opacity=".92"/><rect x="10" y="24" width="20" height="18" fill="#f8f4ea"/>' +
                  '<path d="M13 30 H27 M13 35 H24" stroke="#8a8a8a" stroke-width="1.6"/><path d="M10 18 V52" stroke="#f7b070" stroke-width="2" opacity=".6"/></svg>' },
@@ -198,13 +199,12 @@
         }
         if (!ITEMS[id].keep) letGo();                                // (the revolver stays in your hand until Esc)
     }, true);
+    // Escape: the thing in your hand put away (or whatever's switched on, off)
+    function putAway() { if (holding) letGo(); else { stopActive(); draw(); } }
+    if (Sky.escape) Sky.escape(function () { return !!(holding || active); }, putAway, Sky.ESC.hand);
+    else document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && (holding || active)) { e.stopImmediatePropagation(); putAway(); } }, true);   // (Mel's room: no sky.js)
     function typing(t) { return t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable); }
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            if (holding) { letGo(); e.stopImmediatePropagation(); }
-            else if (active) { stopActive(); draw(); e.stopImmediatePropagation(); }
-            return;
-        }
         // 1 … 8: that slot (not while typing, or in the painting desk, which has its own number keys)
         if (!/^[1-8]$/.test(e.key) || e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
         if (/\b(paint-open|mirror-open|records-open|crate-open|frame-open|paper-open|book-open)\b/.test(body.className)) return;
