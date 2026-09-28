@@ -1108,6 +1108,7 @@ const XLINK = 'http://www.w3.org/1999/xlink';
 async function inlineArt(root) {
   const mine = await davArtFiles();                     // (DaV-nky: Victor's own pictures, from its asset manager. see the end)
   davBackdrop(root, mine);
+  davSkyHole(root, mine);                               // (DaV-nky: the site's own sky through the window, see the end)
   await Promise.all([...root.querySelectorAll('[data-art]')].map(async ph => {
     const pic = davPick(mine, davStem(ph.dataset.art));
     if (pic && !pic.svg) { ph.append(davImage(pic.url)); return; }
@@ -1806,6 +1807,82 @@ function davBackdrop(root, files) {
   const im = davImage(pic.url);
   im.classList.add('dav-backdrop');
   if (first) first.before(im); else root.append(im);
+}
+// the sky through the window is DaV-nky's own (Mel's wish, 27 Sep): once Victor's window picture is in
+// (main-window, its panes see-through), everything in the room behind the window gets a hole where the glass is, and
+// DaV-nky's sky (../window-sky.html: the real sun and moon where the visitor is, the clouds, the stars, day and night)
+// sits behind the room and shows through. The moon's light in the rooms (glow-moon, glow-moonbeam, the closet's
+// glow-hatch-moon) follows that sky's night: full from about 1 h 40 min after sunset, gone by day. In the afternoon
+// scene the sky outside turns to afternoon for as long as it lasts. Its look: ../sky/css/mel-window.css
+const DAV_PANES = { x: 76, y: 136, w: 256, h: 300 };   // the glass, in room coordinates (a little of it under the frame)
+function davSkyHole(root, files) {
+  const win = root.querySelector('[data-art$="objects/main/window.svg"]');
+  if (!win || !davPick(files, 'main-window')) return;
+  let top = win;
+  while (top.parentNode !== root) top = top.parentNode;
+  // the hole: white = keep, black = see through
+  const defs = root.querySelector(':scope > defs') || root.insertBefore(document.createElementNS(SVG_NS, 'defs'), root.firstChild);
+  const mask = document.createElementNS(SVG_NS, 'mask');
+  const rect = (x, y, w, h, fill) => {
+    const r = document.createElementNS(SVG_NS, 'rect');
+    for (const [k, v] of [['x', x], ['y', y], ['width', w], ['height', h], ['fill', fill]]) r.setAttribute(k, v);
+    return r;
+  };
+  mask.id = 'dav-sky-hole';
+  for (const [k, v] of [['maskUnits', 'userSpaceOnUse'], ['x', 0], ['y', 0], ['width', 1600], ['height', 900]]) mask.setAttribute(k, v);
+  mask.append(rect(0, 0, 1600, 900, '#fff'), rect(DAV_PANES.x, DAV_PANES.y, DAV_PANES.w, DAV_PANES.h, '#000'));
+  defs.append(mask);
+  for (const el of [...root.children]) {
+    if (el === top) break;
+    if (el.localName !== 'defs' && el.localName !== 'style') el.setAttribute('mask', 'url(#dav-sky-hole)');
+  }
+  // Mel's twinkling stars for her painted sky (unless Victor drew his own), and the afternoon's painted sky: the real one's there instead
+  if (!davPick(files, 'main-window-blink')) root.querySelector('[data-art$="objects/main/window-blink.svg"]')?.classList.add('dav-own-sky');
+  const day = root.querySelector('#daylight');
+  if (day) for (const el of day.children) if (el.localName === 'rect' || el.localName === 'path') el.classList.add('dav-own-sky');
+  davSkyWindow();
+}
+let davSkyFrame = null;
+function davSkyWindow() {
+  if (davSkyFrame) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = new URL('../sky/css/mel-window.css', location.href).href;
+  document.head.append(link);
+  document.documentElement.classList.add('dav-real-sky');
+  const box = document.createElement('div');
+  box.className = 'dav-sky';
+  box.setAttribute('aria-hidden', 'true');
+  for (const [k, v, of] of [['left', DAV_PANES.x, 1600], ['top', DAV_PANES.y, 900], ['width', DAV_PANES.w, 1600], ['height', DAV_PANES.h, 900]]) {
+    box.style.setProperty('--' + k, (v / of * 100) + '%');
+  }
+  davSkyFrame = document.createElement('iframe');
+  davSkyFrame.src = new URL('../window-sky.html', location.href).href;
+  davSkyFrame.tabIndex = -1;
+  davSkyFrame.title = 'the sky outside';
+  box.append(davSkyFrame);
+  $('#stage').prepend(box);
+  // every couple of seconds: how far into the night the sky is (its --night: 0 by day, 1 at night) → --dav-night
+  // here, for the moon's glows
+  const tick = () => {
+    const doc = davSkyFrame.contentDocument;
+    const night = doc && parseFloat(doc.documentElement.style.getPropertyValue('--night'));
+    if (night >= 0) document.documentElement.style.setProperty('--dav-night', night);
+  };
+  davSkyFrame.addEventListener('load', () => setTimeout(tick, 400));
+  setInterval(tick, 2000);
+  // the afternoon scene (while the screen's black, both ways): the sky outside turns to afternoon, sun and all;
+  // when skizy wakes up it's the real hour again (the sky's loaded afresh, back on the visitor's clock)
+  let afternoon = false;
+  new MutationObserver(() => {
+    const now = body.classList.contains('afternoon');
+    if (now === afternoon) return;
+    afternoon = now;
+    const w = davSkyFrame.contentWindow;
+    if (now) w?.Sky?.setTime?.(.2, 1);
+    else w?.location.reload();
+    setTimeout(tick, 600);
+  }).observe(body, { attributes: true, attributeFilter: ['class'] });
 }
 // the way back to the rooftop in the HUD, next door too (see ROOFTOP above)
 document.querySelectorAll('a[href="https://dav-nky.pleroma.nexus/city.html"]').forEach(a => { a.href = ROOFTOP; });

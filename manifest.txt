@@ -2,6 +2,7 @@
 city.html 9158
 index.html 4380
 living.html 126953
+window-sky.html 1273
 workshop.html 20911
 sky/ambient.js 5052
 sky/attic.js 34415
@@ -74,6 +75,7 @@ sky/css/letters.css 2554
 sky/css/lives.css 3089
 sky/css/loot.css 2076
 sky/css/marker.css 1560
+sky/css/mel-window.css 1881
 sky/css/models.css 3444
 sky/css/music.css 12786
 sky/css/noise.css 2783
@@ -99,7 +101,7 @@ assets/fonts/list.txt 117
 assets/hell/list.txt 117
 assets/items/list.txt 117
 assets/living/list.txt 136
-assets/mel-room/list.txt 117
+assets/mel-room/list.txt 134
 assets/resets/index.txt 77
 assets/resets/list.txt 127
 assets/sea/list.txt 117
@@ -146,6 +148,6 @@ schizophyllu.me.room/room/music.js 4978
 schizophyllu.me.room/room/narration.js 14420
 schizophyllu.me.room/room/radio.js 6517
 schizophyllu.me.room/room/room.css 24479
-schizophyllu.me.room/room/room.js 82971
+schizophyllu.me.room/room/room.js 87600
 schizophyllu.me.room/room/script.js 47501
 schizophyllu.me.room/assets/playlist/playlist.json 677

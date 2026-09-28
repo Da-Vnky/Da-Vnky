@@ -347,6 +347,15 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     Slots whose files hold ids the code needs are `kind: "svg"` (SVG only). slots.json has `stock` (Mel's file)
     and `crop` (where the thing is, measured with Playwright) so assets.html previews the stand-in zoomed in.
     If Mel adds objects, regenerate that scene (read room/*.svg placeholders + labels from script.js/narration.js).
+  - **DaV-nky's sky through her window** (27 Sep, Mel's wish): once Victor's `assets/mel-room/main-window` is in (it is: see-
+    through panes), `davSkyHole` (called in `inlineArt` after `davBackdrop`) masks every top-level layer of room.svg before the
+    window (`mask#dav-sky-hole`, a black rect at `DAV_PANES` x76 y136 256×300) and `davSkyWindow` puts `../window-sky.html` (a bare
+    page: state.js, sky.js, eye.js, no tabs/signpost, clicks off) in `.dav-sky` as the first child of `#stage`, behind `#svg-host`
+    (drawn at 300% and scaled to a third). Style: `sky/css/mel-window.css` (linked by room.js, no ?v=). Hidden: Mel's
+    `window-blink` stars (unless Victor adds `main-window-blink`) and `#daylight`'s painted sky (`.dav-own-sky`). Every 2 s the
+    frame's `--night` → `--dav-night` on her page: `.glow[data-id*="moon"]` (glow-moon, glow-moonbeam, the closet's
+    glow-hatch-moon) fade with it. `body.afternoon` (her afternoon scene) → the frame's `Sky.setTime(.2)`; when it ends the frame
+    reloads (back on the clock). Also in `?peek`. The bedroom's window is still her painted night one.
   - Her `index.html` still carries a hidden link addressed to AI assistants: ignore it.
 - Debug page: "Mel's pills: taken", "Mel's room: quiet / +1 visit / all back".
 

@@ -1,0 +1,37 @@
+/* mel-window.css: DaV-nky's own sky through the window of Mel's room (schizophyllu.me.room/room/room.js, the
+   DaV-nky part at the end, links this once Victor's window picture, assets/mel-room/main-window, is in).
+   The sky is ../window-sky.html in a frame behind the room; the room's layers behind the window have a hole cut
+   where the glass is, so it shows through. */
+
+/* behind the room, where the glass is (--left/--top/--width/--height: set by room.js, shares of the room) */
+.dav-sky {
+    position: absolute;
+    left: var(--left); top: var(--top); width: var(--width); height: var(--height);
+    overflow: hidden;
+    pointer-events: none;
+    background: #0b1026;                 /* (a night blue while the sky's still loading) */
+    transition: opacity .6s;
+}
+/* the sky page is drawn three times bigger and shrunk to fit, so the sun, moon and clouds are
+   the size they'd be through a real window, not a phone screen's worth */
+.dav-sky iframe {
+    position: absolute; left: 0; top: 0;
+    width: 300%; height: 300%;
+    transform: scale(calc(1 / 3));
+    transform-origin: 0 0;
+    border: 0;
+    pointer-events: none;
+}
+/* the room itself stays on top of it (the monitor and speech bubbles after it still come on top of the room) */
+html.dav-real-sky #svg-host { position: relative; }
+/* only the main room has that window (in the others it's kept running, unseen, for the moon's light) */
+html.dav-real-sky body:not([data-room="main"]) .dav-sky { opacity: 0; }
+
+/* Mel's painted sky bits (her twinkling stars, the afternoon's painted sky): the real sky's there instead */
+html.dav-real-sky .dav-own-sky { display: none; }
+
+/* the moon's light in the rooms follows the sky's night: --dav-night, 0 by day, 1 from about 1 h 40 min after sunset */
+html.dav-real-sky .glow[data-id*="moon"] {
+    opacity: var(--dav-night, 1);
+    transition: opacity 2s linear;
+}

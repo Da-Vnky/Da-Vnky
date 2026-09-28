@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>the sky · DaV-nky</title>
+    <!-- window-sky.html — just the site's sky, nothing else: the real sun where the visitor is (sunrise, sunset, dusk,
+         night), the moon, the clouds, the stars, the skyboxes. Mel's room shows it through her window
+         (schizophyllu.me.room/room/room.js, the DaV-nky part at the end), and reads the time of night off it for her moon's
+         glow. Not a page to visit: no tabs, no signpost, no panel. -->
+    <script src="sky/state.js?v=20260927j"></script>
+    <link rel="stylesheet" href="sky/sky.css?v=20260927j">
+    <link rel="stylesheet" href="sky/css/eye.css?v=20260927j">
+    <style>
+        /* only the sky: no ways to anywhere, no labels, no clicking */
+        .place-tabs, .signpost, .sky-links .sl-name, .sky-links a > span, .ui-button { display: none !important; }
+        html, body { overflow: hidden !important; }
+        body { pointer-events: none; }
+    </style>
+</head>
+<body class="window-sky">
+    <script src="sky/sky.js?v=20260927j"></script>
+    <script src="sky/eye.js?v=20260927j"></script>
+</body>
+</html>

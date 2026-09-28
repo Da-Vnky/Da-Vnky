@@ -1,8 +1,9 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-city.html 9158 3920791692
-index.html 4380 278115614
-living.html 126953 2192818477
-workshop.html 20911 243659503
+city.html 9158 3727750153
+index.html 4380 3889941983
+living.html 126953 4041284235
+window-sky.html 1273 1347137487
+workshop.html 20911 267797984
 sky/ambient.js 5052 82158972
 sky/attic.js 34415 1479863069
 sky/bathroom.js 27366 739340607
@@ -74,6 +75,7 @@ sky/css/letters.css 2554 2685416682
 sky/css/lives.css 3089 2936428613
 sky/css/loot.css 2076 1327473539
 sky/css/marker.css 1560 2393379633
+sky/css/mel-window.css 1881 3740731085
 sky/css/models.css 3444 1051530511
 sky/css/music.css 12786 1152388714
 sky/css/noise.css 2783 317061799
@@ -101,7 +103,8 @@ assets/hell/list.txt 117 55339362
 assets/items/list.txt 117 55339362
 assets/living/list.txt 136 2848213636
 assets/living/vinyl-texture.webp 3298872 1062159737
-assets/mel-room/list.txt 117 55339362
+assets/mel-room/list.txt 134 2808779384
+assets/mel-room/main-window.webp 10718 3012613204
 assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
 assets/sea/list.txt 117 55339362
@@ -220,7 +223,7 @@ schizophyllu.me.room/room/narration.js 14420 3403870155
 schizophyllu.me.room/room/radio.js 6517 830110350
 schizophyllu.me.room/room/roof.svg 31510 2470693214
 schizophyllu.me.room/room/room.css 24479 2584604817
-schizophyllu.me.room/room/room.js 82971 1152105678
+schizophyllu.me.room/room/room.js 87600 1342625218
 schizophyllu.me.room/room/room.svg 26999 1991694751
 schizophyllu.me.room/room/script.js 47501 3643087694
 schizophyllu.me.room/assets/apartment/claube-drawing.png 452847 3441601832
