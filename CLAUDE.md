@@ -162,6 +162,28 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   there, in the right group, with a plain "what" and a "size". The manager also finds undescribed ones.
 - `?slots` on a page's URL shows the slot names on the page.
 
+## The asset manager's maps and the template pictures (27 Sep)
+
+- Each scene tab with a `"map"` in tools/slots.json (`{ page, views: [{ name, do, until, wait }] }`) opens on **a map**: the
+  scene's page itself in an iframe (1920 × 1080, scaled to fit) with every slot outlined over it (red dashes = stand-in,
+  green = his). Hover: name, size there, wanted size. Click (or drop a file on) a box: a card with add/replace/remove and
+  "goes with it" (its other states and poses: same name + `-something`, and `-glow`). After an upload the frame reloads.
+  "not in this view" chips = the scene's slots with no box showing now (states, pop-ups, sounds). Selects: `show` (the
+  views: `do` runs in the frame, `until` is waited for, e.g. Mel's rooms), `in` (reset N: `?reset=N`, safe in map mode),
+  names on/off, "every slot on the page". The list of slots is still under it ("every slot, one by one").
+- `?map` (localhost only, sky/state.js, first thing): `html.dav-map`, **nothing is kept** (Storage.prototype patched: writes
+  go to a scratch copy, reads fall through), no sound (media `play()` a no-op, AudioContexts suspended).
+- Where a slot sits: `tools/map.js` (`DavMap.boxes/draw/at/dims`) finds `[data-asset]`, `[data-slot]` and Mel's `[data-art]`
+  (→ `assets/mel-room/<room>-<thing>`) that are showing. Pieces a script fills itself mark themselves with `data-slot`
+  (sky.js `svgArt`, `layerArt`, the room wall/notes; frames.js, ground-view.js, peeper.js `art()`): **do the same for any new
+  one**. Looks: `tools/map.css`.
+- **Template pictures**: `tools/templates.py` (Playwright; `python tools/templates.py [scene]`) opens each map page + each view
+  as a new visitor, midday UTC, 1920 × 1080, draws the outlines with names and sizes, saves `tools/templates/<scene>[-<view>].png`
+  and `…-outlines.png` (see-through). `tools/templates/` is gitignored (never published; ~27 MB). The map's links download
+  them; "make them again" = `POST /__templates/make` (content.py runs templates.py in the background, `GET /__templates/state`,
+  log in `tools/templates/making.log`); it needs Playwright on Victor's computer (it says how if not).
+- No map: below (reset 4: no page to open), hidden things, characters, sounds (lists as before).
+
 ## The attic (sky/attic.js)
 
 - The way up (hallway): **any reset but 4**, a pull cord (`.hall-cord`, slot `hall-cord`) hangs from the hatch with a small

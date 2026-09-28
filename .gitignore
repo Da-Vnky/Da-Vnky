@@ -10,3 +10,6 @@ tools/debug.html
 
 # your own versions of files that were changed on Forgejo too, kept by tools/pull.sh until they're put together
 _your-versions/
+
+# the template pictures for your art program (tools/templates.py makes them again whenever you like)
+tools/templates/

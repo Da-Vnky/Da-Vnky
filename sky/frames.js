@@ -70,6 +70,7 @@
         f.querySelector('.gf-hint').textContent = 'an empty frame';
         // your own frame art: frame-<n> for this one, or frame for all of them
         var art = 'assets/' + ROOM + '/' + (wallOf(f) === ROOM ? '' : wallOf(f) + '-') + 'frame';
+        f.dataset.slot = art + '-' + n;                               // (where it sits: the asset manager's map)
         Sky.findAsset(art + '-' + n, function (url) {
             if (url) return dress(url);
             Sky.findAsset(art, function (u2) { if (u2) dress(u2); });

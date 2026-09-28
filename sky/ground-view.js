@@ -24,6 +24,7 @@
 
     var ground = document.createElement('div');
     ground.className = 'ground ground-view';
+    ground.dataset.slot = base;                                       // (where it sits: the asset manager's map)
     ground.setAttribute('aria-hidden', 'true');
     ground.innerHTML =
         '<svg class="garden">' +

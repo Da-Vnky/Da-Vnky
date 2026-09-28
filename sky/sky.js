@@ -1128,6 +1128,7 @@
     // put art into a drawn SVG group, keeping the group (and anything animating it):
     // the picture is laid on the same canvas as the drawing (x, y, w, h in its viewBox)
     function svgArt(g, base, box, done) {
+        if (!g.closest('[data-slot="' + base + '"]')) g.setAttribute('data-slot', base);   // (where it sits: the asset manager's map)
         findAsset(base, function (url) {
             if (!url) { if (done) done(null); return; }
             var NS = 'http://www.w3.org/2000/svg';

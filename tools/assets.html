@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="map.css">
 <style>
     :root { --ink: #3a2716; --faded: #6e5236; --red: #9a3b1f; --card: #efe3c6; --green: #4f7a3a; }
     * { box-sizing: border-box; }
@@ -169,6 +170,57 @@
     .swap-add { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 4px; }
     .swap-add input { flex: 1 1 280px; max-width: 420px; padding: 7px 12px; border-radius: 999px; border: 1px solid rgba(243,230,194,.35); background: #3a2a1d; color: #f3e6c2; font: .9rem ui-monospace, Menlo, Consolas, monospace; }
     [hidden] { display: none !important; }
+    /* the map of a scene: the page itself, small, with every slot outlined on it (tools/map.js, map.css) */
+    .map { position: relative; margin: 14px 0 6px; }
+    .map-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 0 0 8px; font-size: .92rem; font-style: italic; color: rgba(243,230,194,.8); }
+    .map-bar label { display: inline-flex; align-items: center; gap: 6px; }
+    .map-bar select { font: inherit; font-style: normal; font-size: .88rem; padding: 3px 8px; border-radius: 999px; border: 1px solid rgba(243,230,194,.35); background: #3a2a1d; color: #f3e6c2; }
+    .map-bar input { accent-color: var(--red); }
+    .map-bar .grow { flex: 1; }
+    .map-bar a, .map-bar .linkish { color: #e0b070; font-style: italic; cursor: pointer; background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+    .map-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0 0; font-size: .86rem; font-style: italic; color: rgba(243,230,194,.7); }
+    .map-legend i { display: inline-block; width: 22px; height: 12px; margin-right: 5px; vertical-align: -1px; border: 2px dashed #ff5a36; background: rgba(255,90,54,.12); }
+    .map-legend i.mine { border: 2px solid #7fd05a; background: none; }
+    .map-stage { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #120c08; box-shadow: 0 10px 26px rgba(0,0,0,.5); outline: 1px solid rgba(243,230,194,.2); }
+    .map-stage iframe { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border: 0; transform-origin: 0 0; pointer-events: none; background: #120c08; }
+    .map-hit { position: absolute; inset: 0; cursor: crosshair; }
+    .map-hit.on-box { cursor: pointer; }
+    .map-veil { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(18,12,8,.82); color: #f3e6c2; font-style: italic; transition: opacity .4s; }
+    .map-veil.gone { opacity: 0; pointer-events: none; }
+    .map-tip { position: absolute; z-index: 6; max-width: 320px; padding: 6px 10px; border-radius: 6px; background: rgba(42,29,20,.95); color: #f3e6c2; font-size: .86rem; line-height: 1.35;
+        pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,.5); }
+    .map-tip b { font: normal .84rem ui-monospace, Menlo, Consolas, monospace; color: #ffe27a; }
+    .map-tip .st { display: block; font-style: italic; color: rgba(243,230,194,.75); }
+    .map-stage.dropping { outline: 3px dashed var(--red); }
+    .map-off { margin: 10px 0 0; }
+    .map-off summary { cursor: pointer; color: #e0b070; }
+    .map-off h3 { display: inline; margin: 0 0 6px; font: normal 1rem "IM Fell English SC", Georgia, serif; color: #e0b070; }
+    .map-off h3 small { font: italic .88rem "IM Fell English", Georgia, serif; color: rgba(243,230,194,.6); margin-left: 6px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .chip { display: inline-flex; align-items: center; gap: 7px; padding: 3px 11px 3px 4px; border-radius: 999px; border: 1.5px dashed #ff8a66; background: rgba(255,90,54,.08); color: #f3e6c2;
+        cursor: pointer; font: .82rem ui-monospace, Menlo, Consolas, monospace; outline: 3px dashed transparent; }
+    .chip.mine { border: 1.5px solid #7fd05a; background: rgba(127,208,90,.08); }
+    .chip.drop { outline-color: var(--red); }
+    .chip:hover { background: rgba(243,230,194,.12); }
+    .chip .lthumb { width: 26px; height: 26px; border-radius: 50%; font-size: .7rem; }
+    .chip .with { font: italic .8rem "IM Fell English", Georgia, serif; color: rgba(243,230,194,.6); }
+    .map-pop { position: absolute; z-index: 20; width: 340px; max-width: calc(100% - 10px); max-height: 80vh; overflow-y: auto; background: var(--card); color: var(--ink);
+        box-shadow: 0 12px 30px rgba(0,0,0,.55), inset 0 0 26px rgba(120,80,30,.2); border-radius: 4px; padding: 10px 12px 12px; }
+    .map-pop .x { position: absolute; top: 4px; right: 8px; border: 0; background: none; font-size: 1.3rem; color: var(--faded); cursor: pointer; }
+    .map-pop .pic { height: 120px; display: grid; place-items: center; margin: 4px 0 8px; overflow: hidden; background: repeating-conic-gradient(#e6d8b6 0 25%, #f3ead2 0 50%) 0 0 / 14px 14px; }
+    .map-pop .pic img, .map-pop .pic video { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .map-pop .pic .stock { font-style: italic; color: #8a7258; font-size: .9rem; }
+    .map-pop h4 { margin: 0 24px 2px 0; font: normal .95rem ui-monospace, Menlo, Consolas, monospace; word-break: break-all; }
+    .map-pop .what { font-size: .92rem; }
+    .map-pop .size { font-size: .84rem; font-style: italic; color: var(--faded); }
+    .map-pop .acts { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 2px; }
+    .map-pop .fam { margin-top: 10px; border-top: 1px dashed rgba(110,82,54,.35); padding-top: 6px; }
+    .map-pop .fam p { margin: 0 0 4px; font-size: .84rem; font-style: italic; color: var(--faded); }
+    .map-pop .fam .frow { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+    .map-pop .fam .frow .lthumb { width: 34px; height: 34px; }
+    .map-pop .fam .frow span.nm { flex: 1; min-width: 0; font: .8rem ui-monospace, Menlo, Consolas, monospace; word-break: break-all; }
+    .map-pop .fam .frow span.nm small { display: block; font: italic .8rem "IM Fell English", Georgia, serif; color: var(--faded); }
+    .details-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; }
 </style>
 </head>
 <body>
@@ -187,6 +239,8 @@
 
 <!-- the resets: the same plan the site plays by (sky/state.js) -->
 <script src="/sky/state.js"></script>
+<!-- where each slot sits on a page (the scenes' maps, and tools/templates.py's pictures) -->
+<script src="map.js"></script>
 <script>
 (function () {
     var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -240,7 +294,7 @@
         CAT.scenes.forEach(function (sc) { sc.groups.forEach(function (g) { g.slots.forEach(function (x) { known[x.slot] = 1; known[x.slot + '-glow'] = 1; }); }); });
         CAT.noise.forEach(function (n) { known['assets/sounds/' + n.name] = 1; });
         (STATE.noise || []).forEach(function (n) { known['assets/sounds/' + n.name] = 1; });
-        SCENES = CAT.scenes.map(function (sc) { return { id: sc.id, name: sc.name, page: sc.page, note: sc.note, groups: sc.groups.slice() }; });
+        SCENES = CAT.scenes.map(function (sc) { return { id: sc.id, name: sc.name, page: sc.page, note: sc.note, map: sc.map, groups: sc.groups.slice() }; });
         var extra = {};
         (STATE.found || []).forEach(function (f) {
             if (known[f.slot]) return;
@@ -282,13 +336,14 @@
         say('putting ' + file.name + ' in ' + slot + '…');
         return send('/__assets/put', file, { 'X-Slot': slot, 'X-Kind': kind || 'image' }).then(function (r) {
             if (r.error) say(file.name + ': ' + r.error, true);
-            else say('saved as ' + slot.replace(/[^\/]+$/, '') + r.name + (file.size > 2 * 1048576 ? ' (it’s ' + kb(file.size) + ': big files make the page slow to load)' : '') + '. publish when you’re ready.');
+            else artChanged++;
+            if (!r.error) say('saved as ' + slot.replace(/[^\/]+$/, '') + r.name + (file.size > 2 * 1048576 ? ' (it’s ' + kb(file.size) + ': big files make the page slow to load)' : '') + '. publish when you’re ready.');
             return load();
         });
     }
     function clear(slot) {
         if (!confirm('take your file out of ' + slot + '? the stand-in comes back (on the live site once you publish).')) return;
-        api('/__assets/clear', { slot: slot }).then(function (r) { if (r.error) say(r.error, true); else say('removed ' + (r.removed || []).join(', ') + '. the stand-in is back.'); load(); });
+        api('/__assets/clear', { slot: slot }).then(function (r) { if (r.error) say(r.error, true); else artChanged++, say('removed ' + (r.removed || []).join(', ') + '. the stand-in is back.'); load(); });
     }
 
     /* ---------------- a slot's card ---------------- */
@@ -405,6 +460,295 @@
         return d;
     }
 
+    /* ---------------- the map of a scene ---------------- */
+    // the scene's page itself, in a frame (1920 x 1080, shrunk to fit), with every slot on it outlined (tools/map.js):
+    // red dashes = still the stand-in, green = yours. click one, or drop a picture on it, to put yours in: the page loads
+    // again with it. slots.json's "map": { page, views: [{ name, do, until, wait }] } says which page, and the states it can
+    // be put in (do: a line of the page's own script; until: what's true once it's done, if that takes a while; wait: ms
+    // to let it settle after, 1200 if not given). the page opens with ?map (sky/state.js): nothing it does there is kept, and
+    // it makes no sound. the template pictures (for your art program) are made by tools/templates.py.
+    var MAPS = {}, artChanged = 0, W = 1920, H = 1080, mapOpt = { labels: 'missing', every: false };
+    try { var mo = JSON.parse(sessionStorage.getItem('assets-map') || '{}'); if (mo.labels) mapOpt.labels = mo.labels; mapOpt.every = !!mo.every; } catch (e) {}
+    function saveMapOpt() { try { sessionStorage.setItem('assets-map', JSON.stringify(mapOpt)); } catch (e) {} }
+    function slug(t) { return String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+    function mapURL(page, reset) {
+        var m = /^([^?#]*)(\?[^#]*)?(#.*)?$/.exec(page);
+        return '/' + m[1] + (m[2] ? m[2] + '&' : '?') + 'map' + (reset ? '&reset=' + reset : '') + '&t=' + Date.now() + (m[3] || '');
+    }
+    function slotInfo(slot) { return allSlots().filter(function (x) { return x.slot === slot; })[0] || { slot: slot, what: '', kind: kindOf(slot) }; }
+    function short(slot) { return slot.split('/').pop(); }
+    // the slots that go with one: its other states and poses (fridge + fridge-inside, frame-1 + frame), its glow twin
+    function family(slot, pool) {
+        var out = [];
+        pool.forEach(function (s) {
+            if (s.slot === slot) return;
+            var a = s.slot.length < slot.length ? s.slot : slot, b = a === slot ? s.slot : slot;
+            if (b.indexOf(a + '-') !== 0 || /^assets\/mel-room\/[a-z]+$/.test(a)) return;    // (Mel's room: the backdrop isn't every thing's family)
+            out.push(s);
+        });
+        if (slotInfo(slot).glow && !out.some(function (x) { return x.slot === slot + '-glow'; })) out.push({ slot: slot + '-glow', what: 'its glow twin: fades in at dusk', optional: true });
+        return out.slice(0, 12);
+    }
+    function mapBlock(sc, slots) {
+        var M = MAPS[sc.id];
+        if (M) { M.refresh(); return M.wrap; }
+        M = MAPS[sc.id] = { view: '', reset: '', seen: artChanged, list: [], hot: null, ready: false };
+        var known = {};
+        slots.forEach(function (s) { known[s.slot] = s; });
+        var wrap = M.wrap = el('section', 'map');
+
+        // the bar: which state, which reset, the labels, the template pictures
+        var bar = el('div', 'map-bar');
+        function select(label, opts, val, fn) {
+            var l = el('label', '', esc(label) + ' '), sl = el('select');
+            opts.forEach(function (o) { var op = el('option', '', esc(o[1])); op.value = o[0]; sl.appendChild(op); });
+            sl.value = val;
+            sl.addEventListener('change', function () { fn(sl.value); });
+            l.appendChild(sl);
+            bar.appendChild(l);
+            return sl;
+        }
+        if ((sc.map.views || []).length) select('show', [['', 'the scene as it is']].concat(sc.map.views.map(function (v) { return [v.name, v.name]; })), '', function (v) { M.view = v; open(); drawTmpl(); });
+        select('in', [['', 'your own game, as it is'], ['1', 'reset 1'], ['2', 'reset 2'], ['3', 'reset 3'], ['4', 'reset 4'], ['5', 'reset 5'], ['6', 'reset 6'], ['7', 'reset 7'], ['8', 'reset 8']], '',
+               function (v) { M.reset = v; open(); });
+        select('names', [['missing', 'on the missing ones'], ['all', 'on every one'], ['none', 'off']], mapOpt.labels, function (v) { mapOpt.labels = v; saveMapOpt(); tick(); });
+        var ev = el('label', '', '<input type="checkbox"' + (mapOpt.every ? ' checked' : '') + '> every slot on the page');
+        ev.title = 'the ones from other tabs too (the sky, the buttons, the traveller…)';
+        ev.querySelector('input').addEventListener('change', function () { mapOpt.every = this.checked; saveMapOpt(); tick(); });
+        bar.appendChild(ev);
+        bar.appendChild(el('span', 'grow'));
+        var tmpl = el('span', '');
+        bar.appendChild(tmpl);
+        var pg = el('a', '', 'open the page ↗');
+        pg.target = '_blank';
+        pg.href = '/' + sc.map.page.replace(/^([^?#]*)(\?[^#]*)?/, function (all, a, b) { return a + (b ? b + '&' : '?') + 'slots'; });
+        bar.appendChild(pg);
+
+        // the stage: the page, the outlines over it, and what the pointer's on
+        var stage = el('div', 'map-stage'), frame = el('iframe'), layer = el('div', 'dm-layer'), hit = el('div', 'map-hit'),
+            veil = el('div', 'map-veil', 'opening the scene…'), tip = el('div', 'map-tip');
+        frame.setAttribute('tabindex', '-1');
+        frame.setAttribute('aria-hidden', 'true');
+        frame.title = sc.name;
+        tip.hidden = true;
+        stage.appendChild(frame); stage.appendChild(layer); stage.appendChild(hit); stage.appendChild(veil); stage.appendChild(tip);
+        var legend = el('div', 'map-legend', '<span><i></i>still the stand-in: click it, or drop a picture on it, to put yours in</span><span><i class="mine"></i>yours (click to change it)</span>' +
+            '<span>the page as a visitor sees it, at 1920 × 1080. nothing done in here is kept</span>');
+        var off = el('div', 'map-off'), pop = el('div', 'map-pop');
+        pop.hidden = true;
+        wrap.appendChild(bar); wrap.appendChild(stage); wrap.appendChild(legend); wrap.appendChild(off); wrap.appendChild(pop);
+
+        function scale() { return stage.clientWidth / W || 1; }
+        function fit() { frame.style.transform = 'scale(' + scale() + ')'; }
+        new ResizeObserver(function () { fit(); tick(); }).observe(stage);
+
+        function open() {
+            closePop();
+            M.ready = false;
+            M.list = [];
+            veil.textContent = 'opening the scene…';
+            veil.classList.remove('gone');
+            layer.innerHTML = '';
+            frame.src = mapURL(sc.map.page, M.reset);
+        }
+        frame.addEventListener('load', function () {
+            var src = frame.src;
+            setTimeout(function () {                                  // (the page's scripts and pictures settle in)
+                if (frame.src !== src) return;
+                var v = (sc.map.views || []).filter(function (x) { return x.name === M.view; })[0];
+                if (v) try { new frame.contentWindow.Function(v.do)(); } catch (e) { say('couldn’t show “' + v.name + '”: ' + e.message, true); }
+                var t0 = Date.now();
+                (function settle() {                                  // (until: the state's there, e.g. Mel's roof; at most 15 s)
+                    if (frame.src !== src) return;
+                    var done = true;
+                    if (v && v.until) try { done = !!new frame.contentWindow.Function('return (' + v.until + ')')(); } catch (e) { done = true; }
+                    if (!done && Date.now() - t0 < 15000) return setTimeout(settle, 200);
+                    setTimeout(function () { if (frame.src !== src) return; M.ready = true; veil.classList.add('gone'); tick(); strip(true); }, v ? (v.wait || 1200) : 300);
+                })();
+            }, 1500);
+        });
+
+        function wanted(name) { return known[name] ? name : mapOpt.every && /^assets\/[a-z0-9-]+\/[a-z0-9-]+$/.test(name) ? name : null; }
+        function look(b) { return !known[b.slot] ? 'other' : fileFor(b.slot) ? 'mine' : 'stand'; }
+        function label(b) {
+            if (mapOpt.labels === 'none' && b !== M.hot) return '';
+            if (mapOpt.labels === 'missing' && look(b) !== 'stand' && b !== M.hot) return '';
+            return esc(short(b.slot)) + (b === M.hot ? '<i>' + DavMap.dims(b) + '</i>' : '');
+        }
+        function tick() {
+            if (!wrap.isConnected || !M.ready) return;
+            var w;
+            try { w = frame.contentWindow; if (!w || !w.document || !w.document.body) return; } catch (e) { return; }
+            M.list = DavMap.boxes(w, wanted);
+            if (M.hot) M.hot = M.list.filter(function (b) { return b.el === M.hotEl; })[0] || null;
+            DavMap.draw(layer, M.list, scale(), { kind: look, label: label, hot: M.hot });
+            strip();
+            if (M.pop && M.pop.box) place();
+        }
+        setInterval(tick, 160);
+
+        // pointing, clicking, dropping
+        function pt(e) { var r = stage.getBoundingClientRect(), s = scale(); return { x: (e.clientX - r.left) / s, y: (e.clientY - r.top) / s, cx: e.clientX - r.left, cy: e.clientY - r.top }; }
+        function setHot(b, p) {
+            M.hot = b; M.hotEl = b && b.el;
+            hit.classList.toggle('on-box', !!b);
+            if (!b) tip.hidden = true;
+            else {
+                var s = slotInfo(b.slot), f = fileFor(b.slot);
+                tip.innerHTML = '<b>' + esc(short(b.slot)) + '</b> ' + esc(s.what || '') +
+                    '<span class="st">' + (f ? 'yours: ' + esc(f.name) : known[b.slot] ? 'still the stand-in' : 'from another tab') + ' · ' + DavMap.dims(b) + ' here' + (s.size ? ' · wanted: ' + esc(s.size) : '') + '</span>';
+                tip.hidden = false;
+                var x = p.cx + 16, y = p.cy + 16;
+                if (x + tip.offsetWidth > stage.clientWidth - 6) x = p.cx - tip.offsetWidth - 12;
+                if (y + tip.offsetHeight > stage.clientHeight - 6) y = p.cy - tip.offsetHeight - 12;
+                tip.style.left = Math.max(4, x) + 'px'; tip.style.top = Math.max(4, y) + 'px';
+            }
+            if (M.ready) DavMap.draw(layer, M.list, scale(), { kind: look, label: label, hot: M.hot });
+        }
+        hit.addEventListener('mousemove', function (e) { var p = pt(e); setHot(DavMap.at(M.list, p.x, p.y), p); });
+        hit.addEventListener('mouseleave', function () { setHot(null); });
+        hit.addEventListener('click', function (e) { var p = pt(e), b = DavMap.at(M.list, p.x, p.y); if (b) openPop(b.slot, b); else closePop(); });
+        function hasFiles(e) { return e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') !== -1; }
+        hit.addEventListener('dragover', function (e) { if (!hasFiles(e)) return; e.preventDefault(); stage.classList.add('dropping'); var p = pt(e); setHot(DavMap.at(M.list, p.x, p.y), p); });
+        hit.addEventListener('dragleave', function () { stage.classList.remove('dropping'); setHot(null); });
+        hit.addEventListener('drop', function (e) {
+            e.preventDefault();
+            stage.classList.remove('dropping');
+            var p = pt(e), b = DavMap.at(M.list, p.x, p.y), fs = e.dataTransfer.files;
+            setHot(null);
+            if (b && fs && fs.length) upload(b.slot, fs[0]); else say('drop it on one of the outlined pieces.', true);
+        });
+        function upload(slot, file) { var s = slotInfo(slot); return put(slot, s.kind || kindOf(slot), file); }
+        function choose(slot) { var s = slotInfo(slot); pick(accept(s.kind || kindOf(slot)), false, function (fs) { upload(slot, fs[0]); }); }
+
+        // the ones that aren't showing: other states, pop-ups, poses, sounds
+        var lastOff = null;
+        function strip(force) {
+            if (!M.ready) return;
+            var on = {};
+            M.list.forEach(function (b) { on[b.slot] = 1; });
+            var missing = slots.filter(function (s) { return !on[s.slot]; });
+            var key = missing.map(function (s) { return s.slot + (fileFor(s.slot) ? '+' : ''); }).join(',');
+            if (!force && key === lastOff) return;
+            lastOff = key;
+            off.innerHTML = '';
+            if (!missing.length) return;
+            var box = el('details', '');
+            box.open = missing.length <= 24 || !!M.offOpen;
+            box.addEventListener('toggle', function () { M.offOpen = box.open; });
+            box.appendChild(el('summary', '', '<h3>not in this view: ' + missing.length + ' <small>they come and go (a door opens, a song plays, a pop-up), or they’re sounds: click one to see it or add yours</small></h3>'));
+            var chips = el('div', 'chips');
+            missing.forEach(function (s) {
+                var f = fileFor(s.slot), base = M.list.filter(function (b) { return s.slot.indexOf(b.slot + '-') === 0; })[0];
+                var c = el('button', 'chip' + (f ? ' mine' : ''), thumb(f, s.kind || 'image', s) + esc(short(s.slot)) + (base ? ' <span class="with">with ' + esc(short(base.slot)) + '</span>' : ''));
+                c.type = 'button';
+                c.title = (s.what || '') + (s.size ? ' · ' + s.size : '');
+                c.addEventListener('click', function () { openPop(s.slot, null, c); });
+                droppable(c, function (fs) { upload(s.slot, fs[0]); });
+                chips.appendChild(c);
+            });
+            box.appendChild(chips);
+            off.appendChild(box);
+        }
+
+        // the card for one slot, next to it
+        function openPop(slot, box, anchor) { tip.hidden = true; M.pop = { slot: slot, box: box, anchor: anchor }; renderPop(); place(); }
+        function closePop() { M.pop = null; pop.hidden = true; }
+        function renderPop() {
+            if (!M.pop) return;
+            var slot = M.pop.slot, s = slotInfo(slot), kind = s.kind || kindOf(slot), f = fileFor(slot);
+            pop.innerHTML = '';
+            pop.appendChild(btn('×', closePop, 'x'));
+            pop.appendChild(el('h4', '', esc(slot.replace(/^assets\//, ''))));
+            pop.appendChild(el('div', 'pic', preview(f, kind, s)));
+            pop.appendChild(el('div', 'what', esc(s.what || '')));
+            var b = M.pop.box;
+            pop.appendChild(el('div', 'size', (s.size ? 'wanted: ' + esc(s.size) + '<br>' : '') + (b ? 'here: ' + DavMap.dims(b) + ' on a 1920 × 1080 screen<br>' : '') +
+                (f ? 'yours: ' + esc(f.name) + ' · ' + kb(f.size) : 'still the stand-in')));
+            var acts = el('div', 'acts');
+            acts.appendChild(btn(f ? 'replace' : 'add yours', function () { choose(slot); }, 'sm yes'));
+            if (f) acts.appendChild(btn('open', function () { window.open(f.url, '_blank'); }, 'sm'));
+            if (f) acts.appendChild(btn('remove', function () { clear(slot); }, 'sm no'));
+            pop.appendChild(acts);
+            var fam = family(slot, slots.concat(allSlots().filter(function (x) { return !known[x.slot]; })));
+            if (fam.length) {
+                var fb = el('div', 'fam', '<p>goes with it</p>');
+                fam.forEach(function (x) {
+                    var ff = fileFor(x.slot), r = el('div', 'frow');
+                    r.innerHTML = thumb(ff, x.kind || 'image', x) + '<span class="nm">' + esc(short(x.slot)) + '<small>' + esc(x.what || '') + '</small></span>';
+                    r.appendChild(btn(ff ? 'replace' : 'add', function () { choose(x.slot); }, 'sm' + (ff ? '' : ' yes')));
+                    droppable(r, function (fs) { upload(x.slot, fs[0]); });
+                    fb.appendChild(r);
+                });
+                pop.appendChild(fb);
+            }
+            droppable(pop, function (fs) { upload(slot, fs[0]); });
+            pop.hidden = false;
+        }
+        function place() {
+            if (!M.pop || pop.hidden) return;
+            var wr = wrap.getBoundingClientRect(), a;
+            if (M.pop.box) { var s = scale(), sr = stage.getBoundingClientRect(), bx = M.pop.box; a = { left: sr.left + bx.x * s, top: sr.top + bx.y * s, right: sr.left + (bx.x + bx.w) * s, bottom: sr.top + (bx.y + bx.h) * s }; }
+            else a = M.pop.anchor.getBoundingClientRect();
+            var w = pop.offsetWidth, x = a.right + 10 - wr.left;
+            if (x + w > wr.width) x = a.left - w - 10 - wr.left;
+            if (x < 0) x = Math.max(0, Math.min(wr.width - w, a.left - wr.left));
+            var y = Math.max(0, Math.min(a.top - wr.top, stage.offsetTop + stage.offsetHeight - pop.offsetHeight));
+            if (!M.pop.box) y = a.bottom + 8 - wr.top;
+            pop.style.left = x + 'px'; pop.style.top = y + 'px';
+        }
+        document.addEventListener('mousedown', function (e) {
+            if (M.pop && !pop.contains(e.target) && !hit.contains(e.target) && !off.contains(e.target) && !(fileIn === e.target)) closePop();
+        });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePop(); });
+
+        // the template pictures, for your art program (tools/templates.py makes them; tools/templates/, never published)
+        function drawTmpl() {
+            var n = sc.id + (M.view ? '-' + slug(M.view) : '');
+            tmpl.innerHTML = '';
+            fetch('/tools/templates/' + n + '.png', { method: 'HEAD', cache: 'no-cache' }).then(function (r) { return r.ok; }, function () { return false; }).then(function (ok) {
+                tmpl.innerHTML = '';
+                if (ok) {
+                    var a = el('a', '', 'the template, for your art program ↓');
+                    a.href = '/tools/templates/' + n + '.png'; a.download = 'template-' + n + '.png';
+                    a.title = 'the scene at 1920 × 1080 with every slot outlined and named (its stand-ins, as a visitor in reset 1 sees it at midday)';
+                    var g = el('a', '', 'just the outlines ↓');
+                    g.href = '/tools/templates/' + n + '-outlines.png'; g.download = 'outlines-' + n + '.png';
+                    g.title = 'the same outlines on a see-through picture: a layer to put over your own painting';
+                    tmpl.appendChild(a); tmpl.appendChild(document.createTextNode(' · ')); tmpl.appendChild(g);
+                    tmpl.appendChild(document.createTextNode(' · '));
+                }
+                tmpl.appendChild(btn(ok ? 'make them again' : 'make the template pictures', makeTemplates, 'linkish'));
+            });
+        }
+        M.drawTmpl = drawTmpl;
+        M.refresh = function () {
+            if (M.seen !== artChanged) { M.seen = artChanged; open(); }
+            renderPop(); strip(true); drawTmpl();
+        };
+        fit(); open(); drawTmpl();
+        return wrap;
+    }
+    var making = false;
+    function makeTemplates() {
+        if (making) return;
+        api('/__templates/make', {}).then(function (r) {
+            if (r.error) return say(r.error, true);
+            making = true;
+            say('making the template pictures for every scene: a minute or two (it opens each one in a hidden browser)…');
+            (function wait() {
+                setTimeout(function () {
+                    api('/__templates/state').then(function (x) {
+                        if (x.running) { if (x.at) say('making the template pictures: ' + x.at + '…'); return wait(); }
+                        making = false;
+                        say(x.error || 'the template pictures are made: tools/templates/ (they stay on your computer: never published).', !!x.error);
+                        Object.keys(MAPS).forEach(function (k) { MAPS[k].drawTmpl(); });
+                    });
+                }, 2500);
+            })();
+        });
+    }
+
     /* ---------------- the tabs ---------------- */
     function drawTabs() {
         tabsEl.innerHTML = '';
@@ -440,9 +784,15 @@
 
     function drawScene(sc) {
         var slots = []; sc.groups.forEach(function (g) { slots = slots.concat(g.slots); });
-        var top = intro(sc.note, sc.page, slots);
-        top.appendChild(viewSwitch());
+        var top = intro(sc.note, sc.map ? '' : sc.page, slots);
+        if (!sc.map) top.appendChild(viewSwitch());
         main.appendChild(top);
+        if (sc.map) {
+            main.appendChild(mapBlock(sc, slots));
+            var dh = el('h2', 'details-h', 'every slot, one by one <small>the same slots as a list: what each is for, and the size to draw it</small>');
+            dh.appendChild(viewSwitch());
+            main.appendChild(dh);
+        }
         sc.groups.forEach(function (g) {
             main.appendChild(el('h2', '', esc(g.name) + (g.sub ? '<small>' + esc(g.sub) + '</small>' : '')));
             var box = el('div', view === 'list' ? 'lrows' : 'grid');

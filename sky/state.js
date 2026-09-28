@@ -30,6 +30,41 @@
    reads RESETS and DEATHS from it too.
    ===================================================================== */
 
+// ?map: the asset manager's map of a scene (tools/assets.html shows the page small, with every slot outlined on it).
+// On your own computer only. The page is shown, not played: nothing it does is kept (every save goes to a scratch
+// copy that's forgotten when it closes, so a look at the porch doesn't bring the watcher a step closer), and it
+// makes no sound. html.dav-map for the page's own CSS.
+(function () {
+    if (!/[?&]map(?:[=&]|$)/.test(location.search) || !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) return;
+    window.DAV_MAP = true;
+    document.documentElement.classList.add('dav-map');
+    // the storage: reads see the real one, writes go to a scratch copy
+    var P = Storage.prototype, real = { get: P.getItem, set: P.setItem, del: P.removeItem, key: P.key, len: Object.getOwnPropertyDescriptor(P, 'length').get };
+    var scratch = new Map();
+    function over(s) { if (!scratch.has(s)) scratch.set(s, {}); return scratch.get(s); }
+    function keys(s) {
+        var o = over(s), out = [], n = real.len.call(s), i, k;
+        for (i = 0; i < n; i++) { k = real.key.call(s, i); if (!(k in o)) out.push(k); }
+        for (k in o) if (o[k] !== null) out.push(k);
+        return out;
+    }
+    P.getItem = function (k) { var o = over(this); k = String(k); return k in o ? o[k] : real.get.call(this, k); };
+    P.setItem = function (k, v) { over(this)[String(k)] = String(v); };
+    P.removeItem = function (k) { over(this)[String(k)] = null; };
+    P.clear = function () { var o = over(this); keys(this).forEach(function (k) { o[k] = null; }); };
+    P.key = function (i) { var k = keys(this); return i < k.length ? k[i] : null; };
+    Object.defineProperty(P, 'length', { configurable: true, get: function () { return keys(this).length; } });
+    // no sound: nothing starts playing, and the sound engines stay asleep
+    HTMLMediaElement.prototype.play = function () { return Promise.resolve(); };
+    ['AudioContext', 'webkitAudioContext'].forEach(function (n) {
+        var AC = window[n];
+        if (!AC) return;
+        var Quiet = function (o) { var c = new AC(o); try { c.suspend(); } catch (e) {} c.resume = function () { return Promise.resolve(); }; return c; };
+        Quiet.prototype = AC.prototype;
+        window[n] = Quiet;
+    });
+})();
+
 (function () {
     var MAX = 8;
 

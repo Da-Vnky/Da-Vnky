@@ -349,6 +349,7 @@
     function sfx(n, o) { if (Sky.sounds) Sky.sounds.sfx(n, o); }
     function art(slot, fallback, box) {
         box.innerHTML = fallback;
+        box.dataset.slot = slot;                                      // (where it sits: the asset manager's map)
         Sky.findAsset(slot, function (url) {
             if (!url) return;
             if (/\.(webm|mp4)$/i.test(url)) { box.innerHTML = ''; box.appendChild(Sky.makeMedia({ name: url.split('/').pop(), url: url })); }

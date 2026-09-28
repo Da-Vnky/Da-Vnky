@@ -1,0 +1,22 @@
+/* map.css: the outlines of the slots on a scene (tools/map.js): the asset manager's map and the template pictures */
+.dm-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden;
+    font: 13px/1.25 ui-monospace, Menlo, Consolas, monospace; }
+.dm-box { position: absolute; box-sizing: border-box; border: 2px dashed #ff5a36;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .45); transition: background .12s; }
+.dm-box.mine { border: 2px solid #7fd05a; background: none; }
+.dm-box.other { border: 1px dashed rgba(255, 255, 255, .55); background: none; box-shadow: none; }
+.dm-box.big { background: none; border-width: 3px; }
+.dm-box.hot { background: rgba(255, 230, 120, .28); border-color: #ffe27a; border-style: solid; z-index: 5; }
+.dm-box.mine.hot { background: rgba(127, 208, 90, .22); }
+.dm-tag { position: absolute; left: -2px; top: -2px; max-width: max(100%, 160px); padding: 1px 6px 2px; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; background: #ff5a36; color: #fff; font-weight: 600; pointer-events: none; }
+.dm-tag i { font-style: normal; font-weight: 400; opacity: .85; margin-left: 5px; }
+.dm-box.mine .dm-tag { background: #4f8a37; }
+.dm-box.other .dm-tag { background: rgba(0, 0, 0, .6); }
+.dm-box.hot .dm-tag { background: #ffe27a; color: #2a1d14; }
+/* the template pictures: bigger, always labelled */
+.dm-template .dm-layer { position: fixed; z-index: 2147483647; font-size: 15px; }
+.dm-template .dm-tag { max-width: none; }
+/* the see-through picture of just the outlines: everything else on the page hidden */
+html.dm-outlines, html.dm-outlines body { background: transparent !important; }
+html.dm-outlines body > :not(.dm-layer) { visibility: hidden !important; }

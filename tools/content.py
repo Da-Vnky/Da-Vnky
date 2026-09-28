@@ -1026,6 +1026,41 @@ def asset_clear(slot):
     return gone
 
 
+# ---------------- the template pictures (tools/templates.py): made in the background, a scene at a time ----------------
+TEMPLATES_DIR = os.path.join(HERE, 'templates')
+TEMPLATES_LOG = os.path.join(TEMPLATES_DIR, 'making.log')
+templates_job = {'proc': None}
+
+
+def templates_make():
+    p = templates_job['proc']
+    if p and p.poll() is None:
+        return {'started': True}
+    try:
+        import playwright  # noqa: F401  (only to see it's there)
+    except ImportError:
+        raise ValueError('the template pictures need Playwright, once: in a terminal, type  pip install playwright  and then  python -m playwright install chromium  (then try again)')
+    os.makedirs(TEMPLATES_DIR, exist_ok=True)
+    log = open(TEMPLATES_LOG, 'w', encoding='utf-8')
+    templates_job['proc'] = subprocess.Popen([sys.executable, os.path.join(HERE, 'templates.py')], cwd=ROOT, stdout=log, stderr=subprocess.STDOUT,
+                                             stdin=subprocess.DEVNULL, env=dict(os.environ, PYTHONIOENCODING='utf-8'))
+    return {'started': True}
+
+
+def templates_state():
+    p = templates_job['proc']
+    lines = []
+    if os.path.exists(TEMPLATES_LOG):
+        with open(TEMPLATES_LOG, encoding='utf-8', errors='replace') as f:
+            lines = [x.rstrip() for x in f if x.strip()]
+    heads = [x for x in lines if not x.startswith(' ')]
+    if p and p.poll() is None:
+        return {'running': True, 'at': heads[-1] if heads else ''}
+    if p and p.returncode:
+        return {'running': False, 'error': 'the template pictures stopped: ' + (' / '.join(lines[-3:]) or 'no reason given')}
+    return {'running': False}
+
+
 # slots the site itself uses, found by reading the pages and scripts, so a new piece
 # (data-asset="assets/workshop/clock" or <img src="assets/garden/gate.svg">) shows up in
 # the asset manager by itself, even before it's described in tools/slots.json
@@ -1530,6 +1565,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return
             if url.path == '/__assets/state':
                 return self.reply({'files': asset_files(), 'tracks': tracks(), 'noise': noise_extra(), 'found': found_slots(), 'resets': resets_state()})
+            if url.path == '/__templates/state':
+                return self.reply(templates_state())
             if url.path == '/__resets/note':
                 return self.reply(reset_note(urllib.parse.parse_qs(url.query).get('n', ['1'])[0]))
             if url.path == '/__notify/state':
@@ -1665,6 +1702,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'name': asset_put(slot, name, raw, self.headers.get('X-Kind') or 'image')})
             if url.path == '/__assets/clear':
                 return self.reply({'removed': asset_clear(json.loads(raw or b'{}').get('slot'))})
+            if url.path == '/__templates/make':
+                return self.reply(templates_make())
             if url.path == '/__records/add':
                 return self.reply({'name': track_add(urllib.parse.unquote(self.headers.get('X-Name', '')), raw)})
             if url.path == '/__records/album-new':
