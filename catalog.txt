@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-city.html 9254 1624057071
-index.html 4479 4048607290
-living.html 128790 3970988915
-window-sky.html 1332 1794781746
-workshop.html 20953 2699476472
+city.html 9168 2524636582
+index.html 4387 2680712201
+living.html 128954 1968817018
+window-sky.html 1320 1132566002
+workshop.html 20874 1665452890
 sky/ambient.js 5339 303504477
-sky/attic.js 33508 658131175
+sky/attic.js 33962 1402084230
 sky/bathroom.js 26154 2951866537
 sky/books.js 13679 1574652656
 sky/claubes.js 52340 1339963452
@@ -24,13 +24,14 @@ sky/ground-view.js 6424 2309885180
 sky/hell.js 23882 1855641072
 sky/house.js 11058 2767286303
 sky/inventory.js 17597 1807408083
-sky/kitchen.js 15371 1409761561
+sky/kitchen.js 15822 3110013822
 sky/letters.js 22477 3555333401
 sky/lives.js 11877 3913483697
 sky/loader.js 15520 1770134790
 sky/loot.js 14817 391651511
 sky/marker.js 7204 507894441
 sky/models.js 5025 1630753358
+sky/moonlight.js 6124 2993807472
 sky/music.js 61616 3148296891
 sky/noise.js 11584 92264384
 sky/notes.js 5688 2301167232
@@ -43,7 +44,7 @@ sky/records.js 36049 1435555556
 sky/resets.js 16685 421718036
 sky/revolver.js 18303 1761212564
 sky/ropes.js 5604 1786338978
-sky/sky.js 116065 3728953090
+sky/sky.js 116342 342665877
 sky/state.js 16311 2660482399
 sky/static.js 4269 3444067866
 sky/studio.js 18112 1907161999
@@ -54,7 +55,7 @@ sky/weather.js 26163 3677054639
 sky/paper.css 7388 392067971
 sky/sky.css 50992 3095914540
 sky/css/ambient.css 435 4199751144
-sky/css/attic.css 16069 3015271617
+sky/css/attic.css 15736 521837829
 sky/css/bathroom.css 17498 1224456772
 sky/css/books.css 4900 2258360443
 sky/css/claubes.css 17565 3697391751
@@ -78,8 +79,9 @@ sky/css/lives.css 3089 2936428613
 sky/css/loot.css 2076 1327473539
 sky/css/marker.css 1560 330353198
 sky/css/mel-inventory.css 382 131326107
-sky/css/mel-window.css 1881 3740731085
+sky/css/mel-window.css 2273 1631485753
 sky/css/models.css 3444 1051530511
+sky/css/moonlight.css 2609 1970338388
 sky/css/music.css 12786 1152388714
 sky/css/noise.css 2783 317061799
 sky/css/notes.css 4294 2819331900
@@ -106,7 +108,8 @@ assets/hell/list.txt 117 55339362
 assets/items/list.txt 117 55339362
 assets/living/list.txt 136 2848213636
 assets/living/vinyl-texture.webp 3298872 1062159737
-assets/mel-room/list.txt 134 2808779384
+assets/mel-room/bedroom-bwindow.png 32159 4245744638
+assets/mel-room/list.txt 154 2534666442
 assets/mel-room/main-window.webp 10718 3012613204
 assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
@@ -233,7 +236,7 @@ schizophyllu.me.room/room/narration.js 14420 3403870155
 schizophyllu.me.room/room/radio.js 6517 830110350
 schizophyllu.me.room/room/roof.svg 31510 2470693214
 schizophyllu.me.room/room/room.css 24479 2584604817
-schizophyllu.me.room/room/room.js 90999 2002905584
+schizophyllu.me.room/room/room.js 92768 4051674282
 schizophyllu.me.room/room/room.svg 26999 1991694751
 schizophyllu.me.room/room/script.js 47501 3643087694
 schizophyllu.me.room/assets/apartment/claube-drawing.png 452847 3441601832

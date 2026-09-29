@@ -1848,10 +1848,21 @@ function davBackdrop(root, files) {
 // sits behind the room and shows through. The moon's light in the rooms (glow-moon, glow-moonbeam, the closet's
 // glow-hatch-moon) follows that sky's night: full from about 1 h 40 min after sunset, gone by day. In the afternoon
 // scene the sky outside turns to afternoon for as long as it lasts. Its look: ../sky/css/mel-window.css
-const DAV_PANES = { x: 76, y: 136, w: 256, h: 300 };   // the glass, in room coordinates (a little of it under the frame)
+// the windows it's done for: the main room's, and (28 Sep, Victor's own blinds with a see-through gap) the bedroom's.
+// panes: the glass, in room coordinates (a little of it under the frame). frame: how much sky the window is as if the
+// glass were all of it (the bedroom's gap is only a strip under the blinds: the sky's that strip of a whole window's view)
+const DAV_WINDOWS = {
+  main: { art: 'objects/main/window.svg', pic: 'main-window', blink: ['main-window-blink', 'objects/main/window-blink.svg'],
+          panes: { x: 76, y: 136, w: 256, h: 300 } },
+  bedroom: { art: 'objects/bedroom/bwindow.svg', pic: 'bedroom-bwindow', blink: ['bedroom-bwindow-blink', 'objects/bedroom/bwindow-blink.svg'],
+             panes: { x: 1206, y: 252, w: 240, h: 46 }, frame: { x: 1206, y: 118, w: 240, h: 316 } }
+};
+const davOpen = {};                                     // (the rooms whose window's open to the sky)
 function davSkyHole(root, files) {
-  const win = root.querySelector('[data-art$="objects/main/window.svg"]');
-  if (!win || !davPick(files, 'main-window')) return;
+  const key = Object.keys(DAV_WINDOWS).find(k => root.querySelector(`[data-art$="${DAV_WINDOWS[k].art}"]`));
+  const W = DAV_WINDOWS[key];
+  if (!W || !davPick(files, W.pic)) return;
+  const win = root.querySelector(`[data-art$="${W.art}"]`);
   let top = win;
   while (top.parentNode !== root) top = top.parentNode;
   // the hole: white = keep, black = see through
@@ -1862,19 +1873,40 @@ function davSkyHole(root, files) {
     for (const [k, v] of [['x', x], ['y', y], ['width', w], ['height', h], ['fill', fill]]) r.setAttribute(k, v);
     return r;
   };
-  mask.id = 'dav-sky-hole';
+  mask.id = 'dav-sky-hole-' + key;
   for (const [k, v] of [['maskUnits', 'userSpaceOnUse'], ['x', 0], ['y', 0], ['width', 1600], ['height', 900]]) mask.setAttribute(k, v);
-  mask.append(rect(0, 0, 1600, 900, '#fff'), rect(DAV_PANES.x, DAV_PANES.y, DAV_PANES.w, DAV_PANES.h, '#000'));
+  mask.append(rect(0, 0, 1600, 900, '#fff'), rect(W.panes.x, W.panes.y, W.panes.w, W.panes.h, '#000'));
   defs.append(mask);
   for (const el of [...root.children]) {
     if (el === top) break;
-    if (el.localName !== 'defs' && el.localName !== 'style') el.setAttribute('mask', 'url(#dav-sky-hole)');
+    if (el.localName !== 'defs' && el.localName !== 'style') el.setAttribute('mask', `url(#${mask.id})`);
   }
   // Mel's twinkling stars for her painted sky (unless Victor drew his own), and the afternoon's painted sky: the real one's there instead
-  if (!davPick(files, 'main-window-blink')) root.querySelector('[data-art$="objects/main/window-blink.svg"]')?.classList.add('dav-own-sky');
-  const day = root.querySelector('#daylight');
-  if (day) for (const el of day.children) if (el.localName === 'rect' || el.localName === 'path') el.classList.add('dav-own-sky');
+  if (!davPick(files, W.blink[0])) root.querySelector(`[data-art$="${W.blink[1]}"]`)?.classList.add('dav-own-sky');
+  if (key === 'main') {
+    const day = root.querySelector('#daylight');
+    if (day) for (const el of day.children) if (el.localName === 'rect' || el.localName === 'path') el.classList.add('dav-own-sky');
+  }
+  davOpen[key] = true;
   davSkyWindow();
+  davSkyPlace();
+}
+// the sky's frame, where the current room's window is (or out of sight, in a room without one)
+let davSkyBox = null;
+function davSkyPlace() {
+  if (!davSkyBox) return;
+  const key = davOpen[body.dataset.room || 'main'] ? (body.dataset.room || 'main') : null;
+  davSkyBox.classList.toggle('dav-sky-here', !!key);
+  if (!key) return;
+  const { panes: P, frame: F = P } = DAV_WINDOWS[key];
+  for (const [k, v, of] of [['left', P.x, 1600], ['top', P.y, 900], ['width', P.w, 1600], ['height', P.h, 900]]) {
+    davSkyBox.style.setProperty('--' + k, (v / of * 100) + '%');
+  }
+  // (the sky page drawn the size of the whole window, the glass showing its own part of it)
+  davSkyBox.style.setProperty('--fw', F.w / P.w);
+  davSkyBox.style.setProperty('--fh', F.h / P.h);
+  davSkyBox.style.setProperty('--fx', (P.x - F.x) / P.w);
+  davSkyBox.style.setProperty('--fy', (P.y - F.y) / P.h);
 }
 let davSkyFrame = null;
 function davSkyWindow() {
@@ -1884,12 +1916,9 @@ function davSkyWindow() {
   link.href = new URL('../sky/css/mel-window.css', location.href).href;
   document.head.append(link);
   document.documentElement.classList.add('dav-real-sky');
-  const box = document.createElement('div');
+  const box = davSkyBox = document.createElement('div');
   box.className = 'dav-sky';
   box.setAttribute('aria-hidden', 'true');
-  for (const [k, v, of] of [['left', DAV_PANES.x, 1600], ['top', DAV_PANES.y, 900], ['width', DAV_PANES.w, 1600], ['height', DAV_PANES.h, 900]]) {
-    box.style.setProperty('--' + k, (v / of * 100) + '%');
-  }
   davSkyFrame = document.createElement('iframe');
   davSkyFrame.src = new URL('../window-sky.html', location.href).href;
   davSkyFrame.tabIndex = -1;
@@ -1906,9 +1935,11 @@ function davSkyWindow() {
   davSkyFrame.addEventListener('load', () => setTimeout(tick, 400));
   setInterval(tick, 2000);
   // the afternoon scene (while the screen's black, both ways): the sky outside turns to afternoon, sun and all;
-  // when skizy wakes up it's the real hour again (the sky's loaded afresh, back on the visitor's clock)
+  // when skizy wakes up it's the real hour again (the sky's loaded afresh, back on the visitor's clock).
+  // and a change of room: the sky's frame moves to that room's window
   let afternoon = false;
   new MutationObserver(() => {
+    davSkyPlace();
     const now = body.classList.contains('afternoon');
     if (now === afternoon) return;
     afternoon = now;
@@ -1916,7 +1947,7 @@ function davSkyWindow() {
     if (now) w?.Sky?.setTime?.(.2, 1);
     else w?.location.reload();
     setTimeout(tick, 600);
-  }).observe(body, { attributes: true, attributeFilter: ['class'] });
+  }).observe(body, { attributes: true, attributeFilter: ['class', 'data-room'] });
 }
 // the room shows only once it's as it should be (27 Sep, Victor: the quiet room flashed the ordinary one while its drawings
 // loaded): hidden from the start, shown by main() right after davQuiet(). (and after a few seconds whatever happens)

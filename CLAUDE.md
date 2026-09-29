@@ -319,6 +319,33 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - `Sky.sides` (bathroom.js) is what's left of the side rooms' own API: `inSide`, `goNow(name)` (instant, for
   `living.html#hallway` and the like), the shelf book and the secret wall (`pullBook`, `bookGone`, `book`, `wall`).
 
+## The moon's light through the house's windows (sky/moonlight.js, 28 Sep)
+
+- Victor: the kitchen's window and the attic's round window show the real sky, and every house window (the living room's
+  too) gets a moon glow and a moonbeam by night, like Mel's apartment. `Sky.moonlight(host, { glass, inset|pad, round, cut,
+  slot })` (living.html only, loaded after house.js; its look: sky/css/moonlight.css). The living room's window opts in with
+  `data-moonlight="assets/living/"`; kitchen.js and attic.js call it for theirs.
+- The glass's place in its room: `--gx --gy --gw --gh` (`--gr` for the round one) on the host, measured from the window's
+  element (kitchen: the glass is 8 px in on a 160 x 130 picture; attic: a circle 76% of its width; living room: inside the
+  12 px frame), again on resize, on entering the room and when Victor's own window picture arrives.
+- `cut`: the painted rooms' wall pictures (`.kitchen-wall` / `.attic-roof` / their `> .art`) get a hole cut behind the glass
+  (CSS mask), and the room's own background colour is dropped, so the page's fixed sky shows through (it stays still while
+  the room slides: a real window). The stand-in window drawings no longer paint a sky in the glass. Those rooms also darken
+  as night falls (`.ml-dark`, `--dusk`, not over the window) so the moonlight shows.
+- `.moonlight` (z-index 4, `mix-blend-mode: screen`, opacity `--night × --moon-up`): `.ml-glow` (2½ × the glass) and
+  `.ml-beam` (the glass's width, to the floor, skewed away from the moon by `--moon-x`). sky.js sets `--moon-x` and
+  `--moon-up` beside the moon's position. Slots: assets/living/moonlight, moonbeam, kitchen-moonlight, kitchen-moonbeam,
+  attic-moonlight, attic-moonbeam. (The attic's old static `.attic-beam` is gone.)
+
+## Things that dance sit behind the traveller (28 Sep)
+
+- Victor: the workshop's mannequin and metronome were in front of the traveller (z-index 3 in workshop.html against the
+  traveller's 2), and the living room's cat and plant too. Now z-index 2, and before the traveller in the page, so behind.
+  Checked on every page by moving the traveller over each `.groove` and asking the browser which is on top
+  (`document.elementsFromPoint`): the sea's, the rooftop's, the kitchen's, the attic's and the porch's were already behind.
+- The living room's armchair (Victor calls it the couch) grows with the traveller: `width: min(48vh, 34vw)` (was 20%, at most
+  260 px), the cat on it sized from it (`--chair-w`), and Claude's wall (its frame and plaque) moved up to top 38% above it.
+
 ## One press of Escape, one thing (Sky.escape, sky/sky.js, 28 Sep)
 
 - Anything Escape can close says so with `Sky.escape(isOpen, close, level)`; one listener in sky.js closes only the open
@@ -804,6 +831,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `sky/css/mel-inventory.css` instead of writing its CSS in JavaScript; `room/room.js`: `playRecord` and
   `startAfternoon` do nothing with `?peek` (the view through the window: no sound, and the afternoon never used up
   unseen). peeper.js now removes her live room from the telescope when you stop looking.
+- 28 Sep, later: **the bedroom's window** too. Victor's `assets/mel-room/bedroom-bwindow.png` (blinds, with a see-through
+  gap under them) opens it to the sky: room.js `DAV_WINDOWS` (main, bedroom: their pictures, their glass, and for the
+  bedroom the whole window the gap is part of, `frame`), `davSkyHole` for whichever room's loading, and `davSkyPlace` moves
+  the one sky frame to the current room's window (`.dav-sky-here`; mel-window.css `--fw --fh --fx --fy` show the gap its part
+  of a whole window's sky). The bedroom's glow-moon and glow-moonbeam already followed the night (`.glow[data-id*=moon]`).
 
 ## Testing
 

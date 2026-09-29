@@ -1174,6 +1174,16 @@
        "size": "3840 x 1600"
       },
       {
+       "slot": "assets/living/moonlight",
+       "what": "by night, the moon's glow round the window (sky/moonlight.js): light on black or see-through, screened over the room (only light adds). fades in with the night, while the moon's up",
+       "size": "2½ times the window's glass, centred on it: e.g. 1250 x 1000"
+      },
+      {
+       "slot": "assets/living/moonbeam",
+       "what": "by night, the moon's light falling from the window to the floor, with the panes lit on the floor at the bottom (drawn straight down: it's slanted away from the moon for you). light on black or see-through, screened over the room",
+       "size": "the glass's width, from the window to the floor: e.g. 500 x 1000, stretched to fit"
+      },
+      {
        "slot": "assets/living/view-night",
        "what": "the view at night (crossfades in)",
        "size": "3840 x 1600",
@@ -1593,8 +1603,18 @@
       },
       {
        "slot": "assets/living/attic-window",
-       "what": "the little round window, moonlight coming in",
+       "what": "the little round window: its frame round see-through glass. the real sky shows through the glass (sky/moonlight.js): the glass is a circle 76% of the picture's width across, in its middle",
        "size": "about 300 x 300, see-through"
+      },
+      {
+       "slot": "assets/living/attic-moonlight",
+       "what": "by night, the moon's glow round the round window: light on black or see-through, screened over the attic",
+       "size": "2½ times the glass, centred on it: e.g. 600 x 600"
+      },
+      {
+       "slot": "assets/living/attic-moonbeam",
+       "what": "by night, the moon's light falling from the round window to the floor (drawn straight down: it's slanted for you): light on black or see-through",
+       "size": "the glass's width, from the window to the floor: e.g. 240 x 1000, stretched to fit"
       },
       {
        "slot": "assets/living/attic-clutter",
@@ -1739,8 +1759,18 @@
       },
       {
        "slot": "assets/living/kitchen-window",
-       "what": "the window over the counter",
+       "what": "the window over the counter: its frame round see-through glass. the real sky shows through the glass (sky/moonlight.js): the glass starts 5% in from the sides and 6% in from the top and bottom",
        "size": "about 160:130"
+      },
+      {
+       "slot": "assets/living/kitchen-moonlight",
+       "what": "by night, the moon's glow round the kitchen window: light on black or see-through, screened over the kitchen",
+       "size": "2½ times the glass, centred on it: e.g. 900 x 750"
+      },
+      {
+       "slot": "assets/living/kitchen-moonbeam",
+       "what": "by night, the moon's light falling from the kitchen window to the floor (drawn straight down: it's slanted for you): light on black or see-through",
+       "size": "the glass's width, from the window to the floor: e.g. 360 x 1000, stretched to fit"
       },
       {
        "slot": "assets/living/kitchen-counter",

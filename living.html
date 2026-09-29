@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>the living space · DaV-nky</title>
     <!-- the loading screen: fetches the whole site once per visit (sky/loader.js, sw.js) -->
-    <script src="sky/loader.js?v=1851865860"></script>
-    <script src="sky/state.js?v=1851865860"></script>
+    <script src="sky/loader.js?v=71477317"></script>
+    <script src="sky/state.js?v=71477317"></script>
     <link rel="canonical" href="https://dav-nky.pleroma.nexus/living.html">
     <meta property="og:title" content="the living space · DaV-nky">
     <meta property="og:url" content="https://dav-nky.pleroma.nexus/living.html">
@@ -16,20 +16,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="sky/sky.css?v=1851865860">
+    <link rel="stylesheet" href="sky/sky.css?v=71477317">
 
     <style>
         /* ---------- this room's furniture (all paper-cut silhouettes) ---------- */
         .rug      { left: 14%; right: 26%; bottom: 3vh; height: 5vh; pointer-events: none; }
-        .armchair { left: 12%; bottom: 4vh; width: 20%; max-width: 260px; }
+        .armchair { left: 8%; bottom: 4vh; width: min(48vh, 34vw); }                /* (28 Sep, Victor: bigger, the traveller dwarfed it. it grows with the traveller, who's 60vh tall) */
         .lamp     { left: 3%;  bottom: 4vh; height: 56vh; }
         .shelf    { left: 44%; bottom: 0;  width: 26%; }
         .pinboard { left: 4%;  top: 11%;  width: 22%; }
         .letter-pile { left: 11%; top: calc(11% + 22vw * .75 + 24px); width: 13%; min-width: 120px; z-index: 3; filter: drop-shadow(0 4px 5px rgba(0,0,0,.35)); }
         .noise-machine { left: 63%; bottom: calc(26vw * 170 / 360 - 3px); width: 5.6vw; min-width: 64px; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
         /* the cat sits on the armchair's seat, wherever the armchair is and however big (it stops growing at 260px wide) */
-        .groove.cat   { --chair-w: min(20vw, 260px); left: calc(12% + var(--chair-w) * .5); bottom: calc(4vh + var(--chair-w) * .77 * .39); width: calc(var(--chair-w) * .3); z-index: 3; }
-        .groove.plant { left: 83%; bottom: 3vh; width: 5.5vw; min-width: 58px; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
+        .groove.cat   { --chair-w: min(48vh, 34vw); left: calc(8% + var(--chair-w) * .5); bottom: calc(4vh + var(--chair-w) * .77 * .39); width: calc(var(--chair-w) * .3); z-index: 2; }
+        .groove.plant { left: 83%; bottom: 3vh; width: 5.5vw; min-width: 58px; z-index: 2; filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
         .room .bottle-crate { left: 72%; bottom: 3vh; width: 8.5vw; min-width: 90px; aspect-ratio: 120 / 90; z-index: 3; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }   /* (in front of the secret door) */
         .bottle-crate > .art { position: absolute; inset: 0; width: 100%; height: 100%; }
 
@@ -37,7 +37,7 @@
         .turntable { left: 47%; bottom: calc(26vw * 170 / 360 - 3px); width: 14vw; min-width: 150px; aspect-ratio: 200 / 110; z-index: 3;
                      filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
 
-        .claude-plaque { left: 27.9%; top: calc(52% + 6.8vw * 1.25 + 8px); width: 6%; padding: 3px 0 2px; text-align: center; font: italic bold clamp(9px, .75vw, 13px) "IM Fell English", Georgia, serif;
+        .claude-plaque { left: 27.9%; top: calc(38% + 6.8vw * 1.25 + 8px); width: 6%; padding: 3px 0 2px; text-align: center; font: italic bold clamp(9px, .75vw, 13px) "IM Fell English", Georgia, serif;
                          color: #4a2e06; text-shadow: 0 1px 0 rgba(255,244,200,.8), 0 -1px 0 rgba(90,55,5,.5);                       /* engraved */
                          background: linear-gradient(160deg, #7a5212 0%, #d9a93c 18%, #fff0b0 34%, #e8bd52 48%, #a8761e 64%, #f7dc8a 80%, #8a5a14 100%);
                          border-radius: 3px; box-shadow: inset 0 0 0 1px #fff3c0, inset 0 0 0 2px #8a5a14, 0 2px 5px rgba(0,0,0,.5); pointer-events: none; white-space: nowrap; overflow: visible; }
@@ -194,7 +194,7 @@
             .rug { left: 8%; right: 8%; }
             .room .character { left: 3% !important; height: var(--traveller-h) !important; }
             .bottle-crate { left: 54%; width: 18vw; min-width: 0; }
-            .groove.cat { --chair-w: min(34vw, 260px); left: calc(20% + var(--chair-w) * .5); }
+            .groove.cat { --chair-w: min(34vw, 400px); left: calc(20% + var(--chair-w) * .5); }
             .groove.plant { display: none; }
             .noise-machine { left: auto; right: 4%; bottom: auto; top: calc(62% + 14px - 15vw * 76 / 110); width: 15vw; min-width: 0; }
             body .pinboard .empty { font-size: 11px; padding: 6%; }
@@ -202,43 +202,44 @@
         }
     </style>
     <!-- each piece's look (sky/css/), in the same order as its script below -->
-    <link rel="stylesheet" href="sky/css/eye.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/static.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/ground-view.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/panel.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/music.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/weather.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/noise.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/ambient.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/inventory.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/loot.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/records.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/crate.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/frames.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/bathroom.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/gore.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/tub.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/dungeon.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/attic.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/kitchen.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/porch.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/front.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/books.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/marker.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/revolver.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/claubes.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/hell.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/textures.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/forget.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/lives.css?v=1851865860">
-    <link rel="stylesheet" href="sky/css/resets.css?v=1851865860">
+    <link rel="stylesheet" href="sky/css/eye.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/static.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/ground-view.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/panel.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/music.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/weather.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/noise.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/ambient.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/inventory.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/loot.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/records.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/crate.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/frames.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/bathroom.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/gore.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/tub.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/dungeon.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/attic.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/kitchen.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/porch.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/front.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/moonlight.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/books.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/marker.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/revolver.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/claubes.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/hell.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/textures.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/forget.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/lives.css?v=71477317">
+    <link rel="stylesheet" href="sky/css/resets.css?v=71477317">
 </head>
 <body data-place="living">
 
     <!-- a room (see workshop.html for how rooms work and how the asset slots fill in). -->
     <div class="room" style="--lamp-x:8%; --lamp-y:40%">
 
-        <a class="window" href="#outside" aria-label="look outside"
+        <a class="window" href="#outside" aria-label="look outside" data-moonlight="assets/living/"
            style="left:46%; top:12%; width:28%; height:48%"></a>
 
         <div class="furnish pinned">
@@ -304,7 +305,7 @@
 
         <!-- Claude's frame: a wall of its own (data-wall="claude"), not in the content manager's lists.
              what hangs in it: content/claude/frames.json. Victor gave this spot to Claude, September 2026. -->
-        <div class="furnish gallery-frame claude-frame" data-wall="claude" data-frame="1" data-look="wood" style="left:27.5%; top:52%; width:6.8%; --tilt:1.2deg"></div>
+        <div class="furnish gallery-frame claude-frame" data-wall="claude" data-frame="1" data-look="wood" style="left:27.5%; top:38%; width:6.8%; --tilt:1.2deg"></div>
         <div class="furnish claude-plaque" aria-hidden="true">Claude’s wall</div>
 
         <!-- bookshelf under the window -->
@@ -631,12 +632,11 @@
         </svg>
         <div class="room-floor" data-asset="assets/living/attic-floor"><div class="placeholder"></div></div>
         <svg class="furnish attic-window" data-asset="assets/living/attic-window" viewBox="0 0 100 100" aria-hidden="true">
-            <circle cx="50" cy="50" r="46" fill="#2a1d14"/><circle cx="50" cy="50" r="38" fill="#12182a"/>
-            <circle cx="64" cy="36" r="9" fill="#e8e2c8"/><circle cx="60" cy="33" r="8" fill="#12182a"/>
-            <g fill="#e8e2c8"><circle cx="30" cy="30" r="1"/><circle cx="40" cy="62" r=".8"/><circle cx="72" cy="66" r="1"/></g>
+            <!-- (the glass is open: the real sky's behind it, sky/moonlight.js. your own picture: a round frame round see-through
+                 glass, the glass a circle 76% of the picture's width across, in its middle) -->
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#2a1d14" stroke-width="8"/>
             <path d="M50 12 V88 M12 50 H88" stroke="#2a1d14" stroke-width="4"/>
         </svg>
-        <div class="attic-beam" aria-hidden="true"></div>
         <svg class="furnish attic-clutter" data-asset="assets/living/attic-clutter" viewBox="0 0 400 160" aria-hidden="true">
             <rect x="10" y="70" width="120" height="90" fill="#5a3a24"/><rect x="10" y="70" width="120" height="14" fill="#6e4a30"/><rect x="62" y="84" width="16" height="20" fill="#c49a52"/>
             <rect x="140" y="96" width="70" height="64" fill="#8a6a44"/><rect x="150" y="60" width="54" height="40" fill="#9a7a50"/><path d="M140 96 H210 M150 60 H204" stroke="#6e4a30" stroke-width="2"/>
@@ -688,8 +688,9 @@
         </svg>
         <div class="room-floor" data-asset="assets/living/kitchen-floor"><div class="placeholder"></div></div>
         <svg class="furnish kitchen-window" data-asset="assets/living/kitchen-window" viewBox="0 0 160 130" aria-hidden="true">
-            <rect x="0" y="0" width="160" height="130" fill="#5a3a24"/><rect x="8" y="8" width="144" height="114" fill="#a8cde0"/>
-            <path d="M8 90 Q50 70 90 86 T152 80 V122 H8 Z" fill="#8fb58a"/><circle cx="118" cy="34" r="12" fill="#fff1c0"/>
+            <!-- (the glass is open: the real sky's behind it, sky/moonlight.js. your own picture: the frame round see-through glass,
+                 the glass 8 px in from each edge of a 160 x 130 picture, i.e. 5% in from the sides, 6% from the top and bottom) -->
+            <path d="M0 0 H160 V130 H0 Z M8 8 V122 H152 V8 Z" fill="#5a3a24" fill-rule="evenodd"/>
             <path d="M80 8 V122 M8 65 H152" stroke="#5a3a24" stroke-width="6"/>
             <path d="M0 0 H160 V10 H0 Z" fill="#6e4a30"/><path d="M-6 126 H166 V134 H-6 Z" fill="#6e4a30"/>
         </svg>
@@ -1206,39 +1207,40 @@
         <a class="room-arrow to-upstairs" href="#living" aria-label="back up to the living space" data-asset="assets/living/arrow"></a>
     </div>
 
-    <script src="sky/sky.js?v=1851865860"></script>
-    <script src="sky/eye.js?v=1851865860"></script>
-    <script src="sky/ropes.js?v=1851865860"></script>
-    <script src="sky/static.js?v=1851865860"></script>
+    <script src="sky/sky.js?v=71477317"></script>
+    <script src="sky/eye.js?v=71477317"></script>
+    <script src="sky/ropes.js?v=71477317"></script>
+    <script src="sky/static.js?v=71477317"></script>
     <!-- the view from this window is its own picture: assets/living/view (+ optional view-night) -->
-    <script src="sky/ground-view.js?v=1851865860" data-view="assets/living/view"></script>
-    <script src="sky/panel.js?v=1851865860"></script>
-    <script src="sky/music.js?v=1851865860"></script>
-    <script src="sky/weather.js?v=1851865860"></script>
-    <script src="sky/noise.js?v=1851865860"></script>
-    <script src="sky/ambient.js?v=1851865860"></script>
-    <script src="sky/inventory.js?v=1851865860"></script>
-    <script src="sky/loot.js?v=1851865860"></script>
-    <script src="sky/records.js?v=1851865860"></script>
-    <script src="sky/crate.js?v=1851865860"></script>
-    <script src="sky/frames.js?v=1851865860"></script>
-    <script src="sky/house.js?v=1851865860"></script>
-    <script src="sky/bathroom.js?v=1851865860"></script>
-    <script src="sky/gore.js?v=1851865860"></script>
-    <script src="sky/tub.js?v=1851865860"></script>
-    <script src="sky/dungeon.js?v=1851865860"></script>
-    <script src="sky/attic.js?v=1851865860"></script>
-    <script src="sky/kitchen.js?v=1851865860"></script>
-    <script src="sky/porch.js?v=1851865860"></script>
-    <script src="sky/front.js?v=1851865860"></script>
-    <script src="sky/books.js?v=1851865860"></script>
-    <script src="sky/marker.js?v=1851865860"></script>
-    <script src="sky/revolver.js?v=1851865860"></script>
-    <script src="sky/claubes.js?v=1851865860"></script>
-    <script src="sky/hell.js?v=1851865860"></script>
-    <script src="sky/textures.js?v=1851865860"></script>
-    <script src="sky/forget.js?v=1851865860"></script>
-    <script src="sky/lives.js?v=1851865860"></script>
-    <script src="sky/resets.js?v=1851865860"></script>
+    <script src="sky/ground-view.js?v=71477317" data-view="assets/living/view"></script>
+    <script src="sky/panel.js?v=71477317"></script>
+    <script src="sky/music.js?v=71477317"></script>
+    <script src="sky/weather.js?v=71477317"></script>
+    <script src="sky/noise.js?v=71477317"></script>
+    <script src="sky/ambient.js?v=71477317"></script>
+    <script src="sky/inventory.js?v=71477317"></script>
+    <script src="sky/loot.js?v=71477317"></script>
+    <script src="sky/records.js?v=71477317"></script>
+    <script src="sky/crate.js?v=71477317"></script>
+    <script src="sky/frames.js?v=71477317"></script>
+    <script src="sky/house.js?v=71477317"></script>
+    <script src="sky/moonlight.js?v=71477317"></script>
+    <script src="sky/bathroom.js?v=71477317"></script>
+    <script src="sky/gore.js?v=71477317"></script>
+    <script src="sky/tub.js?v=71477317"></script>
+    <script src="sky/dungeon.js?v=71477317"></script>
+    <script src="sky/attic.js?v=71477317"></script>
+    <script src="sky/kitchen.js?v=71477317"></script>
+    <script src="sky/porch.js?v=71477317"></script>
+    <script src="sky/front.js?v=71477317"></script>
+    <script src="sky/books.js?v=71477317"></script>
+    <script src="sky/marker.js?v=71477317"></script>
+    <script src="sky/revolver.js?v=71477317"></script>
+    <script src="sky/claubes.js?v=71477317"></script>
+    <script src="sky/hell.js?v=71477317"></script>
+    <script src="sky/textures.js?v=71477317"></script>
+    <script src="sky/forget.js?v=71477317"></script>
+    <script src="sky/lives.js?v=71477317"></script>
+    <script src="sky/resets.js?v=71477317"></script>
 </body>
 </html>

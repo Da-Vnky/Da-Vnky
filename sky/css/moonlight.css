@@ -1,0 +1,59 @@
+/* moonlight.css: the moon's light through the house's windows (sky/moonlight.js). --gx --gy --gw --gh (--gr): where
+   the glass is in its room, set by the script */
+
+/* by night, over everything in the room: light only adds (screen) */
+.moonlight {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none !important;
+    mix-blend-mode: screen;
+    opacity: calc(var(--night, 0) * var(--moon-up, 1));
+    transition: opacity 2s linear;
+}
+.moonlight > div { position: absolute; }
+.moonlight .placeholder,
+.moonlight .art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: fill; }
+/* the glow: 2½ times the glass, centred on it */
+.ml-glow {
+    left: calc(var(--gx) - var(--gw) * .75);
+    top: calc(var(--gy) - var(--gh) * .75);
+    width: calc(var(--gw) * 2.5);
+    height: calc(var(--gh) * 2.5);
+}
+/* the beam: the glass's width, from a little way down the glass to the floor, slanting away from the moon */
+.ml-beam {
+    left: var(--gx);
+    width: var(--gw);
+    top: calc(var(--gy) + var(--gh) * .15);
+    bottom: calc(var(--floor-h, 9vh) * .35);
+    transform-origin: 50% 0;
+    transform: skewX(clamp(-34deg, calc((50 - var(--moon-x, 30)) * .9deg), 34deg));
+    transition: transform 3s linear;
+}
+
+/* the room darkening as night falls, over everything in it but the moon's light (and not over the window) */
+.ml-dark {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: rgba(8, 12, 28, calc(.5 * var(--dusk, 0)));
+}
+
+/* a painted window made real: the hole in the wall behind the glass, where the page's own sky shows through */
+.ml-open { background: none !important; }
+.ml-open.ml-square > :is(.kitchen-wall, .art:not(.furnish), .ml-dark) {
+    -webkit-mask:
+        linear-gradient(#000 0 0),
+        linear-gradient(#000 0 0) var(--gx, -999px) var(--gy, -999px) / var(--gw, 0) var(--gh, 0) no-repeat;
+    -webkit-mask-composite: xor;
+            mask:
+        linear-gradient(#000 0 0),
+        linear-gradient(#000 0 0) var(--gx, -999px) var(--gy, -999px) / var(--gw, 0) var(--gh, 0) no-repeat;
+            mask-composite: exclude;
+}
+.ml-open.ml-round > :is(.attic-roof, .art:not(.furnish), .ml-dark) {
+    -webkit-mask: radial-gradient(circle var(--gr, 0px) at calc(var(--gx, -999px) + var(--gw, 0px) / 2) calc(var(--gy, -999px) + var(--gh, 0px) / 2), transparent calc(100% - 1px), #000 100%);
+            mask: radial-gradient(circle var(--gr, 0px) at calc(var(--gx, -999px) + var(--gw, 0px) / 2) calc(var(--gy, -999px) + var(--gh, 0px) / 2), transparent calc(100% - 1px), #000 100%);
+}

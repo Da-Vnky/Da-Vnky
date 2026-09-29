@@ -17,6 +17,11 @@ How it works
 
 == published ==
 
+2026-09-28 18:38 · V
+- The kitchen window and the attic's round window now show the real sky (sun, moon, clouds, stars, day and night), and those rooms darken at night. By night every window in the house (the living room's too) has a moon glow round it and a moonbeam falling to the floor, slanting away from the moon. New slots for your own: moonlight and moonbeam for the living room, the kitchen and the attic.
+- The workshop's mannequin and metronome, and the living room's cat and plant, now sit behind the traveller (checked every dancing thing on every page). The living room's couch is bigger and grows with the traveller, so the cat on it is cat-sized; Claude's wall moved up above it.
+- Mel's bedroom: your new window picture's gap under the blinds shows the real sky, like her main room. (Her moon glow and moonbeam there already follow the night.)
+
 2026-09-28 16:22 · V
 - Resets 1 and 2: the ropes the sky's props hang from swing a little now. The sun and moon lag and sway as you scroll, a breeze (and the weather's wind) keeps everything gently moving, and brushing the pointer past one gives it a nudge.
 - Reset 1 has its own soundtrack now: bright, upbeat and cheerful (the false world at its loveliest). The current one plays from reset 2 on. New slot for your own: assets/sounds/ambient-bright (a drawn stand-in plays until then).

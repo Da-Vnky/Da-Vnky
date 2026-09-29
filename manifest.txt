@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
-city.html 9254
-index.html 4479
-living.html 128790
-window-sky.html 1332
-workshop.html 20953
+city.html 9168
+index.html 4387
+living.html 128954
+window-sky.html 1320
+workshop.html 20874
 sky/ambient.js 5339
-sky/attic.js 33508
+sky/attic.js 33962
 sky/bathroom.js 26154
 sky/books.js 13679
 sky/claubes.js 52340
@@ -24,13 +24,14 @@ sky/ground-view.js 6424
 sky/hell.js 23882
 sky/house.js 11058
 sky/inventory.js 17597
-sky/kitchen.js 15371
+sky/kitchen.js 15822
 sky/letters.js 22477
 sky/lives.js 11877
 sky/loader.js 15520
 sky/loot.js 14817
 sky/marker.js 7204
 sky/models.js 5025
+sky/moonlight.js 6124
 sky/music.js 61616
 sky/noise.js 11584
 sky/notes.js 5688
@@ -43,7 +44,7 @@ sky/records.js 36049
 sky/resets.js 16685
 sky/revolver.js 18303
 sky/ropes.js 5604
-sky/sky.js 116065
+sky/sky.js 116342
 sky/state.js 16311
 sky/static.js 4269
 sky/studio.js 18112
@@ -54,7 +55,7 @@ sky/weather.js 26163
 sky/paper.css 7388
 sky/sky.css 50992
 sky/css/ambient.css 435
-sky/css/attic.css 16069
+sky/css/attic.css 15736
 sky/css/bathroom.css 17498
 sky/css/books.css 4900
 sky/css/claubes.css 17565
@@ -78,8 +79,9 @@ sky/css/lives.css 3089
 sky/css/loot.css 2076
 sky/css/marker.css 1560
 sky/css/mel-inventory.css 382
-sky/css/mel-window.css 1881
+sky/css/mel-window.css 2273
 sky/css/models.css 3444
+sky/css/moonlight.css 2609
 sky/css/music.css 12786
 sky/css/noise.css 2783
 sky/css/notes.css 4294
@@ -104,7 +106,7 @@ assets/fonts/list.txt 117
 assets/hell/list.txt 117
 assets/items/list.txt 117
 assets/living/list.txt 136
-assets/mel-room/list.txt 134
+assets/mel-room/list.txt 154
 assets/resets/index.txt 77
 assets/resets/list.txt 127
 assets/sea/list.txt 117
@@ -151,6 +153,6 @@ schizophyllu.me.room/room/music.js 4978
 schizophyllu.me.room/room/narration.js 14420
 schizophyllu.me.room/room/radio.js 6517
 schizophyllu.me.room/room/room.css 24479
-schizophyllu.me.room/room/room.js 90999
+schizophyllu.me.room/room/room.js 92768
 schizophyllu.me.room/room/script.js 47501
 schizophyllu.me.room/assets/playlist/playlist.json 677

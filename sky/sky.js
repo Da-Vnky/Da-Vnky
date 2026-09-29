@@ -683,6 +683,9 @@
         sun.style.color = mix('#f7d35e', '#e8683c', sunHeat);
         moon.style.left = moonA[0] + 'vw';
         moon.style.top  = moonA[1] + 'vh';
+        // (where the moon is, for its light through the house's windows: sky/moonlight.js. --moon-up: 1 while it's up)
+        root.style.setProperty('--moon-x', moonA[0].toFixed(1));
+        root.style.setProperty('--moon-up', smooth(1 - ramp(moonA[1], 72, 96)).toFixed(3));
         skybox.classList.toggle('mirror', sunA[0] < 50);             // (the sun's coming up on the left: the evening skies flipped)
 
         // clouds fade out through sunset. on the homepage's scroll they drift apart;

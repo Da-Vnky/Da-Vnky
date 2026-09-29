@@ -109,6 +109,10 @@
         H.setOff(function () { stop(me); busy = false; });
         walk(me, 94, function () { sfx('step', { size: 0.35 }); shut(); });
     }
+    // its window: open to the real sky, and the moon's light through it by night (sky/moonlight.js)
+    var light = Sky.moonlight && Sky.moonlight(kit, { glass: function () { return kit.querySelector('.kitchen-window'); },
+                                                     inset: [8 / 160, 8 / 130, 8 / 160, 8 / 130], cut: true, slot: 'assets/living/kitchen-' });
+    H.on(function (what, name) { if (name === 'kitchen' && light) light.fit(); });
     H.room('kitchen', { parent: 'hall', here: function () { return inside; }, busy: function () { return busy; }, enter: goIn, leave: goOut });
     if (door) door.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('kitchen'); });
     if (back) back.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('hall'); });

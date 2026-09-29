@@ -271,6 +271,10 @@
             setTimeout(shut, 650);
         });
     }
+    // its round window: open to the real sky, and the moon's light through it by night (sky/moonlight.js)
+    var light = Sky.moonlight && Sky.moonlight(attic, { glass: function () { return attic.querySelector('.attic-window'); },
+                                                       inset: [.12, .12, .12, .12], round: true, cut: true, slot: 'assets/living/attic-' });
+    H.on(function (what, name) { if (name === 'attic' && light) light.fit(); });
     H.room('attic', { parent: 'hall', here: function () { return up; }, busy: function () { return climbing; }, enter: climbUp, leave: climbDown });
     if (ladder) ladder.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('attic'); });
     if (hole) hole.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('hall'); });
