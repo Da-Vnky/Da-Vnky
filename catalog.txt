@@ -109,7 +109,8 @@ assets/items/list.txt 117 55339362
 assets/living/list.txt 136 2848213636
 assets/living/vinyl-texture.webp 3298872 1062159737
 assets/mel-room/bedroom-bwindow.png 32159 4245744638
-assets/mel-room/list.txt 154 2534666442
+assets/mel-room/list.txt 169 2390302921
+assets/mel-room/main-mira.webp 61712 1354009711
 assets/mel-room/main-window.webp 10718 3012613204
 assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
