@@ -35,7 +35,9 @@ this before changing anything; keep it up to date when something here stops bein
 - `schizophyllu.me.room/` is **Mel's**: only integration edits there, and list exactly what you changed so
   Victor can tell her (see *Mel's room*).
 - Never read out, commit or send anything from `.inbox/`.
-- Don't commit or push unless Victor asks: publishing (`tools\publish.bat`) is his. The repo is public.
+- Don't commit or push unless Victor asks: publishing (`tools\publish.bat`) is his. The repo is public. (The one
+  exception: a Claude cloud session working from the GitHub copy pushes its branch and opens a pull request: see
+  *Working from GitHub* below.)
 - When something big is finished, **update this file** so the next conversation knows.
 - **Every change goes in `CHANGES.txt`** (27 Sep, Victor): a line each under "not published yet", in plain words
   (what a visitor would notice, or what the next Claude needs to know: a file that moved, a rule that changed).
@@ -75,6 +77,32 @@ this before changing anything; keep it up to date when something here stops bein
   `tools/vscode/tasks.json` (all of them as VS Code tasks, Windows too; copied into `.vscode/` once, see FOR-MEL.md), `tools/mel-room-slots.py` (the "Mel's room" slots
   written again from her room's files, keeping measured crops). `tools/debug.html` stays gitignored (a cheat page if
   published): Victor sends Mel the file.
+- **Working from GitHub** (5 Oct, Victor: only while his Claude cloud-session credit lasts, to 4 Nov 2026; he does
+  everything locally after that). A copy of the repo on GitHub (git remote `github` in his folder; Forgejo stays `origin`
+  and the real home) so Claude's cloud sessions (claude.ai/code) can work on it; they can only clone from and push to
+  GitHub, never Forgejo. Two tools of their own, so `publish.bat` / `pull.sh` stay exactly as they were and the GitHub
+  ones can simply be deleted later:
+  - `tools\github-upload.bat` (`tools/github-upload.sh`): asks for the repo's address the first time (`GITHUB_ADDR`;
+    accepts `github.com/owner/repo` in any spelling, rejects other hosts; forgets it again if the first fetch fails),
+    pulls Forgejo (`pull.sh --quiet`), then pushes HEAD to GitHub's `main`. Never forces: stops if GitHub has commits
+    he doesn't (→ github-publish) or unrelated history (a README GitHub made). Unpublished changes stay local (it lists them).
+  - `tools\github-publish.bat` (`tools/github-publish.sh`): 1. `pull.sh --quiet` (Mel), 2. `git fetch --prune github`, merge
+    `github/main` (fast-forward, else `--no-ff` "Claude's changes from GitHub", `--autostash`); stops changing nothing if a file
+    GitHub changed is also changed-and-unpublished here, or on a real clash (merge aborted, his edits put back), 3. lists,
+    `changes.py take` (Claude's waiting lines; with none, "Claude's changes from GitHub"), commit, push to Forgejo, 4. push the
+    same to GitHub `main`, so the next session starts from what's live (Mel's changes and the lists included). Branches on
+    GitHub with work `main` lacks are listed as "waiting for your approval". Nothing new from GitHub: it doesn't publish his
+    own changes (that's publish.bat's), only brings GitHub up to date. Python found by trying `py`, `python`, `python3`
+    (the Windows Store's `python3` stub fails). Rehearsed on throwaway repos (5 Oct): first upload; Mel + Claude + his
+    unpublished edit; the same file on both sides; a real clash with his own work in progress (kept); upload refused while
+    GitHub's ahead; a README'd repo; a GitLab address.
+  - **In a cloud session** (you're working from the GitHub copy, not Victor's folder): there's no device bridge and no
+    `.inbox/`. Work on the session's branch, commit, push, and open a pull request for Victor to merge on GitHub; don't
+    push to `main` unless he asks. Every other rule here still holds: `python3 tools/changes.py add "…"` for each change
+    (never `take`: publishing does), never write the lists or the `?v=` stamps, slots for every picture and sound, Mel's
+    folder integration-only (and say what you changed there), test in the browser first (`python3 tools/content.py` serves
+    the site on :8001; `python3 tools/smoke.py`; Playwright's Chromium is in the cloud VM). Mel's newest work reaches GitHub
+    only when Victor runs github-publish, so if a pull request clashes, rebase on `main` first.
 - `tools/update-lists.sh` runs on every publish (publish.bat, and the pre-commit hook in `tools/hooks`).
   It writes, and you never hand-edit:
   - `assets/<folder>/list.txt`, `content/<scene>/list.txt`, `content/<scene>/<sub>/list.txt`

@@ -17,6 +17,9 @@ How it works
 
 == published ==
 
+2026-10-05 15:31 · V
+- New, for while Victor tries Claude's cloud sessions (until 4 Nov): tools\github-upload.bat puts a copy of the site on GitHub, and tools\github-publish.bat brings the changes he's approved there into his folder, publishes them to Forgejo like publish.bat, and keeps GitHub up to date. publish.bat and pull.bat are unchanged; delete the four github-* tools when he's done with it.
+
 2026-09-28 18:38 · V
 - The kitchen window and the attic's round window now show the real sky (sun, moon, clouds, stars, day and night), and those rooms darken at night. By night every window in the house (the living room's too) has a moon glow round it and a moonbeam falling to the floor, slanting away from the moon. New slots for your own: moonlight and moonbeam for the living room, the kitchen and the attic.
 - The workshop's mannequin and metronome, and the living room's cat and plant, now sit behind the traveller (checked every dancing thing on every page). The living room's couch is bigger and grows with the traveller, so the cat on it is cat-sized; Claude's wall moved up above it.
