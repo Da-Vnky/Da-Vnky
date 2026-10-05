@@ -16,6 +16,7 @@ How it works
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
 - Fixed the smoke test (tools/smoke.py): it never really opened the bathroom, hallway, kitchen, porch, garden, attic or dungeon. Going from living.html to living.html#attic only changes the #, so the page wasn't opened again and it checked the living room seven times. It opens a blank page in between now, so each room is a real fresh visit (all eight resets checked: clean). It also no longer prints 'connection reset' tracebacks when a page is left mid-download.
 - CLAUDE.md: removed the old line saying to bump the ?v= by hand (publishing stamps it now).
+- Python's compiled copies of the tools (__pycache__ folders) are ignored now, so they never get published.
 
 == published ==
 

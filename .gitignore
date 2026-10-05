@@ -13,3 +13,6 @@ _your-versions/
 
 # the template pictures for your art program (tools/templates.py makes them again whenever you like)
 tools/templates/
+
+# python keeps compiled copies of the tools here when it runs them: never needed
+__pycache__/
