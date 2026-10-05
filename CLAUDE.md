@@ -138,8 +138,8 @@ this before changing anything; keep it up to date when something here stops bein
   its icon slot); hanging lights that sway to music take `class="sways hangs"` (pivot at the top).
 
 Each page loads `sky/loader.js` then `sky/state.js` first in `<head>`, then `sky/sky.js` and the modules
-it needs. **When you change anything in `sky/`, bump the `?v=` on every page** (it's the same string
-everywhere, e.g. `sed -i 's/v=20260925r/v=20260925s/g' *.html tools/*.html`).
+it needs. The `?v=` on them is the same string everywhere and **publishing stamps it** (see *How we work*): don't
+bump it by hand.
 
 ## The code (sky/)
 
