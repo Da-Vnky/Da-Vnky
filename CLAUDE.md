@@ -130,6 +130,7 @@ this before changing anything; keep it up to date when something here stops bein
   opening is in the wall only (`.secret-door` sits on `--floor-h`); its inside is `assets/living/secret-stairs`,
   the sliding panel `assets/living/secret-panel`. The washed-up crate (`.room .bottle-crate`, z 3) stands in front of it (z 2). Above the hallway: **the attic** (`sky/attic.js`, below).
 - `template.html` — the starting point for a new page.
+- `beyond.html` — the end, for those who went home (see *The end*): from then on every page sends them here.
 - `schizophyllu.me.room/` — **Mel's room. Her code, not ours** (see *Mel's room*).
 - `tools/` — the content manager (letters, things/shelves, visitors/post, notes, assets, debug).
 - The whole site is unselectable (sky.css "a picture, not a page of text" + `dragstart`/`selectstart` in
@@ -168,7 +169,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `timer.js`, `weather.js`, `noise.js`, `marker.js`, `models.js`, `eye.js` (the sun's eye, loaded right
   after `sky.js` on every page), `attic.js` (the hallway's cord/lamp, the attic, the grimoire's pact),
   `kitchen.js` (the kitchen off the hallway, the fridge, stove, microwave and the serpent), `hell.js` (reset 4: below, the white
-  revolver, the eye and the key), `ambient.js` (the house's soundtrack when no record's on), `static.js` (the screen's static).
+  revolver, the eye and the key), `ambient.js` (the house's soundtrack when no record's on), `static.js` (the screen's static),
+  `veil.js` / `watchers.js` / `loop.js` / `source.js` (resets 5, 6, 7, 8: see *Resets 5 to 8*; on every page, just before
+  resets.js, which needs veil.js's wallpaper there to hide reset 5's key in).
 
 ## The sky's clock (sky.js: `sunClock`, `sunTimes`, `SKY_AT`)
 
@@ -767,7 +770,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   shows the right lamp/cord before attic.js arrives; the ladder is up in the static CSS so it never slides on load).
 - **Forever** (survives resets; only "forget your stay" wipes it): the reset number, `loot-owned` (the P(Doom)
   record), `room_knocked` and Mel's room's recovery (`mel-remedy`,
-  `mel-restored-said`), settings.
+  `mel-restored-said`), settings, and the end: `dav-ending`, `gnosis`, `gnosis-phrases`, `free-said` (see *The end*).
   **This reset** (`RUN` in state.js, and every `run:*` key): `lives-*`, `suicides`, `dungeon-found`, `run:key`,
   `run:hall-hatch`, `run:grimoire-pact`, `run:mel-pills`, `run:claubes-*`, `run:deja-vu`, `run:porch-watcher` …
   **This visit** (sessionStorage): the bag (`inventory`), the open secret wall, the boards off Mel's window …
@@ -786,20 +789,23 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     pact (`DEATHS.grimoire`, `notDeath`): see *Reset 4: below*. Outside reset 4 the diagram's 6th bullet just vanishes
     and the traveller says "Huh, I thought something cool was gonna happen…" (`LETDOWN`); from reset 5 the grimoire is on
     the living-room shelf, only a book.
-  - **Resets 5–7 have no themes or deaths yet** (placeholder bubbles stand in) — Victor will supply them.
-    Reset 8 ("the grand mystery": the truth) is still to be designed.
+  - Resets 5 "the veil", 6 "the watchers", 7 "the loop" (5 Oct): see *Resets 5 to 8*. Reset 8 ("the grand mystery":
+    the truth): black and white, the source showing, **no hearts and no way to die** (lives.js stubs `Sky.lives`); its way
+    out is knowing: see *The end*.
 - **From reset 2 the hearts are there from the start** (locked), and **every way to die is off until the key**:
   each death's trigger calls `Sky.lives.refuse(kind)` first; before the key it returns true and the traveller says
-  that death's own line (lives.js `NOT_YET`: revolver, boat, pills, grimoire, diagram, placeholder). Mel's pills are
+  that death's own line (lives.js `NOT_YET`: revolver, boat, pills, grimoire, diagram, veil, gaze, timer, placeholder;
+  5 to 7's each hint at where the key is). Once the key's found the traveller says the reset's `RESETS[n].after` line, a
+  nudge towards its way out. Mel's pills are
   gated in her room (`DAV.key`). Reset 1 is unchanged (the revolver's free before the key; the heart appears after the
   dungeon + a revolver shot).
 - (Still there from the three-heart days, harmless with one: `refuse(kind)` remembers a death let through (`pending`)
   and `run:spent-<kind>` refuses it again that reset with lives.js `DONE`; two death events within 4 s cost one heart.)
-- **Placeholder deaths**: DEATHS entries with `placeholder: { page, in, left, top }` (r5, r6, r7, r8)
+- **Placeholder deaths**: DEATHS entries with `placeholder: { page, in, left, top }` (none now: r8's went with the end)
   are dashed skull bubbles "a way to die (to come)" (resets.js `placeholders()`): click = zapped (the sea: the
-  revolver's death), a real death. So every reset can be finished. Replace each with a real death when designed.
+  revolver's death), a real death. Kept for any death still to be designed.
 - Themes (RESETS): 1 items (the gun), 2 environmental (the boat), 3 ingestion (Mel's pills), 4 dark witchcraft (the
-  false god), 8 the truth; 5–7 to come (placeholder bubbles).
+  false god), 5 the veil (the torn sky), 6 the watchers (the eye in the sky), 7 the loop (the timer), 8 the truth (knowing: *The end*).
 - Hearts (reset 1, `lives.js`): appear after the dungeon's been found **and** a revolver suicide (that one's
   free). They're locked until that reset's hidden key is clicked (`resets.js` → `Sky.lives.unlock()`);
   a key found before the hearts appear means they turn up unlocked.
@@ -863,8 +869,77 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   backdrop (`--stage-shadow`). A prop with Victor's art casts one shadow from the whole prop (filter on `.sun.has-art`
   etc., the rope's own shadow off), so the picture and its `-glow` twin (two GIFs, never in step) can't flicker.
   From reset 3 the ropes are gone (checked). A reset's own sun is shown at double size.
-- Reset 3's key is in the pie in the kitchen fridge (above); resets 4–8 have hiding spots in `RESETS`. `nextReset()` in reset 8 starts reset 8 again.
+- Reset 3's key is in the pie in the kitchen fridge (above); 4's below; 5's behind the peeling wallpaper; 6's dropped by the
+  hallway's unblinking eye and 7's by the microwave (`drop`, with `host`: the room it lands in, resets.js); 8's on the chimney. `nextReset()` in reset 8 starts reset 8 again.
 - The golden/sunset/dusk skyboxes are mirrored while the sun is on the left (sunrise).
+
+## Resets 5 to 8: the world uncovering itself (5 Oct)
+
+- Victor: resets 5 to 7 with increasingly gnostic themes about uncovering reality; 8 black and white, like the source code of
+  reality. Each reset shows one more layer of what the world is, and each death is the world catching you looking. From 5 the
+  painted sky cracks (sky/veil.js, `.sky-cracks` in `.skybox`, groups `.c5 .c6 .c7` shown by `html[data-reset]`; slot
+  `assets/sky/cracks`), a few in 5, more in 6, all over in 7.
+- **5, the veil** (sky/veil.js, css/veil.css): the world's painted on and coming unstuck. Key: behind the wallpaper peeling off
+  the living-room wall at the ceiling (`.wall-peel`, built by veil.js in `.room`, left 30% top 0; upright phones 82% / 53%; click
+  it: `.peeled`, sessionStorage `wall-peeled`; the key's hidden by CSS till then; from 6 it hangs open). Death: the rooftop's
+  `.sky-seam` (a loose corner of the sky, 64vw / 20vh); pulled after the key, `tear()`: `.veil-tear` (inserted before `.ground`,
+  so the city stays in front) grows a ragged hole (clip-path polygon) onto black and the site's own code (`Sky.veil.code`,
+  `voidInto`), and the traveller's pulled up into it in scraps. From 6: `.stitched`.
+- **6, the watchers** (sky/watchers.js, css/watchers.css): someone keeps it running and watches. Eyes (`.watcher`, `SPOTS` per
+  page/room) open in the walls of the house and workshop, follow the pointer, blink, and shut when it comes near (6 and 7).
+  Key: the hallway's `.watcher.still` (82% / 30%), the one that never blinks: click → it weeps, `dav:drop-key` by 'watcher'.
+  Death: on the rooftop, looking up through the telescope (`body.scope-view`) the sky's eye (`.gaze`, clipped to the lens like
+  the stars) opens; clicked after the key, `burn()`: it stares, white flash (`.gaze-flash`), under it the sky view and telescope
+  close, the traveller's `.burnt`, then ash. From 7: `.painted`.
+- **7, the loop** (sky/loop.js, css/loop.css): time is the cage (Saturn's sphere). Every minute or two `html.loop-skip` (a jolt +
+  static + `skip`). Key: the microwave counts up, not down, and drops it (kitchen.js `runMicro`, `BACK`, by 'microwave').
+  Death: the workshop timer's start (a capture listener on `.pomo-panel .go`), `race()`: the time reads days, years, ∞, the
+  sky flickers day and night (`Sky.holdTime`), the traveller `.ageing` then `.crumbling` into a heap (`.loop-sand`). From 8:
+  `.no-hands`, it won't start.
+- **8, the source** (sky/source.js, css/source.css): `.source-veil` (backdrop-filter grayscale over everything, z 2147483000);
+  the painted sky dimmed to .14 and the site's code running up behind it (`.source-code` in `.skybox`); every `[data-asset]`
+  thing wears its slot name as a tag (`.src-tag`, `<living/turntable>`), not the UI (`SKIP`). `Sky.source.lift()` takes it
+  all away slowly (the Demiurge blinded: *The end*). Off once the end's chosen (`davSave.free`).
+- Lines: lives.js `NOT_YET` / `DONE` for veil, gaze, timer; state.js `RESETS[n].after`; resets.js `DEJA` 5 to 8 rewritten to
+  fit; porch.js `NOTES` 6 and 7 swapped. Slots: tools/slots.json (every page: "resets 5 to 8"; the rooftop; the living room;
+  the workshop's timer; the sounds). Debug page (Victor's own, not in the repo): it reads RESETS and DEATHS, so the new
+  deaths should show there by themselves.
+
+## The end (reset 8: gnosis, the Demiurge, the choice; 6 Oct)
+
+- Victor's picks from the brainstorm: each death leaves a phrase; eating the serpent's fruit is gnosis; the Demiurge is
+  beaten by being named and seen through; then escape or stay.
+- **The phrases**: `RESETS[n].phrase` (1 to 7, the traveller's own voice: "I am not the hand that held it." … "I am not its
+  hours.") and `RESETS[n].claim` (the Demiurge's claim it answers). forget.js `reset()` writes the phrase under the white-out's
+  caption (`.fw-phrase`, the white holds 6.8 s instead of 3.4) on going to the next reset (not reset-manager jumps), and adds
+  the reset to `localStorage gnosis-phrases` (nothing reads that yet: the end recites all seven anyway).
+- **Gnosis** (sky/gnosis.js, css/gnosis.css; every page): reset 8, the serpent says eat (`.kitchen-serpent` click; a nudge
+  9 s into a page once the déjà vu's said, `run:gnosis-nudge`); kitchen.js's pie click calls `Sky.gnosis.eat(pie)` in reset 8
+  until the end's chosen. `remember()`: `.gnosis` (above the grey, in colour; slot `assets/ui/gnosis`), the seven phrases a
+  sphere each (the Moon … Saturn), then "I came from the Light, and to the Light I am going." → `localStorage gnosis = 1`.
+- **The Demiurge** (`confront()`, the sea, when `gnosis` and no ending): `body.demiurge-here`, `.dm-dark`, `.demiurge`
+  (slot `assets/sky/demiurge`; the drawn lion-faced eye's pupil follows the traveller; `data-cracks` 1 to 7). It speaks each
+  claim (`who: 'the Demiurge'`), `.gn-answers` offers the seven phrases shuffled; right = the traveller says it, a crack;
+  wrong = it laughs (`NO` lines). After seven `blind()`: "You are mistaken, Samael." "You are blind." → `.blind`, `.gone`,
+  `Sky.source.lift()`, `html.sky-clearing` (the red goes out of the sky), then `choice()`: a door of light (`.gn-door`),
+  "go home" / "stay, and wake the others".
+- **The choice** (`davSave.setEnding`, `localStorage dav-ending`, forever like the reset number):
+  - `escaped`: a white flood → **beyond.html** (sky/beyond.js, css/beyond.css: no sky.js). state.js sends every page there
+    (not beyond, window-sky, tools/ or Mel's room). Space (`assets/ui/beyond`, a drawn starfield), whooshing wind
+    (`assets/sounds/beyond`, else synthesised noise) from the first tap, and 14 s on **the reprise**, once (`assets/sounds/
+    reprise`, else Victor's `ambient-bright` then `ambient` played far off, else a drawn one: reset 1's chords then reset 2's,
+    through a lowpass and an echo). "the Sophia path" button → `stayed`, back to the homepage.
+    **Leaving a message** always works: beyond's "leave a message" → `index.html#message`, the one page state.js lets through
+    (`davSave.posting`, `html.posting-only`: free-world look, no signpost/tabs/buttons); post.js opens the desk at once and
+    goes back to beyond.html when it's thrown or put away.
+  - `stayed`: `html.free-world`, `davSave.free`: no grey (source.js off), no red sky (sky.js), no eye (eye.js: the ordinary
+    sun), no déjà vu; once, "It's quiet. The sky's only the sky now." and Mel still in the dark (`free-said`). Nothing for
+    "waking the others" is built yet (Mel's room is the obvious place: *Still to do*).
+- Testing: `?ending=stayed|escaped|none` on any page (localhost only, like `?reset=N`) sets or clears it. Run `?reset=8`
+  then `living.html#kitchen`: the serpent, the fridge (tap its top on an upright phone: the traveller rests in front of the
+  rest), the pie; then the sea.
+- Slots: every page, "resets 5 to 8 … and the end"; sounds eat, gnosis, demiurge-voice, demiurge-hurt, demiurge-blind,
+  door-open, beyond, reprise.
 
 ## Mel's window and Mel's room
 
@@ -903,7 +978,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - Saving to Victor's folder: stage each save in a **new** folder under /mnt/user-data/outputs/ (e.g.
   `save-<timestamp>/`). Re-using a path has twice written an OLD copy to his computer. After saving, re-list and
   check the size; for important files stage it back and diff.
-- `?reset=N` on any page jumps to the start of reset N — **only on localhost** (the live site ignores it).
+- `?reset=N` on any page jumps to the start of reset N — **only on localhost** (the live site ignores it). `?ending=stayed`,
+  `escaped` or `none` sets or clears the end the same way (*The end*).
 - `tools/debug.html` (content manager → debug): set the reset, hearts, key, dungeon, Mel's
   room and pills, P(Doom); cause a death or a reset; see the save. It's in `.gitignore`: never published.
 - **The reset manager** (control panel → "resets (preview only)", on localhost): play a real reset, jump to any
@@ -929,12 +1005,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 
 ## Still to do / ideas on hold
 
-- Themes and one death each for resets 5–7; reset 8 (the truth). Replace the placeholder bubbles as they're designed.
+- After the end (built 6 Oct: *The end*): "stay, and wake the others" has nothing to do yet; waking Mel (her room, the
+  record) and the others is the next piece. Victor's art and sounds for the end (the Demiurge, beyond's space, the reprise).
 - Reset 4's art: `assets/hell/` (sky, floor, eye, ouroboros), the white revolver, the menacing Claube, giblets, and the
   sounds (hell, hell-voice, quake, white-appear, white-bang, claube-scream, claube-burst).
-- Ideas Claude suggested (not decided): resets as the soul's climb through the seven spheres, giving up a vice at
-  each (Moon, Mercury, Venus, Sun, Mars, Jupiter, Saturn); 5 wrath (storm, lightning on the roof, drowning), 6 greed
-  (the bag fills itself), 7 time (the workshop timer, the day/night player); 8 the Ogdoad/pleroma: the wireframe
+- Ideas Claude suggested earlier (5 to 7 since built differently: *Resets 5 to 8*): resets as the soul's climb through the
+  seven spheres (Moon, Mercury, Venus, Sun, Mars, Jupiter, Saturn: 7, the loop, is Saturn's); 8 the Ogdoad/pleroma: the wireframe
   world, you can't die, the way out is knowing (the dungeon notes spell a name), out through Mel's window. The world
   wearing thinner each reset (seams in the painted sky, repeats, wrong doors). The moon as a serpent's eye (the
   Ophite serpent, the revealer) against the sun's lion eye (the Demiurge).

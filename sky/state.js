@@ -93,39 +93,65 @@
         grimoire: { name: 'the pact in the grimoire, in the attic (reset 4: the way to the false god)', live: [4], notDeath: true,
                     patch: 'the grimoire on the living-room bookshelf, only a book',
                     slots: ['assets/living/grimoire', 'assets/living/grimoire-open', 'assets/living/pact-hand'], patchSlots: ['assets/living/shelf-grimoire'] },
-        // PLACEHOLDERS: the ways to die still to be designed, one a reset. each is a bubble on a page (a dashed circle with
-        // a skull: sky/resets.js) that kills the traveller when clicked, so every reset can be played through to its end.
-        // page: sea, workshop, city, living; in: which part of the page; left/top: where in it (%).
-        // when you design the real one, give it its own entry above and take the placeholder out.
-        r5: { name: 'reset 5’s way to die (to come)', live: [5], placeholder: { page: 'city',     in: 'body',  left: 40, top: 42 } },
-        r6: { name: 'reset 6’s way to die (to come)', live: [6], placeholder: { page: 'workshop', in: '.room', left: 38, top: 30 } },
-        r7: { name: 'reset 7’s way to die (to come)', live: [7], placeholder: { page: 'living',   in: '.room', left: 24, top: 26 } },
-        r8: { name: 'reset 8’s way to die (to come)', live: [8], placeholder: { page: 'sea',      in: 'body',  left: 30, top: 42 } }
+        // reset 5, the veil: the painted sky over the rooftop has come unstuck at one corner. pull it and the sky tears open
+        // onto what's behind it (nothing: the black, and the lines it's written in), and the traveller is pulled through
+        // (sky/veil.js). after it, the corner's sewn shut
+        veil:     { name: 'the sky, torn open over the rooftop',      live: [5], patch: 'sewn shut with big, clumsy stitches',
+                    slots: ['assets/city/sky-seam', 'assets/city/behind-the-sky'], patchSlots: ['assets/city/sky-stitched'] },
+        // reset 6, the watchers: eyes open in the house's dark places. through the telescope, looking up, the sky opens one
+        // too; meet its gaze and it burns the traveller where they stand (sky/watchers.js). after it, it's painted over
+        gaze:     { name: 'the eye in the sky, met through the telescope', live: [6], patch: 'painted over, from the other side',
+                    slots: ['assets/city/sky-eye', 'assets/ui/watcher-eye'], patchSlots: ['assets/city/sky-eye-painted'] },
+        // reset 7, the loop: the workshop timer, started, doesn't count down minutes. it counts down everything: days and
+        // years race past the window and the traveller ages to dust (sky/loop.js). after it, it has no hands
+        timer:    { name: 'the workshop timer, run to the end of time', live: [7], patch: 'it has no hands any more',
+                    slots: ['assets/workshop/timer-racing'], patchSlots: [] },
+        // (PLACEHOLDERS: a way to die not designed yet can be a bubble on a page, { placeholder: { page, in, left, top } }:
+        // a dashed circle with a skull that kills the traveller when clicked (sky/resets.js). none now: reset 8 has no death,
+        // every one before it is patched by then, and its way on is knowing: sky/gnosis.js)
     };
     Object.keys(DEATHS).forEach(function (k) { var d = DEATHS[k]; d.patch = d.patch || ''; d.slots = d.slots || []; d.patchSlots = d.patchSlots || []; });
     // (one heart: sky/lives.js. every way to die is off until the reset's key is found; each reset's is its only one)
 
     // key: where the reset's key is hidden. page: sea, workshop, city, living; in: which part of the page
     // (a selector); left/top: where in it; where: said in the content manager.
-    // or drop: something in the game drops it instead ('claubes': sky/claubes.js), wherever that happens
+    // or drop: something in the game drops it instead ('claubes': sky/claubes.js), wherever that happens.
+    // after: what the traveller says once it's found (a nudge towards the reset's way out)
+    // phrase: what the reset's death leaves them with, written on the white as the world resets (sky/forget.js), one line
+    //   of the answer to the Demiurge at the end (sky/gnosis.js). claim: what the Demiurge says that line answers: each
+    //   sphere's ruler claims something of them (their hands, the world, their appetite …), and each phrase denies it
     var RESETS = [
         { n: 1, name: 'items',       theme: 'the gun',                                deaths: ['revolver'],
+          phrase: 'I am not the hand that held it.',  claim: 'Your hands held my things. Your hands are mine.',
           key: { page: 'workshop', in: '.room',     left: 12,   top: 55.4, where: 'the workshop, between the jars on the shelf' } },
         { n: 2, name: 'environmental', theme: 'the world itself: the boat',           deaths: ['boat'],
+          phrase: 'I am not the weight that fell.',   claim: 'My world fell on you. You are of my world.',
           key: { page: 'city',     in: 'body',      left: 69.4, top: 89.6, where: 'the rooftop, by the potted plant' } },
         { n: 3, name: 'ingestion',   theme: 'the pills (and the fall)',               deaths: ['pills'],
+          phrase: 'I am not what I swallowed.',       claim: 'You swallowed what I gave you. It is in you still.',
           // (stuck in the apple pie in the kitchen fridge, its ring sticking out: sky/kitchen.js. the junk drawer has a hint)
           key: { page: 'living',   in: '.kitchen-pie', left: 40, top: 30, where: 'the kitchen, in the fridge: stuck in the apple pie' } },
         { n: 4, name: 'dark witchcraft', theme: 'the grimoire, the Claubes and the false god', deaths: ['diagram'],
+          phrase: 'I am not its fire.',               claim: 'You signed my book in blood. My fire is in you.',
           key: { page: 'living',   drop: 'hell', where: 'below (after the grimoire\u2019s pact): shoot the eye with the white revolver and it drops at your feet' } },
-        { n: 5, name: '',            theme: '',                               deaths: ['r5'],
-          key: { page: 'workshop', in: '.room',     left: 93.5, top: 61,   where: 'the workshop, on top of the notes board' } },
-        { n: 6, name: '',            theme: '',                               deaths: ['r6'],
-          key: { page: 'living',   in: '.hallway',  left: 70,   top: 94,   where: 'the hallway, on the floor' } },
-        { n: 7, name: '',            theme: '',                               deaths: ['r7'],
-          key: { page: 'living',   in: '.dungeon',  left: 83,   top: 93,   where: 'the dungeon, under the rack' } },
-        { n: 8, name: 'the grand mystery', tab: 'mystery', theme: 'the truth',                deaths: ['r8'],
-          key: { page: 'city',     in: 'body',      left: 9,    top: 76.5, where: 'the rooftop, on top of the chimney' } }
+        // 5 to 7 (5 Oct): the world uncovering itself, a layer a reset. the sky cracks a little more each time (sky/veil.js)
+        { n: 5, name: 'the veil',    theme: 'the world is painted on, and it\u2019s coming unstuck', deaths: ['veil'],
+          phrase: 'I am not the painted sky.',        claim: 'I painted every sky you ever saw. You are under it.',
+          // (behind the wallpaper peeling off the living-room wall: sky/veil.js)
+          key: { page: 'living',   in: '.wall-peel', left: 62, top: 50, where: 'the living space: behind the wallpaper peeling off the wall' },
+          after: '\u2026And the sky over the rooftop. One corner of it has come loose.' },
+        { n: 6, name: 'the watchers', theme: 'someone keeps it all running, and watches', deaths: ['gaze'],
+          phrase: 'I am not what it sees.',           claim: 'I have watched you every moment. What I see, I own.',
+          key: { page: 'living',   drop: 'watcher', where: 'the hallway: the one eye in the wall that never blinks. click it and it weeps the key' },
+          after: '\u2026Something up there is looking down. Through the telescope, I\u2019d see it looking.' },
+        { n: 7, name: 'the loop',    theme: 'time is the cage: it has always been the same day', deaths: ['timer'],
+          phrase: 'I am not its hours.',              claim: 'Every hour you have lived, I counted. Your time is mine.',
+          key: { page: 'living',   drop: 'microwave', where: 'the kitchen: run the microwave. it counts the wrong way, and the key is on the plate' },
+          after: '\u2026The timer in the workshop. It\u2019s been waiting for me the whole time.' },
+        // 8 (5 Oct): no key and no death. the serpent's pie gives gnosis (they remember every phrase), and on the sea they
+        // answer the Demiurge with them; it goes blind, and they choose: go home, or stay and wake the others (sky/gnosis.js)
+        { n: 8, name: 'the grand mystery', tab: 'mystery', theme: 'the truth: the world in black and white, its source code showing', deaths: [],
+          key: { page: 'living', drop: 'gnosis', where: 'none: the way on is knowing. the serpent in the kitchen, the pie in the fridge, then the sea' } }
     ];
 
     // what a reset forgets (the old names these always had, plus anything saved as "run:…")
@@ -213,6 +239,28 @@
         return hits.length ? 'assets/resets/' + hits[0] : null;
     }
 
+    /* ---------------- the end (reset 8, sky/gnosis.js) ----------------
+       localStorage "dav-ending": "escaped" (they went home: every page of the site is beyond.html from then on, its button
+       the way back onto the Sophia path) or "stayed" (they stayed to wake the others: the world in its colours again, no more
+       resets: html.free-world). like the reset number, it's kept between visits till "forget your stay" */
+    function ending() { var e = get('dav-ending'); return e === 'escaped' || e === 'stayed' ? e : ''; }
+    try {                                                               // (testing, your own computer only: ?ending=stayed / escaped / none)
+        var me = LOCAL && /[?&]ending=(stayed|escaped|none)/.exec(location.search);
+        if (me) {
+            put('dav-ending', me[1] === 'none' ? null : me[1]);
+            history.replaceState(null, '', location.pathname + location.search.replace(/[?&]ending=[a-z]+/, '').replace(/^&/, '?') + location.hash);
+        }
+    } catch (e) {}
+    // (gone home, but leaving a message: anyone can always leave one. beyond.html's "leave a message" opens the sea with
+    // the bottle desk out (index.html#message, sky/post.js), and back to beyond.html once it's thrown)
+    var posting = ending() === 'escaped' && /(^|\/)(index\.html)?$/.test(location.pathname) && location.hash === '#message';
+    if (posting) document.documentElement.classList.add('posting-only');
+    if (ending() === 'escaped' && !posting && !/\/(beyond|window-sky)\.html$|\/tools\/|schizophyllu\.me\.room/.test(location.pathname)) {
+        var here = document.currentScript && document.currentScript.src;
+        try { location.replace(new URL('../beyond.html', here || location.href).href); } catch (e) { location.replace('beyond.html'); }
+    }
+    if (ending() === 'stayed' || posting) document.documentElement.classList.add('free-world');
+
     // resets 1 and 2: the sky's a stage set, its props hung on strings (sky/sky.css)
     if (sphere() <= 2) document.documentElement.classList.add('stage-strings');
     document.documentElement.setAttribute('data-reset', sphere());          // (for the pages' own styles: html[data-reset="4"] …)
@@ -223,6 +271,11 @@
         MAX: MAX, RESETS: RESETS, DEATHS: DEATHS,
         get reset() { return sphere(); },                              // 1 … 8
         get info() { return RESETS[sphere() - 1]; },
+        get ending() { return ending(); },                             // '' / 'escaped' / 'stayed' (the end: sky/gnosis.js)
+        get free() { return ending() === 'stayed' || posting; },      // stayed: the world as it is, no more resets (gone home and
+                                                                        // back for a message: the same, for that one moment)
+        get posting() { return posting; },
+        setEnding: function (e) { put('dav-ending', e === 'escaped' || e === 'stayed' ? e : null); },
         live: function (d) { return !!DEATHS[d] && DEATHS[d].live.indexOf(sphere()) !== -1; },
         patched: function (d) { return !!DEATHS[d] && sphere() > Math.max.apply(null, DEATHS[d].live); },
         before: function (d) { return !!DEATHS[d] && sphere() < Math.min.apply(null, DEATHS[d].live); },

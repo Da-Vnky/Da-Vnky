@@ -160,6 +160,7 @@
         if (e.target.closest('.reset-key')) return;                       // (the key: sky/resets.js takes it)
         e.preventDefault(); e.stopPropagation();
         var n = S ? S.reset : 1;
+        if (n === 8 && !S.ending && Sky.gnosis && Sky.gnosis.eat) { Sky.gnosis.eat(pie); return; }     // (reset 8: eat, and know. sky/gnosis.js)
         say(keyInPie() ? 'Something’s stuck in it. Something metal.' : n < 3 ? PIE.before : n === 3 ? PIE.three : PIE.after, 2600);
     });
 
@@ -242,23 +243,29 @@
         micro.classList.remove('blink');
         micro.classList.add('running');
         sfx('microwave', { size: 0.5 });
-        var left = RUN;
-        clock.textContent = '0:0' + left;
+        // (reset 7, the loop: it counts the wrong way, up instead of down; and the first time, the reset's key is on the plate)
+        var BACK = !!S && S.reset === 7, left = RUN;
+        clock.textContent = '0:0' + (BACK ? 0 : left);
         var tick = setInterval(function () {
             left--;
-            clock.textContent = '0:0' + Math.max(0, left);
+            clock.textContent = '0:0' + (BACK ? RUN - Math.max(0, left) : Math.max(0, left));
             if (left > 0) return;
             clearInterval(tick);
             micro.classList.remove('running');
             sfx('ding', { size: 0.5 });
             clock.textContent = 'End';
             micro.classList.add('blink');
+            if (BACK && S.get('key') !== '1') {
+                var mr = micro.getBoundingClientRect();
+                document.dispatchEvent(new CustomEvent('dav:drop-key', { detail: { by: 'microwave', host: kit, x: mr.left + mr.width * 0.42, y: mr.bottom - 4 } }));
+            }
             if (inside) setTimeout(function () { say(microLine(), 2800); }, 400);
             setTimeout(function () { running = false; idleClock(); }, 3200);
         }, 1000);
     }
     function microLine() {
         var r = S ? S.reset : 1;
+        if (r === 7) return 'Ding. It counted up, not down. …It keeps its own time.';
         return r < 3 ? 'Ding. There was nothing in it.' : r === 3 ? 'Ding. Nothing in it. …It’s warm anyway.' : 'Ding. Something in there is warm now.';
     }
     if (micro) micro.querySelector('.km-hit').addEventListener('click', function (e) {

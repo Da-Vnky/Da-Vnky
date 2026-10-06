@@ -1,0 +1,180 @@
+/* =====================================================================
+   gnosis.css — the look of sky/gnosis.js: the end of reset 8.
+   ===================================================================== */
+
+/* ---------------- the pie, eaten (a slice gone) ---------------- */
+.kitchen .kitchen-pie.eaten { clip-path: polygon(0 0, 46% 0, 50% 52%, 72% 0, 100% 0, 100% 100%, 0 100%); }
+
+/* ---------------- the remembering: in the dark, in colour (above reset 8's grey) ---------------- */
+.gnosis {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483100;
+    display: grid;
+    place-items: center;
+    padding: 4vh 6vw;
+    background: radial-gradient(ellipse at 50% 45%, #1a1226 0%, #07050b 70%);
+    opacity: 0;
+    pointer-events: all;
+    transition: opacity 1.4s ease;
+}
+.gnosis.on { opacity: 1; }
+.gnosis .gn-back { position: absolute; inset: 0; pointer-events: none; }
+.gnosis .gn-back > .art { width: 100%; height: 100%; object-fit: cover; opacity: .6; }
+.gnosis .gn-lines { position: relative; display: grid; gap: 1.6vh; text-align: center; max-width: 760px; }
+.gn-line {
+    font: italic clamp(1.15rem, 2.6vh, 1.7rem)/1.25 "IM Fell English", Georgia, serif;
+    color: #f4dc9a;
+    text-shadow: 0 0 14px rgba(255, 210, 120, .45);
+    animation: gn-in 1.6s ease-out both;
+}
+.gn-line small { display: block; font: normal .62em "IM Fell English SC", Georgia, serif; letter-spacing: .14em; color: #a88fc4; text-shadow: none; }
+.gn-line.last { margin-top: 2.4vh; font-size: clamp(1.35rem, 3.4vh, 2.2rem); color: #fff6dc; text-shadow: 0 0 22px rgba(255, 240, 200, .8); }
+@keyframes gn-in { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+
+/* ---------------- the Demiurge, come down over the sea ---------------- */
+body.demiurge-here .sun,
+body.demiurge-here .ui-button,
+body.demiurge-here .signpost,
+body.demiurge-here .hotbar,
+body.demiurge-here .place-tabs,
+body.demiurge-here .bottle-hint,
+body.demiurge-here .bottle-wrap { opacity: 0; pointer-events: none; transition: opacity 1.4s; }
+body.demiurge-here .mc-say { z-index: 2147482300; }
+.dm-dark {
+    position: fixed;
+    inset: 0;
+    z-index: 2147481500;
+    background: radial-gradient(ellipse at 50% 30%, rgba(40, 14, 4, .55), rgba(4, 2, 2, .88) 75%);
+    opacity: 0;
+    pointer-events: all;
+    transition: opacity 3s ease;
+}
+.dm-dark.on { opacity: 1; }
+.demiurge {
+    position: fixed;
+    left: 50%;
+    top: 3vh;
+    z-index: 2147481600;
+    width: min(56vh, 84vw);
+    aspect-ratio: 1;
+    transform: translate(-50%, -120%) scale(.6);
+    filter: drop-shadow(0 0 40px rgba(255, 150, 40, .45));
+    pointer-events: none;
+    transition: transform 4s cubic-bezier(.25, .8, .3, 1), opacity 2.5s, filter 2.5s;
+}
+.demiurge > svg,
+.demiurge > .art { display: block; width: 100%; height: 100%; object-fit: contain; }
+.demiurge.down { transform: translate(-50%, 0) scale(1); }
+.demiurge .dm-mane { transform-box: fill-box; transform-origin: 50% 50%; animation: dm-burn 9s linear infinite; }
+@keyframes dm-burn { to { transform: rotate(360deg); } }
+.demiurge .dm-look { transform: translate(var(--lx, 0px), var(--ly, 0px)); transition: transform .3s ease-out; }
+.demiurge .dm-cracks path { opacity: 0; transition: opacity .4s; }
+.demiurge[data-cracks="1"] .k1,
+.demiurge[data-cracks="2"] :is(.k1, .k2),
+.demiurge[data-cracks="3"] :is(.k1, .k2, .k3),
+.demiurge[data-cracks="4"] :is(.k1, .k2, .k3, .k4),
+.demiurge[data-cracks="5"] :is(.k1, .k2, .k3, .k4, .k5),
+.demiurge[data-cracks="6"] :is(.k1, .k2, .k3, .k4, .k5, .k6),
+.demiurge[data-cracks="7"] .dm-cracks path { opacity: 1; }
+.demiurge.hurt { animation: dm-hurt .6s ease-out; }
+@keyframes dm-hurt { 20% { transform: translate(calc(-50% - 9px), 4px) scale(.98); } 45% { transform: translate(calc(-50% + 7px), -3px) scale(1.01); } 70% { transform: translate(calc(-50% - 3px), 0) scale(1); } }
+.demiurge.laughs { animation: dm-laugh .7s ease-in-out; }
+@keyframes dm-laugh { 30%, 70% { transform: translate(-50%, 0) scale(1.06); } 50% { transform: translate(-50%, 0) scale(1.02); } }
+/* blind: a white film over the eye, and the fire goes out of it */
+.demiurge .dm-film { opacity: 0; transition: opacity 2.2s ease-in; }
+.demiurge.blind .dm-film { opacity: .96; }
+.demiurge.blind .dm-mane { animation-duration: 40s; }
+.demiurge.blind { filter: drop-shadow(0 0 10px rgba(255, 255, 255, .3)) grayscale(.7); }
+.demiurge.gone { opacity: 0; transform: translate(-50%, -10%) scale(.7); filter: blur(10px); }
+
+/* once it's blind, the red goes out of the sky (a painted hell sky stays till the page is next opened) */
+html.hell-sky.sky-clearing .skybox .hell-veil { opacity: 0; transition: opacity 5s ease; }
+
+/* the answers: the seven phrases */
+.gn-answers {
+    position: fixed;
+    left: 50%;
+    bottom: 3vh;
+    z-index: 2147482200;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    width: min(640px, 94vw);
+    transform: translate(-50%, 12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .5s, transform .5s;
+}
+.gn-answers.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.gn-answers button,
+.gn-choice button {
+    padding: 9px 14px;
+    border: 1px solid rgba(243, 230, 194, .45);
+    border-radius: 999px;
+    background: rgba(26, 18, 12, .86);
+    color: #f3e6c2;
+    font: italic 1rem/1.2 "IM Fell English", Georgia, serif;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .5);
+}
+.gn-answers button:hover:not(:disabled),
+.gn-answers button:focus-visible,
+.gn-choice button:hover,
+.gn-choice button:focus-visible { background: #3a2716; border-color: #f3e6c2; outline: none; }
+.gn-answers button:disabled { opacity: .35; text-decoration: line-through; cursor: default; }
+.gn-answers button.wrong { animation: gn-wrong .45s ease-in-out; border-color: #c0392b; }
+@keyframes gn-wrong { 25% { transform: translateX(-6px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
+
+/* ---------------- the door, and the choice ---------------- */
+.gn-door {
+    position: fixed;
+    left: 50%;
+    bottom: 30vh;
+    z-index: 2147481700;
+    width: clamp(46px, 5vw, 80px);
+    height: clamp(90px, 20vh, 190px);
+    border-radius: 40px 40px 2px 2px;
+    background: linear-gradient(#fff, #fff8e6);
+    box-shadow: 0 0 40px 14px rgba(255, 248, 225, .8), 0 0 140px 60px rgba(255, 240, 200, .35);
+    transform: translateX(-50%) scaleY(0);
+    transform-origin: 50% 100%;
+    transition: transform 2.4s cubic-bezier(.3, .8, .3, 1), opacity 2s;
+    pointer-events: none;
+}
+.gn-door.open { transform: translateX(-50%) scaleY(1); }
+.gn-choice {
+    position: fixed;
+    left: 50%;
+    bottom: 8vh;
+    z-index: 2147482200;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    width: min(640px, 92vw);
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 1.2s;
+}
+.gn-choice.on { opacity: 1; }
+.gn-choice button { font-size: 1.15rem; padding: 12px 22px; }
+.gn-choice .gn-go { background: #f3e6c2; color: #3a2716; }
+.gn-flood {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483500;
+    background: #fff;
+    opacity: 0;
+    pointer-events: all;
+    transition: opacity 2.6s ease-in;
+}
+.gn-flood.on { opacity: 1; }
+@media (max-width: 620px) {
+    .gn-answers { grid-template-columns: 1fr; gap: 5px; bottom: 2vh; }
+    .gn-answers button { padding: 7px 12px; font-size: .92rem; }
+    .demiurge { top: 13vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .demiurge .dm-mane, .demiurge.hurt, .demiurge.laughs, .gn-line { animation: none; }
+}

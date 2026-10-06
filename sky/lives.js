@@ -27,7 +27,10 @@
     if (!Sky || Sky.lives) return;
     var MAX = 1;                                        // one heart: each reset has one death
     var body = document.body, S = window.davSave;
-    var ALWAYS = !!S && S.reset >= 2;                   // from reset 2: the hearts are always there, and locked till the key
+    var ALWAYS = !!S && S.reset >= 2 && S.reset < 8;    // from reset 2: the hearts are always there, and locked till the key
+    // (reset 8: no heart at all. there's nothing left to kill there: its way on is knowing, sky/gnosis.js)
+    if (S && S.reset >= 8) { Sky.lives = { left: 1, shown: false, unlocked: false, jammed: false, last: false, locked: false, counts: false,
+        unlock: function () {}, refuse: function () { return false; }, final: function () {}, give: function () {} }; return; }
     // what the traveller says trying a way to die before the key's found (from reset 2)
     var NOT_YET = {
         revolver:    'My finger won’t pull the trigger. Not yet. Something here is still hidden.',
@@ -35,6 +38,10 @@
         pills:       'I can’t make myself swallow them. Not yet. Something here is still hidden.',
         grimoire:    'My hand stops above the page. It won’t let me sign. Not yet.',
         diagram:     'The circle drinks the bullet… and waits. It isn’t time yet.',
+        // (5 Oct: resets 5 to 7. each one points at where its key is)
+        veil:        'A corner of the sky’s come unstuck. My hand won’t pull it. Not yet. …The wallpaper at home was peeling too.',
+        gaze:        'It shuts the moment I meet it. Not yet. …There was one in the hallway that never blinked.',
+        timer:       'I know how this ends. I’ve watched it end a hundred times. Not yet. …Something in the kitchen keeps its own time.',
         placeholder: 'Not yet. There’s something I have to find first.'
     };
     // each way to die costs a heart once a reset. tried again after that, it doesn't happen, and the traveller says why
@@ -43,6 +50,9 @@
         pills:       'Not again. It didn’t take the first time.',
         grimoire:    'The pact’s already made. The book has nothing more to ask.',
         diagram:     'The circle already took what it wanted.',
+        veil:        'It stitched itself shut behind me.',
+        gaze:        'It’s already seen me. That was enough.',
+        timer:       'The hands won’t move. It already ran out.',
         placeholder: 'Not that one again. It has to be something else.'
     };
     function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }

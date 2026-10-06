@@ -49,10 +49,14 @@
         var me = document.querySelector('script[src*="sky/forget.js"]');
         try { return new URL('../index.html', me ? me.src : location.href).href; } catch (e) { return 'index.html'; }
     })();
-    function whiteOut(slot, caption, work, to) {
+    // phrase (5 Oct, Victor): what the reset's death leaves them with, written on the white under the caption (sky/state.js
+    // RESETS[n].phrase): the white holds a little longer, to read it
+    function whiteOut(slot, caption, work, to, phrase) {
         var w = document.createElement('div');
         w.className = 'forget-white';
-        w.innerHTML = '<div class="fw-world">' + wireframe() + '</div>' + (caption ? '<div class="fw-caption">' + caption + '</div>' : '');
+        w.innerHTML = '<div class="fw-world">' + wireframe() + '</div>' + (caption ? '<div class="fw-caption">' + caption + '</div>' : '') +
+            (phrase ? '<div class="fw-phrase"></div>' : '');
+        if (phrase) w.querySelector('.fw-phrase').textContent = phrase;
         document.body.appendChild(w);
         Sky.findAsset(slot, function (url) {
             if (!url) return;
@@ -66,7 +70,7 @@
         var job = work();
         setTimeout(function () {
             job.then(function () { location.replace(to || location.pathname + location.search); });
-        }, 3400);
+        }, phrase ? 6800 : 3400);
     }
     function wipe() {
         try { localStorage.clear(); } catch (e) {}
@@ -90,11 +94,21 @@
         if (busy) return;
         busy = true;
         var to = wakeAt();
+        // going on to the next reset (not a jump in the reset manager): this reset's phrase, kept for good in "gnosis-phrases"
+        // (the reset numbers whose phrase they've seen: the end, sky/gnosis.js)
+        var phrase = typeof how !== 'function' && S && S.info && S.info.phrase;
+        if (phrase) {
+            try {
+                var had = JSON.parse(localStorage.getItem('gnosis-phrases') || '[]');
+                if (had.indexOf(S.reset) === -1) had.push(S.reset);
+                localStorage.setItem('gnosis-phrases', JSON.stringify(had));
+            } catch (e) {}
+        }
         whiteOut('assets/ui/reset-screen|assets/ui/forget-screen', caption || '', function () {
             if (typeof how === 'function') return Promise.resolve(how());
             if (S) S.nextReset();
             return Promise.resolve();
-        }, to);
+        }, to, phrase || '');
     }
 
     /* ---------------- the reset manager: in your preview only ---------------- */

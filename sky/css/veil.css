@@ -1,0 +1,156 @@
+/* =====================================================================
+   veil.css — the look of sky/veil.js: reset 5, the veil (and the cracks in
+   the painted sky, resets 5 to 7).
+   ===================================================================== */
+
+/* what's behind the painted things: the black, and the lines it's all written in */
+.void-lines {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 6px 8px;
+    overflow: hidden;
+    font: 10px/1.35 ui-monospace, Menlo, Consolas, monospace;
+    color: rgba(190, 230, 200, .42);
+    white-space: pre;
+    text-shadow: 0 0 6px rgba(150, 255, 190, .25);
+    pointer-events: none;
+}
+
+/* ---------------- the cracks in the painted sky ---------------- */
+.skybox .sky-cracks {
+    position: absolute;
+    inset: 0;
+    display: block;
+    pointer-events: none;
+}
+.skybox .sky-cracks > svg,
+.skybox .sky-cracks > .art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.sky-cracks .c5, .sky-cracks .c6, .sky-cracks .c7 { display: none; }
+html[data-reset="5"] .sky-cracks .c5,
+html[data-reset="6"] .sky-cracks .c5, html[data-reset="6"] .sky-cracks .c6,
+html[data-reset="7"] .sky-cracks g { display: inline; }
+/* a dark line, and the paint's chipped edge catching the light beside it */
+.sky-cracks .cr-line path { fill: none; stroke: rgba(22, 16, 10, .5); stroke-width: 1.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.sky-cracks .cr-edge path { fill: none; stroke: rgba(255, 250, 236, .32); stroke-width: 1.2; stroke-linejoin: round; transform: translate(1.6px, 1.2px); vector-effect: non-scaling-stroke; }
+html[data-reset="7"] .sky-cracks .cr-line path { stroke: rgba(10, 8, 6, .62); stroke-width: 2; }
+
+/* ---------------- the wallpaper, peeling (reset 5 on: the living space) ---------------- */
+.room .wall-peel {
+    left: 30%;
+    top: 0;
+    width: max(84px, 7.5vw);
+    aspect-ratio: 120 / 150;
+    z-index: 3;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.wall-peel > div:not(.reset-key) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    pointer-events: none;           /* (the box takes the tap; the strip hanging out of it mustn't cover the radio, upright) */
+}
+.wall-peel > div > svg,
+.wall-peel > div > .art { display: block; width: 100%; height: auto; }
+/* behind it: the wall isn't there. closed, a sliver of it under the folded corner; open, the whole gap the strip left */
+.wall-peel .wp-behind {
+    height: 70%;
+    overflow: hidden;
+    background: #050506;
+    box-shadow: inset 0 0 14px #000;
+    clip-path: polygon(33% 0, 100% 0, 100% 44%);
+    transition: clip-path .9s cubic-bezier(.5, 0, .3, 1);
+}
+.wall-peel .wp-behind .void-lines { font-size: 7px; }
+.wall-peel .wp-behind > .art { height: 100%; object-fit: cover; }
+.wall-peel .wp-curl { transform-origin: 70% 20%; transition: opacity .25s, transform .3s; }
+.wall-peel .wp-open { opacity: 0; transform-origin: 2% 1%; transform: rotate(-64deg); transition: opacity .15s, transform 1s cubic-bezier(.4, 0, .3, 1.35); }
+.wall-peel:hover .wp-curl,
+.wall-peel:focus-visible .wp-curl { transform: rotate(-4deg) scale(1.04); }
+.wall-peel:focus-visible { outline: 2px dashed #fff6dc; outline-offset: 3px; }
+.wall-peel.peeled .wp-behind { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+.wall-peel.peeled .wp-curl { opacity: 0; }
+.wall-peel.peeled .wp-open { opacity: 1; transform: none; }
+/* the key's in the gap: you can't see it till the paper's down (sky/resets.js puts it there) */
+.wall-peel .reset-key { width: 30%; min-width: 22px; z-index: 2; }
+.wall-peel:not(.peeled) .reset-key { visibility: hidden; pointer-events: none; }
+@media (max-width: 620px) {
+    /* (an upright phone: the strip of wall on the right, above where the secret door opens) */
+    .room .wall-peel { left: 82%; top: 53%; width: 15vw; }
+}
+
+/* ---------------- the sky over the rooftop (reset 5 on) ---------------- */
+.sky-seam {
+    position: fixed;
+    left: 64vw;
+    top: 20vh;
+    z-index: 1;
+    width: clamp(64px, 7vw, 110px);
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity .3s;
+}
+.sky-seam > svg,
+.sky-seam > .art { display: block; width: 100%; height: 100%; object-fit: contain; }
+.sky-seam:hover > svg, .sky-seam:hover > .art,
+.sky-seam:focus-visible > svg, .sky-seam:focus-visible > .art { filter: drop-shadow(0 0 6px rgba(255, 246, 220, .7)); }
+.sky-seam:focus-visible { outline: none; }
+.sky-seam.stitched { cursor: default; }
+.sky-seam.tug { animation: seam-tug .5s ease-in-out; }
+@keyframes seam-tug { 30% { transform: translate(3px, -4px) rotate(4deg); } 60% { transform: translate(-1px, 1px) rotate(-1deg); } }
+.sky-seam.gone { opacity: 0; pointer-events: none; }
+body.peep-view .sky-seam, body.peep-close .sky-seam, body.sky-view .sky-seam, body.leaving .sky-seam { opacity: 0; pointer-events: none; }
+@media (max-width: 620px) {
+    .sky-seam { left: 58vw; top: 24vh; }
+}
+
+/* the tear: what's behind the sky, in front of the painted backdrop and behind the city (sky/veil.js inserts it there) */
+.veil-tear {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    clip-path: polygon(0 0, 0 0, 0 0);
+}
+.veil-tear .vt-behind {
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(to right, rgba(120, 200, 150, .06) 0 1px, transparent 1px 48px),
+        repeating-linear-gradient(to bottom, rgba(120, 200, 150, .06) 0 1px, transparent 1px 48px),
+        #030304;
+}
+.veil-tear .vt-behind > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.veil-tear .vt-behind .void-lines { font-size: 12px; animation: void-drift 40s linear infinite; }
+@keyframes void-drift { to { transform: translateY(-30%); } }
+/* the torn edge of the painted sky: pale paper fibres */
+.veil-tear .vt-rim { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.veil-tear .vt-rim polygon { fill: none; stroke: #f1e8d2; stroke-width: 9; stroke-linejoin: round; filter: drop-shadow(0 0 3px rgba(0, 0, 0, .8)); }
+/* the scraps of the traveller, going up into it */
+.vt-scrap {
+    position: fixed;
+    z-index: 4;
+    width: 9px;
+    height: 7px;
+    background: #9a3b1f;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .25);
+    clip-path: polygon(0 20%, 70% 0, 100% 60%, 30% 100%);
+    pointer-events: none;
+}
+.vt-scrap:nth-child(3n) { background: #eadcb9; }
+.vt-scrap:nth-child(4n) { background: #3a2716; }
+@media (prefers-reduced-motion: reduce) {
+    .veil-tear .vt-behind .void-lines { animation: none; }
+    .sky-seam.tug { animation: none; }
+}
