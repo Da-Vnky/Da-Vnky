@@ -66,6 +66,9 @@
             });
             setTimeout(function () { el.remove(); if (Sky.lives) Sky.lives.unlock(); }, 850);
             say(lk ? 'a small key. the lock falls away.' : 'a small key. it must open something.', 3000);
+            // (5 Oct: and a nudge towards this reset's way out: RESETS[n].after, sky/state.js)
+            var after = S.info && S.info.after;
+            if (after) setTimeout(function () { Sky.speak(after, null, { hold: 2600 }); }, 1600);
         }
         el.addEventListener('click', take);
         el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') take(e); });
@@ -80,12 +83,20 @@
         el.style.left = k.in === 'body' ? k.left + 'vw' : k.left + '%';
         el.style.top = k.in === 'body' ? k.top + 'vh' : k.top + '%';
     }
-    // dropped: it falls from where it was (x, y: on the screen) to the floor there, with a little bounce
+    // dropped: it falls from where it was (x, y: on the screen) to the floor there, with a little bounce.
+    // host: a room to drop it in (5 Oct: the hallway's eye, the kitchen's microwave), so it goes with the room as it slides
     document.addEventListener('dav:drop-key', function (e) {
         var k = S.info && S.info.key, d = e.detail || {};
         if (!k || k.drop !== d.by || keyFound()) return;
-        var el = makeKey(body, true);
-        el.style.left = d.x + 'px'; el.style.top = d.y + 'px';
+        var el;
+        if (d.host) {
+            var hr = d.host.getBoundingClientRect();
+            el = makeKey(d.host, false);
+            el.style.left = (d.x - hr.left) + 'px'; el.style.top = (d.y - hr.top) + 'px';
+        } else {
+            el = makeKey(body, true);
+            el.style.left = d.x + 'px'; el.style.top = d.y + 'px';
+        }
         el.style.zIndex = d.z || 6;                                         // (below, in reset 4: over everything down there)
         el.animate([{ translate: '0 -60px', opacity: 0 }, { translate: '0 -60px', opacity: 1, offset: 0.1 }, { translate: '0 0', offset: 0.55 },
                     { translate: '0 -14px', offset: 0.72 }, { translate: '0 0', offset: 0.86 }, { translate: '0 -3px', offset: 0.93 }, { translate: '0 0', opacity: 1 }],
@@ -163,10 +174,11 @@
         2: 'Huh. I could swear I\u2019ve been here before.',
         3: 'This again? Why does all of this feel so\u2026 familiar?',
         4: 'I\u2019ve been here before. More than once. I know I have.',
-        5: 'Same sea. Same sky. How many times have I done this now?',
-        6: 'Every time I come back, a little more of it feels\u2026 painted on.',
+        // (5 Oct: 5 to 8 to match their themes: the veil, the watchers, the loop, the source)
+        5: 'Every time I come back, a little more of it feels\u2026 painted on.',
+        6: 'Same sea. Same sky. And now I can feel it looking back.',
         7: 'I remember this. I remember all of it. Round and round and round.',
-        8: 'Again. It\u2019s always again.'
+        8: 'Oh. So that\u2019s what it was made of, all along.'
     };
     function dejaVu() {
         var line = DEJA[S.reset];

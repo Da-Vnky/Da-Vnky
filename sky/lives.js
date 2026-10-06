@@ -35,6 +35,10 @@
         pills:       'I can’t make myself swallow them. Not yet. Something here is still hidden.',
         grimoire:    'My hand stops above the page. It won’t let me sign. Not yet.',
         diagram:     'The circle drinks the bullet… and waits. It isn’t time yet.',
+        // (5 Oct: resets 5 to 7. each one points at where its key is)
+        veil:        'A corner of the sky’s come unstuck. My hand won’t pull it. Not yet. …The wallpaper at home was peeling too.',
+        gaze:        'It shuts the moment I meet it. Not yet. …There was one in the hallway that never blinked.',
+        timer:       'I know how this ends. I’ve watched it end a hundred times. Not yet. …Something in the kitchen keeps its own time.',
         placeholder: 'Not yet. There’s something I have to find first.'
     };
     // each way to die costs a heart once a reset. tried again after that, it doesn't happen, and the traveller says why
@@ -43,6 +47,9 @@
         pills:       'Not again. It didn’t take the first time.',
         grimoire:    'The pact’s already made. The book has nothing more to ask.',
         diagram:     'The circle already took what it wanted.',
+        veil:        'It stitched itself shut behind me.',
+        gaze:        'It’s already seen me. That was enough.',
+        timer:       'The hands won’t move. It already ran out.',
         placeholder: 'Not that one again. It has to be something else.'
     };
     function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }

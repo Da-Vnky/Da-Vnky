@@ -14,6 +14,13 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Resets 5, 6 and 7 are real now, each uncovering a little more of what the world is (the placeholder skull bubbles for them are gone). From reset 5 the painted sky cracks, a little more each reset.
+- Reset 5, the veil: the world is painted on and coming unstuck. The key is behind the wallpaper peeling off the living-room wall at the ceiling. The way out: a corner of the sky over the rooftop has come loose; pull it and the sky tears open onto black and the code the world's written in, and the traveller is pulled up through it in scraps. From reset 6 it's sewn shut.
+- Reset 6, the watchers: eyes open in the walls of the house and the workshop, follow you, blink, and shut if you come close. The key: the one eye in the hallway that never blinks; click it and it weeps the key. The way out: look up at the sky through the rooftop telescope, and an eye opens up there; meet it and it burns the traveller where they stand. From reset 7 it's painted over.
+- Reset 7, the loop: the world skips now and then, as if a moment came round twice. The key: the kitchen microwave counts up instead of down and leaves it on the plate. The way out: the workshop timer counts everything, not minutes; years race past the window and the traveller grows old and crumbles into sand. From reset 8 it has no hands.
+- Reset 8, the source: the world's black and white, the painted sky worn through to the code running behind it, and every thing wears its name from the source (<living/turntable>, <characters/city>…). Its ending is still to be designed: the skull bubble on the sea stays its way out for now.
+- The traveller now says a nudge towards the way out once a reset's key is found (resets 5 to 7), and the 'not yet' lines hint at where the key is. The déjà vu lines for resets 5 to 8 and two of the porch mailbox notes (6, 7) were changed to fit the new themes.
+- New slots for your own art and sounds (asset manager): the sky's cracks, the watchers' eye, the loose and the stitched sky, what's behind the sky, the sky's eye and its painted-over patch, the peeling wallpaper (closed and open) and what's behind it, the racing timer and the heap of sand; sounds sky-tear, void-wind, wall-peel, eye-open, gaze, gaze-burn, weep, skip, time-rush, crumble. Drawn and synthesised stand-ins until then. New code: sky/veil.js, watchers.js, loop.js, source.js (and their CSS), on every page.
 
 == published ==
 

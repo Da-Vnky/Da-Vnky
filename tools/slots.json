@@ -448,6 +448,22 @@
      ]
     },
     {
+     "name": "resets 5 to 8: the world coming apart (sky/veil.js, watchers.js, loop.js, source.js)",
+     "slots": [
+      {
+       "slot": "assets/sky/cracks",
+       "what": "from reset 5: cracks in the painted sky (dark lines, see-through between), behind the sun, moon and clouds. a few in reset 5, more each reset to 7; one picture for all three, or one per reset in the resets tabs",
+       "size": "1920 x 1080, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/watcher-eye",
+       "what": "reset 6 and 7: an eye that opens in the walls of the house and the workshop, looking straight out (the page opens, blinks and shuts it). the drawn one also follows the pointer",
+       "size": "120 x 64, see-through"
+      }
+     ]
+    },
+    {
      "name": "the signpost",
      "slots": [
       {
@@ -1006,6 +1022,17 @@
        "what": "the sheet it opens up on, stretched",
        "size": "portrait",
        "optional": true
+      },
+      {
+       "slot": "assets/workshop/timer-racing",
+       "what": "reset 7: the timer racing through the years (a GIF can spin). until yours, the drawn one spins",
+       "size": "the same as the timer",
+       "optional": true
+      },
+      {
+       "slot": "assets/workshop/sand",
+       "what": "reset 7: the little heap of sand that’s left of the traveller",
+       "size": "400 x 120, see-through"
       }
      ]
     },
@@ -1137,6 +1164,36 @@
        "slot": "assets/city/mel-board",
        "what": "one board nailed over her window (a plank, stretched to fit)",
        "size": "about 6:1, e.g. 900 x 150"
+      }
+     ]
+    },
+    {
+     "name": "resets 5 and 6: the sky over the rooftop",
+     "slots": [
+      {
+       "slot": "assets/city/sky-seam",
+       "what": "reset 5: a corner of the painted sky come unstuck, lifting off (its back plain paper, black behind). once the key’s found, pulling it is the reset’s death",
+       "size": "200 x 200, see-through"
+      },
+      {
+       "slot": "assets/city/sky-stitched",
+       "what": "from reset 6: where the corner was, sewn shut with big clumsy stitches",
+       "size": "200 x 200, see-through"
+      },
+      {
+       "slot": "assets/city/behind-the-sky",
+       "what": "what the torn sky opens onto (reset 5’s death). until yours: black, with the site’s own code running in it",
+       "size": "1920 x 1080"
+      },
+      {
+       "slot": "assets/city/sky-eye",
+       "what": "reset 6: the eye that opens in the sky, looking up through the telescope (open, looking straight down at you; the page opens it)",
+       "size": "1000 x 550, see-through"
+      },
+      {
+       "slot": "assets/city/sky-eye-painted",
+       "what": "from reset 7: the same patch of sky, the eye painted over",
+       "size": "1000 x 550, see-through"
       }
      ]
     }
@@ -1295,6 +1352,21 @@
        "slot": "assets/living/revolver-rack",
        "what": "the rack on the wall the revolver hangs on, from reset 2 (the gun itself is assets/city/revolver). it stays when the gun is taken",
        "size": "160:100, see-through round it"
+      },
+      {
+       "slot": "assets/living/wall-peel",
+       "what": "reset 5: the wallpaper’s corner come away at the ceiling, folded down (a dog-ear; black shows behind it). reset 5’s key is behind it",
+       "size": "240 x 300, see-through: the corner at the top right"
+      },
+      {
+       "slot": "assets/living/wall-peel-open",
+       "what": "once it’s pulled (and from reset 6): the strip of wallpaper hanging down off its last corner, to the left of the gap",
+       "size": "240 x 300, see-through"
+      },
+      {
+       "slot": "assets/living/behind-the-wall",
+       "what": "what’s behind the wallpaper: no wall (until yours: black, with code in it)",
+       "size": "240 x 210"
       }
      ]
     },
@@ -2895,6 +2967,56 @@
       {
        "slot": "assets/sounds/wretched-scream",
        "what": "reset 4's end: the wretched scream as the false god sends the bullet back (plays twice, overlapping)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/sky-tear",
+       "what": "reset 5: the painted sky ripping open",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/void-wind",
+       "what": "reset 5: the pull up through the tear",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/wall-peel",
+       "what": "reset 5: a long strip of wallpaper coming away",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/eye-open",
+       "what": "reset 6: an eye opening (the ones in the walls, quiet; and the one in the sky)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/gaze",
+       "what": "reset 6: the eye in the sky, looking back",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/gaze-burn",
+       "what": "reset 6: the white glare that burns the traveller",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/weep",
+       "what": "reset 6: the hallway’s eye closing, a tear running",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/skip",
+       "what": "reset 7: the world skipping, a moment come round twice",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/time-rush",
+       "what": "reset 7: the years racing past",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/crumble",
+       "what": "reset 7: the traveller coming apart into sand",
        "kind": "sound"
       }
      ]

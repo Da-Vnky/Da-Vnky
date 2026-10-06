@@ -224,7 +224,7 @@
 
     /* ---------------- the things on the porch ---------------- */
     // the mailbox: bills, or (flag up, from reset 3) a note in the traveller's own handwriting
-    var NOTES = { 3: '“You’ve been here before.”', 4: '“Don’t go up to the attic.”', 5: '“It gets worse.”', 6: '“Stop counting.”', 7: '“You were never alone in the house.”', 8: '“Almost.”' };
+    var NOTES = { 3: '“You’ve been here before.”', 4: '“Don’t go up to the attic.”', 5: '“It gets worse.”', 6: '“You were never alone in the house.”', 7: '“Stop counting.”', 8: '“Almost.”' };
     mailbox.addEventListener('click', function (e) {
         e.preventDefault(); e.stopPropagation();
         if (!outside || busy) return;

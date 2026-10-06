@@ -93,13 +93,23 @@
         grimoire: { name: 'the pact in the grimoire, in the attic (reset 4: the way to the false god)', live: [4], notDeath: true,
                     patch: 'the grimoire on the living-room bookshelf, only a book',
                     slots: ['assets/living/grimoire', 'assets/living/grimoire-open', 'assets/living/pact-hand'], patchSlots: ['assets/living/shelf-grimoire'] },
+        // reset 5, the veil: the painted sky over the rooftop has come unstuck at one corner. pull it and the sky tears open
+        // onto what's behind it (nothing: the black, and the lines it's written in), and the traveller is pulled through
+        // (sky/veil.js). after it, the corner's sewn shut
+        veil:     { name: 'the sky, torn open over the rooftop',      live: [5], patch: 'sewn shut with big, clumsy stitches',
+                    slots: ['assets/city/sky-seam', 'assets/city/behind-the-sky'], patchSlots: ['assets/city/sky-stitched'] },
+        // reset 6, the watchers: eyes open in the house's dark places. through the telescope, looking up, the sky opens one
+        // too; meet its gaze and it burns the traveller where they stand (sky/watchers.js). after it, it's painted over
+        gaze:     { name: 'the eye in the sky, met through the telescope', live: [6], patch: 'painted over, from the other side',
+                    slots: ['assets/city/sky-eye', 'assets/ui/watcher-eye'], patchSlots: ['assets/city/sky-eye-painted'] },
+        // reset 7, the loop: the workshop timer, started, doesn't count down minutes. it counts down everything: days and
+        // years race past the window and the traveller ages to dust (sky/loop.js). after it, it has no hands
+        timer:    { name: 'the workshop timer, run to the end of time', live: [7], patch: 'it has no hands any more',
+                    slots: ['assets/workshop/timer-racing'], patchSlots: [] },
         // PLACEHOLDERS: the ways to die still to be designed, one a reset. each is a bubble on a page (a dashed circle with
         // a skull: sky/resets.js) that kills the traveller when clicked, so every reset can be played through to its end.
         // page: sea, workshop, city, living; in: which part of the page; left/top: where in it (%).
         // when you design the real one, give it its own entry above and take the placeholder out.
-        r5: { name: 'reset 5’s way to die (to come)', live: [5], placeholder: { page: 'city',     in: 'body',  left: 40, top: 42 } },
-        r6: { name: 'reset 6’s way to die (to come)', live: [6], placeholder: { page: 'workshop', in: '.room', left: 38, top: 30 } },
-        r7: { name: 'reset 7’s way to die (to come)', live: [7], placeholder: { page: 'living',   in: '.room', left: 24, top: 26 } },
         r8: { name: 'reset 8’s way to die (to come)', live: [8], placeholder: { page: 'sea',      in: 'body',  left: 30, top: 42 } }
     };
     Object.keys(DEATHS).forEach(function (k) { var d = DEATHS[k]; d.patch = d.patch || ''; d.slots = d.slots || []; d.patchSlots = d.patchSlots || []; });
@@ -107,7 +117,8 @@
 
     // key: where the reset's key is hidden. page: sea, workshop, city, living; in: which part of the page
     // (a selector); left/top: where in it; where: said in the content manager.
-    // or drop: something in the game drops it instead ('claubes': sky/claubes.js), wherever that happens
+    // or drop: something in the game drops it instead ('claubes': sky/claubes.js), wherever that happens.
+    // after: what the traveller says once it's found (a nudge towards the reset's way to die)
     var RESETS = [
         { n: 1, name: 'items',       theme: 'the gun',                                deaths: ['revolver'],
           key: { page: 'workshop', in: '.room',     left: 12,   top: 55.4, where: 'the workshop, between the jars on the shelf' } },
@@ -118,13 +129,18 @@
           key: { page: 'living',   in: '.kitchen-pie', left: 40, top: 30, where: 'the kitchen, in the fridge: stuck in the apple pie' } },
         { n: 4, name: 'dark witchcraft', theme: 'the grimoire, the Claubes and the false god', deaths: ['diagram'],
           key: { page: 'living',   drop: 'hell', where: 'below (after the grimoire\u2019s pact): shoot the eye with the white revolver and it drops at your feet' } },
-        { n: 5, name: '',            theme: '',                               deaths: ['r5'],
-          key: { page: 'workshop', in: '.room',     left: 93.5, top: 61,   where: 'the workshop, on top of the notes board' } },
-        { n: 6, name: '',            theme: '',                               deaths: ['r6'],
-          key: { page: 'living',   in: '.hallway',  left: 70,   top: 94,   where: 'the hallway, on the floor' } },
-        { n: 7, name: '',            theme: '',                               deaths: ['r7'],
-          key: { page: 'living',   in: '.dungeon',  left: 83,   top: 93,   where: 'the dungeon, under the rack' } },
-        { n: 8, name: 'the grand mystery', tab: 'mystery', theme: 'the truth',                deaths: ['r8'],
+        // 5 to 7 (5 Oct): the world uncovering itself, a layer a reset. the sky cracks a little more each time (sky/veil.js)
+        { n: 5, name: 'the veil',    theme: 'the world is painted on, and it\u2019s coming unstuck', deaths: ['veil'],
+          // (behind the wallpaper peeling off the living-room wall: sky/veil.js)
+          key: { page: 'living',   in: '.wall-peel', left: 62, top: 50, where: 'the living space: behind the wallpaper peeling off the wall' },
+          after: '\u2026And the sky over the rooftop. One corner of it has come loose.' },
+        { n: 6, name: 'the watchers', theme: 'someone keeps it all running, and watches', deaths: ['gaze'],
+          key: { page: 'living',   drop: 'watcher', where: 'the hallway: the one eye in the wall that never blinks. click it and it weeps the key' },
+          after: '\u2026Something up there is looking down. Through the telescope, I\u2019d see it looking.' },
+        { n: 7, name: 'the loop',    theme: 'time is the cage: it has always been the same day', deaths: ['timer'],
+          key: { page: 'living',   drop: 'microwave', where: 'the kitchen: run the microwave. it counts the wrong way, and the key is on the plate' },
+          after: '\u2026The timer in the workshop. It\u2019s been waiting for me the whole time.' },
+        { n: 8, name: 'the grand mystery', tab: 'mystery', theme: 'the truth: the world in black and white, its source code showing', deaths: ['r8'],
           key: { page: 'city',     in: 'body',      left: 9,    top: 76.5, where: 'the rooftop, on top of the chimney' } }
     ];
 

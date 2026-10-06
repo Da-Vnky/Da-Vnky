@@ -1,0 +1,57 @@
+/* =====================================================================
+   loop.css — the look of sky/loop.js: reset 7, the loop.
+   ===================================================================== */
+
+/* the skip: the world jolts, as if the same moment came round twice */
+html.loop-skip body { animation: loop-skip .54s steps(1, end); }
+@keyframes loop-skip {
+    0% { transform: translate(0, 0); filter: none; }
+    12% { transform: translate(-7px, 2px); filter: contrast(1.3) saturate(.6); }
+    24% { transform: translate(5px, -3px); }
+    36% { transform: translate(-3px, 0); filter: none; }
+    52% { transform: translate(0, 0); filter: contrast(1.2) brightness(1.15); }
+    64%, 100% { transform: none; filter: none; }
+}
+
+/* the workshop's timer, racing: it spins, and the room flickers day and night through the window */
+.pomodoro.racing { animation: loop-race .18s linear infinite; }
+@keyframes loop-race { 50% { transform: rotate(4deg); } }
+.pomodoro.racing .pomo-dial { transform-box: fill-box; transform-origin: 50% 100%; animation: loop-hand .25s linear infinite; }
+@keyframes loop-hand { to { transform: rotate(360deg); } }
+body.loop-racing .pomo-panel .pp-time { font-variant-numeric: tabular-nums; color: #9a3b1f; }
+/* (from reset 8: no hands) */
+.pomodoro.no-hands .pomo-dial { display: none; }
+
+/* the traveller, growing old where they stand, then coming apart into sand */
+.scene-character.ageing > .placeholder,
+.scene-character.ageing > .art {
+    filter: grayscale(1) sepia(.35) brightness(.82);
+    transform: rotate(4deg) scaleY(.9);
+    transform-origin: 50% 100%;
+    transition: filter 3.6s ease-in, transform 3.6s ease-in;
+}
+.scene-character.crumbling { animation: loop-crumble 2.2s ease-in forwards; }
+@keyframes loop-crumble {
+    0% { opacity: 1; clip-path: inset(0 0 0 0); }
+    100% { opacity: .2; clip-path: inset(100% 0 0 0); }
+}
+.loop-grain {
+    position: fixed;
+    z-index: 4;
+    width: 3px;
+    height: 3px;
+    border-radius: 1px;
+    background: #c9b48a;
+    pointer-events: none;
+}
+.loop-sand {
+    position: absolute;
+    z-index: 3;
+    transform-origin: 50% 100%;
+    pointer-events: none;
+}
+.loop-sand > svg,
+.loop-sand > .art { display: block; width: 100%; height: auto; }
+@media (prefers-reduced-motion: reduce) {
+    html.loop-skip body, .pomodoro.racing, .pomodoro.racing .pomo-dial { animation: none; }
+}

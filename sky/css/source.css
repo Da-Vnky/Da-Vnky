@@ -1,0 +1,57 @@
+/* =====================================================================
+   source.css — the look of sky/source.js: reset 8, the source.
+   ===================================================================== */
+
+/* black and white: one see-through veil over the whole page, greying whatever's under it */
+.source-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    pointer-events: none;
+    -webkit-backdrop-filter: grayscale(1) contrast(1.22) brightness(.96);
+    backdrop-filter: grayscale(1) contrast(1.22) brightness(.96);
+}
+/* the painted sky worn thin, and behind it the code, running up */
+html.source-view .skybox > div[data-sky] { opacity: .14 !important; }
+html.source-view .skybox .hell-veil { display: none; }
+.skybox .source-code {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    margin: 0;
+    padding: 0 3vw;
+    font: 11px/1.45 ui-monospace, Menlo, Consolas, monospace;
+    color: rgba(235, 235, 235, .3);
+    white-space: pre;
+    columns: 2 420px;
+    column-gap: 4vw;
+    pointer-events: none;
+    animation: source-run 600s linear infinite;
+}
+@keyframes source-run { to { transform: translateY(-50%); } }
+/* each thing's name, the way the world looks to whoever wrote it */
+html.source-view [data-src-tagged] { outline: 1px solid rgba(255, 255, 255, .26); outline-offset: -1px; }
+.src-tag {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 20;
+    transform: translateY(-100%);
+    padding: 1px 4px;
+    font: 10px/1.3 ui-monospace, Menlo, Consolas, monospace;
+    font-style: normal;
+    color: #f2f2f2;
+    background: rgba(0, 0, 0, .72);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: 0;
+    text-shadow: none;
+}
+@media (max-width: 620px) {
+    .src-tag { font-size: 8.5px; }
+    .skybox .source-code { font-size: 9px; columns: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .skybox .source-code { animation: none; }
+}
