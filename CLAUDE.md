@@ -448,6 +448,31 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   itself). Everything stops (`quiet()`) when you go back in.
 - Debug page: "the porch's watcher: one step closer", buttons to trigger each event now, "the kitchen" / "the porch" pages.
 
+## Phones (5 Oct: Victor found the site squished on phones, hiding things you can tap and the way around)
+
+- Two kinds of phone screen, and the CSS says which: **upright** `(max-width: 620px)`, **sideways** `(max-height: 500px) and
+  (min-width: 621px)`; both at once: `(max-width: 620px), (max-height: 500px)`. Before 5 Oct only `max-width` existed, so a
+  phone held sideways got the desktop layout (the tab column cut off, a painting desk you couldn't use).
+- **The place tabs fold** on phones (sky.js after the tabs are built, sky.css "the place tabs on phones"): only `.here` shows,
+  or `.pt-fold` (a door) on a page that isn't a place; a tap opens `.place-tabs.open` (in the capture phase, before house.js's
+  own tab clicks), a tap anywhere else closes it. Upright they're top right at 140px; sideways at 92px. The house's side arrows
+  (bathroom.js `placeArrows`, sky.js `underTabs`) skip while the tabs are open, and upright they sit in the bottom corners.
+- **The traveller**: upright `calc(min(44vh, 70vw) - 11px)`; sideways `calc(52vh - 11px)`. Upright, the kitchen's traveller rests
+  by the fridge, sideways past the stove (kitchen.js `rest()`): the kitchen fills a phone side to side.
+- **Upright layouts**: each page's `@media (max-width: 620px)` block (living.html, workshop.html, city.html, kitchen.css,
+  ground-city.css …). Living room: the window's sill at 51% (`.room .window` top 28%, height 23%), the record player, radio and
+  books on it; pinboard, letters and revolver rack at 55% on the wall. Workshop: easel left, portfolio leaning on it, paint easel
+  at 54% with the traveller behind it, timer at the bench's end.
+- **Layers in a room**: `.room .furnish { z-index: 2 }` outranks a plain `.easel { z-index: 3 }` (so those lines in workshop.html
+  never worked, on desktop either: the order in the page decides). To layer one piece over another, write `.room .easel`.
+- **Constellations**: on phones only their names take a tap, and through a window indoors none of them do (they covered the sill's
+  books, the workshop's key). Out front (every screen), `.sky-links` is under the house (front.css): the stars are in its sky.
+- Fixed with it: the empty hotbar now tucks away by its perch too (`--bar-bottom`), or it peeked over "leave a message"; the
+  signpost shows in full on phones (no tuck-and-tap); the record player, message form and painting desk fit sideways.
+- **Check it**: `python tools/phones.py` (every place, upright and sideways; `--sizes all` adds a small and a big phone;
+  `--reset 4`): lists anything tappable that's off the screen or covered, and by what. Known and fine: the living room's empty
+  letter pile (see-through). Then look at the pages too (Playwright screenshots at 390 x 844 and 844 x 390).
+
 ## Mel's room and reset 3 (schizophyllu.me.room: Victor placed Mel's update in her folder, 26 Sep)
 
 - Her update: the afternoon (skizy asleep under a blanket; Aether wakes during Claube's scene), the meds (take a
@@ -513,7 +538,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 
 ## The traveller's size (27 Sep)
 
-- One height in every room of the house and the workshop: `--traveller-h` (sky.css: `calc(60vh - 11px)`, phones `44vh - 11px`),
+- One height in every room of the house and the workshop: `--traveller-h` (sky.css: `calc(60vh - 11px)`; phones: see *Phones*),
   so the head is just under the hallway doors (their tops are 69vh - 12px up). The rooftop, the front garden and below keep
   their own. Victor asked for it big on purpose, to spot overlaps with his art to come.
 - `.character` itself takes no clicks; only the drawn stand-in's shapes (`svg *`, visiblePainted) or Victor's picture do, so
@@ -867,6 +892,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 
 ## Testing
 
+- **The phone check**: `python tools/phones.py` (see *Phones*).
 - **The smoke test**: `python tools/smoke.py` opens every page and room in a hidden browser and reports script errors
   and the site's own files that fail to load (`--resets 1-8` for every reset). `--shots <folder> --still` also saves a
   picture of every page with the clock, chance, animations and the outside world held still, so two runs of the same

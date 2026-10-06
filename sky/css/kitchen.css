@@ -648,12 +648,14 @@ body.kitchen-now .hallway {
 }
 
 @media (max-width: 620px) {
+    /* (5 Oct) a narrow kitchen: the fridge, the counter and the stove side by side, none over another (the fridge hid the
+       first drawer). the traveller waits by the fridge (sky/kitchen.js, rest()): anywhere else they hid the counter or the oven */
     .kitchen .kitchen-stove {
-        left: 71%;
-        height: 17vh;
+        left: 74%;
+        height: 14vh;
     }
     .kitchen .kitchen-microwave {
-        left: 38.5%;
+        left: 33.5%;
         bottom: calc(var(--floor-h) - 1vh + 18vh * .93);
         width: 13vw;
         min-width: 0;
@@ -662,8 +664,8 @@ body.kitchen-now .hallway {
         display: none;
     }
     .kitchen .kitchen-counter {
-        left: 26%;
-        right: 30%;
+        left: 33%;
+        right: 28%;
         height: 18vh;
     }
     .kitchen .kitchen-bowl {
@@ -674,18 +676,19 @@ body.kitchen-now .hallway {
         bottom: calc(var(--floor-h) - 1vh + 18vh * .93 - 1vh);
     }
     .kitchen .kitchen-bowl {
-        left: 52%;
+        left: 47%;
         width: 15vw;
         min-width: 0;
     }
     .kitchen .kitchen-serpent,
     .kitchen .kitchen-sausages {
-        left: calc(52% - 4vw);
+        left: calc(47% - 4vw);
         width: 23vw;
         min-width: 0;
     }
     .kitchen .kitchen-fridge {
-        height: 40vh;
+        left: 2%;
+        height: 34vh;
     }
 }
 @media (prefers-reduced-motion: reduce) {

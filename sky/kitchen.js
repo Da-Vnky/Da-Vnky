@@ -38,6 +38,10 @@
     var hallMe = hall.querySelector('.character'), me = kit.querySelector('.kitchen-character');
     var serpent = kit.querySelector('.kitchen-serpent'), sausages = kit.querySelector('.kitchen-sausages');
     var ENTER = 78;                                        // where the traveller comes in (% across: the doorway's on the right, from here)
+    // where they stand once in: just in from the doorway; on an upright phone, by the fridge (5 Oct: the kitchen fills the
+    // narrow screen side to side, and anywhere else they hid the counter or the stove); on a phone held sideways, past the stove
+    var UPRIGHT = window.matchMedia('(max-width: 620px)'), SIDEWAYS = window.matchMedia('(max-height: 500px)');
+    function rest(n) { return UPRIGHT.matches ? 1 : SIDEWAYS.matches ? 85 : ENTER - n; }
     var H = Sky.house, sfx = Sky.sfx;
     function say(t, ms) { Sky.say(t, ms || 2600); }
 
@@ -79,12 +83,12 @@
         if (Sky.fillAssets) Sky.fillAssets(kit);
         H.fire('enter', 'kitchen');
         turnSerpent();
-        if (now) { place(me, ENTER - 20); setTimeout(function () { body.classList.remove('kitchen-now'); busy = false; }, 60); return; }
+        if (now) { place(me, rest(20)); setTimeout(function () { body.classList.remove('kitchen-now'); busy = false; }, 60); return; }
         H.through();
         place(me, 96, true);
         setTimeout(function () {
             body.classList.remove('kitchen-panning');
-            H.land(me, ENTER - 14, function () { busy = false; me.classList.remove('face-left'); });
+            H.land(me, rest(14), function () { busy = false; me.classList.remove('face-left'); });
         }, 900);
     }
     function goOut() {

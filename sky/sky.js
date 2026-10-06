@@ -496,10 +496,39 @@
     });
     if (!isHome) body.appendChild(tabs);
 
+    // on phones (narrow, or short when held sideways) the tabs fold away so they don't cover the room: only the
+    // "you are here" tab shows (or, on a page that isn't one of the places, a little door). tap it and the others
+    // fan out; tap it again, or anywhere else, and they fold back. (the look: sky.css, "the place tabs on phones")
+    var PHONE = window.matchMedia('(max-width: 620px), (max-height: 500px)'), UPRIGHT = window.matchMedia('(max-width: 620px)');
+    var fold = document.createElement('button');
+    fold.type = 'button';
+    fold.className = 'place-tab pt-fold';
+    fold.setAttribute('aria-label', 'places');
+    fold.innerHTML = '<span class="pt-pic"><svg class="placeholder" viewBox="0 0 48 48" aria-hidden="true">' + PLACE_ICONS.door + '</svg></span>';
+    tabs.appendChild(fold);
+    function foldTabs(open) {
+        tabs.classList.toggle('open', open);
+        fold.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    foldTabs(false);
+    // (in the capture phase, before the house's own tab clicks: on a phone the first tap on "you are here" opens the tabs,
+    // it doesn't walk you anywhere)
+    window.addEventListener('click', function (e) {
+        if (!PHONE.matches) return;
+        var t = e.target.closest && e.target.closest('.place-tab');
+        if (t && tabs.contains(t) && (t === fold || t.classList.contains('here'))) {
+            e.preventDefault(); e.stopImmediatePropagation();
+            foldTabs(!tabs.classList.contains('open'));
+        } else if (!t || !tabs.contains(t)) {
+            foldTabs(false);
+        }
+    }, true);
+    PHONE.addEventListener && PHONE.addEventListener('change', function () { foldTabs(false); });
+
     // on narrow screens the signpost tucks mostly off the edge; a tap pulls it out
     var compact = window.matchMedia('(max-width: 1100px)');
     sign.addEventListener('click', function (e) {
-        if (compact.matches && !sign.classList.contains('open')) {
+        if (compact.matches && !PHONE.matches && !sign.classList.contains('open')) {     // (on a phone it's all showing: sky.css)
             e.preventDefault();
             sign.classList.add('open');
         }
@@ -1463,10 +1492,12 @@
         '<path d="M22 16 L38 30 L22 44" fill="none" stroke="#f3e6c2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     function underTabs() {
         var tabs = document.querySelector('.place-tabs');
+        if (tabs && tabs.classList.contains('open')) return;          // (unfolded on a phone for a moment: it'll fold back)
         document.querySelectorAll('.room-arrow[data-under-tabs]').forEach(function (a) {
             if (!tabs) return;
             var r = tabs.getBoundingClientRect(), h = a.offsetHeight || 54, top = r.bottom + 18;
             if (top + h > window.innerHeight - 12) top = r.top - h - 14;
+            if (UPRIGHT.matches) top = window.innerHeight - h - 16;          // (an upright phone: the bottom corner, the tabs are up top)
             a.style.top = Math.round(top) + 'px';
             a.style.right = '8px';
             a.style.left = 'auto';

@@ -15,7 +15,9 @@
     border-radius: 12px;
     background: rgba(26, 18, 12, .92);
     box-shadow: 0 6px 16px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(243, 230, 194, .18);
-    transform: translate(-50%, 170%);
+    /* (tucked away below the screen while the bag's empty: as far again as it's lifted, or on a phone, perched above the
+       corner buttons, an empty hotbar sat right on "leave a message") */
+    transform: translate(-50%, calc(170% + var(--bar-bottom, 12px)));
     transition: transform .35s cubic-bezier(.3, 1.4, .5, 1), opacity .3s;
     font-family: "IM Fell English", Georgia, serif;
 }
@@ -95,11 +97,7 @@
 .hotbar .hb-slot:hover .hb-name {
     opacity: 1;
 }
-@media (max-width: 620px) {
-    body.hotbar-on .place-tabs {
-        bottom: calc(var(--bar-bottom, 12px) + 62px);
-    }
-}
+/* (the place tabs used to be lifted above the hotbar here, on phones: they're at the top now, sky.css) */
 @media (max-width: 620px) {
     .hotbar {
         gap: 2px;

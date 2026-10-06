@@ -789,3 +789,27 @@ body.evil-waiting .turntable .tt-hint {
     color: #ffb8a4;
     text-shadow: 0 0 8px rgba(200, 0, 0, .8), 0 1px 3px rgba(0, 0, 0, .8);
 }
+/* a phone held sideways (5 Oct): the record player smaller all round, so the crate's records show under it too (they
+   were below the bottom of the screen) */
+@media (max-height: 500px) and (min-width: 621px) {
+    .records {
+        max-height: 96vh;
+        padding: 12px 22px 8px;
+    }
+    .records h2 {
+        margin-bottom: 6px;
+        font-size: 1.25rem;
+    }
+    .rp-now .rp-disc {
+        width: 84px;
+        height: 84px;
+    }
+    .rp-sleeve {
+        width: 96px;
+        height: 96px;
+        margin-right: -46px;
+    }
+    .rp-sleeves {
+        padding: 16px 70px 16px 8px;
+    }
+}

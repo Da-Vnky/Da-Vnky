@@ -23,7 +23,7 @@
         @media (max-width: 620px) { .city-char { bottom: calc(max(17vh, 110px) * .45 - 2px); height: 14vh; min-height: 70px; } }
         /* the revolver, lying on the roof (sky/revolver.js). your own: assets/city/revolver */
         .revolver-pickup { position: fixed; z-index: 3; left: 58vw; bottom: calc(max(20vh, 130px) * .45 - 1px); width: 3.6vw; min-width: 44px; aspect-ratio: 100 / 60; transition: opacity .4s; }
-        @media (max-width: 620px) { .revolver-pickup { left: 22vw; bottom: calc(max(17vh, 110px) * .45 - 1px); width: 10vw; min-width: 0; } }
+        @media (max-width: 620px) { .revolver-pickup { left: 16vw; bottom: calc(max(17vh, 110px) * .45 - 1px); width: 10vw; min-width: 0; } }
         body.peep-view .revolver-pickup, body.peep-close .revolver-pickup, body.sky-view .revolver-pickup, body.leaving .revolver-pickup { opacity: 0; pointer-events: none; }
         /* the telescope on its tripod, standing just left of the traveller (sky/peeper.js). your own: assets/city/telescope */
         .roof-telescope { position: fixed; z-index: 3; right: calc(16vw + max(17vh, 90px) * .55); bottom: calc(max(20vh, 130px) * .45 - 2px); height: 16vh; min-height: 84px;
@@ -34,7 +34,7 @@
             color: #f3e6c2; text-shadow: 0 1px 3px rgba(0,0,0,.8); opacity: 0; transition: opacity .2s; pointer-events: none; }
         .roof-telescope:hover .rt-hint, .roof-telescope:focus-visible .rt-hint { opacity: 1; }
         body.peep-view .roof-telescope, body.peep-close .roof-telescope, body.sky-view .roof-telescope, body.leaving .roof-telescope { opacity: 0; pointer-events: none; }
-        @media (max-width: 620px) { .roof-telescope { right: calc(16vw + max(14vh, 70px) * .55); bottom: calc(max(17vh, 110px) * .45 - 2px); height: 13vh; min-height: 66px; } }
+        @media (max-width: 620px) { .roof-telescope { right: calc(16vw + max(14vh, 70px) * .55 + 4px); bottom: calc(max(17vh, 110px) * .45 - 2px); height: 11vh; min-height: 66px; } }
     </style>
     <!-- each piece's look (sky/css/), in the same order as its script below -->
     <link rel="stylesheet" href="sky/css/eye.css?v=71477317">

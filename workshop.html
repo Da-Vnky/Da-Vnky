@@ -76,15 +76,19 @@
             .bench { height: 24vh; }
             .groove.manikin { left: 42%; bottom: calc(24vh * .818 - 2px); height: 9vh; }
             .groove.metronome { display: none; }
-            .room .character { left: 73% !important; height: var(--traveller-h) !important; }
-            .easel { left: 8%; height: 38vh; }
-            .portfolio { left: auto; right: 4%; height: 11vh; }
-            .paint-easel { left: 41%; height: 27vh; z-index: 4; }
+            /* (5 Oct: four things on a narrow floor. the traveller stands behind the paint easel, as if painting (at 73% they were
+               half off the screen); the portfolio leans on your easel (on the right it was under the arrow) */
+            .room .character { left: 58% !important; height: var(--traveller-h) !important; }
+            .easel { left: 2%; height: 35vh; }
+            .portfolio { left: 30%; height: 9vh; }
+            .paint-easel { left: 54%; height: 21vh; }
+            .room .paint-easel { z-index: 3; }                 /* (.room: .room .furnish's z-index 2 outranks a plain .paint-easel) */
+            .room .portfolio, .room .marker-pickup { z-index: 4; }
             .gallery-frame, .model-shelf { display: none; }
             .room .model-shelf { display: none; }
-            .pomodoro { left: 70%; bottom: calc(24vh * .818 - 4px); width: 8vw; min-width: 0; }
-            .notes-board { left: 79%; top: 13%; width: 17%; }
-            .marker-pickup { left: calc(8% + 38vh * .62 + 8px); bottom: 1.2vh; width: 9vw; min-width: 0; }
+            .pomodoro { left: auto; right: 3%; bottom: calc(24vh * .818 - 4px); width: 8vw; min-width: 0; }     /* (at the bench's end: at 70% the paint easel hid it) */
+            .notes-board { left: 78%; top: 22.5%; width: 17%; }     /* (under the place tab, 5 Oct) */
+            .marker-pickup { left: 3%; bottom: 1.2vh; width: 9vw; min-width: 0; }
         }
     </style>
     <!-- each piece's look (sky/css/), in the same order as its script below -->

@@ -321,3 +321,12 @@ body.tossing .bottle-hint {
         padding: 6px 9px;
     }
 }
+/* a phone held sideways (5 Oct): a shorter sheet, so "never mind" and "roll it up & bottle it" fit under it */
+@media (max-height: 500px) and (min-width: 621px) {
+    .post {
+        padding: 8px 16px;
+    }
+    .note {
+        height: calc(100vh - 170px);
+    }
+}

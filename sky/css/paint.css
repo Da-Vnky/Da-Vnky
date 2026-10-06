@@ -314,3 +314,31 @@
         max-height: none;
     }
 }
+/* a phone held sideways (5 Oct): side by side again (the stacked layout above is for tall, narrow screens: sideways it left
+   a thin canvas cut off at the bottom), the canvas as tall as what's left under the heading */
+@media (max-height: 500px) and (min-width: 621px) {
+    .pt {
+        grid-template-columns: auto auto 220px;
+        justify-items: stretch;
+        gap: 10px;
+    }
+    .pt-tools {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        max-height: calc(100vh - 118px);
+        overflow-y: auto;
+    }
+    .pt-tools .sep {
+        width: auto;
+        height: 1px;
+        margin: 3px 4px;
+    }
+    .pt-stage {
+        height: calc(100vh - 118px);
+        width: auto;
+    }
+    .pt-side {
+        width: auto;
+        max-height: calc(100vh - 118px);
+    }
+}
