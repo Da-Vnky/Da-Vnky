@@ -14,6 +14,10 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+
+== published ==
+
+2026-10-05 20:10 · V
 - Fixed the smoke test (tools/smoke.py): it never really opened the bathroom, hallway, kitchen, porch, garden, attic or dungeon. Going from living.html to living.html#attic only changes the #, so the page wasn't opened again and it checked the living room seven times. It opens a blank page in between now, so each room is a real fresh visit (all eight resets checked: clean). It also no longer prints 'connection reset' tracebacks when a page is left mid-download.
 - CLAUDE.md: removed the old line saying to bump the ?v= by hand (publishing stamps it now).
 - Python's compiled copies of the tools (__pycache__ folders) are ignored now, so they never get published.
@@ -26,8 +30,6 @@ How it works
 - The front of the house (every screen): the stars are behind the house now, in its sky, never in front of its walls or door.
 - Fixed (every screen): the kitchen's 'you are here' tab went pale with pale writing when the pointer was on it.
 - New: tools/phones.py, the phone check. It opens every place on a phone-sized screen, upright and sideways (--sizes all: small and big phones too), and lists anything you can tap that's off the screen or covered, and by what. Run it after moving things about. The site's own rules for phones are in CLAUDE.md, 'Phones'.
-
-== published ==
 
 2026-10-05 15:31 · V
 - New, for while Victor tries Claude's cloud sessions (until 4 Nov): tools\github-upload.bat puts a copy of the site on GitHub, and tools\github-publish.bat brings the changes he's approved there into his folder, publishes them to Forgejo like publish.bat, and keeps GitHub up to date. publish.bat and pull.bat are unchanged; delete the four github-* tools when he's done with it.
