@@ -86,6 +86,27 @@
 .forget-white.on .fw-caption {
     opacity: 1;
 }
+/* the phrase the reset's death leaves them with (5 Oct): darker, under the caption, coming up a moment after it */
+.forget-white .fw-phrase {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: calc(12% + 3.4rem);
+    text-align: center;
+    font: italic 1.9rem/1.3 "IM Fell English", Georgia, serif;
+    color: #2e2a26;
+    letter-spacing: .01em;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 1.6s ease-in 2.4s, transform 1.6s ease-out 2.4s;
+}
+.forget-white.on .fw-phrase {
+    opacity: 1;
+    transform: none;
+}
+@media (max-width: 620px) {
+    .forget-white .fw-phrase { font-size: 1.45rem; }
+}
 .stay-sure {
     margin-top: 6px;
 }

@@ -27,7 +27,10 @@
     if (!Sky || Sky.lives) return;
     var MAX = 1;                                        // one heart: each reset has one death
     var body = document.body, S = window.davSave;
-    var ALWAYS = !!S && S.reset >= 2;                   // from reset 2: the hearts are always there, and locked till the key
+    var ALWAYS = !!S && S.reset >= 2 && S.reset < 8;    // from reset 2: the hearts are always there, and locked till the key
+    // (reset 8: no heart at all. there's nothing left to kill there: its way on is knowing, sky/gnosis.js)
+    if (S && S.reset >= 8) { Sky.lives = { left: 1, shown: false, unlocked: false, jammed: false, last: false, locked: false, counts: false,
+        unlock: function () {}, refuse: function () { return false; }, final: function () {}, give: function () {} }; return; }
     // what the traveller says trying a way to die before the key's found (from reset 2)
     var NOT_YET = {
         revolver:    'My finger won’t pull the trigger. Not yet. Something here is still hidden.',

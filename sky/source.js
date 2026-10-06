@@ -6,8 +6,8 @@
    name it has in the source (the slot it's drawn from: living/turntable,
    characters/city …), the way the world looks to whoever wrote it.
 
-   what happens at the end of reset 8 isn't decided yet: its way out is still
-   the placeholder bubble on the sea (sky/state.js, DEATHS.r8).
+   the end of reset 8 (the serpent, the Demiurge, the choice): sky/gnosis.js.
+   once the Demiurge is blind, sky/gnosis.js lifts the grey (Sky.source.lift).
 
    its look: sky/css/source.css (the grey is one see-through veil over
    everything, so nothing underneath needs to know)
@@ -17,7 +17,7 @@
     var Sky = window.Sky, S = window.davSave;
     if (!Sky || !S || Sky.source) return;
     var body = document.body;
-    if (S.reset !== 8) { Sky.source = {}; return; }
+    if (S.reset !== 8 || S.free) { Sky.source = {}; return; }        // (stayed, at the end: the world in its colours again)
 
     // the grey: over everything, takes no clicks
     var veil = document.createElement('div');
@@ -38,7 +38,7 @@
     }
 
     // every thing, with its name (the slot it's drawn from) on it
-    var SKIP = '.cp, .place-tabs, .hotbar, .lives, .signpost, .peep-ui, .pomo-panel, .records, .post, .studio, .mc-say, .source-veil, .moonlight';
+    var SKIP = '.cp, .place-tabs, .hotbar, .lives, .signpost, .peep-ui, .pomo-panel, .records, .post, .studio, .mc-say, .source-veil, .moonlight, .demiurge, .dm-dark, .gn-answers, .gn-door, .gn-choice, .gnosis';
     function nameOf(el) {
         var n = (el.dataset.asset || '').split('|')[0].replace(/^assets\//, '');
         return n ? '<' + n + '>' : '';
@@ -63,5 +63,10 @@
     setInterval(tagAll, 4000);                                  // (things that turn up later: a room sliding in, a bottle)
     document.documentElement.classList.add('source-view');
 
-    Sky.source = { tag: tagAll };
+    // the Demiurge gone blind (sky/gnosis.js): the code stops, the grey fades off, the names go
+    function lift() {
+        document.documentElement.classList.add('source-lifting');
+        setTimeout(function () { veil.remove(); document.querySelectorAll('.src-tag').forEach(function (t) { t.remove(); }); document.documentElement.classList.remove('source-view'); }, 5200);
+    }
+    Sky.source = { tag: tagAll, lift: lift };
 })();

@@ -448,7 +448,7 @@
      ]
     },
     {
-     "name": "resets 5 to 8: the world coming apart (sky/veil.js, watchers.js, loop.js, source.js)",
+     "name": "resets 5 to 8: the world coming apart, and the end (sky/veil.js, watchers.js, loop.js, source.js, gnosis.js)",
      "slots": [
       {
        "slot": "assets/sky/cracks",
@@ -460,6 +460,23 @@
        "slot": "assets/ui/watcher-eye",
        "what": "reset 6 and 7: an eye that opens in the walls of the house and the workshop, looking straight out (the page opens, blinks and shuts it). the drawn one also follows the pointer",
        "size": "120 x 64, see-through"
+      },
+      {
+       "slot": "assets/sky/demiurge",
+       "what": "reset 8, the end: the Demiurge come down over the sea, a lion-faced eye with a mane of fire (the page cracks it seven times, films it white and fades it away; the drawn one's pupil follows the traveller)",
+       "size": "800 x 800, see-through round it"
+      },
+      {
+       "slot": "assets/ui/gnosis",
+       "what": "reset 8: behind the remembering, when the pie's eaten (the seven phrases come up over it in gold). dark and quiet",
+       "size": "1920 x 1080",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/beyond",
+       "what": "beyond.html, the end for those who went home: deep space, still (stars are drawn over it)",
+       "size": "1920 x 1080",
+       "optional": true
       }
      ]
     },
@@ -2544,6 +2561,11 @@
        "slot": "assets/sounds/hell",
        "what": "below, in reset 4 (sky/hell.js): the music down there, looped, ambient and scary",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/beyond",
+       "what": "beyond.html: still, silent, whooshing space, looped (no music in it: the reprise comes over it)",
+       "kind": "sound"
       }
      ]
     },
@@ -3017,6 +3039,41 @@
       {
        "slot": "assets/sounds/crumble",
        "what": "reset 7: the traveller coming apart into sand",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/eat",
+       "what": "reset 8: a bite of the apple pie",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/gnosis",
+       "what": "reset 8: each phrase remembered (played louder on the last one)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/demiurge-voice",
+       "what": "reset 8: the Demiurge's voice under its words (a short blip, played as it types)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/demiurge-hurt",
+       "what": "reset 8: a phrase lands and the Demiurge cracks",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/demiurge-blind",
+       "what": "reset 8: \"you are blind\": the Demiurge's eye goes white",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/door-open",
+       "what": "reset 8: the door of light opening over the sea (and stepping through it)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/reprise",
+       "what": "beyond.html: the music of resets 1 and 2 a last time, far away (played once, 14 s in). without it the page plays your ambient-bright then ambient, far off, or a drawn one",
        "kind": "sound"
       }
      ]

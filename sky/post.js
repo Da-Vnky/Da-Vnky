@@ -181,6 +181,7 @@
     function close() {
         document.body.classList.remove('post-open');
         btn.focus({ preventScroll: true });
+        if (POSTING && !post.classList.contains('sending')) home(200);       // (never mind: back out there. see below)
     }
     function reset() {
         text.value = ''; from.value = ''; strokes = []; pic = null;
@@ -190,6 +191,14 @@
     }
     btn.addEventListener('click', open);
     post.querySelector('.no').addEventListener('click', close);
+
+    // gone home (the end, reset 8) and come back only to leave a message (sky/state.js davSave.posting): the desk's out
+    // straight away, and once it's thrown, or they change their mind, back out there (beyond.html)
+    var POSTING = !!(window.davSave && window.davSave.posting);
+    function home(ms) { setTimeout(function () { document.body.classList.add('posting-gone'); setTimeout(function () { location.replace('beyond.html'); }, 1600); }, ms); }
+    if (POSTING) {
+        setTimeout(function () { open(); if (!document.body.classList.contains('post-open')) home(4500); }, 900);   // (one a while ago: the note says when)
+    }
     post.addEventListener('pointerdown', function (e) { if (e.target === post) close(); });
     Sky.escape(function () { return document.body.classList.contains('post-open'); }, close);
     window.addEventListener('resize', function () { if (document.body.classList.contains('post-open')) fitCanvas(); });
@@ -364,6 +373,7 @@
                 toast(how === 'sent' ? 'your bottle is out to sea. if it washes up, you\'ll find it in the living space.'
                     : how === 'failed' ? 'your bottle drifts off… but it couldn\'t reach anyone just now. try again a little later?'
                     : 'your bottle drifts out to sea… (the post office here isn\'t open yet, so it won\'t reach anyone)', 7000);
+                if (POSTING) home(5000);
             });
         };
     }

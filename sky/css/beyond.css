@@ -1,0 +1,70 @@
+/* =====================================================================
+   beyond.css — the look of sky/beyond.js: beyond.html, the end for those who went home.
+   ===================================================================== */
+
+html, body { margin: 0; height: 100%; overflow: hidden; background: #020205; }
+body.beyond-page { font-family: "IM Fell English", Georgia, serif; color: #e9e4f2; user-select: none; -webkit-user-select: none; }
+.by-space {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 40%, rgba(40, 30, 70, .35), transparent 60%),
+                radial-gradient(ellipse at 75% 70%, rgba(20, 40, 60, .3), transparent 55%), #020205;
+    background-size: cover;
+    background-position: center;
+}
+.by-space.has-art { opacity: .85; }
+.by-stars { position: fixed; inset: 0; display: block; }
+.by-listen {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 6vh;
+    margin: 0;
+    text-align: center;
+    font-style: italic;
+    font-size: .95rem;
+    color: rgba(233, 228, 242, .45);
+    transition: opacity 3s;
+}
+body.listening .by-listen { opacity: 0; }
+/* the way back: low, quiet, waiting */
+.by-sophia {
+    position: fixed;
+    left: 50%;
+    bottom: 14vh;
+    transform: translateX(-50%);
+    display: grid;
+    gap: 3px;
+    padding: 12px 26px;
+    border: 1px solid rgba(233, 228, 242, .3);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .03);
+    color: #f0eaf8;
+    font: italic 1.15rem "IM Fell English", Georgia, serif;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0;
+    animation: by-in 6s ease 4s forwards;
+    transition: background .4s, border-color .4s, box-shadow .4s;
+}
+.by-sophia small { font-size: .78rem; color: rgba(233, 228, 242, .55); }
+.by-sophia:hover,
+.by-sophia:focus-visible { background: rgba(255, 246, 220, .08); border-color: rgba(255, 246, 220, .7); box-shadow: 0 0 30px rgba(255, 240, 200, .18); outline: none; }
+@keyframes by-in { to { opacity: 1; } }
+body.leaving { transition: opacity 2.4s; opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .by-sophia { animation: none; opacity: 1; } }
+/* leaving a message: always there, and quiet about it */
+.by-message {
+    position: fixed;
+    right: 18px;
+    top: 14px;
+    color: rgba(233, 228, 242, .4);
+    font: italic .9rem "IM Fell English", Georgia, serif;
+    text-decoration: none;
+    opacity: 0;
+    animation: by-in 4s ease 2s forwards;
+    transition: color .4s;
+}
+.by-message:hover,
+.by-message:focus-visible { color: rgba(255, 246, 220, .9); outline: none; }
+@media (prefers-reduced-motion: reduce) { .by-message { animation: none; opacity: 1; } }

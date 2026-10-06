@@ -330,3 +330,23 @@ body.tossing .bottle-hint {
         height: calc(100vh - 170px);
     }
 }
+
+/* gone home (the end, reset 8), and back only to leave a message (sky/post.js, POSTING): just the sea and the desk, then
+   a slow fade back out to beyond.html */
+html.posting-only .signpost,
+html.posting-only .place-tabs,
+html.posting-only .ui-button:not(.post-btn),
+html.posting-only .hotbar,
+html.posting-only .bottle-hint,
+html.posting-only .bottle-wrap { display: none; }
+html.posting-only body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 2147483600;
+    background: #020205;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+html.posting-only body.posting-gone::after { opacity: 1; }

@@ -55,3 +55,8 @@ html.source-view [data-src-tagged] { outline: 1px solid rgba(255, 255, 255, .26)
 @media (prefers-reduced-motion: reduce) {
     .skybox .source-code { animation: none; }
 }
+/* the Demiurge gone blind (sky/gnosis.js): the code stops running, the grey and the names fade off, colour comes back */
+html.source-lifting .source-veil { opacity: 0; transition: opacity 5s ease-in; }
+html.source-lifting .skybox .source-code { animation-play-state: paused; opacity: 0; transition: opacity 4s; }
+html.source-lifting .src-tag { opacity: 0; transition: opacity 2s; }
+html.source-lifting [data-src-tagged] { outline-color: transparent; transition: outline-color 2s; }

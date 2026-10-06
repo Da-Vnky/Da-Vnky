@@ -182,7 +182,7 @@
     };
     function dejaVu() {
         var line = DEJA[S.reset];
-        if (!line || S.get('deja-vu') === '1') return;
+        if (!line || S.get('deja-vu') === '1' || S.ending) return;         // (and not after the end: there's no loop to remember)
         var tries = 0;
         (function when() {                                           // (after the loading screen, if there is one)
             if (document.getElementById('dav-loader')) { if (++tries < 120) setTimeout(when, 250); return; }

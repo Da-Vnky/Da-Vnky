@@ -160,6 +160,7 @@
         if (e.target.closest('.reset-key')) return;                       // (the key: sky/resets.js takes it)
         e.preventDefault(); e.stopPropagation();
         var n = S ? S.reset : 1;
+        if (n === 8 && !S.ending && Sky.gnosis && Sky.gnosis.eat) { Sky.gnosis.eat(pie); return; }     // (reset 8: eat, and know. sky/gnosis.js)
         say(keyInPie() ? 'Something’s stuck in it. Something metal.' : n < 3 ? PIE.before : n === 3 ? PIE.three : PIE.after, 2600);
     });
 

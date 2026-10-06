@@ -40,7 +40,7 @@
     var BLINK = { 4: 0.45, 5: 0.12, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0.5 };
 
     var S = window.davSave;
-    var sunOn = !(S && S.reset < FROM);                  // (the eye in the sky; Sky.eye.make() builds one anywhere, in any reset: below, sky/hell.js)
+    var sunOn = !(S && (S.reset < FROM || S.free));      // (and not once they've stayed, at the end: it's blind, and gone)                  // (the eye in the sky; Sky.eye.make() builds one anywhere, in any reset: below, sky/hell.js)
     var grown = Math.min(1, Math.max(0, ((S && S.reset) || FROM) - FROM) / STEPS), px = Math.round(START + (GROWN - START) * grown);
     var SIZE = 'min(' + px + 'px, ' + (px / 12).toFixed(1) + 'vw)';
     var sun = document.querySelector('.sun');

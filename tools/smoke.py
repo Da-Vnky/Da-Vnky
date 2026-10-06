@@ -35,6 +35,7 @@ STOPS = [
     ('the attic', 'living.html#attic'),
     ('the dungeon', 'living.html#dungeon'),
     ('the template', 'template.html'),
+    ('beyond (the end, gone home)', 'beyond.html'),
     ("mel's room", 'schizophyllu.me.room/index.html?from=dav-nky'),
     ("mel's room, through the window", 'schizophyllu.me.room/index.html?peek'),
 ]

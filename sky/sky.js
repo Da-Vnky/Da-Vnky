@@ -290,7 +290,7 @@
             one(url);
         });
     }
-    if (window.davSave && window.davSave.reset >= 4) {
+    if (window.davSave && window.davSave.reset >= 4 && !window.davSave.free) {      // (not once they've stayed: the sky is only the sky)
         paintedSky('assets/sky/skybox-hell', function (found) {
             if (found) return;
             document.documentElement.classList.add('hell-sky');           // (no hell sky painted yet: the usual one, washed red)
