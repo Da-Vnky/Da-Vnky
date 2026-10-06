@@ -40,10 +40,11 @@
     /* ---------------- the arrows sit just under the tabs (the hallway's on the left) ---------------- */
     function placeArrows() {
         var tabs = document.querySelector('.place-tabs');
-        if (!tabs) return;
+        if (!tabs || tabs.classList.contains('open')) return;          // (unfolded on a phone for a moment: it'll fold back)
         var r = tabs.getBoundingClientRect(), h = go.offsetHeight || 54;
         var top = r.bottom + 18;
         if (top + h > window.innerHeight - 12) top = r.top - h - 14;      // no room below (small screens): just above
+        if (window.matchMedia('(max-width: 620px)').matches) top = window.innerHeight - h - 16;    // (an upright phone: the bottom corners)
         go.style.top = Math.round(top) + 'px';
         go.style.right = '8px';
         var left = document.querySelector('.room-arrow.to-hall');

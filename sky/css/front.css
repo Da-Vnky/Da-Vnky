@@ -32,6 +32,18 @@ body.in-front .sky-links,
 body.in-front .sky-links * {
     visibility: visible !important;
 }
+/* the stars are behind the house, in its see-through sky, never in front of it (5 Oct: on a phone the constellations
+   landed on the front door, and a tap there opened one instead of going in). so the garden lets taps through to them
+   and only the door and the traveller take their own */
+body.has-room.in-front .sky-links {
+    z-index: 3;
+}
+.front {
+    pointer-events: none;
+}
+.front .front-door-hit {
+    pointer-events: auto;
+}
 
 /* the 1600 x 900 picture: always the full width, and at least the full height, from the bottom up */
 .front .front-stage {

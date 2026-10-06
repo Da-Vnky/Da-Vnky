@@ -292,19 +292,56 @@ a.place-tab:hover, a.place-tab:focus-visible { width: 220px; background: #f3e8cc
 .place-tab.here { width: 74px; background: #3a2716; color: #f3e6c2; box-shadow: -4px 5px 12px rgba(0, 0, 0, .38), inset 4px 0 0 #9a3b1f; }
 .place-tab.here .pt-pic { background: #eadcb9; border-radius: 50%; padding: 3px; box-sizing: border-box; }
 .place-tab.here:hover { width: 280px; }
+/* (the kitchen's tab is a link even while you're in there: it keeps the dark "you are here" look on hover, or its pale words vanish) */
+a.place-tab.here:hover, a.place-tab.here:focus-visible { background: #3a2716; }
 /* hidden while something is open over the page */
 body.sky-view .place-tabs, body.gallery-open .place-tabs, body.records-open .place-tabs, body.crate-open .place-tabs,
 body.peep-view .place-tabs, body.peep-close .place-tabs, body.art-open .place-tabs, body.visitors-open .place-tabs, body.leaving .place-tabs {
     opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .4s, visibility 0s .4s;
 }
-@media (max-width: 620px) {
-    .place-tabs { top: auto; bottom: 88px; gap: 6px; }
-    .place-tab { width: 50px; height: 46px; padding-left: 8px; }
+/* the place tabs on phones (5 Oct): folded away, so they don't cover the room. only "you are here" shows (or the door,
+   .pt-fold, on a page that isn't a place); tapped, the rest fan out from behind it with their names (sky.js, "fold") */
+.pt-fold { display: none; border: 0; font: inherit; cursor: pointer; }
+@media (max-width: 620px), (max-height: 500px) {
+    /* (top right, under the control panel's button: lower down, at furniture height, it covered the stove, the crate…) */
+    .place-tabs { top: 140px; bottom: auto; gap: 6px; }
+    .place-tab { width: 50px; height: 46px; padding-left: 8px; gap: 8px; font-size: .95rem; }
     .place-tab .pt-pic { width: 34px; height: 34px; }
     .place-tab.here { width: 58px; }
-    a.place-tab:hover { width: 50px; }
+    a.place-tab:hover, a.place-tab:focus-visible { width: 50px; }
+    .place-tab.here:hover { width: 58px; }
     .place-tab .pt-name { display: none; }
+    .place-tabs:not(:has(.here)) .pt-fold { display: flex; }
+    /* "you are here" (or the door) stays where it is, at the top; the others come out below it */
+    .place-tab.here, .pt-fold { order: -1; cursor: pointer; }
+    .place-tabs:not(.open) .place-tab:not(.here):not(.pt-fold) { display: none; }
+    .place-tabs.open .place-tab:not(.here):not(.pt-fold) { width: max-content; min-width: 172px; animation: pt-fan .28s cubic-bezier(.3, .7, .3, 1) both; }
+    .place-tabs.open .place-tab .pt-name { display: block; opacity: 1; }
+    .place-tabs.open .place-tab.here { width: max-content; min-width: 180px; }
+    .place-tabs.open .place-tab:nth-child(2) { animation-delay: .04s; }
+    .place-tabs.open .place-tab:nth-child(3) { animation-delay: .08s; }
+    .place-tabs.open .place-tab:nth-child(4) { animation-delay: .12s; }
+    .place-tabs.open .place-tab:nth-child(5) { animation-delay: .16s; }
 }
+/* held sideways: a little higher, so they all fit when they're out */
+@media (max-height: 500px) and (min-width: 621px) {
+    .place-tabs { top: 92px; }
+}
+/* the homepage's signpost on phones: short planks, all of them showing (it used to peek in from the edge, its words cut
+   off, until tapped; with two short signs they fit). and the constellations: only their names take a tap, so the stars
+   drawn over a window, a book or a door don't swallow taps meant for the room */
+@media (max-width: 620px), (max-height: 500px) {
+    body .signpost { width: 158px; transform: none; cursor: auto; }      /* (body: over the "peeks in" rule further down) */
+    body .signpost .plank { width: 150px; padding: 0 30px 0 18px; font-size: 1.05rem; --nail: radial-gradient(circle at 117px 50%, #2a1a0e 0 2.2px, #b08a60 2.7px 3.3px, transparent 3.9px); }
+    body .signpost .plank.here { --nail: none; }
+    .sky-links.live .sky-link { pointer-events: none; }
+    .sky-links.live .sky-link .sl-name, .sky-links.live .sky-link .sl-note { pointer-events: auto; }
+    /* (and seen through a window indoors, just to look at: in a phone's small window they crowded what stands on the sill,
+       the books, the workshop's hidden key. outside, on the sea, the rooftop, the porch, they're there to tap as ever) */
+    body.has-room:not(.is-outside):not(.in-porch):not(.in-front) .sky-links.live .sky-link * { pointer-events: none; }
+}
+@keyframes pt-fan { from { transform: translateX(100%); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .place-tabs.open .place-tab { animation: none !important; } }
 
 /* ================= the signpost: wooden arrow planks ================= */
 .signpost {
@@ -760,9 +797,17 @@ body.scope-view .sky-link.l7 { left: calc(50% - 70px);  right: auto; top: 76vh; 
 :root {
     --traveller-h: calc(60vh - 11px);
 }
+/* (a phone held sideways, 5 Oct: a little shorter, the screen being so short: they stood in front of the dungeon's pictures) */
+@media (max-height: 500px) and (min-width: 621px) {
+    :root {
+        --traveller-h: calc(52vh - 11px);
+    }
+}
 @media (max-width: 620px) {
     :root {
-        --traveller-h: calc(44vh - 11px);
+        /* (5 Oct: and no taller than 70% of the screen's width: on an upright phone 44vh made them as tall as the screen is
+           wide, standing in front of the pinboard, the oven, the sink, everything) */
+        --traveller-h: calc(min(44vh, 70vw) - 11px);
     }
 }
 .character {

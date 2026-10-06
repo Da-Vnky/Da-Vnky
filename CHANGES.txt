@@ -14,6 +14,18 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Fixed the smoke test (tools/smoke.py): it never really opened the bathroom, hallway, kitchen, porch, garden, attic or dungeon. Going from living.html to living.html#attic only changes the #, so the page wasn't opened again and it checked the living room seven times. It opens a blank page in between now, so each room is a real fresh visit (all eight resets checked: clean). It also no longer prints 'connection reset' tracebacks when a page is left mid-download.
+- CLAUDE.md: removed the old line saying to bump the ?v= by hand (publishing stamps it now).
+- Python's compiled copies of the tools (__pycache__ folders) are ignored now, so they never get published.
+- Phones: the place tabs fold away into one tab (the dark 'you are here' one, or a little door) that fans the others out when you tap it. Held upright it sits top right under the control panel's button; sideways, a little lower. Before, the column of tabs covered the right side of every room (the stove, the arrows, the record player's corner).
+- Phones held upright: the traveller is sized by the screen's width as well as its height (they were as tall as the screen is wide), and the rooms are laid out again so nothing is hidden: the living room's record player stands on the window sill beside the radio, the window's a little higher so the pinboard, the letters and the revolver rack hang above the traveller's head, and the bottle crate is no longer under the arrow; in the workshop the traveller stands at the paint easel, the portfolio leans on your easel and the timer is at the end of the bench; the kitchen's fridge, counter and stove stand side by side and the traveller waits by the fridge; on the rooftop the roof door, telescope and revolver are spaced out (the telescope stood in front of the door).
+- Phones held sideways get phone layouts now too (before, only narrow screens did): the folded tabs, a slightly shorter traveller, the kitchen's traveller waits past the stove, the painting desk is side by side again (it was a thin canvas cut off at the bottom), the record player is smaller so the crate's records show under it, and the message-in-a-bottle form fits with its buttons.
+- Homepage on phones: the signpost's two signs show in full ('the sea', 'visit home'); they used to peek in from the edge, cut off, until tapped.
+- Fixed: on a phone, an empty hotbar peeked up over 'leave a message' on the sea.
+- Constellations on phones: only their names take a tap, and seen through a window indoors they're just to look at; they were swallowing taps meant for the secret book on the sill, the workshop's hidden key and the front door. Outside (the sea, the rooftop, the porch, the garden) they work as ever.
+- The front of the house (every screen): the stars are behind the house now, in its sky, never in front of its walls or door.
+- Fixed (every screen): the kitchen's 'you are here' tab went pale with pale writing when the pointer was on it.
+- New: tools/phones.py, the phone check. It opens every place on a phone-sized screen, upright and sideways (--sizes all: small and big phones too), and lists anything you can tap that's off the screen or covered, and by what. Run it after moving things about. The site's own rules for phones are in CLAUDE.md, 'Phones'.
 
 == published ==
 

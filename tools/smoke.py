@@ -85,11 +85,18 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
         pass
 
 
+class Server(http.server.ThreadingHTTPServer):
+    # leaving a page cuts off its big sounds half-downloaded: the browser hanging up is fine, not worth a traceback
+    def handle_error(self, request, client_address):
+        if not isinstance(sys.exc_info()[1], (ConnectionResetError, BrokenPipeError)):
+            super().handle_error(request, client_address)
+
+
 def serve():
     with socket.socket() as s:                              # a free port
         s.bind(('127.0.0.1', 0))
         port = s.getsockname()[1]
-    server = http.server.ThreadingHTTPServer(('127.0.0.1', port), Quiet)
+    server = Server(('127.0.0.1', port), Quiet)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     return server, 'http://127.0.0.1:%d/' % port
 
@@ -124,6 +131,9 @@ def visit(page, base, url, trouble):
     for ev, fn in handlers:
         page.on(ev, fn)
     try:
+        # a blank page first: from living.html, going to living.html#attic is only a change of the #, the page
+        # isn't opened again, and the test would look at the living room seven times (it did, till 5 Oct)
+        page.goto('about:blank')
         page.goto(base + url, wait_until='load', timeout=30000)
         try:                                            # till the pictures and sounds have come in (the big ones take a moment)
             page.wait_for_load_state('networkidle', timeout=20000)

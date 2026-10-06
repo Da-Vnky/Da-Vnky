@@ -216,7 +216,7 @@ body.peep-settling .ground-city .mel-leak {
 }
 @media (max-width: 620px) {
     .city-roof .roof-door {
-        left: 38%;
+        left: 26%;              /* (5 Oct: at 38% the telescope stood in front of it) */
         height: 50%;
     }
 }
