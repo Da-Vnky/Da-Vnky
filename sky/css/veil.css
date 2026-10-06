@@ -50,11 +50,12 @@ html[data-reset="7"] .sky-cracks .cr-line path { stroke: rgba(10, 8, 6, .62); st
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
-.wall-peel > div {
+.wall-peel > div:not(.reset-key) {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    pointer-events: none;           /* (the box takes the tap; the strip hanging out of it mustn't cover the radio, upright) */
 }
 .wall-peel > div > svg,
 .wall-peel > div > .art { display: block; width: 100%; height: auto; }
