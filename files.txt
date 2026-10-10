@@ -1,14 +1,14 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1480 2443217089
-city.html 9866 2806361212
-index.html 5085 1014763704
-living.html 130101 1942252704
-window-sky.html 1332 2200738030
-workshop.html 22101 4052855872
+beyond.html 1480 3318139844
+city.html 9866 1416001155
+index.html 5085 2966396007
+living.html 130101 2110192413
+window-sky.html 1332 1653146555
+workshop.html 22101 2636903628
 sky/ambient.js 5339 303504477
 sky/attic.js 33962 1402084230
 sky/bathroom.js 26842 2781763935
-sky/beyond.js 12104 2967370610
+sky/beyond.js 11151 2864391733
 sky/books.js 13679 1574652656
 sky/claubes.js 52340 1339963452
 sky/crate.js 37005 2991220362
@@ -89,6 +89,7 @@ sky/css/loop.css 2425 3557017369
 sky/css/loot.css 2076 1327473539
 sky/css/marker.css 1560 330353198
 sky/css/mel-inventory.css 382 131326107
+sky/css/mel-room.css 704 4171109163
 sky/css/mel-window.css 2273 1631485753
 sky/css/models.css 3444 1051530511
 sky/css/moonlight.css 2609 1970338388
@@ -119,7 +120,7 @@ assets/fonts/list.txt 117 55339362
 assets/hell/list.txt 117 55339362
 assets/items/list.txt 117 55339362
 assets/living/list.txt 136 2848213636
-assets/mel-room/list.txt 169 2390302921
+assets/mel-room/list.txt 186 3580667872
 assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
 assets/sea/list.txt 117 55339362
@@ -166,6 +167,6 @@ schizophyllu.me.room/room/music.js 4978 3071417838
 schizophyllu.me.room/room/narration.js 14420 3403870155
 schizophyllu.me.room/room/radio.js 6517 830110350
 schizophyllu.me.room/room/room.css 24479 2584604817
-schizophyllu.me.room/room/room.js 92768 4051674282
+schizophyllu.me.room/room/room.js 94067 4053707707
 schizophyllu.me.room/room/script.js 47501 3643087694
 schizophyllu.me.room/assets/playlist/playlist.json 677 2065717457

@@ -8,7 +8,7 @@ workshop.html 22101
 sky/ambient.js 5339
 sky/attic.js 33962
 sky/bathroom.js 26842
-sky/beyond.js 12104
+sky/beyond.js 11151
 sky/books.js 13679
 sky/claubes.js 52340
 sky/crate.js 37005
@@ -89,6 +89,7 @@ sky/css/loop.css 2425
 sky/css/loot.css 2076
 sky/css/marker.css 1560
 sky/css/mel-inventory.css 382
+sky/css/mel-room.css 704
 sky/css/mel-window.css 2273
 sky/css/models.css 3444
 sky/css/moonlight.css 2609
@@ -119,7 +120,7 @@ assets/fonts/list.txt 117
 assets/hell/list.txt 117
 assets/items/list.txt 117
 assets/living/list.txt 136
-assets/mel-room/list.txt 169
+assets/mel-room/list.txt 186
 assets/resets/index.txt 77
 assets/resets/list.txt 127
 assets/sea/list.txt 117
@@ -166,6 +167,6 @@ schizophyllu.me.room/room/music.js 4978
 schizophyllu.me.room/room/narration.js 14420
 schizophyllu.me.room/room/radio.js 6517
 schizophyllu.me.room/room/room.css 24479
-schizophyllu.me.room/room/room.js 92768
+schizophyllu.me.room/room/room.js 94067
 schizophyllu.me.room/room/script.js 47501
 schizophyllu.me.room/assets/playlist/playlist.json 677

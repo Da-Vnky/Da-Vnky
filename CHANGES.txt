@@ -14,10 +14,12 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- The go-home screen (beyond.html) no longer has its whooshing wind (too loud): it's silent until the reprise of the reset 1 and 2 music, which now comes in 6 seconds after the first tap instead of 14. Your own space sound (assets/sounds/beyond) would still play, softly, if you add one.
-- Mel's room: a new slot for Claube's pen (asset manager, Mel's room, main room: main-claube-pen). A moving picture (animated WebP or GIF) the same size as your Claube picture, the pen and his writing hand drawn where they sit on him. It's laid over your Claube and shows only while he's writing in the scenes and conversations ('writes it down'). It's only used with your own Claube; Mel's drawing has its own pen. Integration edits in Mel's folder: room/room.js, one marked line at the end of inlineArt (davPen) and davPen/davSheet in the DaV-nky part at the end; the look is DaV-nky's new sky/css/mel-room.css.
 
 == published ==
+
+2026-10-09 19:58 · V
+- The go-home screen (beyond.html) no longer has its whooshing wind (too loud): it's silent until the reprise of the reset 1 and 2 music, which now comes in 6 seconds after the first tap instead of 14. Your own space sound (assets/sounds/beyond) would still play, softly, if you add one.
+- Mel's room: a new slot for Claube's pen (asset manager, Mel's room, main room: main-claube-pen). A moving picture (animated WebP or GIF) the same size as your Claube picture, the pen and his writing hand drawn where they sit on him. It's laid over your Claube and shows only while he's writing in the scenes and conversations ('writes it down'). It's only used with your own Claube; Mel's drawing has its own pen. Integration edits in Mel's folder: room/room.js, one marked line at the end of inlineArt (davPen) and davPen/davSheet in the DaV-nky part at the end; the look is DaV-nky's new sky/css/mel-room.css.
 
 2026-10-06 01:19 · V
 - Resets 5, 6 and 7 are real now, each uncovering a little more of what the world is (the placeholder skull bubbles for them are gone). From reset 5 the painted sky cracks, a little more each reset.

@@ -1,5 +1,6 @@
 # written by tools/update-lists.sh: every art file in this folder.
 # no need to edit it; it's rewritten each commit.
 bedroom-bwindow.png
+main-claube.webp
 main-mira.webp
 main-window.webp
