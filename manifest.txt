@@ -120,7 +120,7 @@ assets/fonts/list.txt 117
 assets/hell/list.txt 117
 assets/items/list.txt 117
 assets/living/list.txt 136
-assets/mel-room/list.txt 186
+assets/mel-room/list.txt 207
 assets/resets/index.txt 77
 assets/resets/list.txt 127
 assets/sea/list.txt 117
