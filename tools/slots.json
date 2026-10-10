@@ -3339,6 +3339,14 @@
        "crop": "1272 363 265 405"
       },
       {
+       "slot": "assets/mel-room/main-claube-pen",
+       "what": "Claube's pen: a moving picture (an animated WebP or GIF) of his pen, and the hand writing with it, laid right over your Claube (main-claube) and shown only while he's writing in the scenes and conversations. same canvas as your Claube, drawn exactly where it sits on him. used only with your own Claube (Mel's drawing has its own pen)",
+       "size": "1600 x 900 (or 3200 x 1800): the whole room, see-through, the same canvas as main-claube",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/main/claube.svg",
+       "crop": "1380 550 80 70"
+      },
+      {
        "slot": "assets/mel-room/main-clipboards",
        "what": "clipboards 1, 2 and 4",
        "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",

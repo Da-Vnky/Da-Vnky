@@ -1133,6 +1133,7 @@ async function inlineArt(root) {
     } catch (e) {
       console.warn(`couldn't load ${ph.dataset.art}:`, e);
     }
+    davPen(ph, mine, pic);                              // (DaV-nky: Claube's pen, on top of Victor's Claube. see the end)
   }));
 }
 
@@ -1820,6 +1821,30 @@ function davImage(url) {
 }
 // under a picture of Victor's: Mel's own drawing of the thing, invisible, so only the thing itself (in its own shape)
 // is hovered and clicked, not the whole room-sized picture
+// Claube's pen (10 Oct, Victor): assets/mel-room/main-claube-pen, a moving picture the size of the whole room (the pen
+// and his writing hand, see-through everywhere else), laid over Victor's own Claube (main-claube) and shown only while
+// he's writing (#claube.writing: the scenes and the speech bubbles switch it on and off). only with Victor's Claube:
+// Mel's drawing has its own pen. its look: ../sky/css/mel-room.css
+function davPen(ph, files, pic) {
+  if (!pic || ph.id !== 'claube') return;
+  const pen = davPick(files, 'main-claube-pen');
+  if (!pen) return;
+  davSheet('mel-room');
+  ph.classList.add('dav-has-pen');
+  const im = davImage(pen.url);
+  im.classList.add('dav-pen');
+  im.dataset.slot = 'assets/mel-room/main-claube-pen';
+  ph.append(im);
+}
+// one of DaV-nky's stylesheets for the room (sky/css/<name>.css), linked once
+function davSheet(name) {
+  if (document.querySelector(`link[data-dav-sheet="${name}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.dataset.davSheet = name;
+  link.href = new URL(`../sky/css/${name}.css`, location.href).href;
+  document.head.append(link);
+}
 function davHit(ph) {
   const g = document.createElementNS(SVG_NS, 'g');
   g.setAttribute('opacity', '0');

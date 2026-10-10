@@ -4,11 +4,11 @@
    comes here (sky/state.js, localStorage "dav-ending" = "escaped"), till they
    take the Sophia path back, or "forget their stay" (clear the site's data).
 
-     space         nothing but space: still, dark, the faintest stars, and the wind of
-                   it: a slow, silent whoosh that never stops.
-                   sound: assets/sounds/beyond (yours, looped); picture: assets/ui/beyond
-                   (optional, behind the stars)
-     the reprise   a while after it starts, once a visit: the music of resets 1 and 2,
+     space         nothing but space: still, dark, the faintest stars, and silence.
+                   (the drawn whoosh that used to fill it was too loud: gone, 10 Oct, Victor.)
+                   sound: assets/sounds/beyond, only if you add one (yours, looped, softly);
+                   picture: assets/ui/beyond (optional, behind the stars)
+     the reprise   a few seconds after the first tap, once a visit: the music of resets 1 and 2,
                    far away, a last time. yours: assets/sounds/reprise (played once). or
                    without it, your own reset 1 and reset 2 ambience (assets/sounds/
                    ambient-bright, then ambient), played far off. or without those, the
@@ -66,21 +66,8 @@
 
     /* ---------------- the sound ---------------- */
     var ac = null, master = null, started = false;
-    function noise(kind, secs) {
-        var b = ac.createBuffer(2, ac.sampleRate * secs, ac.sampleRate);
-        for (var c = 0; c < 2; c++) {
-            var d = b.getChannelData(c), b0 = 0, b1 = 0, b2 = 0, last = 0;
-            for (var i = 0; i < d.length; i++) {
-                var w = Math.random() * 2 - 1;
-                if (kind === 'brown') { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
-                else { b0 = 0.99765 * b0 + w * 0.099; b1 = 0.963 * b1 + w * 0.2965; b2 = 0.57 * b2 + w * 1.0527; d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.16; }
-            }
-        }
-        var src = ac.createBufferSource(); src.buffer = b; src.loop = true; src.start(); return src;
-    }
     function node(type, f, q) { var n = ac.createBiquadFilter(); n.type = type; n.frequency.value = f; if (q) n.Q.value = q; return n; }
     function amp(v) { var g = ac.createGain(); g.gain.value = v; return g; }
-    function lfo(hz, depth, param) { var o = ac.createOscillator(), g = amp(depth); o.frequency.value = hz; o.connect(g); g.connect(param); o.start(); }
     function chain() { for (var i = 0; i + 1 < arguments.length; i++) arguments[i].connect(arguments[i + 1]); return arguments[arguments.length - 1]; }
     // a long echo: far away, in a great empty place
     function echo(secs) {
@@ -90,15 +77,13 @@
     }
     function file(url, loop) { var a = new Audio(url); a.loop = !!loop; a.crossOrigin = 'anonymous'; return a; }
 
-    // the wind of space: a slow whoosh that swells and sinks and never stops
+    // the sound of space: yours if you've added one (assets/sounds/beyond), kept soft; without it, silence
     function space() {
         have('sounds', 'beyond').then(function (u) {
-            if (u) { var a = file(u, true); chain(ac.createMediaElementSource(a), amp(0.8), master); a.play().catch(function () {}); return; }
-            var bp = node('bandpass', 380, 0.5), g = amp(0.32);
-            chain(noise('pink', 7), bp, node('lowpass', 1300), g, master);
-            lfo(0.023, 230, bp.frequency);
-            lfo(0.041, 0.16, g.gain);
-            chain(noise('brown', 8), node('lowpass', 150), amp(0.22), master);
+            if (!u) return;
+            var a = file(u, true);
+            chain(ac.createMediaElementSource(a), amp(0.35), master);
+            a.play().catch(function () {});
         });
     }
     // the reprise: far off, once
@@ -175,7 +160,7 @@
         master.gain.linearRampToValueAtTime(0.8, ac.currentTime + 5);
         body.classList.add('listening');
         space();
-        setTimeout(reprise, 14000);
+        setTimeout(reprise, 6000);                                  // (no whoosh now: not so long a silence first)
     }
     ['pointerdown', 'keydown'].forEach(function (ev) { document.addEventListener(ev, start, { once: false }); });
 
