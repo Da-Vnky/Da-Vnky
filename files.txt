@@ -1,10 +1,10 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1480 3318139844
-city.html 9866 1416001155
-index.html 5085 2966396007
-living.html 130101 2110192413
-window-sky.html 1332 1653146555
-workshop.html 22101 2636903628
+beyond.html 1476 2433530411
+city.html 9813 3302134254
+index.html 5029 2012812575
+living.html 130023 3077430480
+window-sky.html 1326 1605208442
+workshop.html 22036 305544760
 sky/ambient.js 5339 303504477
 sky/attic.js 33962 1402084230
 sky/bathroom.js 26842 2781763935
@@ -89,7 +89,7 @@ sky/css/loop.css 2425 3557017369
 sky/css/loot.css 2076 1327473539
 sky/css/marker.css 1560 330353198
 sky/css/mel-inventory.css 382 131326107
-sky/css/mel-room.css 704 4171109163
+sky/css/mel-room.css 685 3925263297
 sky/css/mel-window.css 2273 1631485753
 sky/css/models.css 3444 1051530511
 sky/css/moonlight.css 2609 1970338388
@@ -167,6 +167,6 @@ schizophyllu.me.room/room/music.js 4978 3071417838
 schizophyllu.me.room/room/narration.js 14420 3403870155
 schizophyllu.me.room/room/radio.js 6517 830110350
 schizophyllu.me.room/room/room.css 24479 2584604817
-schizophyllu.me.room/room/room.js 94067 4053707707
+schizophyllu.me.room/room/room.js 95622 2394656700
 schizophyllu.me.room/room/script.js 47501 3643087694
 schizophyllu.me.room/assets/playlist/playlist.json 677 2065717457

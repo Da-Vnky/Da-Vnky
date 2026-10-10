@@ -1,10 +1,10 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
-beyond.html 1480
-city.html 9866
-index.html 5085
-living.html 130101
-window-sky.html 1332
-workshop.html 22101
+beyond.html 1476
+city.html 9813
+index.html 5029
+living.html 130023
+window-sky.html 1326
+workshop.html 22036
 sky/ambient.js 5339
 sky/attic.js 33962
 sky/bathroom.js 26842
@@ -89,7 +89,7 @@ sky/css/loop.css 2425
 sky/css/loot.css 2076
 sky/css/marker.css 1560
 sky/css/mel-inventory.css 382
-sky/css/mel-room.css 704
+sky/css/mel-room.css 685
 sky/css/mel-window.css 2273
 sky/css/models.css 3444
 sky/css/moonlight.css 2609
@@ -167,6 +167,6 @@ schizophyllu.me.room/room/music.js 4978
 schizophyllu.me.room/room/narration.js 14420
 schizophyllu.me.room/room/radio.js 6517
 schizophyllu.me.room/room/room.css 24479
-schizophyllu.me.room/room/room.js 94067
+schizophyllu.me.room/room/room.js 95622
 schizophyllu.me.room/room/script.js 47501
 schizophyllu.me.room/assets/playlist/playlist.json 677
