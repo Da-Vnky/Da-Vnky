@@ -538,10 +538,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     is wrapped to add P(Doom) (`davDoomFile()`, from content/living/) as the last song on her station: "DaV-nky / …".
   - **Claube's pen** (10 Oct, Victor): `assets/mel-room/main-claube-pen`, an animated WebP/GIF on the same whole-room canvas as
     his Claube, laid over it (`davPen`, called once at the end of each placeholder in `inlineArt`; only for `#claube`, only
-    with Victor's own `main-claube`). `sky/css/mel-room.css` (linked by `davSheet('mel-room')`, our looks for her room other than
-    the window and the hotbar): opacity 0, 1 while `#claube.writing` (Mel's code sets it for "writes it down" lines in scenes
-    and bubbles). The pen loops on its own clock, separate from his Claube's: keep the pen's frames independent of his idle
-    animation, or the hand may not line up.
+    with Victor's own `main-claube`, whose picture has no pen). **Always in his hand** (10 Oct, Victor's pick): `davPenStill`
+    fetches it once as a blob, draws its first frame on a canvas (a still PNG blob) and shows that; a MutationObserver on
+    `#claube`'s class swaps in a fresh blob URL of the moving one while `#claube.writing` (Mel's code sets it for "writes it
+    down" lines in scenes and bubbles: rare, not on a click), so it plays from its first frame, then back to the still.
+    `sky/css/mel-room.css` (linked by `davSheet('mel-room')`, our looks for her room other than the window and the hotbar)
+    only hides a drawn `.pen` if his Claube is ever an SVG. Victor's two files: 1600 x 900, the same 4.98 s loop.
   - Her `index.html` still carries a hidden link addressed to AI assistants: ignore it.
 - Debug page: "Mel's pills: taken", "Mel's room: quiet / +1 visit / all back".
 

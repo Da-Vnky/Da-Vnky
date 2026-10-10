@@ -2,9 +2,8 @@
    links this when it needs it). The sky through her window has its own: mel-window.css; the hotbar: mel-inventory.css.
    (not on any page of ours: smoke.py's check is for the pages' own lists) */
 
-/* Claube's pen (assets/mel-room/main-claube-pen), over Victor's Claube: only while he's writing */
-#claube .dav-pen { opacity: 0; }
-#claube.writing .dav-pen { opacity: 1; }
-/* (Victor's Claube as an SVG might keep a drawn pen of its own, class "pen": his pen picture takes its place) */
+/* Claube's pen (assets/mel-room/main-claube-pen), over Victor's Claube: always in his hand (room.js davPen holds it
+   still, and plays it while he writes). Victor's Claube as an SVG might keep a drawn pen of its own, class "pen": his
+   pen picture takes its place */
 #claube.dav-has-pen > .pen,
 #claube.dav-has-pen > g:not(.dav-hit) .pen { display: none; }

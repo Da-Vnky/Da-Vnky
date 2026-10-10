@@ -1821,10 +1821,10 @@ function davImage(url) {
 }
 // under a picture of Victor's: Mel's own drawing of the thing, invisible, so only the thing itself (in its own shape)
 // is hovered and clicked, not the whole room-sized picture
-// Claube's pen (10 Oct, Victor): assets/mel-room/main-claube-pen, a moving picture the size of the whole room (the pen
-// and his writing hand, see-through everywhere else), laid over Victor's own Claube (main-claube) and shown only while
-// he's writing (#claube.writing: the scenes and the speech bubbles switch it on and off). only with Victor's Claube:
-// Mel's drawing has its own pen. its look: ../sky/css/mel-room.css
+// Claube's pen (10 Oct, Victor): assets/mel-room/main-claube-pen, a moving picture the size of the whole room (the pen,
+// drawn where it sits in his hand, see-through everywhere else), laid over Victor's own Claube (main-claube). it's always
+// in his hand: held still on its first frame, and played from its start whenever he writes (#claube.writing: the scenes
+// and the speech bubbles switch it on and off), then still again. only with Victor's Claube: Mel's drawing has its own pen
 function davPen(ph, files, pic) {
   if (!pic || ph.id !== 'claube') return;
   const pen = davPick(files, 'main-claube-pen');
@@ -1835,6 +1835,36 @@ function davPen(ph, files, pic) {
   im.classList.add('dav-pen');
   im.dataset.slot = 'assets/mel-room/main-claube-pen';
   ph.append(im);
+  davPenStill(im, pen.url);
+}
+// the pen held still (a picture of its first frame), and a fresh copy of the moving one each time he starts writing, so it
+// plays from its first frame (a picture that's already moving can't be sent back to the start). until the still is made,
+// or if it can't be, the moving one just shows
+async function davPenStill(im, url) {
+  try {
+    const blob = await (await fetch(url)).blob();
+    const one = new Image();
+    one.src = URL.createObjectURL(blob);
+    await one.decode();
+    const c = document.createElement('canvas');
+    c.width = one.naturalWidth; c.height = one.naturalHeight;
+    c.getContext('2d').drawImage(one, 0, 0);                  // (a moving picture drawn on a canvas gives its first frame)
+    URL.revokeObjectURL(one.src);
+    const still = URL.createObjectURL(await new Promise(ok => c.toBlob(ok)));
+    const claube = im.closest('#claube');
+    let moving = null;
+    const show = () => {
+      const writing = claube.classList.contains('writing');
+      if (writing && moving) return;
+      if (moving) { URL.revokeObjectURL(moving); moving = null; }
+      if (writing) moving = URL.createObjectURL(blob);
+      if (im.getAttribute('href') !== (moving || still)) im.setAttribute('href', moving || still);
+    };
+    new MutationObserver(show).observe(claube, { attributes: true, attributeFilter: ['class'] });
+    show();
+  } catch (e) {
+    console.warn("couldn't hold Claube's pen still:", e);
+  }
 }
 // one of DaV-nky's stylesheets for the room (sky/css/<name>.css), linked once
 function davSheet(name) {

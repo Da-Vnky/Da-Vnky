@@ -14,6 +14,7 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Mel's room: Claube's pen is always in his hand now. Your Claube picture has no pen of its own, so between his writing moments (which are rare: only some lines in the scenes and conversations, never just from clicking him) his hand looked empty. The pen is held still on its first frame, and plays from the start each time he writes, then goes still again. Integration edit in Mel's folder: room/room.js, the DaV-nky part at the end (davPen, new davPenStill); sky/css/mel-room.css no longer hides it.
 
 == published ==
 
