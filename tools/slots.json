@@ -2107,10 +2107,129 @@
        "optional": true
       }
      ]
+    },
+    {
+     "name": "the bee (sky/bee.js): Mel’s BeeLLM, over the roses by the steps. click it to talk",
+     "slots": [
+      {
+       "slot": "assets/living/bee",
+       "what": "the bee itself, facing right (wings and all: an animated GIF or WebP of it flying is lovely). it lives over the roses by the steps, and the code still moves it: hovering about, bobbing up for a high buzz and down for a low one, squashing on every buzz, flying up close and turning to face its menu while you talk. until yours is in, a drawn bee that makes a face for each mood",
+       "size": "about 240 x 200, see-through around it"
+      },
+      {
+       "slot": "assets/living/bee-happy",
+       "what": "the bee when it's happy (eyes smiling, cheeks pink): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
+       "size": "the same as bee",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-excited",
+       "what": "the bee when it's buzzing with excitement (eyes wide, sparks): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
+       "size": "the same as bee",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-loving",
+       "what": "the bee when it's smitten (heart eyes, hearts puffing): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
+       "size": "the same as bee",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-angry",
+       "what": "the bee when it's furious (brow down, redder, steam): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
+       "size": "the same as bee",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-sad",
+       "what": "the bee when it's sad (brow up, a tear): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
+       "size": "the same as bee",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-scared",
+       "what": "the bee when it's frightened (trembling, a bead of sweat): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
+       "size": "the same as bee",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-sleepy",
+       "what": "the bee when it's sleepy (eyes shut, zZz): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
+       "size": "the same as bee",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-curious",
+       "what": "the bee when it's curious (a brow up, a ?): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
+       "size": "the same as bee",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-buzzing",
+       "what": "the bee while a buzz is sounding (mouth open, wings a blur), for any mood; or one per mood: bee-<mood>-buzzing (bee-angry-buzzing …)",
+       "size": "the same as bee",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-heart",
+       "what": "a little puff it lets off when it's smitten (floats up and fades)",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-tear",
+       "what": "a little puff it lets off when it's sad (floats up and fades)",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-steam",
+       "what": "a little puff it lets off when it's furious (floats up and fades)",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-sweat",
+       "what": "a little puff it lets off when it's frightened (floats up and fades)",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-zzz",
+       "what": "a little puff it lets off when it's sleepy (floats up and fades)",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-spark",
+       "what": "a little puff it lets off when it's happy and excited (floats up and fades)",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-question",
+       "what": "a little puff it lets off when it's curious (floats up and fades)",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-zap",
+       "what": "a little puff it lets off when it's when it stings (*STINGS YOU*) (floats up and fades)",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      }
+     ]
     }
    ],
    "map": {
-    "page": "living.html#front"
+    "page": "living.html#front",
+    "views": [
+     {
+      "name": "talking to the bee",
+      "do": "Sky.bee.open()",
+      "wait": 2500
+     }
+    ]
    }
   },
   {
@@ -3075,6 +3194,12 @@
        "slot": "assets/sounds/reprise",
        "what": "beyond.html: the music of resets 1 and 2 a last time, far away (played once, 14 s in). without it the page plays your ambient-bright then ambient, far off, or a drawn one",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/bee-voice",
+       "what": "the bee’s voice (the front garden): one steady buzz, a second or two, on one note. it's played at every pitch for every word the bee says (the site finds what note you hummed), through the bee’s squelchy filter and its little room. until yours is in, the bee buzzes with a made-up voice",
+       "kind": "sound",
+       "optional": true
       }
      ]
     }

@@ -170,6 +170,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   after `sky.js` on every page), `attic.js` (the hallway's cord/lamp, the attic, the grimoire's pact),
   `kitchen.js` (the kitchen off the hallway, the fridge, stove, microwave and the serpent), `hell.js` (reset 4: below, the white
   revolver, the eye and the key), `ambient.js` (the house's soundtrack when no record's on), `static.js` (the screen's static),
+  `bee.js` (the bee in the front garden, Mel's BeeLLM: see *The bee in the front garden*),
   `veil.js` / `watchers.js` / `loop.js` / `source.js` (resets 5, 6, 7, 8: see *Resets 5 to 8*; on every page, just before
   resets.js, which needs veil.js's wallpaper there to hide reset 5's key in).
 
@@ -425,6 +426,52 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   while out here just leaves the garden (`close()`). `Sky.front = { open, close, goIn, here }`. "Home." the first time.
 - Slots: `assets/living/front-house`, `front-door`, `front-door-open`, `assets/characters/front` (+ `front-walking`);
   asset manager scene "the front of the house". Not linked from the porch (yet): only the homepage comes here.
+
+## The bee in the front garden (sky/bee.js, 10 Oct)
+
+- Victor: Mel's BeeLLM ("Scintilla BeeLLM 42P Chaos", her model on Hugging Face as `hf.co/schizophyllume/BeeLLM`), living on
+  the site so visitors can talk to it. `sky/bee.js` + `sky/css/bee.css`, living.html only (after front.js). It builds itself
+  into `.front-stage` (`.bee-home`, over the right-hand roses: left 63.5% top 66% of the 1600 x 900 garden; upright phones 56.5%,
+  inside what a phone shows). Click it: its menu (`.bee-talk`, fixed bottom left; a bottom sheet upright, a left panel
+  sideways), and it flies up close (`body.bee-talking`). Escape closes it; leaving the garden (`Sky.house.on` 'leave' front)
+  too. Clicking the bee while talking is a poke (a giggle, then crosser; 5 in 6 s: it stings, `*STINGS YOU*`, the traveller
+  says "Ow." at most every 20 s; not a death). `Sky.bee = { open, close, say, poke, mood, fond, think, plan, render, hear, brain }`.
+- **Its brain runs in the visitor's browser**: `content/bee/beellm.json` (the server won't serve .gguf), written by
+  `tools/bee-model.py` (reads a .gguf, F32/F16 only, llama only; with no argument it finds Mel's in Ollama's folder,
+  `OLLAMA_MODELS` or `~/.ollama/models`). bee.js `Brain()` is a full llama forward pass (RMSNorm, rotary positions in
+  neighbouring pairs, attention with a cache, SwiGLU, output head; tied head if there's no output.weight): checked against a
+  numpy version to 2e-6. Mel's has attention and feed-forward all zeros, so each next word hangs only on the last one
+  (a bigram in a transformer's coat): after b it buzzes on (b → z .52, z → z .56), CAPS lead to CAPS, ZZ → *STINGS YOU* 5%.
+  It's loaded when the menu first opens; no file: `instinct()` picks the same words by mood alone.
+- **Its heart**: `hear(text)` scores the visitor's words (`FEEL` word lists, `EMOJI`, negation flips with `FLIP`, `?` curious,
+  `!` and SHOUTING add to the loudest feeling, "you"/"bee" × 1.15; nothing matched = a little curious). Written in bee
+  (`BEE_WORD`, 60% of the words) it answers in kind: their words are its starting point (the seed), CAPS anger it, ~ charms
+  it. `heart` holds nine moods (calm, happy, excited, loving, angry, sad, scared, sleepy, curious), nearly halved by each new message and
+  fading by half each minute; the top one over .4 wins, else `fond` decides (localStorage `bee-heart`, -1…1, how kind people at
+  this browser have been: forever until "forget your stay"; `bee-met`, `bee-mode` too). Each mood's `BIAS` nudges the model's
+  own odds (CAPS, lower, sting/STING, single words), with its own temperature and reply length (`MOODS[m].len`, + a word per 5
+  the visitor wrote, up to 6); sampling: top 40, top-p .95, repeat penalty 1.1 over the last 12.
+- **Its voice** (Web Audio, its own AudioContext, made on the first click; volume follows the panel's sound effects slider):
+  each buzz is a sawtooth through wing flutter (32 Hz), a growl an octave down, a resonant lowpass that opens and closes (the
+  acid squelch), into a stereo hall (made once) and a ping-pong echo, then a limiter that only touches peaks (Victor asked for
+  no squashing). **Talk**: `composeTalk`: a word a buzz; `SHAPES[M.shape]` (arch, lilt, climb, stomp, droop, jitter, sink,
+  ask) is the reply's tune over its length (k = words/10, .6…1.7: longer replies swing further), snapped to the mood's
+  five-note scale; the speed follows the tune (`follow`) and slows towards the end when sad/sleepy (`rit`); each z draws the
+  buzz out and bends it by `slide` semitones; b = a pluck, u = a swoop up, CAPS +3 semitones and louder; ~ a wobbly hum, ! a
+  chirp, a sting a dive. Measured on 12 words: sad and sleepy fall ~6 semitones and take 8-10 s, excited climbs 3.5 in 2.6 s,
+  curious lifts 5 at the end. **Sing** (the menu's switch, `bee-mode`): `composeSing`, the toy keyboard Victor liked in his
+  bee_buzz.py (each word its own note, CAPS a swarm chord, ~ a run, all from one pentatonic: MAJ, MIN or DREAMY by mood, pace by
+  mood). `assets/sounds/bee-voice`: his own buzz, looped and pitched (`pitchOf` finds its note by autocorrelation, else 262 Hz).
+  Everything for a reply is scheduled on the audio clock up front (`perform`), with timers that show each word and act it out
+  as it sounds; `hush()` fades the reply's own bus.
+- **Its body**: the drawn stand-in (`DRAWN`: wings, stripes, head, antennae, eye variants e-open/e-happy/e-shut/e-heart, brow,
+  cheek, mouth and open mouth, tear, sweat) with every mood in bee.css by `.bee-home[data-mood]`: colour `--bee-y`, brow, eyes,
+  pupils, tremble, drip. Each word: `--lift` (up for a high buzz), `--tilt` (leaning into a slide), a squash, `--mouth`, faster
+  wings (`.buzzing`), and now and then a puff (`puff()`: heart, tear, steam, sweat, zzz, spark, question, zap). Victor's
+  pictures (assets/living/, so the folder's list.txt already exists: a new `assets/bee/` folder had no list and asked the
+  server for 40 files that weren't there): `bee`, `bee-<mood>`, `bee-buzzing`, `bee-<mood>-buzzing` (`dress()` picks the best
+  one there is for now), `bee-fx-<kind>`; the code still moves and tints his. A word bubble over its head (`.bee-bubble`).
+- Mel's model and name: credited in the menu's foot ("its brain is BeeLLM 42P Chaos, by skizy").
 
 ## The porch (sky/porch.js)
 

@@ -17,6 +17,14 @@ How it works
 
 == published ==
 
+2026-10-10 01:50 · V
+- The front garden has a bee: Mel's BeeLLM, hovering over the roses to the right of the steps. Click it to talk to it. Every word it says comes out of Mel's own model, run right in the visitor's browser (nothing is sent anywhere), and each word is buzzed out loud the moment it's said.
+- The bee has feelings: what you say to it makes it happy, excited, smitten, furious, sad, frightened, sleepy, curious or calm. Its mood changes the words it reaches for, its voice (the tune and the speed rise and fall over each reply, more so the longer it is, and every z draws a buzz out and bends it: up when happy, down when sad) and its face (colours, brows, eyes, and hearts, tears, steam or zZz puffing off it). It roughly remembers whether you were kind to it before. Poke it too often and it stings you (a cartoon sting, not a death).
+- In the bee's menu, 'sing' makes it answer like a little toy keyboard instead: every note from one five-note scale (which one depends on its mood), so whatever it sings sounds nice; '♪ sing me something' sets it off without a word.
+- New slots (asset manager: the front of the house, the bee): assets/living/bee, bee-<mood> (happy, excited, loving, angry, sad, scared, sleepy, curious), bee-buzzing and bee-<mood>-buzzing, and the puffs bee-fx-heart, -tear, -steam, -sweat, -zzz, -spark, -question, -zap; and a sound, assets/sounds/bee-voice (one steady buzz on one note: it's played at every pitch). The map has a 'talking to the bee' view.
+- For the next Claude: the bee is sky/bee.js and sky/css/bee.css (living.html only, after front.js). Its brain is content/bee/beellm.json, written from Mel's .gguf by the new tools/bee-model.py (the server can't serve .gguf files). If Mel makes a new bee: python tools/bee-model.py (finds hers in Ollama) or python tools/bee-model.py path\to\model.gguf.
+- tools/FOR-MEL.md: a short section for Mel about her bee on the site, and how to put a new one in (tools/bee-model.py).
+
 2026-10-09 20:11 · V
 - Mel's room: Claube's pen is always in his hand now. Your Claube picture has no pen of its own, so between his writing moments (which are rare: only some lines in the scenes and conversations, never just from clicking him) his hand looked empty. The pen is held still on its first frame, and plays from the start each time he writes, then goes still again. Integration edit in Mel's folder: room/room.js, the DaV-nky part at the end (davPen, new davPenStill); sky/css/mel-room.css no longer hides it.
 

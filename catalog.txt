@@ -1,13 +1,14 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1476 2433530411
-city.html 9813 3302134254
-index.html 5029 2012812575
-living.html 130023 3077430480
-window-sky.html 1326 1605208442
-workshop.html 22036 305544760
+beyond.html 1480 2229947314
+city.html 9866 4044396601
+index.html 5085 3319931909
+living.html 130217 2858491051
+window-sky.html 1332 4286240038
+workshop.html 22101 384469851
 sky/ambient.js 5339 303504477
 sky/attic.js 33962 1402084230
 sky/bathroom.js 26842 2781763935
+sky/bee.js 60683 497538361
 sky/beyond.js 11151 2864391733
 sky/books.js 13679 1574652656
 sky/claubes.js 52340 1339963452
@@ -64,6 +65,7 @@ sky/sky.css 55926 3016727324
 sky/css/ambient.css 435 4199751144
 sky/css/attic.css 15736 521837829
 sky/css/bathroom.css 17498 1224456772
+sky/css/bee.css 16676 3429990814
 sky/css/beyond.css 2714 2081711894
 sky/css/books.css 4900 2258360443
 sky/css/claubes.css 17565 3697391751
@@ -164,6 +166,8 @@ assets/textures/letter-1.webp 277104 2867896533
 assets/textures/list.txt 152 1347949450
 assets/ui/list.txt 117 55339362
 assets/workshop/list.txt 117 55339362
+content/bee/beellm.json 130215 1733519914
+content/bee/list.txt 125 1907884572
 content/books/list.txt 113 3293401086
 content/city/example-cat-on-the-sill.svg 1777 1129120048
 content/city/example-cat-on-the-sill.txt 96 226222374

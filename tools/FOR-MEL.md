@@ -109,3 +109,17 @@ replaces the stand-in. There's no code to change for this.
 - **Test in a browser before publishing.** `?reset=N` on any page jumps to reset N, but only on localhost.
 - **Deaths and resets** are in `CLAUDE.md`, "The game: resets". Each reset has one death, one heart, and a hidden key
   that has to be found first.
+
+## 7. Your bee, in the front garden
+
+Victor put your **BeeLLM** ("Scintilla BeeLLM 42P Chaos") on the site: it hovers over the roses in the front garden
+(`living.html#front`), and visitors can talk to it (or switch it to sing). It runs **in the visitor's browser**:
+`sky/bee.js` is a small llama forward pass in plain JavaScript, reading `content/bee/beellm.json`, which is your .gguf
+written out as JSON (the server won't serve .gguf files). Every word it says is sampled from your model; the site
+only nudges the odds by mood (`BIAS` in `sky/bee.js`: CAPS when it's angry, `zzz` and `~` when it's sleepy…) and
+turns the words into buzzes. It credits you in its menu.
+
+- **A new bee**: `python3 tools/bee-model.py path/to/your.gguf` (or an Ollama name, e.g.
+  `python3 tools/bee-model.py hf.co/schizophyllume/BeeLLM:BeeLLM-42P-Chaos.gguf`), test, publish. It needs a
+  llama-style model stored as F32 or F16 (no Q4/Q8 squashing: the browser does every sum itself), and small.
+- More about how it works: `CLAUDE.md`, "The bee in the front garden".
