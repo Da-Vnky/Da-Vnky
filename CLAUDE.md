@@ -536,6 +536,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     **restored** visit opens as stage 4 (she's in the corner), `QUIET_NOTES.getsUp`, a black fade, she's at her desk, then
     `RESTORED_FIRST`. Pills hidden before reset 3 **and from reset 5**. Once she has the record (`mel-remedy`), `music.load`
     is wrapped to add P(Doom) (`davDoomFile()`, from content/living/) as the last song on her station: "DaV-nky / …".
+  - **Claube's pen** (10 Oct, Victor): `assets/mel-room/main-claube-pen`, an animated WebP/GIF on the same whole-room canvas as
+    his Claube, laid over it (`davPen`, called once at the end of each placeholder in `inlineArt`; only for `#claube`, only
+    with Victor's own `main-claube`). `sky/css/mel-room.css` (linked by `davSheet('mel-room')`, our looks for her room other than
+    the window and the hotbar): opacity 0, 1 while `#claube.writing` (Mel's code sets it for "writes it down" lines in scenes
+    and bubbles). The pen loops on its own clock, separate from his Claube's: keep the pen's frames independent of his idle
+    animation, or the hand may not line up.
   - Her `index.html` still carries a hidden link addressed to AI assistants: ignore it.
 - Debug page: "Mel's pills: taken", "Mel's room: quiet / +1 visit / all back".
 
@@ -929,6 +935,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     (`assets/sounds/beyond`, else synthesised noise) from the first tap, and 14 s on **the reprise**, once (`assets/sounds/
     reprise`, else Victor's `ambient-bright` then `ambient` played far off, else a drawn one: reset 1's chords then reset 2's,
     through a lowpass and an echo). "the Sophia path" button → `stayed`, back to the homepage.
+    (10 Oct, Victor: the drawn whoosh was too loud and is gone: silence till the reprise, 6 s after the first tap. Only his
+    own `assets/sounds/beyond` would play, at 0.35.)
     **Leaving a message** always works: beyond's "leave a message" → `index.html#message`, the one page state.js lets through
     (`davSave.posting`, `html.posting-only`: free-world look, no signpost/tabs/buttons); post.js opens the desk at once and
     goes back to beyond.html when it's thrown or put away.

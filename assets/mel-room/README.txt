@@ -3,6 +3,7 @@ your own pictures for Mel's room (schizophyllu.me.room), put here by the content
 
   <room>-<thing>.png (or .webp, .gif, .jpg, .svg)   one thing you can click, e.g. main-crt, bedroom-station
   <room>.png                                        the backdrop of that room: main, bedroom, hallway, bathroom, closet, roof
+  main-claube-pen.webp (or .gif)                    Claube's pen, moving: laid over your main-claube, shown only while he writes
 
 every picture is the size of the whole room, 1600 x 900: draw the thing where it sits in the room and leave the
 rest see-through (Mel's own drawing of it, room/objects/<room>/<thing>.svg, shows you where). a few are SVG only,
