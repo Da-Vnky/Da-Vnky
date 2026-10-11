@@ -577,9 +577,16 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   Only `SORRY` (not `NOT_SORRY`: "not sorry" angers it) gets it back (`forgive()`: into the bag, unless it's the ordinary
   one in reset 4 or the white one isn't theirs any more), `bee-returned` set. Shot at again after that (`breakIt()`):
   the gun stung to pieces (out of the bag, `sessionStorage bee-broke`: gone for the visit, so its spot stays empty;
-  the next visit it's back where it lives: reset 1's revolver death and reset 4's white revolver can't be lost for
-  good) and `localStorage bee-grudge` = 1: angry at every visit after, till "forget your stay" (`mood()` returns
-  angry while armed or grudging). Singing while armed or grudging: `composeSing(w, m, dread)`, `DREAD` scale
+  the white revolver is back the next visit, so reset 4 can't be lost; **the ordinary revolver stays gone till reset 8**:
+  `localStorage revolver-gone` = broken, and revolver.js `destroyed()` takes it off the wall and out of the bag in resets
+  2 to 7, where nothing needs it) and `localStorage bee-grudge` = 1: angry at every visit after, till "forget your stay"
+  (`mood()` returns angry while armed or grudging). **Reset 1** (11 Oct, Victor: the revolver is its only way to die, so
+  breaking it softlocked): `breakIt` → `stingToDeath(id)`: `strike(me, onHit)` (it flies at the traveller and back,
+  `.striking` / `bee-strike` in bee.css on `--strike-x/y`, facing them; sound `bee-dive`, stand-in `throw`); on the hit the
+  sting (`bee-sting`), the gun's out of the bag and in its hands (`.armed`, aimed at them by `aimAt`), `revolver-gone` = bee;
+  1.5 s later it fires (`.firing`: muzzle flash and kick; `bee-bang`, stand-in `bang`), `Sky.gore.splat` on the traveller,
+  then `Sky.stay.reset('Stung, then shot.')`: straight to reset 2, no key or heart needed (lives.js isn't asked). No grudge
+  kept and `fond` set back to 0, so it's itself in reset 2. Singing while armed or grudging: `composeSing(w, m, dread)`, `DREAD` scale
   (0 1 3 6 7), a sixth lower, slow, every note sagging and growling, CAPS clusters, a heartbeat
   (dun-dun every .95 s) and a low tritone hum; its log line `.dread` (dark red).
 
@@ -947,7 +954,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   **This visit** (sessionStorage): the bag (`inventory`), the open secret wall, the boards off skizy's window …
 - `RESETS` table: each reset's theme, its one way to die, and where its hidden key is.
   `DEATHS` table: which resets each death is live in; after its last one it's "patched".
-  - Reset 1 "items": **the revolver** on yourself (the rooftop's). The toaster (and its tub death), the scissors and
+  - Reset 1 "items": **the revolver** on yourself (the rooftop's); or the bee in the front garden, if you shoot it again
+    after it's given the gun back (it stings you, takes the gun and shoots you: straight to reset 2; the gun's gone till reset 8). The toaster (and its tub death), the scissors and
     safety scissors were removed on 27 Sep. From reset 2 the revolver **always jams** on the traveller (revolver.js
     `JAMMED` lines), and from reset 2 it hangs on the living-room wall instead of lying on the roof (the same `revolver`
     item: a thing to shoot things with, and to find P(Doom) before reset 4).

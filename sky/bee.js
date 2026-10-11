@@ -1193,6 +1193,7 @@
     }
     // shot at again, after all that: it stings the gun to pieces, and it'll never forgive you
     function breakIt(id) {
+        if (window.davSave && window.davSave.reset === 1 && !MAPPING) return stingToDeath(id);
         entry('bt-poke', 'missed. you shoot at it again, after all that.');
         feelAll({ angry: 3 });
         stungAt = Date.now();                                       // (it's the gun it stings, this time, not you)
@@ -1204,6 +1205,7 @@
                 if (Sky.sfx) { Sky.sfx('jammed', { or: 'tap' }); Sky.sfx('shatter', { delay: .08 }); }
                 scrap(ptr ? ptr.x : window.innerWidth / 2, ptr ? ptr.y : window.innerHeight * .7);
                 if (I) I.say('the bee stung ' + mine(id) + '. it’s broken.', 3200);
+                if (id === 'revolver' && !MAPPING) store('revolver-gone', 'broken');   // (gone till reset 8: sky/revolver.js)
                 returned = false; grudge = true;
                 if (!MAPPING) {
                     visit('bee-returned', null); store('bee-grudge', '1');
@@ -1217,6 +1219,64 @@
                 setTimeout(function () { Sky.say('It broke it. With its sting.', 2800); }, 1600);
             }, 650);
         });
+    }
+    // reset 1 (11 Oct, Victor): the revolver is that reset's only way to die, so stinging it to pieces left no way on. there,
+    // it flies straight at you and stings you, takes the revolver, and shoots you with it: straight on to reset 2 (no key or
+    // heart needed). it's itself again in reset 2 (no grudge kept), but it's kept the gun: not on the wall till reset 8
+    function stingToDeath(id) {
+        entry('bt-poke', 'missed. you shoot at it again, after all that.');
+        feelAll({ angry: 3 });
+        stungAt = Date.now();
+        var me = document.querySelector(porch && Sky.porch && Sky.porch.outside ? '.porch-character' : '.front-character');
+        if (!(me && me.getClientRects().length)) me = null;
+        var next = function () {
+            if (Sky.stay && Sky.stay.reset) Sky.stay.reset('Stung, then shot.');
+            else if (window.davSave) { window.davSave.nextReset(); location.reload(); }
+        };
+        load().then(function () {
+            reply(null, { mood: 'angry', len: [4, 7], sting: true, talk: true });
+            setMood('angry');
+            strike(me, function () {                                // (it reaches them: the sting, and the gun's its)
+                if (Sky.sfx) Sky.sfx('bee-sting', { or: 'tap' });
+                if (I && I.has(id)) I.remove(id);
+                if (id === 'revolver') store('revolver-gone', 'bee');
+                fond = 0; store('bee-heart', '0');                      // (it's done with it: itself again next reset)
+                home.classList.add('armed');                          // (only to show it: it isn't "holding you up")
+                aimAt(me);
+                note('it flies at you, stings you, and takes ' + mine(id) + '.');
+                Sky.say('Ow! It took the—', 1400);
+                setTimeout(function () {                              // (back at its spot, the gun on them)
+                    aimAt(me);
+                    home.classList.remove('firing'); void home.offsetWidth; home.classList.add('firing');
+                    if (Sky.sfx) Sky.sfx('bee-bang', { or: 'bang' });
+                    note('it shoots you.');
+                    var r = me && me.getBoundingClientRect();
+                    if (me && Sky.gore && Sky.gore.splat) Sky.gore.splat(me, r.left + r.width / 2, r.bottom, function () { setTimeout(next, 600); });
+                    else setTimeout(next, 1500);
+                }, 1500);
+            });
+        });
+    }
+    // its gun turned on the traveller (the same tilt as when it follows your pointer)
+    function aimAt(me) {
+        if (!me) return;
+        var c = centre(), r = me.getBoundingClientRect();
+        home.style.setProperty('--aim-x', clamp((r.left + r.width / 2 - c.x) / (window.innerWidth * .4), -1, 1).toFixed(2));
+        home.style.setProperty('--aim-y', clamp((r.top + r.height * .3 - c.y) / (window.innerHeight * .4), -1, 1).toFixed(2));
+    }
+    // flying at the traveller: a wind-up, a dart straight at them, a jab, and back to its spot (bee.css .striking).
+    // onHit runs as it reaches them
+    function strike(me, onHit) {
+        if (!me) { dive(); setTimeout(onHit, 650); return; }
+        var b = beeBtn.getBoundingClientRect(), r = me.getBoundingClientRect();
+        var dx = r.left + r.width / 2 - (b.left + b.width / 2), dy = r.top + r.height * .32 - (b.top + b.height / 2);
+        home.style.setProperty('--strike-x', dx.toFixed(0) + 'px');
+        home.style.setProperty('--strike-y', dy.toFixed(0) + 'px');
+        home.style.setProperty('--face', dx < 0 ? -1 : 1);            // (facing them)
+        home.classList.remove('striking'); void home.offsetWidth; home.classList.add('striking');
+        if (Sky.sfx) Sky.sfx('bee-dive', { or: 'throw' });
+        setTimeout(function () { puff('zap', 3); onHit(); }, 620);
+        setTimeout(function () { home.classList.remove('striking'); home.style.removeProperty('--face'); }, 1500);
     }
     function scrap(x, y) {                                          // (bits of gun, falling)
         for (var i = 0; i < 12; i++) {

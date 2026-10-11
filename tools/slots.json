@@ -3283,6 +3283,24 @@
        "what": "its wings as it flies about (the front garden and the porch): a soft buzz, a loop of a second or two, played very quietly the whole time you can see it, a little faster when it darts about, quieter while it talks. until yours is in, a made-up hum like its voice",
        "kind": "sound",
        "optional": true
+      },
+      {
+       "slot": "assets/sounds/bee-dive",
+       "what": "the bee darting at the traveller (reset 1, if you shoot it again after it gave the gun back): a quick angry whoosh. until yours is in, a made-up whoosh",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/bee-sting",
+       "what": "the bee stinging the traveller as it takes the gun (reset 1). until yours is in, a little tap",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/bee-bang",
+       "what": "the bee firing the revolver at the traveller (reset 1). until yours is in, the revolver's own bang",
+       "kind": "sound",
+       "optional": true
       }
      ]
     }
