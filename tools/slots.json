@@ -2009,17 +2009,23 @@
       {
        "slot": "assets/living/porch-frame",
        "what": "the porch itself: the roof’s edge along the top, the two posts, the railing (a gap in the middle for the steps), the house wall on the left. see-through wherever the sky and the street show",
-       "size": "1920 x 1080, stretched to fit"
+       "size": "1920 x 1080, stretched to fit",
+       "marksIn": "1600 x 900",
+       "marks": [{"box": [0, 0, 1600, 86], "label": "the eave"}, {"box": [0, 0, 184, 900], "label": "the house wall (the door's on it)"}, {"box": [196, 86, 34, 690], "label": "left post"}, {"box": [1382, 86, 34, 690], "label": "right post"}, {"y": 560, "label": "the railing's top"}, {"y": 752, "label": "the bottom rail"}, {"box": [700, 548, 200, 228], "label": "the gap in the railing, for the steps (the arrow down is here)"}, {"y": 774, "label": "the porch floor starts (porch-floor, the bottom 14% of the screen)"}, {"x": 608, "label": "where the traveller stands (38% across)"}]
       },
       {
        "slot": "assets/living/porch-street",
        "what": "across the street: the houses opposite, the pavement, the road, the lawn and fence, the streetlight, the wire. see-through above them (the sky)",
-       "size": "wide, about 1600 x 500; its bottom sits just behind the railing"
+       "size": "wide, about 1600 x 500; its bottom sits just behind the railing",
+       "marksIn": "1600 x 500",
+       "marks": [{"y": 300, "label": "the pavement starts"}, {"y": 330, "label": "the road"}, {"y": 400, "label": "our lawn and fence (the railing hides most of it)"}, {"line": [760, 402, 700, 500], "label": "the path from the gate, left edge"}, {"line": [840, 402, 900, 500], "label": "the path, right edge"}, {"box": [1050, 90, 300, 210], "label": "the house opposite (the neighbour waves in its window)"}, {"x": 410, "label": "the streetlight"}, {"y": 500, "label": "the bottom edge sits 22% up the screen, just behind the railing"}]
       },
       {
        "slot": "assets/living/porch-yard",
        "what": "the front yard seen from the porch: the lawn between your fence (the bottom of porch-street) and the porch, with the path from the gate to the steps. stretched across the whole width below porch-street; only its top part shows between the railing's posts, the rest is behind the porch floor. the bee's shadow falls on it",
-       "size": "wide, like porch-street (e.g. 1920 x 240), stretched to fit"
+       "size": "wide, like porch-street (e.g. 1920 x 240), stretched to fit",
+       "marksIn": "1600 x 200",
+       "marks": [{"line": [700, 0, 640, 200], "label": "the path, left edge (to the steps)"}, {"line": [900, 0, 960, 200], "label": "the path, right edge"}, {"y": 36, "label": "the bee's shadow falls about here"}, {"y": 73, "label": "below here it's behind the porch floor"}]
       },
       {
        "slot": "assets/living/porch-floor",
@@ -2112,22 +2118,27 @@
       {
        "slot": "assets/living/front-ground",
        "what": "the ground in the front garden: the lawn and the path from the steps down to the gate, where the bee's shadow falls. it's laid under front-house (the same 1600 x 900 canvas), so draw the house, hedge, trees, roses and fence in front-house and leave the ground see-through there; if your front-house already has the ground in it, this one stays hidden underneath",
-       "size": "1600 x 900, see-through above the ground"
+       "size": "1600 x 900, see-through above the ground",
+       "marksIn": "1600 x 900",
+       "marks": [{"y": 672, "label": "the ground starts (paint it up to about y 640: the house, hedge and trunks hide the join)"}, {"y": 711, "label": "the bee's shadow falls along here, in front of the roses"}, {"line": [716, 690, 556, 900], "label": "the path, left edge"}, {"line": [884, 690, 1044, 900], "label": "the path, right edge"}, {"box": [716, 630, 168, 60], "label": "the steps"}, {"box": [770, 492, 60, 120], "label": "the front door"}, {"box": [440, 300, 720, 392], "label": "the house's front wall (its foot at y 692)"}, {"x": 800, "y": 104, "label": "the roof's peak"}, {"box": [1016, 594, 99, 83], "label": "the bee, over its roses"}, {"x": 704, "label": "where the traveller stands on the path (44% across)"}, {"y": 804, "label": "the fence: pickets from here down (open from x 560 to 1040 for the path)"}]
       },
       {
        "slot": "assets/living/front-house",
        "what": "the house, the hedge and trees, the roses, the steps and the fence: everything but the door and the ground (see-through where the sky is; the lawn and the path are front-ground, underneath: leave them see-through here, or paint them in and front-ground stays hidden)",
-       "size": "1600 x 900, see-through sky"
+       "size": "1600 x 900, see-through sky",
+       "marksFrom": "assets/living/front-ground"
       },
       {
        "slot": "assets/living/front-door",
        "what": "the front door, shut: drawn where it sits on the 1600 x 900 canvas (770 to 830 across, 492 to 612 down), see-through everywhere else. click it to go in",
-       "size": "1600 x 900, see-through but the door"
+       "size": "1600 x 900, see-through but the door",
+       "marksFrom": "assets/living/front-ground"
       },
       {
        "slot": "assets/living/front-door-open",
        "what": "the front door, open (the same place), as the traveller goes in",
-       "size": "1600 x 900, see-through but the door"
+       "size": "1600 x 900, see-through but the door",
+       "marksFrom": "assets/living/front-ground"
       },
       {
        "slot": "assets/characters/front",

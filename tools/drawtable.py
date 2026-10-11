@@ -473,13 +473,116 @@ FIND = '''
       if (a.tagName === 'BODY') break;
     }
   }
-  return { x: r.left, y: r.top, w: r.width, h: r.height, vw: innerWidth, vh: innerHeight };
+  // the other slots that overlap it (for the measurements layer: where everything else sits on this canvas)
+  // (not the sky's things, the characters, the bag, the arrows or the buttons: they move, or sit over every page; several of one
+  // slot, like the crows on the wire, become one box round them all)
+  const SKIP = /^assets\/(sky|characters|items|ui|sounds|resets)\//, seen = {};
+  DavMap.boxes(window).forEach(b => {
+    if (b.slot === slot || b.el === el || SKIP.test(b.slot) || /arrow/.test(b.slot)) return;
+    const br = b.el.getBoundingClientRect();
+    const ix = Math.min(br.right, r.right) - Math.max(br.left, r.left), iy = Math.min(br.bottom, r.bottom) - Math.max(br.top, r.top);
+    if (ix < 4 || iy < 4 || br.width * br.height >= r.width * r.height * .95) return;   // (not on it, or the whole canvas again)
+    if (br.width * br.height < r.width * r.height * .0004) return;                      // (a speck)
+    const o = seen[b.slot];
+    if (o) { const x2 = Math.max(o.x + o.w, br.right), y2 = Math.max(o.y + o.h, br.bottom);
+      o.x = Math.min(o.x, br.left); o.y = Math.min(o.y, br.top); o.w = x2 - o.x; o.h = y2 - o.y; o.n++; return; }
+    seen[b.slot] = { slot: b.slot, x: br.left, y: br.top, w: br.width, h: br.height, n: 1 };
+  });
+  const others = Object.values(seen).sort((a, b) => b.w * b.h - a.w * a.h).slice(0, 24);
+  return { x: r.left, y: r.top, w: r.width, h: r.height, vw: innerWidth, vh: innerHeight, others };
 }
 '''
 
+# the measurements layer (11 Oct, Victor: "add measurements like this for the assets"): rulers along the top and left in
+# this canvas's own pixels, its size, the other slots that overlap it (outlined, with where they are on this canvas), and
+# the lines slots.json gives it by hand ("marks": where the ground starts, the path's edges, the door…), each with its
+# numbers in this canvas's pixels. drawn in the page, a see-through picture the size of the canvas
+MEASURE = r"""
+([W, H, others, marks, title]) => {
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  const s = Math.max(1, Math.min(W, H) / 520), fs = Math.round(12 * s), R = v => Math.round(v);
+  const ink = '#1d6f8a', red = '#c0392b', paper = 'rgba(255,250,238,.9)';
+  x.font = fs + 'px Georgia, serif'; x.textBaseline = 'middle';
+  // a label on a scrap of paper; one that would cover another steps down (then up) till it's clear
+  const placed = [], clash = (a) => placed.some(b => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h);
+  const tag = (t, px, py, col, right, fixed) => {
+    const w = x.measureText(t).width + 8 * s, h = fs + 6 * s;
+    const lx = Math.max(2, Math.min(W - w - 2, right ? px - w : px)), ly0 = Math.max(2, Math.min(H - h - 2, py - h / 2));
+    let ly = ly0;
+    if (!fixed) for (let k = 1; k < 40 && clash({ x: lx, y: ly, w, h }); k++) {
+      const d = Math.ceil(k / 2) * (h + 2 * s) * (k % 2 ? 1 : -1);
+      ly = Math.max(2, Math.min(H - h - 2, ly0 + d));
+    }
+    placed.push({ x: lx, y: ly, w, h });
+    x.fillStyle = paper; x.fillRect(lx, ly, w, h); x.fillStyle = col; x.fillText(t, lx + 4 * s, ly + h / 2);
+  };
+  // the rulers: a tick every half step, a number every step (steps that give about a dozen across)
+  const STEPS = [10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000];
+  const sx = STEPS.find(v => W / v <= 16) || 2000, sy = STEPS.find(v => H / v <= 12) || 2000;
+  x.strokeStyle = 'rgba(29,111,138,.85)'; x.lineWidth = Math.max(1, s);
+  for (let v = 0; v <= W; v += sx / 2) { const big = v % sx === 0; x.beginPath(); x.moveTo(R(v) + .5, 0); x.lineTo(R(v) + .5, (big ? 16 : 8) * s); x.stroke(); if (big && v > 0 && v < W) tag(String(v), v + 3 * s, 24 * s, ink, false, true); }
+  for (let v = 0; v <= H; v += sy / 2) { const big = v % sy === 0; x.beginPath(); x.moveTo(0, R(v) + .5); x.lineTo((big ? 16 : 8) * s, R(v) + .5); x.stroke(); if (big && v > 0 && v < H) tag(String(v), 20 * s, v, ink, false, true); }
+  tag(title + ' \u00b7 this canvas: ' + W + ' \u00d7 ' + H + ' px', W - 6 * s, H - 14 * s, ink, true, true);
+  // the other slots on it
+  x.setLineDash([8 * s, 6 * s]); x.lineWidth = Math.max(1.5, 1.5 * s); x.strokeStyle = 'rgba(29,111,138,.85)';
+  others.forEach(o => x.strokeRect(o.x, o.y, o.w, o.h));
+  const later = () => others.forEach(o => { x.setLineDash([]);
+    tag(o.slot + (o.n > 1 ? ' (\u00d7' + o.n + ')' : '') + ' \u00b7 x ' + R(o.x) + '\u2013' + R(o.x + o.w) + ', y ' + R(o.y) + '\u2013' + R(o.y + o.h), o.x + 4 * s, o.y + fs, ink); });
+  // the marks
+  x.setLineDash([]); x.strokeStyle = red; x.fillStyle = red; x.lineWidth = Math.max(2, 2 * s);
+  let nv = 0;
+  marks.forEach(m => {
+    const L = m.label || '';
+    if (m.box) { const [bx, by, bw, bh] = m.box; x.strokeRect(bx, by, bw, bh);
+      tag(L + ' \u00b7 x ' + R(bx) + '\u2013' + R(bx + bw) + ', y ' + R(by) + '\u2013' + R(by + bh), bx + 4 * s, by - fs * .9, red); }
+    else if (m.line) { const [x1, y1, x2, y2] = m.line; x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2, y2); x.stroke();
+      tag(L + ' \u00b7 (' + R(x1) + ', ' + R(y1) + ') to (' + R(x2) + ', ' + R(y2) + ')', (x1 + x2) / 2 + 6 * s, (y1 + y2) / 2, red); }
+    else if (m.x != null && m.y != null) { x.beginPath(); x.arc(m.x, m.y, 5 * s, 0, 7); x.fill();
+      tag(L + ' \u00b7 (' + R(m.x) + ', ' + R(m.y) + ')', m.x + 9 * s, m.y, red); }
+    else if (m.y != null) { x.beginPath(); x.moveTo(0, m.y); x.lineTo(W, m.y); x.stroke(); tag(L + ' \u00b7 y ' + R(m.y), 44 * s, m.y - fs, red); }
+    else if (m.x != null) { x.beginPath(); x.moveTo(m.x, 0); x.lineTo(m.x, H); x.stroke(); tag(L + ' \u00b7 x ' + R(m.x), m.x + 5 * s, 50 * s + (nv++ % 4) * (fs + 10 * s), red); }
+  });
+  later();   // (the other slots' labels last, so they're the ones that step aside for the marks')
+  return c.toDataURL('image/png');
+}
+"""
+MEASURES_NAME = 'measurements (hide me before you export)'
+
+
+def marks_for(s, W, H):
+    """slots.json's "marks" for the slot (or "marksFrom" another slot's), in the units of "marksIn" (else its stated
+    size, else this canvas), turned into this canvas's pixels"""
+    if s.get('marksFrom'):
+        o, _, _ = described(s['marksFrom'])
+        s = dict(o, marksIn=o.get('marksIn') or s.get('marksIn'))
+    m = re.search(r'(\d{2,5})\s*[x\u00d7]\s*(\d{2,5})', s.get('marksIn') or '')
+    bw, bh = (int(m.group(1)), int(m.group(2))) if m else (stated_size(s) or (W, H))
+    kx, ky = W / bw, H / bh
+    out = []
+    for mk in s.get('marks') or []:
+        n = {'label': mk.get('label', '')}
+        if 'box' in mk:
+            b = mk['box']; n['box'] = [b[0] * kx, b[1] * ky, b[2] * kx, b[3] * ky]
+        elif 'line' in mk:
+            l = mk['line']; n['line'] = [l[0] * kx, l[1] * ky, l[2] * kx, l[3] * ky]
+        else:
+            if 'x' in mk: n['x'] = mk['x'] * kx
+            if 'y' in mk: n['y'] = mk['y'] * ky
+        out.append(n)
+    return out
+
+
+def measures(page, slot, s, W, H, others=None):
+    """the measurements layer's picture (a data: URL), drawn in the page"""
+    try:
+        return page.evaluate(MEASURE, [W, H, others or [], marks_for(s, W, H), slot.replace('assets/', '')])
+    except Exception:
+        return None
+
+
 # the page builds the layers' pixels and hands them back (as base64), so no picture library is needed here
 BUILD = '''
-async ([shot, art, W, H, place, artFit]) => {
+async ([shot, art, W, H, place, artFit, measure]) => {
   const load = src => new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => no(new Error('couldn\\'t read ' + src)); i.src = src; });
   const canvas = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
   const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
@@ -524,6 +627,11 @@ async ([shot, art, W, H, place, artFit]) => {
     else { const s = Math.min(W / iw, H / ih); x.drawImage(im, (W - iw * s) / 2, (H - ih * s) / 2, iw * s, ih * s); }
     out.art = squeeze(a, [3, 0, 1, 2]);
   }
+  if (measure) {
+    const im = await load(measure);
+    const m = canvas(); m.getContext('2d').drawImage(im, 0, 0, W, H);
+    out.measure = squeeze(m, [3, 0, 1, 2]);
+  }
   // the flattened picture (only for thumbnails): white, the guide at half strength, then your picture
   const f = canvas(), fx = f.getContext('2d');
   fx.fillStyle = '#fff'; fx.fillRect(0, 0, W, H);
@@ -534,7 +642,7 @@ async ([shot, art, W, H, place, artFit]) => {
 }
 '''
 
-HIDE_UI = ('.place-tabs, .signpost, .hotbar, .ui-button, .cp, .mc-say, .lives, .bee-talk, .bottle-hint, .tap-hint, '
+HIDE_UI = ('.place-tabs, .signpost, .hotbar, .inv-note, .ui-button, .cp, .mc-say, .lives, .bee-talk, .bottle-hint, .tap-hint, '
            '.dm-layer { visibility: hidden !important; } * { animation-play-state: paused !important; }')
 
 
@@ -598,9 +706,16 @@ def look(slot, s, sc, view_name, then):
                 ctx.close()
             out = None
             if found:
-                found['build'] = lambda W, H, art, fit: found['page'].evaluate(
-                    BUILD, [base64.b64encode(found['shot']).decode('ascii') if found['shot'] else None,
-                            (base + art) if art else None, W, H, found['place'], fit])
+                def build(W, H, art, fit):
+                    b = found['box']
+                    others = [{'slot': o['slot'].replace('assets/', ''), 'x': (o['x'] - b['x']) / b['w'] * W,
+                              'y': (o['y'] - b['y']) / b['h'] * H, 'w': o['w'] / b['w'] * W,
+                              'h': o['h'] / b['h'] * H, 'n': o.get('n', 1)} for o in (b.get('others') or [])]
+                    return found['page'].evaluate(
+                        BUILD, [base64.b64encode(found['shot']).decode('ascii') if found['shot'] else None,
+                                (base + art) if art else None, W, H, found['place'], fit,
+                                measures(found['page'], slot, s, W, H, others)])
+                found['build'] = build
                 out = then(found)
                 found['ctx'].close()
             browser.close()
@@ -627,7 +742,7 @@ def guide_file(s):
     return None
 
 
-def from_guide(gpath, art):
+def from_guide(gpath, art, slot='', s=None):
     """the canvas from the picture it's laid on: exactly its size (so what you draw lines up by itself), that picture as
     the guide, and yours (if any) as it is now. no scene to open: a blank page does the squeezing"""
     from playwright.sync_api import sync_playwright
@@ -639,7 +754,7 @@ def from_guide(gpath, art):
                              'i.onerror = () => no(new Error("couldn\'t read the guide picture")); i.src = src; })', g)
         k = min(1, BIGGEST / max(W, H))
         W, H = max(8, round(W * k)), max(8, round(H * k))
-        px = page.evaluate(BUILD, [g, data_url(art) if art else None, W, H, [0, 0, 1, 1], 'fill'])
+        px = page.evaluate(BUILD, [g, data_url(art) if art else None, W, H, [0, 0, 1, 1], 'fill', measures(page, slot, s or {}, W, H)])
         browser.close()
     return W, H, px
 
@@ -710,7 +825,7 @@ def blank_page(then):
             browser.close()
 
 
-def tile_canvas(s, art):
+def tile_canvas(s, art, slot=''):
     """one tile: the size slots.json gives (its "canvas", else its size doubled), the joining edges marked over its
     tileGuide picture, and yours as it is now"""
     W, H = canvas_size(s, None) or (None, None)
@@ -721,7 +836,7 @@ def tile_canvas(s, art):
 
     def build(page):
         guide = page.evaluate(TILE_GUIDE, [W, H, tile_axis(s), under])
-        return page.evaluate(BUILD, [guide, data_url(art) if art else None, W, H, [0, 0, 1, 1], 'fill'])
+        return page.evaluate(BUILD, [guide, data_url(art) if art else None, W, H, [0, 0, 1, 1], 'fill', measures(page, slot, s, W, H)])
     return W, H, blank_page(build)
 
 
@@ -794,7 +909,10 @@ NOTE = '''what to do (the drawing table: tools/drawtable.py)
 {name}.psd is the slot {slot}, at twice the size it's shown at: {w} x {h}.
   guide              the scene as it is, where this slot sits (faded and locked). hide it before you export.
   your picture now   what was in the slot when this was made (if there was anything)
-  draw here          an empty layer, on top
+  draw here          an empty layer
+  measurements       on top: rulers in this canvas's pixels, the other slots on it (blue dashes, with where they
+                     are), and the lines that matter for this picture (red: where the ground starts, the door…).
+                     locked. hide it before you export
 
 when it's done: hide the guide, and export a PNG (or WebP) into this same folder, with a see-through background
 if the slot wants one. the slot's card in the asset manager will show it, with a "use this" button.
@@ -825,13 +943,13 @@ def make(slot, fresh=False, view=None, app=None):
     under = guide_file(s)
     if tile_axis(s):
         try:
-            result['W'], result['H'], result['px'] = tile_canvas(s, mine)
+            result['W'], result['H'], result['px'] = tile_canvas(s, mine, slot)
             result['tile'] = tile_axis(s)
         except Exception as e:
             result['why'] = str(e).splitlines()[0]
     elif under:
         try:
-            result['W'], result['H'], result['px'] = from_guide(under, mine)
+            result['W'], result['H'], result['px'] = from_guide(under, mine, slot, s)
             result['on'] = os.path.relpath(under, ROOT).replace(os.sep, '/')
         except Exception as e:
             result['why'] = str(e).splitlines()[0]
@@ -850,6 +968,8 @@ def make(slot, fresh=False, view=None, app=None):
         if px.get('art'):
             layers.append({'name': 'your picture now', 'chans': chans('art')})
         layers.append({'name': 'draw here', 'rgba': None})
+        if px.get('measure'):
+            layers.append({'name': MEASURES_NAME, 'chans': chans('measure'), 'opacity': 235, 'locked': True})
         composite = base64.b64decode(px['flat']) if px.get('flat') else None
         guide = bool(px.get('guide'))
     else:
@@ -860,6 +980,13 @@ def make(slot, fresh=False, view=None, app=None):
         W, H = size
         layers = [{'name': 'draw here', 'rgba': None}]
         composite, guide = None, False
+        try:                                            # (the measurements still, on a blank page, if there's a browser)
+            px = blank_page(lambda page: page.evaluate(BUILD, [None, None, W, H, [0, 0, 1, 1], 'fill', measures(page, slot, s, W, H)]))
+            if px and px.get('measure'):
+                layers.append({'name': MEASURES_NAME, 'chans': list(zip((-1, 0, 1, 2), (base64.b64decode(x) for x in px['measure']))),
+                               'opacity': 235, 'locked': True})
+        except Exception:
+            pass
     os.makedirs(folder, exist_ok=True)               # (only now: a slot it can't size leaves nothing behind)
     path = os.path.join(folder, stem + '.psd')
     write_psd(path, W, H, layers, composite)
