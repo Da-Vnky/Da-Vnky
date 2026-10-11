@@ -14,9 +14,11 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- Drawing table: a canvas made before the measurements layer (and never saved over) is made again when you press the button, so it gets the layer; if the layer can't be drawn, the card says why. Rebelle now gets a canvas of the right size once it's open (asked over its live link, like the animator), and the guide and measurements are also saved as pictures in the slot's layers folder, to import into Rebelle.
 
 == published ==
+
+2026-10-11 01:08 · V
+- Drawing table: a canvas made before the measurements layer (and never saved over) is made again when you press the button, so it gets the layer; if the layer can't be drawn, the card says why. Rebelle now gets a canvas of the right size once it's open (asked over its live link, like the animator), and the guide and measurements are also saved as pictures in the slot's layers folder, to import into Rebelle.
 
 2026-10-11 00:53 · V
 - The drawing table's canvases now come with a measurements layer on top (hide it before you export): rulers in the canvas's own pixels, its size, the other pictures that sit on it outlined with where they are, and for the front garden and porch slots red lines for the ground, the path's edges, the door, the railing… (slots.json "marks"). Tick "a fresh canvas" to get it on one you've already started.
