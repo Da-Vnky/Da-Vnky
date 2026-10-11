@@ -31,8 +31,9 @@
                   there's a recording of your own: assets/sounds/bee-voice
                   (one steady buzz, a second or two: it's played at every pitch)
      its body     a drawn stand-in bee that hovers, flaps, bobs and squashes with
-                  every buzz, makes faces for its moods, and puffs out hearts,
-                  tears, steam, zZz… slots (assets/living/, with the rest of the
+                  every buzz, makes faces for its moods, and puffs little anime
+                  marks out from its face (a cross vein, sweat, tears, hearts,
+                  notes, sparkles, Zzz…). slots (assets/living/, with the rest of the
                   front garden), in pieces laid one over the other, all on the
                   same canvas so they line up by themselves: bee-body-flying (the
                   bee with no face, wings flapping: an animated WebP) or bee-body
@@ -40,8 +41,8 @@
                   (its everyday one), bee-face-<mood> (happy, excited, loving,
                   angry, sad, scared, sleepy, curious), and bee-face-talking /
                   bee-face-<mood>-talking (its mouth open, flashed on each buzz).
-                  and the little puffs: bee-fx-heart, -tear, -steam, -sweat, -zzz,
-                  -spark, -question, -zap
+                  and the little puffs: bee-fx-vein, -steam, -sweat, -tear, -heart,
+                  -note, -spark, -zzz, -question, -zap
      the revolver it won't be shot (sky/revolver.js asks it first: aimedAt / shot).
                   shoot at it and it weaves out of the way: every shot misses.
                   keep at it: frightened (two shots), furious (two more), then it stings you and takes the gun
@@ -244,10 +245,10 @@
     // (temperature, how many), what it starts from, and how it moves (wingbeat, how long one lap of hovering takes)
     var MOODS = {
         calm:    { seems: 'calm',                    hz: 277, scale: MAJ,    unit: .095, buzz: .4,  vib: [5, .010],   shape: 'arch',   slide: 0,    gain: .8,  bright: .95, follow: .10, rit: 0,    temp: .9,  len: [5, 12],  seed: ['bz', 'buzz'],     flap: .11,  hover: 5,   fx: null },
-        happy:   { seems: 'happy',                   hz: 330, scale: MAJ,    unit: .085, buzz: .45, vib: [5.5, .012], shape: 'lilt',   slide: .8,   gain: .9,  bright: 1,   follow: .15, rit: 0,    temp: 1,   len: [6, 14],  seed: ['buzz', 'bz'],     flap: .085, hover: 4,   fx: 'spark' },
+        happy:   { seems: 'happy',                   hz: 330, scale: MAJ,    unit: .085, buzz: .45, vib: [5.5, .012], shape: 'lilt',   slide: .8,   gain: .9,  bright: 1,   follow: .15, rit: 0,    temp: 1,   len: [6, 14],  seed: ['buzz', 'bz'],     flap: .085, hover: 4,   fx: 'note' },
         excited: { seems: 'buzzing with excitement', hz: 392, scale: MAJ,    unit: .065, buzz: .6,  vib: [6.5, .015], shape: 'climb',  slide: 1.2,  gain: 1,   bright: 1.15, follow: .25, rit: -.15, temp: 1.15, len: [10, 22], seed: ['BZ', 'buzz'],    flap: .06,  hover: 2.2, fx: 'spark' },
         loving:  { seems: 'smitten',                 hz: 294, scale: DREAMY, unit: .11,  buzz: .25, vib: [4.5, .018], shape: 'arch',   slide: .5,   gain: .75, bright: .85, follow: .10, rit: .1,   temp: .85, len: [6, 12],  seed: ['~', 'buzz'],      flap: .1,   hover: 5.5, fx: 'heart' },
-        angry:   { seems: 'furious',                 hz: 233, scale: MIN,    unit: .07,  buzz: .95, vib: [9, .02],    shape: 'stomp',  slide: 0,    gain: 1,   bright: 1.3, follow: .10, rit: 0,    temp: 1.05, len: [8, 18], seed: ['BZ', 'ZZ'],       flap: .05,  hover: 1.8, fx: 'steam', growl: .5 },
+        angry:   { seems: 'furious',                 hz: 233, scale: MIN,    unit: .07,  buzz: .95, vib: [9, .02],    shape: 'stomp',  slide: 0,    gain: 1,   bright: 1.3, follow: .10, rit: 0,    temp: 1.05, len: [8, 18], seed: ['BZ', 'ZZ'],       flap: .05,  hover: 1.8, fx: 'vein', growl: .5 },
         sad:     { seems: 'sad',                     hz: 220, scale: MIN,    unit: .13,  buzz: .3,  vib: [4, .02],    shape: 'droop',  slide: -1.2, gain: .65, bright: .8,  follow: .10, rit: .35,  temp: .8,  len: [3, 8],   seed: ['zzz', '~'],       flap: .14,  hover: 7,   fx: 'tear' },
         scared:  { seems: 'frightened',              hz: 440, scale: MIN,    unit: .06,  buzz: .5,  vib: [11, .03],   shape: 'jitter', slide: .6,   gain: .8,  bright: 1,   follow: .20, rit: 0,    temp: 1.25, len: [4, 10], seed: ['b', 'bu'],        flap: .045, hover: 1.1, fx: 'sweat', pauses: true },
         sleepy:  { seems: 'sleepy',                  hz: 196, scale: MIN,    unit: .16,  buzz: .2,  vib: [3.5, .010], shape: 'sink',   slide: -1.5, gain: .5,  bright: .7,  follow: .05, rit: .4,   temp: .7,  len: [3, 7],   seed: ['zzz', 'z'],       flap: .2,   hover: 8,   fx: 'zzz' },
@@ -740,16 +741,42 @@
             '</g>' +
             '<g class="b-wing w-front"><ellipse cx="62" cy="28" rx="15" ry="24" transform="rotate(16 62 28)" fill="#eef8ff" fill-opacity=".7" stroke="#2a1d14" stroke-width="1.6"/></g>' +
         '</svg>';
-    // the little puffs it lets off (each a slot: assets/living/bee-fx-<name>)
+    // the little puffs it lets off, drawn like the marks in a Japanese cartoon (manpu): bold, flat, a dark or white edge so they
+    // read on any background. each a slot: assets/living/bee-fx-<name>. where each one starts and how it moves: bee.css
+    var INK = '#1d1530', HALO = 'stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"';
     var FX = {
-        heart: '<svg viewBox="0 0 24 24"><path d="M12 21 C3 14 1 9 5 5.5 C8 3 11 5 12 7 C13 5 16 3 19 5.5 C23 9 21 14 12 21 Z" fill="#e2566c" stroke="#2a1d14" stroke-width="1.3"/></svg>',
-        tear: '<svg viewBox="0 0 24 24"><path d="M12 3 C8 10 6 13 6 16 a6 6 0 0 0 12 0 C18 13 16 10 12 3 Z" fill="#8fd0f2" stroke="#2a1d14" stroke-width="1.2"/></svg>',
-        steam: '<svg viewBox="0 0 24 24"><path d="M5 18 q-3-4 1-7 q-1-5 5-5 q3-4 7 0 q5 1 3 6 q3 4-2 6 Z" fill="#f3e6c2" fill-opacity=".85" stroke="#9a3b1f" stroke-width="1.2"/></svg>',
-        sweat: '<svg viewBox="0 0 24 24"><path d="M12 3 C9 9 7 12 7 15 a5 5 0 0 0 10 0 C17 12 15 9 12 3 Z" fill="#c8ecfd" stroke="#2a1d14" stroke-width="1.1"/></svg>',
-        zzz: '<svg viewBox="0 0 24 24"><text x="12" y="18" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-style="italic" font-size="18" fill="#f3e6c2" stroke="#2a1d14" stroke-width=".7">z</text></svg>',
-        spark: '<svg viewBox="0 0 24 24"><path d="M12 2 C12.8 9 15 11.2 22 12 C15 12.8 12.8 15 12 22 C11.2 15 9 12.8 2 12 C9 11.2 11.2 9 12 2 Z" fill="#fff0bf" stroke="#2a1d14" stroke-width="1"/></svg>',
-        question: '<svg viewBox="0 0 24 24"><text x="12" y="19" text-anchor="middle" font-family="IM Fell English, Georgia, serif" font-size="20" fill="#f3e6c2" stroke="#2a1d14" stroke-width=".8">?</text></svg>',
-        zap: '<svg viewBox="0 0 24 24"><path d="M14 2 L5 13 h6 l-2 9 l9-12 h-6 Z" fill="#ffe14d" stroke="#2a1d14" stroke-width="1.2" stroke-linejoin="round"/></svg>'
+        // the cross-shaped vein that pops on a cross forehead
+        vein: '<svg viewBox="0 0 24 24"><g fill="none" stroke-linecap="round">' +
+            '<path d="M10 2.5 Q10 10 2.5 10 M14 2.5 Q14 10 21.5 10 M10 21.5 Q10 14 2.5 14 M14 21.5 Q14 14 21.5 14" ' + HALO + '/>' +
+            '<path d="M10 2.5 Q10 10 2.5 10 M14 2.5 Q14 10 21.5 10 M10 21.5 Q10 14 2.5 14 M14 21.5 Q14 14 21.5 14" stroke="#e3263a" stroke-width="2.6"/></g></svg>',
+        // a huff of steam, blown out in a temper
+        steam: '<svg viewBox="0 0 24 24"><path d="M4 16 q-3.5-1 -2-4.5 q1-3 4.2-2.2 q1-4.3 5.6-3.6 q3.6-3 7 0 q3.8 .8 3.2 4.6 q2.6 2.6 -.4 5.2 q-2 2.4 -5.4 1.4 q-2.6 2.4 -6 .6 q-3.6 1.8 -6.2 -1.5z" fill="#fff" stroke="' + INK + '" stroke-width="1.3" stroke-linejoin="round"/>' +
+            '<path d="M8 13 q2-1.6 4 0 M13.5 11.5 q2-1.4 3.6 .2" fill="none" stroke="#b9c3d6" stroke-width="1.1" stroke-linecap="round"/></svg>',
+        // the big drop of sweat on the side of a worried head
+        sweat: '<svg viewBox="0 0 24 24"><path d="M12 1.5 C9.5 7 5.5 11 5.5 15.5 a6.5 6.5 0 0 0 13 0 C18.5 11 14.5 7 12 1.5 Z" fill="#c4ecff" stroke="#2c6cb8" stroke-width="1.5" stroke-linejoin="round"/>' +
+            '<path d="M9 13.5 q-.8 2.6 .8 4.4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="10.6" cy="10.6" r=".9" fill="#fff"/></svg>',
+        // a tear
+        tear: '<svg viewBox="0 0 24 24"><path d="M12 3 C10 8 7.5 11 7.5 14.5 a4.5 4.5 0 0 0 9 0 C16.5 11 14 8 12 3 Z" fill="#7dc9f7" stroke="#2c6cb8" stroke-width="1.4" stroke-linejoin="round"/>' +
+            '<path d="M10.2 13.6 q-.5 1.8 .6 3" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>',
+        // a heart, with its shine
+        heart: '<svg viewBox="0 0 24 24"><path d="M12 21 C3.5 14.5 1.5 10 4.6 6.2 C7.4 3 10.6 4.6 12 7 C13.4 4.6 16.6 3 19.4 6.2 C22.5 10 20.5 14.5 12 21 Z" fill="#ff5c8e" stroke="#a8174a" stroke-width="1.4" stroke-linejoin="round"/>' +
+            '<path d="M6.4 8.4 q1-1.8 3-1.4" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>',
+        // a little tune (♪)
+        note: '<svg viewBox="0 0 24 24"><g ' + HALO + '><path d="M10 18 V4.5 L18.5 3 V6.5 L10 8" fill="none"/><ellipse cx="7.3" cy="18" rx="3.3" ry="2.5" transform="rotate(-20 7.3 18)"/></g>' +
+            '<path d="M10 18 V4.5 L18.5 3 V6.5 L10 8" fill="none" stroke="' + INK + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+            '<ellipse cx="7.3" cy="18" rx="3.3" ry="2.5" transform="rotate(-20 7.3 18)" fill="' + INK + '"/></svg>',
+        // the twinkle of happiness (kira kira): a big four-pointed star and a small one
+        spark: '<svg viewBox="0 0 24 24"><path d="M10 1.5 C10.8 7.6 12.4 9.2 18.5 10 C12.4 10.8 10.8 12.4 10 18.5 C9.2 12.4 7.6 10.8 1.5 10 C7.6 9.2 9.2 7.6 10 1.5 Z" fill="#fff7c2" stroke="#e2a400" stroke-width="1.2" stroke-linejoin="round"/>' +
+            '<path d="M19 14.5 C19.3 16.9 19.9 17.6 22.3 17.9 C19.9 18.2 19.3 18.9 19 21.3 C18.7 18.9 18.1 18.2 15.7 17.9 C18.1 17.6 18.7 16.9 19 14.5 Z" fill="#fff" stroke="#e2a400" stroke-width="1"/></svg>',
+        // dozing off
+        zzz: '<svg viewBox="0 0 24 24"><path d="M6 6 H18 L6 19 H18" fill="none" ' + HALO + '/><path d="M6 6 H18 L6 19 H18" fill="none" stroke="#4f6fd6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        // wondering
+        question: '<svg viewBox="0 0 24 24"><g fill="none" ' + HALO + '><path d="M7.5 8 Q7.5 3 12 3 Q16.5 3 16.5 7.2 Q16.5 10 13.5 11.4 Q12 12.2 12 14.6"/></g><circle cx="12" cy="19.5" r="2.6" fill="#fff"/>' +
+            '<path d="M7.5 8 Q7.5 3 12 3 Q16.5 3 16.5 7.2 Q16.5 10 13.5 11.4 Q12 12.2 12 14.6" fill="none" stroke="#ff8a1f" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '<circle cx="12" cy="19.5" r="1.7" fill="#ff8a1f"/></svg>',
+        // the jolt of a sting: a burst of shock lines round a flash
+        zap: '<svg viewBox="0 0 24 24"><path d="M12 1 L13.6 8.2 L19.8 4.2 L15.8 10.4 L23 12 L15.8 13.6 L19.8 19.8 L13.6 15.8 L12 23 L10.4 15.8 L4.2 19.8 L8.2 13.6 L1 12 L8.2 10.4 L4.2 4.2 L10.4 8.2 Z" fill="#ffe14d" stroke="' + INK + '" stroke-width="1.2" stroke-linejoin="round"/>' +
+            '<circle cx="12" cy="12" r="3" fill="#fff"/></svg>'
     };
     var fxArt = {};
     Object.keys(FX).forEach(function (k) { Sky.findAsset('assets/living/bee-fx-' + k, function (url) { if (url) fxArt[k] = url; }); });
@@ -781,9 +808,9 @@
         '<div class="bee-bubble" aria-hidden="true"><span></span></div>' +
         '<button type="button" class="bee" aria-label="the bee: talk to it">' +
             '<span class="bee-fly"><span class="bee-pose"><span class="bee-art" data-slot="' + BODY.concat('assets/living/bee-face').join(' ') + '">' + DRAWN +
-                '<img class="art body" alt="" hidden><img class="art face" alt="" hidden><img class="art face-talk" alt="" hidden></span></span>' +
-            '<span class="bee-gun" aria-hidden="true">' + GUN_ART + '</span>' +
-            '<span class="bee-fx" aria-hidden="true"></span></span>' +
+                '<img class="art body" alt="" hidden><img class="art face" alt="" hidden><img class="art face-talk" alt="" hidden></span>' +
+                '<span class="bee-fx" aria-hidden="true"></span></span>' +
+            '<span class="bee-gun" aria-hidden="true">' + GUN_ART + '</span></span>' +
             '<span class="kh-hint">the bee</span>' +
         '</button>';
     stage.appendChild(home);
@@ -843,8 +870,10 @@
             var p = document.createElement('span');
             p.className = 'bee-p fx-' + kind;
             p.innerHTML = fxArt[kind] ? '<img alt="" src="' + fxArt[kind] + '">' : FX[kind];
-            p.style.setProperty('--dx', rnd(-40, 40).toFixed(0) + '%');
+            p.style.setProperty('--dx', rnd(-10, 45).toFixed(0) + '%');           // (forwards, the way it faces: bee.css turns it round)
             p.style.setProperty('--dy', rnd(-120, -60).toFixed(0) + '%');
+            p.style.setProperty('--jx', rnd(-18, 18).toFixed(0) + '%');           // (a little off its usual spot, so two aren't on top of each other)
+            p.style.setProperty('--jy', rnd(-14, 14).toFixed(0) + '%');
             p.style.setProperty('--r', rnd(-25, 25).toFixed(0) + 'deg');
             p.style.animationDelay = (i * .12).toFixed(2) + 's';
             fxBox.appendChild(p);
@@ -1238,10 +1267,120 @@
     });
     Sky.escape(function () { return open; }, close);
 
+    /* ======================================================================
+       as it flies: a dotted trail behind it, and its wings' soft hum
+       ====================================================================== */
+    // the trail: a dot dropped behind its tail every little way it goes, each fading out (a cartoon's flight path).
+    // one dot is a slot: assets/living/bee-trail (else a little cream dot). none for visitors who'd rather nothing moved
+    var STILL = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var trail = document.createElement('div');
+    trail.className = 'bee-trail';
+    trail.setAttribute('aria-hidden', 'true');
+    var dotArt = null;
+    Sky.findAsset('assets/living/bee-trail', function (url) { dotArt = url; });
+    var lastDot = null, lastAt = null, faceSign = 1, faceT = 0, speed = 0;
+    function drop(x, y, w) {
+        var box = trail.getBoundingClientRect();
+        if (!box.width || !box.height) return;
+        var d = document.createElement('span');
+        d.className = 'bee-dot';
+        if (dotArt) d.innerHTML = '<img alt="" src="' + dotArt + '">';
+        d.style.left = ((x - box.left) / box.width * 100).toFixed(2) + '%';
+        d.style.top = ((y - box.top) / box.height * 100).toFixed(2) + '%';
+        d.style.width = Math.max(4, w * .075).toFixed(1) + 'px';
+        d.addEventListener('animationend', function () { d.remove(); });
+        trail.appendChild(d);
+        if (trail.children.length > 48) trail.firstChild.remove();
+    }
+    // every frame while you can see it: where its tail is, how far it's come, how fast (for the hum, below)
+    function fly(now) {
+        requestAnimationFrame(fly);
+        if (MAPPING || !here()) { lastDot = lastAt = null; speed = 0; return; }
+        if (trail.parentNode !== home.parentNode || trail.nextSibling !== home) { home.parentNode.insertBefore(trail, home); lastDot = lastAt = null; }
+        if (now - faceT > 400) { faceT = now; faceSign = parseFloat(getComputedStyle(home).getPropertyValue('--face')) < 0 ? -1 : 1; }
+        var r = art.getBoundingClientRect();
+        if (!r.width) return;
+        var x = r.left + r.width / 2 - faceSign * r.width * .44, y = r.top + r.height * .55;
+        if (lastAt) {
+            var dt = Math.max(1, now - lastAt.t), v = Math.hypot(x - lastAt.x, y - lastAt.y) / dt * 1000 / r.width;   // (its own widths a second)
+            speed += (Math.min(1, v / 1.4) - speed) * Math.min(1, dt / 250);
+        }
+        lastAt = { x: x, y: y, t: now };
+        if (!lastDot) { lastDot = { x: x, y: y }; return; }
+        var step = r.width * .1;
+        if (STILL || Math.hypot(x - lastDot.x, y - lastDot.y) < step) return;
+        drop(x, y, r.width);
+        lastDot = { x: x, y: y };
+    }
+    requestAnimationFrame(fly);
+
+    // the hum: its wings, very quietly, the same warm buzz as its voice (a sawtooth through a soft filter, fluttering at
+    // its wingbeat), a little higher and louder when it darts about, quieter while it talks, panned to where it is, and
+    // silent when you can't see it. the sound effects slider sets how loud. it starts with your first click or key
+    // (browsers insist). your own: assets/sounds/bee-hum (a loop, a second or two), else this one
+    var HUM = .035;                                                  // (how loud, at the usual sound effects level)
+    var hum = null, humLoop = null;
+    Sky.findAsset('assets/sounds/bee-hum.ogg|assets/sounds/bee-hum.mp3', function (url) { humLoop = url; });
+    function startHum() {
+        if (hum || MAPPING) return;
+        var V = voice();
+        if (!V) return;
+        var c = V.ctx, out = c.createGain(), pan = panner(c, 0, c.destination), wing = c.createGain(), lfo = c.createOscillator(), depth = c.createGain();
+        out.gain.value = 0;
+        out.connect(pan);
+        wing.gain.value = .55;                                       // (the wingbeat: the buzz swells and dips)
+        lfo.frequency.value = 30; depth.gain.value = .45;
+        lfo.connect(depth); depth.connect(wing.gain); lfo.start();
+        wing.connect(out);
+        var lp = c.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 650; lp.Q.value = 4;
+        lp.connect(wing);
+        hum = { c: c, out: out, pan: pan, lfo: lfo, lp: lp, oscs: [], src: null };
+        function synth() {
+            [1, 1.006, .5].forEach(function (k, i) {
+                var o = c.createOscillator(), g = c.createGain();
+                o.type = i === 2 ? 'triangle' : 'sawtooth'; o.frequency.value = 140 * k; g.gain.value = i === 2 ? .5 : .35;
+                o.connect(g); g.connect(lp); o.start();
+                hum.oscs.push({ o: o, k: k });
+            });
+        }
+        if (!humLoop) synth();
+        else fetch(humLoop).then(function (r) { return r.arrayBuffer(); }).then(function (a) { return c.decodeAudioData(a); }).then(function (buf) {
+            var s = c.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(out); s.start();
+            hum.src = s;                                             // (his own: straight out, no made-up filter or flutter)
+        }).catch(synth);
+        tuneHum();
+    }
+    // a few times a second: how it should sound now
+    function tuneHum() {
+        if (!hum) return;
+        setTimeout(tuneHum, 120);
+        var c = hum.c, t = c.currentTime, M = MOODS[home.dataset.mood] || MOODS.calm;
+        var on = here() && !document.hidden && !MAPPING;
+        var vol = on ? HUM * level() * (.7 + .6 * speed) * (home.classList.contains('buzzing') ? .35 : 1) : 0;
+        hum.out.gain.setTargetAtTime(vol, t, on ? .25 : .08);
+        if (!on) return;
+        if (c.state !== 'running') c.resume().catch(function () {});
+        var f = M.hz * .5 * (1 + .12 * speed);
+        hum.oscs.forEach(function (x) { x.o.frequency.setTargetAtTime(f * x.k, t, .2); });
+        if (hum.src) hum.src.playbackRate.setTargetAtTime(1 + .1 * speed, t, .2);
+        hum.lfo.frequency.setTargetAtTime(Math.max(14, Math.min(60, 3 / M.flap)), t, .3);
+        hum.lp.frequency.setTargetAtTime(520 + 500 * speed, t, .2);
+        var r = art.getBoundingClientRect();
+        if (hum.pan.pan && r.width) hum.pan.pan.setTargetAtTime(Math.max(-.8, Math.min(.8, ((r.left + r.width / 2) / innerWidth - .5) * 1.6)), t, .2);
+    }
+    function wake() {
+        if (hum) return;
+        startHum();
+        if (hum) { removeEventListener('pointerdown', wake, true); removeEventListener('keydown', wake, true); }
+    }
+    if (!MAPPING) { addEventListener('pointerdown', wake, true); addEventListener('keydown', wake, true); }
+
     Sky.bee = {
         open: openMenu, close: close, say: send, poke: poke,
         aimedAt: aimedAt, shot: shot, get gun() { return gun; }, get grudge() { return grudge; },   // (sky/revolver.js)
         get mood() { return mood(); }, get fond() { return fond; },
+        puff: puff,                                                         // (a mark out of its face: Sky.bee.puff('vein'))
         // (for testing and for the asset manager: what it'd say, and a reply played into any sound context)
         think: function (m, len) { return load().then(function () { return think(m || mood(), { len: len || MOODS[m || 'calm'].len, seed: [MOODS[m || 'calm'].seed[0]] }); }); },
         plan: function (w, m, sing, dread) { return sing ? composeSing(w, m, dread) : composeTalk(w, m); },

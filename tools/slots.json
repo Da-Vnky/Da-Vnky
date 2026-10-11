@@ -2194,50 +2194,68 @@
       },
       {
        "slot": "assets/living/bee-fx-heart",
-       "what": "a little puff it lets off when it's smitten (floats up and fades)",
+       "what": "a heart that floats up when it's smitten: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-vein",
+       "what": "the cross-shaped anger vein (💢) that pops on its forehead and throbs when it's furious: drawn like the marks in a Japanese cartoon, comes out from its face",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-note",
+       "what": "a music note that floats up when it's happy: drawn like the marks in a Japanese cartoon, comes out from its face",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-tear",
-       "what": "a little puff it lets off when it's sad (floats up and fades)",
+       "what": "a tear that wells at its eye and falls when it's sad: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-steam",
-       "what": "a little puff it lets off when it's furious (floats up and fades)",
+       "what": "a huff of steam it blows out in front of its face when it shouts while furious: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-sweat",
-       "what": "a little puff it lets off when it's frightened (floats up and fades)",
+       "what": "the big anime sweat drop on the side of its head when it's frightened (slides slowly down): drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-zzz",
-       "what": "a little puff it lets off when it's sleepy (floats up and fades)",
+       "what": "a Z that floats up when it's sleepy: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-spark",
-       "what": "a little puff it lets off when it's happy and excited (floats up and fades)",
+       "what": "a sparkle (kira kira) that twinkles round its face when it's excited: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-question",
-       "what": "a little puff it lets off when it's curious (floats up and fades)",
+       "what": "a question mark that pops up over its head when it's curious: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-zap",
-       "what": "a little puff it lets off when it stings (*STINGS YOU*) (floats up and fades)",
+       "what": "the flash when it stings you: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-trail",
+       "what": "one dot of the dotted trail it leaves behind it as it flies (dropped behind its tail every little way, each fading and shrinking). until yours is in, a little cream dot",
+       "size": "about 16 x 16, see-through",
        "optional": true
       },
       {
@@ -3232,6 +3250,12 @@
       {
        "slot": "assets/sounds/bee-voice",
        "what": "the bee’s voice (the front garden): one steady buzz, a second or two, on one note. it's played at every pitch for every word the bee says (the site finds what note you hummed), through the bee’s squelchy filter and its little room. until yours is in, the bee buzzes with a made-up voice",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/bee-hum",
+       "what": "its wings as it flies about (the front garden and the porch): a soft buzz, a loop of a second or two, played very quietly the whole time you can see it, a little faster when it darts about, quieter while it talks. until yours is in, a made-up hum like its voice",
        "kind": "sound",
        "optional": true
       }
