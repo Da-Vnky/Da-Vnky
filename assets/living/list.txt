@@ -1,3 +1,13 @@
 # written by tools/update-lists.sh: every art file in this folder.
 # no need to edit it; it's rewritten each commit.
+bee-body.webp
+bee-face-angry.webp
+bee-face-curious.webp
+bee-face-excited.webp
+bee-face-happy.webp
+bee-face-loving.webp
+bee-face-sad.webp
+bee-face-scared.webp
+bee-face-sleepy.webp
+bee-face.webp
 vinyl-texture.webp
