@@ -18,7 +18,7 @@
    slots: assets/ui/heart (the life), assets/ui/heart-empty (lost),
           assets/ui/lives-lock (the lock on it), assets/ui/lives-frame (behind it)
    sounds: assets/sounds/lives-found (the page makes a chime until then)
-   A death that takes the heart is instant (27 Sep, Victor): straight into the reset's white-out, "No more lives
+   A death that takes the heart is instant (27 Sep): straight into the reset's white-out, "No more lives
    left" written on it (sky/forget.js). Deaths that don't count (before the key) bring the traveller back.
    ===================================================================== */
 
@@ -88,7 +88,7 @@
         el.innerHTML = h + '<span class="l-lock" title="locked">' + art.lock + '</span>';
         el.setAttribute('aria-label', MAX === 1 ? (n ? 'your life' : 'no life left') : n + ' of ' + MAX + ' lives');
     }
-    var GONE = 'No more lives left';                                   // what it says as the last one goes (Victor's words)
+    var GONE = 'No more lives left';                                   // what it says as the last one goes (the artist's own words)
     function say(t) {
         var d = document.createElement('div');
         d.className = 'lives-note';
@@ -127,7 +127,7 @@
         pending = null;
         lose();
     });
-    // the heart goes, and the world with it, there and then (27 Sep, Victor: an instant death, straight into the reset's
+    // the heart goes, and the world with it, there and then (27 Sep: an instant death, straight into the reset's
     // white-out, "No more lives left" written on it; no breaking heart, no wait)
     var resetting = false;
     function lose() {

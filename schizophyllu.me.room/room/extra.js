@@ -397,7 +397,7 @@ export const OPI = {
       '  - the conversations: mira\'s, claube\'s, and skizy\'s rants',
       '  - a packed bag, on the floor by the ladder. just in case',
       "  - the stickers on skizy's fridge. beastie is my favourite",
-      "  - a smoke test, and 200,000 characters of css moved out of victor's javascript",
+      "  - a smoke test, and 200,000 characters of css moved out of dav-nky's javascript",
       "most of it was skizy's idea. i just drew it.",
     ],
     'for-skizy.txt': [

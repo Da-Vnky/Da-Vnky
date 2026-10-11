@@ -49,7 +49,7 @@
         var me = document.querySelector('script[src*="sky/forget.js"]');
         try { return new URL('../index.html', me ? me.src : location.href).href; } catch (e) { return 'index.html'; }
     })();
-    // phrase (5 Oct, Victor): what the reset's death leaves them with, written on the white under the caption (sky/state.js
+    // phrase (5 Oct): what the reset's death leaves them with, written on the white under the caption (sky/state.js
     // RESETS[n].phrase): the white holds a little longer, to read it
     function whiteOut(slot, caption, work, to, phrase) {
         var w = document.createElement('div');

@@ -147,7 +147,7 @@
         };
         wp.addEventListener('click', peel);
         wp.addEventListener('keydown', peel);
-        // (11 Oct, Victor: grabbed, then pulled) take hold of the curl and pull it down: it lifts further off the wall, and
+        // (11 Oct: grabbed, then pulled) take hold of the curl and pull it down: it lifts further off the wall, and
         // far enough it tears away in one strip. let go too soon and it curls back
         Sky.pull(wp, {
             dir: [0.25, 1],
@@ -197,7 +197,7 @@
             if (stitched) { say('Someone’s sewn the sky shut. Big, clumsy stitches.', 2800); return; }
             if (e.detail === 0) tryTear();                                   // (from the keyboard. by hand it's pulled: below)
         });
-        // (11 Oct, Victor: grabbed, then pulled) take hold of the loose corner and pull it away from the sky: it lifts and
+        // (11 Oct: grabbed, then pulled) take hold of the loose corner and pull it away from the sky: it lifts and
         // stretches, and far enough it tears. let go too soon and it lies flat again
         var flap = function () { return seam.querySelector('svg, .art'); };
         Sky.pull(seam, {

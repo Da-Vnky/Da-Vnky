@@ -11,7 +11,7 @@
    YOUR OWN: assets/sounds/ambient.mp3 (or .ogg), made to loop. Until then,
    a drawn stand-in (panel.js SYNTHS.ambient: slow warm chords, the hush of
    the house, a far-off note now and then). Icon in the panel: assets/ui/ambient.
-   Reset 1 has its own (28 Sep, Victor): bright and cheerful, the false world at
+   Reset 1 has its own (28 Sep): bright and cheerful, the false world at
    its loveliest: assets/sounds/ambient-bright (stand-in: SYNTHS['ambient-bright']).
    From reset 2 on, it's the one above.
    It keeps quiet wherever the music does (the dungeon, below, the grimoire:

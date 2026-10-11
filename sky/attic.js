@@ -124,7 +124,7 @@
     // the hand that holds them: closed while you've hold of the lamp or the cord (the grab cursors: sky.css, "things you take
     // hold of and pull"; the open hand's over them already)
     function hand(on) { document.documentElement.classList.toggle('grabbing', on); }
-    // the cord: take hold and pull it down, and the hatch gives (11 Oct, Victor: pulled for real; a plain click just
+    // the cord: take hold and pull it down, and the hatch gives (11 Oct: pulled for real; a plain click just
     // tugs it a little and says so. from the keyboard, Enter still pulls it)
     var tug = null;
     function cordBack(el) {

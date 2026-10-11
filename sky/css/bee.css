@@ -153,7 +153,7 @@ body.bee-talking .bee-home .bee-fly {
     height: 100%;
     object-fit: contain;
 }
-/* Victor's bee faces left (mine faces right), so his is turned the other way round */
+/* the artist's bee faces left (mine faces right), so his is turned the other way round */
 .bee-home .bee-art.has-art {
     transform: scaleX(calc(var(--face) * -1));
 }
@@ -313,7 +313,7 @@ body.bee-talking .bee-home .bee-fly {
     translate: -50% -50%;
     pointer-events: none;
 }
-/* Victor's bee: its face is further forward, a little lower (bee-face's own spot, nudged like the faces) */
+/* the artist's bee: its face is further forward, a little lower (bee-face's own spot, nudged like the faces) */
 .bee-home .bee-art.has-art ~ .bee-fx {
     --fx-x: 38%;
     --fx-y: 3%;
@@ -950,7 +950,7 @@ body.bee-talking .hotbar {
     pointer-events: none;
 }
 
-/* the hand over it (11 Oct, Victor): a poking finger over its body, a patting hand over its head (bee.js onHead sets
+/* the hand over it (11 Oct): a poking finger over its body, a patting hand over its head (bee.js onHead sets
    .on-head; the hands are sky.js's cursor-poke and cursor-pat, with the click squeeze every cursor has) */
 html body:not(.inv-holding) .bee-home .bee,
 html body:not(.inv-holding) .bee-home .bee * {

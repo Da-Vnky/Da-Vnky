@@ -37,7 +37,7 @@
 .porch .room-arrow.porch-back:focus-visible {
     transform: translateX(-4px);
 }
-/* down the steps to the front garden (11 Oct, Victor: "make the center of the porch glow be clickable", and no arrow: it
+/* down the steps to the front garden (11 Oct: "make the center of the porch glow be clickable", and no arrow: it
    was confusing). the gap in the railing (x 700-900 of the 1600-wide porch-frame, from just above the railing's top down to
    the floor) breathes a soft warm light (.porch-steps-glow, below), brighter when you point at it, and a click there goes
    down into the garden. this is the click: see-through, over the traveller (z 6), who stands in front of it */
@@ -253,7 +253,7 @@ body.in-porch .sky-links * {
 .porch .porch-door {
     left: .4%;
     bottom: calc(var(--floor-h) - 1vh);
-    width: 10.2%;                                           /* (11 Oct, Victor: it was far too narrow at 7.6%) */
+    width: 10.2%;                                           /* (11 Oct: it was far too narrow at 7.6%) */
     height: 54vh;
 }
 .porch .porch-door>svg,
@@ -513,7 +513,7 @@ body.in-porch .sky-links * {
     }
 }
 
-/* an upright phone (11 Oct, Victor: "just have it scroll across the porch scene if you tap right"): the porch is two and a
+/* an upright phone (11 Oct: "just have it scroll across the porch scene if you tap right"): the porch is two and a
    half screens wide instead of squeezed into one, and you see a part of it at a time: the door end, the steps, the mailbox
    end. porch.js sets --porch-pan (how far along, px) and moves the view with the arrows at the screen's sides (.porch-look,
    outside the porch so they stay put) or a swipe; the view follows the traveller when they walk */

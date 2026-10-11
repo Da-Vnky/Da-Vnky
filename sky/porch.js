@@ -145,7 +145,7 @@
     if (door) door.addEventListener('click', inside);
     if (location.hash === '#porch') setTimeout(function () { if (Sky.sides) Sky.sides.goNow('hall'); setTimeout(function () { openPorch(true); }, 80); }, 120);
 
-    /* ---------------- LOOKING along the porch, on an upright phone (11 Oct, Victor) ----------------
+    /* ---------------- LOOKING along the porch, on an upright phone (11 Oct) ----------------
        porch.css makes the porch wider than the screen there, so you see a part of it at a time: the door end, the steps,
        the mailbox end (VIEWS: how far along the part that doesn't fit; the middle one shows the bee over the yard, the
        traveller and the steps). the arrows at the screen's sides look along it,

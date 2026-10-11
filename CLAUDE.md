@@ -1020,6 +1020,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - Once per visit the loader reads `catalog.txt`, compares checksums with `localStorage["dav-seen"]` and
   deletes changed/removed files from the cache (they're refetched when next needed); on a first visit it
   precaches only pages/code/lists (~1 MB). If the current page, `sky/*`, `assets/*` or any `.txt` list changed, it reloads once (28 Sep: art and lists too, or the first page after a publish showed the old ones).
+- **The first visit's screen** says the site's a work in progress (11 Oct, Victor): a red-ink "WIP" stamp under the name
+  and "a work in progress: some of it is still in pencil" (`.dl-wip`, shown by `#dav-loader.first`: `screen(title, first)`),
+  never on a later visit's "unpacking what's new". The size reads `amount(got, total)`: both in one unit to the same decimal
+  ("1.5 of 2.2 MB", or KB under a megabyte; 1024 × 1024 bytes, as Windows counts). Checked 11 Oct with a fresh catalog: it
+  said 2.2 MB for 175 files that came to 2.16 MB. **catalog.txt's sizes are the served ones**: update-lists.sh measures
+  text files (html js css json txt svg xml) with every `\r` taken out (`tr -d '\r' | cksum`), since Victor's Windows copy has
+  CRLF line ends and the published one doesn't (before, his sizes were ~1% too big and his checksums never matched a
+  publish made on Linux, so each switch of publisher made every visitor's browser forget everything once).
 - Cache keys ignore `?v=`. "Forget your stay… (Clear cache)" asks first; then it **forgets everything**
   (Victor's call, 26 Sep): the cache, sessionStorage and all of localStorage (the reset number, hearts, P(Doom)
   record, settings), plays the white-out and lands on the homepage as a brand-new visitor
@@ -1289,6 +1297,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - Don't change Victor's Supabase setup without asking; he runs SQL himself (`tools/*.sql`).
 - ntfy topics must be long and random.
 - The repo is public: nothing private goes in any committed file (this one included).
+- **Victor's name is never on the site** (11 Oct, Victor): nothing the server sends (html, js, css, json, txt, svg, xml:
+  code comments, CHANGES.txt, skizy's room included) says "Victor". In comments and change lines write "the artist" (or just
+  the date: "(11 Oct: …)" rather than "(11 Oct, Victor: …)"). These notes (.md, never served) and the tools' .py/.sh/.bat
+  may still say Victor. Check with `git grep -i victor -- ':!*.md' ':!tools/*.py' ':!tools/*.sh' ':!tools/*.bat'` (nothing).
 - **Her handle, never her first name** (10 Oct, Victor): the site and the repo are public, so the friend whose room is across
   the street is **skizy** everywhere: on the page, in code, file and folder names, slots, saves, comments, these notes and
   CHANGES.txt. Her room's own code too, since 11 Oct (she asked, through Victor): her character's id and speaker id are `skizy`

@@ -1,7 +1,7 @@
 /* =====================================================================
    moonlight.js — the moon's light through the house's windows (28 Sep,
-   Victor: like skizy's apartment). By night, a soft glow round the window.
-   By day, nothing. (11 Oct, Victor: the beams falling from the windows onto
+   like skizy's apartment). By night, a soft glow round the window.
+   By day, nothing. (11 Oct: the beams falling from the windows onto
    the floor are gone from the house, "they look bad": the beams stay a thing
    of skizy's room.) And where a room's window
    is only painted on (the kitchen's, the attic's round one), a hole is cut

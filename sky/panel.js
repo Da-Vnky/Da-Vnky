@@ -264,7 +264,7 @@
                 }
             };
         },
-        // reset 1's ambience (sky/ambient.js; 28 Sep, Victor): bright and cheerful, a world that looks lovely on the surface.
+        // reset 1's ambience (sky/ambient.js; 28 Sep): bright and cheerful, a world that looks lovely on the surface.
         // a warm major pad (C, G, A minor, F: two bars each), a plucked arpeggio on the eighths, a soft bass on the beat, a
         // shaker on the off-beats and a sparkle up high now and then. (your own: assets/sounds/ambient-bright, loops)
         'ambient-bright': function (out) {

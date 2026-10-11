@@ -407,7 +407,7 @@
         return buf;
     }
     // everything it says goes through this: a bus straight out, one to the hall, one to an echo that bounces side to side;
-    // and at the end a limiter that only touches the rare peak (Victor: no squashing)
+    // and at the end a limiter that only touches the rare peak (no squashing)
     function Engine(ctx) {
         var master = ctx.createGain(), limit = ctx.createDynamicsCompressor();
         limit.threshold.value = -3; limit.knee.value = 0; limit.ratio.value = 20; limit.attack.value = .002; limit.release.value = .12;
@@ -432,7 +432,7 @@
         return b;
     }
 
-    // Victor's own buzz (assets/sounds/bee-voice), played at every pitch, if there is one
+    // the artist's own buzz (assets/sounds/bee-voice), played at every pitch, if there is one
     var sample = null;
     function pitchOf(buf) {                                       // (its note: where it best lines up with itself)
         var d = buf.getChannelData(0), sr = buf.sampleRate, n = Math.min(4096, d.length >> 1), at = Math.max(0, (d.length >> 1) - (n >> 1));
@@ -564,7 +564,7 @@
     }
 
     // singing: its words as keys on a little keyboard (every key in one five-note scale: any order sounds nice).
-    // each mood has its own keyboard (Victor: the notes it sings fit how it feels):
+    // each mood has its own keyboard (the notes it sings fit how it feels):
     //   scale   the five keys (semitones above the root). each is a "mode" with its own colour:
     //           major pentatonic = sunny; the maj9 chord's own notes = dreamy and warm; minor with the flat 6 = sad;
     //           diminished (stacked minor thirds) with a semitone rub = suspense; the suspended pentatonic (no 3rd, so
@@ -796,7 +796,7 @@
         '<rect x="28.5" y="9" width="3" height="4" fill="#2a1d14"/>' +
         '<path d="M8 40 Q16 33 21 37 M52 40 Q44 33 39 37" fill="none" stroke="#2a1d14" stroke-width="2.4" stroke-linecap="round"/></svg>';
 
-    // Victor's bee, in pieces: the body (flapping if he's animated it, else still; still for those who'd rather nothing moved),
+    // the artist's bee, in pieces: the body (flapping if he's animated it, else still; still for those who'd rather nothing moved),
     // and over it the face for how it feels (all on the same canvas, so they sit exactly on each other)
     var BODY = ['assets/living/bee-body-flying', 'assets/living/bee-body'];
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) BODY.reverse();
@@ -819,7 +819,7 @@
         gunEl = home.querySelector('.bee-gun');
     Sky.findAsset('assets/living/bee-gun', function (url) { if (url) gunEl.innerHTML = '<img alt="" src="' + url + '">'; });
 
-    // Victor's pictures, if he's drawn the bee: his body (else mine, faces and all), and on it his face for this mood (else
+    // the artist's pictures, if he's drawn the bee: his body (else mine, faces and all), and on it his face for this mood (else
     // his everyday face), with its mouth-open twin for each buzz (this mood's, else his everyday one, else the face stays)
     var faceKey = '', warmed = false;
     function show(img, url) {
@@ -1065,7 +1065,7 @@
         if (open && menu && !run) entry('bt-poke', 'you poke the bee.');
         reply(null, { len: n > 4 ? [3, 6] : [2, 4], sting: n > 4 });
     }
-    // a pat on the head (11 Oct, Victor): it likes that. it goes happy, loving or excited (happy twice as often), bobs under
+    // a pat on the head (11 Oct): it likes that. it goes happy, loving or excited (happy twice as often), bobs under
     // your hand, a heart or a note or a spark comes off it, and it buzzes back in that mood. kindness it remembers, too
     // (feelAll nudges fond up). the menu shut, the pat opens it, and its hello's in the mood the pat put it in
     var pats = [], PAT = ['happy', 'loving', 'happy', 'excited'], PAT_FX = { happy: 'note', loving: 'heart', excited: 'spark' };
@@ -1246,7 +1246,7 @@
             }, 650);
         });
     }
-    // reset 1 (11 Oct, Victor): the revolver is that reset's only way to die, so stinging it to pieces left no way on. there,
+    // reset 1 (11 Oct): the revolver is that reset's only way to die, so stinging it to pieces left no way on. there,
     // it flies straight at you and stings you, takes the revolver, and shoots you with it: straight on to reset 2 (no key or
     // heart needed). it's itself again in reset 2 (no grudge kept), but it's kept the gun: not on the wall till reset 8
     function stingToDeath(id) {

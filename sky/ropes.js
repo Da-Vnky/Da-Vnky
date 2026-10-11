@@ -1,7 +1,7 @@
 /* =====================================================================
    ropes.js — resets 1 and 2: the sky's a stage set, and its props (the sun,
    the moon, the clouds, the things that fly past) hang on ropes from the
-   flies (sky.css, "props on ropes"). Here they swing a little (28 Sep, Victor):
+   flies (sky.css, "props on ropes"). Here they swing a little (28 Sep):
      - carried along (the sun and moon across the sky as you scroll, a blimp
        setting off), a prop lags behind and swings back and forth, settling
      - the wind pushes them (the weather's wind), and there's always a faint

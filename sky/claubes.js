@@ -67,7 +67,7 @@
     var DOOM = /p\s*\(\s*doom\s*\)/i;          // the song that calls them out
     function doomGiven() { try { return localStorage.getItem('skizy-remedy') !== null; } catch (e) { return false; } }
     function robed() { return !!S && S.reset === 4 && S.get('claubes-robed') === '1'; }      // (robed: reset 4 only, ever)
-    // after reset 4 (27 Sep, Victor): the robed ones were killed. the ordinary ones come out only once more, ever, for the
+    // after reset 4 (27 Sep): the robed ones were killed. the ordinary ones come out only once more, ever, for the
     // purified record (localStorage claubes-after4, kept like the reset number), in case they were missed before; they
     // say AFTER4_LINES, and they never go down to worship in the dungeon again
     function after4() { return !!S && S.reset >= 5; }
@@ -689,7 +689,7 @@
     document.addEventListener('dav:traveller-shot', function () { scatter('!!!'); });
     document.addEventListener('dav:record-shot', function () { scatter('noooo'); });
 
-    // reset 4's static (27 Sep, Victor): none at all till they've been down in the dungeon (run:static-begun, set the first
+    // reset 4's static (27 Sep): none at all till they've been down in the dungeon (run:static-begun, set the first
     // time down there); from then it creeps in (sky/static.js thickens it gradually) and keeps building
     function begun() { return !!S && S.get('static-begun') === '1'; }
     var SHOT_STATIC = 0.035;
