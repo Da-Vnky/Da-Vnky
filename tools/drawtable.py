@@ -80,9 +80,12 @@ ANIMATOR_BAT = 'Rebelle Animator.bat'
 # Rebelle only takes the animator's live link if it was started like this (harmless otherwise)
 LINK = ['-websocket-server-enable', '-websocket-port', '{port}', '-websocket-allowed-ip-addresses', '::ffff:127.0.0.1,127.0.0.1']
 NEW_CONSOLE, DETACHED, NEW_GROUP = 0x00000010, 0x00000008, 0x00000200
-# Rebelle doesn't open a .psd it's handed when it starts (11 Oct, Victor: the wrong size), so once it's up the table tells
-# it, over that same live link, to make a new canvas of the right size (Rebelle's Motion IO "NEW_ARTWORK" event: what the
-# animator does). if Rebelle wants it worded differently, this is the one place to change
+# how Rebelle gets its canvas. 'input' (11 Oct, Victor: Rebelle 8 Pro opens .psd files): it's started with "-input <the
+# .psd>", the way Rebelle's own notes say to open a file at start (a bare file name on its command line was ignored: the
+# wrong size), so the guide and measurements come as layers. 'new': instead, once it's up the table tells it, over the live
+# link, to make a blank canvas of the right size (Motion IO's "NEW_ARTWORK" event, what the animator does), and the guide
+# and measurements are imported from layers/ by hand. if Rebelle wants either worded differently, these are the places
+REBELLE_OPEN = 'input'
 REBELLE_NEW = {'event_type': 'NEW_ARTWORK', 'width': '{w}', 'height': '{h}'}
 REBELLE_WAIT = 90                                       # (seconds to wait for Rebelle to start listening)
 FPS = 12                                                # (Victor's usual: 12 frames a second)
@@ -205,8 +208,10 @@ def open_in(app, path, size=None):
     args, told = [exe, path], None
     if app == 'rebelle':                                # (with the live link on, so the animator can talk to it too)
         port = str(animator_settings().get('websocketPort') or 8265)
-        args = [exe] + [x.replace('{port}', port) for x in LINK] + [path]
-        if size and listening(int(port)):               # (it's open already: a new canvas there could lose what's on it)
+        args = [exe] + [x.replace('{port}', port) for x in LINK] + (['-input', path] if REBELLE_OPEN == 'input' else [path])
+        if REBELLE_OPEN == 'input':
+            told = 'input'
+        elif size and listening(int(port)):               # (it's open already: a new canvas there could lose what's on it)
             told = 'open'
         elif size:                                      # (a helper waits for it to start, then asks for the canvas)
             told = 'sized'

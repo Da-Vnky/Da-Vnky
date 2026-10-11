@@ -301,8 +301,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `POST /__draw/playwright` → content.py `pw_install`: `python -m pip install --upgrade playwright && python -m playwright
   install chromium` in the background, log `tools/drawing/playwright-install.log`; `GET` → `pw_state`). `.made.json` keeps
   `guide`, so an untouched canvas made without one is made again once it can have one.
-- **Rebelle** (11 Oct, Victor: it opened at the wrong size; his animator, over the live link, gets it right): Rebelle doesn't
-  open a .psd handed to it on start. So `open_in('rebelle', path, size)`, if Rebelle isn't already listening on its port,
+- **Rebelle** (11 Oct, Victor: it opened at the wrong size; later: "Rebelle 8 Pro can open .psd files"): `REBELLE_OPEN`.
+  `'input'` (the default now): Rebelle is started with `-input <the .psd>` (Rebelle's own documented way to open a file at
+  start; a bare path was ignored), so the guide and measurements come in as layers; the card says to File › Open it if a blank
+  canvas shows instead. Unverified on his computer yet (checked with a stand-in program that records its arguments).
+  `'new'` (the earlier way, kept): `open_in('rebelle', path, size)`, if Rebelle isn't already listening on its port,
   starts a detached helper (`drawtable.py rebelle-canvas W H port`) that waits for the live link (`REBELLE_WAIT` 90 s), then
   sends `REBELLE_NEW` (Motion IO's `{"event_type": "NEW_ARTWORK", "width", "height"}`) with a stdlib WebSocket client
   (`ws_send`); it logs to `tools/drawing/rebelle.log`. Rebelle already open: nothing is sent (its canvas could hold work).
