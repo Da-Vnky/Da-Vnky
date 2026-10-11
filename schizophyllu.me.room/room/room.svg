@@ -279,7 +279,7 @@
 <g class="obj" data-id="hexley" data-art="room/objects/main/hexley.svg"></g>
 
 <!-- ================================================= SKIZY (from behind, at the desk) -->
-<g class="obj char" data-id="mel" id="mel" data-art="room/objects/main/skizy.svg"></g>
+<g class="obj char" data-id="skizy" id="skizy" data-art="room/objects/main/skizy.svg"></g>
 <!-- the afternoon: skizy's asleep, so her chair's empty -->
 <g id="afternoon-chair" pointer-events="none" style="display:none">
   <g stroke="#0d0c10" stroke-width="5" stroke-linecap="round"><path d="M1012 708 L968 730 M1012 708 L1056 730 M1012 708 L1012 736"/></g>
@@ -290,7 +290,7 @@
   <path d="M978 530 Q1012 520 1046 530" stroke="#26232c" stroke-width="3" fill="none"/>
   <path d="M1000 648 q20 -30 46 -8" stroke="#3a2f52" stroke-width="6" fill="none"/>
 </g>
-  <circle class="anchor" data-anchor="mel" cx="1012" cy="420" r="1" opacity="0"/>
+  <circle class="anchor" data-anchor="skizy" cx="1012" cy="420" r="1" opacity="0"/>
 
 <!-- ================================================= CLAUBE / WATCHLION in the armchair -->
 <g id="lamp">

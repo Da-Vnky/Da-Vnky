@@ -5,7 +5,7 @@
   --text: #d8e2dc;
   --mira: #6dffb0;
   --claube: #ffb347;
-  --mel: #b98cff;
+  --skizy: #b98cff;
   --font: 'IBM VGA', 'Courier New', Courier, monospace;
 }
 
@@ -70,7 +70,7 @@ button:hover, button:focus-visible { color: #07080d; background: var(--fg); outl
 .char.speaking { filter: brightness(1.25) drop-shadow(0 0 6px var(--c, #fff)); }
 #mira { --c: var(--mira); }
 #claube { --c: var(--claube); }
-#mel { --c: var(--mel); }
+#skizy { --c: var(--skizy); }
 
 body.zoomed .obj, body.busy .obj { cursor: default; }
 
@@ -258,7 +258,7 @@ body.zoomed .nav, body.busy .nav { display: none; }
 #cap-who { color: var(--c); font-size: .8em; margin-bottom: 3px; }
 #cap-who:empty { display: none; }
 #caption.note #cap-text { font-style: italic; color: #cfd8d2; }
-#nowplaying { color: var(--mel); max-width: 34vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#nowplaying { color: var(--skizy); max-width: 34vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* music station */
 .st-btn, .st-row { cursor: pointer; }

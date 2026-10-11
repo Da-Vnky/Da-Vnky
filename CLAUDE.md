@@ -1237,8 +1237,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - The repo is public: nothing private goes in any committed file (this one included).
 - **Her handle, never her first name** (10 Oct, Victor): the site and the repo are public, so the friend whose room is across
   the street is **skizy** everywhere: on the page, in code, file and folder names, slots, saves, comments, these notes and
-  CHANGES.txt. (Her own code in `schizophyllu.me.room/` still uses an older internal id for her character: hers to rename, and
-  our integration code (`'#…'` selectors and `CAST.…` in the DaV-nky part of room.js, the speaker id in davnky.js) matches it until she does.)
+  CHANGES.txt. Her room's own code too, since 11 Oct (she asked, through Victor): her character's id and speaker id are `skizy`
+  (`#skizy`, `data-id`/`data-anchor="skizy"` in room.svg, `CAST.skizy`, `--skizy` in room.css, `SKIZY`/`SKIZY_TALK`/`SKIZY_WORK`
+  in script.js, `skizy(…)` lines in extra.js, narration.js and davnky.js, `POS.skizy` in audio.js). Never bring the old one back.
 
 ## Still to do / ideas on hold
 
