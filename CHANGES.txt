@@ -14,9 +14,11 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- Drawing table: Rebelle 8 Pro opens .psd files, so the Rebelle button now opens the slot's .psd itself, with its guide and measurements as layers (Rebelle is started with -input and the file), instead of a blank canvas of the right size. If Rebelle shows a blank canvas, use File > Open on the .psd and tell Claude.
 
 == published ==
+
+2026-10-11 01:46 · V
+- Drawing table: Rebelle 8 Pro opens .psd files, so the Rebelle button now opens the slot's .psd itself, with its guide and measurements as layers (Rebelle is started with -input and the file), instead of a blank canvas of the right size. If Rebelle shows a blank canvas, use File > Open on the .psd and tell Claude.
 
 2026-10-11 01:39 · V
 - Supabase keep-alive: .github/workflows/keep-supabase-alive.yml (the GitHub copy only; it skips itself anywhere else) asks the bottles' database one harmless question every two days, so the free project doesn't pause after a quiet week. It reads the address and public key from SUPABASE in sky/sky.js, adds and reads nothing, and fails (GitHub emails you) if Supabase doesn't answer 200.
