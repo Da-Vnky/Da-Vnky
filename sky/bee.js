@@ -33,11 +33,15 @@
      its body     a drawn stand-in bee that hovers, flaps, bobs and squashes with
                   every buzz, makes faces for its moods, and puffs out hearts,
                   tears, steam, zZz… slots (assets/living/, with the rest of the
-                  front garden): bee (the bee itself, facing right), bee-<mood>
-                  (happy, excited, loving, angry, sad, scared, sleepy, curious),
-                  bee-buzzing / bee-<mood>-buzzing (while a buzz sounds), and the
-                  little puffs: bee-fx-heart, -tear, -steam, -sweat, -zzz, -spark,
-                  -question, -zap
+                  front garden), in pieces laid one over the other, all on the
+                  same canvas so they line up by themselves: bee-body-flying (the
+                  bee with no face, wings flapping: an animated WebP) or bee-body
+                  (the same, still), facing left; then its face on top: bee-face
+                  (its everyday one), bee-face-<mood> (happy, excited, loving,
+                  angry, sad, scared, sleepy, curious), and bee-face-talking /
+                  bee-face-<mood>-talking (its mouth open, flashed on each buzz).
+                  and the little puffs: bee-fx-heart, -tear, -steam, -sweat, -zzz,
+                  -spark, -question, -zap
      the revolver it won't be shot (sky/revolver.js asks it first: aimedAt / shot).
                   shoot at it and it weaves out of the way: every shot misses.
                   keep at it: frightened (two shots), furious (two more), then it stings you and takes the gun
@@ -765,34 +769,63 @@
         '<rect x="28.5" y="9" width="3" height="4" fill="#2a1d14"/>' +
         '<path d="M8 40 Q16 33 21 37 M52 40 Q44 33 39 37" fill="none" stroke="#2a1d14" stroke-width="2.4" stroke-linecap="round"/></svg>';
 
+    // Victor's bee, in pieces: the body (flapping if he's animated it, else still; still for those who'd rather nothing moved),
+    // and over it the face for how it feels (all on the same canvas, so they sit exactly on each other)
+    var BODY = ['assets/living/bee-body-flying', 'assets/living/bee-body'];
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) BODY.reverse();
+
     var home = document.createElement('div');
     home.className = 'bee-home';
     home.dataset.mood = 'calm';
     home.innerHTML =
         '<div class="bee-bubble" aria-hidden="true"><span></span></div>' +
         '<button type="button" class="bee" aria-label="the bee: talk to it">' +
-            '<span class="bee-fly"><span class="bee-pose"><span class="bee-art" data-slot="assets/living/bee">' + DRAWN + '<img class="art" alt="" hidden></span></span>' +
+            '<span class="bee-fly"><span class="bee-pose"><span class="bee-art" data-slot="' + BODY.concat('assets/living/bee-face').join(' ') + '">' + DRAWN +
+                '<img class="art body" alt="" hidden><img class="art face" alt="" hidden><img class="art face-talk" alt="" hidden></span></span>' +
             '<span class="bee-gun" aria-hidden="true">' + GUN_ART + '</span>' +
             '<span class="bee-fx" aria-hidden="true"></span></span>' +
             '<span class="kh-hint">the bee</span>' +
         '</button>';
     stage.appendChild(home);
     var beeBtn = home.querySelector('.bee'), pose = home.querySelector('.bee-pose'), art = home.querySelector('.bee-art'),
-        artImg = art.querySelector('img'), fxBox = home.querySelector('.bee-fx'), bubble = home.querySelector('.bee-bubble span'),
+        bodyImg = art.querySelector('.body'), faceImg = art.querySelector('.face'), talkImg = art.querySelector('.face-talk'), fxBox = home.querySelector('.bee-fx'), bubble = home.querySelector('.bee-bubble span'),
         gunEl = home.querySelector('.bee-gun');
     Sky.findAsset('assets/living/bee-gun', function (url) { if (url) gunEl.innerHTML = '<img alt="" src="' + url + '">'; });
 
-    // Victor's pictures, if he's drawn the bee: the one for how it feels (and while it buzzes), else his plain one, else mine
-    var artKey = '';
+    // Victor's pictures, if he's drawn the bee: his body (else mine, faces and all), and on it his face for this mood (else
+    // his everyday face), with its mouth-open twin for each buzz (this mood's, else his everyday one, else the face stays)
+    var faceKey = '', warmed = false;
+    function show(img, url) {
+        if (url) { if (img.getAttribute('src') !== url) img.src = url; img.hidden = false; }
+        else img.hidden = true;
+    }
+    Sky.findAsset(BODY.join('|'), function (url) {
+        show(bodyImg, url);
+        art.classList.toggle('has-art', !!url);
+        if (url) warm();
+    });
+    function faces(m, talk) {
+        var n = (m === 'calm' ? [] : ['bee-face-' + m]).concat('bee-face');
+        if (talk) n = n.map(function (x) { return x + '-talking'; });
+        return n.map(function (x) { return 'assets/living/' + x; }).join('|');
+    }
     function dress() {
-        var m = home.dataset.mood, b = home.classList.contains('buzzing'), key = m + (b ? '+' : '');
-        if (key === artKey) return;
-        artKey = key;
-        var names = (b ? ['bee-' + m + '-buzzing', 'bee-buzzing'] : []).concat(['bee-' + m, 'bee']).map(function (n) { return 'assets/living/' + n; });
-        Sky.findAsset(names.join('|'), function (url) {
-            if (artKey !== key) return;
-            if (url) { if (artImg.getAttribute('src') !== url) artImg.src = url; artImg.hidden = false; art.classList.add('has-art'); }
-            else { artImg.hidden = true; art.classList.remove('has-art'); }
+        var m = home.dataset.mood;
+        if (m === faceKey) return;
+        faceKey = m;
+        Sky.findAsset(faces(m), function (url) { if (faceKey === m) show(faceImg, url); });
+        Sky.findAsset(faces(m, true), function (url) {
+            if (faceKey !== m) return;
+            show(talkImg, url);
+            art.classList.toggle('has-talk', !!url);
+        });
+    }
+    // every face fetched once his body's in, so a change of mood shows at once (not a moment with no face)
+    function warm() {
+        if (warmed) return;
+        warmed = true;
+        Object.keys(MOODS).forEach(function (m) {
+            [faces(m), faces(m, true)].forEach(function (n) { Sky.findAsset(n, function (url) { if (url) new Image().src = url; }); });
         });
     }
     function setMood(m) {
@@ -821,13 +854,14 @@
     var mouthT = null;
     // one word, acted out: up for a high buzz, down for a low one, leaning into a slide, a squash on every buzz, the mouth open
     function act(e) {
-        if (e.rest) { home.style.setProperty('--mouth', 0); return; }
+        if (e.rest) { home.style.setProperty('--mouth', 0); home.classList.remove('mouth-open'); return; }
         home.style.setProperty('--lift', (e.lift || 0).toFixed(1));
         home.style.setProperty('--tilt', (e.tilt || 0).toFixed(1));
         home.style.setProperty('--mouth', (e.mouth || .4).toFixed(2));
+        home.classList.add('mouth-open');
         pose.classList.remove('squash'); void pose.offsetWidth; pose.classList.add('squash');
         clearTimeout(mouthT);
-        mouthT = setTimeout(function () { home.style.setProperty('--mouth', 0); }, Math.max(80, (e.dur || .1) * 900));
+        mouthT = setTimeout(function () { home.style.setProperty('--mouth', 0); home.classList.remove('mouth-open'); }, Math.max(80, (e.dur || .1) * 900));
         var M = MOODS[home.dataset.mood];
         if (e.fx === 'zap') { puff('zap', 3); stung(); }
         else if (e.fx === 'chirp') puff(M.fx || 'spark', 1);
@@ -837,8 +871,7 @@
     function talking(on) {
         home.classList.toggle('buzzing', on);
         body.classList.toggle('bee-buzzing', on);
-        if (!on) { home.style.setProperty('--lift', 0); home.style.setProperty('--tilt', 0); home.style.setProperty('--mouth', 0); }
-        dress();
+        if (!on) { home.style.setProperty('--lift', 0); home.style.setProperty('--tilt', 0); home.style.setProperty('--mouth', 0); home.classList.remove('mouth-open'); }
     }
     var stungAt = 0;
     function stung(force) {                                       // (it's only a cartoon sting)
@@ -1101,7 +1134,7 @@
         body.classList.toggle('bee-armed', on);
         beeBtn.setAttribute('aria-label', on ? 'the bee, pointing ' + mine(gun) + ' at you: talk to it' : 'the bee: talk to it');
         pickups(on && gun);
-        if (on) { artKey = ''; setMood('angry'); grumbleSoon(); } else clearTimeout(grumbleSoon.t);
+        if (on) { faceKey = ''; setMood('angry'); grumbleSoon(); } else clearTimeout(grumbleSoon.t);
     }
     // it takes the gun off you
     function grab(id) {

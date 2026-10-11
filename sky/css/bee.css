@@ -147,7 +147,36 @@ body.bee-talking .bee-home .bee-fly {
     height: 100%;
     object-fit: contain;
 }
+/* Victor's bee faces left (mine faces right), so his is turned the other way round */
+.bee-home .bee-art.has-art {
+    transform: scaleX(calc(var(--face) * -1));
+}
+/* his pieces, one on the other: the body, its face, and the face's mouth-open twin (on each buzz, if he's drawn one) */
+.bee-home .bee-art > img {
+    position: absolute;
+    inset: 0;
+}
+/* where the faces sit on the body: every face moved together, in shares of the bee's width / height (in his picture's own
+   left and right: more = further right, into the head). 0 0 = exactly where they're drawn on the canvas */
+.bee-home .bee-art > img.face,
+.bee-home .bee-art > img.face-talk {
+    translate: calc(var(--bee-face-x, 3) * 1%) calc(var(--bee-face-y, 0) * 1%);
+}
+/* where the faces sit on the body: every face moved together, in shares of the bee's width / height (in his picture's own
+   left and right: more x = further right, into the head; more y = lower). 0 0 = exactly where they're drawn on the canvas */
+.bee-home .bee-art > img.face,
+.bee-home .bee-art > img.face-talk {
+    translate: calc(var(--bee-face-x, 3) * 1%) calc(var(--bee-face-y, 3) * 1%);
+}
+.bee-home .bee-art > img.face-talk,
+.bee-home.mouth-open .bee-art.has-talk > img.face {
+    visibility: hidden;
+}
+.bee-home.mouth-open .bee-art.has-talk > img.face-talk {
+    visibility: visible;
+}
 .bee-home .bee-art.has-art > svg,
+.bee-home .bee-art:not(.has-art) > img,
 .bee-home .bee-art > img[hidden] {
     display: none;
 }

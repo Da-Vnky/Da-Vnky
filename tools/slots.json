@@ -2112,63 +2112,85 @@
      "name": "the bee (sky/bee.js): skizy’s BeeLLM, over the roses by the steps. click it to talk",
      "slots": [
       {
-       "slot": "assets/living/bee",
-       "what": "the bee itself, facing right (wings and all: an animated GIF or WebP of it flying is lovely). it lives over the roses by the steps, and the code still moves it: hovering about, bobbing up for a high buzz and down for a low one, squashing on every buzz, flying up close and turning to face its menu while you talk. until yours is in, a drawn bee that makes a face for each mood",
-       "size": "about 240 x 200, see-through around it"
+       "slot": "assets/living/bee-body-flying",
+       "what": "the bee with no face, wings flapping: an animated WebP (a loop). facing left. keep the body itself still in the animation, only the wings moving: the code does the hovering, bobbing and squashing, and the faces are laid on top of it (if the body bobbed in the picture, the face wouldn't go with it). until yours is in, a drawn bee that makes a face for each mood",
+       "size": "480 x 400 (or bigger, the same shape: 6 to 5), see-through around it",
+       "guide": "assets/living/bee-body"
       },
       {
-       "slot": "assets/living/bee-happy",
-       "what": "the bee when it's happy (eyes smiling, cheeks pink): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
-       "size": "the same as bee",
+       "slot": "assets/living/bee-body",
+       "what": "the same bee, still (no face, wings at rest): used if there's no flapping one, and for visitors who've asked their computer for less motion. the flapping one is drawn on this canvas",
+       "size": "480 x 400 (or bigger, the same shape: 6 to 5), see-through around it",
        "optional": true
       },
       {
-       "slot": "assets/living/bee-excited",
-       "what": "the bee when it's buzzing with excitement (eyes wide, sparks): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
-       "size": "the same as bee",
-       "optional": true
+       "slot": "assets/living/bee-face",
+       "what": "its everyday face (calm), drawn on the same canvas as bee-body, where the face sits on the head: the drawing table's “draw it in” gives you that canvas with your bee body as the guide, so it lines up by itself. the faces for its moods are the same; a mood without its own face uses this one",
+       "size": "480 x 400, the same canvas as bee-body (whatever size that is), see-through but the face",
+       "guide": "assets/living/bee-body|assets/living/bee-body-flying"
       },
       {
-       "slot": "assets/living/bee-loving",
-       "what": "the bee when it's smitten (heart eyes, hearts puffing): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
-       "size": "the same as bee",
-       "optional": true
+       "slot": "assets/living/bee-face-happy",
+       "what": "its face when it's happy (eyes smiling, cheeks pink): on the same canvas as bee-body, like bee-face. anything else for the mood (a tear, a blush, sweat) can go on it too",
+       "size": "480 x 400, the same canvas as bee-body (whatever size that is), see-through but the face",
+       "optional": true,
+       "guide": "assets/living/bee-body|assets/living/bee-body-flying"
       },
       {
-       "slot": "assets/living/bee-angry",
-       "what": "the bee when it's furious (brow down, redder, steam): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
-       "size": "the same as bee",
-       "optional": true
+       "slot": "assets/living/bee-face-excited",
+       "what": "its face when it's excited (eyes wide, sparkly): on the same canvas as bee-body, like bee-face. anything else for the mood (a tear, a blush, sweat) can go on it too",
+       "size": "480 x 400, the same canvas as bee-body (whatever size that is), see-through but the face",
+       "optional": true,
+       "guide": "assets/living/bee-body|assets/living/bee-body-flying"
       },
       {
-       "slot": "assets/living/bee-sad",
-       "what": "the bee when it's sad (brow up, a tear): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
-       "size": "the same as bee",
-       "optional": true
+       "slot": "assets/living/bee-face-loving",
+       "what": "its face when it's loving (heart eyes, blushing): on the same canvas as bee-body, like bee-face. anything else for the mood (a tear, a blush, sweat) can go on it too",
+       "size": "480 x 400, the same canvas as bee-body (whatever size that is), see-through but the face",
+       "optional": true,
+       "guide": "assets/living/bee-body|assets/living/bee-body-flying"
       },
       {
-       "slot": "assets/living/bee-scared",
-       "what": "the bee when it's frightened (trembling, a bead of sweat): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
-       "size": "the same as bee",
-       "optional": true
+       "slot": "assets/living/bee-face-angry",
+       "what": "its face when it's angry (brow down, cross): on the same canvas as bee-body, like bee-face. anything else for the mood (a tear, a blush, sweat) can go on it too",
+       "size": "480 x 400, the same canvas as bee-body (whatever size that is), see-through but the face",
+       "optional": true,
+       "guide": "assets/living/bee-body|assets/living/bee-body-flying"
       },
       {
-       "slot": "assets/living/bee-sleepy",
-       "what": "the bee when it's sleepy (eyes shut, zZz): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
-       "size": "the same as bee",
-       "optional": true
+       "slot": "assets/living/bee-face-sad",
+       "what": "its face when it's sad (brow up, a tear): on the same canvas as bee-body, like bee-face. anything else for the mood (a tear, a blush, sweat) can go on it too",
+       "size": "480 x 400, the same canvas as bee-body (whatever size that is), see-through but the face",
+       "optional": true,
+       "guide": "assets/living/bee-body|assets/living/bee-body-flying"
       },
       {
-       "slot": "assets/living/bee-curious",
-       "what": "the bee when it's curious (a brow up, a ?): the same canvas as bee. without one, your bee picture is used (tinted for some moods)",
-       "size": "the same as bee",
-       "optional": true
+       "slot": "assets/living/bee-face-scared",
+       "what": "its face when it's scared (eyes wide, wobbly mouth, a bead of sweat): on the same canvas as bee-body, like bee-face. anything else for the mood (a tear, a blush, sweat) can go on it too",
+       "size": "480 x 400, the same canvas as bee-body (whatever size that is), see-through but the face",
+       "optional": true,
+       "guide": "assets/living/bee-body|assets/living/bee-body-flying"
       },
       {
-       "slot": "assets/living/bee-buzzing",
-       "what": "the bee while a buzz is sounding (mouth open, wings a blur), for any mood; or one per mood: bee-<mood>-buzzing (bee-angry-buzzing …)",
-       "size": "the same as bee",
-       "optional": true
+       "slot": "assets/living/bee-face-sleepy",
+       "what": "its face when it's sleepy (eyes shut, drowsy): on the same canvas as bee-body, like bee-face. anything else for the mood (a tear, a blush, sweat) can go on it too",
+       "size": "480 x 400, the same canvas as bee-body (whatever size that is), see-through but the face",
+       "optional": true,
+       "guide": "assets/living/bee-body|assets/living/bee-body-flying"
+      },
+      {
+       "slot": "assets/living/bee-face-curious",
+       "what": "its face when it's curious (a brow up, head on one side): on the same canvas as bee-body, like bee-face. anything else for the mood (a tear, a blush, sweat) can go on it too",
+       "size": "480 x 400, the same canvas as bee-body (whatever size that is), see-through but the face",
+       "optional": true,
+       "guide": "assets/living/bee-body|assets/living/bee-body-flying"
+      },
+      {
+       "slot": "assets/living/bee-face-talking",
+       "what": "its everyday face with its mouth open: flashed on each buzz as it talks (and bee-face-<mood>-talking for a mood: bee-face-angry-talking …). without one, the face stays as it is",
+       "size": "480 x 400, the same canvas as bee-body (whatever size that is), see-through but the face",
+       "optional": true,
+       "guide": "assets/living/bee-body|assets/living/bee-body-flying"
       },
       {
        "slot": "assets/living/bee-fx-heart",

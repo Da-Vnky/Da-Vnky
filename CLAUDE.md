@@ -229,7 +229,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `drawPanel`): "draw it in" Clip Studio / Photoshop / Rebelle, "animate in" Clip Studio / Rebelle Animator, "a fresh canvas",
   "show its folder", and what's waiting (polled every 4 s, `GET /__draw/state`). Not for sounds, fonts or `kind: "svg"` slots.
 - **The canvas** (`drawtable.py make`, run by content.py `draw_run` in a subprocess): twice the size the slot is shown at
-  (`SCALE`; a stated "W x H" size doubled, else 2 × its box on a 1920 × 1080 screen; at most 8000 a side). Playwright opens the
+  (`SCALE`; a stated "W x H" size doubled, else 2 × its box on a 1920 × 1080 screen; at most 8000 a side; a slot with a
+  `"guide"` in slots.json, one piece laid on another like the bee's faces, takes that picture's own size and it as the guide). Playwright opens the
   slot's scene map page (the map's current view first, else each view till the slot shows: templates.py's `NOON`/`page_url`),
   `FIND` picks the box (for a whole-room slot, the nearest ancestor of the stated shape: skizy's room's svg, the garden's
   stage), screenshots it at `device_scale_factor` 2 with the UI hidden (`HIDE_UI`). `BUILD` in the page draws the guide,
@@ -518,8 +519,16 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   pupils, tremble, drip. Each word: `--lift` (up for a high buzz), `--tilt` (leaning into a slide), a squash, `--mouth`, faster
   wings (`.buzzing`), and now and then a puff (`puff()`: heart, tear, steam, sweat, zzz, spark, question, zap). Victor's
   pictures (assets/living/, so the folder's list.txt already exists: a new `assets/bee/` folder had no list and asked the
-  server for 40 files that weren't there): `bee`, `bee-<mood>`, `bee-buzzing`, `bee-<mood>-buzzing` (`dress()` picks the best
-  one there is for now), `bee-fx-<kind>`; the code still moves and tints his. A word bubble over its head (`.bee-bubble`).
+  server for 40 files that weren't there), **in pieces** (11 Oct, Victor: a body and a face per mood, all on one canvas so
+  they stack exactly): `bee-body-flying` (no face, wings flapping, animated WebP; the body itself kept still in it) or
+  `bee-body` (still; also for prefers-reduced-motion), his facing **left** (`.bee-art.has-art` is flipped: `scaleX(-face)`);
+  over it `img.face`: `bee-face-<mood>` else `bee-face` (calm), and `img.face-talk`: `bee-face(-<mood>)-talking`, shown on
+  each buzz (`.mouth-open` on `.bee-home`, set in `act()`; `.has-talk` when there's one). `dress()` swaps the faces; `warm()`
+  fetches them all once the body's in. Every face is moved together by `--bee-face-x/-y` (bee.css, % of the bee; 3 and 3:
+  Victor's "slightly right and a lil lower"; 0 0 = where drawn). His old whole-bee slots (`bee`, `bee-<mood>`, `bee-buzzing`)
+  are gone (none were in). Face slots in slots.json carry `"guide": "assets/living/bee-body|…"`: the drawing table then
+  makes their canvas exactly that picture's size with it as the guide (`drawtable.py from_guide`, no scene opened).
+  `bee-fx-<kind>`; the code still moves and tints his. A word bubble over its head (`.bee-bubble`).
 - skizy's model and name: credited in the menu's foot ("its brain is BeeLLM 42P Chaos, by skizy").
 - The sing switch is a music note (`NOTE_ART`, `.bt-sing-ic`, slot `assets/living/bee-sing`; drawn in `currentColor`, so
   it's light on the dark pressed button). Not `.bt-note`: that's the log's italic notes.
