@@ -14,11 +14,13 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+
+== published ==
+
+2026-10-10 23:13 · V
 - The bee's little puffs are now anime marks coming out of its face (whichever way it faces): a cross anger vein that pops and throbs on its forehead (new, slot bee-fx-vein), a music note when happy (new, bee-fx-note), the big sweat drop sliding down its head, tears falling from its eye, hearts, sparkles, Zzz, a bold question mark, a huff of steam, a sting's flash. Each has its own movement.
 - Victor's new loving face for the bee (from his second bee .psd).
 - The bee leaves a dotted trail behind it as it flies about (out front and seen from the porch), each dot fading, and hums very quietly as it flies (its wings: the same warm buzz as its voice, a little higher when it darts, quieter while it talks, panned to where it is). Starts with the visitor's first click. Slots: assets/living/bee-trail (one dot), assets/sounds/bee-hum (a loop).
-
-== published ==
 
 2026-10-10 22:42 · V
 - The bee is now in pieces for Victor's art: a body (bee-body-flying, wings flapping, or bee-body, still; facing left) and a face per mood laid over it (bee-face, bee-face-happy … -curious, and bee-face-talking for its mouth open as it buzzes), all on the same canvas. The old whole-bee slots (bee, bee-<mood>, bee-buzzing) are gone. The faces sit a little right and lower than drawn (--bee-face-x/-y in sky/css/bee.css).
