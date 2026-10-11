@@ -14,6 +14,7 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Drawing table: Rebelle 8 Pro opens .psd files, so the Rebelle button now opens the slot's .psd itself, with its guide and measurements as layers (Rebelle is started with -input and the file), instead of a blank canvas of the right size. If Rebelle shows a blank canvas, use File > Open on the .psd and tell Claude.
 
 == published ==
 

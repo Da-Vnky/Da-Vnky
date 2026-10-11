@@ -451,7 +451,8 @@
                     '. export into ' + (r.animator || path.indexOf('animate') > -1 ? r.folder + '/frames' : r.folder) + ' and it’ll show on this card.' +
                     (r.made && r.guideWhy ? ' No guide this time: ' + r.guideWhy + '.' : '') +
                     (r.made && !r.measured && !r.playwright ? ' (no measurements layer this time: ' + (r.measureWhy || 'no reason given') + ')' : '') +
-                    (r.rebelle === 'sized' ? ' Rebelle can’t open a .psd’s layers: once it’s up it gets a new ' + (r.w || '') + (r.w ? ' × ' + r.h : '') + ' canvas; File › Import the guide and measurements from ' + r.folder + '/layers.' :
+                    (r.rebelle === 'input' ? ' If Rebelle opens a blank canvas instead of it, use File › Open on ' + r.file + ' (and tell Claude, so the button can be fixed).' :
+                     r.rebelle === 'sized' ? ' Rebelle can’t open a .psd’s layers: once it’s up it gets a new ' + (r.w || '') + (r.w ? ' × ' + r.h : '') + ' canvas; File › Import the guide and measurements from ' + r.folder + '/layers.' :
                      r.rebelle === 'open' ? ' Rebelle was open already, so its canvas wasn’t touched: File › New at the size above, then File › Import the pictures in ' + r.folder + '/layers.' : ''), !!(r.made && (!r.measured || r.guideWhy)));
                 if (r.playwright) offerPlaywright();
                 poll();
