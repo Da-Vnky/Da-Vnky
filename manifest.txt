@@ -124,7 +124,7 @@ sky/css/weather.css 2711
 assets/characters/list.txt 117
 assets/city/list.txt 117
 assets/countryside/list.txt 117
-assets/fonts/list.txt 117
+assets/fonts/list.txt 135
 assets/hell/list.txt 117
 assets/items/list.txt 117
 assets/living/list.txt 363
