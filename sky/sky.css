@@ -1168,3 +1168,84 @@ body.show-slots .has-art[data-asset], body.show-slots .has-art[data-slot] { outl
 .slot-panel b { display: block; font: italic 15px Georgia, serif; margin-bottom: 4px; }
 .slot-panel .on { color: #7fe0a8; }
 .slot-panel .off { color: #c9b89a; opacity: .8; }
+
+/* ---------- a click (11 Oct, Victor: cursors animated when clicking) ----------
+   sky.js swaps every cursor for its pressed twin while the button's down, and leaves this burst of ink where the click
+   lands: a ring opening out and six little strokes flying off it (or your assets/ui/click, shown once and faded) */
+.click-ink {
+    position: fixed;
+    z-index: 2147483600;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+.click-ink>b {
+    position: absolute;
+    left: -9px;
+    top: -9px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(42, 29, 20, .75);
+    box-shadow: 0 0 0 1px rgba(243, 230, 194, .55);
+    animation: ink-ring .42s cubic-bezier(.2, .7, .3, 1) forwards;
+}
+.click-ink>i {
+    position: absolute;
+    left: -1px;
+    top: -6px;
+    width: 2px;
+    height: 6px;
+    border-radius: 1px;
+    background: #2a1d14;
+    box-shadow: 0 0 0 1px rgba(243, 230, 194, .45);
+    transform-origin: 1px 6px;
+    animation: ink-fly .4s cubic-bezier(.2, .7, .3, 1) forwards;
+}
+.click-ink>i:nth-child(1) { --a: 0deg; }
+.click-ink>i:nth-child(2) { --a: 60deg; }
+.click-ink>i:nth-child(3) { --a: 120deg; }
+.click-ink>i:nth-child(4) { --a: 180deg; }
+.click-ink>i:nth-child(5) { --a: 240deg; }
+.click-ink>i:nth-child(6) { --a: 300deg; }
+.click-ink.has-art>img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    translate: -50% -50%;
+    animation: ink-art .5s ease-out forwards;
+}
+@keyframes ink-ring {
+    from { transform: scale(.2); opacity: 1; }
+    to { transform: scale(1.5); opacity: 0; }
+}
+@keyframes ink-fly {
+    from { transform: rotate(var(--a)) translateY(-4px) scaleY(.4); opacity: 1; }
+    to { transform: rotate(var(--a)) translateY(-15px) scaleY(1); opacity: 0; }
+}
+@keyframes ink-art {
+    from { scale: .6; opacity: 1; }
+    70% { opacity: 1; }
+    to { scale: 1.1; opacity: 0; }
+}
+
+/* ---------- things you take hold of and pull (Sky.pull in sky.js) ----------
+   the open hand over them, and the closed one everywhere while you're holding on (so it stays closed as you drag
+   off it). the hallway's cord and reset 4's lamp have their own pulling, in sky/attic.js: the same hands */
+html body:not(.inv-holding) .pullable,
+html body:not(.inv-holding) .pullable *,
+html body:not(.inv-holding) .hall-cord,
+html body:not(.inv-holding) .hall-cord *,
+html[data-reset="4"] body:not(.lamp-down):not(.inv-holding) .hall-lamp,
+html[data-reset="4"] body:not(.lamp-down):not(.inv-holding) .hall-lamp * {
+    cursor: var(--cursor-grab, grab) !important;
+}
+html.grabbing,
+html.grabbing * {
+    cursor: var(--cursor-grabbing, grabbing) !important;
+}
+.pullable {
+    touch-action: none;                    /* (a finger pulls it, rather than scrolling the page) */
+}

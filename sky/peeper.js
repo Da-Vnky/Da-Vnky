@@ -13,8 +13,10 @@
    it. There are no arrows: you find the rooms by looking.
 
    SKIZY'S WINDOW: one building on the front row is abandoned, every window dark,
-   except one that's boarded up. Click it: knock, and keep knocking, and the boards
-   come off one by one until you're in. Behind the last board it's dark for a
+   except one that's boarded up. Click it: a knock. Nobody answers, so take hold of a
+   board and pull (11 Oct, Victor: grabbed, then pulled for real: sky.js Sky.pull): it
+   creaks and gives a little, and far enough out it rips off. Let go too soon and it
+   springs back onto its nails. Every board off, and you're in. Behind the last board it's dark for a
    moment (SKIZY.dark_secs), then the room fades up out of the black: skizy's room, her
    own (schizophyllu.me.room/, she made it), there through the glass. "[ climb in ]"
    and you're in it, on its own page; its "back to the rooftop" brings you back here.
@@ -39,7 +41,8 @@
     var SKIZY = {
         title: 'skizy\u2019s room',
         boards: 5,                                  // how many boards to pull off
-        first: 'knock knock\u2026 nobody answers. try again?',
+        first: 'knock knock\u2026 nobody answers.',
+        pull: 'they\u2019re only nailed on. grab a board and pull.',     // (a knock after the first)
         more: ['something shifts behind the boards.', 'a board splinters.', 'the wood gives a little more.', 'one more\u2026', ''],
         inside: 'skizy\u2019s room',
         dark_secs: 1.5,                                    // how long it's dark in there after the last board, before the room fades up
@@ -425,7 +428,8 @@
         var frame = scene.querySelector('.ps-frame'), wrap = document.createElement('div');
         wrap.className = 'skizy-planks';
         wrap.setAttribute('role', 'button');
-        wrap.setAttribute('aria-label', 'knock on the boards');
+        wrap.setAttribute('aria-label', 'the boards: knock, or pull one off');
+        wrap.tabIndex = 0;
         var tilts = [-6, 4, -3, 7, -5, 3, -4];
         for (var b = 0; b < SKIZY.boards; b++) {
             var d = document.createElement('div');
@@ -438,10 +442,17 @@
         if (skizyState.off >= SKIZY.boards) wrap.style.pointerEvents = 'none';
         frame.appendChild(wrap);
         Sky.fillAssets(wrap);
-        wrap.addEventListener('click', knockKnock);
+        Array.prototype.forEach.call(wrap.querySelectorAll('.skizy-board:not(.gone)'), grabbable);
+        wrap.addEventListener('click', knockKnock);                     // (between the boards, or a board only clicked)
+        wrap.addEventListener('keydown', function (e) {                  // (from the keyboard: Enter pulls the next one off)
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            e.preventDefault();
+            var next = wrap.querySelector('.skizy-board:not(.gone)');
+            if (next) rip(next, 0, 1);
+        });
         document.body.classList.add('peep-close', 'peep-skizy');
         document.body.classList.remove('peep-view');
-        note.textContent = skizyState.off >= SKIZY.boards ? '' : 'click the boards to knock';
+        note.textContent = skizyState.off >= SKIZY.boards ? '' : 'knock, or grab a board and pull';
         if (skizyState.off >= SKIZY.boards) setTimeout(function () { if (scene.classList.contains('skizy')) skizyScene(false); }, 750);
     }
     function knockKnock() {
@@ -449,15 +460,40 @@
         var boards = scene.querySelectorAll('.skizy-board');
         boards.forEach(function (b) { if (!b.classList.contains('gone')) { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); } });
         skizyState.knocks++;
-        if (skizyState.knocks === 1) {                                // the first time, just a knock
-            Sky.sfx('knock');
-            note.textContent = SKIZY.first;
-            return;
-        }
-        var board = boards[skizyState.off];                            // then a board comes off with each one, from the top
+        Sky.sfx('knock');
+        note.textContent = skizyState.knocks === 1 && !skizyState.off ? SKIZY.first : SKIZY.pull;
+    }
+    // a board you can take hold of: it comes a little way with you (nails creaking), and far enough out it rips off
+    function grabbable(board) {
+        var creak = 0;
+        Sky.pull(board, {
+            need: function () { return Math.max(64, Math.min(96, board.offsetHeight * 1.2)); },   // (a good tug, not across the screen)
+            can: function () { return scene.classList.contains('skizy') && !board.classList.contains('gone') && skizyState.off < SKIZY.boards; },
+            move: function (k, dx, dy) {
+                board.classList.remove('shake');
+                board.style.transition = 'none';
+                var give = 0.12 + 0.3 * k;                                  // (it fights you, then starts to come)
+                board.style.translate = (dx * give).toFixed(1) + 'px ' + (dy * give).toFixed(1) + 'px';
+                board.style.rotate = Math.max(-9, Math.min(9, dx * 0.04 * k)).toFixed(2) + 'deg';
+                if (k > creak + 0.28) { creak = k; Sky.sfx('board-creak', { or: 'tap', size: 0.08 + k * 0.12, volume: 0.5 }); }
+            },
+            give: function (dx, dy) { rip(board, dx, dy); },
+            back: function () {
+                creak = 0;
+                board.style.transition = 'translate .45s cubic-bezier(.3,1.9,.5,1), rotate .45s cubic-bezier(.3,1.9,.5,1)';
+                board.style.translate = board.style.rotate = '';
+                setTimeout(function () { if (!board.classList.contains('gone')) board.style.transition = ''; }, 470);
+            },
+            tap: knockKnock
+        });
+    }
+    // off it comes: the way you were pulling, then down and away
+    function rip(board, dx, dy) {
+        if (board.classList.contains('gone') || skizyState.off >= SKIZY.boards) return;
         Sky.sfx('crack');
-        var fall = (skizyState.off % 2 ? 1 : -1);
-        board.style.transform = 'translate(' + (fall * 30) + '%, 260%) rotate(' + (fall * (40 + Math.random() * 30)) + 'deg)';
+        var n = Math.hypot(dx, dy) || 1, ux = dx / n, uy = dy / n, side = ux >= 0 ? 1 : -1;
+        board.style.transition = '';
+        board.style.transform = 'translate(' + (ux * 70 + side * 12).toFixed(0) + '%, ' + (uy * 120 + 220).toFixed(0) + '%) rotate(' + (side * (40 + Math.random() * 30)).toFixed(0) + 'deg)';
         board.classList.add('gone');
         skizyState.off++;
         note.textContent = SKIZY.more[Math.min(SKIZY.more.length - 1, skizyState.off - 1)] || '';

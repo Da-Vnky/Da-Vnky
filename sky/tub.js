@@ -1,8 +1,9 @@
 /* =====================================================================
    tub.js — the bathroom's bathtub.
      • the tap: click it and the tub fills (click again to turn it off)
-     • the plug (on its chain, at the tub's near end): pull it and the tub
-       drains, gurgling; push it back in to keep the water in
+     • the plug (on its chain, at the tub's near end): take hold of its chain and
+       pull it up (11 Oct, Victor: grabbed, then pulled: sky.js Sky.pull) till it
+       pops out, and the tub drains, gurgling; click it to push it back in
      • the traveller in the bathroom can be picked up (they struggle) and
        dropped in the tub (a cold one, or a dry one: nothing worse).
    (the toaster that used to go in it was taken out in September 2026: each
@@ -126,12 +127,31 @@
         if (st.tapOn && st.level >= 0.99 && st.plug === 'in') { st.tapOn = false; say('it’s already full. pull the plug to drain it'); }
         save(); flow();
     });
+    function setPlug(out) {
+        st.plug = out ? 'out' : 'in';
+        sfx(out ? 'cork-pop' : 'cork-in');
+        if (out && st.level > 0.05) say('glug glug glug…');
+        showPlug(); save(); flow();
+    }
+    // in, it's pulled up by its chain: it comes up stiffly, then pops (a plain click: pull it). out, a click pushes it back
+    function chain() { return plug.querySelector('svg, .art'); }
+    Sky.pull(plug, {
+        dir: [0, -1],
+        need: function () { return Math.max(40, plug.offsetHeight * 0.9); },
+        can: function () { return st.plug === 'in'; },
+        move: function (k) {
+            var c = chain(), kk = k * 0.7;                                  // (the last bit's the pop)
+            if (!c) return;
+            c.style.transition = 'none';
+            c.style.transform = 'translateY(' + (46 * (1 - kk)).toFixed(1) + '%) scaleY(' + (0.55 + 0.45 * kk).toFixed(3) + ')';
+        },
+        give: function () { var c = chain(); if (c) c.style.transition = c.style.transform = ''; setPlug(true); },
+        back: function () { var c = chain(); if (c) { c.style.transition = ''; c.style.transform = ''; } },
+        tap: function () { say('take hold of the chain and pull it up'); }
+    });
     plug.addEventListener('click', function (e) {
         e.stopPropagation();
-        st.plug = st.plug === 'out' ? 'in' : 'out';
-        sfx(st.plug === 'out' ? 'cork-pop' : 'cork-in');
-        if (st.plug === 'out' && st.level > 0.05) say('glug glug glug…');
-        showPlug(); save(); flow();
+        setPlug(st.plug !== 'out');                                        // (out: pushed back in. in: only from the keyboard)
     });
 
     if (st.plug === 'out' && st.level > 0) flow();

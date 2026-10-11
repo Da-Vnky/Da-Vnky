@@ -100,9 +100,12 @@
     // the site's own mouse cursors. each is a slot, assets/ui/<name> (a 32 x 32 PNG is best,
     // 64 at most); the numbers are its hotspot: the pixel that does the pointing, from the top left.
     //   cursor           everywhere                     cursor-pointer   over things you can click
-    //   cursor-star      over the constellations        cursor-grab      over things you can pick up
+    //   cursor-star      over the constellations        cursor-grab      over things you can take hold of and pull
     //   cursor-grabbing  while holding something        cursor-look      over things to look into
     //   cursor-brush     over the easel you paint on (its tip is the hotspot, bottom left)
+    // (11 Oct, Victor) each has a pressed twin too, shown while the button's down: assets/ui/<name>-press (cursor-grab's
+    // is cursor-grabbing: the open hand closes). with none, the drawn ones squeeze in, and yours stays as it is. every
+    // click also leaves a little burst of ink where it lands: assets/ui/click, if you draw your own (a small picture).
     // set CURSORS = null to keep the computer's usual cursors.
     var CURSORS = {
         'cursor': [3, 2], 'cursor-pointer': [4, 3], 'cursor-star': [16, 16],
@@ -1342,9 +1345,17 @@
             '<path d="M21 22 L26 27" stroke="#9a3b1f" stroke-width="3" stroke-linecap="round"/>',
         'cursor-star': '<path d="M16 2 C17 11 21 15 30 16 C21 17 17 21 16 30 C15 21 11 17 2 16 C11 15 15 11 16 2 Z" fill="#fff0bf" stroke="#2a1d14" stroke-width="1.3" stroke-linejoin="round"/>' +
             '<circle cx="16" cy="16" r="2" fill="#e8b33c"/><circle cx="26" cy="6" r="1.4" fill="#fff0bf" stroke="#2a1d14" stroke-width=".8"/>',
-        'cursor-grab': '<path d="M9 17 V9 a2 2 0 0 1 4 0 V15 V6.5 a2 2 0 0 1 4 0 V15 V7.5 a2 2 0 0 1 4 0 V16 V10.5 a2 2 0 0 1 4 0 V20 c0 5-3.5 9-8.5 9 h-1.5 c-3 0-5-1.5-6.5-4 l-3.5-6 a2 2 0 0 1 3.4-2.1 Z" fill="#f3e6c2" stroke="#2a1d14" stroke-width="1.5" stroke-linejoin="round"/>',
-        'cursor-grabbing': '<path d="M9 14 a2.2 2.2 0 0 1 4-1 a2.2 2.2 0 0 1 4-.6 a2.2 2.2 0 0 1 4 0 a2.2 2.2 0 0 1 4 1.3 V20 c0 5-3.5 9-8.5 9 h-1.5 c-4 0-7-3-7-7 Z" fill="#f3e6c2" stroke="#2a1d14" stroke-width="1.5" stroke-linejoin="round"/>' +
-            '<path d="M13 13 v3 M17 12.5 v3 M21 13 v3" stroke="#2a1d14" stroke-width="1.1" stroke-linecap="round"/>',
+        // (11 Oct, Victor: "an open hand from the back that then grabs") a right hand seen from its back, fingers spread,
+        // the nails showing at the tips and the knuckles across it; the thumb on the left
+        'cursor-grab': '<path d="M10.2 19.5 L5.4 14.6 a1.9 1.9 0 0 1 2.7-2.7 L11 14.6 V7.4 a1.9 1.9 0 0 1 3.8 0 V13 V4.6 a1.9 1.9 0 0 1 3.8 0 V13 V5.6 a1.9 1.9 0 0 1 3.8 0 V13.6 V8.6 a1.9 1.9 0 0 1 3.8 0 V19 c0 5.6-3.6 10-9.2 10 h-1.4 c-3.4 0-5.8-1.9-7.1-4.4 Z" fill="#f3e6c2" stroke="#2a1d14" stroke-width="1.4" stroke-linejoin="round"/>' +
+            '<path d="M11.9 6.1 h2 M15.7 3.3 h2 M19.5 4.3 h2 M23.3 7.3 h2" stroke="#c9a77a" stroke-width="1.6" stroke-linecap="round"/>' +
+            '<path d="M12.2 15.4 q.7 .7 1.4 0 M16 14.6 q.7 .7 1.4 0 M19.8 15 q.7 .7 1.4 0 M23.6 15.8 q.7 .7 1.4 0" stroke="#2a1d14" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".7"/>' +
+            '<path d="M13.6 21 q3 1.4 6.8 .2" stroke="#2a1d14" stroke-width=".8" fill="none" opacity=".35"/>',
+        // closed round whatever it's holding: the four knuckles in a row along the top, the fingers folded under, the thumb across
+        'cursor-grabbing': '<path d="M8.2 14.2 c0-2 1.6-3.4 3.4-3.2 c.6-1.6 2.2-2.4 3.8-2 c.8-1.3 2.4-1.9 3.9-1.3 c1-1 2.6-1.2 3.8-.4 c1.6 .8 2.4 2.4 2.2 4.1 V19 c0 5.4-3.5 9.6-8.8 9.6 h-1.6 c-4.2 0-6.8-3-6.8-7 Z" fill="#f3e6c2" stroke="#2a1d14" stroke-width="1.4" stroke-linejoin="round"/>' +
+            '<path d="M11.6 11 c.2 1.6 1.2 2.4 2.6 2.2 M15.4 9 c.2 1.8 1.2 2.8 2.8 2.6 M19.3 7.7 c.3 1.9 1.3 2.9 3 2.7" stroke="#2a1d14" stroke-width="1" fill="none" stroke-linecap="round" opacity=".75"/>' +
+            '<path d="M10.4 12.6 q1 .6 2 0 M14.3 10.6 q1 .6 2 0 M18.3 9.4 q1 .6 2 0 M22.2 9.3 q1 .6 2 0" stroke="#fff6dd" stroke-width="1" fill="none" stroke-linecap="round" opacity=".8"/>' +
+            '<path d="M8.4 17.4 c2.6 1 6 1.2 8.8 .2" stroke="#2a1d14" stroke-width="1.1" fill="none" stroke-linecap="round"/>',
         'cursor-look': '<path d="M18.5 18.5 L28 28" stroke="#2a1d14" stroke-width="4.5" stroke-linecap="round"/><path d="M19 19 L27 27" stroke="#6e4a30" stroke-width="2.2" stroke-linecap="round"/>' +
             '<circle cx="12" cy="12" r="8.5" fill="rgba(220,235,245,.45)" stroke="#c49a52" stroke-width="3"/><circle cx="12" cy="12" r="8.5" fill="none" stroke="#2a1d14" stroke-width="1" opacity=".6"/>' +
             '<path d="M8 9 a5 5 0 0 1 4 -3" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/>'
@@ -1354,15 +1365,72 @@
         '<path d="M13 16.5 L15.5 19 L13.5 21 L11 18.5 Z" fill="#c49a52" stroke="#2a1d14" stroke-width="1.1" stroke-linejoin="round"/>' +
         '<path d="M11 18.5 L13.5 21 C11.5 25.5 7.5 28.5 3 29 C3.5 24.5 6.5 20.5 11 18.5 Z" fill="#9a3b1f" stroke="#2a1d14" stroke-width="1.1" stroke-linejoin="round"/>';
     var CURSOR_FALLBACK = { 'cursor-brush': 'crosshair', 'cursor': 'auto', 'cursor-pointer': 'pointer', 'cursor-star': 'pointer', 'cursor-grab': 'grab', 'cursor-grabbing': 'grabbing', 'cursor-look': 'zoom-in' };
+    // a click, in three frames (11 Oct, Victor: "animated when clicking"): the button goes down and the cursor squeezes in
+    // towards its tip, with three little strokes round it (PRESS); it comes up and the cursor springs a touch too big (POP);
+    // then it's itself again after POP_MS. the open hand closes instead, and stays closed while you're holding something
+    var PRESS = 0.8, POP = 1.1, POP_MS = 90;
+    var cursorNow = {}, cursorPress = {}, cursorPop = {};
+    function cursorSvg(art, h, k, ticks) {
+        var g = k === 1 ? art : '<g transform="translate(' + h[0] + ' ' + h[1] + ') scale(' + k + ') translate(' + (-h[0]) + ' ' + (-h[1]) + ')">' + art + '</g>';
+        if (ticks && h[0] > 8 && h[0] < 24 && h[1] > 8 && h[1] < 24) {   // (the three strokes of a click, round the tip: only
+                                                                         // when the tip's inside, not a corner they'd fall off)
+            var x = h[0], y = h[1], d = function (a) { var r = a * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+                return 'M' + (x + c * 5).toFixed(1) + ' ' + (y + s * 5).toFixed(1) + ' L' + (x + c * 9).toFixed(1) + ' ' + (y + s * 9).toFixed(1); };
+            var at = [-150, -90, -30];                                   // (above it)
+            g += '<path d="' + at.map(d).join(' ') + '" stroke="#2a1d14" stroke-width="2.6" stroke-linecap="round"/>' +
+                 '<path d="' + at.map(d).join(' ') + '" stroke="#f3e6c2" stroke-width="1.1" stroke-linecap="round"/>';
+        }
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">' + g + '</svg>';
+    }
+    function cursorValue(src, h, name) { return 'url("' + src + '") ' + h[0] + ' ' + h[1] + ', ' + CURSOR_FALLBACK[name]; }
+    function svgUrl(svg) { return 'data:image/svg+xml,' + encodeURIComponent(svg); }
     function setupCursors() {
         if (!CURSORS) return;
         Object.keys(CURSORS).forEach(function (name) {
-            var h = CURSORS[name], svg = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">' + (CURSOR_ART[name] || CURSOR_ART.cursor) + '</svg>';
-            root.style.setProperty('--' + name, 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '") ' + h[0] + ' ' + h[1] + ', ' + CURSOR_FALLBACK[name]);
+            var h = CURSORS[name], art = CURSOR_ART[name] || CURSOR_ART.cursor;
+            var grab = name === 'cursor-grab' || name === 'cursor-grabbing';
+            cursorNow[name] = cursorValue(svgUrl(cursorSvg(art, h, 1)), h, name);
+            cursorPress[name] = grab ? cursorValue(svgUrl(cursorSvg(CURSOR_ART['cursor-grabbing'], CURSORS['cursor-grabbing'], 1)), CURSORS['cursor-grabbing'], name)
+                                     : cursorValue(svgUrl(cursorSvg(art, h, PRESS, true)), h, name);
+            cursorPop[name] = grab ? cursorNow[name] : cursorValue(svgUrl(cursorSvg(art, h, POP)), h, name);
+            root.style.setProperty('--' + name, cursorNow[name]);
             findAsset('assets/ui/' + name, function (url) {
-                if (url) root.style.setProperty('--' + name, 'url("' + new URL(url, location.href).href + '") ' + h[0] + ' ' + h[1] + ', ' + CURSOR_FALLBACK[name]);
+                if (!url) return;
+                var mine = cursorValue(new URL(url, location.href).href, h, name);
+                cursorNow[name] = cursorPop[name] = mine;
+                if (!grab) cursorPress[name] = mine;                     // (yours stays yourself, unless you draw it pressed)
+                if (!pressing) root.style.setProperty('--' + name, mine);
+            });
+            if (grab) return;
+            findAsset('assets/ui/' + name + '-press', function (url) {
+                if (url) cursorPress[name] = cursorValue(new URL(url, location.href).href, h, name);
             });
         });
+        // cursor-grab's pressed twin is cursor-grabbing, yours if you've drawn one
+        findAsset('assets/ui/cursor-grabbing', function (url) {
+            if (url) cursorPress['cursor-grab'] = cursorPress['cursor-grabbing'] = cursorValue(new URL(url, location.href).href, CURSORS['cursor-grabbing'], 'cursor-grab');
+        });
+        findAsset('assets/ui/click', function (url) { if (url) inkArt = url; });
+        var pressing = false, popTimer = 0;
+        function all(set) { Object.keys(set).forEach(function (n) { root.style.setProperty('--' + n, set[n]); }); }
+        document.addEventListener('pointerdown', function (e) {
+            if (!e.isPrimary || e.button > 0) return;
+            if (e.pointerType === 'touch') { ink(e); return; }          // (a finger has no cursor: just the ink)
+            pressing = true; clearTimeout(popTimer);
+            root.classList.add('pressing');
+            all(cursorPress);
+            ink(e);
+        }, true);
+        function up() {
+            if (!pressing) return;
+            pressing = false;
+            root.classList.remove('pressing');
+            all(cursorPop);
+            popTimer = setTimeout(function () { if (!pressing) all(cursorNow); }, POP_MS);
+        }
+        document.addEventListener('pointerup', up, true);
+        document.addEventListener('pointercancel', up, true);
+        window.addEventListener('blur', up);
         var st = document.createElement('style');                  // last in line, so it wins
         st.textContent =
             'html, body { cursor: var(--cursor) !important; }' +
@@ -1378,6 +1446,89 @@
             '.paint-easel, .paint-easel * { cursor: var(--cursor-brush) !important; }';
         document.head.appendChild(st);
     }
+    // the burst of ink where a click lands (its look: sky.css, "a click"). not while you're holding the revolver or the marker
+    // (they have their own), in a field you're typing in, or for anyone who'd rather things didn't move
+    var inkArt = null;
+    function ink(e) {
+        if (reduceMotion.matches || body.classList.contains('inv-holding')) return;
+        if (e.target.closest && e.target.closest('input, textarea, select, .paint-easel, .note-draw')) return;
+        var b = document.createElement('div');
+        b.className = 'click-ink' + (inkArt ? ' has-art' : '');
+        b.style.left = e.clientX + 'px'; b.style.top = e.clientY + 'px';
+        b.innerHTML = inkArt ? '<img alt="" src="' + inkArt + '">' : '<i></i><i></i><i></i><i></i><i></i><i></i><b></b>';
+        body.appendChild(b);
+        setTimeout(function () { b.remove(); }, 520);
+    }
+
+    /* ---------------- take hold, and pull (11 Oct) ----------------
+       Victor: things you grab and pull (the boards over skizy's window, the book that opens the wall, the bath plug, the
+       hallway's cord, the wallpaper, the sky's loose corner…) take the grab cursor, the hand closes as you take hold, and
+       they only give once you've dragged them far enough; let go sooner and they spring back. a plain click tells you to pull.
+           Sky.pull(el, {
+               dir:   [x, y]  which way it pulls (down [0, 1], up [0, -1], out to the left [-.7, .7]…); none: any way
+               need:  how far (px, or a function giving px) before it gives
+               can(e):     false: not now (the pointer's left alone, so a click on it still happens)
+               move(k, dx, dy):  as you pull, k from 0 to 1 (dx, dy: how far the pointer's gone)
+               give(dx, dy):     far enough: it comes away. return false and it hasn't (it springs back instead)
+               back():     let go too soon (and after a give that returned false): put it back
+               tap():      only clicked
+               stiff:      0…1, how much of the way it moves before it gives (default .35: things fight back)
+           })
+       a click from the keyboard still reaches the thing's own click handlers (a click by pointer doesn't: the pull had it). */
+    function pull(el, o) {
+        if (!el || el.dataset.pull) return;
+        el.dataset.pull = '1';
+        el.classList.add('pullable');
+        var held = null;
+        function need() { return Math.max(12, typeof o.need === 'function' ? o.need() : (o.need || 60)); }
+        function along(dx, dy) {
+            if (!o.dir) return Math.hypot(dx, dy);
+            var n = Math.hypot(o.dir[0], o.dir[1]) || 1;
+            return (dx * o.dir[0] + dy * o.dir[1]) / n;
+        }
+        el.addEventListener('pointerdown', function (e) {
+            if (e.button > 0 || !e.isPrimary || held || (o.can && !o.can(e)) || body.classList.contains('inv-holding')) return;
+            e.preventDefault(); e.stopPropagation();
+            try { el.setPointerCapture(e.pointerId); } catch (x) {}
+            held = { x: e.clientX, y: e.clientY, far: 0, k: 0, need: need(), id: e.pointerId };
+            root.classList.add('grabbing');
+            el.classList.add('held');
+        });
+        el.addEventListener('pointermove', function (e) {
+            if (!held || e.pointerId !== held.id) return;
+            var dx = e.clientX - held.x, dy = e.clientY - held.y;
+            held.far = Math.max(held.far, Math.hypot(dx, dy));
+            var k = Math.max(0, Math.min(1, along(dx, dy) / held.need));
+            held.k = k;
+            if (o.move) o.move(k, dx, dy);
+            if (k >= 1) {
+                held = null; finish(e);
+                pulledAt = Infinity;                                     // (still holding on: the click comes when they let go)
+                if (o.give && o.give(dx, dy) === false && o.back) o.back();
+            }
+        });
+        function finish(e) {
+            pulledAt = Date.now();
+            root.classList.remove('grabbing');
+            el.classList.remove('held');
+            try { if (e && e.pointerId != null) el.releasePointerCapture(e.pointerId); } catch (x) {}
+        }
+        function letGo(e) {
+            if (!held) return;
+            var h = held; held = null; finish(e);
+            if (h.far < 6 && o.tap) o.tap(); else if (o.back) o.back();
+        }
+        el.addEventListener('pointerup', letGo);
+        el.addEventListener('pointercancel', letGo);
+        el.addEventListener('lostpointercapture', letGo);
+    }
+    // (the click a pull leaves behind is the pull's, not the thing's: nor whatever's under the pointer when it lets go, like
+    // the gap where a board was)
+    var pulledAt = 0;
+    document.addEventListener('pointerup', function () { if (pulledAt === Infinity) pulledAt = Date.now(); }, true);
+    document.addEventListener('click', function (e) {
+        if (e.detail > 0 && Date.now() - pulledAt < 600) { pulledAt = 0; e.preventDefault(); e.stopImmediatePropagation(); }
+    }, true);
 
     /* ---------------- ?slots: see every slot on the page and whether it has art yet ---------------- */
     // open any page with ?slots on the end (…/city.html?slots) to get a list of its slots
@@ -1887,7 +2038,7 @@
     function say(text, ms) { if (window.Sky && Sky.inventory && Sky.inventory.say) Sky.inventory.say(text, ms); }
 
     window.Sky = {
-        escape: escape, ESC: ESC, sfx: sfx, say: say, speak: speak, ARROW_ART: ARROW_ART,
+        escape: escape, ESC: ESC, sfx: sfx, say: say, speak: speak, ARROW_ART: ARROW_ART, pull: pull,
         // run fn(p) every frame the scene changes; p goes 0 (noon) → 1 (midnight)
         onFrame: function (fn) { hooks.push(fn); fn(shown); },
         // run fn(go) when a sign or constellation is clicked; return true and

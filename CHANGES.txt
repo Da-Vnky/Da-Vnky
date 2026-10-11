@@ -14,6 +14,8 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Every cursor now animates when you click: it squeezes in as the button goes down and springs back as it comes up, and a little burst of ink is left where the click lands (your own pressed cursors: assets/ui/<cursor>-press; your own burst: assets/ui/click).
+- A new grab cursor, an open hand seen from the back that closes into a fist when you click and stays closed while you hold on, over everything you grab or pull (and the boat, the bottle cork). Those things now have to be grabbed and really pulled: the boards on skizy's window (a click knocks; pull a board far enough and it rips off), the book that opens the secret wall (pull it out and the wall opens; pull again to shut it), the bath plug (pull it up by its chain), the hallway's cord, the reset 5 wallpaper and the loose corner of the sky. Let go too soon and they spring back; a plain click says to pull.
 
 == published ==
 

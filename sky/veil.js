@@ -127,6 +127,14 @@
         voidInto(wp.querySelector('.wp-behind'), 14);
         if (Sky.fillAssets) Sky.fillAssets(wp);
         try { if (sessionStorage.getItem('wall-peeled') === '1') wp.classList.add('peeled'); } catch (e) {}
+        var curl = wp.querySelector('.wp-curl');
+        var tearDown = function () {
+            curl.style.transition = curl.style.transform = '';
+            wp.classList.add('peeled');
+            try { sessionStorage.setItem('wall-peeled', '1'); } catch (e2) {}
+            sfx('wall-peel', { or: 'paper-unroll' });
+            setTimeout(function () { say('It came away in one long strip. There’s no wall behind it.', 3200); }, 500);
+        };
         var peel = function (e) {
             if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
             if (busyHands() || e.target.closest('.reset-key')) return;
@@ -135,13 +143,24 @@
                 say(R === 5 ? 'Behind the wallpaper there’s no wall. Just the dark, and writing in it.' : 'It’s still hanging open. Nobody’s papered over it.', 3200);
                 return;
             }
-            wp.classList.add('peeled');
-            try { sessionStorage.setItem('wall-peeled', '1'); } catch (e2) {}
-            sfx('wall-peel', { or: 'paper-unroll' });
-            setTimeout(function () { say('It came away in one long strip. There’s no wall behind it.', 3200); }, 500);
+            if (e.type === 'keydown') tearDown();                            // (by hand it's pulled: below)
         };
         wp.addEventListener('click', peel);
         wp.addEventListener('keydown', peel);
+        // (11 Oct, Victor: grabbed, then pulled) take hold of the curl and pull it down: it lifts further off the wall, and
+        // far enough it tears away in one strip. let go too soon and it curls back
+        Sky.pull(wp, {
+            dir: [0.25, 1],
+            need: function () { return Math.max(50, wp.offsetHeight * 0.55); },
+            can: function (e) { return !wp.classList.contains('peeled') && !(e.target.closest && e.target.closest('.reset-key')); },
+            move: function (k) {
+                curl.style.transition = 'none';
+                curl.style.transform = 'rotate(' + (-4 - 18 * k).toFixed(1) + 'deg) scale(' + (1.04 + 0.16 * k).toFixed(3) + ') translateY(' + (12 * k).toFixed(1) + '%)';
+            },
+            give: tearDown,
+            back: function () { curl.style.transition = ''; curl.style.transform = ''; },
+            tap: function () { say('It’s coming away at the corner. You could pull it down.', 2600); }
+        });
     }
 
     /* ---------------- the sky over the rooftop ---------------- */
@@ -168,12 +187,31 @@
         body.appendChild(seam);
         if (Sky.fillAssets) Sky.fillAssets(seam.parentNode);
         var tearing = false;
+        var tryTear = function () {
+            if (Sky.lives && Sky.lives.refuse('veil')) { seam.classList.remove('tug'); void seam.offsetWidth; seam.classList.add('tug'); return false; }
+            tear();
+        };
         seam.addEventListener('click', function (e) {
             e.preventDefault(); e.stopPropagation();
             if (tearing || busyHands()) return;
             if (stitched) { say('Someone’s sewn the sky shut. Big, clumsy stitches.', 2800); return; }
-            if (Sky.lives && Sky.lives.refuse('veil')) { seam.classList.remove('tug'); void seam.offsetWidth; seam.classList.add('tug'); return; }
-            tear();
+            if (e.detail === 0) tryTear();                                   // (from the keyboard. by hand it's pulled: below)
+        });
+        // (11 Oct, Victor: grabbed, then pulled) take hold of the loose corner and pull it away from the sky: it lifts and
+        // stretches, and far enough it tears. let go too soon and it lies flat again
+        var flap = function () { return seam.querySelector('svg, .art'); };
+        Sky.pull(seam, {
+            need: 80,
+            can: function () { return !stitched && !tearing; },
+            move: function (k, dx, dy) {
+                var f = flap(); if (!f) return;
+                f.style.transition = 'none';
+                f.style.transformOrigin = '64% 44%';
+                f.style.transform = 'translate(' + (dx * 0.18).toFixed(1) + 'px, ' + (dy * 0.18).toFixed(1) + 'px) scale(' + (1 + 0.2 * k).toFixed(3) + ')';
+            },
+            give: function () { var f = flap(); if (f) f.style.transition = f.style.transform = ''; return tryTear(); },
+            back: function () { var f = flap(); if (f) { f.style.transition = 'transform .4s cubic-bezier(.3,1.8,.5,1)'; f.style.transform = ''; } },
+            tap: function () { say('A corner of the sky is coming loose. You could pull it.', 2600); }
         });
     }
     function tear() {
