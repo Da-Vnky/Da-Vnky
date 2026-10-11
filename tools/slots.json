@@ -102,7 +102,9 @@
       {
        "slot": "assets/sky/rope",
        "what": "the rope the sky's props hang from in resets 1 and 2: a short piece hanging straight down, that repeats along its length",
-       "size": "e.g. 20 x 80 (drawn 5 px wide on the page, so thin detail is lost), see-through at the sides"
+       "size": "e.g. 20 x 80 (drawn 5 px wide on the page, so thin detail is lost), see-through at the sides",
+       "tile": "y",
+       "canvas": "60 x 240"
       },
       {
        "slot": "assets/sky/moon",
@@ -760,22 +762,34 @@
       {
        "slot": "assets/sea/wave-1",
        "what": "the back row of waves: a strip as tall as the whole sea that repeats left to right, so its left and right edges must match. its crests sit on their own line: lay assets/templates/wave-1-guide.png over your canvas (all four together: waves-template.png; how they repeat: waves-how-they-repeat.png)",
-       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests"
+       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests",
+       "tile": "x",
+       "canvas": "3024 x 1008",
+       "tileGuide": "assets/templates/wave-1-guide.png"
       },
       {
        "slot": "assets/sea/wave-2",
        "what": "the second row of waves: a strip as tall as the whole sea that repeats left to right, so its left and right edges must match. its crests sit on their own line: lay assets/templates/wave-2-guide.png over your canvas (all four together: waves-template.png; how they repeat: waves-how-they-repeat.png)",
-       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests"
+       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests",
+       "tile": "x",
+       "canvas": "3024 x 1008",
+       "tileGuide": "assets/templates/wave-2-guide.png"
       },
       {
        "slot": "assets/sea/wave-3",
        "what": "the third row of waves: a strip as tall as the whole sea that repeats left to right, so its left and right edges must match. its crests sit on their own line: lay assets/templates/wave-3-guide.png over your canvas (all four together: waves-template.png; how they repeat: waves-how-they-repeat.png)",
-       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests"
+       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests",
+       "tile": "x",
+       "canvas": "3024 x 1008",
+       "tileGuide": "assets/templates/wave-3-guide.png"
       },
       {
        "slot": "assets/sea/wave-4",
        "what": "the front row of waves: a strip as tall as the whole sea that repeats left to right, so its left and right edges must match. its crests sit on their own line: lay assets/templates/wave-4-guide.png over your canvas (all four together: waves-template.png; how they repeat: waves-how-they-repeat.png)",
-       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests"
+       "size": "3024 x 1008 (the templates’ size; any width works, the same height ratio keeps the lines right), see-through above the crests",
+       "tile": "x",
+       "canvas": "3024 x 1008",
+       "tileGuide": "assets/templates/wave-4-guide.png"
       },
       {
        "slot": "assets/sea/ship",
@@ -1998,6 +2012,11 @@
        "size": "wide, about 1600 x 500; its bottom sits just behind the railing"
       },
       {
+       "slot": "assets/living/porch-yard",
+       "what": "the front yard seen from the porch: the lawn between your fence (the bottom of porch-street) and the porch, with the path from the gate to the steps. stretched across the whole width below porch-street; only its top part shows between the railing's posts, the rest is behind the porch floor. the bee's shadow falls on it",
+       "size": "wide, like porch-street (e.g. 1920 x 240), stretched to fit"
+      },
+      {
        "slot": "assets/living/porch-floor",
        "what": "the porch floorboards",
        "size": "wide, stretched along the bottom"
@@ -2256,6 +2275,12 @@
        "slot": "assets/living/bee-trail",
        "what": "one dot of the dotted trail it leaves behind it as it flies (dropped behind its tail every little way, each fading and shrinking). until yours is in, a little cream dot",
        "size": "about 16 x 16, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-shadow",
+       "what": "its shadow on the ground below it (the lawn out front, the yard from the porch): it follows the bee, smaller, softer and fainter the higher it flies, and faint at night. until yours is in, a soft dark oval",
+       "size": "about 160 x 40, see-through around a soft dark oval",
        "optional": true
       },
       {
@@ -3256,6 +3281,24 @@
       {
        "slot": "assets/sounds/bee-hum",
        "what": "its wings as it flies about (the front garden and the porch): a soft buzz, a loop of a second or two, played very quietly the whole time you can see it, a little faster when it darts about, quieter while it talks. until yours is in, a made-up hum like its voice",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/bee-dive",
+       "what": "the bee darting at the traveller (reset 1, if you shoot it again after it gave the gun back): a quick angry whoosh. until yours is in, a made-up whoosh",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/bee-sting",
+       "what": "the bee stinging the traveller as it takes the gun (reset 1). until yours is in, a little tap",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/bee-bang",
+       "what": "the bee firing the revolver at the traveller (reset 1). until yours is in, the revolver's own bang",
        "kind": "sound",
        "optional": true
       }

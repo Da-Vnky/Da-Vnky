@@ -271,13 +271,17 @@
     // reset 4 (so nothing can go wrong): nowhere, and not in the bag: the only revolver is the white one, from the pact
     // (and while the bee in the front garden has it, or once it's stung it to pieces, this visit: sky/bee.js)
     function withBee(id) { try { return sessionStorage.getItem('bee-gun') === id || (' ' + (sessionStorage.getItem('bee-broke') || '') + ' ').indexOf(' ' + id + ' ') !== -1; } catch (e) { return false; } }
+    // and once the bee's had it for good (11 Oct, Victor: in reset 1 it takes it and shoots them with it; in 2 to 7, given
+    // back and shot at again, it stings it to pieces), it's gone: off the wall till reset 8, where everything's as it was
+    // (localStorage revolver-gone: bee / broken)
+    function destroyed(r) { try { return r < 8 && !!localStorage.getItem('revolver-gone'); } catch (e) { return false; } }
     (function () {
-        var S = window.davSave, r = S ? S.reset : 1;
+        var S = window.davSave, r = S ? S.reset : 1, gone = r === 4 || destroyed(r);
         document.querySelectorAll('.pickup[data-item="revolver"]').forEach(function (p) {
-            if (r === 4 || (r === 1) === p.classList.contains('wall-revolver')) p.remove();
+            if (gone || (r === 1) === p.classList.contains('wall-revolver')) p.remove();
             else if (withBee('revolver')) p.classList.add('with-bee');
         });
-        if (r === 4 && I.has('revolver')) I.remove('revolver');
+        if (gone && I.has('revolver')) I.remove('revolver');
     })();
     // the white revolver stays theirs for the rest of reset 4 (the bag itself only lasts the visit)
     (function () {

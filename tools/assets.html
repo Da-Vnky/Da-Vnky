@@ -241,6 +241,13 @@
     .dt-item .dt-nm .warn { color: var(--red); }
     .dt-item input[type=number] { width: 46px; }
     .dt-item .done { font-style: italic; color: #4c7a3a; font-size: .8rem; }
+    .dt-item .dt-nm .ok { color: #4c7a3a; }
+    .dt-rep { flex: none; display: grid; place-items: center; border-radius: 4px; overflow: hidden;
+      background: repeating-conic-gradient(#e9dfc6 0 25%, #f6f0e0 0 50%) 0 0 / 12px 12px; }
+    .dt-rep.wide { max-width: 210px; }
+    .dt-rep.wide canvas { display: block; max-width: 210px; height: auto; }
+    .dt-rep.tall canvas { display: block; max-height: 150px; width: auto; }
+    .dt-tile { margin: 4px 0; padding: 4px 6px; border-radius: 6px; background: rgba(243,234,210,.55); }
     .details-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; }
 </style>
 </head>
@@ -401,6 +408,7 @@
         function go(path, app, name) {
             if (busy) return;
             busy = true;
+            if (app !== 'animator') try { localStorage.setItem('dt-app', app); } catch (e) {}
             all.forEach(function (b) { b.disabled = true; });
             say('setting up ' + slot.replace(/^assets\//, '') + ' for ' + name + '… (it opens the scene to take the guide: a few seconds, longer for skizy’s room)');
             var body = { slot: slot, app: app, fresh: fresh.querySelector('input').checked, view: viewName || '' };
@@ -427,7 +435,17 @@
         [['csp', 'Clip Studio'], ['animator', 'Rebelle Animator']].forEach(function (a) { var b = btn(a[1], function () { go('/__draw/animate', a[0], a[1]); }, 'sm'); all.push(b); rowA.appendChild(b); });
         opts.appendChild(fresh);
         opts.appendChild(btn('show its folder', function () { api('/__draw/reveal', { slot: slot }).then(function (r) { say(r.error || 'opened ' + r.folder, !!r.error); }); }, 'linkish'));
-        box.appendChild(rowD); box.appendChild(rowA); box.appendChild(opts); box.appendChild(wait);
+        box.appendChild(rowD); box.appendChild(rowA); box.appendChild(opts);
+        // a picture that repeats (slots.json "tile"): how yours repeats now, and a way to mend the join
+        var mineNow = s.tile && fileFor(slot);
+        if (mineNow) {
+            var rep = el('div', 'dt-item dt-tile');
+            rep.appendChild(el('span', 'dt-nm', 'how yours repeats now<small></small>'));
+            rep.insertBefore(repeatStrip(mineNow.url, s.tile, rep.querySelector('small')), rep.firstChild);
+            rep.appendChild(wrapBtn('current'));
+            box.appendChild(rep);
+        }
+        box.appendChild(wait);
         var shown = '', player = null;
         function refresh() {
             var t = DT.table[slot], key = JSON.stringify(t || null);
@@ -442,6 +460,10 @@
                 var url = '/__draw/file?slot=' + encodeURIComponent(slot) + '&name=' + encodeURIComponent(e.name) + '&t=' + e.time;
                 var it = el('div', 'dt-item', '<span class="dt-pic"><img alt="" src="' + url + '"></span><span class="dt-nm">' + esc(e.name) + '<small>' + ago(e.time) + ' · ' + kb(e.size) + '</small></span>');
                 if (/see-through|whole room/i.test(s.size || '')) checkSeeThrough(it.querySelector('img'), it.querySelector('small'));
+                if (s.tile) {                                     // (laid out as it'll repeat, and whether the join shows)
+                    it.querySelector('.dt-pic').replaceWith(repeatStrip(url, s.tile, it.querySelector('small')));
+                    it.appendChild(wrapBtn(e.name));
+                }
                 it.appendChild(e.used ? el('span', 'done', 'in the slot') : btn('use this', function () {
                     api('/__draw/use', { slot: slot, name: e.name }).then(function (r) { if (r.error) say(r.error, true); else { artChanged++; say('put ' + e.name + ' in ' + slot.replace(/^assets\//, '') + '. publish when you’re ready.'); load(); poll(); } });
                 }, 'sm yes'));
@@ -473,10 +495,74 @@
                 wait.appendChild(it);
             }
         }
+        // "wrap it": the picture moved by half a tile (so the join's in the middle), opened in the program you last drew in
+        function wrapBtn(name) {
+            var app = 'csp'; try { app = localStorage.getItem('dt-app') || 'csp'; } catch (e) {}
+            var label = { csp: 'Clip Studio', ps: 'Photoshop', rebelle: 'Rebelle' }[app] || 'Clip Studio';
+            var b = btn('wrap it', function () {
+                if (busy) return;
+                busy = true; b.disabled = true;
+                say('moving it by half a tile, so the join is in the middle… (opens in ' + label + ')');
+                var body = { slot: slot, name: name, app: app };
+                api('/__draw/wrap', body).then(function done(r) {
+                    if (r.need) {                                 // (it couldn't find the program: where is it?)
+                        var where = prompt('Where is ' + r.name + '? In File Explorer, find the program itself (its .exe), right-click it and choose "Copy as path", then paste it here.');
+                        if (!where) { say('made, but not opened: it needs to know where ' + r.name + ' is.', true); return; }
+                        return api('/__draw/app', { app: r.need, path: where }).then(function (a) {
+                            if (a.error) { say(a.error, true); return; }
+                            return api('/__draw/wrap', body).then(done);
+                        });
+                    }
+                    if (r.error) { say(r.error, true); return; }
+                    say((r.opened ? 'opened in ' + r.name : 'made') + ': ' + r.file + '. the join is in the middle now: paint over it, hide the guide, export into ' + r.folder + ' and it’ll show here.');
+                    poll();
+                }).then(function () { busy = false; b.disabled = false; });
+            }, 'sm');
+            b.title = 'makes a copy moved by half a tile (wrapping round), so the join between the copies is in the middle, where you can see it and paint over it. opens in ' + label + ' (the program you last used here)';
+            return b;
+        }
         box.refresh = refresh;
         DT.panels.push(box);
         refresh();
         return box;
+    }
+    // a repeating picture laid out as it'll repeat (three copies, the joins marked), and a word on whether the join shows:
+    // the edges that meet are compared with how much the picture changes from one column (or row) to the next inside it
+    function repeatStrip(url, axis, note) {
+        var c = document.createElement('canvas'), wrap = el('span', 'dt-rep ' + (axis === 'y' ? 'tall' : 'wide'));
+        wrap.appendChild(c);
+        var img = new Image();
+        img.onload = function () {
+            var W = img.naturalWidth, H = img.naturalHeight; if (!W || !H) return;
+            var n = 3, x = c.getContext('2d'), across = axis.indexOf('x') > -1, down = axis.indexOf('y') > -1;
+            var tw, th;
+            if (across && !down) { th = 52; tw = W * th / H; c.width = Math.round(tw * n); c.height = th; }
+            else if (down && !across) { tw = Math.max(14, Math.min(60, W * 120 / H)); th = H * tw / W; c.width = Math.round(tw); c.height = Math.round(th * n); }
+            else { tw = th = 40; c.width = c.height = 120; }
+            for (var i = 0; i < (across ? n : 1); i++) for (var j = 0; j < (down ? n : 1); j++) x.drawImage(img, i * tw, j * th, tw, th);
+            // how well the edges meet (at most 1024 px along the join, for speed)
+            var k = Math.min(1, 1024 / Math.max(W, H)), w = Math.max(2, Math.round(W * k)), h = Math.max(2, Math.round(H * k));
+            var o = document.createElement('canvas'); o.width = w; o.height = h;
+            var q = o.getContext('2d'); q.drawImage(img, 0, 0, w, h);
+            var d; try { d = q.getImageData(0, 0, w, h).data; } catch (e) { return; }
+            function px(a, b) { var p = (b * w + a) * 4; return [d[p] * d[p + 3] / 255, d[p + 1] * d[p + 3] / 255, d[p + 2] * d[p + 3] / 255, d[p + 3]]; }
+            function diff(a1, b1, a2, b2) { var u = px(a1, b1), v = px(a2, b2); return (Math.abs(u[0] - v[0]) + Math.abs(u[1] - v[1]) + Math.abs(u[2] - v[2]) + Math.abs(u[3] - v[3])) / 4; }
+            function cols(c1, c2) { var s = 0; for (var r = 0; r < h; r++) s += diff(c1, r, c2, r); return s / h; }
+            function rows(r1, r2) { var s = 0; for (var cc = 0; cc < w; cc++) s += diff(cc, r1, cc, r2); return s / w; }
+            var bad = [];
+            function judge(seam, inside) { return seam > inside * 2.5 + 6; }
+            if (across) { var inX = (cols(Math.floor(w / 3), Math.floor(w / 3) + 1) + cols(Math.floor(2 * w / 3), Math.floor(2 * w / 3) + 1)) / 2; if (judge(cols(w - 1, 0), inX)) bad.push('the left and right edges'); }
+            if (down) { var inY = (rows(Math.floor(h / 3), Math.floor(h / 3) + 1) + rows(Math.floor(2 * h / 3), Math.floor(2 * h / 3) + 1)) / 2; if (judge(rows(h - 1, 0), inY)) bad.push('the top and bottom edges'); }
+            x.strokeStyle = bad.length ? 'rgba(200,40,30,.9)' : 'rgba(60,130,60,.55)'; x.lineWidth = 1.5; x.setLineDash(bad.length ? [] : [3, 3]);
+            x.beginPath();
+            if (across) for (var a = 1; a < n; a++) { x.moveTo(Math.round(a * tw) + .5, 0); x.lineTo(Math.round(a * tw) + .5, c.height); }
+            if (down) for (var b2 = 1; b2 < n; b2++) { x.moveTo(0, Math.round(b2 * th) + .5); x.lineTo(c.width, Math.round(b2 * th) + .5); }
+            x.stroke();
+            if (note) note.appendChild(el('span', bad.length ? 'warn' : 'ok', bad.length ? ' · the join shows: ' + bad.join(' and ') + ' don’t meet (marked red). “wrap it” to mend it' : ' · it repeats with no join showing'));
+        };
+        img.src = url;
+        wrap.title = 'how it repeats on the site: three copies, the joins between them marked (green dashes: seamless; red: the join shows)';
+        return wrap;
     }
     // an export that should be see-through but isn't anywhere: probably the guide was still showing when it was exported
     function checkSeeThrough(img, note) {

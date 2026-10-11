@@ -1125,6 +1125,15 @@ def draw_frames(slot, fps=None):
     return {'name': saved, 'size': len(raw), 'halved': half}
 
 
+def draw_wrap(d):
+    """a repeating picture (an export, or the slot's picture now) moved by half a tile, to mend its join, opened in the program"""
+    slot, name, app = d.get('slot') or '', os.path.basename(d.get('name') or 'current'), d.get('app') or ''
+    drawtable().where(slot)
+    if app and app not in ('csp', 'ps', 'rebelle'):
+        raise ValueError('which program?')
+    return draw_run(*(['wrap', slot, name] + ([app] if app else [])))
+
+
 def draw_reveal(slot, in_frames=False):
     """the slot's folder on the drawing table, in File Explorer"""
     folder, _, _ = drawtable().where(slot)
@@ -1805,6 +1814,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if url.path == '/__draw/frames':
                 d = json.loads(raw or b'{}')
                 return self.reply(draw_frames(d.get('slot'), d.get('fps')))
+            if url.path == '/__draw/wrap':
+                return self.reply(draw_wrap(json.loads(raw or b'{}')))
             if url.path == '/__draw/reveal':
                 d = json.loads(raw or b'{}')
                 return self.reply(draw_reveal(d.get('slot'), bool(d.get('frames'))))
