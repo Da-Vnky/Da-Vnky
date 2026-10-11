@@ -14,6 +14,8 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- CLAUDE.md (notes for the next Claude), checked against the bee and the renaming: the bee's list of what other code can ask of it was a little off (its mood is a value to read, not to call; aimedAt, shot, gun and grudge were missing), and a new note on how skizy's room's saves moved to their new names, with a warning never to give another save a name ending in -remedy, -restored-said or -pills (it would be moved too).
+- The bee can be seen from the porch too: the same bee, hovering out over the front yard just past the railing, left of the steps (where its roses are, seen from that side). Click it there and you can talk to it just the same; its mood, menu, singing and its feelings about the revolver all go with it. (sky/bee.js and sky/css/bee.css.)
 
 == published ==
 

@@ -34,7 +34,35 @@ body.bee-talking .front .bee-home {
     body.bee-talking .front .bee-home { left: 70%; top: 36%; width: 8%; }
 }
 
-.front .bee {
+/* seen from the porch (bee.js perch): out over the yard past the railing, left of the steps (where its roses are, seen
+   from this side), between the streetlight and the traveller. the same bee, so everything else below applies here too */
+.porch .bee-home {
+    --bee-y: #f2c230;
+    --lift: 0;
+    --tilt: 0;
+    --mouth: 0;
+    --face: 1;
+    position: absolute;
+    left: 32%;
+    top: 51%;
+    width: clamp(58px, 5.6vw, 110px);
+    aspect-ratio: 120 / 100;
+    z-index: 1;
+    pointer-events: none;
+    transition: left 1.2s cubic-bezier(.45, .05, .3, 1), top 1.2s cubic-bezier(.45, .05, .3, 1), width 1.2s cubic-bezier(.45, .05, .3, 1);
+}
+/* talking: up close, over the porch roof's shadow, facing the menu */
+body.bee-talking .porch .bee-home { left: 36%; top: 28%; width: clamp(76px, 8vw, 150px); --face: -1; }
+@media (max-width: 620px) {
+    .porch .bee-home { left: 25%; top: 52%; }
+    body.bee-talking .porch .bee-home { left: 38%; top: 24%; --face: 1; }
+}
+@media (max-height: 500px) and (min-width: 621px) {
+    .porch .bee-home { left: 33%; top: 44%; }
+    body.bee-talking .porch .bee-home { left: 64%; top: 22%; }
+}
+
+.bee-home .bee {
     position: absolute;
     inset: 0;
     display: block;
@@ -45,16 +73,16 @@ body.bee-talking .front .bee-home {
     pointer-events: auto;
     -webkit-tap-highlight-color: transparent;
 }
-.front .bee:focus-visible {
+.bee-home .bee:focus-visible {
     outline: 2px dashed rgba(243, 230, 194, .8);
     outline-offset: 6px;
     border-radius: 50%;
 }
-.front .bee:hover .kh-hint,
-.front .bee:focus-visible .kh-hint {
+.bee-home .bee:hover .kh-hint,
+.bee-home .bee:focus-visible .kh-hint {
     opacity: 1;
 }
-body.bee-talking .front .bee .kh-hint {
+body.bee-talking .bee-home .bee .kh-hint {
     opacity: 0;
 }
 
@@ -575,12 +603,12 @@ body.bee-talking .hotbar {
 
 /* ---------------- the revolver (bee.js): it won't be shot ---------------- */
 /* weaving out of the gun's sights (bee.js sets --dodge-x/y every frame while you aim) */
-.front .bee,
+.bee-home .bee,
 .bee-home .bee-bubble {
     translate: var(--dodge-x, 0px) var(--dodge-y, 0px);
 }
 /* coming straight at you, to sting */
-.front .bee-home.diving .bee {
+.bee-home.diving .bee {
     animation: bee-dive .8s cubic-bezier(.3, 0, .3, 1);
 }
 @keyframes bee-dive {
