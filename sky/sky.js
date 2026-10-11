@@ -99,7 +99,7 @@
 
     // the site's own mouse cursors. each is a slot, assets/ui/<name> (a 32 x 32 PNG is best,
     // 64 at most); the numbers are its hotspot: the pixel that does the pointing, from the top left.
-    //   cursor           everywhere                     cursor-pointer   over things you can click (a pointing hand)
+    //   cursor           everywhere (a pointing hand)   cursor-pointer   over things you can click (the same hand)
     //   cursor-star      over the constellations        cursor-grab      over things you can take hold of and pull
     //   cursor-grabbing  while holding something        cursor-look      over things to look into
     //   cursor-brush     over the easel you paint on (its tip is the hotspot, bottom left)
@@ -109,7 +109,7 @@
     // click also leaves a little burst of ink where it lands: assets/ui/click, if you draw your own (a small picture).
     // set CURSORS = null to keep the computer's usual cursors.
     var CURSORS = {
-        'cursor': [3, 2], 'cursor-pointer': [12, 3], 'cursor-star': [16, 16],
+        'cursor': [12, 3], 'cursor-pointer': [12, 3], 'cursor-star': [16, 16],
         'cursor-grab': [16, 18], 'cursor-grabbing': [16, 18], 'cursor-look': [12, 12], 'cursor-brush': [3, 29],
         'cursor-poke': [12, 3], 'cursor-pat': [17, 17]
     };
@@ -1341,7 +1341,6 @@
 
     /* ---------------- the cursors ---------------- */
     var CURSOR_ART = {
-        'cursor': '<path d="M3 2 L3 24 L9 18.5 L13 28 L17.5 26 L13.5 16.8 L21.5 16.8 Z" fill="#2a1d14" stroke="#f3e6c2" stroke-width="1.6" stroke-linejoin="round"/>',
         'cursor-star': '<path d="M16 2 C17 11 21 15 30 16 C21 17 17 21 16 30 C15 21 11 17 2 16 C11 15 15 11 16 2 Z" fill="#fff0bf" stroke="#2a1d14" stroke-width="1.3" stroke-linejoin="round"/>' +
             '<circle cx="16" cy="16" r="2" fill="#e8b33c"/><circle cx="26" cy="6" r="1.4" fill="#fff0bf" stroke="#2a1d14" stroke-width=".8"/>',
         // (11 Oct: "an open hand from the back that then grabs") a right hand seen from its back, fingers spread,
@@ -1369,6 +1368,9 @@
     CURSOR_ART['cursor-pointer'] = handPointing(4.4);
     var CURSOR_PRESS_ART = { 'cursor-pointer': handPointing(9.2) +            // (the finger's come down: a tap, and a tick of it)
         '<path d="M8.2 8.6 l-2.4-1.2 M8 11.6 h-2.8" stroke="#2a1d14" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>' };
+    // the everyday cursor is the same pointing hand (11 Oct: it was still a dark arrow), its finger tapping the same way
+    CURSOR_ART['cursor'] = CURSOR_ART['cursor-pointer'];
+    CURSOR_PRESS_ART['cursor'] = CURSOR_PRESS_ART['cursor-pointer'];
     // the bee: the same hand, to poke it with (the tip's the hotspot)…
     CURSOR_ART['cursor-poke'] = handPointing(4.4);
     // …and over its head, an open hand, to pat it (the hotspot's the palm; 11 Oct: turned the other way up)

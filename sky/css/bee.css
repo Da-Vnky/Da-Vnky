@@ -3,7 +3,9 @@
    its menu (talking to it).
    ===================================================================== */
 
-/* where it lives: over the roses by the steps (shares of the 1600 x 900 garden picture) */
+/* where it lives: over the roses by the steps (shares of the 1600 x 900 garden picture), and from there all over the lawn
+   (11 Oct: bee.js wander() sets --wx, --wy where it's flying to, --wd how far back that is, --wt how long it takes).
+   smaller out here than up close (11 Oct: 4.2% of the garden, it was 6.2%; talking it's as big as ever) */
 .front .bee-home {
     --bee-y: #f2c230;
     --lift: 0;
@@ -11,13 +13,16 @@
     --mouth: 0;
     --face: 1;
     position: absolute;
-    left: 63.5%;
-    top: 66%;
-    width: 6.2%;
+    left: var(--wx, 63.5%);
+    top: var(--wy, 67%);
+    width: calc(4.2% * var(--wd, 1));
     aspect-ratio: 120 / 100;
     z-index: 2;
     pointer-events: none;
-    transition: left 1.2s cubic-bezier(.45, .05, .3, 1), top 1.2s cubic-bezier(.45, .05, .3, 1), width 1.2s cubic-bezier(.45, .05, .3, 1);
+    transition: left var(--wt, 1.2s) cubic-bezier(.45, .05, .3, 1), top var(--wt, 1.2s) cubic-bezier(.45, .05, .3, 1), width var(--wt, 1.2s) cubic-bezier(.45, .05, .3, 1);
+}
+body.bee-talking .bee-home {
+    transition-duration: 1.2s;
 }
 /* talking: it flies up closer (and turns to face the menu) */
 body.bee-talking .front .bee-home {
@@ -27,7 +32,7 @@ body.bee-talking .front .bee-home {
     --face: -1;
 }
 @media (max-width: 620px) {
-    .front .bee-home { left: 56.5%; top: 67%; }
+    .front .bee-home { left: var(--wx, 56.5%); top: var(--wy, 68%); }
     body.bee-talking .front .bee-home { left: 46%; top: 17%; width: 8%; --face: 1; }
 }
 @media (max-height: 500px) and (min-width: 621px) {
@@ -35,7 +40,8 @@ body.bee-talking .front .bee-home {
 }
 
 /* seen from the porch (bee.js perch): out over the yard past the railing, left of the steps (where its roses are, seen
-   from this side), between the streetlight and the traveller. the same bee, so everything else below applies here too */
+   from this side), between the streetlight and the traveller, and from there all over the yard (bee.js wander(), as in the
+   garden; smaller than up close: 11 Oct, it was clamp(58px, 5.6vw, 110px)). the same bee, so everything else below applies */
 .porch .bee-home {
     --bee-y: #f2c230;
     --lift: 0;
@@ -43,13 +49,13 @@ body.bee-talking .front .bee-home {
     --mouth: 0;
     --face: 1;
     position: absolute;
-    left: 32%;
-    top: 51%;
-    width: clamp(58px, 5.6vw, 110px);
+    left: var(--wx, 32%);
+    top: var(--wy, 54%);
+    width: calc(clamp(48px, 3.8vw, 76px) * var(--wd, 1));
     aspect-ratio: 120 / 100;
     z-index: 1;
     pointer-events: none;
-    transition: left 1.2s cubic-bezier(.45, .05, .3, 1), top 1.2s cubic-bezier(.45, .05, .3, 1), width 1.2s cubic-bezier(.45, .05, .3, 1);
+    transition: left var(--wt, 1.2s) cubic-bezier(.45, .05, .3, 1), top var(--wt, 1.2s) cubic-bezier(.45, .05, .3, 1), width var(--wt, 1.2s) cubic-bezier(.45, .05, .3, 1);
 }
 /* dimmed with the porch as night falls (porch.css darkens each of its pieces by --pd; in the garden the whole stage is
    dimmed, the bee with it) */
@@ -60,11 +66,11 @@ body.bee-talking .porch .bee-home { left: 36%; top: 28%; width: clamp(76px, 8vw,
 @media (max-width: 620px) {
     /* (the porch is 2½ screens wide on an upright phone and you look along it, porch.css: the bee's in the view the
        traveller stands in, and talking it comes to wherever you're looking, --porch-pan) */
-    .porch .bee-home { left: 30%; top: 52%; }
+    .porch .bee-home { left: var(--wx, 30%); top: var(--wy, 54%); }
     body.bee-talking .porch .bee-home { left: calc(var(--porch-pan, 0) * 1px + 38vw); top: 24%; --face: 1; }
 }
 @media (max-height: 500px) and (min-width: 621px) {
-    .porch .bee-home { left: 33%; top: 44%; }
+    .porch .bee-home { left: var(--wx, 33%); top: var(--wy, 47%); }
     body.bee-talking .porch .bee-home { left: 64%; top: 22%; }
 }
 

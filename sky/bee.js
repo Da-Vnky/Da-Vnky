@@ -894,7 +894,10 @@
         var M = MOODS[home.dataset.mood];
         if (e.fx === 'zap') { puff('zap', 3); stung(); }
         else if (e.fx === 'chirp') puff(M.fx || 'spark', 1);
-        else if (e.caps && home.dataset.mood === 'angry') puff('steam', 1);
+        // (angry, its first word always throws up the cross vein, then its shouting takes turns between steam and veins:
+        // it used to be steam for every CAPS word, and an angry bee shouts nearly every word, so the vein never showed)
+        else if (home.dataset.mood === 'angry' && !act.veined) { act.veined = true; puff('vein', 1); }
+        else if (e.caps && home.dataset.mood === 'angry') puff(Math.random() < .5 ? 'steam' : 'vein', 1);
         else if (M.fx && Math.random() < .28) puff(M.fx, 1);
     }
     function talking(on) {
@@ -1001,6 +1004,18 @@
         body.classList.remove('bee-talking');
         menu.classList.remove('on');
         if (document.activeElement && menu.contains(document.activeElement)) document.activeElement.blur();
+        restFace();
+        wanderSoon(2600);
+    }
+    // done talking (11 Oct): a moment later its face is its everyday one again, unless it's cross or sad (those
+    // stay till they've worn off). what it feels is kept: come back soon and it's still glad, or still upset, to see you
+    function restFace() {
+        clearTimeout(restFace.t);
+        restFace.t = setTimeout(function () {
+            var m = home.dataset.mood;
+            if (open || gun || grudge || m === 'angry' || m === 'sad') return;
+            setMood('calm');
+        }, 2800);
     }
     function send(text) {
         text = (text || '').trim();
@@ -1035,6 +1050,7 @@
         bubble.textContent = '';
         home.classList.add('saying');
         menu.querySelector('.bt-hush').hidden = false;
+        act.veined = false;
         perform(plan, function (e) {
             line.textContent += e.word;
             bubble.textContent = (bubble.textContent + e.word).slice(-48);
@@ -1364,6 +1380,7 @@
                 plan.silent = !heard || MAPPING;
                 bubble.textContent = '';
                 home.classList.add('saying');
+                act.veined = false;
                 perform(plan, function (e) { bubble.textContent = (bubble.textContent + e.word).slice(-48); act(e); }, function () { talking(false); finishLine(); });
                 talking(true);
             });
@@ -1378,11 +1395,52 @@
     // to whichever you're in (behind the porch's posts and railing, in front of the street)
     function perch(where) {
         var host = where === 'porch' && porch ? porch : stage;
-        if (home.parentNode === host) return;
+        if (home.parentNode === host) { wanderSoon(1500); return; }
         close();
+        ['--wx', '--wy', '--wd', '--wt'].forEach(function (v) { home.style.removeProperty(v); });   // (back over its roses there)
+        lastSpot = null;
         if (host === porch) porch.insertBefore(home, porch.querySelector('.porch-frame'));
         else stage.appendChild(home);
+        wanderSoon(1500);
     }
+
+    // wandering the lawn (11 Oct: "move around the entirety of the front lawn", in the garden and from the porch):
+    // while nobody's talking to it, it flies from one spot over the lawn to the next, hovering a while at each, its dotted
+    // trail behind it and its shadow under it. LAWN, in shares of where it is (the garden's 1600 x 900 picture; the porch,
+    // the screen): x across, g the ground it's over (the lawn from the hedge, y 711, to just behind the fence, y 787: the
+    // further back, the smaller it looks, --wd), up how high over the ground it flies, door: never in front of the front
+    // door near the house (x between, ground further back than). on a phone the garden's sides are off the screen: it keeps
+    // to what shows. those who'd rather nothing moved: it stays over its roses
+    var LAWN = {
+        front: { x: [.05, .95], g: [.79, .875], up: .075, door: [.43, .57, .83] },
+        porch: { x: [.13, .9], g: [.79, .85], up: .27 }
+    };
+    var lastSpot = null;
+    function lawn() { return home.parentNode === porch ? LAWN.porch : LAWN.front; }
+    function wanderSoon(ms) { clearTimeout(wander.t); wander.t = setTimeout(wander, ms); }
+    function wander() {
+        if (MAPPING || STILL) return;
+        if (!here() || open || document.hidden || home.classList.contains('striking') || home.classList.contains('diving')) { wanderSoon(2000); return; }
+        var L = lawn(), host = home.parentNode, box = host.getBoundingClientRect();
+        if (!box.width || !box.height) { wanderSoon(2000); return; }
+        var x0 = L.x[0], x1 = L.x[1];
+        if (host === stage) { x0 = Math.max(x0, -box.left / box.width + .04); x1 = Math.min(x1, (innerWidth - box.left) / box.width - .06); }
+        var x, g, tries = 0;
+        do { x = rnd(x0, x1); g = rnd(L.g[0], L.g[1]); }
+        while (((L.door && x > L.door[0] && x < L.door[1] && g < L.door[2]) || (lastSpot && Math.abs(x - lastSpot.x) * box.width < 60)) && ++tries < 16);
+        var d = .82 + .3 * (g - L.g[0]) / (L.g[1] - L.g[0]);                     // (.82 at the back of the lawn, 1.12 at the front)
+        var px = (host === stage ? .042 * box.width : clamp(.038 * innerWidth, 48, 76)) * d, ph = px * 100 / 120;
+        var cy = g - L.up, M = MOODS[home.dataset.mood] || MOODS.calm;
+        var from = lastSpot || { x: x, y: cy }, far = Math.hypot((x - from.x) * box.width, (cy - from.y) * box.height);
+        var secs = clamp(far / (110 * 5 / Math.max(1.5, M.hover)), 1.6, 8);       // (quicker when it's excited or cross, slower sleepy)
+        home.style.setProperty('--wt', secs.toFixed(2) + 's');
+        home.style.setProperty('--wd', d.toFixed(3));
+        home.style.setProperty('--wx', ((x - px / box.width / 2) * 100).toFixed(2) + '%');
+        home.style.setProperty('--wy', ((cy - ph / box.height / 2) * 100).toFixed(2) + '%');
+        lastSpot = { x: x, y: cy, g: g };
+        wanderSoon(secs * 1000 + rnd(1500, 5500));
+    }
+    wanderSoon(3000);
     if (Sky.house && Sky.house.on) Sky.house.on(function (what, name) {
         if ((name === 'front' || name === 'porch') && what === 'leave') close();
         if ((name === 'front' || name === 'porch') && what === 'enter') perch(name);
@@ -1412,7 +1470,12 @@
     function shade(r) {
         var host = home.parentNode, box = host.getBoundingClientRect();
         if (!box.width || !box.height) return;
-        var ground = host === stage ? box.top + box.height * GROUND.front : innerHeight * (1 - GROUND.porch);
+        // (the ground under it: wherever it's wandered to, the same height below it it flies at; talking, it's come up to
+        // you from the lawn, so its shadow stays where it was)
+        var L = lawn(), hb = home.getBoundingClientRect();
+        var ground = open && lastSpot ? box.top + box.height * lastSpot.g
+                   : lastSpot ? hb.top + hb.height / 2 + box.height * L.up
+                   : host === stage ? box.top + box.height * GROUND.front : innerHeight * (1 - GROUND.porch);
         var up = Math.max(0, ground - r.bottom), k = Math.max(.45, 1 - up / (r.height * 8));     // (1 on the ground … .45 high up)
         var w = r.width * .78 * (.55 + .45 * k);
         shadow.style.left = ((r.left + r.width / 2 - box.left) / box.width * 100).toFixed(2) + '%';
