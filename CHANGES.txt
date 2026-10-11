@@ -14,11 +14,13 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+
+== published ==
+
+2026-10-11 00:27 · V
 - When the bee shoots the traveller in reset 1 there's a proper muzzle flash now: a white-hot starburst at the gun flaring towards them, a streak of light across to them, and the whole screen lit for an instant (slot assets/living/bee-muzzle-flash).
 - The signpost at the sea has one sign now, "visit home", hung lower, so its post on the dock is shorter ("the sea" is only a tab).
 - A porch tab (walks you out to the porch from anywhere in the house; from other pages it opens living.html#porch). On the porch, an arrow at the steps takes you down into the front garden. In the hallway no tab is "you are here" any more, and the living space's tab now lights up and slides out on hover there like the others (it looked dead). Slot: assets/ui/place-porch.
-
-== published ==
 
 2026-10-11 00:02 · V
 - The drawing table knows which pictures repeat (the waves side to side, the sky's rope top to bottom): their canvas is one tile with the joining edges marked (over each wave's own guide); the asset manager shows every export laid out three times and says whether the join shows; 'wrap it' moves a picture by half a tile so the join is in the middle to paint over (like Photoshop's Offset, which Clip Studio doesn't have). Restart the content manager.
