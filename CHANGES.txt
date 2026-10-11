@@ -17,6 +17,10 @@ How it works
 
 == published ==
 
+2026-10-11 10:52 · V
+- Letters: a picture on a line of its own is taped onto the paper like the embeds, each at its own slight angle, a little off centre, with its tape strips at their own angles (always the same for the same picture).
+- Letters: leaving the letters any way (clicking outside, the close button, Escape) now always stops their videos and songs (before, one could keep playing hidden after the letters were put away).
+
 2026-10-11 10:41 · V
 - Letters: clicking into a video or song in a letter hushes the site (the record, the ambience, the weather, the sound effects); rolling the letter up, or putting the letters away, stops the player and brings the site's sound back.
 - Letters from the same day now go newest first, by when they were written (content/sea/written.json, kept by the desk and the content manager), so a letter just written at the desk comes before an older one from the same day (and is the one in the bottle).

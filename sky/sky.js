@@ -1935,6 +1935,8 @@
             if (/^~\s/.test(b)) { out += '<p class="signoff">' + inline(b.replace(/^~\s*/, '')) + '</p>'; return; }
             var link = embed && DavEmbed.lone(b);
             if (link) { out += DavEmbed.html(link); return; }
+            // a picture on its own line: taped onto the paper, like the embeds (sky/css/embeds.css)
+            if (embed && /^!\[[^\]]*\]\([^)\s]+\)$/.test(b)) { out += DavEmbed.taped(inline(b), b); return; }
             out += '<p' + (i === 1 ? ' class="lede"' : '') + '>' + inline(b).replace(/\n/g, '<br>') + '</p>';
         });
         return out;

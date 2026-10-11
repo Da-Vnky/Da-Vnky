@@ -208,10 +208,12 @@
         document.body.classList.add('letter-reading');
         lv.querySelector('.lv-close').focus({ preventScroll: true });
     }
-    function closeAll() { lv.classList.remove('open'); document.body.classList.remove('letter-reading'); stopPlayers(lv); quiet(false); }
-    // a letter put away: its players stop (an iframe sent back to its own address starts over, silent)
+    function closeAll() { stopPlayers(lv); lv.classList.remove('open'); document.body.classList.remove('letter-reading'); quiet(false); }
+    // letters put away: their players stop. each one is taken out of the page and a fresh copy put in its place (only
+    // that stops it for certain: an iframe sent back to its address while hidden may never load again, and keeps
+    // playing). the copy waits, silent, to be played again next time
     function stopPlayers(box) {
-        Array.prototype.forEach.call(box.querySelectorAll('figure.embed iframe'), function (f) { var s = f.src; f.src = 'about:blank'; f.src = s; });
+        Array.prototype.forEach.call(box.querySelectorAll('figure.embed iframe'), function (f) { f.parentNode.replaceChild(f.cloneNode(false), f); });
         Array.prototype.forEach.call(box.querySelectorAll('figure.embed video, figure.embed audio'), function (m) { m.pause(); });
     }
     board.addEventListener('click', openAll);

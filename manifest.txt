@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
-beyond.html 1480
-city.html 9866
+beyond.html 1476
+city.html 9813
 desk.html 5899
-index.html 5207
-living.html 133039
-window-sky.html 1334
-workshop.html 22101
+index.html 5149
+living.html 132959
+window-sky.html 1328
+workshop.html 22036
 sky/ambient.js 5331
 sky/attic.js 34823
 sky/bathroom.js 29419
@@ -14,9 +14,9 @@ sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 52332
 sky/crate.js 36569
-sky/desk.js 67388
+sky/desk.js 67541
 sky/dungeon.js 9600
-sky/embeds.js 17396
+sky/embeds.js 18796
 sky/eye.js 16302
 sky/forget.js 10564
 sky/frames.js 7570
@@ -32,7 +32,7 @@ sky/hell.js 23866
 sky/house.js 11177
 sky/inventory.js 17335
 sky/kitchen.js 16998
-sky/letters.js 25330
+sky/letters.js 25530
 sky/lives.js 12907
 sky/loader.js 17385
 sky/loop.js 7643
@@ -52,7 +52,7 @@ sky/records.js 36049
 sky/resets.js 17516
 sky/revolver.js 19577
 sky/ropes.js 5596
-sky/sky.js 137047
+sky/sky.js 137258
 sky/source.js 3809
 sky/state.js 22677
 sky/static.js 4257
@@ -75,7 +75,7 @@ sky/css/claubes.css 17565
 sky/css/crate.css 15195
 sky/css/desk.css 15923
 sky/css/dungeon.css 7780
-sky/css/embeds.css 3879
+sky/css/embeds.css 5122
 sky/css/eye.css 1165
 sky/css/forget.css 3893
 sky/css/frames.css 7028

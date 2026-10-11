@@ -5,7 +5,9 @@
    ===================================================================== */
 
 .letter figure.embed,
-.content figure.embed {
+.content figure.embed,
+.letter figure.taped,
+.content figure.taped {
     position: relative;
     margin: 1.6em auto;
     padding: 9px 9px 6px;
@@ -18,7 +20,9 @@
 .content figure.embed:nth-of-type(even) { transform: rotate(.6deg); }
 /* the tape */
 .letter figure.embed::before, .letter figure.embed::after,
-.content figure.embed::before, .content figure.embed::after {
+.content figure.embed::before, .content figure.embed::after,
+.letter figure.taped::before, .letter figure.taped::after,
+.content figure.taped::before, .content figure.taped::after {
     content: "";
     position: absolute;
     top: -9px;
@@ -29,8 +33,28 @@
     pointer-events: none;
     z-index: 2;
 }
-.letter figure.embed::before, .content figure.embed::before { left: 12px; transform: rotate(-7deg); }
-.letter figure.embed::after, .content figure.embed::after { right: 12px; transform: rotate(6deg); }
+.letter figure.embed::before, .content figure.embed::before,
+.letter figure.taped::before, .content figure.taped::before { left: 12px; transform: rotate(-7deg); }
+.letter figure.embed::after, .content figure.embed::after,
+.letter figure.taped::after, .content figure.taped::after { right: 12px; transform: rotate(6deg); }
+
+/* a picture of your own, alone on its line: the mount fits the picture, the tape on its top corners, and each at
+   its own angle (--tilt, --nudge, --tape-*: set per picture by DavEmbed.taped, from its name) */
+.letter figure.taped,
+.content figure.taped {
+    width: fit-content;
+    max-width: 92%;                                   /* (room for the shift and the tilt, so a wide one stays on the paper) */
+    padding-bottom: 9px;
+    margin-top: 2em;
+    transform: translateX(var(--nudge, 0%)) rotate(var(--tilt, -1.5deg));
+}
+.letter figure.taped::before, .content figure.taped::before {
+    left: var(--tape-lx, 12px); width: var(--tape-w, 64px); transform: rotate(var(--tape-l, -7deg));
+}
+.letter figure.taped::after, .content figure.taped::after {
+    right: var(--tape-rx, 12px); width: var(--tape-w, 64px); transform: rotate(var(--tape-r, 6deg));
+}
+figure.taped img { display: block; max-width: 100%; height: auto; margin: 0; box-shadow: none; }
 
 /* a player: as wide as the page, the shape it asks for */
 .em-frame {

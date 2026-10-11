@@ -253,5 +253,22 @@
         dress(box);
     }
 
-    window.DavEmbed = { find: find, lone: lone, html: html, dress: dress, patch: patch, SITES: SITES };
+    /* ---------------- a picture of your own, alone on its line: taped on, each at its own angle ----------------
+       the tilt, a little sideways shift and each strip of tape's angle and place come from the picture's own name, so a
+       letter looks the same every time it's opened, and no two pictures sit quite alike. (its look: sky/css/embeds.css) */
+    function taped(img, src) {
+        var h = 2166136261;
+        for (var i = 0; i < src.length; i++) { h ^= src.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+        function next() { h ^= h << 13; h >>>= 0; h ^= h >>> 17; h ^= h << 5; h >>>= 0; return h / 4294967296; }
+        next();
+        var side = next() < 0.5 ? -1 : 1;
+        var vars = '--tilt: ' + (side * (1.1 + next() * 2.6)).toFixed(2) + 'deg; ' +              // (never quite straight: 1.1° to 3.7° either way)
+                   '--nudge: ' + ((next() - 0.5) * 8).toFixed(1) + '%; ' +                         // (a little off centre)
+                   '--tape-l: ' + (-3 - next() * 11).toFixed(1) + 'deg; --tape-lx: ' + (2 + next() * 18).toFixed(0) + 'px; ' +
+                   '--tape-r: ' + (3 + next() * 11).toFixed(1) + 'deg; --tape-rx: ' + (2 + next() * 18).toFixed(0) + 'px; ' +
+                   '--tape-w: ' + (48 + next() * 26).toFixed(0) + 'px';
+        return '<figure class="taped" style="' + vars + '">' + img + '</figure>';
+    }
+
+    window.DavEmbed = { find: find, lone: lone, html: html, dress: dress, patch: patch, taped: taped, SITES: SITES };
 })();

@@ -194,7 +194,15 @@ this before changing anything; keep it up to date when something here stops bein
   inside a `figure.embed` (a page can't see into another site's player, so clicking into it counts as playing), or a
   `<video>`/`<audio>` in one plays. Off: rolling the letter up (`closeLetter`) or putting the letters away (`closeAll`), which
   also stop that letter's players (`stopPlayers`: each iframe sent back to its own address, media paused), so nothing plays
-  on hidden under the music. `Sky.letters.quiet` says whether it's on.
+  on hidden under the music. `Sky.letters.quiet` says whether it's on. `stopPlayers` **replaces** each iframe with a fresh clone
+  (11 Oct, Victor: a video kept playing after clicking out of the letters): setting `src` again on a hidden `loading="lazy"`
+  iframe may never load, so the old document went on playing; taking it out of the page always stops it. Escape pressed while
+  the player itself has the focus goes to the player, not the page (can't be caught).
+- **Pictures alone on their line are taped on too** (11 Oct, Victor): a paragraph that's only `![…](…)` → `DavEmbed.taped(img,
+  src)` (sky.js with `{ embeds: true }`, the desk, the content manager's preview): `figure.taped` with `--tilt` (1.1° to 3.7°
+  either way), `--nudge` (±4% sideways), `--tape-l/-r` (each strip's angle), `--tape-lx/-rx` (where it sits), `--tape-w`, all
+  from a hash of the picture's line, so the same letter always looks the same (embeds.css; `max-width: 92%` keeps it on the
+  paper). A picture inside a sentence is as before.
 
 ## Letters from the same day: newest first (content/sea/written.json, 11 Oct)
 
