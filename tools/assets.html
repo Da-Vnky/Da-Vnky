@@ -220,6 +220,27 @@
     .map-pop .fam .frow .lthumb { width: 34px; height: 34px; }
     .map-pop .fam .frow span.nm { flex: 1; min-width: 0; font: .8rem ui-monospace, Menlo, Consolas, monospace; word-break: break-all; }
     .map-pop .fam .frow span.nm small { display: block; font: italic .8rem "IM Fell English", Georgia, serif; color: var(--faded); }
+    /* the drawing table (tools/drawtable.py): a slot's canvas, opened in your art program, and what you export back */
+    .dt { margin: 8px 0 2px; padding-top: 7px; border-top: 1px dashed rgba(110,82,54,.35); font-size: .86rem; }
+    .dt-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin: 3px 0; }
+    .dt-row .dt-l { min-width: 72px; font-style: italic; color: var(--faded); }
+    .dt-row button { padding: 2px 9px; font-size: .82rem; }
+    .dt-row button:disabled { opacity: .5; cursor: progress; }
+    .dt-opts { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; margin: 3px 0; font-size: .8rem; color: var(--faded); }
+    .dt-opts label { display: inline-flex; gap: 4px; align-items: center; cursor: pointer; }
+    .dt-opts .linkish { color: #8a5a2c; font-style: italic; cursor: pointer; background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; font-size: .8rem; }
+    .dt-wait:empty { display: none; }
+    .dt-wait { margin-top: 5px; padding: 6px; border-radius: 6px; background: rgba(243,234,210,.55); }
+    .dt-wait p { margin: 0 0 4px; font-style: italic; color: var(--faded); font-size: .8rem; }
+    .dt-item { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+    .dt-item .dt-pic { width: 54px; height: 54px; flex: none; display: grid; place-items: center; overflow: hidden; border-radius: 4px;
+        background: repeating-conic-gradient(#e6d8b6 0 25%, #f3ead2 0 50%) 0 0 / 10px 10px; }
+    .dt-item .dt-pic img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .dt-item .dt-nm { flex: 1; min-width: 0; font: .78rem ui-monospace, Menlo, Consolas, monospace; word-break: break-all; }
+    .dt-item .dt-nm small { display: block; font: italic .78rem "IM Fell English", Georgia, serif; color: var(--faded); }
+    .dt-item .dt-nm .warn { color: var(--red); }
+    .dt-item input[type=number] { width: 46px; }
+    .dt-item .done { font-style: italic; color: #4c7a3a; font-size: .8rem; }
     .details-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; }
 </style>
 </head>
@@ -364,6 +385,124 @@
         if (/\.json$/i.test(f.name)) return '<pre data-json="' + f.url + '">…</pre>';
         return '<div class="fontdemo">Aa</div>';
     }
+    /* ---------------- the drawing table: draw it, or animate it, in your own program ---------------- */
+    // (tools/drawtable.py through the content manager: a canvas twice the size it's shown at, with a guide of the scene,
+    // opened in Clip Studio, Photoshop or Rebelle; or an animation in Clip Studio or the Rebelle Animator. what you export
+    // back into its folder shows here, with "use this")
+    var DT = { table: {}, key: '', panels: [] };
+    function drawable(s, kind) { return kind === 'image' && s.kind !== 'svg' && !/^assets\/(sounds|fonts)\//.test(s.slot) && !/^assets\/resets\/[^\/]+$/.test(s.slot); }
+    function ago(t) { var m = Math.round((Date.now() / 1000 - t) / 60); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' days ago'; }
+    function drawPanel(s, viewName) {
+        var slot = s.slot, box = el('div', 'dt'), busy = false;
+        var rowD = el('div', 'dt-row', '<span class="dt-l">draw it in</span>'), rowA = el('div', 'dt-row', '<span class="dt-l">animate in</span>');
+        var opts = el('div', 'dt-opts'), fresh = el('label', '', '<input type="checkbox"> a fresh canvas'), wait = el('div', 'dt-wait');
+        fresh.title = 'start again from a new canvas, instead of the one you saved last time';
+        var all = [];
+        function go(path, app, name) {
+            if (busy) return;
+            busy = true;
+            all.forEach(function (b) { b.disabled = true; });
+            say('setting up ' + slot.replace(/^assets\//, '') + ' for ' + name + '… (it opens the scene to take the guide: a few seconds, longer for skizy’s room)');
+            var body = { slot: slot, app: app, fresh: fresh.querySelector('input').checked, view: viewName || '' };
+            api(path, body).then(function done(r) {
+                if (r.need) {                                     // (it couldn't find the program: where is it?)
+                    var where = prompt(r.need === 'animator'
+                        ? 'Where is the Rebelle Animator folder (the one with "Rebelle Animator.bat" in it)? In File Explorer, right-click it and choose "Copy as path", then paste it here.'
+                        : 'Where is ' + r.name + '? In File Explorer, find the program itself (its .exe), right-click it and choose "Copy as path", then paste it here.');
+                    if (!where) { say('not opened: it needs to know where ' + r.name + ' is.', true); return; }
+                    return api('/__draw/app', { app: r.need, path: where }).then(function (a) {
+                        if (a.error) { say(a.error, true); return; }
+                        return api(path, body).then(done);
+                    });
+                }
+                if (r.error) { say(r.error, true); return; }
+                fresh.querySelector('input').checked = false;
+                var size = r.w ? ' (' + r.w + ' × ' + r.h + (r.guide ? ', with a guide' : '') + ')' : '';
+                say((r.opened ? 'opened in ' + r.name : 'made') + ': ' + (r.made === false ? 'your working file, as you left it' : r.animator ? 'a new animation' + size : 'a new canvas' + size) +
+                    '. export into ' + (r.animator || path.indexOf('animate') > -1 ? r.folder + '/frames' : r.folder) + ' and it’ll show on this card.');
+                poll();
+            }).then(function () { busy = false; all.forEach(function (b) { b.disabled = false; }); });
+        }
+        [['csp', 'Clip Studio'], ['ps', 'Photoshop'], ['rebelle', 'Rebelle']].forEach(function (a) { var b = btn(a[1], function () { go('/__draw/open', a[0], a[1]); }, 'sm'); all.push(b); rowD.appendChild(b); });
+        [['csp', 'Clip Studio'], ['animator', 'Rebelle Animator']].forEach(function (a) { var b = btn(a[1], function () { go('/__draw/animate', a[0], a[1]); }, 'sm'); all.push(b); rowA.appendChild(b); });
+        opts.appendChild(fresh);
+        opts.appendChild(btn('show its folder', function () { api('/__draw/reveal', { slot: slot }).then(function (r) { say(r.error || 'opened ' + r.folder, !!r.error); }); }, 'linkish'));
+        box.appendChild(rowD); box.appendChild(rowA); box.appendChild(opts); box.appendChild(wait);
+        var shown = '', player = null;
+        function refresh() {
+            var t = DT.table[slot], key = JSON.stringify(t || null);
+            if (key === shown) return;
+            shown = key;
+            if (player) { clearInterval(player); player = null; }
+            wait.innerHTML = '';
+            if (!t) return;
+            var ex = t.exports || [], fr = t.frames;
+            if (ex.length) wait.appendChild(el('p', '', 'on the drawing table'));
+            ex.slice(0, 4).forEach(function (e) {
+                var url = '/__draw/file?slot=' + encodeURIComponent(slot) + '&name=' + encodeURIComponent(e.name) + '&t=' + e.time;
+                var it = el('div', 'dt-item', '<span class="dt-pic"><img alt="" src="' + url + '"></span><span class="dt-nm">' + esc(e.name) + '<small>' + ago(e.time) + ' · ' + kb(e.size) + '</small></span>');
+                if (/see-through|whole room/i.test(s.size || '')) checkSeeThrough(it.querySelector('img'), it.querySelector('small'));
+                it.appendChild(e.used ? el('span', 'done', 'in the slot') : btn('use this', function () {
+                    api('/__draw/use', { slot: slot, name: e.name }).then(function (r) { if (r.error) say(r.error, true); else { artChanged++; say('put ' + e.name + ' in ' + slot.replace(/^assets\//, '') + '. publish when you’re ready.'); load(); poll(); } });
+                }, 'sm yes'));
+                wait.appendChild(it);
+            });
+            if (fr && fr.count) {
+                var it = el('div', 'dt-item'), pic = el('span', 'dt-pic', '<img alt="">'), img = pic.querySelector('img'), i = 0;
+                var src = function (n) { return '/__draw/file?slot=' + encodeURIComponent(slot) + '&frames=1&name=' + encodeURIComponent(n) + '&t=' + fr.time; };
+                fr.files.forEach(function (n) { (new Image()).src = src(n); });           // (loaded once, then it plays)
+                img.src = src(fr.files[0]);
+                player = setInterval(function () { if (!box.isConnected) { clearInterval(player); return; } i = (i + 1) % fr.files.length; img.src = src(fr.files[i]); }, 1000 / (fr.fps || 12));
+                var fps = el('input'); fps.type = 'number'; fps.min = 1; fps.max = 60; fps.value = fr.fps || 12; fps.title = 'frames a second';
+                it.appendChild(pic);
+                it.appendChild(el('span', 'dt-nm', fr.count + ' frames' + (fr.by ? ' from the ' + esc(fr.by) : '') + '<small>' + ago(fr.time) + ' · ' + Math.round(fr.count / (fr.fps || 12) * 10) / 10 + ' s at </small>'));
+                it.querySelector('small').appendChild(fps);
+                it.querySelector('small').appendChild(document.createTextNode(' fps'));
+                it.appendChild(fr.used ? el('span', 'done', 'in the slot') : btn('use as animation', function (ev) {
+                    var b = ev.target; b.disabled = true;
+                    say('turning ' + fr.count + ' frames into one moving picture… (big canvases take a little while)');
+                    api('/__draw/frames', { slot: slot, fps: +fps.value || 12 }).then(function (r) {
+                        b.disabled = false;
+                        if (r.error) { say(r.error, true); return; }
+                        artChanged++;
+                        say('put the animation in ' + slot.replace(/^assets\//, '') + ' (' + kb(r.size) + ')' + (r.halved ? '. at full size it was ' + kb(r.halved) + ', over the site’s 30 MB for one file, so it’s at half size' : '') + '. publish when you’re ready.');
+                        load(); poll();
+                    });
+                }, 'sm yes'));
+                if (!ex.length) wait.appendChild(el('p', '', 'on the drawing table'));
+                wait.appendChild(it);
+            }
+        }
+        box.refresh = refresh;
+        DT.panels.push(box);
+        refresh();
+        return box;
+    }
+    // an export that should be see-through but isn't anywhere: probably the guide was still showing when it was exported
+    function checkSeeThrough(img, note) {
+        img.addEventListener('load', function () {
+            try {
+                var c = document.createElement('canvas'), w = c.width = 64, h = c.height = 64, x = c.getContext('2d');
+                x.drawImage(img, 0, 0, w, h);
+                var d = x.getImageData(0, 0, w, h).data;
+                for (var i = 3; i < d.length; i += 4) if (d[i] < 250) return;
+                note.appendChild(el('span', 'warn', ' · nothing see-through in it: was the guide still showing?'));
+            } catch (e) {}
+        });
+    }
+    function poll() {
+        return api('/__draw/state').then(function (r) {
+            if (!r || r.error || !r.table) return;
+            var key = JSON.stringify(r.table);
+            if (key === DT.key) return;
+            DT.key = key; DT.table = r.table;
+            DT.panels = DT.panels.filter(function (p) { return p.isConnected; });
+            DT.panels.forEach(function (p) { p.refresh(); });
+        });
+    }
+    setInterval(function () { if (!document.hidden) poll(); }, 4000);
+    poll();
+
     function card(s) {
         var kind = s.kind || 'image', f = fileFor(s.slot);
         var c = el('div', 'card' + (s.optional ? ' optional' : ''));
@@ -387,6 +526,7 @@
         if (f) acts.appendChild(btn('open', function () { window.open(f.url, '_blank'); }));
         if (f) acts.appendChild(btn('remove', function () { clear(s.slot); }, 'no'));
         c.appendChild(acts);
+        if (drawable(s, kind)) c.appendChild(drawPanel(s));
         droppable(c, function (fs) { put(s.slot, kind, fs[0]); });
         return c;
     }
@@ -672,6 +812,7 @@
             if (f) acts.appendChild(btn('open', function () { window.open(f.url, '_blank'); }, 'sm'));
             if (f) acts.appendChild(btn('remove', function () { clear(slot); }, 'sm no'));
             pop.appendChild(acts);
+            if (drawable(s.slot ? s : { slot: slot }, kind)) pop.appendChild(drawPanel(s.slot ? s : { slot: slot, size: s.size }, M.view));
             var fam = family(slot, slots.concat(allSlots().filter(function (x) { return !known[x.slot]; })));
             if (fam.length) {
                 var fb = el('div', 'fam', '<p>goes with it</p>');

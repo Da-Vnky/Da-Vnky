@@ -222,6 +222,45 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   log in `tools/templates/making.log`); it needs Playwright on Victor's computer (it says how if not).
 - No map: below (reset 4: no page to open), hidden things, characters, sounds (lists as before).
 
+## The drawing table: a slot's canvas, opened in Victor's art program (tools/drawtable.py, 11 Oct)
+
+- Victor: a button per slot that opens a canvas, ready, in Clip Studio Paint, Photoshop or Rebelle 8, and an "animate" one
+  (Clip Studio or his Rebelle Animator). Every image slot's card (the list and the map's pop-up) has `.dt` (assets.html
+  `drawPanel`): "draw it in" Clip Studio / Photoshop / Rebelle, "animate in" Clip Studio / Rebelle Animator, "a fresh canvas",
+  "show its folder", and what's waiting (polled every 4 s, `GET /__draw/state`). Not for sounds, fonts or `kind: "svg"` slots.
+- **The canvas** (`drawtable.py make`, run by content.py `draw_run` in a subprocess): twice the size the slot is shown at
+  (`SCALE`; a stated "W x H" size doubled, else 2 × its box on a 1920 × 1080 screen; at most 8000 a side). Playwright opens the
+  slot's scene map page (the map's current view first, else each view till the slot shows: templates.py's `NOON`/`page_url`),
+  `FIND` picks the box (for a whole-room slot, the nearest ancestor of the stated shape: skizy's room's svg, the garden's
+  stage), screenshots it at `device_scale_factor` 2 with the UI hidden (`HIDE_UI`). `BUILD` in the page draws the guide,
+  his current picture and a flattened copy and squeezes them the .psd way (PackBits; in JS, ~50× faster than Python: 29 s for
+  skizy's room, 5 s elsewhere, most of it opening the scene). `write_psd` (hand-written, standard library only) makes a
+  layered .psd: `guide (hide me before you export)` at opacity 128, locked (`lspf`); `your picture now` if he has one; `draw
+  here`, empty. Checked with psd-tools: layers, opacity, lock, pixels. No Playwright, or not on any page: just the empty
+  layer at the stated size (a slot with neither size nor page is refused, with why).
+- **Where it goes**: `tools/drawing/<folder>--<name>/` (gitignored: nothing there is published): `<name>.psd`, `what to do.txt`,
+  his exports (any png/webp/gif/jpg: the card shows each, warns "nothing see-through: was the guide still showing?" when the
+  slot wants see-through, and "use this" → `asset_put`, remembered in `.used.json`), `frames/` (an animation's numbered PNGs)
+  and `animator/` (the Rebelle Animator's starting project). Pressing a button again opens his working file as he left it (a
+  Clip Studio `.clip` first for csp, else the newest .psd/.psb/.tif…); "a fresh canvas" makes a new one.
+- **The programs** (`find_app`): `tools/drawing/apps.json` (what he told it), Rebelle from the animator's settings (`rebelle`),
+  Windows' App Paths, then the usual folders (`APPS`); not found → `{need}` → the page asks for the path (`prompt`, "Copy as
+  path") → `POST /__draw/app` → again. Opened detached. **Rebelle is always started with the live-link flags** (`LINK`:
+  `-websocket-server-enable -websocket-port 8265 -websocket-allowed-ip-addresses ::ffff:127.0.0.1,127.0.0.1`), so his animator
+  can connect too. Whether Rebelle opens a file given on its command line is unverified (Victor to try).
+- **Animating**: `drawtable.py animate <slot> csp|animator`. csp: the same canvas in Clip Studio (he sets up the timeline
+  himself; his usual is 12 fps, 60 frames) and exports an image sequence into `frames/`. animator: **Victor's own Rebelle
+  Animator, proprietary: never put it in the repo** (it lives in `Documents\Rebelle Animation\Rebelle Animator`, or where
+  `apps.json` `animator` says; his local Claude's integration notes describe it). We write `animator/project.json` (format
+  rebelle-animator, the canvas size, `fps` 12, `output_dir` = the slot's `frames/`, one empty drawing) and run
+  `"Rebelle Animator.bat" --open <that folder>` (`CREATE_NEW_CONSOLE`): it imports its own copy into its library once and opens
+  that copy every time after (checked with its engine: size, fps and render folder kept). We never write in its library. Its
+  renders come back as `<Name>_0001.png …` + `.rebelle_animator_render.json` (we read its `files` and `fps`).
+- **Frames → the slot** (`assemble`, `POST /__draw/frames`): one animated WebP (`<name>-animation.webp`, see-through kept), with
+  FFmpeg (the animator's `ffmpeg`, or one on the PATH: `libwebp_anim`, yuva420p) or Pillow; over the 30 MB upload limit at full
+  size → made again at half size, and the card says so.
+- After changing content.py: Victor restarts the content manager (close its window, double-click `tools\content.bat`).
+
 ## The attic (sky/attic.js)
 
 - The way up (hallway): **any reset but 4**, a pull cord (`.hall-cord`, slot `hall-cord`) hangs from the hatch with a small

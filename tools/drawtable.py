@@ -19,6 +19,19 @@ pressing the button again opens it as you left it (a fresh canvas only if you as
     python tools/drawtable.py make assets/living/bee --fresh    a fresh one, even if there's one there already
     python tools/drawtable.py open assets/living/bee csp        make it if need be, and open it in Clip Studio
                                                                 (csp, ps or rebelle)
+    python tools/drawtable.py animate assets/living/bee animator
+                                                                an animation: Victor's Rebelle Animator (or csp)
+
+Animating (the asset manager's "animate in" buttons): the frames go in the slot's frames/ folder on the table.
+  csp        opens the same layered canvas in Clip Studio (you set up the timeline: 12 fps, 60 frames is the usual);
+             export the frames there (File > Export animation > Image sequence, PNG)
+  animator   Victor's own Rebelle Animator (his, not part of the site: it lives on his computer, by default in
+             Documents\Rebelle Animation\Rebelle Animator). this writes a starting project for the slot (the canvas
+             size, 12 fps, renders going to the slot's frames/ folder) in the slot's animator/ folder and opens it with
+             "Rebelle Animator.bat" --open: the animator takes its own copy into its library once, and opens that copy
+             every time after. this never touches the animator's library itself
+then the slot's card turns the frames into one moving picture (an animated WebP) for the slot, with FFmpeg if
+there is one (the animator's own, or any on the computer) or Pillow.
 
 The file is a .psd: Clip Studio, Photoshop and Rebelle all open those with their layers. Working out the size and
 taking the guide needs Playwright (the same as the template pictures: pip install playwright, then
@@ -61,6 +74,56 @@ APPS = {
 }
 
 
+# Victor's Rebelle Animator (his own program, not the site's: see its REBELLE_ANIMATOR_INTEGRATION notes)
+ANIMATOR_BAT = 'Rebelle Animator.bat'
+# Rebelle only takes the animator's live link if it was started like this (harmless otherwise)
+LINK = ['-websocket-server-enable', '-websocket-port', '{port}', '-websocket-allowed-ip-addresses', '::ffff:127.0.0.1,127.0.0.1']
+NEW_CONSOLE, DETACHED, NEW_GROUP = 0x00000010, 0x00000008, 0x00000200
+FPS = 12                                                # (Victor's usual: 12 frames a second)
+
+
+def documents_dir():
+    """the real Documents folder (it can be moved, e.g. into OneDrive)"""
+    if sys.platform == 'win32':
+        try:
+            import ctypes
+            from ctypes import wintypes
+            buf = ctypes.create_unicode_buffer(wintypes.MAX_PATH)
+            if ctypes.windll.shell32.SHGetFolderPathW(None, 5, None, 0, buf) == 0 and buf.value:
+                return buf.value
+        except Exception:
+            pass
+    return os.path.join(os.path.expanduser('~'), 'Documents')
+
+
+def animator_workspace():
+    return os.environ.get('RBA_WORKSPACE') or os.path.join(documents_dir(), 'Rebelle Animation')
+
+
+def animator_settings():
+    """the animator's settings (config.json, then its own animator_settings.json over it): where Rebelle, Motion IO
+    and FFmpeg are, and its library. only read, never written"""
+    d = {}
+    for n in ('config.json', 'animator_settings.json'):
+        try:
+            with open(os.path.join(animator_workspace(), n), encoding='utf-8-sig') as f:
+                d.update({k: v for k, v in json.load(f).items() if v not in (None, '')})
+        except (OSError, ValueError, AttributeError):
+            pass
+    return d
+
+
+def find_animator():
+    """the animator's "Rebelle Animator.bat": where you told it, else where it usually is"""
+    mine = saved_apps().get('animator')
+    for p in ([mine] if mine else []) + [os.path.join(animator_workspace(), 'Rebelle Animator')]:
+        if p and os.path.isdir(p):
+            p = os.path.join(p, ANIMATOR_BAT)
+        if p and os.path.isfile(p):
+            return p
+    return None
+
+
 def saved_apps():
     try:
         with open(APPS_FILE, encoding='utf-8') as f:
@@ -72,12 +135,17 @@ def saved_apps():
 
 def remember_app(app, path):
     """you told it where a program is (the asset manager asks, if it can't find one): kept for next time"""
-    if app not in APPS:
+    if app not in APPS and app != 'animator':
         raise ValueError('which program?')
     path = (path or '').strip().strip('"')
     if not path or not os.path.exists(path):
-        raise ValueError("there's nothing at " + (path or 'that address') + ': copy the address of the program itself (the .exe)')
-    if sys.platform == 'win32' and not path.lower().endswith('.exe'):
+        raise ValueError("there's nothing at " + (path or 'that address') + ': copy its address from File Explorer (right-click it, "Copy as path")')
+    if app == 'animator':
+        if os.path.isdir(path):
+            path = os.path.join(path, ANIMATOR_BAT)
+        if not (os.path.isfile(path) and os.path.basename(path).lower() == ANIMATOR_BAT.lower()):
+            raise ValueError('that needs to be the Rebelle Animator folder (the one with "Rebelle Animator.bat" in it)')
+    elif sys.platform == 'win32' and not path.lower().endswith('.exe'):
         raise ValueError('that needs to be the program itself: the file whose name ends in .exe')
     d = saved_apps()
     d[app] = path
@@ -94,6 +162,10 @@ def find_app(app):
     mine = saved_apps().get(app)
     if mine and os.path.exists(mine):
         return mine
+    if app == 'rebelle':                                # (the animator knows where Rebelle 8 Pro is)
+        r = animator_settings().get('rebelle')
+        if r and os.path.isfile(r):
+            return r
     a = APPS[app]
     if sys.platform == 'win32':
         try:                                            # (programs that put themselves in Windows' list of app paths)
@@ -124,11 +196,15 @@ def open_in(app, path):
     exe = find_app(app)
     if not exe:
         return {'opened': False, 'need': app, 'name': APPS[app]['name']}
+    args = [exe, path]
+    if app == 'rebelle':                                # (with the live link on, so the animator can talk to it too)
+        port = str(animator_settings().get('websocketPort') or 8265)
+        args = [exe] + [x.replace('{port}', port) for x in LINK] + [path]
     if sys.platform == 'darwin':
         subprocess.Popen(['open', '-a', exe, path])
     else:
-        flags = 0x00000008 | 0x00000200 if sys.platform == 'win32' else 0   # (on its own: closing the content manager won't close it)
-        subprocess.Popen([exe, path], creationflags=flags, close_fds=True, cwd=os.path.dirname(path))
+        flags = DETACHED | NEW_GROUP if sys.platform == 'win32' else 0   # (on its own: closing the content manager won't close it)
+        subprocess.Popen(args, creationflags=flags, close_fds=True, cwd=os.path.dirname(path))
     return {'opened': True, 'name': APPS[app]['name'], 'program': exe}
 
 
@@ -189,17 +265,70 @@ def working_file(folder, stem, app=None):
     return max(have, key=os.path.getmtime) if have else None
 
 
+def used(folder):
+    try:
+        with open(os.path.join(folder, '.used.json'), encoding='utf-8') as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def mark_used(slot, name):
+    """remember which export went into the slot (its time), so the card can say so"""
+    folder, _, _ = where(slot)
+    d = used(folder)
+    p = os.path.join(folder, name) if name != 'frames' else os.path.join(folder, 'frames')
+    d[name] = int(os.path.getmtime(p)) if os.path.exists(p) else 0
+    with open(os.path.join(folder, '.used.json'), 'w', encoding='utf-8') as f:
+        json.dump(d, f)
+
+
 def exports(slot):
     """the pictures you've exported onto the table for this slot, newest first"""
     folder, stem, _ = where(slot)
     if not os.path.isdir(folder):
         return []
-    out = []
+    out, u = [], used(folder)
     for n in os.listdir(folder):
         p = os.path.join(folder, n)
-        if os.path.isfile(p) and n.rsplit('.', 1)[-1].lower() in EXPORTS and not n.startswith(('.', '_')):
-            out.append({'name': n, 'time': int(os.path.getmtime(p)), 'size': os.path.getsize(p)})
+        if os.path.isfile(p) and n.rsplit('.', 1)[-1].lower() in EXPORTS and not n.startswith(('.', '_')) and n != stem + '-animation.webp':
+            t = int(os.path.getmtime(p))
+            out.append({'name': n, 'time': t, 'size': os.path.getsize(p), 'used': u.get(n) == t})
     return sorted(out, key=lambda e: -e['time'])
+
+
+def natural(name):
+    return [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', name)]
+
+
+def frames(slot):
+    """the frames in the slot's frames/ folder (the animator's own list of them if it rendered them), in order"""
+    folder, _, _ = where(slot)
+    fd = os.path.join(folder, 'frames')
+    if not os.path.isdir(fd):
+        return None
+    man, fps = None, None
+    try:
+        with open(os.path.join(fd, '.rebelle_animator_render.json'), encoding='utf-8') as f:
+            man = json.load(f)
+    except (OSError, ValueError):
+        pass
+    if man and man.get('files'):
+        names = [n for n in man['files'] if os.path.isfile(os.path.join(fd, n))]
+        fps = man.get('fps')
+    else:
+        names = sorted((n for n in os.listdir(fd) if n.lower().endswith('.png') and not n.startswith(('.', '_'))), key=natural)
+    if not names:
+        return {'count': 0}
+    t = max(int(os.path.getmtime(os.path.join(fd, n))) for n in names)
+    return {'count': len(names), 'fps': fps or FPS, 'files': names, 'time': t, 'by': 'Rebelle Animator' if man else '',
+            'used': used(folder).get('frames') == t}
+
+
+def frame_paths(slot):
+    folder, _, _ = where(slot)
+    fr = frames(slot) or {}
+    return [os.path.join(folder, 'frames', n) for n in fr.get('files') or []], fr
 
 
 def table():
@@ -216,7 +345,7 @@ def table():
         if not SLOT.match(slot):
             continue
         w = working_file(os.path.join(TABLE, d), stem)
-        out[slot] = {'working': os.path.basename(w) if w else '', 'exports': exports(slot)}
+        out[slot] = {'working': os.path.basename(w) if w else '', 'exports': exports(slot), 'frames': frames(slot)}
     return out
 
 
@@ -238,9 +367,20 @@ def locked():
     return b'8BIMlspf' + struct.pack('>I', 4) + struct.pack('>I', 0x80000000)
 
 
+PLAIN = {}
+
+
 def packbits_row(row):
     """one row of a picture, squeezed the way .psd files do it (runs of the same byte say so once)"""
-    out, i, n = bytearray(), 0, len(row)
+    n = len(row)
+    if n and row.count(row[0]) == n:                    # (a plain row, all one colour: the usual for empty space)
+        key = (row[0], n)
+        if key not in PLAIN:
+            full, rest = divmod(n, 128)
+            b = bytes([129, row[0]]) * full
+            PLAIN[key] = b + (bytes([257 - rest, row[0]]) if rest >= 2 else bytes([0, row[0]]) if rest == 1 else b'')
+        return PLAIN[key]
+    out, i = bytearray(), 0
     lit = bytearray()
 
     def flush():
@@ -276,11 +416,14 @@ def plane_rle(rows):
 
 def write_psd(path, w, h, layers, composite=None):
     """layers: bottom first, each { name, rgba: bytes (w*h*4) or None (empty), opacity, locked, hidden }.
-    composite: the flattened picture as rgb bytes (w*h*3), or None for plain white (thumbnails only; the programs
-    use the layers)"""
+    a layer's pixels come either as chans: [(channel id, squeezed bytes), …] (made by the page) or rgba bytes.
+    composite: the flattened picture, squeezed (made by the page), or None for plain white (thumbnails only: the
+    programs use the layers)"""
     recs, data = b'', b''
     for L in layers:
-        if L.get('rgba'):
+        if L.get('chans'):                                               # (squeezed in the page already)
+            chans, rect = L['chans'], (0, 0, h, w)
+        elif L.get('rgba'):
             rgba = L['rgba']
             chans = []
             for cid, off in ((-1, 3), (0, 0), (1, 1), (2, 2)):          # (transparency first, then red, green, blue)
@@ -307,13 +450,11 @@ def write_psd(path, w, h, layers, composite=None):
         f.write(struct.pack('>I', 0))                                    # (no colour table)
         f.write(struct.pack('>I', 0))                                    # (no image resources)
         f.write(struct.pack('>I', len(layer_section)) + layer_section)
-        if composite:
-            planes = [composite[o::3] for o in range(3)]
+        if composite:                                                    # (squeezed in the page already)
+            f.write(composite)
         else:
-            planes = [b'\xff' * (w * h)] * 3
-        rows = [p[y * w:(y + 1) * w] for p in planes for y in range(h)]
-        packed = [packbits_row(r) for r in rows]
-        f.write(struct.pack('>H', 1) + b''.join(struct.pack('>H', len(p)) for p in packed) + b''.join(packed))
+            row = packbits_row(b'\xff' * w)
+            f.write(struct.pack('>H', 1) + struct.pack('>H', len(row)) * (3 * h) + row * (3 * h))
 
 
 # ---------------- the guide and your picture, from the scene itself (a hidden browser, like the templates) ----------------
@@ -340,8 +481,30 @@ BUILD = '''
 async ([shot, art, W, H, place, artFit]) => {
   const load = src => new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => no(new Error('couldn\\'t read ' + src)); i.src = src; });
   const canvas = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
-  const b64 = c => { const d = c.getContext('2d').getImageData(0, 0, W, H).data; let s = '';
-    for (let i = 0; i < d.length; i += 0x8000) s += String.fromCharCode.apply(null, d.subarray(i, i + 0x8000)); return btoa(s); };
+  const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+  // a row squeezed the .psd way (PackBits): runs of 3 or more of the same byte said once, the rest as they are
+  const row = (d, start, n, buf, pos) => {
+    const p0 = pos; let i = 0, lit = 0;
+    const flush = to => { while (lit < to) { const k = Math.min(128, to - lit); buf[pos++] = k - 1; for (let j = 0; j < k; j++) buf[pos++] = d[start + (lit + j) * 4]; lit += k; } };
+    while (i < n) {
+      const v = d[start + i * 4]; let r = 1;
+      while (i + r < n && r < 128 && d[start + (i + r) * 4] === v) r++;
+      if (r >= 3) { flush(i); buf[pos++] = 257 - r; buf[pos++] = v; i += r; lit = i; } else i += r;
+    }
+    flush(n);
+    return pos - p0;
+  };
+  // channels (offsets in rgba): each one [compression 1][a length per row][the rows]; or (flat) one compression for all
+  const squeeze = (c, offs, together) => {
+    const d = c.getContext('2d').getImageData(0, 0, W, H).data, worst = H * (W + Math.ceil(W / 128) + 2);
+    const parts = offs.map(off => { const buf = new Uint8Array(worst), lens = new Uint16Array(H); let pos = 0;
+      for (let y = 0; y < H; y++) { lens[y] = row(d, y * W * 4 + off, W, buf, pos); pos += lens[y]; } return { lens, data: buf.subarray(0, pos) }; });
+    const head = n => { const b = new Uint8Array(2 + 2 * n); b[1] = 1; return b; };
+    const join = list => { let n = 0; list.forEach(x => n += x.length); const o = new Uint8Array(n); let p = 0; list.forEach(x => { o.set(x, p); p += x.length; }); return o; };
+    const lens = ls => { const b = new Uint8Array(2 * ls.length); ls.forEach((v, i) => { b[2 * i] = v >> 8; b[2 * i + 1] = v & 255; }); return b; };
+    if (together) { const h = new Uint8Array(2); h[1] = 1; return b64(join([h].concat(parts.map(x => lens(x.lens))).concat(parts.map(x => x.data)))); }
+    return parts.map(x => { const h = new Uint8Array(2); h[1] = 1; return b64(join([h, lens(x.lens), x.data])); });
+  };
   const out = {};
   let g = null, a = null;
   if (shot) {
@@ -349,7 +512,7 @@ async ([shot, art, W, H, place, artFit]) => {
     g = canvas(); const x = g.getContext('2d');
     x.imageSmoothingQuality = 'high';
     x.drawImage(im, place[0] * W, place[1] * H, place[2] * W, place[3] * H);
-    out.guide = b64(g);
+    out.guide = squeeze(g, [3, 0, 1, 2]);
   }
   if (art) {
     const im = await load(art);
@@ -358,14 +521,14 @@ async ([shot, art, W, H, place, artFit]) => {
     const iw = im.naturalWidth || W, ih = im.naturalHeight || H;
     if (artFit === 'fill' || Math.abs(iw / ih - W / H) < 0.02 * W / H) x.drawImage(im, 0, 0, W, H);
     else { const s = Math.min(W / iw, H / ih); x.drawImage(im, (W - iw * s) / 2, (H - ih * s) / 2, iw * s, ih * s); }
-    out.art = b64(a);
+    out.art = squeeze(a, [3, 0, 1, 2]);
   }
   // the flattened picture (only for thumbnails): white, the guide at half strength, then your picture
   const f = canvas(), fx = f.getContext('2d');
   fx.fillStyle = '#fff'; fx.fillRect(0, 0, W, H);
   if (g) { fx.globalAlpha = 0.5; fx.drawImage(g, 0, 0); fx.globalAlpha = 1; }
   if (a) fx.drawImage(a, 0, 0);
-  out.flat = b64(f);
+  out.flat = squeeze(f, [0, 1, 2], true);
   return out;
 }
 '''
@@ -469,6 +632,12 @@ NOTE = '''what to do (the drawing table: tools/drawtable.py)
 when it's done: hide the guide, and export a PNG (or WebP) into this same folder, with a see-through background
 if the slot wants one. the slot's card in the asset manager will show it, with a "use this" button.
 your working file stays here, so the asset manager's button opens it again as you left it.
+
+an animation: its frames go in the frames folder here, as numbered PNGs (see-through).
+  Clip Studio: set up the timeline (12 fps, 60 frames is the usual), then File > Export animation > Image sequence,
+               PNG, into the frames folder. (or export an animated GIF or APNG into this folder, like a still)
+  Rebelle Animator: its renders go straight into the frames folder (the project's set up that way).
+the slot's card then plays them, with a "use as animation" button that makes them one animated WebP for the slot.
 '''
 
 
@@ -479,7 +648,6 @@ def make(slot, fresh=False, view=None, app=None):
     have = None if fresh else working_file(folder, stem, app)
     if have:
         return {'file': have, 'folder': folder, 'made': False}
-    os.makedirs(folder, exist_ok=True)
     mine = current_file(slot)
     art = os.path.relpath(mine, ROOT).replace(os.sep, '/') if mine else None
     result = {}
@@ -494,15 +662,14 @@ def make(slot, fresh=False, view=None, app=None):
             result['why'] = str(e).splitlines()[0]
     if result.get('px'):
         W, H, px = result['W'], result['H'], result['px']
-        dec = lambda k: base64.b64decode(px[k]) if px.get(k) else None
+        chans = lambda k: list(zip((-1, 0, 1, 2), (base64.b64decode(x) for x in px[k])))
         layers = []
         if px.get('guide'):
-            layers.append({'name': 'guide (hide me before you export)', 'rgba': dec('guide'), 'opacity': GUIDE_OPACITY, 'locked': True})
+            layers.append({'name': 'guide (hide me before you export)', 'chans': chans('guide'), 'opacity': GUIDE_OPACITY, 'locked': True})
         if px.get('art'):
-            layers.append({'name': 'your picture now', 'rgba': dec('art')})
+            layers.append({'name': 'your picture now', 'chans': chans('art')})
         layers.append({'name': 'draw here', 'rgba': None})
-        flat = dec('flat')
-        composite = bytes(b for i, b in enumerate(flat) if i % 4 != 3) if flat else None
+        composite = base64.b64decode(px['flat']) if px.get('flat') else None
         guide = bool(px.get('guide'))
     else:
         size = canvas_size(s, None)
@@ -512,6 +679,7 @@ def make(slot, fresh=False, view=None, app=None):
         W, H = size
         layers = [{'name': 'draw here', 'rgba': None}]
         composite, guide = None, False
+    os.makedirs(folder, exist_ok=True)               # (only now: a slot it can't size leaves nothing behind)
     path = os.path.join(folder, stem + '.psd')
     write_psd(path, W, H, layers, composite)
     with open(os.path.join(folder, 'what to do.txt'), 'w', encoding='utf-8') as f:
@@ -519,19 +687,117 @@ def make(slot, fresh=False, view=None, app=None):
     return {'file': path, 'folder': folder, 'w': W, 'h': H, 'guide': guide, 'made': True, 'view': result.get('view')}
 
 
+def psd_size(path):
+    """(width, height) of a .psd (from its header)"""
+    try:
+        with open(path, 'rb') as f:
+            head = f.read(26)
+        if head[:4] == b'8BPS':
+            h, w = struct.unpack('>II', head[14:22])
+            return w, h
+    except OSError:
+        pass
+    return None
+
+
+def animate(slot, app, fresh=False, view=None):
+    """set up an animation of the slot: in Clip Studio (the canvas: you make the timeline), or in the Rebelle Animator"""
+    if app not in ('csp', 'animator'):
+        raise ValueError('animate in which? (csp or animator)')
+    folder, stem, _ = where(slot)
+    if app == 'animator' and not find_animator():
+        return {'opened': False, 'need': 'animator', 'name': 'Rebelle Animator'}
+    info = make(slot, fresh=fresh, view=view, app='csp' if app == 'csp' else None)
+    os.makedirs(os.path.join(folder, 'frames'), exist_ok=True)          # (the frames come back here)
+    if app == 'csp':
+        info.update(open_in('csp', info['file']))
+        return info
+    size = (info.get('w'), info.get('h')) if info.get('w') else psd_size(os.path.join(folder, stem + '.psd'))
+    if not size:
+        raise ValueError("couldn't tell the canvas's size")
+    proj = os.path.join(folder, 'animator')
+    pj = os.path.join(proj, 'project.json')
+    if not os.path.exists(pj):
+        os.makedirs(proj, exist_ok=True)
+        with open(pj, 'w', encoding='utf-8') as f:
+            json.dump({'format': 'rebelle-animator', 'version': 1, 'name': 'DaV-nky ' + slot.replace('assets/', '').replace('/', ' '),
+                       'created': time.time(), 'modified': time.time(),
+                       'width': min(8000, size[0]), 'height': min(8000, size[1]), 'fps': FPS,
+                       'output_dir': os.path.abspath(os.path.join(folder, 'frames')),
+                       'drawings': [{'id': os.urandom(4).hex(), 'hold': 2, 'strokes': []}]}, f, indent=1)
+    if sys.platform != 'win32':
+        raise ValueError('the Rebelle Animator only runs on Windows')
+    subprocess.Popen([find_animator(), '--open', os.path.abspath(proj)], creationflags=NEW_CONSOLE, close_fds=True,
+                     cwd=os.path.dirname(find_animator()))
+    info.update(opened=True, name='Rebelle Animator', animator=True, w=size[0], h=size[1])
+    return info
+
+
+def ffmpeg():
+    import shutil
+    mine = animator_settings().get('ffmpeg')
+    return mine if mine and os.path.isfile(mine) else shutil.which('ffmpeg')
+
+
+def assemble(slot, fps=None, half=False):
+    """the frames → one animated WebP (see-through kept), in the slot's folder. → its path"""
+    folder, stem, _ = where(slot)
+    paths, fr = frame_paths(slot)
+    if not paths:
+        raise ValueError('there are no frames in ' + os.path.join(folder, 'frames') + ' yet')
+    fps = max(1, min(60, float(fps or fr.get('fps') or FPS)))
+    out = os.path.join(folder, stem + '-animation.webp')
+    ff = ffmpeg()
+    if ff:
+        import shutil, tempfile
+        tmp = tempfile.mkdtemp(prefix='dav-frames-')
+        try:
+            for i, pth in enumerate(paths):                 # (numbered plainly, in order, for FFmpeg)
+                shutil.copyfile(pth, os.path.join(tmp, '%05d.png' % (i + 1)))
+            for enc in ('libwebp_anim', 'libwebp'):
+                cmd = [ff, '-y', '-loglevel', 'error', '-framerate', str(fps), '-i', os.path.join(tmp, '%05d.png')]
+                if half:
+                    cmd += ['-vf', 'scale=trunc(iw/2):trunc(ih/2):flags=lanczos']
+                cmd += ['-c:v', enc, '-lossless', '0', '-q:v', '85', '-compression_level', '4', '-loop', '0', '-pix_fmt', 'yuva420p', out]
+                r = subprocess.run(cmd, capture_output=True, text=True, creationflags=0x08000000 if sys.platform == 'win32' else 0)
+                if r.returncode == 0 and os.path.exists(out):
+                    return out
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+    try:
+        from PIL import Image
+    except ImportError:
+        raise ValueError('turning frames into one moving picture needs FFmpeg (the Rebelle Animator can use it too) or Pillow: '
+                         'in a terminal, type  py -m pip install pillow  and try again')
+    first = Image.open(paths[0]).convert('RGBA')
+    size = (first.width // 2, first.height // 2) if half else first.size
+    def frame(pth):
+        im = Image.open(pth).convert('RGBA')
+        return im.resize(size, Image.LANCZOS) if im.size != size else im
+    rest = [frame(pth) for pth in paths[1:]]
+    frame_ms = round(1000 / fps)
+    (first.resize(size, Image.LANCZOS) if first.size != size else first).save(
+        out, save_all=True, append_images=rest, duration=frame_ms, loop=0, quality=85, method=4)
+    return out
+
+
 def main():
     a = sys.argv[1:]
-    if len(a) < 2 or a[0] not in ('make', 'open'):
+    if len(a) < 2 or a[0] not in ('make', 'open', 'animate'):
         sys.exit(__doc__)
     slot, fresh = a[1], '--fresh' in a
     view = a[a.index('--view') + 1] if '--view' in a and a.index('--view') + 1 < len(a) else None
-    app = a[2] if a[0] == 'open' and len(a) > 2 and not a[2].startswith('--') else None
+    app = a[2] if a[0] in ('open', 'animate') and len(a) > 2 and not a[2].startswith('--') else None
     try:
-        out = make(slot, fresh=fresh, view=view, app=app)
-        out['file'] = os.path.relpath(out['file'], ROOT).replace(os.sep, '/')
-        out['folder'] = os.path.relpath(out['folder'], ROOT).replace(os.sep, '/')
-        if app:
-            out.update(open_in(app, os.path.join(ROOT, out['file'])))
+        if a[0] == 'animate':
+            out = animate(slot, app, fresh=fresh, view=view)
+        else:
+            out = make(slot, fresh=fresh, view=view, app=app)
+            if app:
+                out.update(open_in(app, out['file']))
+        for k in ('file', 'folder'):
+            if out.get(k):
+                out[k] = os.path.relpath(out[k], ROOT).replace(os.sep, '/')
     except Exception as e:
         out = {'error': str(e)}
     print(json.dumps(out), flush=True)
