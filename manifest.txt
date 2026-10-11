@@ -8,7 +8,7 @@ workshop.html 22101
 sky/ambient.js 5331
 sky/attic.js 34823
 sky/bathroom.js 29419
-sky/bee.js 106994
+sky/bee.js 111555
 sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 52332
@@ -49,7 +49,7 @@ sky/records.js 36049
 sky/resets.js 17516
 sky/revolver.js 19577
 sky/ropes.js 5596
-sky/sky.js 132494
+sky/sky.js 132574
 sky/source.js 3809
 sky/state.js 22677
 sky/static.js 4257
@@ -65,7 +65,7 @@ sky/sky.css 58055
 sky/css/ambient.css 435
 sky/css/attic.css 15736
 sky/css/bathroom.css 16836
-sky/css/bee.css 31936
+sky/css/bee.css 32601
 sky/css/beyond.css 2644
 sky/css/books.css 4721
 sky/css/claubes.css 17565
