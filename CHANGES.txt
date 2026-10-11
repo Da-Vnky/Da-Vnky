@@ -14,9 +14,11 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- Drawing table: the empty "draw here" layer now shows up in Rebelle too (it's a whole see-through canvas now, not a layer with no size, which Rebelle dropped). Canvases made before this: tick "a fresh canvas" to get it.
 
 == published ==
+
+2026-10-11 01:58 · V
+- Drawing table: the empty "draw here" layer now shows up in Rebelle too (it's a whole see-through canvas now, not a layer with no size, which Rebelle dropped). Canvases made before this: tick "a fresh canvas" to get it.
 
 2026-10-11 01:46 · V
 - Drawing table: Rebelle 8 Pro opens .psd files, so the Rebelle button now opens the slot's .psd itself, with its guide and measurements as layers (Rebelle is started with -input and the file), instead of a blank canvas of the right size. If Rebelle shows a blank canvas, use File > Open on the .psd and tell Claude.
