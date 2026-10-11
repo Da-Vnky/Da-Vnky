@@ -525,6 +525,11 @@
        "slot": "assets/ui/place-kitchen",
        "what": "the kitchen’s tab (it goes straight to the kitchen)",
        "size": "192 x 192"
+      },
+      {
+       "slot": "assets/ui/place-porch",
+       "what": "the porch’s tab (the traveller walks out to the porch, from anywhere in the house)",
+       "size": "192 x 192"
       }
      ]
     },
@@ -2287,6 +2292,12 @@
        "slot": "assets/living/bee-gun",
        "what": "your revolver in the bee's hands, seen from the front with the muzzle pointed straight at you: shown over the bee while it's taken the gun off you (shoot at it five times: it weaves out of the way, gets frightened, then furious, then stings you and takes it, till you say sorry). it turns a little to follow your pointer and shakes with rage. until yours is in, a drawn one",
        "size": "about 240 x 264, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-muzzle-flash",
+       "what": "the flash when the bee fires the revolver at the traveller (reset 1). it's turned to point at them, so draw it pointing right, with the muzzle a third of the way in from the left (it flares out from there). until yours is in, a drawn starburst",
+       "size": "about 300 x 300, see-through",
        "optional": true
       },
       {

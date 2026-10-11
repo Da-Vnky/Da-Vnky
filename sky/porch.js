@@ -4,7 +4,8 @@
    comes up: the roof's edge, the railing, a rocking chair, the mailbox, and
    over the railing the street and the houses across it under the site's own
    sky (the sun, the moon, the clouds, the constellations: the porch is open
-   to them). The arrow on the left, the front door, or Escape: back inside.
+   to them). The arrow on the left, the front door, or Escape: back inside. The arrow
+   at the steps (the gap in the railing): down into the front garden (sky/front.js).
    living.html#porch starts out here.
 
    FROM RESET 3 ON, THINGS OUT HERE AREN'T RIGHT:
@@ -104,6 +105,34 @@
         walk(me, DOOR, function () { sfx('door', { size: 0.5 }); shut(); });
     }
     H.room('porch', { parent: 'hall', here: function () { return outside; }, busy: function () { return busy; }, enter: goOut, leave: goIn });
+    // down the steps (the gap in the railing, the arrow there): out into the front garden, the house seen from the path
+    // (sky/front.js: the black, and the garden comes up out of it)
+    var steps = porch.querySelector('.porch-steps'), STEPS = 50;
+    function goDown() {
+        if (!outside || busy || !Sky.front || !Sky.front.fromPorch) return;
+        busy = true;
+        H.setOff(function () { stop(me); busy = false; });
+        walk(me, standAt(me, STEPS), function () {
+            H.through();
+            me.classList.remove('face-left');
+            me.classList.add('going-down');
+            sfx('step', { size: 0.4 });
+            setTimeout(function () { sfx('step', { size: 0.35 }); }, 280);
+            setTimeout(function () {
+                Sky.front.fromPorch(function () {                 // (in the black: the porch put away, nothing moving)
+                    outside = false;
+                    quiet();
+                    body.classList.remove('in-porch', 'porch-panning');
+                    porch.setAttribute('aria-hidden', 'true');
+                    me.classList.remove('going-down');
+                    busy = false;
+                    H.fire('leave', 'porch');
+                    if (Sky.sides && Sky.sides.homeNow) Sky.sides.homeNow();
+                });
+            }, 420);
+        });
+    }
+    if (steps) steps.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.ask(goDown); });
     function inside(e) { e.preventDefault(); e.stopPropagation(); H.go('hall'); }
     if (out) out.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('porch'); });
     if (back) back.addEventListener('click', inside);

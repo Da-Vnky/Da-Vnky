@@ -5,6 +5,7 @@
    top of the picture is open). Click the front door: the traveller walks
    up the path, the door opens, they go in, and it's the hallway.
    Going anywhere else from here (a place tab) just leaves the garden behind.
+   Down the porch's steps (sky/porch.js) comes here too: fromPorch().
 
    Its look: sky/css/front.css. The markup and its stand-ins: living.html.
    slots (assets/living/): front-house (the whole 1600 x 900 picture: house, garden, path,
@@ -130,5 +131,24 @@
 
     if (location.hash === '#front') open();
 
-    Sky.front = { open: open, close: close, get here() { return here; } };
+    // down the porch steps (sky/porch.js): the black, the porch put away in it (inBlack), and out of the black the garden
+    function fromPorch(inBlack) {
+        busy = true;
+        body.classList.add('front-going-in');
+        setTimeout(function () {
+            var root = document.documentElement;
+            root.classList.add('front-snap');
+            if (inBlack) inBlack();
+            busy = false;
+            open();
+            try { history.replaceState(null, '', '#front'); } catch (e) {}
+            requestAnimationFrame(function () { requestAnimationFrame(function () {
+                root.classList.remove('front-snap');
+                body.classList.remove('front-going-in');
+                H.drop();
+            }); });
+        }, 500);
+    }
+
+    Sky.front = { open: open, close: close, fromPorch: fromPorch, get here() { return here; } };
 })();

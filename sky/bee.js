@@ -1248,6 +1248,7 @@
                 setTimeout(function () {                              // (back at its spot, the gun on them)
                     aimAt(me);
                     home.classList.remove('firing'); void home.offsetWidth; home.classList.add('firing');
+                    muzzleFlash(me);
                     if (Sky.sfx) Sky.sfx('bee-bang', { or: 'bang' });
                     note('it shoots you.');
                     var r = me && me.getBoundingClientRect();
@@ -1256,6 +1257,41 @@
                 }, 1500);
             });
         });
+    }
+    // the shot (reset 1): a starburst at the muzzle, flaring towards them, a streak of light across to them, and the whole
+    // screen lit for an instant. slot: assets/living/bee-muzzle-flash (else a drawn burst; it's turned to point at them, so
+    // draw yours pointing right, the muzzle at its left third)
+    var FLASH_ART = (function () {
+        var pts = [];
+        for (var k = 0; k < 24; k++) {
+            var a = k / 24 * Math.PI * 2, f = Math.max(0, Math.cos(a)), r = k % 2 ? 9 + 6 * f : 16 + 52 * f * f + (k % 4 ? 0 : 6);
+            pts.push((30 + Math.cos(a) * r).toFixed(1) + ',' + (50 + Math.sin(a) * r * .8).toFixed(1));
+        }
+        return '<svg viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bee-flash-g" cx=".3" cy=".5" r=".7">' +
+            '<stop offset="0" stop-color="#fff"/><stop offset=".25" stop-color="#fff6c4"/><stop offset=".55" stop-color="#ffc93a"/>' +
+            '<stop offset="1" stop-color="#ff7a1a"/></radialGradient></defs>' +
+            '<polygon points="' + pts.join(' ') + '" fill="url(#bee-flash-g)" stroke="#ffeb9a" stroke-width="1"/>' +
+            '<circle cx="30" cy="50" r="9" fill="#fff"/></svg>';
+    })();
+    var flashArt = null;
+    Sky.findAsset('assets/living/bee-muzzle-flash', function (url) { flashArt = url; });
+    function muzzleFlash(me) {
+        var g = gunEl.getBoundingClientRect();
+        if (!g.width) return;
+        var mx = g.left + g.width * .5, my = g.top + g.height * .35;              // (the muzzle, on the stand-in gun)
+        var r = me && me.getBoundingClientRect(), tx = r ? r.left + r.width / 2 : mx + 100, ty = r ? r.top + r.height * .35 : my;
+        var box = document.createElement('div');
+        box.className = 'bee-shot';
+        box.setAttribute('aria-hidden', 'true');
+        box.style.setProperty('--mx', mx.toFixed(0) + 'px');
+        box.style.setProperty('--my', my.toFixed(0) + 'px');
+        box.style.setProperty('--ang', Math.atan2(ty - my, tx - mx).toFixed(3));
+        box.style.setProperty('--len', Math.hypot(tx - mx, ty - my).toFixed(0) + 'px');
+        box.style.setProperty('--fs', Math.max(70, g.width * 2.6).toFixed(0) + 'px');
+        box.innerHTML = '<span class="bs-screen"></span><span class="bs-streak"></span><span class="bs-burst">' +
+            (flashArt ? '<img alt="" src="' + flashArt + '">' : FLASH_ART) + '</span>';
+        document.body.appendChild(box);
+        setTimeout(function () { box.remove(); }, 800);
     }
     // its gun turned on the traveller (the same tilt as when it follows your pointer)
     function aimAt(me) {

@@ -204,9 +204,11 @@
         g.setAttribute('cx', kx); g.setAttribute('cy', ky + 18); g.setAttribute('r', small ? 40 : 60);
         }
 
-        // on wide screens the signpost's post stands on the dock, reaching up to the planks
+        // on wide screens the signpost's post stands on the dock, reaching up to its plank (wherever the sign hangs:
+        // sky.css; one plank since 11 Oct, so it's lower, and the post shorter)
         if (W > 1100) {
-            var vh = window.innerHeight, pTop = vh * 0.27 - 26 - (vh - S), px = W - 68;
+            var sp = document.querySelector('.signpost'), sTop = sp ? sp.getBoundingClientRect().top : 0;
+            var vh = window.innerHeight, pTop = (sTop > 0 ? sTop : vh * 0.27) - 26 - (vh - S), px = W - 68;
             wood  += 'M' + px + ' ' + (y + 1) + 'V' + (pTop + 9) + 'a9 9 0 0 1 18 0V' + (y + 1) + 'Z';
             shade += R(px + 13, pTop + 9, 5, y - pTop - 9);
             for (var ry = pTop + 30; ry < y - 10; ry += 30) shade += R(px, ry, 18, 1.2);

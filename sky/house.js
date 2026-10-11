@@ -171,9 +171,10 @@
     }
 
     /* ---------------- the place tabs for the house's rooms ----------------
-       the living space's tab is "you are here" in the living space and the bathroom; the kitchen's in the kitchen.
+       the living space's tab is "you are here" in the living space and the bathroom; the kitchen's in the kitchen; the
+       porch's on the porch (the hallway, the attic, the dungeon and the garden have none of their own).
        from anywhere else in the house, clicking one walks the traveller there */
-    var TABS = { living: ['living', 'bath'], kitchen: ['kitchen'] };
+    var TABS = { living: ['living', 'bath'], kitchen: ['kitchen'], porch: ['porch'] };
     function tabs() {
         var w = where();
         Object.keys(TABS).forEach(function (id) {

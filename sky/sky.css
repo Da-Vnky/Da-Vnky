@@ -287,7 +287,9 @@ body:not([data-page="home"]) .sky-link.l2 { right: 11vw; }
 .place-tab .pt-pic { flex: none; display: block; width: 40px; height: 40px; }
 .place-tab .pt-pic svg, .place-tab .pt-pic > .art { display: block; width: 100%; height: 100%; object-fit: contain; }
 .place-tab .pt-name { opacity: 0; transition: opacity .2s; padding-right: 16px; }
-a.place-tab:hover, a.place-tab:focus-visible { width: 220px; background: #f3e8cc; outline: none; }
+/* (any tab but the one you're at: a room's tab can stop being "you are here" as you walk out of it, sky/house.js) */
+.place-tab:not(.here):not(.pt-fold) { cursor: pointer; }
+.place-tab:not(.here):not(.pt-fold):hover, .place-tab:not(.here):not(.pt-fold):focus-visible { width: 220px; background: #f3e8cc; outline: none; }
 .place-tab:hover .pt-name, .place-tab:focus-visible .pt-name { opacity: 1; }
 .place-tab.here { width: 74px; background: #3a2716; color: #f3e6c2; box-shadow: -4px 5px 12px rgba(0, 0, 0, .38), inset 4px 0 0 #9a3b1f; }
 .place-tab.here .pt-pic { background: #eadcb9; border-radius: 50%; padding: 3px; box-sizing: border-box; }
@@ -308,7 +310,7 @@ body.peep-view .place-tabs, body.peep-close .place-tabs, body.art-open .place-ta
     .place-tab { width: 50px; height: 46px; padding-left: 8px; gap: 8px; font-size: .95rem; }
     .place-tab .pt-pic { width: 34px; height: 34px; }
     .place-tab.here { width: 58px; }
-    a.place-tab:hover, a.place-tab:focus-visible { width: 50px; }
+    .place-tab:not(.here):not(.pt-fold):hover, .place-tab:not(.here):not(.pt-fold):focus-visible { width: 50px; }
     .place-tab.here:hover { width: 58px; }
     .place-tab .pt-name { display: none; }
     .place-tabs:not(:has(.here)) .pt-fold { display: flex; }
@@ -425,6 +427,11 @@ body:not([data-page="home"]) .signpost { filter: drop-shadow(-2px 5px 5px rgba(0
 body.leaving .letters,
 body.leaving .credit { opacity: 0; transition: opacity .7s ease; }
 
+/* one plank since 11 Oct ("visit home": Victor): on a big screen it hangs lower, so its post on the dock (sky/ground-sea.js,
+   drawn up to wherever the sign is) is shorter */
+@media (min-width: 1101px) and (min-height: 501px) {
+    body[data-page="home"] .signpost { top: 50vh; }
+}
 /* narrow screens: the signpost peeks in from the edge until tapped */
 @media (max-width: 1100px) {
     .signpost { transform: translateX(178px); cursor: pointer; }

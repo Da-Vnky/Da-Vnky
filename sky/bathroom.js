@@ -50,7 +50,7 @@
         var left = document.querySelector('.room-arrow.to-hall');
         if (left) { left.style.top = Math.round(top) + 'px'; left.style.left = '8px'; }
         // and the arrows back from the side rooms: the same height, so going and coming back they don't jump about
-        Array.prototype.forEach.call(document.querySelectorAll('.bathroom .room-arrow, .hallway .room-arrow:not(.hall-out), .dungeon .room-arrow, .kitchen .room-arrow, .porch .room-arrow'), function (a) {
+        Array.prototype.forEach.call(document.querySelectorAll('.bathroom .room-arrow, .hallway .room-arrow:not(.hall-out), .dungeon .room-arrow, .kitchen .room-arrow, .porch .room-arrow:not(.porch-steps)'), function (a) {
             a.style.top = Math.round(top) + 'px';
             a.style.marginTop = '0';
             if (a.classList.contains('back-right')) a.style.right = '8px'; else a.style.left = '8px';
@@ -248,6 +248,18 @@
         timer = setTimeout(slide, secs * 700);
     }
     function goNow(name) { var sd = side(name); if (sd && !inSide) goTo(sd, true); }
+    // back in the living space at once, nothing moving (the porch's steps down into the garden, sky/porch.js: in the black,
+    // so the garden has the living space behind it, as when you come from the homepage, not the hallway)
+    function homeNow() {
+        var sd = inSide;
+        if (!sd) return;
+        body.classList.remove('in-' + sd.name, 'in-side', sd.name + '-panning');
+        sd.el.setAttribute('aria-hidden', 'true');
+        inSide = null;
+        busy = false;
+        H.fire('leave', sd.name);
+        if (home) place(home, homeAt);
+    }
     SIDES.forEach(function (sd) {
         H.room(sd.name, { parent: 'living', here: function () { return inSide === sd; }, busy: function () { return busy; },
                           enter: function () { goTo(sd); }, leave: goHome });
@@ -337,7 +349,7 @@
         });
         SIDES.forEach(function (sd) { if (sd.me) { sd.me.classList.remove('gore-hidden'); place(sd.me, sd.standAt); } });
     });
-    Sky.sides = { get inSide() { return inSide && inSide.name; }, get busy() { return H.busy; }, goNow: goNow,
+    Sky.sides = { get inSide() { return inSide && inSide.name; }, get busy() { return H.busy; }, goNow: goNow, homeNow: homeNow,
                   get me() { return home; },
                   // someone else pulls the book (sky/claubes.js: the robed Claubes): the wall grinds open. false while it can't
                   // (reset 4's book is missing until the pact); true if it's open, or opening
