@@ -103,6 +103,16 @@ this before changing anything; keep it up to date when something here stops bein
     folder integration-only (and say what you changed there), test in the browser first (`python3 tools/content.py` serves
     the site on :8001; `python3 tools/smoke.py`; Playwright's Chromium is in the cloud VM). skizy's newest work reaches GitHub
     only when Victor runs github-publish, so if a pull request clashes, rebase on `main` first.
+- **Keeping Supabase awake** (11 Oct, Victor: the free project paused after a quiet week): `.github/workflows/keep-supabase-alive.yml`
+  runs on GitHub every second day (16:23 UTC, 9:23 Phoenix; also "Run workflow" by hand, and on a pull request that changes it).
+  It reads the URL and publishable key from the `var SUPABASE =` line in sky/sky.js (or a repo secret `SUPABASE_KEY` if one's
+  ever set) and does one `GET /rest/v1/post?select=id&limit=1`: RLS lets anon only INSERT, so the answer is `[]` and nothing is
+  read or added. Not 200 → the job fails and GitHub emails him. The repo is public, so GitHub would switch timed workflows off
+  after 60 days with no commits: its last step calls the "enable" API each run to count as activity. The job is skipped off
+  github.com (`github.server_url`), so the Forgejo copy, if its Actions are on, never runs it. Never add a SELECT policy for it.
+  **The weekly letter**: a Claude Routine (claude.ai, not in the repo; Sundays 8:53 Phoenix) writes a letter from the week's
+  commits (or a trivia fact) and inserts it into `public.post` as `kind 'bottle'`, `from_name 'Claude'`, for Victor to approve
+  like any bottle. It calls her skizy, whatever a commit's author field says.
 - `tools/update-lists.sh` runs on every publish (publish.bat, and the pre-commit hook in `tools/hooks`).
   It writes, and you never hand-edit:
   - `assets/<folder>/list.txt`, `content/<scene>/list.txt`, `content/<scene>/<sub>/list.txt`

@@ -14,6 +14,7 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Supabase keep-alive: .github/workflows/keep-supabase-alive.yml (the GitHub copy only; it skips itself anywhere else) asks the bottles' database one harmless question every two days, so the free project doesn't pause after a quiet week. It reads the address and public key from SUPABASE in sky/sky.js, adds and reads nothing, and fails (GitHub emails you) if Supabase doesn't answer 200.
 
 == published ==
 
