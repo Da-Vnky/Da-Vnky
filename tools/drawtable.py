@@ -517,9 +517,12 @@ def write_psd(path, w, h, layers, composite=None):
                 plane = rgba[off::4]
                 chans.append((cid, plane_rle([plane[y * w:(y + 1) * w] for y in range(h)])))
             rect = (0, 0, h, w)
-        else:
-            chans = [(cid, struct.pack('>H', 0)) for cid in (-1, 0, 1, 2)]  # (an empty layer: no pixels at all)
-            rect = (0, 0, 0, 0)
+        else:                                                            # an empty layer: the whole canvas, all see-through
+            # (not a 0 x 0 layer with no pixels: Photoshop and Clip Studio keep that, but Rebelle drops it, 11 Oct)
+            row = packbits_row(b'\0' * w)
+            clear = struct.pack('>H', 1) + struct.pack('>H', len(row)) * h + row * h
+            chans = [(cid, clear) for cid in (-1, 0, 1, 2)]
+            rect = (0, 0, h, w)
         flags = (0x02 if L.get('hidden') else 0)                         # (bit 1 set = hidden)
         extra = struct.pack('>I', 0) + struct.pack('>I', 0) + pascal(L['name']) + unicode_name(L['name'])
         if L.get('locked'):
