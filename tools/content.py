@@ -129,16 +129,54 @@ def safe(name):
     return name
 
 
+# when each letter was written (content/sea/written.json, also kept by the desk): letters from the same day go
+# newest first by it, here, at the desk and on the sea (sky/letters.js)
+WRITTEN = os.path.join(SEA, 'written.json')
+
+
+def written():
+    w = load_json(WRITTEN, {})
+    return {k: v for k, v in w.items() if isinstance(v, str)} if isinstance(w, dict) else {}
+
+
+def note_written(name, old=None):
+    w = written()
+    if old and old != name:
+        w[name] = w.pop(old, None) or now_iso()
+    elif not old and name not in w:                  # (an old letter edited keeps its place)
+        w[name] = now_iso()
+    else:
+        return
+    save_written(w)
+
+
+def forget_written(name):
+    w = written()
+    if w.pop(name, None) is not None:
+        save_written(w)
+
+
+def save_written(w):
+    with open(WRITTEN, 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(dict(sorted(w.items())), f, indent=2)
+        f.write('\n')
+
+
+def now_iso():
+    return datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'   # (as the desk writes it)
+
+
 def letters():
     today = datetime.date.today().isoformat()
+    when = written()
     out = []
     for n in os.listdir(SEA):
         if not LETTER.match(n) or n == 'list.txt' or n.lower().startswith('readme'):
             continue
         d = date_of(n)
         out.append({'name': n, 'date': d, 'title': title_of(n, read(n)) or n, 'kind': n.rsplit('.', 1)[1].lower(),
-                    'later': bool(d and d > today)})
-    out.sort(key=lambda l: (l['date'] or '0000', l['name']), reverse=True)
+                    'later': bool(d and d > today), 'written': when.get(n, '')})
+    out.sort(key=lambda l: (l['date'] or '0000', l['written'], l['name']), reverse=True)
     return out
 
 
@@ -175,6 +213,7 @@ def save(data):
         f.write(text)
     if old and old != name and os.path.exists(os.path.join(SEA, old)):
         os.remove(os.path.join(SEA, old))
+    note_written(name, old)                          # (a new one: written now; renamed: keeps its time; an edit: no change)
     write_list()
     return name
 
@@ -1744,6 +1783,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if url.path == '/__letters/delete':
                 name = safe(json.loads(raw or b'{}').get('name'))
                 os.remove(os.path.join(SEA, name))
+                forget_written(name)
                 write_list()
                 return self.reply({'deleted': name})
             if url.path == '/__letters/picture':

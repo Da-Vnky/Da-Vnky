@@ -21,6 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..'))
 CONTENT = os.path.join(ROOT, 'content')
 CONF = os.path.join(ROOT, '.inbox', 'supabase.json')
+WRITTEN = 'content/sea/written.json'      # (when each letter was written: kept on both sides, so the two are put together)
 
 
 def conf():
@@ -84,9 +85,42 @@ def what(path, gone, had):
         thing = 'a picture for a letter'
     if name.endswith('.txt') and path.startswith(('content/workshop/', 'content/frames/')) and not path.startswith('content/workshop/visitors/'):
         thing = 'a caption'
+    if path == WRITTEN:
+        return 'From the desk: when its letters were written (' + path + ').'
     if path.endswith('.json'):
         return 'From the desk: ' + thing + ' (' + path + ').'
     return 'From the desk: ' + thing + (' deleted' if gone else ' changed' if had else ' added') + ' (' + name + ').'
+
+
+def merge_written(dest, data):
+    try:
+        with open(dest, encoding='utf-8') as f:
+            mine = json.load(f)
+    except Exception:
+        mine = {}
+    try:
+        theirs = json.loads(data.decode('utf-8'))
+    except Exception:
+        theirs = {}
+    both = {k: v for k, v in (mine if isinstance(mine, dict) else {}).items() if isinstance(v, str)}
+    both.update({k: v for k, v in (theirs if isinstance(theirs, dict) else {}).items() if isinstance(v, str)})
+    return (json.dumps(dict(sorted(both.items())), indent=2) + '\n').encode('utf-8')
+
+
+def tidy_written():
+    """written.json keeps only letters that are still there"""
+    dest = target(WRITTEN)
+    try:
+        with open(dest, encoding='utf-8') as f:
+            w = json.load(f)
+    except Exception:
+        return
+    if not isinstance(w, dict):
+        return
+    keep = {k: v for k, v in w.items() if isinstance(v, str) and os.path.exists(os.path.join(os.path.dirname(dest), k))}
+    if keep != w:
+        with open(dest, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(json.dumps(dict(sorted(keep.items())), indent=2) + '\n')
 
 
 def backup(path, stamp):
@@ -135,6 +169,8 @@ def file_all(c):
                     os.remove(dest)
             else:
                 data = call(c, 'GET', obj_url(r['obj']))
+                if path == WRITTEN and had:                      # both kept times: the two lists together (the desk's wins a tie)
+                    data = merge_written(dest, data)
                 if had:
                     with open(dest, 'rb') as f:
                         mine = f.read()
@@ -153,6 +189,8 @@ def file_all(c):
             add_change(what(path, r.get('gone') or not r.get('obj'), had))
         except Exception as e:
             print('   x  ' + path + ': ' + str(e) + ' (left on the desk; it\'ll be tried again next time)')
+    if any(p.startswith('content/sea/') for p in filed):
+        tidy_written()
     if filed:
         print('   brought in from the desk:')
         for p in filed:

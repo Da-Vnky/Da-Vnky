@@ -17,6 +17,12 @@ How it works
 
 == published ==
 
+2026-10-11 10:41 · V
+- Letters: clicking into a video or song in a letter hushes the site (the record, the ambience, the weather, the sound effects); rolling the letter up, or putting the letters away, stops the player and brings the site's sound back.
+- Letters from the same day now go newest first, by when they were written (content/sea/written.json, kept by the desk and the content manager), so a letter just written at the desk comes before an older one from the same day (and is the one in the bottle).
+- From the desk: a letter on the sea added (2026-10-11-if-ur-seeing-this-video.txt).
+- From the desk: a letter on the sea changed (2026-10-11-if-ur-seeing-this.txt).
+
 2026-10-11 10:27 · V
 - Letters: a link on a line of its own is embedded: a YouTube, Vimeo, Spotify, SoundCloud, Twitch, TikTok, Instagram, Mastodon/Pleroma … player (or a picture, video or sound) taped onto the paper; any other link becomes a little card. The desk and the content manager show it as you write, with an "embed a link…" button (sky/embeds.js).
 - From the desk: a bottle in the living space added (2026-10-11-from-claude.txt).

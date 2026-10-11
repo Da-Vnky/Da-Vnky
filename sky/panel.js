@@ -40,9 +40,18 @@
         if (!AC) return null;
         ctx = new AC();
         master = ctx.createGain();
+        master.gain.value = quiet() ? 0 : 1;
         master.connect(ctx.destination);
         ctx.onstatechange = function () { refreshAll(); };
         return ctx;
+    }
+    // everything this engine plays can be hushed for a while, by name (a video playing in a letter: sky/letters.js):
+    // Sky.sounds.hush(true, 'embed') … hush(false, 'embed'). it all fades back once every one has let go
+    var hushes = {};
+    function quiet() { return Object.keys(hushes).some(function (k) { return hushes[k]; }); }
+    function hush(on, who) {
+        hushes[who || 'page'] = !!on;
+        if (master) master.gain.setTargetAtTime(quiet() ? 0 : 1, ctx.currentTime, quiet() ? 0.15 : 0.6);
     }
     // browsers only let sound start once you've clicked or tapped the page
     var pendingFiles = [];
@@ -415,7 +424,7 @@
         if (!ac() || ctx.state !== 'running') return;
         loud = Math.max(0, Math.min(1, loud)) * (muffled ? 0.6 : 1);
         if (thunderFile) {
-            setTimeout(function () { var a = new Audio(thunderFile); a.volume = loud; a.play().catch(function () {}); }, (delay || 0) * 1000);
+            setTimeout(function () { if (quiet()) return; var a = new Audio(thunderFile); a.volume = loud; a.play().catch(function () {}); }, (delay || 0) * 1000);
             return;
         }
         var dest = out || master, t = ctx.currentTime + (delay || 0), len = 3 + Math.random() * 2.5;
@@ -886,6 +895,7 @@
         var vol = sfxVol * (opts.volume === undefined ? 1 : Math.max(0, Math.min(1, opts.volume)));   // (volume: a share of the usual loudness)
         if (sfxFiles[name]) {                                          // your recording
             setTimeout(function () {
+                if (quiet()) return;                                   // (hushed: a recording plays outside the engine, so it's simply not played)
                 var a = new Audio(sfxFiles[name]);
                 a.volume = vol;
                 if (name === 'splash' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = 1.3 - 0.55 * size; }
@@ -908,6 +918,8 @@
         channel: channel,
         thunder: thunder,
         sfx: sfx,
+        hush: hush,
+        get hushed() { return quiet(); },
         get sfxVolume() { return sfxVol; },
         set sfxVolume(v) { sfxVol = Math.max(0, Math.min(1, v)); try { localStorage.setItem(SFX_KEY, sfxVol); } catch (e) {} },
         has: function (name) { return !!SYNTHS[name]; },

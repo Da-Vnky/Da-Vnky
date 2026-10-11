@@ -45,9 +45,19 @@
 
     /* ---------------- letters from the folder (content/sea/), plus any written into the page ---------------- */
     var folder = section.dataset.folder;
+    // when each letter was written (content/sea/written.json: { "2026-10-11-hello.txt": "2026-10-11T22:32:05.120Z" },
+    // kept by the desk and the content manager). letters from the same day go newest first by it; one with no
+    // time (written before 11 Oct) counts as the oldest of its day
+    function whenWritten() {
+        return new Promise(function (done) { Sky.listFolder(folder, ['json'], done); }).then(function (files) {     // (only if there is one)
+            var f = files.filter(function (x) { return x.name === 'written.json'; })[0];
+            return f ? fetch(f.url, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }) : {};
+        }).catch(function () { return {}; }).then(function (j) { return j && typeof j === 'object' ? j : {}; });
+    }
     if (folder) {
+        var written = whenWritten();
         Sky.listFolder(folder, ['html', 'txt'], function (files) {
-            Promise.all(files.map(function (f) {
+            written.then(function (at) { return Promise.all(files.map(function (f) {
                 return fetch(f.url, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.text() : null; })
                     .catch(function () { return null; })
                     .then(function (text) {
@@ -55,6 +65,7 @@
                         var a = document.createElement('article');
                         a.className = 'letter';
                         a.dataset.id = f.name;
+                        a.dataset.written = typeof at[f.name] === 'string' ? at[f.name] : '';
                         var d = Sky.fileDate(f.name);
                         if (d) a.dataset.date = d; else a.setAttribute('data-nodate', '');
                         a.innerHTML = /\.txt$/i.test(f.name) ? Sky.txtToHtml(text, { embeds: true }) : text;
@@ -63,7 +74,7 @@
                         a.querySelectorAll('img[src^="content/"]').forEach(function (im) { var u = Sky.desk.url(im.getAttribute('src')); if (u) im.src = u; });
                         return a;
                     });
-            })).then(function (arts) {
+            })); }).then(function (arts) {
                 arts.forEach(function (a) { if (a) section.appendChild(a); });
                 begin();
             });
@@ -76,8 +87,10 @@
     var letters = Array.prototype.slice.call(section.querySelectorAll('article.letter'));
     var bottled = null;
 
-    // newest first; undated letters keep their place at the end
-    letters.sort(function (a, b) { return (b.dataset.date || '').localeCompare(a.dataset.date || ''); });
+    // newest first (and on the same day, the one written last first); undated letters keep their place at the end
+    letters.sort(function (a, b) {
+        return (b.dataset.date || '').localeCompare(a.dataset.date || '') || (b.dataset.written || '').localeCompare(a.dataset.written || '');
+    });
     letters.forEach(function (a) { section.appendChild(a); });
 
     // your own letter paper and ink marks (slots): assets/sea/letter-paper (one sheet, stretched to fit;
@@ -195,7 +208,12 @@
         document.body.classList.add('letter-reading');
         lv.querySelector('.lv-close').focus({ preventScroll: true });
     }
-    function closeAll() { lv.classList.remove('open'); document.body.classList.remove('letter-reading'); }
+    function closeAll() { lv.classList.remove('open'); document.body.classList.remove('letter-reading'); stopPlayers(lv); quiet(false); }
+    // a letter put away: its players stop (an iframe sent back to its own address starts over, silent)
+    function stopPlayers(box) {
+        Array.prototype.forEach.call(box.querySelectorAll('figure.embed iframe'), function (f) { var s = f.src; f.src = 'about:blank'; f.src = s; });
+        Array.prototype.forEach.call(box.querySelectorAll('figure.embed video, figure.embed audio'), function (m) { m.pause(); });
+    }
     board.addEventListener('click', openAll);
 
     // and a button in the corner, so the letters are one click away wherever you are on the voyage
@@ -216,6 +234,28 @@
     lv.querySelector('.lv-close').addEventListener('click', closeAll);
     lv.addEventListener('click', function (e) { if (e.target === lv || e.target === list) closeAll(); });
 
+    /* ---------------- a player in a letter (sky/embeds.js): the site goes quiet while you use it ----------------
+       the moment you click into a video or a song in a letter, the record, the ambience, the weather, the static and
+       the sound effects fade out; they come back when you roll the letter up (or put the letters away). a page can't
+       see inside another site's player, so "in use" means clicked into: the browser tells the page it lost the focus
+       to that player's frame */
+    var quietFor = false;
+    function quiet(on) {
+        if (quietFor === on) return;
+        quietFor = on;
+        if (Sky.music && Sky.music.hush) Sky.music.hush(on, 'embed');
+        if (Sky.noise && Sky.noise.hush) Sky.noise.hush(on, 'embed');
+        if (Sky.sounds && Sky.sounds.hush) Sky.sounds.hush(on, 'embed');
+    }
+    window.addEventListener('blur', function () {
+        setTimeout(function () {
+            var a = document.activeElement;
+            if (a && a.tagName === 'IFRAME' && a.closest('figure.embed')) quiet(true);
+        }, 0);
+    });
+    document.addEventListener('play', function (e) { if (e.target.closest && e.target.closest('figure.embed')) quiet(true); }, true);
+    Sky.letters = { get quiet() { return quietFor; } };
+
     var reading = null;
     // read one letter over the sea
     function openLetter(a, from) {
@@ -232,6 +272,8 @@
         var a = reading;
         if (!a) return;
         reading = null;
+        stopPlayers(a);
+        quiet(false);
         Sky.sfx('paper-roll');
         markAllSeen();
         var wasHidden = !board.classList.contains('show');

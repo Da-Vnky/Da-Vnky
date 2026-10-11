@@ -186,6 +186,26 @@ this before changing anything; keep it up to date when something here stops bein
   lays the new version in around the players already there (an iframe moved in the page reloads), so typing doesn't
   restart a video. Iframes are `loading="lazy"`: the letters on the board load theirs only when shown.
 - Inside a player the cursor is the other site's own (a page can't change it there).
+- **The site goes quiet while a player's in use** (11 Oct, Victor: "mute site's sound while embeds are playing … resume after
+  letters containing the embeds are closed out of"): letters.js `quiet(on)` holds `Sky.music.hush(on, 'embed')` (the record
+  pauses, and plays on after if it was playing), `Sky.noise.hush` and `Sky.sounds.hush(on, 'embed')` (panel.js: a named hush
+  of the engine's `master` gain, so the weather, the ambience and every sound effect; recorded sound effects and thunder,
+  which play outside the engine, are skipped while hushed; `Sky.sounds.hushed`). On: the window loses the focus to an iframe
+  inside a `figure.embed` (a page can't see into another site's player, so clicking into it counts as playing), or a
+  `<video>`/`<audio>` in one plays. Off: rolling the letter up (`closeLetter`) or putting the letters away (`closeAll`), which
+  also stop that letter's players (`stopPlayers`: each iframe sent back to its own address, media paused), so nothing plays
+  on hidden under the music. `Sky.letters.quiet` says whether it's on.
+
+## Letters from the same day: newest first (content/sea/written.json, 11 Oct)
+
+- Victor: a letter written at the desk came after an older one from the repo with the same date. File names only carry the
+  day, so **`content/sea/written.json`** (`{ "<letter file>": "<ISO time, UTC, ms, Z>" }`) says when each was written. The sea
+  (letters.js, only if the folder lists one: `whenWritten`), the desk (`letterList`) and the content manager (`letters()`)
+  all sort by date, then by that time, newest first; a letter with no time (before 11 Oct) is the oldest of its day.
+- Kept by: content.py `save` (`note_written`: a new letter now; renamed by its date: keeps its time; an edit: nothing) and the
+  letters delete route (`forget_written`); the desk the same (`noteWritten`, `forgetWritten`, written whole as a desk file).
+  Publishing (desk.py) **puts the two together** rather than taking the desk's (`merge_written`: both lists, the desk's wins a
+  tie), then drops letters that are gone (`tidy_written`).
 
 ## The pages
 

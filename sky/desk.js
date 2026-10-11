@@ -426,7 +426,7 @@
     function refresh() {
         return Promise.all([loadRows(), Promise.all(Object.keys(FOLDERS).map(function (k) { return loadRepo(FOLDERS[k]); })),
                             frameNums.living ? null : loadFrames()])
-            .then(function () { return Promise.all([loadBoard(), loadFrameLists(), countPost()]); })
+            .then(function () { return Promise.all([loadBoard(), loadFrameLists(), loadWritten(), countPost()]); })
             .then(drawWaiting);
     }
     // "N changes on the desk": live on the site, not in the folder yet
@@ -482,8 +482,30 @@
     function letterList() {
         return names(FOLDERS.sea, LETTER_RE).map(function (n) {
             var path = FOLDERS.sea + n;
-            return { name: n, path: path, date: dateOf(n), kind: extOf(n), later: !!(dateOf(n) && dateOf(n) > today()) };
-        }).sort(function (a, b) { return (b.date || '0000').localeCompare(a.date || '0000') || b.name.localeCompare(a.name); });
+            return { name: n, path: path, date: dateOf(n), kind: extOf(n), later: !!(dateOf(n) && dateOf(n) > today()), written: written[n] || '' };
+        }).sort(function (a, b) {
+            return (b.date || '0000').localeCompare(a.date || '0000') || b.written.localeCompare(a.written) || b.name.localeCompare(a.name);
+        });
+    }
+    // when each letter was written (content/sea/written.json, as the content manager keeps it): the same day's
+    // letters go newest first by it, here and on the sea (sky/letters.js)
+    var WRITTEN = FOLDERS.sea + 'written.json', written = {};
+    function loadWritten() {
+        return readJson(WRITTEN, {}).then(function (j) {
+            written = {};
+            Object.keys(j || {}).forEach(function (k) { if (typeof j[k] === 'string') written[k] = j[k]; });
+        });
+    }
+    function noteWritten(name, from) {
+        if (from && from !== name) { written[name] = written[from] || new Date().toISOString(); delete written[from]; }
+        else if (!written[name]) written[name] = new Date().toISOString();
+        else return Promise.resolve();
+        return putJson(WRITTEN, written);
+    }
+    function forgetWritten(name) {
+        if (!(name in written)) return Promise.resolve();
+        delete written[name];
+        return putJson(WRITTEN, written);
     }
     function letterTitle(item) {
         var key = item.path + '|' + (rows[item.path] ? rows[item.path].obj : '');
@@ -735,6 +757,9 @@
             return putText(path, text).then(function () {
                 if (old && old !== path) return remove(old);
             }).then(function () {
+                // (a new letter: written now. one renamed by its date keeps when it was first written; an edit changes nothing)
+                return old ? (old !== path ? noteWritten(name, split(old)[1]) : null) : noteWritten(name);
+            }).then(function () {
                 var renamed = old && old !== path;
                 L.cur = path;
                 setLetterDirty(pane, false);
@@ -748,7 +773,7 @@
         if (!L.cur || !confirm('delete “' + ($('.dk-l-title', pane).value || split(L.cur)[1]) + '”? it goes from the site now.')) return;
         var path = L.cur;
         work('deleting…', function () {
-            return remove(path).then(function () {
+            return remove(path).then(function () { return forgetWritten(split(path)[1]); }).then(function () {
                 L.cur = null; L.dirty = false;
                 $('.dk-edit', pane).hidden = true;
                 pane.classList.remove('dk-writing', 'dk-looking');
