@@ -25,7 +25,7 @@
         var lit = '';
         for (var b = 0; b < BUCKETS; b++) lit += '<path class="lit" data-b="' + b + '"/>';
         return '<svg class="layer c' + (i + 1) + '"><path class="body"/><path class="glass"/>' + lit + '<path class="beacon"/>' +
-            (i === LAYERS.length - 1 ? '<path class="dead"/><path class="cracks"/><path class="boards"/><path class="mel-leak"/><path class="mel-boards"/>' : '') + '</svg>';
+            (i === LAYERS.length - 1 ? '<path class="dead"/><path class="cracks"/><path class="boards"/><path class="skizy-leak"/><path class="skizy-boards"/>' : '') + '</svg>';
     }).join('');
     document.body.appendChild(ground);
 
@@ -166,14 +166,14 @@
             var L = LAYERS[i], W = svg.clientWidth, S = svg.clientHeight - 12, B = S + 12;
             var rnd = Sky.seeded(L.seed * 7919);
             var body = '', glass = '', beacon = '', lit = [], wins = [];
-            var dead = '', cracks = '', boards = '', melLeak = '', melBoards = '', mel = null, derelict = false;
+            var dead = '', cracks = '', boards = '', skizyLeak = '', skizyBoards = '', skizy = null, derelict = false;
             var aim = W * (W < 620 ? 0.3 : 0.36);             // the derelict building: the first tall-enough one past here
             for (var b = 0; b < BUCKETS; b++) lit.push('');
 
             for (var x = -10; x < W; ) {
                 var bw = (L.w[0] + rnd() * (L.w[1] - L.w[0])) * small;
                 var bh = S * (L.lo + rnd() * (L.hi - L.lo));
-                // mel's building: an old tenement, tall enough to stand over the rooftop you're on
+                // skizy's building: an old tenement, tall enough to stand over the rooftop you're on
                 var dz = i === LAYERS.length - 1 && !derelict && !frontArt && x + bw / 2 > aim && bw >= 44 * small;
                 if (dz) bh = Math.max(bh, S * 0.6);
                 var top = B - bh;
@@ -201,7 +201,7 @@
                     var ww = 5 * small + i, wh = 7 * small + i, gx = 11 * small + i * 2, gy = 15 * small + i * 2;
                     var cols = Math.floor((bw - 10) / gx), rows = Math.floor((bh - 18) / gy);
                     var ox = x + (bw - (cols - 1) * gx - ww) / 2;
-                    // mel's building: abandoned, not a light on, except behind one boarded-up window
+                    // skizy's building: abandoned, not a light on, except behind one boarded-up window
                     var isDead = dz && rows >= 3 && cols >= 2;
                     if (isDead) {
                         derelict = true;
@@ -216,10 +216,10 @@
                             var isLit = rnd() < 0.78, bucket = isLit ? Math.floor(rnd() * BUCKETS) : 0;
                             if (isDead) {                           // (the dice still roll, so the rest of the city stays put)
                                 if (r === mr && c === mc) {
-                                    mel = { x: wx, y: wy, w: ww, h: wh, lit: false, top: B - bh, mel: true };
+                                    skizy = { x: wx, y: wy, w: ww, h: wh, lit: false, top: B - bh, skizy: true };
                                     dead += w;
-                                    melLeak += rect(wx + ww * .12, wy + wh * .2, ww * .76, wh * .7);
-                                    melBoards += rect(wx - 1, wy + wh * .08, ww + 2, wh * .26) + rect(wx - 1, wy + wh * .42, ww + 2, wh * .24) + rect(wx - 1, wy + wh * .74, ww + 2, wh * .24);
+                                    skizyLeak += rect(wx + ww * .12, wy + wh * .2, ww * .76, wh * .7);
+                                    skizyBoards += rect(wx - 1, wy + wh * .08, ww + 2, wh * .26) + rect(wx - 1, wy + wh * .42, ww + 2, wh * .24) + rect(wx - 1, wy + wh * .74, ww + 2, wh * .24);
                                 } else {
                                     var roll = crnd();
                                     if (roll < 0.22) boards += rect(wx - .5, wy + wh * .15, ww + 1, wh * .3) + rect(wx - .5, wy + wh * .6, ww + 1, wh * .3);
@@ -238,13 +238,13 @@
             }
 
             if (i === LAYERS.length - 1) {
-                if (frontArt) mel = artMel(W, B);
-                front = { svg: svg, windows: frontArt ? artWindows(W, B) : wins, W: W, H: B, mel: mel };
+                if (frontArt) skizy = artSkizy(W, B);
+                front = { svg: svg, windows: frontArt ? artWindows(W, B) : wins, W: W, H: B, skizy: skizy };
                 svg.querySelector('.dead').setAttribute('d', dead);
                 svg.querySelector('.cracks').setAttribute('d', cracks);
                 svg.querySelector('.boards').setAttribute('d', boards);
-                svg.querySelector('.mel-leak').setAttribute('d', frontArt ? '' : melLeak);
-                svg.querySelector('.mel-boards').setAttribute('d', frontArt ? '' : melBoards);
+                svg.querySelector('.skizy-leak').setAttribute('d', frontArt ? '' : skizyLeak);
+                svg.querySelector('.skizy-boards').setAttribute('d', frontArt ? '' : skizyBoards);
             }
             svg.setAttribute('viewBox', '0 0 ' + W + ' ' + B);
             svg.querySelector('.body').setAttribute('d', body);
@@ -268,13 +268,13 @@
         });
         return out;
     }
-    // mel's window on your own front row: "mel": [x%, y%, w%, h%] in skyline-front-windows.json
-    function artMel(W, B) {
-        var m = frontArt && frontArt.mel;
+    // skizy's window on your own front row: "skizy": [x%, y%, w%, h%] in skyline-front-windows.json
+    function artSkizy(W, B) {
+        var m = frontArt && frontArt.skizy;
         if (!m || m.length < 2) return null;
         var sc = Math.max(W / frontArt.w, B / frontArt.h), iw = frontArt.w * sc, ih = frontArt.h * sc;
         var ww = (m[2] || 0.9) / 100 * iw, wh = (m[3] || 1.6) / 100 * ih;
-        return { x: (W - iw) / 2 + m[0] / 100 * iw - ww / 2, y: B - ih + m[1] / 100 * ih - wh / 2, w: ww, h: wh, lit: false, top: 0, mel: true };
+        return { x: (W - iw) / 2 + m[0] / 100 * iw - ww / 2, y: B - ih + m[1] / 100 * ih - wh / 2, w: ww, h: wh, lit: false, top: 0, skizy: true };
     }
     build();
     function rebuild() { build(); svgs.forEach(Sky.fitLayerArt); Sky.refresh(); if (Sky.city.onBuild) Sky.city.onBuild(); }
@@ -286,7 +286,7 @@
             Sky.findAsset(SKYLINE[i] + '-windows.json', function (u, data) {
                 if (!u) return;
                 frontArt.windows = Array.isArray(data) ? data : (data && data.windows) || null;
-                frontArt.mel = data && !Array.isArray(data) ? data.mel || null : null;
+                frontArt.skizy = data && !Array.isArray(data) ? data.skizy || null : null;
                 rebuild();
             });
         } : null);

@@ -1,5 +1,5 @@
 #!/bin/sh
-# pull.sh — gets the latest version of the site from Forgejo into this folder: whatever Mel (or anyone else
+# pull.sh — gets the latest version of the site from Forgejo into this folder: whatever skizy (or anyone else
 # with access) has pushed since you last published or pulled. tools\pull.bat runs it; so does publish.bat,
 # before it publishes.
 #

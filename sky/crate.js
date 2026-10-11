@@ -524,7 +524,7 @@
             '<div class="pb-row"><button type="button" class="act pb-dl">download board.json</button><button type="button" class="act soft pb-copy">copy it instead</button></div>' +
             '<details><summary>or publish it straight from here, through Forgejo</summary>' +
                 '<p class="cp-note">Needs a Forgejo access token (Forgejo → Settings → Applications → generate a token with permission to write to the repository). ' +
-                'It\'s kept in this browser only. This works only if Mel\'s Forgejo lets web pages talk to it; if not, use the download.</p>' +
+                'It\'s kept in this browser only. This works only if skizy\'s Forgejo lets web pages talk to it; if not, use the download.</p>' +
                 '<div class="pb-row"><input type="password" class="pb-token" placeholder="your access token" autocomplete="off"><button type="button" class="act pb-api">publish now</button></div>' +
             '</details>' +
             '<p class="pb-msg" role="status"></p>' +

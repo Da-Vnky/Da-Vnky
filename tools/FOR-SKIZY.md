@@ -1,4 +1,4 @@
-# For Mel (and Mel's Claude): working on DaV-nky
+# For skizy (and skizy's Claude): working on DaV-nky
 
 Victor's site, **DaV-nky** (dav-nky.pleroma.nexus), is plain static files in this repo. Publishing = a git push to
 Forgejo. Your room, `schizophyllu.me.room/`, lives inside it. This page is the short version of how Victor works on
@@ -25,7 +25,7 @@ tools are in **Terminal → Run Task…** (copied from `tools/vscode/tasks.json`
 | **preview the site** | `sh tools/preview.sh` → http://localhost:8000/ | DaV-nky: preview the site | `tools\preview.bat` |
 | **publish** (pull, lists, commit, push) | `sh tools/publish.sh "what changed"` | DaV-nky: publish | `tools\publish.bat` |
 | rewrite the lists by hand | `sh tools/update-lists.sh` | DaV-nky: rewrite the lists | (publish does it) |
-| your room's slots, after adding things to it | `python3 tools/mel-room-slots.py` | DaV-nky: Mel's room slots | same |
+| your room's slots, after adding things to it | `python3 tools/skizy-room-slots.py` | DaV-nky: skizy's room slots | same |
 
 **Pull before you start, publish when you're done.** Victor works on his copy at the same time.
 - `pull.sh` never loses work. Your unpublished changes stay put.
@@ -84,11 +84,11 @@ replaces the stand-in. There's no code to change for this.
   - a short hook at the top of `inlineArt()`;
   - `room/davnky.js`: those lines of dialogue;
   - `room/davinv.js`: the site's hotbar inside your room.
-- **Victor's pictures for your room**: the asset manager's "Mel's room" tab. `assets/mel-room/<room>-<thing>.*`
-  replaces `room/objects/<room>/<thing>.svg`, and `assets/mel-room/<room>.*` is that room's backdrop. Your own
+- **Victor's pictures for your room**: the asset manager's "skizy's room" tab. `assets/skizy-room/<room>-<thing>.*`
+  replaces `room/objects/<room>/<thing>.svg`, and `assets/skizy-room/<room>.*` is that room's backdrop. Your own
   drawings stay as the stand-ins.
   - **Add a clickable thing** (a new `<g class="obj" data-id=… data-art="room/objects/<room>/<name>.svg">`) and run
-    `python3 tools/mel-room-slots.py`: it gets a slot.
+    `python3 tools/skizy-room-slots.py`: it gets a slot.
   - **If the code switches parts of a drawing on and off**, put a comment at its top:
     `the code looks these ids up, so keep them: #a, #b`. Its slot then takes SVG only.
 
@@ -97,7 +97,7 @@ replaces the stand-in. There's no code to change for this.
 - **What's changed: `CHANGES.txt`** at the top of the repo, newest first. Read it when you start, to see what Victor
   (and his Claude) changed since you last looked. When you change something, add a line under "not published yet"
   (`python3 tools/changes.py add "what changed"`). `publish.sh` turns those lines into the commit message and moves
-  them into the log. For a pull request: `python3 tools/changes.py take --who Mel`, then commit with
+  them into the log. For a pull request: `python3 tools/changes.py take --who skizy`, then commit with
   `git commit -F .git/PUBLISH_MSG`. Two people adding lines never clash (it merges with `union`).
 
 - **Written by the tools, never by hand:** every `list.txt`, `catalog.txt`, `files.txt`, `manifest.txt`,

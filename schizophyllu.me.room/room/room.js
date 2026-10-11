@@ -1636,6 +1636,19 @@ main();
 //   · after that (and in every reset from 4 on) the room stays quiet: the ending's dark room, skizy alone
 //     in the corner. give her the P(Doom) record (the visitor's to give from reset 5, when it's back in DaV-nky's record player) and
 //     every visit after brings a little more back. on the fifth it's all back, and they're glad of it
+// (10 Oct) these saves used to go by an older name, now by skizy: a visitor's progress is moved across once, as it was
+// (DaV-nky's sky/state.js does the same on its side)
+try {
+  const old = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i), m = /^(run:)?(?!skizy-)[a-z]+-(remedy|restored-said|pills)$/.exec(k);
+    if (m) old.push([k, (m[1] || '') + 'skizy-' + m[2]]);
+  }
+  for (const [from, to] of old) {
+    if (localStorage.getItem(to) === null) localStorage.setItem(to, localStorage.getItem(from));
+    localStorage.removeItem(from);
+  }
+} catch {}
 const DAV = (() => {
   const reset = Math.min(8, (+store.get('dav-reset') || 0) + 1);
   let loot = [];
@@ -1647,16 +1660,16 @@ const DAV = (() => {
     ownsRecord: loot.includes('doom-record'),
     hasRecord: reset >= 5,   // (the record's the visitor's to give from reset 5: back in DaV-nky's record player then, found or not. reset 4 it's missing)
     run, setRun: (k, v) => store.set('run:' + k, v),
-    get pillsHere() { return reset === 3 && run('mel-pills') !== '1'; },
+    get pillsHere() { return reset === 3 && run('skizy-pills') !== '1'; },
   };
 })();
 const REMEDY_DONE = 5;
 // null: the room as it always was. 0 … 4: quiet, and how much has come back
 function davQuiet() {
-  const quiet = DAV.reset >= 4 || DAV.run('mel-pills') === '1';
+  const quiet = DAV.reset >= 4 || DAV.run('skizy-pills') === '1';
   if (!quiet) return null;
-  let v = store.get('mel-remedy');                      // (visits since the record: kept forever, not per reset)
-  if (v !== null && +v < REMEDY_DONE && !PEEK) { v = String(+v + 1); store.set('mel-remedy', v); }
+  let v = store.get('skizy-remedy');                      // (visits since the record: kept forever, not per reset)
+  if (v !== null && +v < REMEDY_DONE && !PEEK) { v = String(+v + 1); store.set('skizy-remedy', v); }
   if (v !== null && +v >= REMEDY_DONE) {
     const r = restoredOnce();
     if (r === 'restored') quietRoom(REMEDY_DONE - 1);   // (the day it's all back: it opens as the visit before, she's still in the corner)
@@ -1670,7 +1683,7 @@ function davQuiet() {
 function restoredOnce() {
   RESTORED.forEach(x => AMBIENT_MORE.push(x));          // (their new talk joins the rest)
   bags.ambient = bag([...AMBIENT, ...AMBIENT_MORE]);
-  if (store.get('mel-restored-said') === '1' || PEEK) return null;
+  if (store.get('skizy-restored-said') === '1' || PEEK) return null;
   return 'restored';
 }
 // the ending's dark room (goDark, without the fade), with whatever's come back so far
@@ -1700,7 +1713,7 @@ async function davArrive(stage) {
   store.set('room_knocked', '1');                       // (no climbing-in scene: there's nobody to play it)
   await sleep(1500);
   if (stage === 'restored') {
-    store.set('mel-restored-said', '1');
+    store.set('skizy-restored-said', '1');
     // she gets up out of the corner and goes back to her desk (a moment of black), and only then does she speak
     quietNote(QUIET_NOTES.getsUp);
     await sleep(readTime(QUIET_NOTES.getsUp[1]) + 600);
@@ -1718,7 +1731,7 @@ async function davArrive(stage) {
     await sleep(700);
     return say(RESTORED_FIRST);
   }
-  const gifted = store.get('mel-remedy') !== null;
+  const gifted = store.get('skizy-remedy') !== null;
   if (!gifted) return quietNote(QUIET_NOTES.arrive);
   if (REMEDY_BACK[stage]?.note) quietNote(REMEDY_BACK[stage].note);
   if (REMEDY_BACK[stage]?.say) { await sleep(REMEDY_BACK[stage].note ? 5200 : 0); await quietSay(REMEDY_BACK[stage].say); }
@@ -1726,11 +1739,11 @@ async function davArrive(stage) {
 // skizy in the corner: the one thing to click while it's quiet
 function aloneClicked() {
   closeMenu();
-  const gifted = store.get('mel-remedy') !== null;
+  const gifted = store.get('skizy-remedy') !== null;
   if (!gifted && DAV.hasRecord) {
     return openMenu('skizy', CAST.mel.color, [
       ['give her the record', () => {
-        store.set('mel-remedy', '0');
+        store.set('skizy-remedy', '0');
         quietNote(QUIET_NOTES.gift);
         playRecord();
       }],
@@ -1760,13 +1773,13 @@ async function playRecord() {
 }
 // reset 3: after the lights go out, the visitor
 async function guilt() {
-  DAV.setRun('mel-pills', '1');
+  DAV.setRun('skizy-pills', '1');
   await sleep(6000);
   for (const line of GUILT) { quietNote(line); await sleep(readTime(line) + 900); }
   fade.classList.add('dark', 'on');
   audio.hold(10);
   await sleep(3200);
-  try { sessionStorage.setItem('dav-mel-death', '1'); } catch {}  // (the rooftop picks this up: DaV-nky's sky/resets.js)
+  try { sessionStorage.setItem('dav-skizy-death', '1'); } catch {}  // (the rooftop picks this up: DaV-nky's sky/resets.js)
   location.href = ROOFTOP;
 }
 // the visitor's hotbar (DaV-nky's), in here too: room/davinv.js loads it. davInv(fn) runs fn with it once it's there
@@ -1784,16 +1797,16 @@ if (DAV.reset < 3 || DAV.reset >= 5) {
   st.textContent = '[data-id="pills"] { display: none; }';
   document.head.appendChild(st);
 }
-// Victor's own pictures for the room, from DaV-nky's asset manager (tools/assets.html → "Mel's room"), in
-// assets/mel-room/ (its list.txt says what's there):
+// Victor's own pictures for the room, from DaV-nky's asset manager (tools/assets.html → "skizy's room"), in
+// assets/skizy-room/ (its list.txt says what's there):
 //   · <room>-<thing>  takes the place of room/objects/<room>/<thing>.svg: a picture the size of the whole room
 //     (1600 × 900), the thing drawn where it sits, see-through everywhere else. an .svg is poured in just like the
 //     room's own drawings (so it can keep the ids the code needs); any other picture is laid in as an <image>
 //   · <room>          the backdrop: it takes the place of everything in that room that isn't a thing to click,
 //     a speech-bubble anchor, or one of the lights and darks the scenes switch on and off (DAV_ART_KEEP)
-// Mel's own drawings stay as they are: they're the stand-ins
+// skizy's own drawings stay as they are: they're the stand-ins
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const DAV_ART = '../assets/mel-room/';
+const DAV_ART = '../assets/skizy-room/';
 const DAV_ART_KEEP = ['afternoon-chair', 'light', 'daylight', 'alone-dark', 'h-darkness', 'c-darkness'];
 function davArtFiles() {
   return davArtFiles.p ??= fetch(new URL(DAV_ART + 'list.txt', location.href), { cache: 'no-cache' })
@@ -1819,21 +1832,21 @@ function davImage(url) {
   for (const [k, v] of [['x', 0], ['y', 0], ['width', 1600], ['height', 900], ['preserveAspectRatio', 'none']]) im.setAttribute(k, v);
   return im;
 }
-// under a picture of Victor's: Mel's own drawing of the thing, invisible, so only the thing itself (in its own shape)
+// under a picture of Victor's: skizy's own drawing of the thing, invisible, so only the thing itself (in its own shape)
 // is hovered and clicked, not the whole room-sized picture
-// Claube's pen (10 Oct, Victor): assets/mel-room/main-claube-pen, a moving picture the size of the whole room (the pen,
+// Claube's pen (10 Oct, Victor): assets/skizy-room/main-claube-pen, a moving picture the size of the whole room (the pen,
 // drawn where it sits in his hand, see-through everywhere else), laid over Victor's own Claube (main-claube). it's always
 // in his hand: held still on its first frame, and played from its start whenever he writes (#claube.writing: the scenes
-// and the speech bubbles switch it on and off), then still again. only with Victor's Claube: Mel's drawing has its own pen
+// and the speech bubbles switch it on and off), then still again. only with Victor's Claube: skizy's drawing has its own pen
 function davPen(ph, files, pic) {
   if (!pic || ph.id !== 'claube') return;
   const pen = davPick(files, 'main-claube-pen');
   if (!pen) return;
-  davSheet('mel-room');
+  davSheet('skizy-room');
   ph.classList.add('dav-has-pen');
   const im = davImage(pen.url);
   im.classList.add('dav-pen');
-  im.dataset.slot = 'assets/mel-room/main-claube-pen';
+  im.dataset.slot = 'assets/skizy-room/main-claube-pen';
   ph.append(im);
   davPenStill(im, pen.url);
 }
@@ -1897,12 +1910,12 @@ function davBackdrop(root, files) {
   im.classList.add('dav-backdrop');
   if (first) first.before(im); else root.append(im);
 }
-// the sky through the window is DaV-nky's own (Mel's wish, 27 Sep): once Victor's window picture is in
+// the sky through the window is DaV-nky's own (skizy's wish, 27 Sep): once Victor's window picture is in
 // (main-window, its panes see-through), everything in the room behind the window gets a hole where the glass is, and
 // DaV-nky's sky (../window-sky.html: the real sun and moon where the visitor is, the clouds, the stars, day and night)
 // sits behind the room and shows through. The moon's light in the rooms (glow-moon, glow-moonbeam, the closet's
 // glow-hatch-moon) follows that sky's night: full from about 1 h 40 min after sunset, gone by day. In the afternoon
-// scene the sky outside turns to afternoon for as long as it lasts. Its look: ../sky/css/mel-window.css
+// scene the sky outside turns to afternoon for as long as it lasts. Its look: ../sky/css/skizy-window.css
 // the windows it's done for: the main room's, and (28 Sep, Victor's own blinds with a see-through gap) the bedroom's.
 // panes: the glass, in room coordinates (a little of it under the frame). frame: how much sky the window is as if the
 // glass were all of it (the bedroom's gap is only a strip under the blinds: the sky's that strip of a whole window's view)
@@ -1936,7 +1949,7 @@ function davSkyHole(root, files) {
     if (el === top) break;
     if (el.localName !== 'defs' && el.localName !== 'style') el.setAttribute('mask', `url(#${mask.id})`);
   }
-  // Mel's twinkling stars for her painted sky (unless Victor drew his own), and the afternoon's painted sky: the real one's there instead
+  // skizy's twinkling stars for her painted sky (unless Victor drew his own), and the afternoon's painted sky: the real one's there instead
   if (!davPick(files, W.blink[0])) root.querySelector(`[data-art$="${W.blink[1]}"]`)?.classList.add('dav-own-sky');
   if (key === 'main') {
     const day = root.querySelector('#daylight');
@@ -1968,7 +1981,7 @@ function davSkyWindow() {
   if (davSkyFrame) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = new URL('../sky/css/mel-window.css', location.href).href;
+  link.href = new URL('../sky/css/skizy-window.css', location.href).href;
   document.head.append(link);
   document.documentElement.classList.add('dav-real-sky');
   const box = davSkyBox = document.createElement('div');
@@ -2020,11 +2033,11 @@ $('#svg-host').addEventListener('click', e => {
   fade.classList.add('dark', 'on');
   setTimeout(() => { location.href = ROOFTOP; }, 1300);
 }, true);
-// P(Doom), once she has it (mel-remedy): on her computer's song list too, the last song on the station
+// P(Doom), once she has it (skizy-remedy): on her computer's song list too, the last song on the station
 const davLoadMusic = music.load.bind(music);
 music.load = async function () {
   await davLoadMusic();
-  if (store.get('mel-remedy') === null) return;
+  if (store.get('skizy-remedy') === null) return;
   const name = await davDoomFile();
   if (!name || this.tracks.some(t => t.dav)) return;
   this.tracks.push({ title: 'DaV-nky / ' + name.replace(/^\d+[-_. ]+/, '').replace(/\.[a-z0-9]+$/i, ''), file: '../../content/living/' + encodeURIComponent(name), dav: true });

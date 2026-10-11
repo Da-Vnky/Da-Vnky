@@ -4,7 +4,7 @@
    revolver on themselves. It's locked: nothing's taken until the visitor has found
    this reset's hidden key (sky/resets.js calls Sky.lives.unlock()). From then on
    this reset's one death (sky/state.js, RESETS[n].deaths: the revolver in reset 1,
-   the boat in 2, Mel's pills in 3, the false god's bullet in 4 …) takes the heart
+   the boat in 2, skizy's pills in 3, the false god's bullet in 4 …) takes the heart
    (sky/gore.js tells it, 'dav:traveller-died'), and the world resets: on to the
    next reset (sky/state.js).
 

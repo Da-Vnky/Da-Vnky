@@ -8,7 +8,7 @@
    world changes around them. Only a few things carry on:
 
      FOREVER   which reset they're in, the P(Doom) record once it's theirs,
-               how far Mel's room has come back, and their settings (volumes,
+               how far skizy's room has come back, and their settings (volumes,
                the brush, the weather …)
      A RESET   everything in RUN below: the hidden key, the hearts, the dungeon
                found … gone at the next reset
@@ -16,7 +16,7 @@
                the tab closes, and at every reset
 
    RESETS below is the plan for each: its theme, its one way to die (DEATHS:
-   one death a reset, one heart: 27 Sep, Mel and Victor, so the easter egg
+   one death a reset, one heart: 27 Sep, skizy and Victor, so the easter egg
    can be reached), and where its key is hidden (until it's found, every way
    to die is off: curious clicking can't kill the traveller). Its own art (the key, the mirror, the note, the world getting more
    twisted) lives in assets/resets/reset-<n>/: the content manager's
@@ -65,6 +65,23 @@
     });
 })();
 
+// her room's saves (10 Oct): they used to go by an older name, now by her handle, skizy. a visitor's own progress
+// (the record given to her, how far her room has come back, this reset's pills) is moved across once, as it was.
+// her room does the same for itself (the DaV-nky part at the end of schizophyllu.me.room/room/room.js)
+(function () {
+    try {
+        var old = [];
+        for (var i = 0; i < localStorage.length; i++) {
+            var k = localStorage.key(i), m = /^(run:)?(?!skizy-)[a-z]+-(remedy|restored-said|pills)$/.exec(k);
+            if (m) old.push([k, (m[1] || '') + 'skizy-' + m[2]]);
+        }
+        old.forEach(function (o) {
+            if (localStorage.getItem(o[1]) === null) localStorage.setItem(o[1], localStorage.getItem(o[0]));
+            localStorage.removeItem(o[0]);
+        });
+    } catch (e) {}
+})();
+
 (function () {
     var MAX = 8;
 
@@ -77,12 +94,12 @@
         // reset 2: the boat dropped on the traveller (sky/ground-sea.js). after it, an anchor
         boat:     { name: 'the boat, dropped on the traveller',       live: [2], patch: 'a heavy anchor: the boat can’t be lifted high',
                     slots: ['assets/sea/ship'], patchSlots: ['assets/sea/anchor'] },
-        // reset 3, ingestion: the pills (Mel's room across the street: take a bottle from her bathroom cabinet and talk her
+        // reset 3, ingestion: the pills (skizy's room across the street: take a bottle from her bathroom cabinet and talk her
         // into them; when the lights go out, the visitor can't live with it, and goes off the roof. schizophyllu.me.room/
-        // room/room.js, the end, and sky/resets.js melDeath: the next reset starts on the porch). after reset 3 her room
+        // room/room.js, the end, and sky/resets.js skizyDeath: the next reset starts on the porch). after reset 3 her room
         // stays quiet until the P(Doom) record brings it back (5 visits). (the kitchen's serpent, from reset 3 on, is only
         // a serpent: sky/kitchen.js)
-        pills:    { name: 'the pills, in Mel\u2019s room (then the roof)', live: [3], patch: 'Mel\u2019s room stays quiet (give her the P(Doom) record, and visit)',
+        pills:    { name: 'the pills, in skizy\u2019s room (then the roof)', live: [3], patch: 'skizy\u2019s room stays quiet (give her the P(Doom) record, and visit)',
                     slots: [], patchSlots: [] },
         // reset 4: the book that opens the dungeon is missing; the grimoire in the attic: the pact, dragged down to the
         // brimstone and the voice (sky/hell.js), back with a white revolver; the Claubes and the six pictures round the

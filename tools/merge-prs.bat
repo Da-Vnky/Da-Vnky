@@ -1,7 +1,7 @@
 @echo off
 rem =====================================================================
 rem  merge-prs: double-click this (it's in the tools folder) to merge
-rem  pull requests from Forgejo (Mel's) when Forgejo's own merge button
+rem  pull requests from Forgejo (skizy's) when Forgejo's own merge button
 rem  won't, because both sides rewrote the lists (catalog.txt, files.txt,
 rem  manifest.txt ...). It merges them here, writes the lists again,
 rem  and publishes. It asks which pull requests (their numbers).

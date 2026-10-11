@@ -3,7 +3,7 @@
    the moment a reset happens.
    It asks first, then forgets everything: the site's copy of itself in the
    visitor's browser (sky/loader.js) and everything they've done here (which
-   reset they're in, the hearts, the P(Doom) record, Mel's scare, the settings:
+   reset they're in, the hearts, the P(Doom) record, skizy's scare, the settings:
    sky/state.js). The white, and then the homepage, as a brand-new visitor.
    A reset (sky/lives.js, when the last heart goes) looks the same: a flashbang,
    the world goes white and shows what it really is, and then it starts again,
@@ -82,7 +82,7 @@
     var busy = false;
     // a reset: the white, the world under it, and then the homepage (how = what changes in the save, while it's white).
     // a death can ask for somewhere else to come to (localStorage "dav-wake-at", a page of the site, e.g. reset 3's
-    // "living.html#porch": sky/resets.js melDeath). once only
+    // "living.html#porch": sky/resets.js skizyDeath). once only
     function wakeAt() {
         var w = null;
         try { w = localStorage.getItem('dav-wake-at'); localStorage.removeItem('dav-wake-at'); } catch (e) {}
@@ -125,7 +125,7 @@
                 '<button type="button" class="rm-next">the next reset</button>' +
                 '<p class="cp-note">or start one from the beginning:</p><div class="rm-grid">' + grid + '</div>' +
                 '<button type="button" class="rm-fresh">start over: a brand-new visitor</button>' +
-                '<p class="cp-note">(a brand-new visitor forgets everything: the reset, the P(Doom) record, Mel\u2019s scare, your settings.)</p>';
+                '<p class="cp-note">(a brand-new visitor forgets everything: the reset, the P(Doom) record, skizy\u2019s scare, your settings.)</p>';
             body.querySelector('.rm-next').addEventListener('click', function () { reset(); });
             body.querySelectorAll('.rm-grid button').forEach(function (b) {
                 b.addEventListener('click', function () { var k = +b.dataset.n; reset(function () { S.goTo(k); }); });

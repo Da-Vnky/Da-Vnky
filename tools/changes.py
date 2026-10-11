@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
 changes.py: the change log's helper. CHANGES.txt (at the top of the repo) says what's changed on the site,
-newest first, in plain words, so Victor, Mel and any Claude working here can catch up. Its top section,
+newest first, in plain words, so Victor, skizy and any Claude working here can catch up. Its top section,
 "not published yet", is where you write what you've just changed (a line each, starting with "- ").
 
 Publishing (tools/publish.bat, tools/publish.sh, the content manager's publish button) runs
 
-    python tools/changes.py take            (or: take --who Mel --also "content push")
+    python tools/changes.py take            (or: take --who skizy --also "content push")
 
 which turns those lines into the commit's message (.git/PUBLISH_MSG, for git commit -F) and moves them
 down into the log under today's date and the name of whoever's publishing. Nothing waiting: it says so
@@ -16,7 +16,7 @@ down into the log under today's date and the name of whoever's publishing. Nothi
     python tools/changes.py show                    prints what's waiting
     python tools/changes.py waiting                 exit code 0 if anything is waiting, 1 if not
 
-A pull request (Mel's way in) works the same: add your lines, then run "take --who Mel" before your last
+A pull request (skizy's way in) works the same: add your lines, then run "take --who skizy" before your last
 commit, and commit with the message it wrote (git commit -F .git/PUBLISH_MSG).
 """
 import datetime, os, re, subprocess, sys

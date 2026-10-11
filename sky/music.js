@@ -636,9 +636,9 @@
     /* ---------------- picking up the song from the last page ---------------- */
     var saved = null;
     try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {}
-    // P(Doom) given to Mel (her room sets mel-remedy): it's at her place now, not in the list (sky/records.js)
+    // P(Doom) given to skizy (her room sets skizy-remedy): it's at her place now, not in the list (sky/records.js)
     try {
-        if (saved && saved.tracks && localStorage.getItem('mel-remedy') !== null) {
+        if (saved && saved.tracks && localStorage.getItem('skizy-remedy') !== null) {
             var was = saved.tracks[saved.at];
             saved.tracks = saved.tracks.filter(function (x) { return x.special !== 'doom'; });
             saved.at = was && was.special !== 'doom' ? saved.tracks.indexOf(was) : -1;

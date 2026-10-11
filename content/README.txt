@@ -151,9 +151,9 @@ list.txt naming its files. You never need to write it by hand:
 
   • The site also asks two other places, so it can still find files you upload
     some other way (e.g. through the Forgejo website, where the hook doesn't run):
-      – the server's own folder listing, if Mel's server shows one
+      – the server's own folder listing, if skizy's server shows one
         (for Caddy that's "file_server browse"; nginx: "autoindex on")
-      – your Forgejo repo's API, if Mel's Forgejo lets browsers ask it
+      – your Forgejo repo's API, if skizy's Forgejo lets browsers ask it
         (the address is set near the top of sky/sky.js as REPO_API)
     If either is switched on, dropping in a file is truly all it takes.
 

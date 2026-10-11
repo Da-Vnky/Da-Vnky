@@ -1,7 +1,7 @@
 @echo off
 rem =====================================================================
 rem  pull: double-click this (it's in the tools folder) to get the latest
-rem  version of the site from Forgejo: whatever Mel (or anyone else) has
+rem  version of the site from Forgejo: whatever skizy (or anyone else) has
 rem  pushed since you last published or pulled.
 rem    - your own changes that aren't published yet stay as they are
 rem    - if the same file was changed here AND on Forgejo, it keeps a

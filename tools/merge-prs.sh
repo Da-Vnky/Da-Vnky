@@ -1,5 +1,5 @@
 #!/bin/sh
-# merge-prs.sh — merges pull requests (Mel's) from Forgejo into the site, here on this computer, and publishes
+# merge-prs.sh — merges pull requests (skizy's) from Forgejo into the site, here on this computer, and publishes
 # the result. For when Forgejo's own merge button won't: it says "changes conflicting with the target branch"
 # because both sides rewrote the lists (catalog.txt, files.txt, manifest.txt, list.txt …). Those are made by
 # tools/update-lists.sh, never by hand, so here they're simply written again, and nothing is lost.
@@ -53,7 +53,7 @@ for n in "$@"; do
         git branch -D --quiet "pr-$n"
         continue
     fi
-    if git merge --no-ff --no-edit -m "merge pull request #$n (Mel)" "pr-$n" >/dev/null 2>&1; then
+    if git merge --no-ff --no-edit -m "merge pull request #$n (skizy)" "pr-$n" >/dev/null 2>&1; then
         echo "    merged."
     else
         # a clash: fine if it's only the lists (they're written again below); anything else, stop and undo this one

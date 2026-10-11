@@ -1,0 +1,9 @@
+/* skizy-room.css: DaV-nky's own touches in skizy's room (schizophyllu.me.room/room/room.js, the DaV-nky part at the end
+   links this when it needs it). The sky through her window has its own: skizy-window.css; the hotbar: skizy-inventory.css.
+   (not on any page of ours: smoke.py's check is for the pages' own lists) */
+
+/* Claube's pen (assets/skizy-room/main-claube-pen), over Victor's Claube: always in his hand (room.js davPen holds it
+   still, and plays it while he writes). Victor's Claube as an SVG might keep a drawn pen of its own, class "pen": his
+   pen picture takes its place */
+#claube.dav-has-pen > .pen,
+#claube.dav-has-pen > g:not(.dav-hit) .pen { display: none; }

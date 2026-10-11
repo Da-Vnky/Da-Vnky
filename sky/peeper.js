@@ -12,18 +12,18 @@
    Click a window on the skyline (telescope down) and it comes up already aimed at
    it. There are no arrows: you find the rooms by looking.
 
-   MEL'S WINDOW: one building on the front row is abandoned, every window dark,
+   SKIZY'S WINDOW: one building on the front row is abandoned, every window dark,
    except one that's boarded up. Click it: knock, and keep knocking, and the boards
    come off one by one until you're in. Behind the last board it's dark for a
-   moment (MEL.dark_secs), then the room fades up out of the black: Mel's room, her
+   moment (SKIZY.dark_secs), then the room fades up out of the black: skizy's room, her
    own (schizophyllu.me.room/, she made it), there through the glass. "[ climb in ]"
    and you're in it, on its own page; its "back to the rooftop" brings you back here.
    (there used to be a jump scare in the dark, before reset 3 became ingestion: gone.)
    slots:
-       assets/city/mel-board       one board (a plank, wider than tall; it's stretched)
+       assets/city/skizy-board       one board (a plank, wider than tall; it's stretched)
    sounds: assets/sounds/knock, crack
-   the words (and who says them): MEL near the top of this file. on your own skyline art, say where her
-   window is: "mel": [x%, y%, w%, h%] in assets/city/skyline-front-windows.json
+   the words (and who says them): SKIZY near the top of this file. on your own skyline art, say where her
+   window is: "skizy": [x%, y%, w%, h%] in assets/city/skyline-front-windows.json
 
    files: pictures (.png .jpg .jpeg .webp .gif .svg), video (.mp4 .webm, plays muted
    on loop) or a bit of .html. order: by file name. caption: from the file name,
@@ -36,12 +36,12 @@
     if (!btn || !Sky.city) return;
     var MEDIA = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'mp4', 'webm', 'html'];
     var EVENING = 0.84;                        // the hour the telescope turns it to: dark enough for every window to be lit
-    var MEL = {
-        title: 'mel\u2019s room',
+    var SKIZY = {
+        title: 'skizy\u2019s room',
         boards: 5,                                  // how many boards to pull off
         first: 'knock knock\u2026 nobody answers. try again?',
         more: ['something shifts behind the boards.', 'a board splinters.', 'the wood gives a little more.', 'one more\u2026', ''],
-        inside: 'mel\u2019s room',
+        inside: 'skizy\u2019s room',
         dark_secs: 1.5,                                    // how long it's dark in there after the last board, before the room fades up
         lit: 'something inside is lit.',
         climb: '[ climb in ]'
@@ -72,7 +72,7 @@
     document.body.appendChild(scene);
     var viewEl = scene.querySelector('.ps-view'), titleEl = scene.querySelector('.ps-title');
 
-    var scenes = [], chosen = [], at = 0, state = 'off', melWin = null;
+    var scenes = [], chosen = [], at = 0, state = 'off', skizyWin = null;
     var Z = 2.8, pan = { x: 0, y: 0 };
 
     function frontInfo() { return Sky.city.front; }
@@ -84,15 +84,15 @@
         if (!fr) return;
         frontSvg = fr.svg;
         spots.style.transform = frontSvg.style.transform;
-        melWin = fr.mel || null;
-        if (melWin) {
+        skizyWin = fr.skizy || null;
+        if (skizyWin) {
             var m = document.createElement('button');
             m.type = 'button';
-            m.className = 'peep-spot mel';
-            m.style.left = (melWin.x - 0.5) + 'px'; m.style.top = (melWin.y - 0.5) + 'px';
-            m.style.width = (melWin.w + 1) + 'px'; m.style.height = (melWin.h + 1) + 'px';
+            m.className = 'peep-spot skizy';
+            m.style.left = (skizyWin.x - 0.5) + 'px'; m.style.top = (skizyWin.y - 0.5) + 'px';
+            m.style.width = (skizyWin.w + 1) + 'px'; m.style.height = (skizyWin.h + 1) + 'px';
             m.setAttribute('aria-label', 'a boarded-up window');
-            m.addEventListener('click', function (e) { e.stopPropagation(); if (!dragged) melPeek(); });
+            m.addEventListener('click', function (e) { e.stopPropagation(); if (!dragged) skizyPeek(); });
             m.addEventListener('mouseenter', function () { if (state === 'looking') note.textContent = 'a boarded-up window. there\u2019s a light on behind it.'; });
             m.addEventListener('mouseleave', function () { if (state === 'looking') note.textContent = hintText(); });
             spots.appendChild(m);
@@ -324,29 +324,29 @@
         note.textContent = scenes[i].title;
     }
     function leaveScene(quiet) {
-        var wasMel = scene.classList.contains('mel');
-        melRun++;
-        viewEl.querySelectorAll('.mel-live').forEach(function (b) { b.remove(); });   // (her room, live: closed, not left running out of sight)
-        scene.querySelectorAll('.mel-climb').forEach(function (b) { b.remove(); });
+        var wasSkizy = scene.classList.contains('skizy');
+        skizyRun++;
+        viewEl.querySelectorAll('.skizy-live').forEach(function (b) { b.remove(); });   // (her room, live: closed, not left running out of sight)
+        scene.querySelectorAll('.skizy-climb').forEach(function (b) { b.remove(); });
         scene.classList.remove('climbing');
-        document.body.classList.remove('peep-mel');
-        scene.classList.remove('drawn', 'mel', 'in', 'void');
-        scene.querySelectorAll('.mel-planks').forEach(function (b) { b.remove(); });
+        document.body.classList.remove('peep-skizy');
+        scene.classList.remove('drawn', 'skizy', 'in', 'void');
+        scene.querySelectorAll('.skizy-planks').forEach(function (b) { b.remove(); });
         document.body.classList.remove('peep-close');
         viewEl.querySelectorAll('video').forEach(function (v) { v.pause(); });
         if (quiet) return;
         state = 'looking';
         document.body.classList.add('peep-view');
-        if (wasMel && melWin) { aimAt(melWin, 650); note.textContent = hintText(); }
+        if (wasSkizy && skizyWin) { aimAt(skizyWin, 650); note.textContent = hintText(); }
         else { aim(at, 650); note.textContent = scenes[at] ? scenes[at].title : hintText(); }
     }
     btn.addEventListener('click', function () { lookThrough(); });
 
-    /* ---------------- mel's window ---------------- */
-    var melState = { knocks: 0, off: 0 };
-    try { if (sessionStorage.getItem('mel-in') === '1') { melState.off = MEL.boards; document.body.classList.add('mel-in'); } } catch (e) {}
-    var melRun = 0;
-    function later(run, ms, fn) { setTimeout(function () { if (run === melRun && scene.classList.contains('mel')) fn(); }, ms); }
+    /* ---------------- skizy's window ---------------- */
+    var skizyState = { knocks: 0, off: 0 };
+    try { if (sessionStorage.getItem('skizy-in') === '1') { skizyState.off = SKIZY.boards; document.body.classList.add('skizy-in'); } } catch (e) {}
+    var skizyRun = 0;
+    function later(run, ms, fn) { setTimeout(function () { if (run === skizyRun && scene.classList.contains('skizy')) fn(); }, ms); }
     var sfx = Sky.sfx;
     function art(slot, fallback, box) {
         box.innerHTML = fallback;
@@ -357,16 +357,16 @@
             else box.innerHTML = '<img alt="" src="' + url + '">';
         });
     }
-    // her room, live: Mel's own (schizophyllu.me.room/, with ?peek: no telescope, no sound, nothing to click),
+    // her room, live: skizy's own (schizophyllu.me.room/, with ?peek: no telescope, no sound, nothing to click),
     // scaled to fill the window
     var ROOM = 'schizophyllu.me.room/index.html';
     function buildRoom() {
         var box = document.createElement('div');
-        box.className = 'mel-live';
+        box.className = 'skizy-live';
         box.setAttribute('role', 'button');
         box.setAttribute('aria-label', 'climb in through the window');
         var f = document.createElement('iframe');
-        f.title = 'mel\u2019s room'; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
+        f.title = 'skizy\u2019s room'; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
         f.src = ROOM + '?peek';
         box.appendChild(f);
         function fit() { var k = Math.max(box.clientWidth / 1600, box.clientHeight / 900) || 0.3; f.style.transform = 'translate(-50%, -50%) scale(' + k.toFixed(4) + ')'; }
@@ -375,97 +375,97 @@
         box.addEventListener('click', climbIn);
         return box;
     }
-    window.addEventListener('resize', function () { var b = viewEl.querySelector('.mel-live'); if (b) b._fit(); });
+    window.addEventListener('resize', function () { var b = viewEl.querySelector('.skizy-live'); if (b) b._fit(); });
     // in through the window: into her room, for real (its own page; its "back to the rooftop" brings them back here)
     function climbIn(e) {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         if (!scene.classList.contains('in') || scene.classList.contains('climbing')) return;
         scene.classList.add('climbing');
         sfx('step', { size: 0.5 }); setTimeout(function () { sfx('step', { size: 0.6 }); }, 380);
-        var t = document.body.appendChild(Object.assign(document.createElement('div'), { className: 'mel-through' }));
+        var t = document.body.appendChild(Object.assign(document.createElement('div'), { className: 'skizy-through' }));
         requestAnimationFrame(function () { t.classList.add('on'); });
         setTimeout(function () { location.href = ROOM + '?from=dav-nky'; }, 1100);
     }
     // in through the window: a moment's dark, and then her room fades up out of the black
-    function melScene(fresh) {
-        var run = ++melRun;
+    function skizyScene(fresh) {
+        var run = ++skizyRun;
         scene.classList.add('void');
         note.textContent = '';
-        later(run, fresh ? MEL.dark_secs * 1000 : 250, function () {
-            scene.classList.remove('void');                             // (.mel-dark fades out over the room: see the css above)
+        later(run, fresh ? SKIZY.dark_secs * 1000 : 250, function () {
+            scene.classList.remove('void');                             // (.skizy-dark fades out over the room: see the css above)
             lightsUp(run);
         });
     }
     function lightsUp(run) {
-        var room = viewEl.querySelector('.mel-live');
+        var room = viewEl.querySelector('.skizy-live');
         if (!room) { room = buildRoom(); viewEl.insertBefore(room, viewEl.firstChild); }
         scene.classList.add('in');
-        titleEl.textContent = MEL.inside;
-        note.textContent = MEL.lit;
-        var go = scene.querySelector('.mel-climb');
+        titleEl.textContent = SKIZY.inside;
+        note.textContent = SKIZY.lit;
+        var go = scene.querySelector('.skizy-climb');
         if (!go) {
             go = document.createElement('button');
             go.type = 'button';
-            go.className = 'mel-climb';
-            go.textContent = MEL.climb;
+            go.className = 'skizy-climb';
+            go.textContent = SKIZY.climb;
             go.addEventListener('click', climbIn);
             scene.querySelector('.ps-frame').appendChild(go);
         }
     }
-    function melPeek() {
-        if (state !== 'looking' || !melWin) return;
+    function skizyPeek() {
+        if (state !== 'looking' || !skizyWin) return;
         state = 'scene';
-        applyPan(26, panFor(melWin, 26), 700);
+        applyPan(26, panFor(skizyWin, 26), 700);
         viewEl.innerHTML = '';
         viewEl.appendChild(buildRoom());                                 // (behind the boards and the dark, till it's lit)
-        viewEl.insertAdjacentHTML('beforeend', '<div class="mel-dark"></div>');
-        titleEl.textContent = melState.off >= MEL.boards ? MEL.inside : 'a boarded-up window';
-        scene.classList.add('mel');
+        viewEl.insertAdjacentHTML('beforeend', '<div class="skizy-dark"></div>');
+        titleEl.textContent = skizyState.off >= SKIZY.boards ? SKIZY.inside : 'a boarded-up window';
+        scene.classList.add('skizy');
         scene.classList.remove('in', 'void');
         var frame = scene.querySelector('.ps-frame'), wrap = document.createElement('div');
-        wrap.className = 'mel-planks';
+        wrap.className = 'skizy-planks';
         wrap.setAttribute('role', 'button');
         wrap.setAttribute('aria-label', 'knock on the boards');
         var tilts = [-6, 4, -3, 7, -5, 3, -4];
-        for (var b = 0; b < MEL.boards; b++) {
+        for (var b = 0; b < SKIZY.boards; b++) {
             var d = document.createElement('div');
-            d.className = 'mel-board' + (b < melState.off ? ' gone' : '');
-            d.style.top = (6 + b * (84 / MEL.boards)) + '%';
+            d.className = 'skizy-board' + (b < skizyState.off ? ' gone' : '');
+            d.style.top = (6 + b * (84 / SKIZY.boards)) + '%';
             d.style.transform = 'rotate(' + tilts[b % tilts.length] + 'deg)';
-            d.dataset.asset = 'assets/city/mel-board';
+            d.dataset.asset = 'assets/city/skizy-board';
             wrap.appendChild(d);
         }
-        if (melState.off >= MEL.boards) wrap.style.pointerEvents = 'none';
+        if (skizyState.off >= SKIZY.boards) wrap.style.pointerEvents = 'none';
         frame.appendChild(wrap);
         Sky.fillAssets(wrap);
         wrap.addEventListener('click', knockKnock);
-        document.body.classList.add('peep-close', 'peep-mel');
+        document.body.classList.add('peep-close', 'peep-skizy');
         document.body.classList.remove('peep-view');
-        note.textContent = melState.off >= MEL.boards ? '' : 'click the boards to knock';
-        if (melState.off >= MEL.boards) setTimeout(function () { if (scene.classList.contains('mel')) melScene(false); }, 750);
+        note.textContent = skizyState.off >= SKIZY.boards ? '' : 'click the boards to knock';
+        if (skizyState.off >= SKIZY.boards) setTimeout(function () { if (scene.classList.contains('skizy')) skizyScene(false); }, 750);
     }
     function knockKnock() {
-        if (!scene.classList.contains('mel') || melState.off >= MEL.boards) return;
-        var boards = scene.querySelectorAll('.mel-board');
+        if (!scene.classList.contains('skizy') || skizyState.off >= SKIZY.boards) return;
+        var boards = scene.querySelectorAll('.skizy-board');
         boards.forEach(function (b) { if (!b.classList.contains('gone')) { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); } });
-        melState.knocks++;
-        if (melState.knocks === 1) {                                // the first time, just a knock
+        skizyState.knocks++;
+        if (skizyState.knocks === 1) {                                // the first time, just a knock
             Sky.sfx('knock');
-            note.textContent = MEL.first;
+            note.textContent = SKIZY.first;
             return;
         }
-        var board = boards[melState.off];                            // then a board comes off with each one, from the top
+        var board = boards[skizyState.off];                            // then a board comes off with each one, from the top
         Sky.sfx('crack');
-        var fall = (melState.off % 2 ? 1 : -1);
+        var fall = (skizyState.off % 2 ? 1 : -1);
         board.style.transform = 'translate(' + (fall * 30) + '%, 260%) rotate(' + (fall * (40 + Math.random() * 30)) + 'deg)';
         board.classList.add('gone');
-        melState.off++;
-        note.textContent = MEL.more[Math.min(MEL.more.length - 1, melState.off - 1)] || '';
-        if (melState.off >= MEL.boards) {                            // in
-            try { sessionStorage.setItem('mel-in', '1'); } catch (e) {}
-            document.body.classList.add('mel-in');
-            scene.querySelector('.mel-planks').style.pointerEvents = 'none';
-            setTimeout(function () { if (scene.classList.contains('mel')) melScene(true); }, 700);
+        skizyState.off++;
+        note.textContent = SKIZY.more[Math.min(SKIZY.more.length - 1, skizyState.off - 1)] || '';
+        if (skizyState.off >= SKIZY.boards) {                            // in
+            try { sessionStorage.setItem('skizy-in', '1'); } catch (e) {}
+            document.body.classList.add('skizy-in');
+            scene.querySelector('.skizy-planks').style.pointerEvents = 'none';
+            setTimeout(function () { if (scene.classList.contains('skizy')) skizyScene(true); }, 700);
         }
     }
 
@@ -477,7 +477,7 @@
         function d(w) { var b = baseXY(w); return Math.hypot(b.x - cx, b.y - cy); }
         var best = null, bd = 1e9;
         chosen.forEach(function (w, i) { var k = d(w); if (k < 16 && k < bd) { bd = k; best = { win: w, scene: i }; } });
-        if (melWin && d(melWin) < 16 && d(melWin) < bd) { bd = d(melWin); best = { win: melWin, mel: true }; }
+        if (skizyWin && d(skizyWin) < 16 && d(skizyWin) < bd) { bd = d(skizyWin); best = { win: skizyWin, skizy: true }; }
         if (best) return best;
         fr.windows.forEach(function (w) { var k = d(w); if (k < 10 && k < bd) { bd = k; best = { win: w }; } });
         return best;
@@ -496,7 +496,7 @@
         if (!t) return;
         e.preventDefault();
         if (t.scene != null) { at = t.scene; t.then = function () { peek(t.scene); }; }
-        if (t.mel) t.then = melPeek;
+        if (t.skizy) t.then = skizyPeek;
         lookThrough(t);
     });
     document.addEventListener('pointermove', function (e) {

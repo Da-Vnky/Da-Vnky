@@ -39,8 +39,8 @@
        stuck. It plays Victor's reversed song, assets/sounds/evilrecord (.ogg or .mp3), or
        until he adds one, P(Doom) played backwards, made in the browser (sky/music.js).
      • reset 5 on: P(Doom) is back, found or not, purified: glowing rainbow, a rainbow ring
-       on the record. Now it can be given to Mel (her room sets localStorage mel-remedy):
-       then it's at her place, and the slot's empty, "at Mel's" under it.
+       on the record. Now it can be given to skizy (her room sets localStorage skizy-remedy):
+       then it's at her place, and the slot's empty, "at skizy's" under it.
    ===================================================================== */
 
 (function () {
@@ -50,7 +50,7 @@
     var M = Sky.music, audio = M.audio;
     var AUDIO = ['mp3', 'ogg'], PICS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'];
     var DOOM = /p\s*\(\s*doom\s*\)/i;
-    function doomGiven() { try { return localStorage.getItem('mel-remedy') !== null; } catch (e) { return false; } }
+    function doomGiven() { try { return localStorage.getItem('skizy-remedy') !== null; } catch (e) { return false; } }
     var invertedSong = null;
     Sky.findAsset('assets/sounds/evilrecord.ogg|assets/sounds/evilrecord.mp3', function (u) { invertedSong = u || null; if (doomEntry) refill(); });
     var LABELS = ['#9a3b1f', '#c49a52', '#3f5a55', '#6e2f24', '#56636f', '#8a3f6e', '#b88c5e', '#28323b'];
@@ -235,10 +235,10 @@
             e.className = 'rp-special-empty';
             box.appendChild(e);
         }
-        // its caption, always showing: the record's name, or ??? until it's found (at Mel's, once she has it)
+        // its caption, always showing: the record's name, or ??? until it's found (at skizy's, once she has it)
         var cap = document.createElement('span');
         cap.className = 'rp-special-name';
-        cap.textContent = special ? special.title : doomGiven() && pure() ? 'at Mel\u2019s' : '???';
+        cap.textContent = special ? special.title : doomGiven() && pure() ? 'at skizy\u2019s' : '???';
         box.appendChild(cap);
         sleeves.appendChild(box);
     }

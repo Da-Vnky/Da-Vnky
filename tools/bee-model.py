@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-bee-model.py — puts Mel's BeeLLM (or any tiny model like it) on the site, for the bee in the front garden.
+bee-model.py — puts skizy's BeeLLM (or any tiny model like it) on the site, for the bee in the front garden.
 
 The site can't serve .gguf files (the server only hands out pictures, sounds, pages, code, .json and .txt),
 so this reads the model and writes it out as content/bee/beellm.json, which sky/bee.js runs right there in
 each visitor's browser. Nothing is sent anywhere.
 
-    python tools/bee-model.py                       finds Mel's bee in your Ollama folder and writes it
+    python tools/bee-model.py                       finds skizy's bee in your Ollama folder and writes it
     python tools/bee-model.py path\\to\\model.gguf    a .gguf file of your own
     python tools/bee-model.py hf.co/someone/Model:tag    another model you've pulled into Ollama
 
@@ -19,7 +19,7 @@ import base64, json, os, struct, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'content', 'bee', 'beellm.json')
-MEL = 'hf.co/schizophyllume/BeeLLM:BeeLLM-42P-Chaos.gguf'      # (the bee Mel made)
+SKIZY = 'hf.co/schizophyllume/BeeLLM:BeeLLM-42P-Chaos.gguf'      # (the bee skizy made)
 BIGGEST = 4_000_000                                             # numbers; past this a browser would struggle
 
 
@@ -128,7 +128,7 @@ def _count(dims):
 
 
 def main():
-    arg = sys.argv[1] if len(sys.argv) > 1 else MEL
+    arg = sys.argv[1] if len(sys.argv) > 1 else SKIZY
     path = arg if os.path.isfile(arg) else from_ollama(arg)
     meta, tensors = read_gguf(path)
     arch = meta.get('general.architecture', '')

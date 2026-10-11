@@ -5,14 +5,14 @@
    A slot is found on the page by:
      data-asset="assets/…"   (the usual: an element that's filled with your picture; "a|b" = either name)
      data-slot="assets/…"    (a piece a script fills itself marks where it is with this)
-     data-art="room/objects/<room>/<thing>.svg"   (Mel's room: that thing's slot is assets/mel-room/<room>-<thing>)
+     data-art="room/objects/<room>/<thing>.svg"   (skizy's room: that thing's slot is assets/skizy-room/<room>-<thing>)
    It only counts what's showing: on the screen, and not hidden (display: none, invisible, see-through). */
 (function () {
     function names(el) {
         if (el.dataset.asset) return el.dataset.asset.split('|');
         if (el.dataset.slot) return [el.dataset.slot];
         var m = /objects\/([a-z0-9]+)\/([a-z0-9-]+)\.svg$/i.exec(el.getAttribute('data-art') || '');
-        return m ? ['assets/mel-room/' + (m[1] + '-' + m[2]).toLowerCase()] : [];
+        return m ? ['assets/skizy-room/' + (m[1] + '-' + m[2]).toLowerCase()] : [];
     }
     function showing(win, el) {
         if (win.getComputedStyle(el).visibility === 'hidden') return false;

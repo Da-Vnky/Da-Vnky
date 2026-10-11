@@ -41,18 +41,18 @@
     stroke: rgba(0, 0, 0, .45);
     stroke-width: 1;
 }
-.ground-city .mel-leak {
+.ground-city .skizy-leak {
     fill: #ffb866;
     filter: drop-shadow(0 0 3px rgba(255, 170, 90, .9));
-    animation: mel-flicker 3.4s ease-in-out infinite;
+    animation: skizy-flicker 3.4s ease-in-out infinite;
 }
-.ground-city .mel-boards {
+.ground-city .skizy-boards {
     fill: #5b4030;
 }
-body.mel-in .ground-city .mel-boards {
+body.skizy-in .ground-city .skizy-boards {
     display: none;
 }
-body.mel-in .ground-city .mel-leak {
+body.skizy-in .ground-city .skizy-leak {
     fill: #ffd28a;
     animation: none;
 }
@@ -61,12 +61,12 @@ body.mel-in .ground-city .mel-leak {
 body.peep-view .ground-city .layer,
 body.peep-close .ground-city .layer,
 body.peep-settling .ground-city .layer,
-body.peep-view .ground-city .mel-leak,
-body.peep-close .ground-city .mel-leak,
-body.peep-settling .ground-city .mel-leak {
+body.peep-view .ground-city .skizy-leak,
+body.peep-close .ground-city .skizy-leak,
+body.peep-settling .ground-city .skizy-leak {
     filter: none !important;
 }
-@keyframes mel-flicker {
+@keyframes skizy-flicker {
     0%,
     100% {
         opacity: .55;

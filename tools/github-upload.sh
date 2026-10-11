@@ -5,7 +5,7 @@
 # tools\github-upload.bat runs it (it asks for the address the first time).
 #
 # it
-#   1. gets anything new from Forgejo first (tools/pull.sh: Mel's changes), so GitHub gets the latest
+#   1. gets anything new from Forgejo first (tools/pull.sh: skizy's changes), so GitHub gets the latest
 #   2. remembers the GitHub address (git calls it the "github" remote; Forgejo stays "origin")
 #   3. sends everything you've published to GitHub. Changes you haven't published yet stay here: they don't
 #      go (publish first if you want the cloud sessions to have them). Nor does anything .gitignore keeps out
@@ -45,7 +45,7 @@ PAGE=$(printf '%s' "$URL" | sed 's#\.git$##')
 
 # --- 1. the latest from Forgejo
 echo
-echo "  1. getting anything new from Forgejo first (Mel's changes)..."
+echo "  1. getting anything new from Forgejo first (skizy's changes)..."
 if ! tr -d '\r' < tools/pull.sh | sh -s -- --quiet; then
     echo
     echo "  So nothing's gone to GitHub. Your folder is just as it was."

@@ -13,7 +13,7 @@
 #
 # it needs Playwright, once:   pip install playwright   then   python -m playwright install chromium
 # nothing shows on screen: the browser is hidden. it serves the site itself (like tools/preview), on
-# its own port, and only looks at the site's own files: fonts, the weather and Mel's live site (on the
+# its own port, and only looks at the site's own files: fonts, the weather and skizy's live site (on the
 # CRT in her room) come from elsewhere and don't count.
 # it only ever reads the site; it never changes a file.
 
@@ -36,8 +36,8 @@ STOPS = [
     ('the dungeon', 'living.html#dungeon'),
     ('the template', 'template.html'),
     ('beyond (the end, gone home)', 'beyond.html'),
-    ("mel's room", 'schizophyllu.me.room/index.html?from=dav-nky'),
-    ("mel's room, through the window", 'schizophyllu.me.room/index.html?peek'),
+    ("skizy's room", 'schizophyllu.me.room/index.html?from=dav-nky'),
+    ("skizy's room, through the window", 'schizophyllu.me.room/index.html?peek'),
 ]
 
 # things that are fine and expected (see CLAUDE.md, "Testing"): a line of trouble is skipped if it has one of these in it
@@ -64,7 +64,7 @@ STILL_SCRIPT = '''
   window.requestAnimationFrame = cb => raf(() => cb(0));
   const hold = () => {
     const s = document.createElement('style');
-    // (pages shown inside pages, like Mel's live site on her CRT, come from elsewhere and change: hidden)
+    // (pages shown inside pages, like skizy's live site on her CRT, come from elsewhere and change: hidden)
     s.textContent = '*, *::before, *::after { animation: none !important; transition: none !important; caret-color: transparent !important; } iframe { visibility: hidden !important; }';
     (document.head || document.documentElement).appendChild(s);
   };
@@ -175,7 +175,7 @@ def main():
     ap = argparse.ArgumentParser(description='open every page in a hidden browser and report anything that goes wrong')
     ap.add_argument('--resets', default='1', help='which resets: 1, 1-8, 3,4 … (default: 1)')
     ap.add_argument('--shots', help='also save a picture of every page into this folder')
-    ap.add_argument('--only', help='just the stops whose name has this in it (e.g. "mel")')
+    ap.add_argument('--only', help='just the stops whose name has this in it (e.g. "skizy")')
     ap.add_argument('--still', action='store_true', help='hold the clock, chance and animations still, so pictures can be compared')
     args = ap.parse_args()
 
@@ -199,11 +199,11 @@ def main():
             ctx = browser.new_context(viewport={'width': 1600, 'height': 900})
             if args.still:
                 ctx.add_init_script(STILL_SCRIPT)
-                # and nothing from outside the site (fonts, the weather, Mel's live site): the internet isn't the same twice
+                # and nothing from outside the site (fonts, the weather, skizy's live site): the internet isn't the same twice
                 ctx.route('**/*', lambda route: route.continue_() if route.request.url.startswith(base) else route.abort())
             page = ctx.new_page()
             page.goto(base + 'index.html?reset=%d' % n, wait_until='load')
-            # (Mel's room would otherwise play its climbing-in scene first; see CLAUDE.md, "Testing")
+            # (skizy's room would otherwise play its climbing-in scene first; see CLAUDE.md, "Testing")
             page.evaluate("localStorage.setItem('room_knocked', '1')")
             for name, url in stops:
                 trouble = []

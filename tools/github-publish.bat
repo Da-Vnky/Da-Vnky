@@ -4,7 +4,7 @@ rem  github-publish: double-click this (it's in the tools folder) after
 rem  approving Claude's changes on GitHub (merging its pull request), to
 rem  put them on the live site. Only while the cloud-session credit lasts:
 rem  your usual publish.bat is unchanged and still publishes your own work.
-rem    1. gets anything new from Forgejo first (Mel's changes)
+rem    1. gets anything new from Forgejo first (skizy's changes)
 rem    2. gets the changes you approved on GitHub and puts them together
 rem       with your folder (it stops, changing nothing, if a file clashes)
 rem    3. publishes to Forgejo like publish.bat (lists, CHANGES.txt)

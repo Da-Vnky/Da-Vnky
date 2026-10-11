@@ -69,7 +69,7 @@
         { id: 'key',     name: 'the key',        egg: 'key',                    shape: 7 }
     ];
 
-    // your Forgejo repo's API address. if Mel's Forgejo allows it, the site asks it
+    // your Forgejo repo's API address. if skizy's Forgejo allows it, the site asks it
     // which files are in each content folder (one of three ways it finds new files).
     var REPO_API = 'https://members.pleroma.nexus/api/v1/repos/subdomains/DaV-nky';
 

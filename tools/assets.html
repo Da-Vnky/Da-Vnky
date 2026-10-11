@@ -347,7 +347,7 @@
     }
 
     /* ---------------- a slot's card ---------------- */
-    // a stand-in that's a file of its own (Mel's room: her drawings, each the size of the whole room), shown
+    // a stand-in that's a file of its own (skizy's room: her drawings, each the size of the whole room), shown
     // zoomed in on the thing (crop: x y w h in the room, measured when the slot was described)
     function stockPic(s) {
         if (!s || !s.stock) return '';
@@ -355,7 +355,7 @@
             '<image href="/' + esc(s.stock) + '" x="0" y="0" width="1600" height="900"/></svg>';
     }
     function preview(f, kind, s) {
-        if (!f && s && s.stock) return '<div class="stock has-pic">' + stockPic(s) + '<small>the stand-in (' + (s.kind === 'svg' ? 'SVG only' : 'Mel\u2019s drawing') + ')</small></div>';
+        if (!f && s && s.stock) return '<div class="stock has-pic">' + stockPic(s) + '<small>the stand-in (' + (s.kind === 'svg' ? 'SVG only' : 'skizy\u2019s drawing') + ')</small></div>';
         if (f && s && s.stock && s.crop && PICS.test(f.name)) return stockPic({ stock: f.url.replace(/^\//, ''), crop: s.crop });
         if (!f) return '<div class="stock">the stand-in<br><small>(' + (kind === 'sound' ? 'the page makes this sound itself' : kind === 'font' ? 'the default lettering' : 'the drawing that’s there now') + ')</small></div>';
         if (PICS.test(f.name)) return '<img alt="" loading="lazy" src="' + f.url + '">';
@@ -444,7 +444,7 @@
     }
     function counts(slots) {
         var need = slots.filter(function (s) { return !s.optional; });
-        if (!need.length) need = slots.filter(function (s) { return !s.twin; });     // (a scene that's all optional, like Mel's room: count them all)
+        if (!need.length) need = slots.filter(function (s) { return !s.twin; });     // (a scene that's all optional, like skizy's room: count them all)
         return { done: need.filter(function (s) { return fileFor(s.slot); }).length, of: need.length };
     }
     function intro(text, page, slots) {
@@ -485,7 +485,7 @@
             if (s.slot === slot) return;
             if (plain(s.slot) === plain(slot)) { out.push(s); return; }
             var a = s.slot.length < slot.length ? s.slot : slot, b = a === slot ? s.slot : slot;
-            if (b.indexOf(a + '-') !== 0 || /^assets\/mel-room\/[a-z]+$/.test(a)) return;    // (Mel's room: the backdrop isn't every thing's family)
+            if (b.indexOf(a + '-') !== 0 || /^assets\/skizy-room\/[a-z]+$/.test(a)) return;    // (skizy's room: the backdrop isn't every thing's family)
             out.push(s);
         });
         if (slotInfo(slot).glow && !out.some(function (x) { return x.slot === slot + '-glow'; })) out.push({ slot: slot + '-glow', what: 'its glow twin: fades in at dusk', optional: true });
@@ -560,7 +560,7 @@
                 var v = (sc.map.views || []).filter(function (x) { return x.name === M.view; })[0];
                 if (v) try { new frame.contentWindow.Function(v.do)(); } catch (e) { say('couldn’t show “' + v.name + '”: ' + e.message, true); }
                 var t0 = Date.now();
-                (function settle() {                                  // (until: the state's there, e.g. Mel's roof; at most 15 s)
+                (function settle() {                                  // (until: the state's there, e.g. skizy's roof; at most 15 s)
                     if (frame.src !== src) return;
                     var done = true;
                     if (v && v.until) try { done = !!new frame.contentWindow.Function('return (' + v.until + ')')(); } catch (e) { done = true; }

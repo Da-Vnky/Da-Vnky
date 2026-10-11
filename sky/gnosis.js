@@ -20,7 +20,7 @@
                    the sky stops.
      the choice    a door of light on the horizon. go home: "escaped", and from then
                    on the whole site is beyond.html (sky/beyond.js): space, and the
-                   last of the music. or stay, and wake the others (Mel): "stayed",
+                   last of the music. or stay, and wake the others (skizy): "stayed",
                    the world in its colours again, no more resets (html.free-world;
                    sky/state.js davSave.ending / free). both are kept between visits
                    till "forget your stay".
@@ -55,11 +55,11 @@
     var CLAIMS = S.RESETS.slice(0, 7).map(function (r) { return r.claim; });
     var LAST = 'I came from the Light, and to the Light I am going.';
 
-    /* ---------------- the stayed world: quiet, and a nudge towards Mel ---------------- */
+    /* ---------------- the stayed world: quiet, and a nudge towards skizy ---------------- */
     if (S.free) {
         if (get('free-said') !== '1' && !S.posting) setTimeout(function () {
             put('free-said', '1');
-            Sky.speak(['It’s quiet. The sky’s only the sky now.', 'Mel’s still in the dark, across from the rooftop. Someone has to bring her back.'], null, { hold: 3000 });
+            Sky.speak(['It’s quiet. The sky’s only the sky now.', 'skizy’s still in the dark, across from the rooftop. Someone has to bring her back.'], null, { hold: 3000 });
         }, 4000);
         Sky.gnosis = { knows: true };
         return;
@@ -236,7 +236,7 @@
         body.appendChild(door);
         requestAnimationFrame(function () { door.classList.add('open'); });
         sfx('door-open', { or: 'shimmer' });
-        Sky.speak(['It can’t see me any more.', 'The door’s open. I could go home.', '…But Mel’s still asleep in there. They all are.'], function () {
+        Sky.speak(['It can’t see me any more.', 'The door’s open. I could go home.', '…But skizy’s still asleep in there. They all are.'], function () {
             var c = document.createElement('div');
             c.className = 'gn-choice';
             c.innerHTML = '<button type="button" class="gn-go">go home</button><button type="button" class="gn-stay">stay, and wake the others</button>';

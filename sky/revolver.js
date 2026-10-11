@@ -19,6 +19,8 @@
      • the record player (while a record's on) — the record is shot to
        pieces, and gone from the crate for the rest of the visit
      • one of the little Claubes (sky/claubes.js) — pop
+     • the bee in the front garden (sky/bee.js) — it always misses: the bee
+       weaves out of the way, and keeps count (bee.js aimedAt / shot)
      • anything else — a bullet hole, for a while
      • a painting in a frame — it bursts into pieces, and the frame stays
        empty for the rest of the visit
@@ -241,8 +243,10 @@
         var c = traveller(t);
         if (c && white) { I.say(WONT[wontAt++ % WONT.length], 2400); return true; }
         if (c) { takeIt(c); return true; }                              // (it counts its own round: a jam doesn't use one)
+        // the bee in the front garden (sky/bee.js): it weaves out of the way, every time (and it remembers)
+        if (Sky.bee && Sky.bee.aimedAt && Sky.bee.aimedAt(x, y, t)) { if (!spend()) return true; bang(); hole(x, y); Sky.bee.shot(x, y, id); return true; }
         var claube = t.closest && t.closest('.mini-claube'), deck = t.closest && t.closest('.turntable'), frame = t.closest && t.closest('.gallery-frame[data-frame]');
-        if (!claube && !deck && !frame && t.closest && t.closest('.cp, .place-tabs, .sky-links, .marker-tray, a[href], button')) return false;   // (the controls still work)
+        if (!claube && !deck && !frame && t.closest && t.closest('.cp, .place-tabs, .sky-links, .marker-tray, .bee-talk, a[href], button')) return false;   // (the controls still work)
         if (!spend()) return true;
         // below, in reset 4: the eye (sky/hell.js). the white revolver bursts it and it gives up the key
         var eye = t.closest && t.closest('.hell .hl-eye');
@@ -265,17 +269,20 @@
     // where the ordinary revolver is (27 Sep, Victor): only ever one. reset 1: on the rooftop. from reset 2: hung on the
     // living-room wall (.wall-revolver, on its rack), where it only jams on the traveller: a thing to shoot things with.
     // reset 4 (so nothing can go wrong): nowhere, and not in the bag: the only revolver is the white one, from the pact
+    // (and while the bee in the front garden has it, or once it's stung it to pieces, this visit: sky/bee.js)
+    function withBee(id) { try { return sessionStorage.getItem('bee-gun') === id || (' ' + (sessionStorage.getItem('bee-broke') || '') + ' ').indexOf(' ' + id + ' ') !== -1; } catch (e) { return false; } }
     (function () {
         var S = window.davSave, r = S ? S.reset : 1;
         document.querySelectorAll('.pickup[data-item="revolver"]').forEach(function (p) {
             if (r === 4 || (r === 1) === p.classList.contains('wall-revolver')) p.remove();
+            else if (withBee('revolver')) p.classList.add('with-bee');
         });
         if (r === 4 && I.has('revolver')) I.remove('revolver');
     })();
     // the white revolver stays theirs for the rest of reset 4 (the bag itself only lasts the visit)
     (function () {
         var S = window.davSave;
-        if (S && S.get('white-revolver') === 'taken' && !I.has('white-revolver')) I.add('white-revolver', { quiet: true });
+        if (S && S.get('white-revolver') === 'taken' && !I.has('white-revolver') && !withBee('white-revolver')) I.add('white-revolver', { quiet: true });
     })();
 
     Sky.revolver = { bang: bang, hole: hole, mend: mend, get left() { return reloading ? 0 : ROUNDS - fired(); }, get reloading() { return reloading; } };

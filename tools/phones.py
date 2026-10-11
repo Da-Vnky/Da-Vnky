@@ -10,7 +10,7 @@
 #
 # it needs Playwright, like the smoke test (see tools/smoke.py). nothing shows on screen, and it never changes a file.
 # a few things it finds are fine: the living room's letter pile, empty, is see-through (it says "covered by div.room"),
-# and the window, seen past its constellations. Mel's room is hers: it isn't checked.
+# and the window, seen past its constellations. skizy's room is hers: it isn't checked.
 
 import argparse, json, os, sys, time
 
@@ -71,7 +71,7 @@ def main():
     except ImportError:
         sys.exit('this needs Playwright:  pip install playwright   then   python -m playwright install chromium')
     sizes = list(SIZES) if args.sizes == 'all' else [s.strip() for s in args.sizes.split(',')]
-    stops = [s for s in smoke.STOPS if 'mel' not in s[0] and (not args.only or args.only.lower() in s[0])]
+    stops = [s for s in smoke.STOPS if 'skizy' not in s[0] and (not args.only or args.only.lower() in s[0])]
     server, base = smoke.serve()
     found = 0
     with sync_playwright() as pw:

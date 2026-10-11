@@ -39,8 +39,8 @@
 
    The song: any track whose name or title has "p(doom)" in it (DOOM below).
 
-   ONCE P(DOOM) IS MEL'S (given to her in her room: localStorage mel-remedy), it's gone
-   from the crate and it calls nobody (and the party lights never come on for it: Mel
+   ONCE P(DOOM) IS SKIZY'S (given to her in her room: localStorage skizy-remedy), it's gone
+   from the crate and it calls nobody (and the party lights never come on for it: skizy
    asked for that). In RESET 4 P(Doom) is missing: its INVERTED TWIN is in its slot instead
    (sky/records.js, special 'inverted'; the only time it exists):
    played, the light goes red and staticky (sky/static.js) instead of the party, and the
@@ -65,7 +65,7 @@
     if (!Sky || Sky.claubes) return;
     var body = document.body;
     var DOOM = /p\s*\(\s*doom\s*\)/i;          // the song that calls them out
-    function doomGiven() { try { return localStorage.getItem('mel-remedy') !== null; } catch (e) { return false; } }
+    function doomGiven() { try { return localStorage.getItem('skizy-remedy') !== null; } catch (e) { return false; } }
     function robed() { return !!S && S.reset === 4 && S.get('claubes-robed') === '1'; }      // (robed: reset 4 only, ever)
     // after reset 4 (27 Sep, Victor): the robed ones were killed. the ordinary ones come out only once more, ever, for the
     // purified record (localStorage claubes-after4, kept like the reset number), in case they were missed before; they

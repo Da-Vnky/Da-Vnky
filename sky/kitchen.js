@@ -20,7 +20,7 @@
    will know": the serpent in Eden, the one who offered knowledge; in reset 3
    that's the pie in the fridge). The first time a visitor walks in each
    reset from 3 on, they see the sausages first, and then they turn. (There
-   used to be an apple here, reset 3's death: that's Mel's pills now.)
+   used to be an apple here, reset 3's death: that's skizy's pills now.)
 
    slots (assets/living/): kitchen-wall, kitchen-floor, kitchen-window, kitchen-counter,
           kitchen-drawer, kitchen-drawer-1 … -4, kitchen-fridge, kitchen-fridge-inside, kitchen-pie,

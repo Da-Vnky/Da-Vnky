@@ -176,18 +176,18 @@ SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
     assets/sounds/fizz           something electric in the bathwater
     assets/sounds/door           a wooden door opening and shutting (the hallway, the workshop)
     assets/sounds/door-metal     the steel roof access door: a clank, a squeal, a boom
-    assets/sounds/knock          knocking on mel's boarded-up window
+    assets/sounds/knock          knocking on skizy's boarded-up window
     assets/sounds/crack          a board splintering off it
     assets/sounds/book           the book pulled on the bookshelf: a click, the wall
                                  grinding open, a thud (about 3 s)
-    assets/sounds/hobo           behind mel's boards: from the moment the last one comes off.
+    assets/sounds/hobo           behind skizy's boards: from the moment the last one comes off.
                                  12 s of pitch black (you can only call out), then the scare
                                  (with it in, the drawn unnerve and scare sounds aren't used)
-    assets/sounds/unnerve        behind mel's boards, before the scare (only without hobo)
+    assets/sounds/unnerve        behind skizy's boards, before the scare (only without hobo)
     assets/sounds/flashbang      "Forget your stay": the bang, and the ringing after
     assets/sounds/scare          the jump scare
-    assets/sounds/typing         mel typing (about 2 s; played over and over)
-    assets/sounds/sparkle        claube tidying mel's room, as if by magic
+    assets/sounds/typing         skizy typing (about 2 s; played over and over)
+    assets/sounds/sparkle        claube tidying skizy's room, as if by magic
     assets/sounds/bang           the revolver
     assets/sounds/shatter        a record shot to pieces
     assets/sounds/flick          a little claube flicked away (the whoosh)
@@ -265,31 +265,31 @@ THE ROOFTOP (city.html)
                              one each. without the file, the telescope
                              spreads them along the middle of the row.
     assets/city/telescope    the icon on the telescope button          128 x 128
-    MEL'S WINDOW: one building on the front row is abandoned (not a light on),
+    SKIZY'S WINDOW: one building on the front row is abandoned (not a light on),
     except one boarded-up window. Click it: knock, keep knocking, and the boards
     come off one by one until you're in. The first time in a visit: darkness,
     a wrong sound, and something at the window that slowly slides out of sight.
-    Then Mel, typing, with Claube and Mira there too. She turns round, furious
+    Then skizy, typing, with Claube and Mira there too. She turns round, furious
     you barged in; you ask Claube to fix the place up; he's thrilled to, and it's
     clean for the rest of the visit.
-    assets/city/mel-room       her room, the mess (picture, GIF,       about 1.27:1
+    assets/city/skizy-room       her room, the mess (picture, GIF,       about 1.27:1
                                or a .webm / .mp4)
-    assets/city/mel-room-clean her room once Claube's been at it (same size and layout)
-    assets/city/mel-board      one board over her window (a plank,       about 6:1
+    assets/city/skizy-room-clean her room once Claube's been at it (same size and layout)
+    assets/city/skizy-board      one board over her window (a plank,       about 6:1
                                stretched to fit)
-    assets/city/mel-scare      what's behind the boards (see-through,  about 4:5
+    assets/city/skizy-scare      what's behind the boards (see-through,  about 4:5
                                feet at the bottom; it fills the window)
-    assets/city/mel-typing     Mel at her desk, her back to you        1:2
+    assets/city/skizy-typing     skizy at her desk, her back to you        1:2
                                (a GIF can type)
-    assets/city/mel-angry      Mel turned round, cross (same canvas)   1:2
+    assets/city/skizy-angry      skizy turned round, cross (same canvas)   1:2
     assets/city/claube         Claube                                   40:52
     assets/city/mira           Mira                                     about 2:5
-    (the stand-ins for Mel, Claube and Mira are only guesses: swap in the real
-     ones. who says what, and when the room gets tidied: MEL.script in sky/peeper.js)
+    (the stand-ins for skizy, Claube and Mira are only guesses: swap in the real
+     ones. who says what, and when the room gets tidied: SKIZY.script in sky/peeper.js)
     assets/city/revolver       the revolver lying on the roof (it goes in your bag), about 10:6
     on your own front-row art, say where her window is in
-    skyline-front-windows.json:  { "windows": [ … ], "mel": [41.5, 38, 1, 1.6] }
-    (the words she gets: MEL near the top of sky/peeper.js)
+    skyline-front-windows.json:  { "windows": [ … ], "skizy": [41.5, 38, 1, 1.6] }
+    (the words she gets: SKIZY near the top of sky/peeper.js)
 
 THE COUNTRYSIDE (what the workshop looks out on)
     assets/countryside/sheep          one sheep, facing RIGHT, feet at the bottom, about 3:2   (e.g. 360 x 240)
@@ -580,7 +580,7 @@ the same one-time setup keeps them up to date on every commit:
     git config core.hooksPath tools/hooks
 (or run  sh tools/update-lists.sh  yourself). If you upload a picture
 through the Forgejo website instead, the list won't know about it unless
-Mel's server or Forgejo lets the site look (see content/README.txt): run
+skizy's server or Forgejo lets the site look (see content/README.txt): run
 the script next time you're at your computer, or add the file's name to
 that folder's list.txt by hand.
 

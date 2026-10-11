@@ -2,7 +2,7 @@
 rem =====================================================================
 rem  publish: double-click this (it's in the tools folder) to put your
 rem  changes on the live site. it
-rem    1. fetches anything new from Forgejo (Mel's changes, songs you
+rem    1. fetches anything new from Forgejo (skizy's changes, songs you
 rem       uploaded there): tools/pull.sh, the same as pull.bat
 rem    2. rewrites every list.txt, so new files appear and deleted ones go
 rem    3. commits and pushes. the message: the lines waiting in CHANGES.txt
@@ -24,7 +24,7 @@ if not defined GITSH (
 )
 
 echo.
-echo  1. getting anything new from Forgejo (Mel's changes, songs you uploaded there)...
+echo  1. getting anything new from Forgejo (skizy's changes, songs you uploaded there)...
 "%GITSH%" -c "tr -d '\r' < tools/pull.sh | sh -s -- --quiet"
 if errorlevel 1 (
     echo.

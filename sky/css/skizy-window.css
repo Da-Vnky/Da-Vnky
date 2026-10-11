@@ -1,5 +1,5 @@
-/* mel-window.css: DaV-nky's own sky through the window of Mel's room (schizophyllu.me.room/room/room.js, the
-   DaV-nky part at the end, links this once Victor's window picture, assets/mel-room/main-window, is in).
+/* skizy-window.css: DaV-nky's own sky through the window of skizy's room (schizophyllu.me.room/room/room.js, the
+   DaV-nky part at the end, links this once Victor's window picture, assets/skizy-room/main-window, is in).
    The sky is ../window-sky.html in a frame behind the room; the room's layers behind the window have a hole cut
    where the glass is, so it shows through. */
 
@@ -31,7 +31,7 @@ html.dav-real-sky #svg-host { position: relative; }
    moon's light) */
 .dav-sky:not(.dav-sky-here) { opacity: 0; }
 
-/* Mel's painted sky bits (her twinkling stars, the afternoon's painted sky): the real sky's there instead */
+/* skizy's painted sky bits (her twinkling stars, the afternoon's painted sky): the real sky's there instead */
 html.dav-real-sky .dav-own-sky { display: none; }
 
 /* the moon's light in the rooms follows the sky's night: --dav-night, 0 by day, 1 from about 1 h 40 min after sunset */

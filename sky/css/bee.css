@@ -386,6 +386,24 @@ body.bee-talking .bee-home .bee-fly {
     cursor: pointer;
     font: italic 1rem "IM Fell English", Georgia, serif;
 }
+/* the sing switch: a music note (yours, assets/living/bee-sing, or the drawn one) */
+.bee-talk .bt-modes .bt-sing-ic {
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: -.25em;
+}
+.bee-talk .bt-modes .bt-sing-ic > svg,
+.bee-talk .bt-modes .bt-sing-ic > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.bee-talk .bt-modes button[data-mode=sing] {
+    padding-left: 10px;
+    padding-right: 10px;
+}
 .bee-talk .bt-modes button {
     padding: 3px 12px;
     border-radius: 999px;
@@ -438,6 +456,7 @@ body.bee-talking .bee-home .bee-fly {
     min-width: 2.2em;
 }
 .bee-talk .bt-bee.sung::before { content: "♪ "; }
+.bee-talk .bt-bee.dread { background: #3a1712 !important; color: #f2c7a8 !important; }
 .bee-talk .bt-bee[data-mood=excited] { background: #ffd968; }
 .bee-talk .bt-bee[data-mood=loving]  { background: #f6c6cf; }
 .bee-talk .bt-bee[data-mood=angry]   { background: #f2ac85; color: #5a1d0e; }
@@ -552,4 +571,65 @@ body.bee-talking .hotbar {
     }
     .bee-talk .bt-log { min-height: 60px; }
     .bee-talk .bt-foot { display: none; }
+}
+
+/* ---------------- the revolver (bee.js): it won't be shot ---------------- */
+/* weaving out of the gun's sights (bee.js sets --dodge-x/y every frame while you aim) */
+.front .bee,
+.bee-home .bee-bubble {
+    translate: var(--dodge-x, 0px) var(--dodge-y, 0px);
+}
+/* coming straight at you, to sting */
+.front .bee-home.diving .bee {
+    animation: bee-dive .8s cubic-bezier(.3, 0, .3, 1);
+}
+@keyframes bee-dive {
+    0%   { scale: 1; }
+    30%  { scale: 2.6; }
+    50%  { scale: 2.6; }
+    100% { scale: 1; }
+}
+/* your gun, in its hands, the muzzle on you (slot assets/living/bee-gun), turning to follow you, shaking with rage */
+.bee-home .bee-gun {
+    position: absolute;
+    left: calc(34% - (1 - var(--face)) * 10%);
+    top: 36%;
+    width: 56%;
+    aspect-ratio: 60 / 66;
+    display: none;
+    pointer-events: none;
+    transition: left .5s;
+}
+.bee-home.armed .bee-gun {
+    display: block;
+    animation: bee-gun-shake .18s steps(2) infinite;
+}
+.bee-home .bee-gun > svg,
+.bee-home .bee-gun > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: perspective(140px) rotateY(calc(var(--aim-x, 0) * 22deg)) rotateX(calc(var(--aim-y, 0) * -22deg));
+    transition: transform .25s ease-out;
+    filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .4));
+}
+@keyframes bee-gun-shake {
+    0%   { translate: 0 0; }
+    100% { translate: 1px -1px; }
+}
+/* the gun's spot (the wall, the roof) stays empty while the bee's got it, or once it's broken it */
+.pickup.with-bee {
+    display: none !important;
+}
+/* bits of gun, falling */
+.bee-scrap {
+    position: fixed;
+    z-index: 9000;
+    width: 9px;
+    height: 6px;
+    background: #8d8f96;
+    border: 1px solid #2a1d14;
+    border-radius: 1px;
+    pointer-events: none;
 }

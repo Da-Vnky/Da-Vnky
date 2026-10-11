@@ -5,13 +5,13 @@
 #  to publish your own changes; when you stop using GitHub, delete the four github-* tools and nothing else changes.)
 #
 # it
-#   1. gets anything new from Forgejo first (tools/pull.sh: Mel's changes), like publish.bat
+#   1. gets anything new from Forgejo first (tools/pull.sh: skizy's changes), like publish.bat
 #   2. gets what's on GitHub's main branch: the changes you've approved there (merged pull requests), and puts it
 #      together with this folder. It stops (and changes nothing) if a file Claude changed is one you've changed here
-#      and not published, or if Claude's and Mel's changes clash in the same lines: then ask Claude to put them together
+#      and not published, or if Claude's and skizy's changes clash in the same lines: then ask Claude to put them together
 #   3. publishes, like publish.bat: rewrites the lists, takes the lines waiting in CHANGES.txt as the message, commits
 #      and pushes to Forgejo
-#   4. sends the result back to GitHub too (Mel's changes and the lists included), so the next cloud session starts
+#   4. sends the result back to GitHub too (skizy's changes and the lists included), so the next cloud session starts
 #      from exactly what's live
 # Claude's work that's on GitHub but not approved yet (a pull request still open) isn't brought in: it says so.
 #
@@ -27,9 +27,9 @@ if ! git remote get-url github >/dev/null 2>&1; then
 fi
 PAGE=$(git remote get-url github | sed 's#\.git$##')
 
-# --- 1. Forgejo (Mel's changes)
+# --- 1. Forgejo (skizy's changes)
 echo
-echo " 1. getting anything new from Forgejo (Mel's changes)..."
+echo " 1. getting anything new from Forgejo (skizy's changes)..."
 if ! tr -d '\r' < tools/pull.sh | sh -s -- --quiet; then
     echo
     echo " So nothing's been published. Your folder is just as it was."
@@ -89,14 +89,14 @@ else
             echo; echo " Bringing them in didn't work, so nothing's been published. Copy what it says above and ask for help."; exit 1; }
         rm -f .git/GITHUB_MERGE
     else
-        # (Mel's or your own published changes since: both go together, in a merge)
+        # (skizy's or your own published changes since: both go together, in a merge)
         if ! git merge --no-ff --quiet --autostash --no-edit -m "Claude's changes from GitHub" github/main >.git/GITHUB_MERGE 2>&1; then
             CLASH=$(git diff --name-only --diff-filter=U 2>/dev/null)
             [ -f .git/MERGE_HEAD ] && git merge --abort >/dev/null 2>&1    # (puts everything back, your unpublished changes too)
             lists
             echo
             if [ -n "$CLASH" ]; then
-                echo " Claude's changes on GitHub and the ones here (Mel's, or yours) clash in these files:"
+                echo " Claude's changes on GitHub and the ones here (skizy's, or yours) clash in these files:"
                 printf '%s\n' "$CLASH" | sed 's/^/      /'
                 echo " So nothing's been brought in or published. Ask Claude to put them together."
             else

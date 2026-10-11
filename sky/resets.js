@@ -9,15 +9,15 @@
                    a key with "drop" isn't hidden: something drops it where it
                    happens (none does now: reset 3's is in the pie in the fridge)
      the roof      the jump off the roof, and the street far below (a cutscene): no longer a death of
-                   its own (27 Sep: one death a reset). it's how reset 3's ends: back from Mel's room,
-                   the traveller goes off the edge (melDeath), and the next reset starts on the porch
+                   its own (27 Sep: one death a reset). it's how reset 3's ends: back from skizy's room,
+                   the traveller goes off the edge (skizyDeath), and the next reset starts on the porch
                    (assets/city/street-below)
      placeholders  the ways to die not designed yet (DEATHS with a "placeholder" in
                    sky/state.js): a dashed bubble with a skull on a page. click it and
                    the traveller dies (a stand-in death: zapped), so the reset can be
                    played to its end. from reset 2, not before the key (sky/lives.js)
    one death a reset: reset 1 the revolver (sky/revolver.js), reset 2 the boat (sky/ground-sea.js),
-   reset 3 the pills (Mel's room, then the roof: below), reset 4 the false god's reflected bullet
+   reset 3 the pills (skizy's room, then the roof: below), reset 4 the false god's reflected bullet
    (sky/claubes.js, after the grimoire: sky/attic.js, sky/hell.js). the note on the dungeon floor is
    sky/dungeon.js.
 
@@ -228,18 +228,18 @@
         });
     }
 
-    /* ---------------- back from Mel's room, after the pills (reset 3: schizophyllu.me.room/room/room.js) ----------------
-       the room sends the visitor back here (sessionStorage "dav-mel-death"): it was too much. out of the black, the
+    /* ---------------- back from skizy's room, after the pills (reset 3: schizophyllu.me.room/room/room.js) ----------------
+       the room sends the visitor back here (sessionStorage "dav-skizy-death"): it was too much. out of the black, the
        traveller walks to the edge of the roof and goes off it (jumpOff: the street far below). it's reset 3's death:
        their one heart goes, and the next reset starts on the porch of the house (localStorage "dav-wake-at", read by
        sky/forget.js) instead of by the sea */
-    function melDeath() {
+    function skizyDeath() {
         var was = null;
-        try { was = sessionStorage.getItem('dav-mel-death'); sessionStorage.removeItem('dav-mel-death'); } catch (e) {}
+        try { was = sessionStorage.getItem('dav-skizy-death'); sessionStorage.removeItem('dav-skizy-death'); } catch (e) {}
         if (!was || PAGE !== 'city') return;
         var ch = document.querySelector('.scene-character');
         var blk = document.createElement('div');
-        blk.className = 'mel-black';                                     // (its look: sky/css/resets.css)
+        blk.className = 'skizy-black';                                     // (its look: sky/css/resets.css)
         body.appendChild(blk);
         var wake = function () { if (Sky.lives && Sky.lives.unlocked) { try { localStorage.setItem('dav-wake-at', 'living.html#porch'); } catch (e) {} } };   // (they come to on the porch)
         setTimeout(function () {
@@ -258,7 +258,7 @@
         }, 1800);
     }
 
-    function start() { placeKey(); placeholders(); melDeath(); dejaVu(); }
+    function start() { placeKey(); placeholders(); skizyDeath(); dejaVu(); }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
     Sky.resets = { get reset() { return S.reset; }, live: S.live, patched: S.patched };

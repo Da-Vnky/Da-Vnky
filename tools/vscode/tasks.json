@@ -1,6 +1,6 @@
 {
     // DaV-nky's tools as VS Code tasks: Terminal > Run Task… (or Ctrl+Shift+P, "Tasks: Run Task"), then pick one.
-    // the same tools as the double-click .bat files in tools/, on linux, mac and windows alike (see tools/FOR-MEL.md).
+    // the same tools as the double-click .bat files in tools/, on linux, mac and windows alike (see tools/FOR-SKIZY.md).
     "version": "2.0.0",
     "tasks": [
         {
@@ -49,11 +49,11 @@
             "problemMatcher": []
         },
         {
-            "label": "DaV-nky: Mel's room slots (after adding things to the room)",
-            "detail": "the asset manager's \"Mel's room\" slots, written again from the room's own files",
+            "label": "DaV-nky: skizy's room slots (after adding things to the room)",
+            "detail": "the asset manager's \"skizy's room\" slots, written again from the room's own files",
             "type": "shell",
-            "command": "python3 tools/mel-room-slots.py",
-            "windows": { "command": "py tools\\mel-room-slots.py" },
+            "command": "python3 tools/skizy-room-slots.py",
+            "windows": { "command": "py tools\\skizy-room-slots.py" },
             "problemMatcher": []
         }
     ]

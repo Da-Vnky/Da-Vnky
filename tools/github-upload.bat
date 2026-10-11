@@ -6,7 +6,7 @@ rem  (claude.ai/code) can work on it. Only while the credit lasts:
 rem  Forgejo stays the site's real home.
 rem    - the first time, make an EMPTY repository on GitHub (no README,
 rem      no .gitignore, no licence) and paste its address when asked
-rem    - it gets Mel's changes from Forgejo first, then sends everything
+rem    - it gets skizy's changes from Forgejo first, then sends everything
 rem      you've published. Unpublished changes stay here; so does
 rem      everything .gitignore keeps out (.inbox and the rest)
 rem    - it never overwrites anything on GitHub

@@ -3,7 +3,7 @@
    numbered 1 to 8, like Minecraft's. Things you pick up go in the next
    free slot and stay with you from page to page for the rest of the visit:
      the marker (the workshop's bench), the revolver (the rooftop, and a
-     toy one in the living space), a bottle of Mel's pills (her bathroom, in
+     toy one in the living space), a bottle of skizy's pills (her bathroom, in
      reset 3), and whatever turns up from the hidden loot (sky/loot.js).
    Click a slot, or press its number, to hold that thing (or, for the
    marker and anything else you switch on, to switch it on); press it
@@ -36,7 +36,7 @@
         marker: { name: 'the marker', slot: 'assets/workshop/marker', toggle: true, hint: 'draw on anything. Esc to stop.',
             art: '<svg viewBox="0 0 100 30" aria-hidden="true"><rect x="10" y="6" width="62" height="18" rx="4" fill="#2a2a2e"/><rect x="72" y="8" width="16" height="14" rx="2" fill="#1a1a1c"/>' +
                  '<path d="M88 11 L98 15 L88 19 Z" fill="#111"/><rect x="18" y="10" width="36" height="10" rx="2" fill="#f3e6c2"/><text x="36" y="18" text-anchor="middle" font-size="7" font-family="Arial" font-weight="bold" fill="#2a2a2e">PERM</text></svg>' },
-        // a bottle of Mel's pills, taken from her bathroom cabinet (reset 3). it goes where you go for the rest of the
+        // a bottle of skizy's pills, taken from her bathroom cabinet (reset 3). it goes where you go for the rest of the
         // visit, but it's only any use back in her room (schizophyllu.me.room/room/davinv.js brings this bag in there)
         pills: { name: 'a bottle of skizy\u2019s pills', label: 'a pill bottle', slot: 'assets/items/pills',
             hint: /schizophyllu\.me\.room/.test(location.pathname) ? 'give it to her: click skizy' : 'it rattles. it\u2019s for skizy.',
@@ -202,7 +202,7 @@
     // Escape: the thing in your hand put away (or whatever's switched on, off)
     function putAway() { if (holding) letGo(); else { stopActive(); draw(); } }
     if (Sky.escape) Sky.escape(function () { return !!(holding || active); }, putAway, Sky.ESC.hand);
-    else document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && (holding || active)) { e.stopImmediatePropagation(); putAway(); } }, true);   // (Mel's room: no sky.js)
+    else document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && (holding || active)) { e.stopImmediatePropagation(); putAway(); } }, true);   // (skizy's room: no sky.js)
     function typing(t) { return t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable); }
     document.addEventListener('keydown', function (e) {
         // 1 … 8: that slot (not while typing, or in the painting desk, which has its own number keys)

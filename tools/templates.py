@@ -104,7 +104,7 @@ def main():
                 # a brand-new visitor each time (reset 1), on a 1920 x 1080 screen, at midday
                 ctx = browser.new_context(viewport={'width': W, 'height': H}, timezone_id='UTC')
                 ctx.add_init_script(NOON)
-                # nothing from outside the site (fonts, the weather, Mel's live site on her CRT)
+                # nothing from outside the site (fonts, the weather, skizy's live site on her CRT)
                 ctx.route('**/*', lambda route: route.continue_() if route.request.url.startswith(base) else route.abort())
                 page = ctx.new_page()
                 try:
@@ -116,7 +116,7 @@ def main():
                     time.sleep(2.5)
                     if view:
                         page.evaluate('() => { %s }' % view['do'])
-                        if view.get('until'):                   # (till the state's there, e.g. Mel's roof: at most 15 s)
+                        if view.get('until'):                   # (till the state's there, e.g. skizy's roof: at most 15 s)
                             try:
                                 page.wait_for_function('() => (%s)' % view['until'], timeout=15000, polling=200)
                             except Exception:

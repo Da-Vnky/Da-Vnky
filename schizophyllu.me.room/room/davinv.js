@@ -62,10 +62,10 @@
     l.rel = 'stylesheet'; l.href = ROOT + href;
     document.head.appendChild(l);
   }
-  sheet('sky/css/inventory.css'); sheet('sky/css/loot.css'); sheet('sky/css/mel-inventory.css');
+  sheet('sky/css/inventory.css'); sheet('sky/css/loot.css'); sheet('sky/css/skizy-inventory.css');
   window.davInventory = load('sky/inventory.js').then(function () { return load('sky/loot.js'); }).then(function () {
     // (the pill bottle is sky/inventory.js's own; in here its hint says to give it to her. the bag's look in the room:
-    // sky/css/mel-inventory.css)
+    // sky/css/skizy-inventory.css)
     return Sky.inventory || null;
   });
 })();

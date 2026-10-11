@@ -1,13 +1,13 @@
 /* =====================================================================
-   bee.js — the bee in the front garden (living.html#front): Mel's
+   bee.js — the bee in the front garden (living.html#front): skizy's
    BeeLLM ("Scintilla BeeLLM 42P Chaos", made by skizy), living over the
    roses by the steps. click it and you can talk to it.
 
-     its brain    Mel's own model, run right here in the visitor's browser:
+     its brain    skizy's own model, run right here in the visitor's browser:
                   content/bee/beellm.json (written from her .gguf by
                   tools/bee-model.py; the server can't hand out .gguf files).
                   every word the bee says comes out of it, one at a time.
-                  (it's a real little llama-style transformer. Mel's has its
+                  (it's a real little llama-style transformer. skizy's has its
                   attention and feed-forward parts set to nothing, so what it
                   says next hangs only on the word it just said: after "b" it
                   nearly always buzzes on, and once it's shouting in CAPS it
@@ -36,6 +36,18 @@
                   bee-buzzing / bee-<mood>-buzzing (while a buzz sounds), and the
                   little puffs: bee-fx-heart, -tear, -steam, -sweat, -zzz, -spark,
                   -question, -zap
+     the revolver it won't be shot (sky/revolver.js asks it first: aimedAt / shot).
+                  shoot at it and it weaves out of the way: every shot misses.
+                  keep at it: frightened (two shots), furious (two more), then it stings you and takes the gun
+                  off you (sessionStorage bee-gun, for the visit, like the bag).
+                  it keeps it, pointed at you and buzzing crossly, till you tell it
+                  you're sorry; singing, all that while, it sings dread (a dark
+                  scale, low and slow, a heartbeat under it). given back, shoot at
+                  it once more and it stings the gun to pieces (gone for the visit:
+                  sessionStorage bee-broke) and it never forgives you: angry at
+                  every visit after (localStorage bee-grudge, till "forget your stay")
+                  slots: bee-gun (the gun it points at you, muzzle on), bee-sing
+                  (the menu's sing switch, a music note)
      sounds       bee-voice (above). everything else here is the bee's own voice.
 
    its look: sky/css/bee.css
@@ -224,15 +236,15 @@
     // wobble, the shape of a reply's tune, how each z bends a buzz, how loud, how bright), how it picks its words
     // (temperature, how many), what it starts from, and how it moves (wingbeat, how long one lap of hovering takes)
     var MOODS = {
-        calm:    { seems: 'calm',                    hz: 277, scale: MAJ,    unit: .095, buzz: .4,  vib: [5, .010],   shape: 'arch',   slide: 0,    gain: .8,  bright: .95, follow: .10, rit: 0,    temp: .9,  len: [5, 12],  seed: ['bz', 'buzz'],     flap: .11,  hover: 5,   fx: null,       sing: MAJ,    pace: .95 },
-        happy:   { seems: 'happy',                   hz: 330, scale: MAJ,    unit: .085, buzz: .45, vib: [5.5, .012], shape: 'lilt',   slide: .8,   gain: .9,  bright: 1,   follow: .15, rit: 0,    temp: 1,   len: [6, 14],  seed: ['buzz', 'bz'],     flap: .085, hover: 4,   fx: 'spark',    sing: MAJ,    pace: 1 },
-        excited: { seems: 'buzzing with excitement', hz: 392, scale: MAJ,    unit: .065, buzz: .6,  vib: [6.5, .015], shape: 'climb',  slide: 1.2,  gain: 1,   bright: 1.15, follow: .25, rit: -.15, temp: 1.15, len: [10, 22], seed: ['BZ', 'buzz'],    flap: .06,  hover: 2.2, fx: 'spark',    sing: MAJ,    pace: 1.25 },
-        loving:  { seems: 'smitten',                 hz: 294, scale: DREAMY, unit: .11,  buzz: .25, vib: [4.5, .018], shape: 'arch',   slide: .5,   gain: .75, bright: .85, follow: .10, rit: .1,   temp: .85, len: [6, 12],  seed: ['~', 'buzz'],      flap: .1,   hover: 5.5, fx: 'heart',    sing: DREAMY, pace: .8 },
-        angry:   { seems: 'furious',                 hz: 233, scale: MIN,    unit: .07,  buzz: .95, vib: [9, .02],    shape: 'stomp',  slide: 0,    gain: 1,   bright: 1.3, follow: .10, rit: 0,    temp: 1.05, len: [8, 18], seed: ['BZ', 'ZZ'],       flap: .05,  hover: 1.8, fx: 'steam',    sing: MIN,    pace: 1.15, growl: .5 },
-        sad:     { seems: 'sad',                     hz: 220, scale: MIN,    unit: .13,  buzz: .3,  vib: [4, .02],    shape: 'droop',  slide: -1.2, gain: .65, bright: .8,  follow: .10, rit: .35,  temp: .8,  len: [3, 8],   seed: ['zzz', '~'],       flap: .14,  hover: 7,   fx: 'tear',     sing: MIN,    pace: .75 },
-        scared:  { seems: 'frightened',              hz: 440, scale: MIN,    unit: .06,  buzz: .5,  vib: [11, .03],   shape: 'jitter', slide: .6,   gain: .8,  bright: 1,   follow: .20, rit: 0,    temp: 1.25, len: [4, 10], seed: ['b', 'bu'],        flap: .045, hover: 1.1, fx: 'sweat',    sing: MIN,    pace: 1.3, pauses: true },
-        sleepy:  { seems: 'sleepy',                  hz: 196, scale: MIN,    unit: .16,  buzz: .2,  vib: [3.5, .010], shape: 'sink',   slide: -1.5, gain: .5,  bright: .7,  follow: .05, rit: .4,   temp: .7,  len: [3, 7],   seed: ['zzz', 'z'],       flap: .2,   hover: 8,   fx: 'zzz',      sing: MIN,    pace: .65 },
-        curious: { seems: 'curious',                 hz: 311, scale: DREAMY, unit: .09,  buzz: .4,  vib: [5, .012],   shape: 'ask',    slide: 1,    gain: .85, bright: 1,   follow: .15, rit: 0,    temp: .95, len: [5, 11],  seed: ['bu', 'buzz'],     flap: .09,  hover: 4.5, fx: 'question', sing: DREAMY, pace: .9 }
+        calm:    { seems: 'calm',                    hz: 277, scale: MAJ,    unit: .095, buzz: .4,  vib: [5, .010],   shape: 'arch',   slide: 0,    gain: .8,  bright: .95, follow: .10, rit: 0,    temp: .9,  len: [5, 12],  seed: ['bz', 'buzz'],     flap: .11,  hover: 5,   fx: null },
+        happy:   { seems: 'happy',                   hz: 330, scale: MAJ,    unit: .085, buzz: .45, vib: [5.5, .012], shape: 'lilt',   slide: .8,   gain: .9,  bright: 1,   follow: .15, rit: 0,    temp: 1,   len: [6, 14],  seed: ['buzz', 'bz'],     flap: .085, hover: 4,   fx: 'spark' },
+        excited: { seems: 'buzzing with excitement', hz: 392, scale: MAJ,    unit: .065, buzz: .6,  vib: [6.5, .015], shape: 'climb',  slide: 1.2,  gain: 1,   bright: 1.15, follow: .25, rit: -.15, temp: 1.15, len: [10, 22], seed: ['BZ', 'buzz'],    flap: .06,  hover: 2.2, fx: 'spark' },
+        loving:  { seems: 'smitten',                 hz: 294, scale: DREAMY, unit: .11,  buzz: .25, vib: [4.5, .018], shape: 'arch',   slide: .5,   gain: .75, bright: .85, follow: .10, rit: .1,   temp: .85, len: [6, 12],  seed: ['~', 'buzz'],      flap: .1,   hover: 5.5, fx: 'heart' },
+        angry:   { seems: 'furious',                 hz: 233, scale: MIN,    unit: .07,  buzz: .95, vib: [9, .02],    shape: 'stomp',  slide: 0,    gain: 1,   bright: 1.3, follow: .10, rit: 0,    temp: 1.05, len: [8, 18], seed: ['BZ', 'ZZ'],       flap: .05,  hover: 1.8, fx: 'steam', growl: .5 },
+        sad:     { seems: 'sad',                     hz: 220, scale: MIN,    unit: .13,  buzz: .3,  vib: [4, .02],    shape: 'droop',  slide: -1.2, gain: .65, bright: .8,  follow: .10, rit: .35,  temp: .8,  len: [3, 8],   seed: ['zzz', '~'],       flap: .14,  hover: 7,   fx: 'tear' },
+        scared:  { seems: 'frightened',              hz: 440, scale: MIN,    unit: .06,  buzz: .5,  vib: [11, .03],   shape: 'jitter', slide: .6,   gain: .8,  bright: 1,   follow: .20, rit: 0,    temp: 1.25, len: [4, 10], seed: ['b', 'bu'],        flap: .045, hover: 1.1, fx: 'sweat', pauses: true },
+        sleepy:  { seems: 'sleepy',                  hz: 196, scale: MIN,    unit: .16,  buzz: .2,  vib: [3.5, .010], shape: 'sink',   slide: -1.5, gain: .5,  bright: .7,  follow: .05, rit: .4,   temp: .7,  len: [3, 7],   seed: ['zzz', 'z'],       flap: .2,   hover: 8,   fx: 'zzz' },
+        curious: { seems: 'curious',                 hz: 311, scale: DREAMY, unit: .09,  buzz: .4,  vib: [5, .012],   shape: 'ask',    slide: 1,    gain: .85, bright: 1,   follow: .15, rit: 0,    temp: .95, len: [5, 11],  seed: ['bu', 'buzz'],     flap: .09,  hover: 4.5, fx: 'question' }
     };
     var ORDER = Object.keys(MOODS);
     // which of its words each mood reaches for (+) or shies from (−): nudges on the model's own odds.
@@ -334,6 +346,11 @@
         return { add: add, seed: seed, bee: beeTalk, words: list.length };
     }
 
+    function visit(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) { return null; } }
+    // the revolver (below): which gun it's taken off you (this visit), and whether it's never forgiving you
+    var GUNS = { revolver: 'the revolver', 'white-revolver': 'the white revolver' };
+    var gun = MAPPING ? null : visit('bee-gun'), grudge = !MAPPING && store('bee-grudge') === '1';
+    if (!GUNS[gun]) gun = null;
     var heart = { calm: 0 }, lastFelt = Date.now(), fond = clamp(+(store('bee-heart') || 0) || 0, -1, 1);
     ORDER.forEach(function (m) { heart[m] = 0; });
     function settle() {                                                        // feelings fade (half of it a minute)
@@ -355,6 +372,7 @@
     }
     function mood() {
         settle();
+        if (gun || grudge) return 'angry';                                     // (the revolver, below: it's not over it)
         var best = 'calm', top = 0;
         ORDER.forEach(function (m) { if (m !== 'calm' && heart[m] > top) { top = heart[m]; best = m; } });
         if (top >= .4) return best;
@@ -537,45 +555,101 @@
         return { events: ev, total: at, wet: .9, echo: .5 };
     }
 
-    // singing: its words as keys on a little keyboard (every key in one five-note scale: any order sounds nice)
+    // singing: its words as keys on a little keyboard (every key in one five-note scale: any order sounds nice).
+    // each mood has its own keyboard (Victor: the notes it sings fit how it feels):
+    //   scale   the five keys (semitones above the root). each is a "mode" with its own colour:
+    //           major pentatonic = sunny; the maj9 chord's own notes = dreamy and warm; minor with the flat 6 = sad;
+    //           diminished (stacked minor thirds) with a semitone rub = suspense; the suspended pentatonic (no 3rd, so
+    //           neither happy nor sad) = drifting; lydian's raised 4th = wonder; a minor blues with the flat 5 = mean
+    //   base    the root (a MIDI note: 60 is middle C): high for happy and frightened, low for sad, sleepy and cross
+    //   beat    seconds per step; art: how long each note rings against that (under 1 bouncy and clipped, over 1 legato)
+    //   chord   what a shouted (CAPS) word plays, in semitones over its note: major, major 7th, minor, diminished,
+    //           sus2, a lydian #4, an add9, or a bare power chord (root, fifth, octave) when it's furious
+    //   bed     what plays under the whole song: a soft held chord (pad), an oom-pah (bounce), a pounding root (chug),
+    //           a shivering high pair (shiver), or nothing
+    //   drift   how the tune wanders over the song (in keys): up when it's excited or curious, down when sad or sleepy
+    //   (and its voice for the song: buzz, growl, wobble, how notes bend and swoop into place)
+    var SING = {
+        calm:    { scale: [0, 2, 4, 7, 9],   base: 55, beat: .1,   art: 1.1, gain: .28, chord: [0, 4, 7],      bed: 'pad',    drift: 0,    vib: [5, .01] },
+        happy:   { scale: [0, 2, 4, 7, 9],   base: 60, beat: .085, art: .7,  gain: .3,  chord: [0, 4, 7],      bed: 'bounce', drift: .15,  vib: [6, .012], pluck: true },
+        excited: { scale: [0, 2, 4, 7, 9],   base: 62, beat: .065, art: .6,  gain: .32, chord: [0, 4, 7, 14],  bed: 'bounce', drift: .45,  vib: [6.5, .015], pluck: true, swoop: true },
+        loving:  { scale: [0, 4, 7, 11, 14], base: 57, beat: .13,  art: 1.8, gain: .25, chord: [0, 4, 7, 11],  bed: 'pad',    drift: 0,    vib: [4.5, .02], swoop: true, buzz: .25 },
+        angry:   { scale: [0, 3, 5, 6, 7],   base: 45, beat: .075, art: .55, gain: .34, chord: [0, 7, 12],     bed: 'chug',   drift: 0,    vib: [9, .02], pluck: true, buzz: 1, growl: .7 },
+        sad:     { scale: [0, 2, 3, 7, 8],   base: 52, beat: .15,  art: 1.7, gain: .24, chord: [0, 3, 7],      bed: 'pad',    drift: -.4,  vib: [4, .022], slide: -.6, buzz: .3 },
+        scared:  { scale: [0, 1, 3, 6, 9],   base: 64, beat: .06,  art: .5,  gain: .22, chord: [0, 3, 6],      bed: 'shiver', drift: 0,    vib: [11, .03], pluck: true, jitter: true },
+        sleepy:  { scale: [0, 2, 5, 7, 10],  base: 50, beat: .2,   art: 2.2, gain: .2,  chord: [0, 2, 7],      bed: 'pad',    drift: -.25, vib: [3.5, .01], slide: -.3, buzz: .2 },
+        curious: { scale: [0, 2, 4, 6, 9],   base: 58, beat: .1,   art: 1,   gain: .27, chord: [0, 4, 6],      bed: 'none',   drift: .3,   vib: [5, .012], swoop: true, endUp: true }
+    };
+    // dread (the revolver, below: while it's pointing it at you, or never forgiving you): a dark five (root, a semitone
+    // up, a minor third, the tritone, the fifth), low and slow, every note sagging and growling, the shouted chords
+    // crushed into clusters, and a heartbeat under the whole song
+    var DREAD = [0, 1, 3, 6, 7];
+    var DREADED = { scale: DREAD, base: 46, beat: .13, art: 1.6, gain: .3, chord: [0, 1, 6], bed: 'heart', drift: -.15, vib: [7, .02], slide: -.7, buzz: .9, growl: .7, bright: .85 };
     var NOTE = { b: 0, bu: 1, bz: 2, buzz: 3, bzzz: 4, z: 5, zz: 6, zzz: 7 };
-    var CHORD = { b: 0, bu: 3, bz: 1, buzz: 2, bzzz: 4, z: 5, zz: 6, zzz: -1 };
-    function composeSing(w, mood) {
-        var M = MOODS[mood], sc = M.sing, unit = .09 / M.pace, ev = [], at = 0;
-        function hz(step) { return 440 * Math.pow(2, (55 + sc[((step % 5) + 5) % 5] + 12 * Math.floor(step / 5) - 69) / 12); }
+    function composeSing(w, mood, dread) {
+        var M = MOODS[mood], P = dread ? DREADED : SING[mood] || SING.calm, sc = P.scale, unit = P.beat, ev = [], at = 0;
+        var n = w.filter(function (x) { return x !== ' '; }).length, si = 0;
+        function hz(step, semis) { return 440 * Math.pow(2, (P.base + sc[((step % 5) + 5) % 5] + 12 * Math.floor(step / 5) + (semis || 0) - 69) / 12); }
         function one(step, len, extra) {
-            var n = { f: hz(step), dur: len, gain: .3, buzz: M.buzz, vib: [5.5, .01], bright: M.bright, growl: M.growl || 0, pan: (step - 3.5) / 3.5 * .35 };
-            for (var k in extra) n[k] = extra[k];
-            return n;
+            var nn = { f: hz(step), dur: len * P.art, gain: P.gain, buzz: P.buzz !== undefined ? P.buzz : M.buzz, vib: P.vib,
+                       bright: P.bright || M.bright, growl: P.growl !== undefined ? P.growl : M.growl || 0, slide: P.slide || 0,
+                       pan: (step - 3.5) / 3.5 * .35, pluck: !!P.pluck, swoop: !!P.swoop };
+            if (P.jitter) nn.f *= 1 + (Math.random() - .5) * .012;                  // (a voice that won't hold still)
+            for (var k in extra) nn[k] = extra[k];
+            return nn;
         }
         w.forEach(function (x) {
             var lw = x.toLowerCase(), caps = x !== lw && /^[A-Z*]/.test(x), zc = (lw.match(/z/g) || []).length, e = { at: at, word: x, caps: caps }, gap;
-            if (x === ' ') { e.rest = true; e.dur = unit; gap = 1; }
+            var pos = n > 1 ? si / (n - 1) : .5, shift = Math.round(P.drift * 6 * pos) + (P.endUp && pos > .8 ? 3 : 0);
+            if (x !== ' ') si++;
+            if (x === ' ') { e.rest = true; e.dur = unit; gap = P.jitter && Math.random() < .3 ? 3 : 1; }      // (frightened: it freezes now and then)
             else if (lw === '~') {
-                e.notes = [3, 4, 5, 6].map(function (st, i) { var n = one(st, .05, { pluck: true, gain: .24 }); n.off = i * .06; return n; });
-                e.dur = .3; e.fx = 'wobble'; e.step = 6; gap = 2;
+                e.notes = [3, 4, 5, 6].map(function (st, i) { var nn = one(st + shift, .05, { pluck: true, gain: P.gain * .8 }); nn.off = i * unit * .7; return nn; });
+                e.dur = .3; e.fx = 'wobble'; e.step = 6 + shift; gap = 2.5;
             } else if (lw === '!') {
-                e.notes = [one(8, .1, { swoop: true, pluck: true, gain: .36 })]; e.dur = .14; e.fx = 'chirp'; e.step = 8; gap = 2;
+                e.notes = [one(8 + shift, .1, { swoop: true, pluck: true, gain: P.gain * 1.2 })]; e.dur = .14; e.fx = 'chirp'; e.step = 8 + shift; gap = 2;
             } else if (/stings/.test(lw)) {
-                e.notes = [one(caps ? 9 : 7, caps ? .45 : .3, { pluck: true, slide: caps ? -14 : -9, buzz: 1, gain: .36 })]; e.dur = .45; e.fx = 'zap'; e.step = 9; gap = 6;
+                e.notes = [one(caps ? 9 : 7, (caps ? .45 : .3) / P.art, { pluck: true, slide: caps ? -14 : -9, buzz: 1, gain: P.gain * 1.2 })]; e.dur = .45; e.fx = 'zap'; e.step = 9; gap = .45 / unit + 1;
             } else if (NOTE[lw] !== undefined) {
-                var len = .05 + .08 * zc, sw = lw.indexOf('u') >= 0, pl = lw[0] === 'b';
-                if (caps) {                                        // a little swarm, buzzing a chord
-                    var r = CHORD[lw];
-                    e.notes = [r, r + 2, r + 4].map(function (st, i) { var n = one(st, len + .08, { swoop: sw, pluck: pl, gain: .2 }); n.off = i * .025; n.f *= 1 + .004 * (i - 1); return n; });
-                    e.step = r + 2;
-                } else {
-                    e.notes = [one(NOTE[lw], len, { swoop: sw, pluck: pl })];
-                    e.step = NOTE[lw];
-                }
-                e.dur = len + (caps ? .08 : 0);
+                var len = .05 + .08 * zc, st = NOTE[lw] + shift, sw = lw.indexOf('u') >= 0;
+                if (caps) {                                        // a little swarm, buzzing the mood's chord
+                    e.notes = P.chord.map(function (semi, i) { var nn = one(st, len + .08, { swoop: sw || !!P.swoop, gain: P.gain * .7 }); nn.f = hz(st, semi); nn.off = i * .025; nn.f *= 1 + .004 * (i - 1); return nn; });
+                } else e.notes = [one(st, len, { swoop: sw || !!P.swoop, pluck: lw[0] === 'b' || !!P.pluck })];
+                e.step = st;
+                e.dur = len * P.art + (caps ? .08 : 0);
                 gap = Math.max(1, lw.length - 1) + (caps ? 1 : 0);
-            } else { e.notes = [one(hashStep(x), .04, { pluck: true, gain: .18 })]; e.dur = .05; e.step = 3; gap = 1; }
+            } else { e.notes = [one(hashStep(x) + shift, .04, { pluck: true, gain: P.gain * .6 })]; e.dur = .05; e.step = 3 + shift; gap = 1; }
             if (e.notes) { e.lift = clamp((e.step - 3.5) * 4, -18, 26); e.tilt = 0; e.mouth = clamp(.4 + .2 * zc + (caps ? .3 : 0), .3, 1); }
             ev.push(e);
             at += gap * unit;
         });
-        return { events: ev, total: at + .3, wet: 1.1, echo: .7 };
+        // what plays under it (all scheduled with the first word)
+        var under = [], end = at + .2, root = hz(-5), bar = unit * 8;
+        function bed(f, dur, gain, extra) { var o = { f: f, dur: dur, gain: gain, buzz: .25, vib: [.8, .006], bright: .55, growl: 0, pan: 0 }; for (var k in extra) o[k] = extra[k]; under.push(o); return o; }
+        if (P.bed === 'pad') P.chord.forEach(function (semi, i) {                       // a soft held chord, an octave down
+            bed(hz(-5, semi), end, .045, { off: i * .04, pan: (i - 1) * .3, vib: [.7 + i * .2, .008] });
+        });
+        else if (P.bed === 'bounce') for (var t = 0; t < end; t += bar / 2) {         // oom (the root) … pah (the chord)
+            bed(root, unit * 1.2, .13, { off: t, pluck: true, bright: .9 });
+            P.chord.slice(1, 3).forEach(function (semi) { bed(hz(0, semi), unit * .8, .07, { off: t + bar / 4, pluck: true, bright: 1 }); });
+        }
+        else if (P.bed === 'chug') for (var c = 0; c < end; c += unit * 2) {          // a pounding low root and fifth
+            bed(root, unit * 1.3, .15, { off: c, pluck: true, buzz: 1, growl: .8, bright: 1 });
+            if ((c / (unit * 2)) % 4 === 3) bed(hz(-5, 7), unit * 1.3, .11, { off: c, pluck: true, buzz: 1, growl: .6, bright: 1 });
+        }
+        else if (P.bed === 'shiver') [0, 6].forEach(function (semi, i) {               // a high pair, a tritone apart, trembling
+            bed(hz(5, semi), end, .03, { off: 0, vib: [13 + i * 2, .025], bright: .7, pan: i ? .35 : -.35 });
+        });
+        else if (P.bed === 'heart') {                                                   // the heartbeat: dun-dun, low, all the way through
+            for (var h = 0; h < end; h += .95) {
+                bed(hz(0), .13, .34, { off: h, pluck: true, buzz: .7, growl: .8, bright: 1, slide: -1, vib: [3, .004] });
+                bed(hz(0), .1, .24, { off: h + .24, pluck: true, buzz: .7, growl: .8, bright: .9, slide: -1, vib: [3, .004] });
+            }
+            bed(hz(-2), end, .07, { buzz: .5, growl: .4, bright: .5, vib: [.6, .01] });   // (and a low tritone, humming)
+        }
+        if (under.length && ev.length) ev[0].notes = (ev[0].notes || []).concat(under);
+        var wet = { loving: 1.4, sad: 1.4, sleepy: 1.5, scared: 1.2, angry: .8, excited: 1, happy: 1 }[mood] || 1.1;
+        return { events: ev, total: at + .3, wet: dread ? 1.4 : wet, echo: dread ? .8 : .7 };
     }
     function hashStep(x) { var s = 0; for (var i = 0; i < x.length; i++) s += x.charCodeAt(i); return s % 8; }
 
@@ -595,7 +669,7 @@
     function perform(plan, onWord, onDone) {
         hush();
         var me = run = { timers: [], bus: null };
-        var V = voice(), lead = .09;
+        var V = plan.silent ? null : voice(), lead = .09;
         if (V) {
             if (V.ctx.state !== 'running') V.ctx.resume().catch(function () {});
             V.master.gain.value = Math.min(1.4, level());
@@ -672,6 +746,21 @@
     };
     var fxArt = {};
     Object.keys(FX).forEach(function (k) { Sky.findAsset('assets/living/bee-fx-' + k, function (url) { if (url) fxArt[k] = url; }); });
+    // your revolver, in its little hands, seen from the front: the muzzle pointed straight at you (slot: assets/living/bee-gun)
+    var GUN_ART = '<svg class="placeholder" viewBox="0 0 60 66">' +
+        '<path d="M33 40 L44 60 Q46 64 41 64 L31 64 Q27 64 27 60 L25 42 Z" fill="#6e4a2c" stroke="#2a1d14" stroke-width="1.6" stroke-linejoin="round"/>' +
+        '<ellipse cx="30" cy="51" rx="7" ry="5" fill="none" stroke="#2a1d14" stroke-width="2"/>' +
+        '<circle cx="30" cy="34" r="17" fill="#8d8f96" stroke="#2a1d14" stroke-width="1.8"/>' +
+        [30, 90, 150, 210, 330].map(function (a) {
+            var r = a * Math.PI / 180;
+            return '<circle cx="' + (30 + 11 * Math.cos(r)).toFixed(1) + '" cy="' + (34 + 11 * Math.sin(r)).toFixed(1) + '" r="3.4" fill="#3a3a40"/>';
+        }).join('') +
+        '<rect x="24" y="9" width="12" height="16" rx="3" fill="#a6a8ae" stroke="#2a1d14" stroke-width="1.6"/>' +
+        '<circle cx="30" cy="23" r="10" fill="#c3c5cb" stroke="#2a1d14" stroke-width="1.8"/>' +
+        '<circle cx="30" cy="23" r="6" fill="#0d0a08"/>' +
+        '<path d="M24.5 17.5 A8 8 0 0 1 31 15" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".55"/>' +
+        '<rect x="28.5" y="9" width="3" height="4" fill="#2a1d14"/>' +
+        '<path d="M8 40 Q16 33 21 37 M52 40 Q44 33 39 37" fill="none" stroke="#2a1d14" stroke-width="2.4" stroke-linecap="round"/></svg>';
 
     var home = document.createElement('div');
     home.className = 'bee-home';
@@ -680,12 +769,15 @@
         '<div class="bee-bubble" aria-hidden="true"><span></span></div>' +
         '<button type="button" class="bee" aria-label="the bee: talk to it">' +
             '<span class="bee-fly"><span class="bee-pose"><span class="bee-art" data-slot="assets/living/bee">' + DRAWN + '<img class="art" alt="" hidden></span></span>' +
+            '<span class="bee-gun" aria-hidden="true">' + GUN_ART + '</span>' +
             '<span class="bee-fx" aria-hidden="true"></span></span>' +
             '<span class="kh-hint">the bee</span>' +
         '</button>';
     stage.appendChild(home);
     var beeBtn = home.querySelector('.bee'), pose = home.querySelector('.bee-pose'), art = home.querySelector('.bee-art'),
-        artImg = art.querySelector('img'), fxBox = home.querySelector('.bee-fx'), bubble = home.querySelector('.bee-bubble span');
+        artImg = art.querySelector('img'), fxBox = home.querySelector('.bee-fx'), bubble = home.querySelector('.bee-bubble span'),
+        gunEl = home.querySelector('.bee-gun');
+    Sky.findAsset('assets/living/bee-gun', function (url) { if (url) gunEl.innerHTML = '<img alt="" src="' + url + '">'; });
 
     // Victor's pictures, if he's drawn the bee: the one for how it feels (and while it buzzes), else his plain one, else mine
     var artKey = '';
@@ -746,8 +838,8 @@
         dress();
     }
     var stungAt = 0;
-    function stung() {                                            // (it's only a cartoon sting)
-        if (Date.now() - stungAt < 20000) return;
+    function stung(force) {                                       // (it's only a cartoon sting)
+        if (!force && Date.now() - stungAt < 20000) return;
         stungAt = Date.now();
         setTimeout(function () { Sky.say(['Ow.', 'Ow! Rude.', 'Ouch.'][Math.floor(Math.random() * 3)], 1800); }, 350);
     }
@@ -758,6 +850,13 @@
     /* ======================================================================
        talking to it: the menu
        ====================================================================== */
+    // the sing switch is a little music note (slot: assets/living/bee-sing; drawn in the colour of the button's words,
+    // so it's light on dark when it's switched on)
+    var NOTE_ART = '<svg class="placeholder" viewBox="0 0 24 24" aria-hidden="true">' +
+        '<path d="M9 17.5 V5.2 L19 3 V15" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+        '<path d="M9 7.8 L19 5.6" stroke="currentColor" stroke-width="2.4"/>' +
+        '<ellipse cx="6.4" cy="17.8" rx="3.3" ry="2.5" transform="rotate(-22 6.4 17.8)" fill="currentColor"/>' +
+        '<ellipse cx="16.4" cy="15.3" rx="3.3" ry="2.5" transform="rotate(-22 16.4 15.3)" fill="currentColor"/></svg>';
     var menu = null, log = null, input = null, mode = store('bee-mode') === 'sing' ? 'sing' : 'talk', open = false, line = null, met = !!store('bee-met');
     function build() {
         menu = document.createElement('div');
@@ -768,7 +867,8 @@
             '<div class="bt-head">' +
                 '<div class="bt-title"><b>the bee</b><i class="bt-mood"></i></div>' +
                 '<div class="bt-modes" role="group" aria-label="how it answers">' +
-                    '<button type="button" data-mode="talk">talk</button><button type="button" data-mode="sing">sing</button></div>' +
+                    '<button type="button" data-mode="talk">talk</button>' +
+                    '<button type="button" data-mode="sing" aria-label="sing" title="sing"><span class="bt-sing-ic" data-asset="assets/living/bee-sing">' + NOTE_ART + '</span></button></div>' +
                 '<button type="button" class="bt-x" aria-label="close">✕</button>' +
             '</div>' +
             '<div class="bt-log" aria-live="polite"></div>' +
@@ -779,6 +879,7 @@
                 'its brain is <i>BeeLLM 42P Chaos</i>, by skizy, thinking right here in your browser</p>';
         body.appendChild(menu);
         log = menu.querySelector('.bt-log'); input = menu.querySelector('input');
+        if (Sky.fillAssets) Sky.fillAssets(menu);
         menu.querySelector('.bt-mood').textContent = 'seems ' + MOODS[home.dataset.mood].seems;
         menu.querySelector('.bt-x').addEventListener('click', close);
         menu.querySelector('form').addEventListener('submit', function (ev) { ev.preventDefault(); send(input.value); });
@@ -822,6 +923,8 @@
             var m = !met ? 'curious' : fond > .35 ? 'happy' : fond < -.35 ? (fond < -.6 ? 'angry' : 'sad') : mood();
             if (!met) { met = true; if (!MAPPING) store('bee-met', '1'); }
             feelAll(m === 'calm' ? {} : (function () { var o = {}; o[m] = .6; return o; })());
+            if (gun) note('it’s still pointing ' + mine(gun) + ' at you.');
+            else if (grudge) note('it hasn’t forgiven you for the revolver. it never will.');
             reply(null, { len: [3, 6], mood: mood() });
         });
     }
@@ -840,6 +943,12 @@
         input.value = '';
         entry('bt-you', text);
         var h = hear(text);
+        if (gun) {                                                // (it's got your gun: only one thing it wants to hear)
+            var sorry = SORRY.test(text), nope = sorry && NOT_SORRY.test(text);
+            if (sorry && !nope) { forgive(h); return; }
+            h.add = { angry: nope ? 1.5 : .6 };
+            if (++unsorry === 2 || nope) setTimeout(function () { note('(it seems to be waiting for an apology.)'); }, 1200);
+        }
         feelAll(h.add);
         load().then(function () { reply(h); });
     }
@@ -849,13 +958,14 @@
         opts = opts || {};
         var m = opts.mood || mood();
         setMood(m);
-        var M = MOODS[m], sing = opts.song || mode === 'sing';
-        var len = opts.len || (sing ? [24, 40] : [M.len[0], M.len[1] + Math.min(6, Math.floor(((h && h.words) || 0) / 5))]);
+        var M = MOODS[m], sing = !opts.talk && (opts.song || mode === 'sing'), dread = sing && !!(gun || grudge);
+        var len = opts.len || (sing ? (dread ? [16, 26] : [24, 40]) : [M.len[0], M.len[1] + Math.min(6, Math.floor(((h && h.words) || 0) / 5))]);
         var seed = h && h.seed && h.seed.length ? h.seed : [M.seed[Math.floor(Math.random() * M.seed.length)]];
         var w = think(m, { len: len, seed: seed, sting: opts.sting, temp: sing ? M.temp + .1 : M.temp });
-        var plan = sing ? composeSing(w, m) : composeTalk(w, m);
+        var plan = sing ? composeSing(w, m, dread) : composeTalk(w, m);
+        if (!menu) build();
         finishLine();
-        line = entry('bt-bee' + (sing ? ' sung' : ''));
+        line = entry('bt-bee' + (sing ? ' sung' : '') + (dread ? ' dread' : ''));
         line.dataset.mood = m;
         bubble.textContent = '';
         home.classList.add('saying');
@@ -895,16 +1005,196 @@
         if (!open) openMenu(); else poke();
     });
 
+    /* ======================================================================
+       the revolver: it won't be shot (sky/revolver.js asks aimedAt, then calls shot)
+       ====================================================================== */
+    var I = Sky.inventory;
+    var SORRY = /\b(sorry|sowwy|sowy|sorr+y+|soz|sry|apolog\w*|forgive|my bad|pardon|i was wrong|regret\w*)\b/i;
+    var NOT_SORRY = /\b(not|never|no|nt)\s+(even\s+|really\s+|at all\s+)?(sorry|apolog\w*|regret\w*)|n['’]?t\s+(be\s+)?(sorry|apolog\w*)/i;
+    var shots = [], unsorry = 0, returned = !MAPPING && visit('bee-returned') === '1';
+    function mine(id) { return GUNS[id].replace(/^the /, 'your '); }
+    function here() { return !!(Sky.front && Sky.front.here); }
+
+    // weaving: only when you actually fire. the shot sends it jinking out of the way (a quick zig and zag, then back
+    // over its roses); the rest of the time it just hovers, gun or no gun
+    var dodge = { x: 0, y: 0 }, ptr = null, jink = { x: 0, y: 0, at: -1e9 }, weaving = 0, side = 1;
+    function centre() { var r = home.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, R: Math.max(70, r.width * 1.5) }; }
+    function weave() {
+        weaving = 0;
+        var t = performance.now() - jink.at, j = Math.max(0, 1 - t / 900), tx = 0, ty = 0;
+        if (j) {
+            var zig = Math.sin(t / 1000 * 2 * Math.PI * 3.2) * .3 * j;                  // (side to side as it goes)
+            tx = jink.x * j - jink.y * zig; ty = jink.y * j + jink.x * zig;
+        }
+        dodge.x += (tx - dodge.x) * (t < 120 ? .55 : .2); dodge.y += (ty - dodge.y) * (t < 120 ? .55 : .2);
+        if (!j && Math.abs(dodge.x) < .3 && Math.abs(dodge.y) < .3) dodge.x = dodge.y = 0;
+        home.style.setProperty('--dodge-x', dodge.x.toFixed(1) + 'px');
+        home.style.setProperty('--dodge-y', dodge.y.toFixed(1) + 'px');
+        if (j || dodge.x || dodge.y) weaving = requestAnimationFrame(weave);
+    }
+    function weaveOn() { if (!weaving) weaving = requestAnimationFrame(weave); }
+    document.addEventListener('pointermove', function (e) {
+        ptr = { x: e.clientX, y: e.clientY };
+        if (gun && here()) {                                       // (and with yours, it follows you)
+            var c = centre();
+            home.style.setProperty('--aim-x', clamp((ptr.x - c.x) / (window.innerWidth * .4), -1, 1).toFixed(2));
+            home.style.setProperty('--aim-y', clamp((ptr.y - c.y) / (window.innerHeight * .4), -1, 1).toFixed(2));
+        }
+    }, { passive: true });
+    root.addEventListener('pointerleave', function () { ptr = null; });
+
+    // was that shot meant for it? (anywhere near where it lives, or at it, wherever it's dodged to)
+    function aimedAt(x, y, target) {
+        if (!here() || MAPPING) return false;
+        if (target && target.closest && target.closest('.bee-talk')) return false;          // (its menu: still just a menu)
+        if (target && target.closest && target.closest('.bee-home')) return true;
+        var c = centre();
+        return Math.hypot(x - c.x - dodge.x, y - c.y - dodge.y) < c.R * .6;
+    }
+    // a shot: it's missed (always). then, by how many there've been lately: frightened, furious, and then it's had enough
+    function shot(x, y, id) {
+        if (!menu) build();
+        var c = centre(), dx = c.x + dodge.x - x, dy = c.y + dodge.y - y, d = Math.max(1, Math.hypot(dx, dy));
+        side = Math.random() < .5 ? -1 : 1;
+        jink = { x: (dx / d * .6 - dy / d * side) * c.R * 1.1, y: (dy / d * .6 + dx / d * side) * c.R * .8 - c.R * .3, at: performance.now() };
+        weaveOn();
+        var now = Date.now();
+        shots = shots.filter(function (t) { return now - t < 120000; });
+        shots.push(now);
+        var n = shots.length;
+        if (I) I.say('missed.', 1200);
+        if (gun) {                                                  // (it's got one already: you've another?)
+            entry('bt-poke', 'you shoot at the bee. it doesn’t even flinch.');
+            feelAll({ angry: 2 });
+            load().then(function () { reply(null, { len: [4, 7], talk: true }); });
+            return;
+        }
+        if (returned) { breakIt(id); return; }                      // (it gave it back, and you did it again)
+        var stage = n >= 5 ? 'grab' : grudge || n >= 3 ? 'angry' : 'scared';
+        entry('bt-poke', [
+            'you shoot at the bee. it weaves out of the way.',
+            'you shoot at it again. missed: it’s too quick.',
+            'another shot. it dodges, and now it’s cross.',
+            'missed again. it’s furious.',
+            'missed. the bee comes straight at you…'][Math.min(n, 5) - 1]);
+        if (stage === 'scared') { feelAll({ scared: 2.4 }); puff('sweat', 2); }
+        else feelAll({ angry: 2.4 });
+        load().then(function () {
+            if (stage !== 'grab') { reply(null, { mood: stage, len: stage === 'scared' ? [3, 6] : [6, 10], talk: true }); return; }
+            reply(null, { mood: 'angry', len: [3, 5], sting: true, talk: true });
+            dive();
+            setTimeout(function () { stung(true); grab(id); }, 650);
+        });
+    }
+    function dive() { home.classList.remove('diving'); void home.offsetWidth; home.classList.add('diving'); puff('zap', 3); setTimeout(function () { home.classList.remove('diving'); }, 900); }
+    function pickups(withBee) {                                     // (the gun's spot on the wall or the roof stays empty while it's got it)
+        document.querySelectorAll('.pickup[data-item="revolver"], .pickup[data-item="white-revolver"]').forEach(function (p) {
+            p.classList.toggle('with-bee', !!withBee && p.dataset.item === withBee);
+        });
+    }
+    function arm(on) {
+        home.classList.toggle('armed', on);
+        body.classList.toggle('bee-armed', on);
+        beeBtn.setAttribute('aria-label', on ? 'the bee, pointing ' + mine(gun) + ' at you: talk to it' : 'the bee: talk to it');
+        pickups(on && gun);
+        if (on) { artKey = ''; setMood('angry'); grumbleSoon(); } else clearTimeout(grumbleSoon.t);
+    }
+    // it takes the gun off you
+    function grab(id) {
+        if (!GUNS[id]) return;
+        gun = id; shots = []; unsorry = 0;
+        if (!MAPPING) visit('bee-gun', id);
+        if (I && I.has(id)) I.remove(id);
+        arm(true);
+        entry('bt-note', 'it stings you, and takes ' + mine(id) + ' out of your hand. it’s pointing it at you. it won’t give it back until you say you’re sorry.');
+        setTimeout(function () { Sky.say('It took my gun. I think it wants an apology.', 3400); }, 2200);
+    }
+    // "sorry": it gives it back (it's still not happy about it)
+    function forgive(h) {
+        var id = gun;
+        gun = null; shots = []; unsorry = 0; returned = true;
+        if (!MAPPING) { visit('bee-gun', null); visit('bee-returned', '1'); }
+        arm(false);
+        settle();
+        heart.angry = 0; heart.scared = 0;
+        feelAll({ calm: .8, sad: .5 });
+        var S = window.davSave, back = id === 'white-revolver' ? !S || S.get('white-revolver') === 'taken' : !S || S.reset !== 4;
+        if (back && I) {
+            if (!I.has(id) && I.add(id, { quiet: true })) { if (Sky.sfx) Sky.sfx('pickup'); I.say('the bee gives you ' + mine(id) + ' back.', 2800); }
+            note('it gives you ' + mine(id) + ' back, slowly. it doesn’t take its eyes off you.');
+        } else note('it drops ' + mine(id) + ' in the roses. it’s gone.');
+        load().then(function () { reply(h, { mood: 'sad', len: [3, 6], talk: true }); });
+    }
+    // shot at again, after all that: it stings the gun to pieces, and it'll never forgive you
+    function breakIt(id) {
+        entry('bt-poke', 'missed. you shoot at it again, after all that.');
+        feelAll({ angry: 3 });
+        stungAt = Date.now();                                       // (it's the gun it stings, this time, not you)
+        load().then(function () {
+            reply(null, { mood: 'angry', len: [4, 7], sting: true, talk: true });
+            dive();
+            setTimeout(function () {
+                if (I && I.has(id)) I.remove(id);
+                if (Sky.sfx) { Sky.sfx('jammed', { or: 'tap' }); Sky.sfx('shatter', { delay: .08 }); }
+                scrap(ptr ? ptr.x : window.innerWidth / 2, ptr ? ptr.y : window.innerHeight * .7);
+                if (I) I.say('the bee stung ' + mine(id) + '. it’s broken.', 3200);
+                returned = false; grudge = true;
+                if (!MAPPING) {
+                    visit('bee-returned', null); store('bee-grudge', '1');
+                    var broke = (visit('bee-broke') || '').split(' ').filter(Boolean);
+                    if (broke.indexOf(id) === -1) broke.push(id);
+                    visit('bee-broke', broke.join(' '));
+                }
+                document.querySelectorAll('.pickup[data-item="' + id + '"]').forEach(function (p) { p.classList.add('with-bee'); });
+                setMood('angry');
+                note('it stings ' + mine(id) + ' to pieces. it will never forgive you for this.');
+                setTimeout(function () { Sky.say('It broke it. With its sting.', 2800); }, 1600);
+            }, 650);
+        });
+    }
+    function scrap(x, y) {                                          // (bits of gun, falling)
+        for (var i = 0; i < 12; i++) {
+            var b = document.createElement('span');
+            b.className = 'bee-scrap';
+            b.style.left = x + 'px'; b.style.top = y + 'px';
+            body.appendChild(b);
+            var a = Math.random() * Math.PI * 2, d = 30 + Math.random() * 90;
+            b.animate([
+                { transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 1 },
+                { transform: 'translate(' + (Math.cos(a) * d) + 'px,' + (Math.sin(a) * d * .5 + 160) + 'px) rotate(' + (Math.random() * 600 - 300) + 'deg)', opacity: 0 }
+            ], { duration: 900 + Math.random() * 500, easing: 'cubic-bezier(.2,.6,.4,1)', fill: 'forwards' }).onfinish = (function (el) { return function () { el.remove(); }; })(b);
+        }
+    }
+    // while it's got your gun: a cross little buzz every so often (shown over its head; not in the menu's log)
+    function grumbleSoon() { clearTimeout(grumbleSoon.t); if (gun) grumbleSoon.t = setTimeout(grumble, rnd(6000, 11000)); }
+    function grumble() {
+        if (gun && here() && !run && !document.hidden) {
+            var heard = E || (navigator.userActivation && navigator.userActivation.hasBeenActive);
+            load().then(function () {
+                if (run || !gun) return;
+                var plan = composeTalk(think('angry', { len: [2, 5], seed: ['BZ'] }), 'angry');
+                plan.silent = !heard || MAPPING;
+                bubble.textContent = '';
+                home.classList.add('saying');
+                perform(plan, function (e) { bubble.textContent = (bubble.textContent + e.word).slice(-48); act(e); }, function () { talking(false); finishLine(); });
+                talking(true);
+            });
+        }
+        grumbleSoon();
+    }
+    if (gun) arm(true); else if (grudge) setMood('angry');
+
     // gone from the garden: it stops talking
     if (Sky.house && Sky.house.on) Sky.house.on(function (what, name) { if (name === 'front' && what === 'leave') close(); });
     Sky.escape(function () { return open; }, close);
 
     Sky.bee = {
         open: openMenu, close: close, say: send, poke: poke,
+        aimedAt: aimedAt, shot: shot, get gun() { return gun; }, get grudge() { return grudge; },   // (sky/revolver.js)
         get mood() { return mood(); }, get fond() { return fond; },
         // (for testing and for the asset manager: what it'd say, and a reply played into any sound context)
         think: function (m, len) { return load().then(function () { return think(m || mood(), { len: len || MOODS[m || 'calm'].len, seed: [MOODS[m || 'calm'].seed[0]] }); }); },
-        plan: function (w, m, sing) { return sing ? composeSing(w, m) : composeTalk(w, m); },
+        plan: function (w, m, sing, dread) { return sing ? composeSing(w, m, dread) : composeTalk(w, m); },
         render: function (ctx, plan) { var V = Engine(ctx), B = bus(V, plan.wet * .3, plan.echo * .3); plan.events.forEach(function (e) { (e.notes || []).forEach(function (n) { var o = {}; for (var k in n) o[k] = n[k]; o.t = .05 + e.at + (n.off || 0); buzz(V, B, o); }); }); return V; },
         hear: hear, moods: MOODS, brain: function () { return load().then(function () { return brain; }); }
     };

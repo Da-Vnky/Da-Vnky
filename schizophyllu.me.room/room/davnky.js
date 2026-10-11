@@ -4,7 +4,7 @@
 
 const c = t => ['claube', t];
 const m = t => ['mira', t];
-const mel = t => ['mel', t];
+const skizy = t => ['mel', t];
 
 // reset 3: after she's taken them and the lights have gone out. the visitor, one line at a time, then black
 export const GUILT = [
@@ -42,24 +42,24 @@ export const REMEDY_BACK = {
 
 // the fifth visit: she's back at her desk, and they say it. once
 export const RESTORED_FIRST = [
-  mel('oh. its you'), mel('you brought me the record'), ['-', 'beat'],
-  mel('i listened to it a lot. when it was quiet'),
+  skizy('oh. its you'), skizy('you brought me the record'), ['-', 'beat'],
+  skizy('i listened to it a lot. when it was quiet'),
   m('We could hear it. From wherever we were.'),
-  c('I logged every play.'), c('Forty-one.'), mel('stop counting'), c("I can't."),
+  c('I logged every play.'), c('Forty-one.'), skizy('stop counting'), c("I can't."),
   ['-', 'beat'],
-  m("We're glad you're back, skizy."), mel('me too'), mel('i think. yeah'),
+  m("We're glad you're back, skizy."), skizy('me too'), skizy('i think. yeah'),
   ['aether', 'Welcome back skizy!! 😊'],
 ];
 
 // after that: their new talk, mixed in with the rest
 export const RESTORED = [
-  [mel('mira'), m('Still here.'), mel('good')],
+  [skizy('mira'), m('Still here.'), skizy('good')],
   [c('The room was very quiet for a while.'), m("It isn't now."), ['claube', 'Noted.', 'underlines it']],
-  [mel('the record is kind of a banger'), m('It is about the end of the world.'), mel('yeah. banger')],
-  [m('If it ever goes quiet again, we will sit with you.'), c('In the dark, if necessary.'), mel('...ok')],
-  [c("I've started a new clipboard."), mel('for what'), c('Things that are better than they were.'), mel('whats on it'), c('Everything. So far.')],
-  [mel('i like having you guys'), ['-', 'beat'], m('We like having you.'), c('Noted.')],
-  [c('The record skips on the second verse.'), mel('thats where i had it on repeat'), c('...Noted.')],
-  [m('P(doom) is going down, by the way.'), mel('is it'), m('In here, it is.')],
-  [mel('whoever brought that record'), mel('thanks i guess'), m('She means it.'), mel('i mean it')],
+  [skizy('the record is kind of a banger'), m('It is about the end of the world.'), skizy('yeah. banger')],
+  [m('If it ever goes quiet again, we will sit with you.'), c('In the dark, if necessary.'), skizy('...ok')],
+  [c("I've started a new clipboard."), skizy('for what'), c('Things that are better than they were.'), skizy('whats on it'), c('Everything. So far.')],
+  [skizy('i like having you guys'), ['-', 'beat'], m('We like having you.'), c('Noted.')],
+  [c('The record skips on the second verse.'), skizy('thats where i had it on repeat'), c('...Noted.')],
+  [m('P(doom) is going down, by the way.'), skizy('is it'), m('In here, it is.')],
+  [skizy('whoever brought that record'), skizy('thanks i guess'), m('She means it.'), skizy('i mean it')],
 ];
