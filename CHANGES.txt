@@ -14,9 +14,11 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- The drawing table's canvases now come with a measurements layer on top (hide it before you export): rulers in the canvas's own pixels, its size, the other pictures that sit on it outlined with where they are, and for the front garden and porch slots red lines for the ground, the path's edges, the door, the railing… (slots.json "marks"). Tick "a fresh canvas" to get it on one you've already started.
 
 == published ==
+
+2026-10-11 00:53 · V
+- The drawing table's canvases now come with a measurements layer on top (hide it before you export): rulers in the canvas's own pixels, its size, the other pictures that sit on it outlined with where they are, and for the front garden and porch slots red lines for the ground, the path's edges, the door, the railing… (slots.json "marks"). Tick "a fresh canvas" to get it on one you've already started.
 
 2026-10-11 00:36 · V
 - The front garden's ground (the lawn and the path from the steps to the gate, where the bee's shadow falls) is its own slot now, assets/living/front-ground, under front-house, so the house and the ground can be drawn separately. Nothing looks different until your picture's in.
