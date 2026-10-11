@@ -1,10 +1,10 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
-beyond.html 1480
-city.html 9866
-index.html 5085
-living.html 131596
-window-sky.html 1334
-workshop.html 22101
+beyond.html 1476
+city.html 9813
+index.html 5029
+living.html 131910
+window-sky.html 1328
+workshop.html 22036
 sky/ambient.js 5339
 sky/attic.js 33962
 sky/bathroom.js 27452
@@ -74,7 +74,7 @@ sky/css/dungeon.css 8071
 sky/css/eye.css 1216
 sky/css/forget.css 4066
 sky/css/frames.css 7258
-sky/css/front.css 4657
+sky/css/front.css 4739
 sky/css/gallery.css 5593
 sky/css/gnosis.css 7764
 sky/css/gore.css 5544
