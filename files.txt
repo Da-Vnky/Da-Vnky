@@ -1,14 +1,14 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1480 3057035318
-city.html 9866 2057922505
-index.html 5085 3621585441
-living.html 131990 3107744791
-window-sky.html 1334 854607904
-workshop.html 22101 3949824409
+beyond.html 1480 1846947066
+city.html 9866 3012590156
+index.html 5085 1992518738
+living.html 131990 2424487811
+window-sky.html 1334 1781624638
+workshop.html 22101 3202867422
 sky/ambient.js 5339 303504477
 sky/attic.js 35399 2013422403
 sky/bathroom.js 29933 1952839507
-sky/bee.js 106377 3691230479
+sky/bee.js 108343 3509210047
 sky/beyond.js 11151 2864391733
 sky/books.js 13679 1574652656
 sky/claubes.js 52348 1552619900
@@ -49,7 +49,7 @@ sky/records.js 36061 768060095
 sky/resets.js 17781 4015916708
 sky/revolver.js 19886 3300906875
 sky/ropes.js 5604 1786338978
-sky/sky.js 132286 3944755389
+sky/sky.js 134072 1797354900
 sky/source.js 3881 3601012274
 sky/state.js 22982 2010806125
 sky/static.js 4273 186896628
@@ -65,7 +65,7 @@ sky/sky.css 59330 975241207
 sky/css/ambient.css 435 4199751144
 sky/css/attic.css 15736 521837829
 sky/css/bathroom.css 17498 1224456772
-sky/css/bee.css 31754 1321386600
+sky/css/bee.css 32660 2362193590
 sky/css/beyond.css 2714 2081711894
 sky/css/books.css 4900 2258360443
 sky/css/claubes.css 17565 3697391751

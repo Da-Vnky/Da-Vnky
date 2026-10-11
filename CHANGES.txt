@@ -14,9 +14,11 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- The bee: over its body the cursor is a poking finger (a click pokes it, as before), and over its head a patting hand. A pat on the head makes it happy, loving or excited: it dips under your hand, a note, heart or spark comes off it, and it buzzes back in that mood (your own hands: assets/ui/cursor-poke and cursor-pat).
 
 == published ==
+
+2026-10-11 03:36 · V
+- The bee: over its body the cursor is a poking finger (a click pokes it, as before), and over its head a patting hand. A pat on the head makes it happy, loving or excited: it dips under your hand, a note, heart or spark comes off it, and it buzzes back in that mood (your own hands: assets/ui/cursor-poke and cursor-pat).
 
 2026-10-11 03:10 · V
 - Every cursor now animates when you click: it squeezes in as the button goes down and springs back as it comes up, and a little burst of ink is left where the click lands (your own pressed cursors: assets/ui/<cursor>-press; your own burst: assets/ui/click).
