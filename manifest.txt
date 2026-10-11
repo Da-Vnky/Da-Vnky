@@ -2,13 +2,13 @@
 beyond.html 1480
 city.html 9866
 index.html 5085
-living.html 132883
+living.html 133039
 window-sky.html 1334
 workshop.html 22101
 sky/ambient.js 5331
 sky/attic.js 34823
 sky/bathroom.js 29419
-sky/bee.js 111555
+sky/bee.js 113692
 sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 52332
@@ -65,7 +65,7 @@ sky/sky.css 58055
 sky/css/ambient.css 435
 sky/css/attic.css 15736
 sky/css/bathroom.css 16836
-sky/css/bee.css 32601
+sky/css/bee.css 33143
 sky/css/beyond.css 2644
 sky/css/books.css 4721
 sky/css/claubes.css 17565
