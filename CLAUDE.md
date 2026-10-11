@@ -260,6 +260,16 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - **Frames → the slot** (`assemble`, `POST /__draw/frames`): one animated WebP (`<name>-animation.webp`, see-through kept), with
   FFmpeg (the animator's `ffmpeg`, or one on the PATH: `libwebp_anim`, yuva420p) or Pillow; over the 30 MB upload limit at full
   size → made again at half size, and the card says so.
+- **Pictures that repeat** (11 Oct, Victor: "like the waves"): slots.json `"tile": "x" | "y" | "xy"` (the waves: x, with
+  `"tileGuide": "assets/templates/wave-N-guide.png"`; the rope: y), `"canvas": "W x H"` (the canvas as it is, not doubled:
+  waves 3024 x 1008, rope 60 x 240). `make` then builds one tile on a blank page (`tile_canvas`, `TILE_GUIDE`: the tileGuide
+  picture with the joining edges marked, shaded bands, "joins the right edge" labels), layer `repeat guide: the edges join`;
+  `what to do.txt` gets `NOTE_TILE`. **"wrap it"** (`drawtable.py wrap <slot> <export|current> [app]`, `POST /__draw/wrap`,
+  content.py `draw_wrap`): `WRAP` moves the picture by half a tile, wrapping round (Photoshop's Offset, which Clip Studio
+  lacks), into `<stem>-wrapped.psd` (the join guide at opacity 200, the moved picture, an empty layer), opened in the program
+  last used on that card (`localStorage dt-app`). No need to move it back: a tile shifted by half repeats the same. The card
+  (assets.html `repeatStrip`): every export, and the slot's picture now, laid out three times with the joins marked, and
+  whether the join shows (the edge columns/rows compared with neighbouring ones inside: seam > 2.5 × inside + 6 → red).
 - After changing content.py: Victor restarts the content manager (close its window, double-click `tools\content.bat`).
 
 ## The attic (sky/attic.js)
@@ -542,6 +552,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   lowpassed, fluttering at `3 / flap` Hz, straight to the speakers (not through the voice's master, whose gain `perform`
   sets), `HUM` .035 × the sound effects level, louder/higher with `speed` (from `fly()`), × .35 while it talks, panned to
   where it is, 0 when not `here()` or the tab's hidden; measured about -34 dB; slot `assets/sounds/bee-hum`, a loop).
+  **Its shadow** (11 Oct, Victor): `.bee-shadow` (just before `.bee-trail`), placed every frame by `shade(r)` in `fly()` on
+  the ground under it (`GROUND`: the garden .79 of the stage's height, the lawn in front of the roses; the porch .18 of the
+  screen up from the bottom, the yard), smaller, blurrier (`--sh-blur`) and fainter (`--sh`) the higher it is, × (1 − .55
+  dusk) in bee.css; slot `assets/living/bee-shadow`. For it the porch got a **front yard** (`.porch-yard`, slot
+  `assets/living/porch-yard`, porch.css: bottom 0, 22vh tall, under porch-street's bottom edge, behind the floor): the sky
+  used to show through between the street's fence and the porch floor.
+  **Night on the porch**: porch.css dims each of its pieces by `--pd` (not the whole porch), so `.porch .bee-home` and
+  `.porch .bee-trail` take `brightness(var(--pd))` too (bee.css); in the garden the whole `.front-stage` is dimmed already.
   The code still moves and tints his. A word bubble over its head (`.bee-bubble`).
 - skizy's model and name: credited in the menu's foot ("its brain is BeeLLM 42P Chaos, by skizy").
 - The sing switch is a music note (`NOTE_ART`, `.bt-sing-ic`, slot `assets/living/bee-sing`; drawn in `currentColor`, so
@@ -559,9 +577,16 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   Only `SORRY` (not `NOT_SORRY`: "not sorry" angers it) gets it back (`forgive()`: into the bag, unless it's the ordinary
   one in reset 4 or the white one isn't theirs any more), `bee-returned` set. Shot at again after that (`breakIt()`):
   the gun stung to pieces (out of the bag, `sessionStorage bee-broke`: gone for the visit, so its spot stays empty;
-  the next visit it's back where it lives: reset 1's revolver death and reset 4's white revolver can't be lost for
-  good) and `localStorage bee-grudge` = 1: angry at every visit after, till "forget your stay" (`mood()` returns
-  angry while armed or grudging). Singing while armed or grudging: `composeSing(w, m, dread)`, `DREAD` scale
+  the white revolver is back the next visit, so reset 4 can't be lost; **the ordinary revolver stays gone till reset 8**:
+  `localStorage revolver-gone` = broken, and revolver.js `destroyed()` takes it off the wall and out of the bag in resets
+  2 to 7, where nothing needs it) and `localStorage bee-grudge` = 1: angry at every visit after, till "forget your stay"
+  (`mood()` returns angry while armed or grudging). **Reset 1** (11 Oct, Victor: the revolver is its only way to die, so
+  breaking it softlocked): `breakIt` → `stingToDeath(id)`: `strike(me, onHit)` (it flies at the traveller and back,
+  `.striking` / `bee-strike` in bee.css on `--strike-x/y`, facing them; sound `bee-dive`, stand-in `throw`); on the hit the
+  sting (`bee-sting`), the gun's out of the bag and in its hands (`.armed`, aimed at them by `aimAt`), `revolver-gone` = bee;
+  1.5 s later it fires (`.firing`: muzzle flash and kick; `bee-bang`, stand-in `bang`), `Sky.gore.splat` on the traveller,
+  then `Sky.stay.reset('Stung, then shot.')`: straight to reset 2, no key or heart needed (lives.js isn't asked). No grudge
+  kept and `fond` set back to 0, so it's itself in reset 2. Singing while armed or grudging: `composeSing(w, m, dread)`, `DREAD` scale
   (0 1 3 6 7), a sixth lower, slow, every note sagging and growling, CAPS clusters, a heartbeat
   (dun-dun every .95 s) and a low tritone hum; its log line `.dread` (dark red).
 
@@ -929,7 +954,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   **This visit** (sessionStorage): the bag (`inventory`), the open secret wall, the boards off skizy's window …
 - `RESETS` table: each reset's theme, its one way to die, and where its hidden key is.
   `DEATHS` table: which resets each death is live in; after its last one it's "patched".
-  - Reset 1 "items": **the revolver** on yourself (the rooftop's). The toaster (and its tub death), the scissors and
+  - Reset 1 "items": **the revolver** on yourself (the rooftop's); or the bee in the front garden, if you shoot it again
+    after it's given the gun back (it stings you, takes the gun and shoots you: straight to reset 2; the gun's gone till reset 8). The toaster (and its tub death), the scissors and
     safety scissors were removed on 27 Sep. From reset 2 the revolver **always jams** on the traveller (revolver.js
     `JAMMED` lines), and from reset 2 it hangs on the living-room wall instead of lying on the roof (the same `revolver`
     item: a thing to shoot things with, and to find P(Doom) before reset 4).

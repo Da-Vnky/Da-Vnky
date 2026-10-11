@@ -80,6 +80,19 @@ body.in-porch .sky-links * {
     filter: brightness(var(--pd));
     pointer-events: none;
 }
+/* the front yard: from the street's bottom edge (the fence and the gate) down behind the porch floor, so there's ground
+   below the railing (the bee's shadow falls on it) */
+.porch .porch-yard {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(22vh + 1px);
+    z-index: 1;
+    filter: brightness(var(--pd));
+    pointer-events: none;
+}
+.porch .porch-yard>svg,
+.porch .porch-yard>.art,
 .porch .porch-street>svg,
 .porch .porch-street>.art {
     display: block;

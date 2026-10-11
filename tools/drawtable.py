@@ -19,6 +19,7 @@ pressing the button again opens it as you left it (a fresh canvas only if you as
     python tools/drawtable.py make assets/living/bee-body --fresh  a fresh one, even if there's one there already
     python tools/drawtable.py open assets/living/bee-body csp      make it if need be, and open it in Clip Studio
                                                                    (csp, ps or rebelle)
+    python tools/drawtable.py wrap assets/sea/wave-1 wave-1.png csp   a repeating picture moved by half a tile, to mend its join
     python tools/drawtable.py animate assets/living/bee-body animator
                                                                    an animation: Victor's Rebelle Animator (or csp)
 
@@ -643,10 +644,142 @@ def from_guide(gpath, art):
     return W, H, px
 
 
+# ---------------- pictures that repeat (the waves: side to side; the rope: top to bottom) ----------------
+# slots.json "tile": "x" (repeats sideways), "y" (downwards) or "xy" (both). their canvas is one tile, and its guide marks
+# the edges that join (what goes off one comes back on the other), over "tileGuide" (a picture, e.g. a wave's lines) if
+# there is one. "wrap it" (wrap() below) shifts a picture by half a tile, so the join's in the middle, to paint over
+TILE_GUIDE = r"""
+async ([W, H, axis, under]) => {
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  if (under) await new Promise(ok => { const i = new Image(); i.onload = () => { x.drawImage(i, 0, 0, W, H); ok(); }; i.onerror = ok; i.src = under; });
+  const s = Math.max(1, Math.min(W, H) / 400), band = (n) => Math.max(6 * s, n * .06);
+  const ink = '#b4442a', font = Math.round(Math.max(11, 15 * s)) + 'px Georgia, serif';
+  x.font = font; x.lineWidth = Math.max(2, 2 * s); x.setLineDash([10 * s, 7 * s]);
+  const label = (t, px, py, rot) => { x.save(); x.translate(px, py); x.rotate(rot || 0); x.fillStyle = 'rgba(255,248,232,.85)';
+    const w = x.measureText(t).width; x.fillRect(-4 * s, -14 * s, w + 8 * s, 19 * s); x.fillStyle = ink; x.fillText(t, 0, 0); x.restore(); };
+  if (axis.includes('x')) {
+    const b = band(W);
+    x.fillStyle = 'rgba(180,68,42,.12)'; x.fillRect(0, 0, b, H); x.fillRect(W - b, 0, b, H);
+    x.strokeStyle = ink; x.beginPath(); x.moveTo(x.lineWidth / 2, 0); x.lineTo(x.lineWidth / 2, H); x.moveTo(W - x.lineWidth / 2, 0); x.lineTo(W - x.lineWidth / 2, H); x.stroke();
+    const ly = Math.max(24 * s, H * .26);                     // (below a guide picture's own title)
+    label('← joins the right edge', b + 6 * s, ly); label('joins the left edge →', W - b - 6 * s - x.measureText('joins the left edge →').width, ly);
+    label('what goes off one side comes back on the other: keep heights and lines level across', b + 6 * s, H - 12 * s);
+  }
+  if (axis.includes('y')) {
+    const b = band(H);
+    x.fillStyle = 'rgba(180,68,42,.12)'; x.fillRect(0, 0, W, b); x.fillRect(0, H - b, W, b);
+    x.strokeStyle = ink; x.beginPath(); x.moveTo(0, x.lineWidth / 2); x.lineTo(W, x.lineWidth / 2); x.moveTo(0, H - x.lineWidth / 2); x.lineTo(W, H - x.lineWidth / 2); x.stroke();
+    if (W >= 160 * s) { label('↑ joins the bottom edge', 8 * s, b + 18 * s); label('joins the top edge ↓', 8 * s, H - b - 8 * s); }
+    else { label('joins the bottom →', 6 * s + 14 * s, b + 6 * s, Math.PI / 2); }
+  }
+  return c.toDataURL('image/png');
+}
+"""
+# the picture moved by half a tile, wrapping round (Photoshop's Filter > Other > Offset), and a guide where the join is now
+WRAP = r"""
+async ([src, axis]) => {
+  const i = await new Promise((ok, no) => { const m = new Image(); m.onload = () => ok(m); m.onerror = () => no(new Error("couldn't read that picture")); m.src = src; });
+  const W = i.naturalWidth, H = i.naturalHeight, dx = axis.includes('x') ? Math.round(W / 2) : 0, dy = axis.includes('y') ? Math.round(H / 2) : 0;
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  for (const ox of [0, -W]) for (const oy of [0, -H]) x.drawImage(i, dx + ox, dy + oy);
+  const g = document.createElement('canvas'); g.width = W; g.height = H; const y = g.getContext('2d');
+  const s = Math.max(1, Math.min(W, H) / 400), ink = '#b4442a';
+  y.fillStyle = 'rgba(180,68,42,.14)'; y.strokeStyle = ink; y.lineWidth = Math.max(2, 2 * s); y.setLineDash([10 * s, 7 * s]);
+  y.font = Math.round(Math.max(11, 15 * s)) + 'px Georgia, serif';
+  const label = (t, px, py) => { y.fillStyle = 'rgba(255,248,232,.85)'; const w = y.measureText(t).width; y.fillRect(px - 4 * s, py - 14 * s, w + 8 * s, 19 * s); y.fillStyle = ink; y.fillText(t, px, py); };
+  if (dx) { const b = W * .05; y.fillRect(dx - b, 0, 2 * b, H); y.beginPath(); y.moveTo(dx, 0); y.lineTo(dx, H); y.stroke(); label('the join is here now: paint over it till it disappears', dx + b + 6 * s, 24 * s); }
+  if (dy) { const b = H * .05; y.fillStyle = 'rgba(180,68,42,.14)'; y.fillRect(0, dy - b, W, 2 * b); y.beginPath(); y.moveTo(0, dy); y.lineTo(W, dy); y.stroke(); if (W >= 160 * s) label('the join is here now: paint over it', 8 * s, dy - b - 8 * s); }
+  return { W, H, art: c.toDataURL('image/png'), guide: g.toDataURL('image/png') };
+}
+"""
+
+
+def tile_axis(s):
+    a = (s.get('tile') or '').lower()
+    return a if a in ('x', 'y', 'xy') else ''
+
+
+def blank_page(then):
+    """a hidden browser's empty page, for squeezing pictures into a .psd with no scene to open"""
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        try:
+            return then(browser.new_page())
+        finally:
+            browser.close()
+
+
+def tile_canvas(s, art):
+    """one tile: the size slots.json gives (its "canvas", else its size doubled), the joining edges marked over its
+    tileGuide picture, and yours as it is now"""
+    W, H = canvas_size(s, None) or (None, None)
+    if not W:
+        raise ValueError('a repeating slot needs a size in tools/slots.json')
+    under = os.path.join(ROOT, *s['tileGuide'].split('/')) if s.get('tileGuide') else None
+    under = data_url(under) if under and os.path.isfile(under) else None
+
+    def build(page):
+        guide = page.evaluate(TILE_GUIDE, [W, H, tile_axis(s), under])
+        return page.evaluate(BUILD, [guide, data_url(art) if art else None, W, H, [0, 0, 1, 1], 'fill'])
+    return W, H, blank_page(build)
+
+
+NOTE_TILE = """
+this one REPEATS ({how}): the canvas is one tile, and the guide marks the edges that join. whatever goes off one of
+those edges has to come back on the other, at the same height, so the copies line up with no seam. (the guide over
+the waves also shows each wave's waterline and crest line.)
+
+to check and mend the join: export as usual, and the slot's card shows it laid out {times}, and says whether the join
+shows. "wrap it" then makes {name}-wrapped.psd: your picture moved by half a tile, so the join is in the middle where you
+can see it and paint over it (like Photoshop's Filter > Other > Offset, which Clip Studio doesn't have). export that one;
+it doesn't need moving back (a tile shifted by half still repeats the same).
+"""
+
+
+def wrap(slot, name, app=None):
+    """an export (or the slot's picture now: name 'current') moved by half a tile → <stem>-wrapped.psd, opened in app"""
+    folder, stem, _ = where(slot)
+    s, _, _ = described(slot)
+    axis = tile_axis(s)
+    if not axis:
+        raise ValueError(slot + " doesn't repeat (tools/slots.json gives it no 'tile')")
+    if name in (None, '', 'current'):
+        src = current_file(slot)
+        if not src:
+            raise ValueError('there is no picture in ' + slot + ' yet')
+    else:
+        src = os.path.join(folder, os.path.basename(name))
+        if not os.path.isfile(src) or src.rsplit('.', 1)[-1].lower() not in EXPORTS:
+            raise ValueError('no such picture on the drawing table')
+
+    def build(page):
+        r = page.evaluate(WRAP, [data_url(src), axis])
+        r['px'] = page.evaluate(BUILD, [r['guide'], r['art'], r['W'], r['H'], [0, 0, 1, 1], 'fill'])
+        return r
+    r = blank_page(build)
+    W, H, px = r['W'], r['H'], r['px']
+    chans = lambda k: list(zip((-1, 0, 1, 2), (base64.b64decode(x) for x in px[k])))
+    layers = [{'name': 'the join (hide me before you export)', 'chans': chans('guide'), 'opacity': 200, 'locked': True},
+              {'name': 'your picture, moved by half', 'chans': chans('art')},
+              {'name': 'paint over the join here', 'rgba': None}]
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.join(folder, stem + '-wrapped.psd')
+    write_psd(path, W, H, layers, base64.b64decode(px['flat']))
+    out = {'file': path, 'folder': folder, 'w': W, 'h': H, 'made': True, 'wrapped': True}
+    if app:
+        out.update(open_in(app, path))
+    return out
+
+
 def canvas_size(s, box):
-    """twice the size it's shown at (or the size it says, doubled), the right shape, never over BIGGEST a side"""
+    """twice the size it's shown at (or the size it says, doubled; or slots.json's "canvas", as it is), the right shape,
+    never over BIGGEST a side"""
+    own = re.search(r'(\d{2,5})\s*[x×]\s*(\d{2,5})', s.get('canvas') or '')
     want = stated_size(s)
-    if want:
+    if own:
+        w, h = int(own.group(1)), int(own.group(2))
+    elif want:
         w, h = want[0] * SCALE, want[1] * SCALE
     elif box:
         w, h = round(box['w'] * SCALE), round(box['h'] * SCALE)
@@ -690,7 +823,13 @@ def make(slot, fresh=False, view=None, app=None):
         W, H = canvas_size(s, found['box'])
         result.update(W=W, H=H, px=found['build'](W, H, art, 'fill'), view=found.get('view'))
     under = guide_file(s)
-    if under:
+    if tile_axis(s):
+        try:
+            result['W'], result['H'], result['px'] = tile_canvas(s, mine)
+            result['tile'] = tile_axis(s)
+        except Exception as e:
+            result['why'] = str(e).splitlines()[0]
+    elif under:
         try:
             result['W'], result['H'], result['px'] = from_guide(under, mine)
             result['on'] = os.path.relpath(under, ROOT).replace(os.sep, '/')
@@ -706,7 +845,8 @@ def make(slot, fresh=False, view=None, app=None):
         chans = lambda k: list(zip((-1, 0, 1, 2), (base64.b64decode(x) for x in px[k])))
         layers = []
         if px.get('guide'):
-            layers.append({'name': 'guide (hide me before you export)', 'chans': chans('guide'), 'opacity': GUIDE_OPACITY, 'locked': True})
+            layers.append({'name': 'repeat guide: the edges join (hide me before you export)' if result.get('tile') else 'guide (hide me before you export)',
+                           'chans': chans('guide'), 'opacity': GUIDE_OPACITY, 'locked': True})
         if px.get('art'):
             layers.append({'name': 'your picture now', 'chans': chans('art')})
         layers.append({'name': 'draw here', 'rgba': None})
@@ -725,7 +865,12 @@ def make(slot, fresh=False, view=None, app=None):
     write_psd(path, W, H, layers, composite)
     with open(os.path.join(folder, 'what to do.txt'), 'w', encoding='utf-8') as f:
         f.write(NOTE.format(name=stem, slot=slot, w=W, h=H))
-    return {'file': path, 'folder': folder, 'w': W, 'h': H, 'guide': guide, 'made': True, 'view': result.get('view'), 'on': result.get('on')}
+        if result.get('tile'):
+            a = result['tile']
+            f.write(NOTE_TILE.format(name=stem, how={'x': 'side to side', 'y': 'top to bottom', 'xy': 'both ways'}[a],
+                                     times={'x': 'three times side by side', 'y': 'three times one above another', 'xy': 'three by three'}[a]))
+    return {'file': path, 'folder': folder, 'w': W, 'h': H, 'guide': guide, 'made': True, 'view': result.get('view'), 'on': result.get('on'),
+            'tile': result.get('tile')}
 
 
 def psd_size(path):
@@ -824,8 +969,17 @@ def assemble(slot, fps=None, half=False):
 
 def main():
     a = sys.argv[1:]
-    if len(a) < 2 or a[0] not in ('make', 'open', 'animate'):
+    if len(a) < 2 or a[0] not in ('make', 'open', 'animate', 'wrap'):
         sys.exit(__doc__)
+    if a[0] == 'wrap':                                  # wrap <slot> <export name | current> [app]
+        try:
+            out = wrap(a[1], a[2] if len(a) > 2 else 'current', a[3] if len(a) > 3 else None)
+            for k in ('file', 'folder'):
+                out[k] = os.path.relpath(out[k], ROOT).replace(os.sep, '/')
+        except Exception as e:
+            out = {'error': str(e)}
+        print(json.dumps(out), flush=True)
+        sys.exit(1 if 'error' in out else 0)
     slot, fresh = a[1], '--fresh' in a
     view = a[a.index('--view') + 1] if '--view' in a and a.index('--view') + 1 < len(a) else None
     app = a[2] if a[0] in ('open', 'animate') and len(a) > 2 and not a[2].startswith('--') else None
