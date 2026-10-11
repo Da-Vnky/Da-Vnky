@@ -552,6 +552,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   lowpassed, fluttering at `3 / flap` Hz, straight to the speakers (not through the voice's master, whose gain `perform`
   sets), `HUM` .035 × the sound effects level, louder/higher with `speed` (from `fly()`), × .35 while it talks, panned to
   where it is, 0 when not `here()` or the tab's hidden; measured about -34 dB; slot `assets/sounds/bee-hum`, a loop).
+  **Its shadow** (11 Oct, Victor): `.bee-shadow` (just before `.bee-trail`), placed every frame by `shade(r)` in `fly()` on
+  the ground under it (`GROUND`: the garden .79 of the stage's height, the lawn in front of the roses; the porch .18 of the
+  screen up from the bottom, the yard), smaller, blurrier (`--sh-blur`) and fainter (`--sh`) the higher it is, × (1 − .55
+  dusk) in bee.css; slot `assets/living/bee-shadow`. For it the porch got a **front yard** (`.porch-yard`, slot
+  `assets/living/porch-yard`, porch.css: bottom 0, 22vh tall, under porch-street's bottom edge, behind the floor): the sky
+  used to show through between the street's fence and the porch floor.
   **Night on the porch**: porch.css dims each of its pieces by `--pd` (not the whole porch), so `.porch .bee-home` and
   `.porch .bee-trail` take `brightness(var(--pd))` too (bee.css); in the garden the whole `.front-stage` is dimmed already.
   The code still moves and tints his. A word bubble over its head (`.bee-bubble`).

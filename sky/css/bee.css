@@ -444,6 +444,31 @@ body.bee-talking .bee-home .bee-fly {
     100% { transform: scale(1.4) rotate(45deg); opacity: 0; }
 }
 
+/* its shadow on the ground (bee.js shade): a soft dark oval under it, smaller, blurrier and fainter the higher it flies
+   (--sh, --sh-blur), and fainter still at night. just before the trail, so behind everything of the bee's */
+.bee-shadow {
+    position: absolute;
+    aspect-ratio: 4 / 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(20, 14, 10, .85), rgba(20, 14, 10, .5) 55%, rgba(20, 14, 10, 0));
+    filter: blur(var(--sh-blur, 2px));
+    opacity: calc(var(--sh, .4) * (1 - .55 * var(--dusk, 0)));
+    pointer-events: none;
+}
+.bee-shadow.has-art {
+    background: none;
+    border-radius: 0;
+    aspect-ratio: auto;
+}
+.bee-shadow > img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.front .bee-shadow { z-index: 2; }
+.porch .bee-shadow { z-index: 1; }
+
 /* the dotted trail it leaves as it flies (bee.js fly/drop): dots dropped behind its tail, each fading as it shrinks.
    the layer sits just before the bee, so the dots are behind it (slot: assets/living/bee-trail, one dot) */
 .bee-trail {

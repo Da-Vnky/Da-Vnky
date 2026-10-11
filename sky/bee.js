@@ -1268,7 +1268,7 @@
     Sky.escape(function () { return open; }, close);
 
     /* ======================================================================
-       as it flies: a dotted trail behind it, and its wings' soft hum
+       as it flies: a dotted trail behind it, its shadow on the ground, and its wings' soft hum
        ====================================================================== */
     // the trail: a dot dropped behind its tail every little way it goes, each fading out (a cartoon's flight path).
     // one dot is a slot: assets/living/bee-trail (else a little cream dot). none for visitors who'd rather nothing moved
@@ -1279,6 +1279,26 @@
     var dotArt = null;
     Sky.findAsset('assets/living/bee-trail', function (url) { dotArt = url; });
     var lastDot = null, lastAt = null, faceSign = 1, faceT = 0, speed = 0;
+    // its shadow on the ground below it: follows it about, smaller, softer and fainter the higher it flies (and faint at
+    // night). slot: assets/living/bee-shadow (else a soft dark oval). the ground: the lawn in front of the roses (the
+    // garden, a share of the garden picture's height), or the yard beyond the railing (the porch, from the screen's bottom)
+    var GROUND = { front: .79, porch: .18 };
+    var shadow = document.createElement('div');
+    shadow.className = 'bee-shadow';
+    shadow.setAttribute('aria-hidden', 'true');
+    Sky.findAsset('assets/living/bee-shadow', function (url) { if (url) { shadow.innerHTML = '<img alt="" src="' + url + '">'; shadow.classList.add('has-art'); } });
+    function shade(r) {
+        var host = home.parentNode, box = host.getBoundingClientRect();
+        if (!box.width || !box.height) return;
+        var ground = host === stage ? box.top + box.height * GROUND.front : innerHeight * (1 - GROUND.porch);
+        var up = Math.max(0, ground - r.bottom), k = Math.max(.45, 1 - up / (r.height * 8));     // (1 on the ground … .45 high up)
+        var w = r.width * .78 * (.55 + .45 * k);
+        shadow.style.left = ((r.left + r.width / 2 - box.left) / box.width * 100).toFixed(2) + '%';
+        shadow.style.top = ((ground - box.top) / box.height * 100).toFixed(2) + '%';
+        shadow.style.width = w.toFixed(1) + 'px';
+        shadow.style.setProperty('--sh', (.6 * k).toFixed(3));
+        shadow.style.setProperty('--sh-blur', (1.5 + 5 * (1 - k)).toFixed(1) + 'px');
+    }
     function drop(x, y, w) {
         var box = trail.getBoundingClientRect();
         if (!box.width || !box.height) return;
@@ -1297,9 +1317,11 @@
         requestAnimationFrame(fly);
         if (MAPPING || !here()) { lastDot = lastAt = null; speed = 0; return; }
         if (trail.parentNode !== home.parentNode || trail.nextSibling !== home) { home.parentNode.insertBefore(trail, home); lastDot = lastAt = null; }
+        if (shadow.nextSibling !== trail) home.parentNode.insertBefore(shadow, trail);
         if (now - faceT > 400) { faceT = now; faceSign = parseFloat(getComputedStyle(home).getPropertyValue('--face')) < 0 ? -1 : 1; }
         var r = art.getBoundingClientRect();
         if (!r.width) return;
+        shade(r);
         var x = r.left + r.width / 2 - faceSign * r.width * .44, y = r.top + r.height * .55;
         if (lastAt) {
             var dt = Math.max(1, now - lastAt.t), v = Math.hypot(x - lastAt.x, y - lastAt.y) / dt * 1000 / r.width;   // (its own widths a second)

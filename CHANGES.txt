@@ -16,6 +16,7 @@ How it works
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
 - The drawing table knows which pictures repeat (the waves side to side, the sky's rope top to bottom): their canvas is one tile with the joining edges marked (over each wave's own guide); the asset manager shows every export laid out three times and says whether the join shows; 'wrap it' moves a picture by half a tile so the join is in the middle to paint over (like Photoshop's Offset, which Clip Studio doesn't have). Restart the content manager.
 - The bee seen from the porch now darkens with the evening like the rest of the porch (it stayed bright at night).
+- The bee casts a little shadow on the ground under it (the lawn out front, the yard from the porch), smaller and fainter the higher it flies, faint at night (slot assets/living/bee-shadow). The porch has a front yard now (slot assets/living/porch-yard): the lawn and the path from the gate to the steps, where the sky used to show through between the fence and the porch floor.
 
 == published ==
 
