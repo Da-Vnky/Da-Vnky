@@ -16,6 +16,7 @@ How it works
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
 - The bee is now in pieces for Victor's art: a body (bee-body-flying, wings flapping, or bee-body, still; facing left) and a face per mood laid over it (bee-face, bee-face-happy … -curious, and bee-face-talking for its mouth open as it buzzes), all on the same canvas. The old whole-bee slots (bee, bee-<mood>, bee-buzzing) are gone. The faces sit a little right and lower than drawn (--bee-face-x/-y in sky/css/bee.css).
 - The drawing table: a face slot's canvas is the bee body picture's exact size, with the body as its guide (slots.json "guide"). The asset manager's map reads several names in one data-slot (space-separated, as sky.js's ?slots already did).
+- Victor's bee is in: his body (bee-body, still for now, until the flapping one) and his nine faces (everyday, happy, excited, loving, angry, sad, scared, sleepy, curious), taken from his bee .psd at its full 480 x 400 canvas.
 
 == published ==
 
