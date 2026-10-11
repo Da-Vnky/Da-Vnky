@@ -273,6 +273,15 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   last used on that card (`localStorage dt-app`). No need to move it back: a tile shifted by half repeats the same. The card
   (assets.html `repeatStrip`): every export, and the slot's picture now, laid out three times with the joins marked, and
   whether the join shows (the edge columns/rows compared with neighbouring ones inside: seam > 2.5 × inside + 6 → red).
+- **The measurements layer** (11 Oct, Victor: "add measurements like this"): every canvas `make` builds gets a top layer
+  `measurements (hide me before you export)` (opacity 235, locked), drawn in the page by `MEASURE`: rulers in the canvas's
+  own pixels, its size, the other slots on it (FIND's `others`: dashed blue boxes with "x a–b, y c–d"; not `assets/sky|
+  characters|items|ui/…` or arrows, which move or sit over everything; several of one slot, like the crows, become one box
+  "(×5)"), and red **marks** from slots.json (`marks_for`): `{label, y}` a level line, `{label, x}` an upright one, `{label,
+  x, y}` a point, `{label, box: [x,y,w,h]}`, `{label, line: [x1,y1,x2,y2]}`, in the units of `"marksIn": "W x H"` (else the
+  slot's stated size), scaled to the canvas; `"marksFrom": "<another slot>"` borrows that one's (front-house, front-door(-open)
+  use front-ground's). Marked so far: front-ground, porch-frame, porch-street, porch-yard. Labels that would cover each other
+  step aside (the other slots' ones last). A canvas made before this has no such layer: "a fresh canvas" makes one.
 - After changing content.py: Victor restarts the content manager (close its window, double-click `tools\content.bat`).
 
 ## The attic (sky/attic.js)
