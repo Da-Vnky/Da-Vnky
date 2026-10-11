@@ -427,7 +427,10 @@
                 fresh.querySelector('input').checked = false;
                 var size = r.w ? ' (' + r.w + ' × ' + r.h + (r.on ? ', on ' + r.on.replace(/^assets\//, '').replace(/\.\w+$/, '') + ' as the guide' : r.guide ? ', with a guide' : '') + ')' : '';
                 say((r.opened ? 'opened in ' + r.name : 'made') + ': ' + (r.made === false ? 'your working file, as you left it' : r.animator ? 'a new animation' + size : 'a new canvas' + size) +
-                    '. export into ' + (r.animator || path.indexOf('animate') > -1 ? r.folder + '/frames' : r.folder) + ' and it’ll show on this card.');
+                    '. export into ' + (r.animator || path.indexOf('animate') > -1 ? r.folder + '/frames' : r.folder) + ' and it’ll show on this card.' +
+                    (r.made && !r.measured ? ' (no measurements layer this time: ' + (r.measureWhy || 'no reason given') + ')' : '') +
+                    (r.rebelle === 'sized' ? ' Rebelle can’t open a .psd’s layers: once it’s up it gets a new ' + (r.w || '') + (r.w ? ' × ' + r.h : '') + ' canvas; File › Import the guide and measurements from ' + r.folder + '/layers.' :
+                     r.rebelle === 'open' ? ' Rebelle was open already, so its canvas wasn’t touched: File › New at the size above, then File › Import the pictures in ' + r.folder + '/layers.' : ''), !!(r.made && !r.measured));
                 poll();
             }).then(function () { busy = false; all.forEach(function (b) { b.disabled = false; }); });
         }

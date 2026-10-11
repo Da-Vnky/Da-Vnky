@@ -14,6 +14,7 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Drawing table: a canvas made before the measurements layer (and never saved over) is made again when you press the button, so it gets the layer; if the layer can't be drawn, the card says why. Rebelle now gets a canvas of the right size once it's open (asked over its live link, like the animator), and the guide and measurements are also saved as pictures in the slot's layers folder, to import into Rebelle.
 
 == published ==
 
