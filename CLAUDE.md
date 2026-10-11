@@ -125,6 +125,46 @@ this before changing anything; keep it up to date when something here stops bein
   constantly. **On localhost nothing is kept**: `sky/loader.js` unregisters the service worker and deletes
   its cache, and `sw.js` passes every request straight through, so every edit shows on refresh.
 
+## The desk (desk.html: letters, post, bottles, paintings and frames from anywhere, signed in; 11 Oct)
+
+- Victor: a login page on the site, not linked from it, that does the letters / visitors / paintings parts of the content
+  manager from any browser (his phone), with no confirming in the content manager. `desk.html` + `sky/desk.js` +
+  `sky/css/desk.css` (no loader, no state.js, no sky.js: it reads `SUPABASE` out of sky/sky.js's text, so the project is
+  written once). `noindex`; nothing links to it. Its safety is Supabase's rules, not the hidden address.
+- **Supabase** (`tools/supabase-desk.sql`, Victor runs it; safe to run again): `desk_owner (uid)` (no policies: only the
+  SQL editor writes it), `dav_is_owner()` (security definer), `desk (path pk, gone, obj, at, filed_at)` (anon reads,
+  only the owner writes), the public bucket `desk` (30 MB, images/text/json/video; only the owner writes), and the owner
+  may read and delete `post` and its private pictures. The keep-alive job still gets `[]` (anon still can't read post).
+  Sign-in is Supabase Auth, email + password, via `/auth/v1/token` (no library); the session is kept in localStorage
+  `dav-desk-session` and refreshed a minute before it runs out (and once more on a 401 / "JWT expired"). A signed-in
+  account that isn't the owner sees the one line that makes it so (`insert into public.desk_owner (uid) values ('…')`):
+  so no email ever goes in the (public) repo. Victor should switch off "Allow new users to sign up".
+- **A change at the desk is a file**: `rows[path]` = a new copy in storage (`obj`: the same folder, a fresh name each
+  time, `<stamp>-<slug>.<ext>`, so no cache ever serves an old one; the old copy is deleted) or `gone: true` (deleted; a
+  file only ever on the desk is just removed). Names are made exactly as content.py makes them (`save`, `keep`,
+  `shelf_add`/`clean_name`, `unique`: case-insensitive), and board.json / frames.json are written whole, as content.py
+  writes them (`hang`: one frame per wall, `moved`, `unhang_everywhere`, `place_bottle`). The desk reads the published
+  lists from the site itself (`content/…/list.txt`, the pages for the frame numbers) and lays its rows over them.
+- **The site shows the desk at once** (sky.js "the desk": `deskReady()`, one `GET /rest/v1/desk` per page, given up after
+  `DESK_WAIT` 2.5 s; Supabase asleep or no desk table = nothing changes). `listFolder` merges it into every `content/`
+  folder (new and changed files get the desk's address, gone ones vanish); `Sky.desk.ready` / `Sky.desk.url(path)` for
+  single files: crate.js (board.json), frames.js (frames.json and the pictures), gallery.js (the workshop's frames.json),
+  letters.js (a letter's `content/…` pictures). On localhost, rows already filed are skipped (the folder has them, and
+  may have newer edits). sw.js never keeps the desk page or anything it asks for (its referrer), so it's always fresh.
+- **Into the repo**: publish.bat / publish.sh step 2 runs `tools/desk.py file` (with the content manager's secret key,
+  `.inbox/supabase.json`): rows filed by an earlier publish are deleted (row + storage copy: they're live from the repo by
+  now), then every unfiled row is written into content/ (a gone one deleted), marked `filed_at` (only if `at` hasn't
+  changed meanwhile), and gets a CHANGES.txt line ("From the desk: …"). A file that differed here is copied to
+  `_your-versions/<date_time>-desk/` first. `python tools/desk.py show` lists what's waiting. No key / no desk table /
+  Supabase unreachable: it says so and the publish carries on.
+- content.py `fetch_supabase`: post kept or thrown back at the desk is gone from Supabase, so it's dropped from the
+  inbox here too (only when fewer than 500 rows came back).
+- Tested 11 Oct against a stand-in Supabase (a small mock of PostgREST/auth/storage): wrong password, a non-owner (the
+  claim line), letters (new, picture, rename by date, editing a published one, deleting), the post (keep a bottle, keep a
+  painting, throw back), pinning, paintings (add, caption, hang, move to the walls pool with its frame following), the
+  frames tab, the sea / living space / workshop showing all of it, a phone (390 wide, no sideways scroll), a session
+  running out, then `desk.py file` (files, backups, CHANGES lines) and again (tidied). Not yet against the real project.
+
 ## The pages
 
 - `index.html` — the sea (homepage): scroll = the day turning; ship you can pick up; dock; bottles. Its signpost
@@ -662,8 +702,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   **As it flies** (11 Oct, Victor): a dotted trail (`fly()`, rAF: a dot every `.1` of its width its tail travels, `drop()`
   into `.bee-trail`, a layer kept just before `.bee-home` in whichever host it's in; dots fade over 2.8 s, at most 48; slot
   `assets/living/bee-trail`; none with prefers-reduced-motion) and its wings' hum (`startHum` on the visitor's first
-  pointerdown/keydown anywhere, `tuneHum` every 120 ms: two sawtooths + a triangle an octave down at half its mood's `hz`,
-  lowpassed, fluttering at `3 / flap` Hz, straight to the speakers (not through the voice's master, whose gain `perform`
+  pointerdown/keydown anywhere, `tuneHum` every 120 ms: two sawtooths + a triangle an octave down at its mood's `hz` (half of it × `HUM_UP`, 12 semitones since 11 Oct: Victor wanted it cuter; 24 was too high),
+  lowpassed (the filter × the same), fluttering at `3 / flap` Hz, straight to the speakers (not through the voice's master, whose gain `perform`
   sets), `HUM` .035 × the sound effects level, louder/higher with `speed` (from `fly()`), × .35 while it talks, panned to
   where it is, 0 when not `here()` or the tab's hidden; measured about -34 dB; slot `assets/sounds/bee-hum`, a loop).
   **Its shadow** (11 Oct, Victor): `.bee-shadow` (just before `.bee-trail`), placed every frame by `shade(r)` in `fly()` on
@@ -1316,7 +1356,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 
 - `.inbox/` (gitignored) holds the letters manager's private keys (FormSubmit, Supabase). Never print,
   commit or publish anything from it, and never send it anywhere.
-- Don't change Victor's Supabase setup without asking; he runs SQL himself (`tools/*.sql`).
+- Don't change Victor's Supabase setup without asking; he runs SQL himself (`tools/*.sql`). The desk's rules are in `tools/supabase-desk.sql`: never add a rule that lets anyone but the owner (`dav_is_owner()`) write the desk or read the post.
 - ntfy topics must be long and random.
 - The repo is public: nothing private goes in any committed file (this one included).
 - **Victor's name is never on the site** (11 Oct, Victor): nothing the server sends (html, js, css, json, txt, svg, xml:

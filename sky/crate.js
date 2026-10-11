@@ -588,7 +588,9 @@
 
     /* ---------------- the bottles, and where they are ---------------- */
     drawAll();
-    var gotBoard = fetch(BOARD_FILE, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+    // (board.json as published, or the desk's newer one: desk.html)
+    var gotBoard = Sky.desk.ready.then(function () { var u = Sky.desk.url(BOARD_FILE); return u ? fetch(u, { cache: 'no-cache' }) : null; })
+        .then(function (r) { return r && r.ok ? r.json() : null; }).catch(function () { return null; });
     Sky.listFolder(crate.dataset.folder, KINDS, function (files) {
         gotBoard.then(function (j) {
             if (j) published = clean(j);

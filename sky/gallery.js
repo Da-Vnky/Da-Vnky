@@ -190,7 +190,8 @@
 
     // what hangs on this room's walls (content/workshop/frames.json) isn't on the easel too
     var FOLDER = easel.dataset.folder.replace(/\/?$/, '/');
-    var onWall = fetch(FOLDER + 'frames.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
+    var onWall = Sky.desk.ready.then(function () { var u = Sky.desk.url(FOLDER + 'frames.json'); return u ? fetch(u, { cache: 'no-cache' }) : null; })
+        .then(function (r) { return r && r.ok ? r.json() : {}; }).catch(function () { return {}; });
     Sky.listFolder(easel.dataset.folder, IMG.concat(['txt']), function (files) { onWall.then(function (map) {
         var hung = {};
         Object.keys(map || {}).forEach(function (k) {

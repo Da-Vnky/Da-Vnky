@@ -93,6 +93,9 @@ self.addEventListener('fetch', function (e) {
     if (LOCAL) return;                                              // (a preview: straight from your files, every time)
     var req = e.request, url = new URL(req.url);
     if (url.origin !== self.location.origin) return;              // (Supabase, fonts … go straight out)
+    // the desk (desk.html) and everything it asks for: always fresh from the site, never a kept copy
+    // (it has to see the lists as they are now, and it doesn't run the loader that tidies the kept ones)
+    if (/\/desk\.html$/.test(url.pathname) || /\/desk\.html(?:[?#]|$)/.test(req.referrer || '')) return;
     if (req.method === 'HEAD') {                                    // "is this file there?": answer from the copy if we have it
         e.respondWith(caches.open(CACHE).then(function (c) { return c.match(keyOf(url), { ignoreSearch: true }); }).then(function (hit) {
             return hit ? new Response(null, { status: 200, headers: hit.headers }) : fetch(req);

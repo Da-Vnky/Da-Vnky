@@ -58,6 +58,8 @@
                         var d = Sky.fileDate(f.name);
                         if (d) a.dataset.date = d; else a.setAttribute('data-nodate', '');
                         a.innerHTML = /\.txt$/i.test(f.name) ? Sky.txtToHtml(text) : text;
+                        // (a picture in it that's still on the desk: desk.html)
+                        a.querySelectorAll('img[src^="content/"]').forEach(function (im) { var u = Sky.desk.url(im.getAttribute('src')); if (u) im.src = u; });
                         return a;
                     });
             })).then(function (arts) {

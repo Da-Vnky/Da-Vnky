@@ -1752,6 +1752,65 @@
          2. the server's own folder listing, if it shows one
          3. your Forgejo repo's API, if it answers browsers
        files that turn out to be missing are skipped. */
+    /* ---------------- the desk (desk.html): what the artist changed from anywhere, before it's published ----------------
+       the desk keeps its changes on Supabase: a list (the "desk" table: a file's place on the site, and where its new
+       copy is in the "desk" storage, or that it was deleted) and the files themselves. the site shows them at once,
+       on top of what's published: a letter written on a phone is on the sea a moment later. the next publish copies
+       them into the repo (tools/desk.py), and the one after tidies them away. no desk (or Supabase asleep): nothing
+       changes, everything's as published. */
+    var DESK_WAIT = 2500;                                            // (how long to wait for the desk's list, ms)
+    var deskRows = null, deskList = {};
+    var LOCALHOST = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    function deskReady() {
+        if (deskRows) return deskRows;
+        if (!SUPABASE.url || !SUPABASE.key || location.protocol === 'file:' || /[?&]map\b/.test(location.search)) return (deskRows = Promise.resolve(deskList));
+        var stop = typeof AbortController === 'function' ? new AbortController() : null;
+        var late = setTimeout(function () { if (stop) stop.abort(); }, DESK_WAIT);
+        deskRows = fetch(SUPABASE.url.replace(/\/+$/, '') + '/rest/v1/desk?select=path,gone,obj,at,filed_at', { headers: sbHeaders(), cache: 'no-store', signal: stop ? stop.signal : undefined })
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .catch(function () { return []; })
+            .then(function (rows) {
+                clearTimeout(late);
+                (Array.isArray(rows) ? rows : []).forEach(function (r) {
+                    // on your own computer, what's been filed is in your folder already (and you may have changed it since)
+                    if (!r || !r.path || (LOCALHOST && r.filed_at)) return;
+                    deskList[r.path] = r;
+                });
+                return deskList;
+            });
+        return deskRows;
+    }
+    function deskPath(p) {
+        p = String(p || '').split(/[?#]/)[0].replace(/^(\.\/|\/)+/, '');
+        try { p = decodeURIComponent(p); } catch (e) {}
+        return p;
+    }
+    function deskFileUrl(r) {
+        return SUPABASE.url.replace(/\/+$/, '') + '/storage/v1/object/public/desk/' + r.obj.split('/').map(encodeURIComponent).join('/');
+    }
+    // the address to fetch a content file from: the desk's copy if there is one, else the published one.
+    // (call it once Sky.desk.ready has answered.) deleted at the desk: null
+    function deskUrl(path) {
+        var r = deskList[deskPath(path)];
+        if (!r) return path;
+        return r.gone || !r.obj ? null : deskFileUrl(r);
+    }
+    // a folder's files, with the desk's new, changed and deleted ones
+    function withDesk(dir, want, files) {
+        var at = deskPath(dir), byName = {}, order = [];
+        files.forEach(function (f) { byName[f.name] = f; order.push(f.name); });
+        Object.keys(deskList).forEach(function (p) {
+            if (p.indexOf(at) !== 0) return;
+            var n = p.slice(at.length);
+            if (!n || n.indexOf('/') !== -1 || n === 'list.txt' || /^[._]/.test(n) || !want.test(n)) return;
+            var r = deskList[p];
+            if (r.gone || !r.obj) { delete byName[n]; return; }
+            if (!byName[n]) order.push(n);
+            byName[n] = { name: n, url: deskFileUrl(r), desk: true };
+        });
+        return order.filter(function (n, i) { return byName[n] && order.indexOf(n) === i; }).map(function (n) { return byName[n]; });
+    }
+
     var folderCache = {};
     function listFolder(dir, exts, cb) {
         dir = dir.replace(/\/?$/, '/');
@@ -1774,10 +1833,13 @@
             if (!t || /<html/i.test(t)) return null;
             return clean(t.split(/\r?\n/).filter(function (l) { return l.trim() && !/^\s*#/.test(l); }));
         });
-        folderCache[key] = fromList.then(function (listed) {
+        var published = fromList.then(function (listed) {
             if (listed) return listed.map(function (n) { return { name: n, url: dir + encodeURIComponent(n) }; });
             return askAround();
         });
+        // (the content folders also get what's waiting on the desk)
+        folderCache[key] = deskPath(dir).indexOf('content/') !== 0 ? published :
+            Promise.all([published, deskReady()]).then(function (both) { return withDesk(dir, want, both[0]); });
         return folderCache[key].then(cb);
         function askAround() {
         var fromServer = get(dir).then(function (t) {
@@ -2070,6 +2132,9 @@
         openSkyView: openSkyView,
         closeSkyView: closeSkyView,
         listFolder: listFolder,
+        // the desk's changes (desk.html): Sky.desk.ready.then(…), then Sky.desk.url('content/…') for a content file's
+        // address (the desk's copy, the published one, or null if it was deleted at the desk)
+        desk: { get ready() { return deskReady(); }, url: deskUrl },
         inbox: BOTTLE_INBOX,
         sendPost: sendPost,
         // a glass bottle drawing (viewBox 0 0 200 90): .b-scroll (the note inside), .b-cork

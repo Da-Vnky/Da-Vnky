@@ -1,0 +1,258 @@
+/* =====================================================================
+   desk.css — the desk (desk.html, sky/desk.js): a walnut writing desk under
+   a lamp, the letters and post laid out on it as sheets of the site's paper.
+   ===================================================================== */
+
+:root {
+    --ink: #3a2716;
+    --ink-faded: #6e5236;
+    --sanguine: #9a3b1f;
+    --sanguine-hi: #b24a28;
+    --card: #eadcb9;
+    --card-hi: #f6ecd4;
+    --cream: #f3e6c2;
+    --wood: #2a1b11;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background: var(--wood);
+    font: 1.05rem/1.5 "IM Fell English", Georgia, serif;
+    padding: 0 0 env(safe-area-inset-bottom);
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+a { color: var(--sanguine); }
+code { font: .86em ui-monospace, Menlo, Consolas, monospace; background: rgba(110,82,54,.12); padding: 0 4px; border-radius: 4px; font-style: normal; }
+
+/* ---------- the desk itself: walnut, its grain, the lamp's light ---------- */
+.dk-wood {
+    position: fixed; inset: 0; z-index: -2;
+    background:
+        repeating-linear-gradient(92deg, rgba(0,0,0,.0) 0 7px, rgba(0,0,0,.09) 7px 8px, rgba(0,0,0,0) 8px 19px, rgba(255,210,150,.03) 19px 21px),
+        repeating-linear-gradient(88deg, rgba(0,0,0,.12) 0 2px, transparent 2px 61px),
+        radial-gradient(ellipse 140% 60% at 30% 120%, #3b2516, transparent 60%),
+        linear-gradient(176deg, #3a2618, #24170e 60%, #1a100a);
+}
+.dk-wood::after {                                                   /* knots and rings in the grain */
+    content: ""; position: absolute; inset: 0;
+    background:
+        radial-gradient(ellipse 60px 18px at 18% 34%, rgba(0,0,0,.25), transparent 70%),
+        radial-gradient(ellipse 120px 30px at 18% 34%, transparent 55%, rgba(0,0,0,.12) 60%, transparent 66%),
+        radial-gradient(ellipse 40px 12px at 78% 72%, rgba(0,0,0,.22), transparent 70%),
+        radial-gradient(ellipse 90px 22px at 78% 72%, transparent 55%, rgba(0,0,0,.1) 60%, transparent 66%);
+}
+.dk-lamp {
+    position: fixed; inset: -20vh -20vw auto auto; width: 120vw; height: 110vh; z-index: -1; pointer-events: none;
+    background: radial-gradient(ellipse 55% 50% at 62% 34%, rgba(255,214,150,.22), rgba(255,190,120,.08) 45%, transparent 70%);
+}
+
+/* ---------- the head ---------- */
+.dk-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: max(14px, env(safe-area-inset-top)) 18px 10px;
+    color: var(--cream);
+}
+.dk-mark svg { width: 46px; height: 46px; display: block; filter: drop-shadow(0 3px 4px rgba(0,0,0,.5)); }
+.dk-titles { flex: 1; min-width: 0; }
+.dk-head h1 { margin: 0; font: normal 2rem/1 "IM Fell English SC", Georgia, serif; letter-spacing: .02em; text-shadow: 0 2px 6px rgba(0,0,0,.5); }
+.dk-who { margin: 4px 0 0; font-size: .88rem; font-style: italic; color: rgba(243,230,194,.72); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dk-link { background: none; border: 0; padding: 0; color: #e0b070; font-style: italic; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.dk-site { font-size: .92rem; white-space: nowrap; }
+
+/* ---------- paper ---------- */
+.dk-sheet {
+    position: relative;
+    background-color: var(--card);
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0 0.12 0 0 0 0.16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 30% 20%, var(--card-hi), transparent 60%),
+        radial-gradient(ellipse at center, transparent 62%, #c9b082 100%);
+    border-radius: 3px;
+    padding: 20px 22px 22px;
+    box-shadow: 0 0 0 1px rgba(60,40,20,.25), inset 0 0 60px rgba(110,70,30,.22), 0 16px 40px rgba(0,0,0,.55);
+}
+.dk-sheet h2 { margin: 0; font: normal 1.55rem/1.15 "IM Fell English SC", Georgia, serif; color: var(--ink); }
+.dk-hint { margin: 6px 0 12px; font-size: .9rem; font-style: italic; color: var(--ink-faded); }
+.dk-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.dk-row h2 { flex: 1; min-width: 8em; }
+
+/* ---------- buttons and fields ---------- */
+.dk-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 16px; border: 1px solid rgba(110,82,54,.4); border-radius: 999px;
+    background: rgba(248,240,220,.85); color: var(--ink); cursor: pointer; font-style: italic; line-height: 1.2;
+    transition: background .15s, transform .1s;
+}
+.dk-btn:hover { background: #fff8e6; }
+.dk-btn:active { transform: translateY(1px); }
+.dk-btn.dk-main { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.dk-btn.dk-main:hover { background: var(--sanguine); border-color: var(--sanguine); }
+.dk-btn.dk-danger { background: none; color: var(--sanguine); border-color: rgba(154,59,31,.45); }
+.dk-btn.dk-danger:hover { background: rgba(154,59,31,.08); }
+.dk-busy .dk-btn, .dk-busy select { opacity: .6; pointer-events: none; }
+label { display: block; font-size: .85rem; font-style: italic; color: var(--ink-faded); }
+input[type=text], input[type=email], input[type=password], input[type=date], select, textarea {
+    width: 100%; margin-top: 3px; padding: 8px 11px; border: 1px solid rgba(110,82,54,.32); border-radius: 8px;
+    background: rgba(250,243,226,.92); outline: none; font-style: normal; color: var(--ink);
+}
+input:focus, textarea:focus, select:focus { border-color: var(--sanguine); box-shadow: 0 0 0 3px rgba(154,59,31,.14); }
+input.dk-big { font-size: 1.35rem; }
+input[type=date] { min-height: 2.4em; }
+
+/* ---------- signing in ---------- */
+.dk-signin, .dk-claim { display: grid; place-items: center; padding: 6vh 16px 40px; }
+.dk-signin-card { width: min(380px, 100%); display: grid; gap: 12px; padding: 34px 28px 26px; transform: rotate(-.6deg); }
+.dk-signin-card h2 { text-align: center; }
+.dk-signin-card .dk-hint { text-align: center; margin: -6px 0 4px; }
+.dk-seal { position: absolute; top: -26px; right: -14px; width: 70px; transform: rotate(14deg); filter: drop-shadow(0 4px 5px rgba(0,0,0,.45)); }
+.dk-seal svg { display: block; width: 100%; }
+.dk-say { margin: 0; min-height: 1.3em; text-align: center; font-style: italic; color: var(--sanguine); font-size: .92rem; }
+.dk-claim .dk-sheet { width: min(620px, 100%); }
+.dk-claim textarea { font: .85rem/1.45 ui-monospace, Menlo, Consolas, monospace; resize: none; }
+
+/* ---------- the tabs: bookmarks along the desk's edge ---------- */
+.dk-tabs {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
+    padding: 8px 14px 0;
+    background: linear-gradient(to bottom, rgba(26,16,10,.96) 70%, rgba(26,16,10,0));
+    -webkit-overflow-scrolling: touch;
+}
+.dk-tabs::-webkit-scrollbar { display: none; }
+.dk-tabs button {
+    flex: 0 0 auto; position: relative;
+    padding: 9px 16px 11px; border: 0; border-radius: 10px 10px 0 0; cursor: pointer;
+    background: linear-gradient(to bottom, #8a6a46, #5d442c); color: var(--cream); font-style: italic;
+    box-shadow: inset 0 1px 0 rgba(255,230,190,.25), 0 -2px 6px rgba(0,0,0,.3);
+    transform: translateY(4px); transition: transform .15s, background .15s;
+}
+.dk-tabs button:hover { transform: translateY(1px); }
+.dk-tabs button.on { background: linear-gradient(to bottom, var(--card-hi), var(--card)); color: var(--ink); transform: none; }
+.dk-count { display: inline-block; min-width: 1.4em; padding: 0 5px; margin-left: 3px; border-radius: 999px; background: var(--sanguine); color: var(--cream); font-size: .8rem; font-style: normal; text-align: center; }
+.dk-waiting {
+    margin: 10px 16px 0; padding: 8px 14px; border-radius: 10px;
+    background: rgba(243,230,194,.08); border: 1px dashed rgba(224,176,112,.45); color: rgba(243,230,194,.85);
+    font-size: .9rem; font-style: italic;
+}
+.dk-waiting b { font-weight: normal; color: #e0b070; }
+.dk-main-area { padding: 14px 16px 60px; max-width: 1500px; margin: 0 auto; }
+.dk-pane > .dk-sheet + .dk-sheet { margin-top: 22px; }
+.dk-wide { transform: rotate(-.15deg); }
+.dk-wide:nth-child(even) { transform: rotate(.2deg); }
+
+/* ---------- letters ---------- */
+.dk-letters { display: grid; grid-template-columns: 280px minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.dk-list-sheet { position: sticky; top: 64px; max-height: calc(100vh - 84px); display: flex; flex-direction: column; }
+.dk-list { overflow-y: auto; margin: 0 -8px; padding: 0 8px; }
+.dk-item {
+    display: block; width: 100%; margin: 0 0 6px; padding: 9px 12px; border: 0; border-radius: 10px; cursor: pointer; text-align: left;
+    background: rgba(110,82,54,.07); position: relative;
+}
+.dk-item:hover { background: rgba(110,82,54,.14); }
+.dk-item.on { background: var(--ink); color: var(--cream); }
+.dk-item b { display: block; font-weight: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dk-item small { display: block; font-style: italic; opacity: .78; font-size: .82rem; }
+.dk-later-tag { color: #b8860b; }
+.dk-item.on .dk-later-tag { color: #e8b33c; }
+.dk-ondesk {
+    display: inline-block; margin-top: 3px; padding: 0 7px; border-radius: 999px; font-size: .74rem; font-style: italic;
+    background: rgba(154,59,31,.12); color: var(--sanguine); border: 1px solid rgba(154,59,31,.3);
+}
+.dk-item.on .dk-ondesk { background: rgba(243,230,194,.15); color: #f0c49a; border-color: rgba(243,230,194,.3); }
+.dk-edit { display: flex; flex-direction: column; gap: 10px; }
+.dk-two { display: grid; grid-template-columns: 1fr 10.5em; gap: 10px; }
+.dk-tools { display: flex; flex-wrap: wrap; gap: 4px; }
+.dk-tools button { padding: 4px 11px; border: 1px solid rgba(110,82,54,.3); border-radius: 999px; background: rgba(250,243,226,.9); cursor: pointer; font-size: .92rem; }
+.dk-tools button:hover { background: #fff8e6; }
+.dk-l-body { min-height: 46vh; resize: vertical; padding: 12px 14px; font-size: 1.08rem; line-height: 1.62;
+    background-image: repeating-linear-gradient(to bottom, transparent 0 27px, rgba(110,82,54,.09) 27px 28px); background-attachment: local; }
+.dk-l-body.dk-code { font: .9rem/1.5 ui-monospace, Menlo, Consolas, monospace; background-image: none; }
+.dk-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dk-l-state { flex: 1; min-width: 8em; font-style: italic; font-size: .9rem; color: var(--ink-faded); }
+.dk-l-state.dirty::before { content: "\25cf  "; color: var(--sanguine); }
+.dk-l-look { display: none; }
+.dk-preview {
+    min-height: 60vh; padding: 46px 22px 40px; border-radius: 6px;
+    background: radial-gradient(ellipse at 50% 30%, #4b6d8c, #1e2c40 80%);
+    box-shadow: inset 0 0 40px rgba(0,0,0,.5), 0 14px 34px rgba(0,0,0,.5);
+}
+.dk-preview .letter { margin: 0 auto 20px; }
+.dk-preview .sheet { padding: 48px 42px 54px; }
+.dk-preview img { max-width: 100%; height: auto; }
+.dk-note { text-align: center; color: rgba(243,230,194,.8); font-style: italic; margin: 0 0 18px; }
+.dk-empty { display: grid; place-items: center; min-height: 40vh; color: rgba(243,230,194,.75); font-style: italic; text-align: center; }
+
+/* ---------- cards: post, bottles, paintings, frames ---------- */
+.dk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; margin-top: 8px; align-items: start; }
+.dk-group { margin: 18px 0 2px; font: normal 1.12rem "IM Fell English SC", Georgia, serif; color: var(--ink-faded); border-bottom: 1px solid rgba(110,82,54,.2); }
+.dk-card {
+    display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 6px;
+    background: rgba(250,243,226,.72); box-shadow: 0 0 0 1px rgba(110,82,54,.2), 0 5px 14px rgba(60,35,15,.18);
+}
+.dk-card h3 { margin: 0; font-weight: normal; font-size: 1.08rem; }
+.dk-card h3 small { font-style: italic; color: var(--ink-faded); }
+.dk-kind { font: normal .9rem "IM Fell English SC", Georgia, serif; color: var(--sanguine); letter-spacing: .04em; }
+.dk-thumb {
+    position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 4px;
+    background: repeating-conic-gradient(#e6d8b6 0 25%, #f1e6cb 0 50%) 0 0 / 16px 16px;
+}
+.dk-thumb img, .dk-thumb video { width: 100%; height: 100%; object-fit: contain; display: block; }
+.dk-thumb.dk-words, .dk-words {
+    display: block; aspect-ratio: auto; max-height: 12em; overflow: auto; padding: 10px 12px; white-space: pre-wrap;
+    background: var(--card-hi); font-size: .95rem; line-height: 1.45; border-radius: 4px; box-shadow: inset 0 0 18px rgba(110,70,30,.18);
+}
+.dk-from { margin: 0; font-size: .82rem; font-style: italic; color: var(--ink-faded); word-break: break-word; }
+.dk-caption { margin: 0; font-size: .9rem; font-style: italic; }
+.dk-caption:empty { display: none; }
+.dk-empty-note { grid-column: 1 / -1; margin: 4px 0; font-style: italic; color: var(--ink-faded); }
+.dk-card .dk-actions .dk-btn { padding: 6px 12px; font-size: .9rem; }
+.dk-upload { position: relative; }
+.dk-hangs { display: flex; flex-wrap: wrap; gap: 6px 10px; }
+.dk-hang { display: flex; align-items: center; gap: 4px; font-size: .8rem; }
+.dk-hang select { width: auto; margin: 0; padding: 2px 6px; font-size: .85rem; }
+.dk-frame-no { font: normal 1.05rem "IM Fell English SC", Georgia, serif; }
+.dk-frame-no small { font-family: "IM Fell English", Georgia, serif; font-style: italic; color: var(--ink-faded); }
+.dk-frame-pic {
+    display: grid; place-items: center; aspect-ratio: 4 / 3; padding: 10px; border-radius: 3px;
+    background: linear-gradient(135deg, #8a6236, #5a3c20); box-shadow: inset 0 0 0 4px #b8925c, inset 0 0 0 7px #4a3018, inset 0 0 20px rgba(0,0,0,.5);
+}
+.dk-frame-pic > .dk-thumb { width: 100%; height: 100%; aspect-ratio: auto; background: #efe3c6; }
+.dk-frame-pic > span { color: rgba(243,230,194,.75); font-style: italic; font-size: .9rem; text-align: center; }
+
+/* ---------- the note that pops up ---------- */
+.dk-toast {
+    position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); z-index: 50; max-width: min(560px, calc(100vw - 28px));
+    padding: 10px 18px; border-radius: 14px; background: var(--ink); color: var(--cream); font-style: italic; text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5); opacity: 0; transform: translate(-50%, 16px); pointer-events: none; transition: opacity .25s, transform .25s;
+}
+.dk-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.dk-toast.bad { background: var(--sanguine); }
+
+/* ---------- smaller screens: one column; on a phone the preview is a button away ---------- */
+@media (max-width: 1100px) {
+    .dk-letters { grid-template-columns: 250px minmax(0, 1fr); }
+    .dk-preview { grid-column: 2; }
+}
+@media (max-width: 760px) {
+    .dk-head h1 { font-size: 1.7rem; }
+    .dk-main-area { padding: 12px 10px 70px; }
+    .dk-sheet { padding: 16px 14px 18px; }
+    .dk-wide, .dk-wide:nth-child(even) { transform: none; }
+    .dk-letters { grid-template-columns: 1fr; gap: 14px; }
+    .dk-list-sheet { position: static; max-height: none; }
+    .dk-list { max-height: 34vh; }
+    .dk-writing .dk-list { max-height: 22vh; }
+    .dk-preview { grid-column: auto; display: none; padding: 34px 8px 26px; min-height: 0; }
+    .dk-looking .dk-preview { display: block; }
+    .dk-l-look { display: inline-flex; }
+    .dk-looking .dk-l-look { display: inline-flex; }
+    .dk-preview .sheet { padding: 34px 20px 38px; }
+    .dk-two { grid-template-columns: 1fr; }
+    .dk-l-body { min-height: 40vh; }
+    .dk-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; }
+    .dk-tabs button { padding: 8px 13px 10px; }
+}

@@ -1544,6 +1544,8 @@
     // (browsers insist). your own: assets/sounds/bee-hum (a loop, a second or two), else this one
     var HUM = .035;                                                  // (how loud, at the usual sound effects level)
     var SWOOP = 4;                                                   // (how far its pitch bends with its speeding up and slowing, in semitones)
+    var HUM_UP = 12;                                                 // (how much higher its hum sits, in semitones: 12 = an octave up. 11 Oct:
+                                                                     //  it was an octave below its voice; up here it sounds smaller and cuter)
     var hum = null, humLoop = null;
     Sky.findAsset('assets/sounds/bee-hum.ogg|assets/sounds/bee-hum.mp3', function (url) { humLoop = url; });
     function startHum() {
@@ -1590,11 +1592,12 @@
         // and lower in pitch in accordance to its acceleration"): up to SWOOP semitones higher as it speeds off, lower as it
         // slows to a stop, like a toy plane
         var bend = Math.pow(2, Math.max(-SWOOP, Math.min(SWOOP, accel * 3)) / 12);
-        var f = M.hz * .5 * (1 + .12 * speed) * bend;
+        var up = Math.pow(2, HUM_UP / 12);
+        var f = M.hz * .5 * up * (1 + .12 * speed) * bend;
         hum.oscs.forEach(function (x) { x.o.frequency.setTargetAtTime(f * x.k, t, .09); });
         if (hum.src) hum.src.playbackRate.setTargetAtTime((1 + .1 * speed) * bend, t, .09);
         hum.lfo.frequency.setTargetAtTime(Math.max(14, Math.min(60, 3 / M.flap)), t, .3);
-        hum.lp.frequency.setTargetAtTime(520 + 500 * speed, t, .2);
+        hum.lp.frequency.setTargetAtTime((520 + 500 * speed) * up, t, .2);   // (the soft filter goes up with it, so it stays as clear)
         var r = art.getBoundingClientRect();
         if (hum.pan.pan && r.width) hum.pan.pan.setTargetAtTime(Math.max(-.8, Math.min(.8, ((r.left + r.width / 2) / innerWidth - .5) * 1.6)), t, .2);
     }

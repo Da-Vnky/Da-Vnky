@@ -323,6 +323,14 @@ def fetch_supabase():
         save_json(inbox_path(sid + '.json'), item)
         if not old:
             new += 1
+    # post kept or thrown back at the desk (desk.html) is gone from Supabase: gone from the inbox here too
+    there = set(row['id'] for row in rows)
+    if len(rows) < 500:
+        for item in inbox_items():
+            if item.get('sb_id') and item['sb_id'] not in there:
+                for f in (item.get('picture'), item['id'] + '.json'):
+                    if f and os.path.exists(inbox_path(f)):
+                        os.remove(inbox_path(f))
     st = load_json(inbox_path('state.json'), {})
     st['last_ok'] = datetime.datetime.now().timestamp()
     save_json(inbox_path('state.json'), st)

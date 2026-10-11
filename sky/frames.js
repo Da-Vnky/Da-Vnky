@@ -98,11 +98,14 @@
     frames.forEach(function (f) { walls[wallOf(f)] = 1; });
     Object.keys(walls).forEach(function (wall) {
       var ART = folderOf(wall);
-      fetch(listOf(wall), { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (map) {
+      // (its list as published, or the desk's newer one: desk.html)
+      Sky.desk.ready.then(function () { var u = Sky.desk.url(listOf(wall)); return u ? fetch(u, { cache: 'no-cache' }) : null; })
+        .then(function (r) { return r && r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (map) {
         frames.filter(function (f) { return wallOf(f) === wall; }).forEach(function (f) {
             var name = map && typeof map[f.dataset.frame] === 'string' ? map[f.dataset.frame].trim() : '';
             if (!name) return;
-            var url = name.indexOf('/') !== -1 ? name : ART + encodeURIComponent(name), d = describe(name);
+            var url = Sky.desk.url(name.indexOf('/') !== -1 ? name : ART + encodeURIComponent(name)), d = describe(name);
+            if (!url) return;                                       // (deleted at the desk)
             var im = new Image();
             im.onload = function () {
                 var pic = f.querySelector('.gf-pic');

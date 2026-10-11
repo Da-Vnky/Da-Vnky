@@ -4,8 +4,10 @@ rem  publish: double-click this (it's in the tools folder) to put your
 rem  changes on the live site. it
 rem    1. fetches anything new from Forgejo (skizy's changes, songs you
 rem       uploaded there): tools/pull.sh, the same as pull.bat
-rem    2. rewrites every list.txt, so new files appear and deleted ones go
-rem    3. commits and pushes. the message: the lines waiting in CHANGES.txt
+rem    2. brings in what you changed at the desk (desk.html, on the live
+rem       site) since the last publish: tools/desk.py
+rem    3. rewrites every list.txt, so new files appear and deleted ones go
+rem    4. commits and pushes. the message: the lines waiting in CHANGES.txt
 rem       ("not published yet"), which then move down into its log; if
 rem       there aren't any, it asks what you changed
 rem  preview first with preview.bat if you like.
@@ -33,22 +35,31 @@ if errorlevel 1 (
     goto :eof
 )
 
+set "PY="
+where py >nul 2>nul && set "PY=py"
+if not defined PY where python >nul 2>nul && set "PY=python"
+
 echo.
-echo  2. updating the file lists...
+echo  2. bringing in what you changed at the desk...
+if defined PY (
+    %PY% tools\desk.py file
+) else (
+    echo    ^(no python: the desk's changes wait for the next publish^)
+)
+
+echo.
+echo  3. updating the file lists...
 "%GITSH%" -c "tr -d '\r' < tools/update-lists.sh | sh"
 
 echo.
 git status --short
 echo.
-rem  3. the message: what's waiting in CHANGES.txt (tools/changes.py), or else what you type
+rem  4. the message: what's waiting in CHANGES.txt (tools/changes.py), or else what you type
 set "MSG=%~1"
 if defined PUBLISH_MSG set "MSG=%PUBLISH_MSG%"
-set "PY="
-where py >nul 2>nul && set "PY=py"
-if not defined PY where python >nul 2>nul && set "PY=python"
 set "HAVE="
 if defined PY %PY% tools\changes.py waiting >nul 2>nul && set "HAVE=1"
-if not defined HAVE if not defined MSG set /p "MSG=  3. what did you change? (a few words, then Enter): "
+if not defined HAVE if not defined MSG set /p "MSG=  4. what did you change? (a few words, then Enter): "
 if not defined MSG set "MSG=update"
 set "USEFILE="
 if defined PY %PY% tools\changes.py take --also "%MSG%" && set "USEFILE=1"

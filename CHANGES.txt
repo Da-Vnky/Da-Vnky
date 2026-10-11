@@ -17,6 +17,13 @@ How it works
 
 == published ==
 
+2026-10-11 09:03 · V
+- The bee's hum as it flies about is an octave higher: smaller and cuter (HUM_UP in sky/bee.js, in semitones, if it wants tuning).
+- The desk (desk.html): a page of its own, linked from nowhere, where the artist signs in from any browser (a phone too) to write letters, keep or throw back visitors' post, pin bottles, add and caption paintings and hang the frames. What's done there is on the site at once.
+- The site lays the desk's changes over what's published (sky.js: Sky.desk, used by the crate, the frames, the easel and the letters). With no desk, or Supabase asleep, everything's as published.
+- Publishing now brings the desk's changes into the folder first (tools/desk.py, step 2 of publish.bat / publish.sh), with a line each in this log; the next publish tidies them off the desk.
+- tools/supabase-desk.sql: the desk's tables and rules for Supabase (run once). The content manager's inbox drops post already handled at the desk. The smoke test opens the desk too.
+
 2026-10-11 08:11 · V
 - The bee turns round to face the way it's flying, and the gun it's holding (if it took yours) turns with it.
 - The bee no longer starts near the top of the screen when the page loads (it was borrowing the living room window's numbers); it starts over its roses.
