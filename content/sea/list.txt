@@ -2,3 +2,5 @@
 # no need to edit it; it's rewritten each commit.
 2026-09-25-hello-world.txt
 2026-09-25-mmmmm.jpg
+2026-10-11-1739877026713f.gif
+2026-10-11-the-site-so-far.txt

@@ -145,7 +145,8 @@ content/living/albums.txt 123 775924658
 content/living/frames.json 150 2267752740
 content/living/list.txt 382 703812112
 content/sea/2026-09-25-hello-world.txt 213 4016599039
-content/sea/list.txt 161 3392900003
+content/sea/2026-10-11-the-site-so-far.txt 594 839400045
+content/sea/list.txt 222 932984141
 content/shame/frames.json 359 3564234737
 content/shame/list.txt 125 95844360
 content/workshop/frames.json 77 3506889498
