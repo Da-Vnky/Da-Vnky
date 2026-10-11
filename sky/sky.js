@@ -38,16 +38,18 @@
     // instead (right side, on the dock): a wooden sign for each place that isn't
     // tabOnly. since 27 Sep (Victor) that's just the sea and "visit home", which
     // takes you to the front of the house (living.html#front, sky/front.js): the
-    // workshop, the rooftop and the rooms are reached from inside the house.
+    // workshop, the rooftop and the rooms are reached from inside the house (11 Oct,
+    // Victor: "the sea" has no plank any more, only its tab: one sign, "visit home").
     //   tabOnly: a tab, but no sign on the homepage    signOnly: a sign, but no tab
     // to add a place: add a line here, in the order you want them.
     var PLACES = [
-        { id: 'sea',      name: 'the sea',          href: HOME },
+        { id: 'sea',      name: 'the sea',          href: HOME, tabOnly: true },
         { id: 'home',     name: 'visit home',       href: 'living.html#front', signOnly: true },
         { id: 'workshop', name: 'the workshop',     href: 'workshop.html', tabOnly: true },
         { id: 'city',     name: 'the rooftop',      href: 'city.html', tabOnly: true },
         { id: 'living',   name: 'the living space', href: 'living.html', tabOnly: true },
-        { id: 'kitchen',  name: 'the kitchen',      href: 'living.html#kitchen', tabOnly: true }
+        { id: 'kitchen',  name: 'the kitchen',      href: 'living.html#kitchen', tabOnly: true },
+        { id: 'porch',    name: 'the porch',        href: 'living.html#porch', tabOnly: true }
     ];
 
     // the constellations: they come out at night, on every page. each one is a link
@@ -477,6 +479,12 @@
             '<path d="M13 25 L35 25 M16 22.5 L32 27.5 M32 22.5 L16 27.5" stroke="#9a5a24" stroke-width="1.2" stroke-linecap="round"/>' +
             '<path d="M11 29 L14 34 H34 L37 29" fill="#c49a52" stroke="#3a2716" stroke-width="1.3" stroke-linejoin="round"/>' +
             '<path d="M19 17 Q17 13 19 10 M24 16 Q22 11 24 7 M29 17 Q27 13 29 10" fill="none" stroke="#9a8a7a" stroke-width="1.2" stroke-linecap="round" opacity=".8"/>',
+        // the porch: its lamp by the door, and the rocking chair
+        porch: '<path d="M8 40 H40" stroke="#3a2716" stroke-width="1.6" stroke-linecap="round"/>' +
+            '<path d="M14 18 V8 M34 18 V8" stroke="#3a2716" stroke-width="1.4"/><path d="M10 8 H38" stroke="#6e4a30" stroke-width="2.4" stroke-linecap="round"/>' +
+            '<path d="M21 19 Q20 14 24 13 Q28 14 27 19 Z" fill="#c49a52" stroke="#3a2716" stroke-width="1.2"/><circle cx="24" cy="17.5" r="1.8" fill="#ffe6a0"/>' +
+            '<path d="M17 24 V36 M17 30 H29 V36 M17 24 Q22 23 23 30" fill="none" stroke="#6e4a30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '<path d="M13 37 Q22 41 32 37" fill="none" stroke="#6e4a30" stroke-width="2" stroke-linecap="round"/>',
         // any new place: a door
         door: '<path d="M14 42 V20 a10 10 0 0 1 20 0 V42 Z" fill="#6e4a30" stroke="#3a2716" stroke-width="1.3"/>' +
             '<path d="M24 12 V42" stroke="#3a2716" stroke-width="1" opacity=".5"/><circle cx="29" cy="30" r="1.6" fill="#c49a52"/><path d="M10 42 H38" stroke="#3a2716" stroke-width="1.6" stroke-linecap="round"/>'

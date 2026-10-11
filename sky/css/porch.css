@@ -37,6 +37,36 @@
 .porch .room-arrow.porch-back:focus-visible {
     transform: translateX(-4px);
 }
+/* down the steps to the front garden: a down arrow at the gap in the railing (x 700-900 of the 1600-wide porch-frame),
+   its right-hand side (the traveller stands in front of the rest) */
+.porch .room-arrow.porch-steps {
+    left: 57%;
+    top: auto;
+    bottom: calc(var(--bar-bottom, 12px) + 66px);
+    margin-left: -27px;
+    z-index: 6;                                              /* (over the traveller) */
+}
+@media (max-width: 620px) {
+    .porch .room-arrow.porch-steps { left: 76%; }
+}
+.porch-steps>svg,
+.porch-steps>.art {
+    transform: rotate(90deg);
+}
+.porch .room-arrow.porch-steps:hover,
+.porch .room-arrow.porch-steps:focus-visible {
+    transform: translateY(4px);
+}
+.porch .porch-character.going-down {
+    animation: pc-down .45s ease-in forwards;
+}
+@keyframes pc-down {
+    to {
+        translate: 0 14%;
+        scale: .94;
+        opacity: 0;
+    }
+}
 /* the porch: waits below, comes up as the hallway lifts away. open at the top: the site's sky shows through */
 .porch {
     position: fixed;

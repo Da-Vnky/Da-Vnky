@@ -525,6 +525,11 @@
        "slot": "assets/ui/place-kitchen",
        "what": "the kitchen’s tab (it goes straight to the kitchen)",
        "size": "192 x 192"
+      },
+      {
+       "slot": "assets/ui/place-porch",
+       "what": "the porch’s tab (the traveller walks out to the porch, from anywhere in the house)",
+       "size": "192 x 192"
       }
      ]
     },

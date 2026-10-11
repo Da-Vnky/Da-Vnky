@@ -118,9 +118,12 @@ this before changing anything; keep it up to date when something here stops bein
 ## The pages
 
 - `index.html` — the sea (homepage): scroll = the day turning; ship you can pick up; dock; bottles. Its signpost
-  has only two signs since 27 Sep (Victor): "the sea" and **"visit home"** (→ `living.html#front`, the front of the
-  house). The workshop, rooftop and rooms are reached from inside the house (the hallway's doors), and still have
-  their tabs on every other page. sky.js `PLACES`: `tabOnly` = a tab but no sign, `signOnly` = a sign but no tab.
+  has **one sign** since 11 Oct (Victor): **"visit home"** (→ `living.html#front`, the front of the house); "the sea" is a
+  tab only. On big screens it hangs lower (sky.css: `top: 50vh` from 1101 px wide), and the post ground-sea.js draws on the
+  dock reaches up to wherever the sign actually is (`.signpost`'s top), so it's shorter. The workshop, rooftop and rooms
+  are reached from inside the house (the hallway's doors), and still have their tabs on every other page. sky.js `PLACES`:
+  `tabOnly` = a tab but no sign, `signOnly` = a sign but no tab. Tabs: the sea, workshop, rooftop, living space, kitchen,
+  **porch** (11 Oct: `living.html#porch`, icon the porch lamp and rocking chair, slot `assets/ui/place-porch`).
 - `workshop.html` — the workshop: easel, paint easel, portfolio, frames, notes board, timer.
 - `city.html` — the rooftop at night-ish: skyline, the telescope (a prop on its tripod just left of the
   traveller, `.roof-telescope` = `.telescope-btn`, slot `assets/city/telescope`; no corner button any more)
@@ -382,7 +385,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `Sky.house.room(name, { parent, here(), busy(), enter(), leave(), away(to)? })`. `enter` is the leg from its
   parent into it, `leave` the leg back out; `away` (the garden only) is its own way of leaving (the fade, or a jump).
 - **Every way of going somewhere is `Sky.house.go(name)`**: the arrows, doors, the ladder, the hole, the place tabs
-  (house.js handles the living and kitchen tabs itself, `TABS`, and their "you are here"), Escape (back one room), the
+  (house.js handles the living, kitchen and porch tabs itself, `TABS`, and their "you are here": the living space's in the
+  living space and bathroom, the kitchen's in the kitchen, the porch's on the porch; none in the hallway, attic, dungeon or
+  garden; a tab that stops being "you are here" stays a `<span>`, so sky.css styles every `.place-tab:not(.here)` as a link,
+  11 Oct: the living space's tab looked dead from the hallway), Escape (back one room), the
   shelf book. `go` = `ask(nav(name))`: `nav` works out the next room on the way (`toward`), starts that leg, and queues
   `nav(name)` to carry on from there, so the kitchen tab from the bathroom walks bath → living → hall → kitchen.
 - **Changing your mind on the way** (27 Sep, Victor): a leg calls `setOff(cancel)` as it starts walking (another
@@ -475,7 +481,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   the garden faded: jarring, Victor.) Any side room or the living space's tab
   while out here just leaves the garden (`close()`). `Sky.front = { open, close, goIn, here }`. "Home." the first time.
 - Slots: `assets/living/front-house`, `front-door`, `front-door-open`, `assets/characters/front` (+ `front-walking`);
-  asset manager scene "the front of the house". Not linked from the porch (yet): only the homepage comes here.
+  asset manager scene "the front of the house". **From the porch too** (11 Oct, Victor): the arrow at the steps
+  (`.porch-steps`, the gap in the railing; left 57%, upright phones 76%, z 6 over the traveller): porch.js `goDown()` walks
+  them to the steps (`STEPS` 50), `.going-down`, then `Sky.front.fromPorch(inBlack)`: the black, and in it the porch put away
+  and `Sky.sides.homeNow()` (bathroom.js: back in the living space at once, so the garden has the living space behind it,
+  hidden by `in-front`, as from the homepage, not the hallway showing through its sky), then the garden opens.
 
 ## The bee in the front garden (sky/bee.js, 10 Oct)
 
