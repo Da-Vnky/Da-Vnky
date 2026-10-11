@@ -55,6 +55,7 @@ body.has-room.in-front .sky-links {
     transform: translateX(-50%);
     filter: brightness(var(--pd));
 }
+.front .front-ground,
 .front .front-house,
 .front .front-door,
 .front .front-door-open {
@@ -62,6 +63,8 @@ body.has-room.in-front .sky-links {
     inset: 0;
     pointer-events: none;
 }
+.front .front-ground > svg,
+.front .front-ground > .art,
 .front .front-house > svg,
 .front .front-house > .art,
 .front .front-door > svg,

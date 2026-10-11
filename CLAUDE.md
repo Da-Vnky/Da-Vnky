@@ -480,7 +480,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   the front door (`.hall-out`) and walks to 44%. (It used to show the hallway behind the house's see-through sky while
   the garden faded: jarring, Victor.) Any side room or the living space's tab
   while out here just leaves the garden (`close()`). `Sky.front = { open, close, goIn, here }`. "Home." the first time.
-- Slots: `assets/living/front-house`, `front-door`, `front-door-open`, `assets/characters/front` (+ `front-walking`);
+- **The ground** (11 Oct, Victor: "front of house 4 bee", the ground its shadow falls on): `.front-ground`, slot
+  `assets/living/front-ground` (the same 1600 x 900 canvas, laid under `front-house`): the lawn and the path from the steps to
+  the gate (the stand-in's were moved out of front-house's drawing). His front-house can leave the ground see-through, or
+  paint it in (then front-ground stays hidden underneath).
+- Slots: `assets/living/front-ground`, `front-house`, `front-door`, `front-door-open`, `assets/characters/front` (+ `front-walking`);
   asset manager scene "the front of the house". **From the porch too** (11 Oct, Victor): the arrow at the steps
   (`.porch-steps`, the gap in the railing; left 57%, upright phones 76%, z 6 over the traveller): porch.js `goDown()` walks
   them to the steps (`STEPS` 50), `.going-down`, then `Sky.front.fromPorch(inBlack)`: the black, and in it the porch put away

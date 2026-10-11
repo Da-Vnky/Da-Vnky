@@ -2110,8 +2110,13 @@
      "name": "the house from the garden path",
      "slots": [
       {
+       "slot": "assets/living/front-ground",
+       "what": "the ground in the front garden: the lawn and the path from the steps down to the gate, where the bee's shadow falls. it's laid under front-house (the same 1600 x 900 canvas), so draw the house, hedge, trees, roses and fence in front-house and leave the ground see-through there; if your front-house already has the ground in it, this one stays hidden underneath",
+       "size": "1600 x 900, see-through above the ground"
+      },
+      {
        "slot": "assets/living/front-house",
-       "what": "the house, the garden, the path and the fence: everything but the door (see-through where the sky is)",
+       "what": "the house, the hedge and trees, the roses, the steps and the fence: everything but the door and the ground (see-through where the sky is; the lawn and the path are front-ground, underneath: leave them see-through here, or paint them in and front-ground stays hidden)",
        "size": "1600 x 900, see-through sky"
       },
       {
