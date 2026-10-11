@@ -497,6 +497,13 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (tub.js; a click puts it back in); reset 5's wallpaper, down (veil.js `tearDown`) and the sky's loose corner, any way
   (`tryTear`, refused before the key with the lives line). The cord and the lamp keep their own drag code (attic.js `hand()`).
 - Slots: `assets/ui/<cursor>-press` ×5, `assets/ui/click`, sound `board-creak` (stand-in `tap`).
+- **The bee's two hands** (11 Oct, Victor): `cursor-poke` (a finger out, hotspot 12, 3) over its body and `cursor-pat` (the
+  open hand turned over, hotspot 16, 21, no click strokes) over its head: bee.js `onHead` (within .62 of `.bee-fx`'s width of
+  its centre: the box round its face) sets `.bee-home.on-head` on pointermove; bee.css picks the hand. A click on the head is
+  `pat()`: happy, loving, happy or excited (`PAT`), .9 of it (so `fond` goes up too), `.patted` (it dips and bobs), a note,
+  heart or spark (`PAT_FX`), "you pat the bee on the head." and a short reply in that mood; with the menu shut it opens it, its
+  hello in the pat's mood (`openMenu(patted)`; `Sky.bee.open` still takes nothing). A click on the body is as before (open, then
+  `poke`). `Sky.bee.pat`.
 
 ## One press of Escape, one thing (Sky.escape, sky/sky.js, 28 Sep)
 

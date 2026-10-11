@@ -973,7 +973,7 @@
     }
     function note(t) { entry('bt-note', t); }
 
-    function openMenu() {
+    function openMenu(patted) {                                          // (patted: the mood a pat on the head put it in)
         if (open || !here()) return;
         open = true;
         if (!menu) build();
@@ -985,12 +985,12 @@
         load().then(function () {
             if (!open) return;
             // hello: how glad it is to see you depends on how you've treated it
-            var m = !met ? 'curious' : fond > .35 ? 'happy' : fond < -.35 ? (fond < -.6 ? 'angry' : 'sad') : mood();
+            var m = patted || (!met ? 'curious' : fond > .35 ? 'happy' : fond < -.35 ? (fond < -.6 ? 'angry' : 'sad') : mood());
             if (!met) { met = true; if (!MAPPING) store('bee-met', '1'); }
             feelAll(m === 'calm' ? {} : (function () { var o = {}; o[m] = .6; return o; })());
             if (gun) note('it’s still pointing ' + mine(gun) + ' at you.');
             else if (grudge) note('it hasn’t forgiven you for the revolver. it never will.');
-            reply(null, { len: [3, 6], mood: mood() });
+            reply(null, { len: [3, 6], mood: patted || mood() });
         });
     }
     function close() {
@@ -1065,8 +1065,34 @@
         if (open && menu && !run) entry('bt-poke', 'you poke the bee.');
         reply(null, { len: n > 4 ? [3, 6] : [2, 4], sting: n > 4 });
     }
+    // a pat on the head (11 Oct, Victor): it likes that. it goes happy, loving or excited (happy twice as often), bobs under
+    // your hand, a heart or a note or a spark comes off it, and it buzzes back in that mood. kindness it remembers, too
+    // (feelAll nudges fond up). the menu shut, the pat opens it, and its hello's in the mood the pat put it in
+    var pats = [], PAT = ['happy', 'loving', 'happy', 'excited'], PAT_FX = { happy: 'note', loving: 'heart', excited: 'spark' };
+    function pat() {
+        var now = Date.now();
+        pats = pats.filter(function (t) { return now - t < 8000; });
+        pats.push(now);
+        var m = PAT[Math.floor(Math.random() * PAT.length)], add = {};
+        add[m] = .9;
+        feelAll(add);
+        pose.classList.remove('patted'); void pose.offsetWidth; pose.classList.add('patted');
+        puff(PAT_FX[m], pats.length > 2 ? 2 : 1);
+        if (!open) { openMenu(m); return; }
+        if (menu && !run) entry('bt-poke', 'you pat the bee on the head.');
+        reply(null, { len: [1, 3], mood: m });
+    }
+    // its head or the rest of it: over its head the cursor's a patting hand, over its body a poking finger (sky.js:
+    // cursor-pat, cursor-poke; the look in bee.css). its head is round its face: the box its marks come out of (.bee-fx)
+    function onHead(x, y) {
+        var r = fxBox.getBoundingClientRect();
+        return !!r.width && Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2)) < r.width * .62;
+    }
+    beeBtn.addEventListener('pointermove', function (e) { home.classList.toggle('on-head', onHead(e.clientX, e.clientY)); });
+    beeBtn.addEventListener('pointerleave', function () { home.classList.remove('on-head'); });
     beeBtn.addEventListener('click', function (ev) {
         ev.stopPropagation();
+        if (ev.detail > 0 && onHead(ev.clientX, ev.clientY)) return pat();
         if (!open) openMenu(); else poke();
     });
 
@@ -1495,7 +1521,7 @@
     if (!MAPPING) { addEventListener('pointerdown', wake, true); addEventListener('keydown', wake, true); }
 
     Sky.bee = {
-        open: openMenu, close: close, say: send, poke: poke,
+        open: function () { openMenu(); }, close: close, say: send, poke: poke, pat: pat,
         aimedAt: aimedAt, shot: shot, get gun() { return gun; }, get grudge() { return grudge; },   // (sky/revolver.js)
         get mood() { return mood(); }, get fond() { return fond; },
         puff: puff,                                                         // (a mark out of its face: Sky.bee.puff('vein'))

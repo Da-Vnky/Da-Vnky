@@ -602,6 +602,18 @@
        "optional": true
       },
       {
+       "slot": "assets/ui/cursor-poke",
+       "what": "over the bee’s body: a hand with one finger out, to poke it with (the fingertip is the hotspot, 12, 3). Pressed: assets/ui/cursor-poke-press",
+       "size": "32 x 32",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/cursor-pat",
+       "what": "over the bee’s head: a hand turned over it, to pat it (the palm is the hotspot, 16, 21). Pressed: assets/ui/cursor-pat-press",
+       "size": "32 x 32",
+       "optional": true
+      },
+      {
        "slot": "assets/ui/click",
        "what": "the little burst of ink every click leaves where it lands (a ring opening out and six strokes flying off it, until yours). Shown 40 x 40, centred on the click, and faded out over half a second",
        "size": "80 x 80",
