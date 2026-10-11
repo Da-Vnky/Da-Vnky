@@ -294,22 +294,36 @@ body.bee-talking .bee-home .bee-fly {
 }
 
 /* the little puffs it lets off: hearts, tears, steam, sweat, zZz, sparks, ?, a zap */
+/* its little marks come out of its face: a box centred on the face (at the front, whichever way it's facing), the marks
+   placed round it like in a cartoon. --fx-x / --fx-y: where the face is, from the middle of the bee (shares of its size) */
 .bee-home .bee-fx {
+    --fx-x: 27%;
+    --fx-y: 0%;
     position: absolute;
-    left: 60%;
-    top: 0;
-    width: 40%;
-    height: 40%;
+    left: calc(50% + var(--face) * var(--fx-x));
+    top: calc(50% + var(--fx-y));
+    width: 36%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
     pointer-events: none;
 }
+/* Victor's bee: its face is further forward, a little lower (bee-face's own spot, nudged like the faces) */
+.bee-home .bee-art.has-art ~ .bee-fx {
+    --fx-x: 38%;
+    --fx-y: 3%;
+}
+/* one mark: where it starts (--x0 forwards, --y0 down, shares of the face's box; turned round with the bee), how big */
 .bee-home .bee-p {
+    --x0: 25%;
+    --y0: -95%;
     position: absolute;
-    left: 20%;
-    top: 0;
-    width: 70%;
+    left: calc(50% + var(--face) * var(--x0) + var(--jx, 0%));
+    top: calc(50% + var(--y0) + var(--jy, 0%));
+    width: 62%;
     aspect-ratio: 1;
+    translate: -50% -50%;
     opacity: 0;
-    animation: bee-puff 1.9s ease-out forwards;
+    animation: bee-float 1.9s ease-out forwards;
 }
 .bee-home .bee-p > svg,
 .bee-home .bee-p > img {
@@ -318,19 +332,113 @@ body.bee-talking .bee-home .bee-fly {
     height: 100%;
     object-fit: contain;
 }
-@keyframes bee-puff {
-    0%   { transform: translate(0, 0) scale(.4) rotate(0deg); opacity: 0; }
-    18%  { opacity: 1; transform: translate(calc(var(--dx) * .2), calc(var(--dy) * .2)) scale(1) rotate(calc(var(--r) * .3)); }
-    100% { transform: translate(var(--dx), var(--dy)) scale(.9) rotate(var(--r)); opacity: 0; }
+/* hearts, notes, Zzz: float up and forwards, swaying */
+@keyframes bee-float {
+    0%   { transform: translate(0, 0) scale(.3) rotate(0deg); opacity: 0; }
+    15%  { opacity: 1; transform: translate(calc(var(--face) * var(--dx) * .15), calc(var(--dy) * .15)) scale(1.1) rotate(calc(var(--r) * .3)); }
+    25%  { transform: translate(calc(var(--face) * var(--dx) * .25), calc(var(--dy) * .25)) scale(1) rotate(calc(var(--r) * .4)); }
+    60%  { opacity: 1; transform: translate(calc(var(--face) * var(--dx) * .6 + 8%), calc(var(--dy) * .6)) scale(.95) rotate(calc(var(--r) * -.4)); }
+    100% { transform: translate(calc(var(--face) * var(--dx)), var(--dy)) scale(.85) rotate(var(--r)); opacity: 0; }
 }
-.bee-home .bee-p.fx-tear,
-.bee-home .bee-p.fx-sweat { animation-name: bee-fall; }
+.bee-home .bee-p.fx-heart { --x0: 30%; --y0: -80%; }
+.bee-home .bee-p.fx-note  { --x0: 40%; --y0: -90%; }
+.bee-home .bee-p.fx-zzz   { --x0: 10%; --y0: -105%; width: 50%; animation-duration: 2.4s; animation-timing-function: ease-in-out; }
+
+/* the cross vein: pops on its forehead and throbs, staying put */
+.bee-home .bee-p.fx-vein {
+    --x0: -5%;
+    --y0: -78%;
+    width: 58%;
+    animation: bee-pop-throb 1.8s ease-out forwards;
+}
+@keyframes bee-pop-throb {
+    0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+    12%  { transform: scale(1.35) rotate(6deg); opacity: 1; }
+    22%  { transform: scale(.9) rotate(0deg); }
+    34%  { transform: scale(1.15); }
+    46%  { transform: scale(.95); }
+    58%  { transform: scale(1.12); }
+    72%  { transform: scale(1); opacity: 1; }
+    100% { transform: scale(.9); opacity: 0; }
+}
+/* the question mark: pops up over its head with a little bounce and tilt */
+.bee-home .bee-p.fx-question {
+    --x0: 15%;
+    --y0: -110%;
+    animation: bee-pop-tilt 1.9s ease-out forwards;
+}
+@keyframes bee-pop-tilt {
+    0%   { transform: translateY(30%) scale(0); opacity: 0; }
+    14%  { transform: translateY(-12%) scale(1.25) rotate(calc(var(--r) * .6)); opacity: 1; }
+    26%  { transform: translateY(0) scale(1) rotate(var(--r)); }
+    75%  { transform: translateY(-6%) scale(1) rotate(calc(var(--r) * -.4)); opacity: 1; }
+    100% { transform: translateY(-16%) scale(.9); opacity: 0; }
+}
+/* sparkles: twinkle round its face, turning */
+.bee-home .bee-p.fx-spark {
+    --x0: 35%;
+    --y0: -55%;
+    width: 50%;
+    animation: bee-twinkle 1.3s ease-in-out forwards;
+}
+@keyframes bee-twinkle {
+    0%   { transform: scale(0) rotate(0deg); opacity: 0; }
+    25%  { transform: scale(1.2) rotate(45deg); opacity: 1; }
+    45%  { transform: scale(.6) rotate(90deg); }
+    65%  { transform: scale(1.05) rotate(135deg); opacity: 1; }
+    100% { transform: translate(calc(var(--face) * var(--dx) * .3), calc(var(--dy) * .3)) scale(0) rotate(200deg); opacity: 0; }
+}
+/* the big sweat drop: appears on the side of its head and slides slowly down */
+.bee-home .bee-p.fx-sweat {
+    --x0: -30%;
+    --y0: -62%;
+    width: 46%;
+    animation: bee-slide 1.9s ease-in forwards;
+}
+@keyframes bee-slide {
+    0%   { transform: scale(.2); opacity: 0; }
+    14%  { transform: scale(1.1); opacity: 1; }
+    24%  { transform: scale(1); }
+    80%  { transform: translateY(40%) scale(1); opacity: 1; }
+    100% { transform: translateY(55%) scale(.95); opacity: 0; }
+}
+/* a tear: wells at its eye and falls */
+.bee-home .bee-p.fx-tear {
+    --x0: 5%;
+    --y0: 5%;
+    width: 36%;
+    animation: bee-fall 1.6s ease-in forwards;
+}
 @keyframes bee-fall {
-    0%   { transform: translate(0, 0) scale(.5); opacity: 0; }
-    20%  { opacity: 1; transform: translate(0, 10%) scale(1); }
-    100% { transform: translate(calc(var(--dx) * .3), 160%) scale(.8); opacity: 0; }
+    0%   { transform: scale(.3); opacity: 0; }
+    25%  { transform: scale(1); opacity: 1; }
+    100% { transform: translate(calc(var(--face) * var(--dx) * .2), 220%) scale(.8); opacity: 0; }
 }
-.bee-home .bee-p.fx-zap { width: 90%; animation-duration: .9s; }
+/* a huff of steam: blown out in front of its face, swelling as it goes */
+.bee-home .bee-p.fx-steam {
+    --x0: 60%;
+    --y0: 15%;
+    width: 52%;
+    animation: bee-huff 1.1s ease-out forwards;
+}
+@keyframes bee-huff {
+    0%   { transform: scale(.2); opacity: 0; }
+    20%  { transform: translate(calc(var(--face) * 40%), 0) scale(.9); opacity: 1; }
+    100% { transform: translate(calc(var(--face) * 130%), -30%) scale(1.5); opacity: 0; }
+}
+/* the jolt of a sting: a flash, right at its front */
+.bee-home .bee-p.fx-zap {
+    --x0: 70%;
+    --y0: 20%;
+    width: 80%;
+    animation: bee-flash .9s ease-out forwards;
+}
+@keyframes bee-flash {
+    0%   { transform: scale(.2) rotate(0deg); opacity: 0; }
+    20%  { transform: scale(1.3) rotate(20deg); opacity: 1; }
+    50%  { transform: scale(.9) rotate(30deg); opacity: 1; }
+    100% { transform: scale(1.4) rotate(45deg); opacity: 0; }
+}
 
 /* what it's saying, over its head */
 .bee-home .bee-bubble {

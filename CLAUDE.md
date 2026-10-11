@@ -528,7 +528,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   Victor's "slightly right and a lil lower"; 0 0 = where drawn). His old whole-bee slots (`bee`, `bee-<mood>`, `bee-buzzing`)
   are gone (none were in). Face slots in slots.json carry `"guide": "assets/living/bee-body|…"`: the drawing table then
   makes their canvas exactly that picture's size with it as the guide (`drawtable.py from_guide`, no scene opened).
-  `bee-fx-<kind>`; the code still moves and tints his. A word bubble over its head (`.bee-bubble`).
+  Victor's body and nine faces are in (11 Oct, from his bee .psd: each layer saved at the full 480 x 400 canvas; the loving
+  face replaced from a second .psd the same day). **Its puffs** (`puff(kind)`, also `Sky.bee.puff`) are anime marks (manpu,
+  11 Oct, Victor): `FX` vein (💢, angry), steam (a huff, CAPS while angry), sweat, tear, heart, note (happy), spark
+  (excited), zzz, question, zap (a sting), slots `bee-fx-<kind>`. They come out of its face: `.bee-fx` now sits inside
+  `.bee-pose` after `.bee-art` (so it moves with lift/tilt), centred on the face (`--fx-x/-y`: the drawn bee's head, or
+  `.bee-art.has-art ~ .bee-fx` for Victor's), and each kind has its own start (`--x0/-y0`, forwards × `--face`) and
+  movement in bee.css (float, pop-throb, pop-tilt, twinkle, slide, fall, huff, flash), never mirrored.
+  The code still moves and tints his. A word bubble over its head (`.bee-bubble`).
 - skizy's model and name: credited in the menu's foot ("its brain is BeeLLM 42P Chaos, by skizy").
 - The sing switch is a music note (`NOTE_ART`, `.bt-sing-ic`, slot `assets/living/bee-sing`; drawn in `currentColor`, so
   it's light on the dark pressed button). Not `.bt-note`: that's the log's italic notes.

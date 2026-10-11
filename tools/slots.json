@@ -2194,49 +2194,61 @@
       },
       {
        "slot": "assets/living/bee-fx-heart",
-       "what": "a little puff it lets off when it's smitten (floats up and fades)",
+       "what": "a heart that floats up when it's smitten: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-vein",
+       "what": "the cross-shaped anger vein (💢) that pops on its forehead and throbs when it's furious: drawn like the marks in a Japanese cartoon, comes out from its face",
+       "size": "about 48 x 48, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/living/bee-fx-note",
+       "what": "a music note that floats up when it's happy: drawn like the marks in a Japanese cartoon, comes out from its face",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-tear",
-       "what": "a little puff it lets off when it's sad (floats up and fades)",
+       "what": "a tear that wells at its eye and falls when it's sad: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-steam",
-       "what": "a little puff it lets off when it's furious (floats up and fades)",
+       "what": "a huff of steam it blows out in front of its face when it shouts while furious: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-sweat",
-       "what": "a little puff it lets off when it's frightened (floats up and fades)",
+       "what": "the big anime sweat drop on the side of its head when it's frightened (slides slowly down): drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-zzz",
-       "what": "a little puff it lets off when it's sleepy (floats up and fades)",
+       "what": "a Z that floats up when it's sleepy: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-spark",
-       "what": "a little puff it lets off when it's happy and excited (floats up and fades)",
+       "what": "a sparkle (kira kira) that twinkles round its face when it's excited: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-question",
-       "what": "a little puff it lets off when it's curious (floats up and fades)",
+       "what": "a question mark that pops up over its head when it's curious: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
       {
        "slot": "assets/living/bee-fx-zap",
-       "what": "a little puff it lets off when it stings (*STINGS YOU*) (floats up and fades)",
+       "what": "the flash when it stings you: drawn like the marks in a Japanese cartoon, comes out from its face (it's turned round with the bee, but never mirrored)",
        "size": "about 48 x 48, see-through",
        "optional": true
       },
