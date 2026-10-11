@@ -156,6 +156,43 @@
     }
     try { if (!bookGone() && !recordFirst() && (sessionStorage.getItem('secret-open') === '1' || location.hash === '#dungeon')) openDoor(true); } catch (e) {}
 
+    // the book itself (11 Oct, Victor: "grabbed, then physically pulled"): take hold of it and pull it out from the top (down
+    // and to the left, the way it tips) and the wall under the paintings grinds open; pulled again with the wall open, it
+    // grinds shut. let go too soon and it slips back in. only clicked: it's loose, pull it. (from the keyboard, Enter on it
+    // still sends the traveller over to pull it and on down the stairs.) while it won't move (reset 4, the record not yet
+    // played: recordFirst) it only gives a little, and they say why
+    var grinding = false;
+    function grindShut() {
+        theBook.classList.add('pulled');
+        sfx('book');
+        setTimeout(function () { room.classList.add('rumble'); closeDoor(); sfx('wall-slide'); }, 500);
+        setTimeout(function () { room.classList.remove('rumble'); theBook.classList.remove('pulled'); }, 2900);
+    }
+    if (theBook) Sky.pull(theBook, {
+        dir: [-0.6, 0.8],
+        need: function () { return Math.max(44, theBook.offsetHeight * 0.8); },
+        can: function () { return H.where() === 'living' && !busy && !inSide && !H.going && !grinding && !tugging && !bookGone(); },
+        move: function (k) {
+            var kk = recordFirst() ? Math.min(k, 0.18) : k;                // (stuck fast: it hardly moves)
+            theBook.style.transition = 'none';
+            theBook.style.transform = 'rotate(' + (-24 * kk).toFixed(1) + 'deg) translateX(' + (-12 * kk).toFixed(1) + '%)';
+        },
+        give: function () {
+            theBook.style.transition = theBook.style.transform = '';
+            if (recordFirst()) {
+                tugging = true;
+                sfx('book', { volume: 0.5 });
+                Sky.speak(NOT_YET, function () { tugging = false; });
+                return false;
+            }
+            grinding = true;
+            if (secret && secret.classList.contains('open')) grindShut(); else grindOpen();
+            setTimeout(function () { grinding = false; }, 3000);
+        },
+        back: function () { theBook.style.transition = ''; theBook.style.transform = ''; },
+        tap: function () { Sky.say(secret && secret.classList.contains('open') ? 'pull it again to close the wall' : 'it\u2019s loose at the top. pull it out', 2400); }
+    });
+
     // into a side room: over to that edge (or down the stairs behind the wall), and it slides in. instant: no walking, no sliding
     function goTo(sd, instant) {
         if (busy || inSide) return;
@@ -274,6 +311,7 @@
         sd.go.addEventListener('click', function (e) {
             e.preventDefault();
             if (sd.dir !== 0) return H.go(sd.name);
+            if (e.detail > 0) return;                                      // (the book's pulled by hand now: Sky.pull above. this is the keyboard's way)
             H.ask(function () {
                 if (H.where() !== 'living') return;                        // (the bookshelf's in the living space)
                 if (recordFirst()) return tugInVain(sd.go);

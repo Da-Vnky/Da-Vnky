@@ -553,12 +553,12 @@
       },
       {
        "slot": "assets/ui/cursor-grab",
-       "what": "over things you can pick up",
+       "what": "the open hand, seen from the back: over things you take hold of and pull (the boards on skizy’s window, the book that opens the wall, the bath plug, the hallway’s cord and lamp, the wallpaper, the sky’s loose corner) and things you pick up (the boat, the traveller by the sea, a bottle’s cork). Its hotspot is 16, 14",
        "size": "32 x 32"
       },
       {
        "slot": "assets/ui/cursor-grabbing",
-       "what": "while you’re holding one",
+       "what": "the same hand closed round it: shown as you click on one of those, and the whole time you’re holding on",
        "size": "32 x 32"
       },
       {
@@ -570,6 +570,42 @@
        "slot": "assets/ui/cursor-brush",
        "what": "over the “paint here” easel",
        "size": "32 x 32"
+      },
+      {
+       "slot": "assets/ui/cursor-press",
+       "what": "the everyday pointer, pressed: shown while the button’s down (the same hotspot). Without one, the drawn cursor squeezes in with three little strokes round its tip, and yours stays as it is",
+       "size": "32 x 32",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/cursor-pointer-press",
+       "what": "the pointer over things you can click, pressed: shown while the button’s down (the same hotspot). Without one, the drawn cursor squeezes in with three little strokes round its tip, and yours stays as it is",
+       "size": "32 x 32",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/cursor-star-press",
+       "what": "the pointer over the constellations, pressed: shown while the button’s down (the same hotspot). Without one, the drawn cursor squeezes in with three little strokes round its tip, and yours stays as it is",
+       "size": "32 x 32",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/cursor-look-press",
+       "what": "the pointer over things to look into, pressed: shown while the button’s down (the same hotspot). Without one, the drawn cursor squeezes in with three little strokes round its tip, and yours stays as it is",
+       "size": "32 x 32",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/cursor-brush-press",
+       "what": "the brush over the easel, pressed: shown while the button’s down (the same hotspot). Without one, the drawn cursor squeezes in with three little strokes round its tip, and yours stays as it is",
+       "size": "32 x 32",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/click",
+       "what": "the little burst of ink every click leaves where it lands (a ring opening out and six strokes flying off it, until yours). Shown 40 x 40, centred on the click, and faded out over half a second",
+       "size": "80 x 80",
+       "optional": true
       },
       {
        "slot": "assets/ui/cursor-flick",
@@ -2889,6 +2925,12 @@
        "slot": "assets/sounds/crack",
        "what": "a board splintering off her window and clattering down",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/board-creak",
+       "what": "a board on her window straining against its nails as you pull it (short: it plays two or three times a pull, a little higher each time)",
+       "kind": "sound",
+       "optional": true
       },
       {
        "slot": "assets/sounds/scream",

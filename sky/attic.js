@@ -95,6 +95,7 @@
         var r = lamp.getBoundingClientRect();
         pull = { el: lamp, x: e.clientX, y: e.clientY, h: r.height || 150, creak: 0 };
         lamp.classList.add('pulling');
+        hand(true);
         lamp.style.transition = 'none';
     });
     hall.addEventListener('pointermove', function (e) {
@@ -111,6 +112,7 @@
         if (!pull) return;
         var lamp = pull.el;
         pull = null;
+        hand(false);
         lamp.classList.remove('pulling');
         lamp.style.transition = 'transform .7s cubic-bezier(.3,1.9,.5,1)';                      // back up it springs, swinging
         lamp.style.transform = '';
@@ -119,7 +121,11 @@
     hall.addEventListener('pointerup', letGo);
     hall.addEventListener('pointercancel', letGo);
 
-    // the cord: pull it down (or just click it) and the hatch gives
+    // the hand that holds them: closed while you've hold of the lamp or the cord (the grab cursors: sky.css, "things you take
+    // hold of and pull"; the open hand's over them already)
+    function hand(on) { document.documentElement.classList.toggle('grabbing', on); }
+    // the cord: take hold and pull it down, and the hatch gives (11 Oct, Victor: pulled for real; a plain click just
+    // tugs it a little and says so. from the keyboard, Enter still pulls it)
     var tug = null;
     function cordBack(el) {
         el.classList.remove('pulling');
@@ -141,6 +147,7 @@
             try { cord.setPointerCapture(e.pointerId); } catch (x) {}
             tug = { y: e.clientY, h: cord.getBoundingClientRect().height || 200, far: 0, done: false };
             cord.classList.add('pulling');
+            hand(true);
             cord.style.transition = 'none';
         });
         cord.addEventListener('pointermove', function (e) {
@@ -158,12 +165,20 @@
         var cordUp = function () {
             if (!tug) return;
             var t = tug; tug = null;
-            if (!t.done && t.far < 6) { clickCord(); return; }            // (just a click: a tug of its own)
+            hand(false);
+            if (!t.done && t.far < 6) { nudgeCord(); return; }            // (just a click: it swings, and they're told to pull)
             cordBack(cord);
         };
         cord.addEventListener('pointerup', cordUp);
         cord.addEventListener('pointercancel', cordUp);
         cord.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); clickCord(); } });
+    }
+    function nudgeCord() {
+        cord.classList.add('pulling');
+        cord.style.transition = 'transform .12s ease-out';
+        cord.style.transform = 'scaleY(1.04)';
+        setTimeout(function () { cordBack(cord); }, 130);
+        say(hatchOpen() ? 'it\u2019s open already.' : 'take hold of the cord and pull it down', 2000);
     }
     function clickCord() {
         cord.classList.add('pulling');
@@ -178,6 +193,7 @@
     function snap(ang) {
         var lamp = pull.el;
         pull = null;
+        hand(false);
         set('hall-lamp', 'broken');
         sfx('lamp-snap', { or: 'crack' });
         var r = lamp.getBoundingClientRect(), floorY = hall.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(hall).getPropertyValue('--floor-h')) || 11) / 100 * window.innerHeight;

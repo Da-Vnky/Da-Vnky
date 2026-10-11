@@ -317,8 +317,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 ## The attic (sky/attic.js)
 
 - The way up (hallway): **any reset but 4**, a pull cord (`.hall-cord`, slot `hall-cord`) hangs from the hatch with a small
-  light either side (`.hall-light.l/.r`, slot `hall-light`), all `sways hangs`. Drag the cord down past `CORD_PULL` (or just
-  click it) → `run:hall-hatch = open` → the hatch opens (`body.hatch-open`: `hall-hatch-open` if Victor adds it, else the
+  light either side (`.hall-light.l/.r`, slot `hall-light`), all `sways hangs`. Drag the cord down past `CORD_PULL` (a plain
+  click only nudges it and says to pull, `nudgeCord`; Enter still pulls it) → `run:hall-hatch = open` → the hatch opens (`body.hatch-open`: `hall-hatch-open` if Victor adds it, else the
   shut hatch dimmed) and the ladder slides down (`body.ladder-down`). `body.hall-cord-on` hides the middle lamp.
 - **Reset 4 only** (`LAMP_RESETS`): no cord or side lights, the lamp in the middle instead: grab it and **drag it down**: it
   stretches (rotate + scaleY from the top) and past `TUG` (42% of its height) it snaps, falls, smashes; the hallway goes
@@ -472,6 +472,31 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (`document.elementsFromPoint`): the sea's, the rooftop's, the kitchen's, the attic's and the porch's were already behind.
 - The living room's armchair (Victor calls it the couch) grows with the traveller: `width: min(48vh, 34vw)` (was 20%, at most
   260 px), the cat on it sized from it (`--chair-w`), and Claude's wall (its frame and plaque) moved up to top 38% above it.
+
+## Clicking, and taking hold of things (sky/sky.js, 11 Oct)
+
+- Victor: "a click state to the cursors, so they're animated when clicking", and an open hand from the back that grabs when
+  clicked, for everything grabbed or pulled, which must be **grabbed and then physically pulled**.
+- **A click, in three frames** (`setupCursors`): on pointerdown every cursor variable swaps to its pressed twin (`cursorPress`:
+  `assets/ui/<name>-press` if Victor draws one; else the drawn one squeezed to `PRESS` .8 towards its hotspot, with three little
+  strokes round the tip when the tip isn't in a corner; his own cursor with no -press stays as it is); on release a `POP` 1.1
+  frame for `POP_MS` 90, then back (`cursorNow`). `html.pressing` while down. Every click also drops `.click-ink` at the pointer
+  (a ring and six strokes, .42 s; `assets/ui/click` replaces it; sky.css "a click"; not while holding the revolver/marker, in a
+  field, the easel, or with reduced motion; touches get the ink only).
+- **The hand**: `cursor-grab` is now drawn as a right hand from the back (nails, knuckles, thumb left), `cursor-grabbing` the fist
+  round something; cursor-grab's pressed twin is cursor-grabbing. sky.css "things you take hold of and pull": `.pullable`, the
+  hall cord and reset 4's lamp take the open hand (not while `inv-holding`); `html.grabbing` puts the fist on everything while
+  you hold on, so it stays closed as you drag off it.
+- **`Sky.pull(el, { dir, need, can, move(k, dx, dy), give(dx, dy), back, tap })`**: pointer capture, `k` 0…1 along `dir` (or
+  any way), `give` at 1 (return false: it hasn't, `back` instead), `back` on an early let-go, `tap` for a plain click. The click
+  a pull leaves behind is swallowed page-wide (`pulledAt`, from the release), so nothing under the pointer acts on it; keyboard
+  clicks (`detail` 0) still reach the thing's own handlers. `.pullable` has `touch-action: none`.
+- Pulled now: skizy's boards (peeper.js); the shelf book (bathroom.js: down and left, `dir [-.6, .8]`; it opens the wall, or
+  shuts it, right there, `grindOpen`/`grindShut`, and you click the opening to go down; reset 4 before the record: it hardly
+  moves, `NOT_YET`; a pointer click on it does nothing else, Enter still sends the traveller); the bath plug, up by its chain
+  (tub.js; a click puts it back in); reset 5's wallpaper, down (veil.js `tearDown`) and the sky's loose corner, any way
+  (`tryTear`, refused before the key with the lives line). The cord and the lamp keep their own drag code (attic.js `hand()`).
+- Slots: `assets/ui/<cursor>-press` ×5, `assets/ui/click`, sound `board-creak` (stand-in `tap`).
 
 ## One press of Escape, one thing (Sky.escape, sky/sky.js, 28 Sep)
 
@@ -1179,7 +1204,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 
 ## skizy's window and skizy's room
 
-- `peeper.js`: knock on the boarded window on the rooftop, the boards come off one by one, it's dark for a moment
+- `peeper.js`: the boarded window on the rooftop: a click knocks (`knockKnock`: the first "nobody answers", then `SKIZY.pull`);
+  each board is taken hold of and pulled off (11 Oct, Victor: `grabbable` → `Sky.pull`, any direction, ~80 px: it comes with
+  you a little, creaking, `board-creak`; far enough, `rip()` flings it off the way you pulled; Enter on the boards pulls the next
+  one). All off: it's dark for a moment
   (`SKIZY.dark_secs`, 1.5 s) and then her room fades up out of the black (`.skizy-dark`, 1.2 s): **skizy's room, live**
   (`schizophyllu.me.room/index.html?peek`, scaled into the window); "[ climb in ]" goes to
   `schizophyllu.me.room/index.html?from=dav-nky`. The old jump scare in the dark (the hobo, its picture, `hobo.ogg`,
