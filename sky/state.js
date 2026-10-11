@@ -16,7 +16,7 @@
                the tab closes, and at every reset
 
    RESETS below is the plan for each: its theme, its one way to die (DEATHS:
-   one death a reset, one heart: 27 Sep, skizy and Victor, so the easter egg
+   one death a reset, one heart: 27 Sep, skizy and the artist, so the easter egg
    can be reached), and where its key is hidden (until it's found, every way
    to die is off: curious clicking can't kill the traveller). Its own art (the key, the mirror, the note, the world getting more
    twisted) lives in assets/resets/reset-<n>/: the content manager's

@@ -1,11 +1,11 @@
 /* =====================================================================
    beyond.js — beyond.html: the end, for those who went home (reset 8: sky/
-   gnosis.js; 5 Oct, Victor). once they've gone, every page of the site
+   gnosis.js; 5 Oct). once they've gone, every page of the site
    comes here (sky/state.js, localStorage "dav-ending" = "escaped"), till they
    take the Sophia path back, or "forget their stay" (clear the site's data).
 
      space         nothing but space: still, dark, the faintest stars, and silence.
-                   (the drawn whoosh that used to fill it was too loud: gone, 10 Oct, Victor.)
+                   (the drawn whoosh that used to fill it was too loud: gone, 10 Oct.)
                    sound: assets/sounds/beyond, only if you add one (yours, looped, softly);
                    picture: assets/ui/beyond (optional, behind the stars)
      the reprise   a few seconds after the first tap, once a visit: the music of resets 1 and 2,

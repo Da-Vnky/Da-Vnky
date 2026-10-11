@@ -427,7 +427,7 @@ body:not([data-page="home"]) .signpost { filter: drop-shadow(-2px 5px 5px rgba(0
 body.leaving .letters,
 body.leaving .credit { opacity: 0; transition: opacity .7s ease; }
 
-/* one plank since 11 Oct ("visit home": Victor): on a big screen it hangs lower, so its post on the dock (sky/ground-sea.js,
+/* one plank since 11 Oct ("visit home"): on a big screen it hangs lower, so its post on the dock (sky/ground-sea.js,
    drawn up to wherever the sign is) is shorter */
 @media (min-width: 1101px) and (min-height: 501px) {
     body[data-page="home"] .signpost { top: 50vh; }
@@ -799,7 +799,7 @@ body.scope-view .sky-link.l7 { left: calc(50% - 70px);  right: auto; top: 76vh; 
 /* =====================================================================
    characters (placeholders until assets/characters/<scene> exists)
    ===================================================================== */
-/* how tall the traveller stands in the house's rooms (27 Sep, Victor: the top of their head just under the hallway's
+/* how tall the traveller stands in the house's rooms (27 Sep: the top of their head just under the hallway's
    doors, whose tops are 69vh - 12px up; they stand at 3vh). every room's traveller uses it, so they're one size everywhere */
 :root {
     --traveller-h: calc(60vh - 11px);
@@ -1169,7 +1169,7 @@ body.show-slots .has-art[data-asset], body.show-slots .has-art[data-slot] { outl
 .slot-panel .on { color: #7fe0a8; }
 .slot-panel .off { color: #c9b89a; opacity: .8; }
 
-/* ---------- a click (11 Oct, Victor: cursors animated when clicking) ----------
+/* ---------- a click (11 Oct: cursors animated when clicking) ----------
    sky.js swaps every cursor for its pressed twin while the button's down, and leaves this burst of ink where the click
    lands: a ring opening out and six little strokes flying off it (or your assets/ui/click, shown once and faded) */
 .click-ink {

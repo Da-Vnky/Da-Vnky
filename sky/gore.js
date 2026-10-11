@@ -239,7 +239,7 @@
     /* ---------------- respawn ---------------- */
     function respawn(el) {
         // a death that takes the heart: they don't come back, the reset's white-out comes at once (sky/lives.js). any other:
-        // back again (the "-1" heart that used to float up is gone, 27 Sep, Victor: with one heart it only ever misled)
+        // back again (the "-1" heart that used to float up is gone, 27 Sep: with one heart it only ever misled)
         if (!(Sky.lives && Sky.lives.counts)) {
             el.classList.remove('gore-hidden', 'gore-back');
             el.style.visibility = '';

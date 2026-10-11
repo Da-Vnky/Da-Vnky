@@ -4,9 +4,10 @@
    comes up: the roof's edge, the railing, a rocking chair, the mailbox, and
    over the railing the street and the houses across it under the site's own
    sky (the sun, the moon, the clouds, the constellations: the porch is open
-   to them). The arrow on the left, the front door, or Escape: back inside. The arrow
-   at the steps (the gap in the railing): down into the front garden (sky/front.js).
-   living.html#porch starts out here.
+   to them). The arrow on the left, the front door, or Escape: back inside. The
+   glow at the steps (the gap in the railing): down into the front garden (sky/front.js).
+   living.html#porch starts out here. On an upright phone the porch is wider than the
+   screen: the arrows at the sides (or a swipe) look along it (LOOKING below).
 
    FROM RESET 3 ON, THINGS OUT HERE AREN'T RIGHT:
      the watcher   someone standing under the streetlight across the road,
@@ -74,12 +75,15 @@
         H.fire('enter', 'porch');
         if (now) {
             place(me, STAND);
+            look(viewOf(STAND), true);
             setTimeout(function () { body.classList.remove('porch-now'); busy = false; arrived(); }, 60);
             return;
         }
         place(me, DOOR);
+        look(0, true);                                                      // (the door end, then along with them)
         setTimeout(function () {
             body.classList.remove('porch-panning');
+            look(viewOf(STAND));
             H.land(me, STAND, function () { busy = false; me.classList.remove('face-left'); arrived(); });
         }, 900);
     }
@@ -102,6 +106,7 @@
         };
         busy = true;
         H.setOff(function () { stop(me); busy = false; });
+        look(0);
         walk(me, DOOR, function () { sfx('door', { size: 0.5 }); shut(); });
     }
     H.room('porch', { parent: 'hall', here: function () { return outside; }, busy: function () { return busy; }, enter: goOut, leave: goIn });
@@ -112,6 +117,7 @@
         if (!outside || busy || !Sky.front || !Sky.front.fromPorch) return;
         busy = true;
         H.setOff(function () { stop(me); busy = false; });
+        look(viewOf(STEPS));
         walk(me, standAt(me, STEPS), function () {
             H.through();
             me.classList.remove('face-left');
@@ -138,6 +144,46 @@
     if (back) back.addEventListener('click', inside);
     if (door) door.addEventListener('click', inside);
     if (location.hash === '#porch') setTimeout(function () { if (Sky.sides) Sky.sides.goNow('hall'); setTimeout(function () { openPorch(true); }, 80); }, 120);
+
+    /* ---------------- LOOKING along the porch, on an upright phone (11 Oct) ----------------
+       porch.css makes the porch wider than the screen there, so you see a part of it at a time: the door end, the steps,
+       the mailbox end (VIEWS: how far along the part that doesn't fit; the middle one shows the bee over the yard, the
+       traveller and the steps). the arrows at the screen's sides look along it,
+       so does a swipe; when the traveller walks (out of the door, to the steps, back in) the view goes with them */
+    var VIEWS = [0, .43, 1], view = 1, narrow = window.matchMedia('(max-width: 620px)');
+    var lookL = document.querySelector('.porch-look.look-left'), lookR = document.querySelector('.porch-look.look-right');
+    function spare() { return narrow.matches ? Math.max(0, porch.offsetWidth - window.innerWidth) : 0; }
+    function look(i, now) {
+        view = Math.max(0, Math.min(VIEWS.length - 1, i));
+        var more = spare();
+        if (now) body.classList.add('porch-look-now');
+        porch.style.setProperty('--porch-pan', Math.round(VIEWS[view] * more));
+        body.classList.toggle('porch-look-l', more > 0 && view > 0);
+        body.classList.toggle('porch-look-r', more > 0 && view < VIEWS.length - 1);
+        if (now) { void porch.offsetWidth; body.classList.remove('porch-look-now'); }
+    }
+    // the view that shows the traveller best, standing at pct (% across the porch)
+    function viewOf(pct) {
+        var more = spare(), w = porch.offsetWidth, x = (pct / 100) * w + me.offsetWidth / 2, best = view, d = Infinity;
+        if (!more) return view;
+        VIEWS.forEach(function (f, i) { var off = Math.abs(f * more + window.innerWidth / 2 - x); if (off < d) { d = off; best = i; } });
+        return best;
+    }
+    function lookBy(n) { return function (e) { e.preventDefault(); e.stopPropagation(); if (outside) look(view + n); }; }
+    if (lookL) lookL.addEventListener('click', lookBy(-1));
+    if (lookR) lookR.addEventListener('click', lookBy(1));
+    // a swipe across the porch (a finger, sideways more than down): look the other way, like dragging the view along
+    var swipe = null;
+    porch.addEventListener('pointerdown', function (e) { swipe = e.pointerType === 'mouse' ? null : { x: e.clientX, y: e.clientY }; }, true);
+    porch.addEventListener('pointerup', function (e) {
+        if (!swipe || !outside || body.classList.contains('bee-talking')) return;
+        var dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+        swipe = null;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && spare()) look(view + (dx < 0 ? 1 : -1));
+    }, true);
+    porch.addEventListener('pointercancel', function () { swipe = null; }, true);
+    window.addEventListener('resize', function () { look(view, true); });
+    look(view, true);
 
     /* ---------------- what happens out here ---------------- */
     var timers = [];
@@ -276,6 +322,6 @@
     });
     chair.addEventListener('animationend', function () { chair.classList.remove('rock'); });
 
-    Sky.porch = { get outside() { return outside; },
+    Sky.porch = { get outside() { return outside; }, look: look, views: function () { return spare() ? VIEWS.length : 0; },
                   events: Object.keys(EVENTS), event: function (n) { if (outside && EVENTS[n]) EVENTS[n](); } };      // (the debug page: one of them, now)
 })();

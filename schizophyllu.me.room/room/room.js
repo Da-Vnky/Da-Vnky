@@ -18,7 +18,7 @@ const $ = s => document.querySelector(s);
 // the knocking and the boards happen up there; you climb in (?from=dav-nky), and the way out leads
 // back up to the roof. ?peek is the live view through that window: no sound, nothing to click, no HUD
 const PEEK = new URLSearchParams(location.search).has('peek');
-// (DaV-nky: served from the same site, or a preview on Victor's computer, the rooftop is just next door)
+// (DaV-nky: served from the same site, or a preview on the artist's computer, the rooftop is just next door)
 const ROOFTOP = /(^|\.)dav-nky\.pleroma\.nexus$|^localhost$|^127\.0\.0\.1$|^\[::1\]$/.test(location.hostname)
   ? new URL('../city.html', location.href).href : 'https://dav-nky.pleroma.nexus/city.html';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -1106,12 +1106,12 @@ function climb(id) {
 // layering stays put; this pours the drawings in before anything else touches the room
 const XLINK = 'http://www.w3.org/1999/xlink';
 async function inlineArt(root) {
-  const mine = await davArtFiles();                     // (DaV-nky: Victor's own pictures, from its asset manager. see the end)
+  const mine = await davArtFiles();                     // (DaV-nky: the artist's own pictures, from its asset manager. see the end)
   davBackdrop(root, mine);
   davSkyHole(root, mine);                               // (DaV-nky: the site's own sky through the window, see the end)
   await Promise.all([...root.querySelectorAll('[data-art]')].map(async ph => {
     const pic = davPick(mine, davStem(ph.dataset.art));
-    let hit = null;                                     // (DaV-nky: Victor's picture shows; her drawing, invisible, still takes the clicks)
+    let hit = null;                                     // (DaV-nky: the artist's picture shows; her drawing, invisible, still takes the clicks)
     if (pic && !pic.svg) { ph.append(davImage(pic.url)); hit = davHit(ph); }
     const url = new URL(pic && pic.svg ? pic.url : ph.dataset.art, location.href);
     try {
@@ -1133,7 +1133,7 @@ async function inlineArt(root) {
     } catch (e) {
       console.warn(`couldn't load ${ph.dataset.art}:`, e);
     }
-    davPen(ph, mine, pic);                              // (DaV-nky: Claube's pen, on top of Victor's Claube. see the end)
+    davPen(ph, mine, pic);                              // (DaV-nky: Claube's pen, on top of the artist's Claube. see the end)
   }));
 }
 
@@ -1628,7 +1628,7 @@ async function main() {
 main();
 
 // ============================================================ DaV-nky
-// integration with Victor's site (dav-nky.pleroma.nexus), which this room sits across the street from.
+// integration with the artist's site (dav-nky.pleroma.nexus), which this room sits across the street from.
 // everything here was added for that; the lines themselves are in room/davnky.js.
 //   · the cabinet is empty before reset 3. the pills (the bathroom cabinet) can only be taken to skizy in DaV-nky's reset 3, and only once that
 //     reset's key is found. in reset 3 it's one of the ways to die: after the lights go out, the visitor
@@ -1791,13 +1791,13 @@ if (!PEEK) {
   document.head.appendChild(s);
 }
 // before reset 3 the bathroom cabinet is empty: the pill bottles (and the bags and organizer with them) aren't there yet.
-// and from reset 5 they're gone again (27 Sep, Victor)
+// and from reset 5 they're gone again (27 Sep)
 if (DAV.reset < 3 || DAV.reset >= 5) {
   const st = document.createElement('style');
   st.textContent = '[data-id="pills"] { display: none; }';
   document.head.appendChild(st);
 }
-// Victor's own pictures for the room, from DaV-nky's asset manager (tools/assets.html → "skizy's room"), in
+// the artist's own pictures for the room, from DaV-nky's asset manager (tools/assets.html → "skizy's room"), in
 // assets/skizy-room/ (its list.txt says what's there):
 //   · <room>-<thing>  takes the place of room/objects/<room>/<thing>.svg: a picture the size of the whole room
 //     (1600 × 900), the thing drawn where it sits, see-through everywhere else. an .svg is poured in just like the
@@ -1832,12 +1832,12 @@ function davImage(url) {
   for (const [k, v] of [['x', 0], ['y', 0], ['width', 1600], ['height', 900], ['preserveAspectRatio', 'none']]) im.setAttribute(k, v);
   return im;
 }
-// under a picture of Victor's: skizy's own drawing of the thing, invisible, so only the thing itself (in its own shape)
+// under a picture of the artist's: skizy's own drawing of the thing, invisible, so only the thing itself (in its own shape)
 // is hovered and clicked, not the whole room-sized picture
-// Claube's pen (10 Oct, Victor): assets/skizy-room/main-claube-pen, a moving picture the size of the whole room (the pen,
-// drawn where it sits in his hand, see-through everywhere else), laid over Victor's own Claube (main-claube). it's always
+// Claube's pen (10 Oct): assets/skizy-room/main-claube-pen, a moving picture the size of the whole room (the pen,
+// drawn where it sits in his hand, see-through everywhere else), laid over the artist's own Claube (main-claube). it's always
 // in his hand: held still on its first frame, and played from its start whenever he writes (#claube.writing: the scenes
-// and the speech bubbles switch it on and off), then still again. only with Victor's Claube: skizy's drawing has its own pen
+// and the speech bubbles switch it on and off), then still again. only with the artist's Claube: skizy's drawing has its own pen
 function davPen(ph, files, pic) {
   if (!pic || ph.id !== 'claube') return;
   const pen = davPick(files, 'main-claube-pen');
@@ -1910,13 +1910,13 @@ function davBackdrop(root, files) {
   im.classList.add('dav-backdrop');
   if (first) first.before(im); else root.append(im);
 }
-// the sky through the window is DaV-nky's own (skizy's wish, 27 Sep): once Victor's window picture is in
+// the sky through the window is DaV-nky's own (skizy's wish, 27 Sep): once the artist's window picture is in
 // (main-window, its panes see-through), everything in the room behind the window gets a hole where the glass is, and
 // DaV-nky's sky (../window-sky.html: the real sun and moon where the visitor is, the clouds, the stars, day and night)
 // sits behind the room and shows through. The moon's light in the rooms (glow-moon, glow-moonbeam, the closet's
 // glow-hatch-moon) follows that sky's night: full from about 1 h 40 min after sunset, gone by day. In the afternoon
 // scene the sky outside turns to afternoon for as long as it lasts. Its look: ../sky/css/skizy-window.css
-// the windows it's done for: the main room's, and (28 Sep, Victor's own blinds with a see-through gap) the bedroom's.
+// the windows it's done for: the main room's, and (28 Sep, the artist's own blinds with a see-through gap) the bedroom's.
 // panes: the glass, in room coordinates (a little of it under the frame). frame: how much sky the window is as if the
 // glass were all of it (the bedroom's gap is only a strip under the blinds: the sky's that strip of a whole window's view)
 const DAV_WINDOWS = {
@@ -1949,7 +1949,7 @@ function davSkyHole(root, files) {
     if (el === top) break;
     if (el.localName !== 'defs' && el.localName !== 'style') el.setAttribute('mask', `url(#${mask.id})`);
   }
-  // skizy's twinkling stars for her painted sky (unless Victor drew his own), and the afternoon's painted sky: the real one's there instead
+  // skizy's twinkling stars for her painted sky (unless the artist drew his own), and the afternoon's painted sky: the real one's there instead
   if (!davPick(files, W.blink[0])) root.querySelector(`[data-art$="${W.blink[1]}"]`)?.classList.add('dav-own-sky');
   if (key === 'main') {
     const day = root.querySelector('#daylight');
@@ -2017,14 +2017,14 @@ function davSkyWindow() {
     setTimeout(tick, 600);
   }).observe(body, { attributes: true, attributeFilter: ['class', 'data-room'] });
 }
-// the room shows only once it's as it should be (27 Sep, Victor: the quiet room flashed the ordinary one while its drawings
+// the room shows only once it's as it should be (27 Sep: the quiet room flashed the ordinary one while its drawings
 // loaded): hidden from the start, shown by main() right after davQuiet(). (and after a few seconds whatever happens)
 const davHide = document.createElement('style');
 davHide.textContent = '#svg-host { visibility: hidden; }';
 document.head.append(davHide);
 function davReveal() { davHide.remove(); }
 setTimeout(davReveal, 8000);
-// the window in the main room is a way out: back to DaV-nky's rooftop, across the street (27 Sep, Victor)
+// the window in the main room is a way out: back to DaV-nky's rooftop, across the street (27 Sep)
 $('#svg-host').addEventListener('click', e => {
   if (current !== 'main' || mode !== 'room' || PEEK || !e.target.closest('[data-id="window"]')) return;
   e.stopPropagation(); e.preventDefault();

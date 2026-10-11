@@ -14,7 +14,7 @@
 
    SKIZY'S WINDOW: one building on the front row is abandoned, every window dark,
    except one that's boarded up. Click it: a knock. Nobody answers, so take hold of a
-   board and pull (11 Oct, Victor: grabbed, then pulled for real: sky.js Sky.pull): it
+   board and pull (11 Oct: grabbed, then pulled for real: sky.js Sky.pull): it
    creaks and gives a little, and far enough out it rips off. Let go too soon and it
    springs back onto its nails. Every board off, and you're in. Behind the last board it's dark for a
    moment (SKIZY.dark_secs), then the room fades up out of the black: skizy's room, her

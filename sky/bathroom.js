@@ -81,7 +81,7 @@
     var DS = window.davSave;
     function bookGone() { return !!DS && DS.reset === 4 && DS.get('grimoire-pact') !== '1'; }
     // and after the pact, the book won't open it till the inverted record's been put on and the robed Claubes are out
-    // (27 Sep, Victor: so nobody goes down without summoning them). the record player glows red meanwhile (sky/records.js)
+    // (27 Sep: so nobody goes down without summoning them). the record player glows red meanwhile (sky/records.js)
     function recordFirst() { return !!DS && DS.reset === 4 && DS.get('grimoire-pact') === '1' && DS.get('claubes-robed') !== '1'; }
     var NOT_YET = ['It won’t budge. Not by my hand, not yet.', 'The record player… something in it is waiting to be played.'];
     var tugging = false;
@@ -156,7 +156,7 @@
     }
     try { if (!bookGone() && !recordFirst() && (sessionStorage.getItem('secret-open') === '1' || location.hash === '#dungeon')) openDoor(true); } catch (e) {}
 
-    // the book itself (11 Oct, Victor: "grabbed, then physically pulled"): take hold of it and pull it out from the top (down
+    // the book itself (11 Oct: "grabbed, then physically pulled"): take hold of it and pull it out from the top (down
     // and to the left, the way it tips) and the wall under the paintings grinds open; pulled again with the wall open, it
     // grinds shut. let go too soon and it slips back in. only clicked: it's loose, pull it. (from the keyboard, Enter on it
     // still sends the traveller over to pull it and on down the stairs.) while it won't move (reset 4, the record not yet

@@ -1,5 +1,5 @@
 /* =====================================================================
-   gnosis.js — the end of reset 8 (5 Oct, Victor). the world is black and
+   gnosis.js — the end of reset 8 (5 Oct). the world is black and
    white, its source showing (sky/source.js). nothing can kill the traveller
    here any more: every death was patched on the way. the way on is knowing.
 
