@@ -260,6 +260,28 @@ this before changing anything; keep it up to date when something here stops bein
   and the subtitle, not italic). h2/h3, the drop capital and the embeds' figures keep IM Fell. `--hand-size` scales it
   (1 = same size). With no font there, nothing is fetched but the list.
 
+## Writing letters by hand (sky/inkpad.js, 11 Oct)
+
+- Victor: "add a drawing function to desktop letters … I'd like to be able to write my letters … with my cintiq" (he set the
+  handwriting font aside: "it flows more naturally"). "✎ write by hand" in the toolbar of the desk (`data-do="hand"`, desk.js
+  `byHand`) and the content manager's letters page (tools/letters.html `byHand`) opens `DavInk.open({ base, done, cancel })`.
+- **The pad**: a full-screen sheet of the letters' paper, `W` 636 wide (the site's writing width: .letter 780 less the sheet's
+  72 + 72; measured 639 on the sea), kept at `S` 2× (so the picture is 1272 wide), shrunk to fit a narrower screen (`k`). Ruled
+  lines every 32 (a guide only, "lines" switches them off). Inks (`INKS`: the site's ink, black, faded, sanguine, night blue),
+  sizes (`SIZES`), rubber (button, E, or the pen's other end: `button` 5 / `buttons & 32`), undo/redo (ctrl+z, ctrl+shift+z,
+  ctrl+y), clear (undoable), [ and ] for the size, ctrl+s puts it in, Escape cancels (asks if anything's written). The last ink
+  and size are kept (`localStorage dav-inkpad`). Strokes are kept as points (pressure smoothed; `getCoalescedEvents`, so every
+  point the tablet sends), drawn as curves through the midpoints with the width from the pen's pressure (`widthAt`: × 0.28 to
+  1.72; a mouse: the size as it is); undo draws them all again. A finger is ignored once a pen's been used (a hand resting on a
+  Cintiq). Writing near the bottom adds paper (`MORE`). The picture: trimmed to the ink top and bottom, full width, PNG.
+- **Into the letter**: a paragraph `![handwritten](content/sea/<date>-handwritten.png)`. The content manager saves it with
+  `/__letters/picture`; the desk `put`s it like any picture (`unique(… '-handwritten', '.png')`). With the cursor in such a
+  paragraph, or clicking one in a preview, the pad opens with it as the first thing on the sheet (can be rubbed out), and the
+  new picture replaces that line (the old file stays in the folder).
+- **Shown**: `DavEmbed.isHand(block)` / `DavEmbed.handwritten(img)` (embeds.js) in all three renderers (sky.js `txtToHtml` with
+  `embeds`, the desk, the letters page), before the taped pictures: `figure.handwritten`, width 100%, no filter or shadow
+  (embeds.css).
+
 ## The pages
 
 - `index.html` — the sea (homepage): scroll = the day turning; ship you can pick up; dock; bottles. Its signpost
@@ -448,6 +470,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   the animator sends into `REBELLE_NEW`. Rebelle's own `.reb` in the slot's folder is opened first next time (like `.clip`
   for Clip Studio; neither is handed to another program).
 - After changing content.py: Victor restarts the content manager (close its window, double-click `tools\content.bat`).
+- **Animated WebPs bigger than Clip Studio exports** (11 Oct, Victor: CSP's animated WebP stops at about 2000 across; he needs
+  3200 x 1800): `tools/webp.py` (+ `webp.bat`: drag a folder of frames, or several frames, or one animated GIF/PNG/WebP onto it;
+  double-clicked, a folder picker; `webp.sh`). Frames in natural name order; asks fps (12), quality 1-100 or "lossless" (90),
+  size (as drawn, `1600x900` or `50%`); `--yes`, `--out`, `--open` (Explorer shows it; the .bat passes it). FFmpeg first
+  (`drawtable.ffmpeg()`: the animator's, else PATH; frames hard-linked into a temp folder as `%05d`; `libwebp_anim`,
+  `-preset drawing`, `yuva420p` when any frame's see-through, else `yuv420p`; lossless keeps RGBA), else Pillow (every frame in
+  memory). Saves `<folder>.webp` beside the folder (`<name>-big.webp` for a remade file); says if it's over the site's 30 MB.
+  Checked: 30 frames of 3200 x 1800 with see-through, both ways, 83/84 ms a frame at 12 fps, loop forever, the corners clear.
 
 ## The attic (sky/attic.js)
 

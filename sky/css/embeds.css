@@ -120,3 +120,21 @@ a.em-card:hover { background: rgba(252, 245, 228, .9); border-color: #9a3b1f; }
 @media (max-width: 620px) {
     .em-pic { width: 76px; }
 }
+
+/* ---------- a page written by hand (sky/inkpad.js): straight on the paper, as wide as the writing, no tape ---------- */
+.letter figure.handwritten,
+.content figure.handwritten {
+    margin: .3em 0 1.1em;
+    padding: 0;
+    transform: none;
+}
+.letter figure.handwritten img,
+.content figure.handwritten img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 0;
+    filter: none;
+    box-shadow: none;
+}

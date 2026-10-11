@@ -1,0 +1,108 @@
+/* =====================================================================
+   inkpad.css — the look of sky/inkpad.js: writing a letter by hand.
+   (the desk and the content manager's letters page)
+   ===================================================================== */
+html.ink-pad-open { overflow: hidden; }
+.ink-pad {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    display: flex;
+    flex-direction: column;
+    background: rgba(20, 13, 8, .95);
+    color: #f3e6c2;
+    font: italic 15px/1.4 "IM Fell English", Georgia, serif;
+}
+.ink-pad .ip-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    padding: 10px 16px;
+    background: #2a1c11;
+    border-bottom: 1px solid rgba(243, 230, 194, .2);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .4);
+}
+.ink-pad .ip-title { font: normal 1.25rem "IM Fell English SC", Georgia, serif; letter-spacing: .03em; margin-right: 6px; }
+.ink-pad .ip-group { display: inline-flex; align-items: center; gap: 6px; }
+.ink-pad .ip-gap { flex: 1; }
+.ink-pad button { font: inherit; color: inherit; cursor: pointer; }
+.ink-pad .ip-btn {
+    padding: 5px 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(243, 230, 194, .35);
+    background: transparent;
+}
+.ink-pad .ip-btn:hover { background: rgba(243, 230, 194, .12); }
+.ink-pad .ip-btn[aria-pressed="true"] { background: #f3e6c2; color: #2a1c11; }
+.ink-pad .ip-btn:disabled { opacity: .35; cursor: default; }
+.ink-pad .ip-done { background: #9a3b1f; border-color: #9a3b1f; color: #fff6e4; }
+.ink-pad .ip-done:hover { background: #b2492a; }
+.ink-pad .ip-ink {
+    width: 24px; height: 24px; padding: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(243, 230, 194, .3);
+    background: var(--c);
+}
+.ink-pad .ip-ink[aria-pressed="true"] { border-color: #f3e6c2; box-shadow: 0 0 0 2px #2a1c11, 0 0 0 4px #f3e6c2; }
+.ink-pad .ip-size {
+    width: 28px; height: 28px; padding: 0;
+    display: inline-grid; place-items: center;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    background: transparent;
+}
+.ink-pad .ip-size i { display: block; width: var(--d); height: var(--d); border-radius: 50%; background: #f3e6c2; }
+.ink-pad .ip-size[aria-pressed="true"] { border-color: #f3e6c2; }
+.ink-pad .ip-lines-sw { display: inline-flex; align-items: center; gap: 5px; margin-left: 4px; cursor: pointer; }
+.ink-pad .ip-scroll {
+    flex: 1;
+    overflow: auto;
+    padding: 22px 12px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+/* the paper: the letters' own colour, with their ruled lines (only to write along: they aren't in the picture) */
+.ink-pad .ip-sheet {
+    position: relative;
+    flex: none;
+    background-color: var(--paper, #e9dbb8);
+    background-image:
+        repeating-linear-gradient(to bottom, transparent 0 calc(var(--line, 32px) - 1px), rgba(110, 82, 54, .22) calc(var(--line, 32px) - 1px) var(--line, 32px)),
+        radial-gradient(ellipse at 30% 20%, var(--paper-light, #f3e8cc), transparent 70%);
+    box-shadow: 0 0 0 1px rgba(60, 40, 20, .3), inset 0 0 60px rgba(110, 70, 30, .28), 0 18px 40px rgba(0, 0, 0, .55);
+    border-radius: 2px;
+}
+.ink-pad .ip-sheet.no-lines { background-image: radial-gradient(ellipse at 30% 20%, var(--paper-light, #f3e8cc), transparent 70%); }
+.ink-pad .ip-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: none;
+}
+/* where the pen is, and how big it writes */
+.ink-pad .ip-tip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--tip, 4px);
+    height: var(--tip, 4px);
+    margin: calc(var(--tip, 4px) / -2) 0 0 calc(var(--tip, 4px) / -2);
+    border-radius: 50%;
+    border: 1px solid rgba(42, 28, 17, .8);
+    box-shadow: 0 0 0 1px rgba(243, 230, 194, .7);
+    pointer-events: none;
+}
+.ink-pad .ip-tip.rub { border-style: dashed; }
+.ink-pad .ip-tip[hidden] { display: none; }
+.ink-pad .ip-more { flex: none; }
+.ink-pad .ip-hint { margin: 0; max-width: 636px; text-align: center; font-size: 13px; opacity: .7; }
+.ink-pad.ip-busy { cursor: progress; }
+@media (max-width: 620px) {
+    .ink-pad .ip-bar { padding: 8px 10px; gap: 8px; }
+    .ink-pad .ip-title { display: none; }
+}

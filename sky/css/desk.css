@@ -256,3 +256,8 @@ input[type=date] { min-height: 2.4em; }
     .dk-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; }
     .dk-tabs button { padding: 8px 13px 10px; }
 }
+
+/* writing by hand (sky/inkpad.js): the button stands out a little, and a handwritten page in the preview opens again on a click */
+.dk-tools .dk-hand { font-weight: bold; }
+.dk-preview figure.handwritten { cursor: pointer; }
+.dk-preview figure.handwritten:hover img { outline: 1px dashed rgba(110, 82, 54, .5); outline-offset: 4px; }

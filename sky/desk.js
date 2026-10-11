@@ -533,7 +533,9 @@
                         '<p class="dk-hint dk-later" hidden>this date is in the future: the letter stays hidden until that day, then arrives in a bottle.</p>' +
                         '<div class="dk-tools dk-txt">' +
                             '<button type="button" data-wrap="*"><i>italic</i></button><button type="button" data-wrap="**"><b>bold</b></button>' +
-                            '<button type="button" data-do="link">link</button><button type="button" data-do="picture">picture…</button>' +
+                            '<button type="button" data-do="link">link</button>' +
+                            '<button type="button" data-do="hand" class="dk-hand" title="write with a pen (a drawing tablet\u2019s pressure works), a mouse or a finger. with the cursor on a page you wrote by hand: carry on with that one">\u270e write by hand</button>' +
+                            '<button type="button" data-do="picture">picture…</button>' +
                             '<button type="button" data-do="embed">embed a link…</button><button type="button" data-do="line">a line ——</button><button type="button" data-do="signoff">sign-off</button>' +
                             '<input type="file" class="dk-l-pic" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" hidden></div>' +
                         '<textarea class="dk-l-body" spellcheck="true" placeholder="write your letter here.\n\na blank line starts a new paragraph."></textarea>' +
@@ -617,7 +619,41 @@
                 if (w === 'line') block('---');
                 if (w === 'signoff') { var so = prompt('sign off with:', 'more soon'); if (so) block('~ ' + so); }
                 if (w === 'picture') pic.click();
+                if (w === 'hand') byHand(handAt(body.value, body.selectionStart));
             });
+        });
+        // writing by hand (sky/inkpad.js): a page of it, put on the desk as a picture beside the letters
+        // the paragraph the cursor's in, if it's a page written by hand (so the button carries on with that one)
+        function handAt(v, c) {
+            var a = v.lastIndexOf('\n\n', Math.max(0, c - 1)), z = v.indexOf('\n\n', c);
+            a = a < 0 ? 0 : a + 2; z = z < 0 ? v.length : z;
+            var m = /^!\[handwritten[^\]]*\]\(([^)\s]+)\)$/i.exec(v.slice(a, z).trim());
+            return m ? { a: a, z: z, path: m[1] } : null;
+        }
+        function byHand(at) {
+            if (!window.DavInk || L.kind !== 'txt') return;
+            DavInk.open({ base: at ? urlOf(decodeURIComponent(at.path)) : null, done: function (blob) {
+                work('putting your handwriting in…', function () {
+                    var path = FOLDERS.sea + unique(FOLDERS.sea, today() + '-handwritten', '.png');
+                    return put(path, blob, 'image/png').then(function () {
+                        var line = '![handwritten](' + path + ')';
+                        if (at) {                                          // (in place of the one it carried on from)
+                            var v = body.value;
+                            body.value = v.slice(0, at.a) + line + v.slice(at.z);
+                            body.setSelectionRange(at.a + line.length, at.a + line.length);
+                            setLetterDirty(pane, true); renderLetter(pane);
+                        } else block(line);
+                        toast('your handwriting’s on the desk. save the letter to put it up.');
+                    });
+                });
+            } });
+        }
+        // a page written by hand, clicked in the preview: carry on writing on it
+        $('.dk-preview', pane).addEventListener('click', function (e) {
+            var f = e.target.closest && e.target.closest('figure.handwritten'), im = f && f.querySelector('img');
+            if (!im || L.kind !== 'txt') return;
+            var v = body.value, re = /!\[handwritten[^\]]*\]\(([^)\s]+)\)/gi, m;
+            while ((m = re.exec(v))) if (urlOf(decodeURIComponent(m[1])) === im.getAttribute('src')) { byHand(handAt(v, m.index)); return; }
         });
         pic.addEventListener('change', function () {
             var f = pic.files[0];
@@ -711,6 +747,7 @@
             if (/^~\s/.test(b)) { out += '<p class="signoff">' + inline(b.replace(/^~\s*/, '')) + '</p>'; return; }
             var link = window.DavEmbed && DavEmbed.lone(b);                 // (a link on its own: its player, sky/embeds.js)
             if (link) { out += DavEmbed.html(link); return; }
+            if (window.DavEmbed && DavEmbed.isHand(b)) { out += DavEmbed.handwritten(inline(b)); return; }      // (written by hand: sky/inkpad.js)
             if (window.DavEmbed && /^!\[[^\]]*\]\([^)\s]+\)$/.test(b)) { out += DavEmbed.taped(inline(b), b); return; }   // (a picture alone: taped on)
             out += '<p' + (i === 0 ? ' class="lede"' : '') + '>' + inline(b).replace(/\n/g, '<br>') + '</p>';
         });

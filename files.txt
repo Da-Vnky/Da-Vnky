@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1480 241583496
-city.html 9866 1200584983
-desk.html 5939 3517477933
-index.html 5247 2238867689
-living.html 133346 2508823652
-window-sky.html 1334 3024231033
-workshop.html 22101 1057914518
+beyond.html 1480 75741493
+city.html 9866 3818991282
+desk.html 6031 2246916050
+index.html 5247 2148946222
+living.html 133346 2328892176
+window-sky.html 1334 318328981
+workshop.html 22101 2059013013
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/bathroom.js 29419 3573512770
@@ -14,9 +14,9 @@ sky/beyond.js 10960 423359035
 sky/books.js 13450 616855077
 sky/claubes.js 52332 2508345692
 sky/crate.js 36569 3934218302
-sky/desk.js 67541 3245931204
+sky/desk.js 70322 4224198815
 sky/dungeon.js 9600 328112207
-sky/embeds.js 18796 799051498
+sky/embeds.js 19215 1533122486
 sky/eye.js 16302 1561931541
 sky/forget.js 10564 1871474324
 sky/frames.js 7570 2003764363
@@ -31,6 +31,7 @@ sky/ground-view.js 6301 1081822792
 sky/hand.js 1836 1437817105
 sky/hell.js 23866 1668939081
 sky/house.js 11177 2717587795
+sky/inkpad.js 17787 3945018531
 sky/inventory.js 17335 1835204345
 sky/kitchen.js 16998 1806270189
 sky/letters.js 25530 944212490
@@ -53,7 +54,7 @@ sky/records.js 36049 331287201
 sky/resets.js 17516 2785905217
 sky/revolver.js 19577 3874064095
 sky/ropes.js 5596 4224145225
-sky/sky.js 137258 2372243288
+sky/sky.js 137451 2407999316
 sky/source.js 3809 654057405
 sky/state.js 22677 242285796
 sky/static.js 4257 3285748512
@@ -74,9 +75,9 @@ sky/css/beyond.css 2644 3959879294
 sky/css/books.css 4721 4205520486
 sky/css/claubes.css 17565 3697391751
 sky/css/crate.css 15195 526352604
-sky/css/desk.css 15923 781513927
+sky/css/desk.css 16259 3308899224
 sky/css/dungeon.css 7780 2252711842
-sky/css/embeds.css 5122 3938868840
+sky/css/embeds.css 5568 2272375864
 sky/css/eye.css 1165 2492654789
 sky/css/forget.css 3893 1029278307
 sky/css/frames.css 7028 2345002776
@@ -89,6 +90,7 @@ sky/css/ground-countryside.css 834 2965982463
 sky/css/ground-sea.css 8871 1730813069
 sky/css/ground-view.css 788 375225604
 sky/css/hell.css 10082 3168670266
+sky/css/inkpad.css 4227 1974191486
 sky/css/inventory.css 6010 1973479581
 sky/css/kitchen.css 17248 3013673126
 sky/css/letters.css 2447 3776226858
@@ -124,7 +126,7 @@ sky/css/weather.css 2711 4110356900
 assets/characters/list.txt 117 55339362
 assets/city/list.txt 117 55339362
 assets/countryside/list.txt 117 55339362
-assets/fonts/list.txt 135 3545437160
+assets/fonts/list.txt 117 55339362
 assets/hell/list.txt 117 55339362
 assets/items/list.txt 117 55339362
 assets/living/list.txt 363 3476233613
@@ -151,10 +153,12 @@ content/living/albums.txt 123 775924658
 content/living/frames.json 150 2267752740
 content/living/list.txt 382 703812112
 content/sea/2026-09-25-hello-world.txt 213 4016599039
+content/sea/2026-10-11-handwriting-test.txt 119 3848642082
 content/sea/2026-10-11-if-ur-seeing-this-video.txt 86 1342626792
 content/sea/2026-10-11-if-ur-seeing-this.txt 274 700905633
 content/sea/2026-10-11-the-site-so-far.txt 594 839400045
-content/sea/list.txt 374 2141914537
+content/sea/list.txt 446 2627608072
+content/sea/written.json 68 3586333723
 content/shame/frames.json 359 3564234737
 content/shame/list.txt 125 95844360
 content/workshop/frames.json 77 3506889498

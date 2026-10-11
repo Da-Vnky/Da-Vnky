@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="../sky/css/embeds.css">
 <script src="../sky/embeds.js"></script>
 <script src="../sky/hand.js"></script>
+<link rel="stylesheet" href="../sky/css/inkpad.css">
+<script src="../sky/inkpad.js"></script>
 <style>
     :root { --ink: #3a2716; --ink-faded: #6e5236; --sanguine: #9a3b1f; --desk: #2a1d14; --card: #eadcb9; }
     * { box-sizing: border-box; }
@@ -50,6 +52,9 @@
     .tools { display: flex; flex-wrap: wrap; gap: 4px; }
     .tools button { padding: 4px 10px; border: 1px solid rgba(110,82,54,.3); border-radius: 999px; background: #f8f0dc; cursor: pointer; font-size: .92rem; }
     .tools button:hover { background: #fff8e6; }
+    .tools .hand-btn { font-weight: bold; }
+    .preview figure.handwritten { cursor: pointer; }
+    .preview figure.handwritten:hover img { outline: 1px dashed rgba(110,82,54,.5); outline-offset: 4px; }
     textarea { flex: 1; min-height: 320px; width: 100%; padding: 12px; border: 1px solid rgba(110,82,54,.3); border-radius: 8px; background: #f8f0dc;
         resize: none; outline: none; font-size: 1.08rem; line-height: 1.6; }
     textarea.code { font: .92rem/1.5 Consolas, Menlo, monospace; }
@@ -113,6 +118,7 @@
                 <button type="button" data-wrap="*" title="select some words first">italic</button>
                 <button type="button" data-wrap="**" title="select some words first"><b>bold</b></button>
                 <button type="button" data-do="link">link</button>
+                <button type="button" data-do="hand" class="hand-btn" title="write with a pen (a drawing tablet's pressure works), a mouse or a finger. with the cursor on a page you wrote by hand: carry on with that one">✎ write by hand</button>
                 <button type="button" data-do="picture">picture…</button>
                 <button type="button" data-do="embed">embed a link…</button>
                 <button type="button" data-do="line">a line ———</button>
@@ -243,6 +249,7 @@ a blank line starts a new paragraph."></textarea>
             if (/^~\s/.test(b)) { out += '<p class="signoff">' + inline(b.replace(/^~\s*/, '')) + '</p>'; return; }
             var link = window.DavEmbed && DavEmbed.lone(b);                 // (a link on its own: its player, sky/embeds.js)
             if (link) { out += DavEmbed.html(link); return; }
+            if (window.DavEmbed && DavEmbed.isHand(b)) { out += DavEmbed.handwritten(inline(b)); return; }      // (written by hand: sky/inkpad.js)
             if (window.DavEmbed && /^!\[[^\]]*\]\([^)\s]+\)$/.test(b)) { out += DavEmbed.taped(inline(b), b); return; }   // (a picture alone: taped on)
             out += '<p' + (i === 0 ? ' class="lede"' : '') + '>' + inline(b).replace(/\n/g, '<br>') + '</p>';
         });
@@ -315,7 +322,44 @@ a blank line starts a new paragraph."></textarea>
             if (d === 'line') block('---');
             if (d === 'signoff') block('~ ' + (prompt('sign off with:', 'more soon') || 'more soon'));
             if (d === 'picture') picIn.click();
+            if (d === 'hand') byHand(handAt(bodyIn.value, bodyIn.selectionStart));
         });
+    });
+    /* ---------- writing by hand (sky/inkpad.js): a page of it, saved as a picture beside the letters ---------- */
+    // the paragraph the cursor's in, if it's a page written by hand (so the button carries on with that one)
+    function handAt(v, c) {
+        var a = v.lastIndexOf('\n\n', Math.max(0, c - 1)), z = v.indexOf('\n\n', c);
+        a = a < 0 ? 0 : a + 2; z = z < 0 ? v.length : z;
+        var m = /^!\[handwritten[^\]]*\]\(([^)\s]+)\)$/i.exec(v.slice(a, z).trim());
+        return m ? { a: a, z: z, path: m[1] } : null;
+    }
+    function byHand(at) {
+        if (!window.DavInk || kind !== 'txt') return;
+        DavInk.open({ base: at ? '/' + at.path : null, done: function (blob) {
+            say('putting your handwriting in…');
+            fetch('/__letters/picture', { method: 'POST', body: blob, headers: { 'Content-Type': 'image/png', 'X-Name': 'handwritten.png' } })
+                .then(function (r) { return r.json(); })
+                .then(function (r) {
+                    if (r.error) { say(r.error, true); return; }
+                    var line = '![handwritten](' + r.path + ')';
+                    if (at) {                                              // (in place of the one it carried on from)
+                        var v = bodyIn.value;
+                        bodyIn.value = v.slice(0, at.a) + line + v.slice(at.z);
+                        bodyIn.setSelectionRange(at.a + line.length, at.a + line.length);
+                        setDirty(true); render();
+                    } else block(line);
+                    say('your handwriting is in the letter (saved in content/sea/; publish takes it along). save the letter to keep it.');
+                }, function () { say('couldn’t put the handwriting in', true); });
+        } });
+    }
+    // a page written by hand, clicked in the preview: carry on writing on it
+    prev.addEventListener('click', function (e) {
+        var f = e.target.closest && e.target.closest('figure.handwritten');
+        if (!f || kind !== 'txt') return;
+        var src = (f.querySelector('img') || {}).getAttribute ? f.querySelector('img').getAttribute('src').replace(/^\//, '') : '';
+        var v = bodyIn.value, i = v.indexOf('](' + src + ')');
+        if (i < 0) return;
+        byHand(handAt(v, i));
     });
     picIn.addEventListener('change', function () {
         var f = picIn.files[0];

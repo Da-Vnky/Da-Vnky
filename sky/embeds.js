@@ -270,5 +270,10 @@
         return '<figure class="taped" style="' + vars + '">' + img + '</figure>';
     }
 
-    window.DavEmbed = { find: find, lone: lone, html: html, dress: dress, patch: patch, taped: taped, SITES: SITES };
+    /* ---------------- a page written by hand (sky/inkpad.js): ![handwritten](…) alone on its line ----------------
+       straight on the paper, the writing's own width, no tape or tilt */
+    function isHand(block) { return /^!\[handwritten[^\]]*\]\([^)\s]+\)$/i.test(block); }
+    function handwritten(img) { return '<figure class="handwritten">' + img + '</figure>'; }
+
+    window.DavEmbed = { find: find, lone: lone, html: html, dress: dress, patch: patch, taped: taped, isHand: isHand, handwritten: handwritten, SITES: SITES };
 })();

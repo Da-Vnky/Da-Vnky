@@ -17,6 +17,10 @@ How it works
 
 == published ==
 
+2026-10-11 12:17 · V
+- tools/webp.bat (and webp.py, webp.sh): drag a folder of animation frames onto it (Clip Studio: Export animation > Image sequence, PNG) and it makes one animated WebP at their full size (3200 x 1800 or bigger; Clip Studio's own WebP export stops at about 2000 across). It asks how fast and how good; FFmpeg if there is one, else Pillow. Also makes an animated GIF/PNG/WebP again at another size or quality.
+- Letters can be written by hand: "✎ write by hand" at the desk and on the content manager's letters page opens a sheet of the letters' paper to write on with a pen (a drawing tablet's pressure makes the line thicker, the pen's other end rubs out; a mouse or a finger work too). It goes into the letter as a page of handwriting straight on the paper, as wide as the writing (no tape, no tilt); clicking it in the preview carries on writing on it (sky/inkpad.js).
+
 2026-10-11 11:53 · V
 - Letters: they can be written in the artist's own handwriting. The asset manager's new slot fonts/handwriting opens a sheet to write on (a box for every letter, three tries at each small letter) in Clip Studio, Photoshop or Rebelle; "make the font" traces the exported sheet into a font, and the sea, the desk and the letter writer use it as soon as it's there (tools/handwriting.py, sky/hand.js). Neighbouring letters never look stamped: each letter takes its versions in turn.
 - Drawing table: tools/drawtable.py no longer prints two warnings about backslashes when it starts.

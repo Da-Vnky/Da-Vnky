@@ -1,7 +1,7 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
 beyond.html 1480
 city.html 9866
-desk.html 5939
+desk.html 6031
 index.html 5247
 living.html 133346
 window-sky.html 1334
@@ -14,9 +14,9 @@ sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 52332
 sky/crate.js 36569
-sky/desk.js 67541
+sky/desk.js 70322
 sky/dungeon.js 9600
-sky/embeds.js 18796
+sky/embeds.js 19215
 sky/eye.js 16302
 sky/forget.js 10564
 sky/frames.js 7570
@@ -31,6 +31,7 @@ sky/ground-view.js 6301
 sky/hand.js 1836
 sky/hell.js 23866
 sky/house.js 11177
+sky/inkpad.js 17787
 sky/inventory.js 17335
 sky/kitchen.js 16998
 sky/letters.js 25530
@@ -53,7 +54,7 @@ sky/records.js 36049
 sky/resets.js 17516
 sky/revolver.js 19577
 sky/ropes.js 5596
-sky/sky.js 137258
+sky/sky.js 137451
 sky/source.js 3809
 sky/state.js 22677
 sky/static.js 4257
@@ -74,9 +75,9 @@ sky/css/beyond.css 2644
 sky/css/books.css 4721
 sky/css/claubes.css 17565
 sky/css/crate.css 15195
-sky/css/desk.css 15923
+sky/css/desk.css 16259
 sky/css/dungeon.css 7780
-sky/css/embeds.css 5122
+sky/css/embeds.css 5568
 sky/css/eye.css 1165
 sky/css/forget.css 3893
 sky/css/frames.css 7028
@@ -89,6 +90,7 @@ sky/css/ground-countryside.css 834
 sky/css/ground-sea.css 8871
 sky/css/ground-view.css 788
 sky/css/hell.css 10082
+sky/css/inkpad.css 4227
 sky/css/inventory.css 6010
 sky/css/kitchen.css 17248
 sky/css/letters.css 2447
@@ -124,7 +126,7 @@ sky/css/weather.css 2711
 assets/characters/list.txt 117
 assets/city/list.txt 117
 assets/countryside/list.txt 117
-assets/fonts/list.txt 135
+assets/fonts/list.txt 117
 assets/hell/list.txt 117
 assets/items/list.txt 117
 assets/living/list.txt 363
@@ -151,10 +153,12 @@ content/living/albums.txt 123
 content/living/frames.json 150
 content/living/list.txt 382
 content/sea/2026-09-25-hello-world.txt 213
+content/sea/2026-10-11-handwriting-test.txt 119
 content/sea/2026-10-11-if-ur-seeing-this-video.txt 86
 content/sea/2026-10-11-if-ur-seeing-this.txt 274
 content/sea/2026-10-11-the-site-so-far.txt 594
-content/sea/list.txt 374
+content/sea/list.txt 446
+content/sea/written.json 68
 content/shame/frames.json 359
 content/shame/list.txt 125
 content/workshop/frames.json 77
