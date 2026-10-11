@@ -14,12 +14,14 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+
+== published ==
+
+2026-10-11 00:02 · V
 - The drawing table knows which pictures repeat (the waves side to side, the sky's rope top to bottom): their canvas is one tile with the joining edges marked (over each wave's own guide); the asset manager shows every export laid out three times and says whether the join shows; 'wrap it' moves a picture by half a tile so the join is in the middle to paint over (like Photoshop's Offset, which Clip Studio doesn't have). Restart the content manager.
 - The bee seen from the porch now darkens with the evening like the rest of the porch (it stayed bright at night).
 - The bee casts a little shadow on the ground under it (the lawn out front, the yard from the porch), smaller and fainter the higher it flies, faint at night (slot assets/living/bee-shadow). The porch has a front yard now (slot assets/living/porch-yard): the lawn and the path from the gate to the steps, where the sky used to show through between the fence and the porch floor.
 - Reset 1 could softlock: if the bee stung the revolver to pieces there was no way left to die. Now, in reset 1, the bee flies at the traveller, stings them, takes the revolver and shoots them with it: straight on to reset 2 (no key or heart needed). It's itself again in reset 2, but it's kept the gun: the revolver isn't on the wall until reset 8, where everything's as it was (the same if it stings the gun to pieces in resets 2 to 7). Sound slots: bee-dive, bee-sting, bee-bang.
-
-== published ==
 
 2026-10-10 23:13 · V
 - The bee's little puffs are now anime marks coming out of its face (whichever way it faces): a cross anger vein that pops and throbs on its forehead (new, slot bee-fx-vein), a music note when happy (new, bee-fx-note), the big sweat drop sliding down its head, tears falling from its eye, hearts, sparkles, Zzz, a bold question mark, a huff of steam, a sting's flash. Each has its own movement.

@@ -2,13 +2,13 @@
 beyond.html 1480
 city.html 9866
 index.html 5085
-living.html 130217
+living.html 131401
 window-sky.html 1334
 workshop.html 22101
 sky/ambient.js 5339
 sky/attic.js 33962
 sky/bathroom.js 26842
-sky/bee.js 97919
+sky/bee.js 103829
 sky/beyond.js 11151
 sky/books.js 13679
 sky/claubes.js 52348
@@ -47,7 +47,7 @@ sky/porch.js 14442
 sky/post.js 22036
 sky/records.js 36061
 sky/resets.js 17781
-sky/revolver.js 19147
+sky/revolver.js 19886
 sky/ropes.js 5604
 sky/sky.js 120395
 sky/source.js 3881
@@ -65,7 +65,7 @@ sky/sky.css 55926
 sky/css/ambient.css 435
 sky/css/attic.css 15736
 sky/css/bathroom.css 17498
-sky/css/bee.css 27874
+sky/css/bee.css 30518
 sky/css/beyond.css 2714
 sky/css/books.css 4900
 sky/css/claubes.css 17565
@@ -98,7 +98,7 @@ sky/css/notes.css 4294
 sky/css/paint.css 7655
 sky/css/panel.css 6803
 sky/css/peeper.css 11311
-sky/css/porch.css 10056
+sky/css/porch.css 10923
 sky/css/post.css 8285
 sky/css/records.css 20241
 sky/css/resets.css 4281
