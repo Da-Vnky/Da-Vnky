@@ -440,6 +440,40 @@ body.bee-talking .bee-home .bee-fly {
     100% { transform: scale(1.4) rotate(45deg); opacity: 0; }
 }
 
+/* the dotted trail it leaves as it flies (bee.js fly/drop): dots dropped behind its tail, each fading as it shrinks.
+   the layer sits just before the bee, so the dots are behind it (slot: assets/living/bee-trail, one dot) */
+.bee-trail {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.front .bee-trail { z-index: 2; }
+.porch .bee-trail { z-index: 1; }
+.bee-trail .bee-dot {
+    position: absolute;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: #fff4d6;
+    box-shadow: 0 0 0 1.5px rgba(42, 29, 20, .45), 0 0 5px rgba(255, 236, 170, .6);
+    animation: bee-dot 2.8s ease-out forwards;
+}
+.bee-trail .bee-dot:has(img) {
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+.bee-trail .bee-dot > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+@keyframes bee-dot {
+    0%   { opacity: .9; scale: 1; }
+    100% { opacity: 0; scale: .35; }
+}
+
 /* what it's saying, over its head */
 .bee-home .bee-bubble {
     position: absolute;

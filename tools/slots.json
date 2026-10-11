@@ -2253,6 +2253,12 @@
        "optional": true
       },
       {
+       "slot": "assets/living/bee-trail",
+       "what": "one dot of the dotted trail it leaves behind it as it flies (dropped behind its tail every little way, each fading and shrinking). until yours is in, a little cream dot",
+       "size": "about 16 x 16, see-through",
+       "optional": true
+      },
+      {
        "slot": "assets/living/bee-gun",
        "what": "your revolver in the bee's hands, seen from the front with the muzzle pointed straight at you: shown over the bee while it's taken the gun off you (shoot at it five times: it weaves out of the way, gets frightened, then furious, then stings you and takes it, till you say sorry). it turns a little to follow your pointer and shakes with rage. until yours is in, a drawn one",
        "size": "about 240 x 264, see-through",
@@ -3244,6 +3250,12 @@
       {
        "slot": "assets/sounds/bee-voice",
        "what": "the bee’s voice (the front garden): one steady buzz, a second or two, on one note. it's played at every pitch for every word the bee says (the site finds what note you hummed), through the bee’s squelchy filter and its little room. until yours is in, the bee buzzes with a made-up voice",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/bee-hum",
+       "what": "its wings as it flies about (the front garden and the porch): a soft buzz, a loop of a second or two, played very quietly the whole time you can see it, a little faster when it darts about, quieter while it talks. until yours is in, a made-up hum like its voice",
        "kind": "sound",
        "optional": true
       }

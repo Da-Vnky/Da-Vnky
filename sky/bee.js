@@ -1267,6 +1267,115 @@
     });
     Sky.escape(function () { return open; }, close);
 
+    /* ======================================================================
+       as it flies: a dotted trail behind it, and its wings' soft hum
+       ====================================================================== */
+    // the trail: a dot dropped behind its tail every little way it goes, each fading out (a cartoon's flight path).
+    // one dot is a slot: assets/living/bee-trail (else a little cream dot). none for visitors who'd rather nothing moved
+    var STILL = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var trail = document.createElement('div');
+    trail.className = 'bee-trail';
+    trail.setAttribute('aria-hidden', 'true');
+    var dotArt = null;
+    Sky.findAsset('assets/living/bee-trail', function (url) { dotArt = url; });
+    var lastDot = null, lastAt = null, faceSign = 1, faceT = 0, speed = 0;
+    function drop(x, y, w) {
+        var box = trail.getBoundingClientRect();
+        if (!box.width || !box.height) return;
+        var d = document.createElement('span');
+        d.className = 'bee-dot';
+        if (dotArt) d.innerHTML = '<img alt="" src="' + dotArt + '">';
+        d.style.left = ((x - box.left) / box.width * 100).toFixed(2) + '%';
+        d.style.top = ((y - box.top) / box.height * 100).toFixed(2) + '%';
+        d.style.width = Math.max(4, w * .075).toFixed(1) + 'px';
+        d.addEventListener('animationend', function () { d.remove(); });
+        trail.appendChild(d);
+        if (trail.children.length > 48) trail.firstChild.remove();
+    }
+    // every frame while you can see it: where its tail is, how far it's come, how fast (for the hum, below)
+    function fly(now) {
+        requestAnimationFrame(fly);
+        if (MAPPING || !here()) { lastDot = lastAt = null; speed = 0; return; }
+        if (trail.parentNode !== home.parentNode || trail.nextSibling !== home) { home.parentNode.insertBefore(trail, home); lastDot = lastAt = null; }
+        if (now - faceT > 400) { faceT = now; faceSign = parseFloat(getComputedStyle(home).getPropertyValue('--face')) < 0 ? -1 : 1; }
+        var r = art.getBoundingClientRect();
+        if (!r.width) return;
+        var x = r.left + r.width / 2 - faceSign * r.width * .44, y = r.top + r.height * .55;
+        if (lastAt) {
+            var dt = Math.max(1, now - lastAt.t), v = Math.hypot(x - lastAt.x, y - lastAt.y) / dt * 1000 / r.width;   // (its own widths a second)
+            speed += (Math.min(1, v / 1.4) - speed) * Math.min(1, dt / 250);
+        }
+        lastAt = { x: x, y: y, t: now };
+        if (!lastDot) { lastDot = { x: x, y: y }; return; }
+        var step = r.width * .1;
+        if (STILL || Math.hypot(x - lastDot.x, y - lastDot.y) < step) return;
+        drop(x, y, r.width);
+        lastDot = { x: x, y: y };
+    }
+    requestAnimationFrame(fly);
+
+    // the hum: its wings, very quietly, the same warm buzz as its voice (a sawtooth through a soft filter, fluttering at
+    // its wingbeat), a little higher and louder when it darts about, quieter while it talks, panned to where it is, and
+    // silent when you can't see it. the sound effects slider sets how loud. it starts with your first click or key
+    // (browsers insist). your own: assets/sounds/bee-hum (a loop, a second or two), else this one
+    var HUM = .035;                                                  // (how loud, at the usual sound effects level)
+    var hum = null, humLoop = null;
+    Sky.findAsset('assets/sounds/bee-hum.ogg|assets/sounds/bee-hum.mp3', function (url) { humLoop = url; });
+    function startHum() {
+        if (hum || MAPPING) return;
+        var V = voice();
+        if (!V) return;
+        var c = V.ctx, out = c.createGain(), pan = panner(c, 0, c.destination), wing = c.createGain(), lfo = c.createOscillator(), depth = c.createGain();
+        out.gain.value = 0;
+        out.connect(pan);
+        wing.gain.value = .55;                                       // (the wingbeat: the buzz swells and dips)
+        lfo.frequency.value = 30; depth.gain.value = .45;
+        lfo.connect(depth); depth.connect(wing.gain); lfo.start();
+        wing.connect(out);
+        var lp = c.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 650; lp.Q.value = 4;
+        lp.connect(wing);
+        hum = { c: c, out: out, pan: pan, lfo: lfo, lp: lp, oscs: [], src: null };
+        function synth() {
+            [1, 1.006, .5].forEach(function (k, i) {
+                var o = c.createOscillator(), g = c.createGain();
+                o.type = i === 2 ? 'triangle' : 'sawtooth'; o.frequency.value = 140 * k; g.gain.value = i === 2 ? .5 : .35;
+                o.connect(g); g.connect(lp); o.start();
+                hum.oscs.push({ o: o, k: k });
+            });
+        }
+        if (!humLoop) synth();
+        else fetch(humLoop).then(function (r) { return r.arrayBuffer(); }).then(function (a) { return c.decodeAudioData(a); }).then(function (buf) {
+            var s = c.createBufferSource(); s.buffer = buf; s.loop = true; s.connect(out); s.start();
+            hum.src = s;                                             // (his own: straight out, no made-up filter or flutter)
+        }).catch(synth);
+        tuneHum();
+    }
+    // a few times a second: how it should sound now
+    function tuneHum() {
+        if (!hum) return;
+        setTimeout(tuneHum, 120);
+        var c = hum.c, t = c.currentTime, M = MOODS[home.dataset.mood] || MOODS.calm;
+        var on = here() && !document.hidden && !MAPPING;
+        var vol = on ? HUM * level() * (.7 + .6 * speed) * (home.classList.contains('buzzing') ? .35 : 1) : 0;
+        hum.out.gain.setTargetAtTime(vol, t, on ? .25 : .08);
+        if (!on) return;
+        if (c.state !== 'running') c.resume().catch(function () {});
+        var f = M.hz * .5 * (1 + .12 * speed);
+        hum.oscs.forEach(function (x) { x.o.frequency.setTargetAtTime(f * x.k, t, .2); });
+        if (hum.src) hum.src.playbackRate.setTargetAtTime(1 + .1 * speed, t, .2);
+        hum.lfo.frequency.setTargetAtTime(Math.max(14, Math.min(60, 3 / M.flap)), t, .3);
+        hum.lp.frequency.setTargetAtTime(520 + 500 * speed, t, .2);
+        var r = art.getBoundingClientRect();
+        if (hum.pan.pan && r.width) hum.pan.pan.setTargetAtTime(Math.max(-.8, Math.min(.8, ((r.left + r.width / 2) / innerWidth - .5) * 1.6)), t, .2);
+    }
+    function wake() {
+        if (hum) return;
+        startHum();
+        if (hum) { removeEventListener('pointerdown', wake, true); removeEventListener('keydown', wake, true); }
+    }
+    if (!MAPPING) { addEventListener('pointerdown', wake, true); addEventListener('keydown', wake, true); }
+
     Sky.bee = {
         open: openMenu, close: close, say: send, poke: poke,
         aimedAt: aimedAt, shot: shot, get gun() { return gun; }, get grudge() { return grudge; },   // (sky/revolver.js)

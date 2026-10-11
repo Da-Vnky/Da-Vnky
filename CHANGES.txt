@@ -14,6 +14,9 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- The bee's little puffs are now anime marks coming out of its face (whichever way it faces): a cross anger vein that pops and throbs on its forehead (new, slot bee-fx-vein), a music note when happy (new, bee-fx-note), the big sweat drop sliding down its head, tears falling from its eye, hearts, sparkles, Zzz, a bold question mark, a huff of steam, a sting's flash. Each has its own movement.
+- Victor's new loving face for the bee (from his second bee .psd).
+- The bee leaves a dotted trail behind it as it flies about (out front and seen from the porch), each dot fading, and hums very quietly as it flies (its wings: the same warm buzz as its voice, a little higher when it darts, quieter while it talks, panned to where it is). Starts with the visitor's first click. Slots: assets/living/bee-trail (one dot), assets/sounds/bee-hum (a loop).
 
 == published ==
 
@@ -21,8 +24,6 @@ How it works
 - The bee is now in pieces for Victor's art: a body (bee-body-flying, wings flapping, or bee-body, still; facing left) and a face per mood laid over it (bee-face, bee-face-happy … -curious, and bee-face-talking for its mouth open as it buzzes), all on the same canvas. The old whole-bee slots (bee, bee-<mood>, bee-buzzing) are gone. The faces sit a little right and lower than drawn (--bee-face-x/-y in sky/css/bee.css).
 - The drawing table: a face slot's canvas is the bee body picture's exact size, with the body as its guide (slots.json "guide"). The asset manager's map reads several names in one data-slot (space-separated, as sky.js's ?slots already did).
 - Victor's bee is in: his body (bee-body, still for now, until the flapping one) and his nine faces (everyday, happy, excited, loving, angry, sad, scared, sleepy, curious), taken from his bee .psd at its full 480 x 400 canvas.
-- The bee's little puffs are now anime marks coming out of its face (whichever way it faces): a cross anger vein that pops and throbs on its forehead (new, slot bee-fx-vein), a music note when happy (new, bee-fx-note), the big sweat drop sliding down its head, tears falling from its eye, hearts, sparkles, Zzz, a bold question mark, a huff of steam, a sting's flash. Each has its own movement.
-- Victor's new loving face for the bee (from his second bee .psd).
 
 2026-10-10 19:28 · V
 - The asset manager's drawing table: every picture slot's card has 'draw it in' buttons (Clip Studio, Photoshop, Rebelle) and 'animate in' buttons (Clip Studio, your Rebelle Animator). It makes a layered canvas at twice the size the slot is shown at (sharper on big screens): a faded, locked picture of the scene where the slot sits as a guide, your current picture on its own layer if there is one, and an empty layer to draw on, and opens it in the program you picked. Export your picture into the slot's folder (tools/drawing/…, never published) and the card shows it with a 'use this' button; it warns if it has no see-through parts (the guide left on). The first time, it asks where a program is if it can't find it, and remembers.

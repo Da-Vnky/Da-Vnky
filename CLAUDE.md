@@ -535,6 +535,13 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `.bee-pose` after `.bee-art` (so it moves with lift/tilt), centred on the face (`--fx-x/-y`: the drawn bee's head, or
   `.bee-art.has-art ~ .bee-fx` for Victor's), and each kind has its own start (`--x0/-y0`, forwards × `--face`) and
   movement in bee.css (float, pop-throb, pop-tilt, twinkle, slide, fall, huff, flash), never mirrored.
+  **As it flies** (11 Oct, Victor): a dotted trail (`fly()`, rAF: a dot every `.1` of its width its tail travels, `drop()`
+  into `.bee-trail`, a layer kept just before `.bee-home` in whichever host it's in; dots fade over 2.8 s, at most 48; slot
+  `assets/living/bee-trail`; none with prefers-reduced-motion) and its wings' hum (`startHum` on the visitor's first
+  pointerdown/keydown anywhere, `tuneHum` every 120 ms: two sawtooths + a triangle an octave down at half its mood's `hz`,
+  lowpassed, fluttering at `3 / flap` Hz, straight to the speakers (not through the voice's master, whose gain `perform`
+  sets), `HUM` .035 × the sound effects level, louder/higher with `speed` (from `fly()`), × .35 while it talks, panned to
+  where it is, 0 when not `here()` or the tab's hidden; measured about -34 dB; slot `assets/sounds/bee-hum`, a loop).
   The code still moves and tints his. A word bubble over its head (`.bee-bubble`).
 - skizy's model and name: credited in the menu's foot ("its brain is BeeLLM 42P Chaos, by skizy").
 - The sing switch is a music note (`NOTE_ART`, `.bt-sing-ic`, slot `assets/living/bee-sing`; drawn in `currentColor`, so
