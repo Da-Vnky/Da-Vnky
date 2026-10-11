@@ -250,7 +250,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   his current picture and a flattened copy and squeezes them the .psd way (PackBits; in JS, ~50× faster than Python: 29 s for
   skizy's room, 5 s elsewhere, most of it opening the scene). `write_psd` (hand-written, standard library only) makes a
   layered .psd: `guide (hide me before you export)` at opacity 128, locked (`lspf`); `your picture now` if he has one; `draw
-  here`, empty. Checked with psd-tools: layers, opacity, lock, pixels. No Playwright, or not on any page: just the empty
+  here`, empty (the whole canvas, every pixel see-through: Rebelle drops a 0 x 0 layer, 11 Oct). Checked with psd-tools: layers, opacity, lock, pixels. No Playwright, or not on any page: just the empty
   layer at the stated size (a slot with neither size nor page is refused, with why).
 - **Where it goes**: `tools/drawing/<folder>--<name>/` (gitignored: nothing there is published): `<name>.psd`, `what to do.txt`,
   his exports (any png/webp/gif/jpg: the card shows each, warns "nothing see-through: was the guide still showing?" when the

@@ -14,6 +14,7 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Drawing table: the empty "draw here" layer now shows up in Rebelle too (it's a whole see-through canvas now, not a layer with no size, which Rebelle dropped). Canvases made before this: tick "a fresh canvas" to get it.
 
 == published ==
 
