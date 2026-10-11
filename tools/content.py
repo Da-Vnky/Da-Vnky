@@ -1061,6 +1061,84 @@ def templates_state():
     return {'running': False}
 
 
+# ---------------- the drawing table (tools/drawtable.py): a slot's canvas, opened in your art program ----------------
+def drawtable():
+    import drawtable as dt                            # (tools/drawtable.py, next to this file)
+    return dt
+
+
+def draw_run(*args):
+    """tools/drawtable.py on its own (it opens a hidden browser to take the guide: a few seconds, more for skizy's room)"""
+    r = subprocess.run([sys.executable, os.path.join(HERE, 'drawtable.py')] + list(args), cwd=ROOT, capture_output=True, text=True,
+                       timeout=300, env=dict(os.environ, PYTHONIOENCODING='utf-8'), stdin=subprocess.DEVNULL)
+    lines = [x for x in (r.stdout or '').splitlines() if x.strip().startswith('{')]
+    if not lines:
+        raise ValueError('the drawing table stopped: ' + ((r.stderr or '').strip().splitlines() or ['no reason given'])[-1])
+    out = json.loads(lines[-1])
+    if out.get('error'):
+        raise ValueError(out['error'])
+    return out
+
+
+def draw_open(d, animate=False):
+    slot, app = d.get('slot') or '', d.get('app') or ''
+    drawtable().where(slot)                           # (a real slot, or it says so)
+    args = ['animate' if animate else 'open', slot, app]
+    if d.get('fresh'):
+        args.append('--fresh')
+    if d.get('view'):
+        args += ['--view', str(d['view'])]
+    return draw_run(*args)
+
+
+def draw_file(slot, name, in_frames=False):
+    """one of the pictures on the table (an export, or a frame), by its plain name only"""
+    folder, _, _ = drawtable().where(slot)
+    name = os.path.basename(name or '')
+    pth = os.path.join(folder, 'frames', name) if in_frames else os.path.join(folder, name)
+    if not name or not os.path.isfile(pth) or name.rsplit('.', 1)[-1].lower() not in ('png', 'webp', 'gif', 'jpg', 'jpeg'):
+        raise ValueError('no such picture on the drawing table')
+    return pth
+
+
+def draw_use(slot, name):
+    """an export from the table into the slot"""
+    pth = draw_file(slot, name)
+    with open(pth, 'rb') as f:
+        raw = f.read()
+    saved = asset_put(slot, name, raw)
+    drawtable().mark_used(slot, os.path.basename(name))
+    return {'name': saved, 'size': len(raw)}
+
+
+def draw_frames(slot, fps=None):
+    """the slot's frames → one animated WebP → into the slot. too big for the site at full size: at half size"""
+    dt = drawtable()
+    out, half = dt.assemble(slot, fps), False
+    if os.path.getsize(out) > UPLOAD_LIMIT:
+        full = os.path.getsize(out)
+        out, half = dt.assemble(slot, fps, half=True), full
+    with open(out, 'rb') as f:
+        raw = f.read()
+    saved = asset_put(slot, os.path.basename(out), raw)
+    dt.mark_used(slot, 'frames')
+    return {'name': saved, 'size': len(raw), 'halved': half}
+
+
+def draw_reveal(slot, in_frames=False):
+    """the slot's folder on the drawing table, in File Explorer"""
+    folder, _, _ = drawtable().where(slot)
+    pth = os.path.join(folder, 'frames') if in_frames else folder
+    os.makedirs(pth, exist_ok=True)
+    if sys.platform == 'win32':
+        os.startfile(pth)
+    elif sys.platform == 'darwin':
+        subprocess.Popen(['open', pth])
+    else:
+        subprocess.Popen(['xdg-open', pth])
+    return {'folder': os.path.relpath(pth, ROOT).replace(os.sep, '/')}
+
+
 # slots the site itself uses, found by reading the pages and scripts, so a new piece
 # (data-asset="assets/workshop/clock" or <img src="assets/garden/gate.svg">) shows up in
 # the asset manager by itself, even before it's described in tools/slots.json
@@ -1567,6 +1645,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'files': asset_files(), 'tracks': tracks(), 'noise': noise_extra(), 'found': found_slots(), 'resets': resets_state()})
             if url.path == '/__templates/state':
                 return self.reply(templates_state())
+            if url.path == '/__draw/state':
+                return self.reply({'table': drawtable().table()})
+            if url.path == '/__draw/file':
+                pth = draw_file(q.get('slot', [''])[0], q.get('name', [''])[0], q.get('frames', [''])[0] == '1')
+                with open(pth, 'rb') as f:
+                    raw = f.read()
+                self.send_response(200)
+                self.send_header('Content-Type', 'image/' + {'jpg': 'jpeg'}.get(pth.rsplit('.', 1)[-1].lower(), pth.rsplit('.', 1)[-1].lower()))
+                self.send_header('Content-Length', str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+                return
             if url.path == '/__resets/note':
                 return self.reply(reset_note(urllib.parse.parse_qs(url.query).get('n', ['1'])[0]))
             if url.path == '/__notify/state':
@@ -1702,6 +1792,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'name': asset_put(slot, name, raw, self.headers.get('X-Kind') or 'image')})
             if url.path == '/__assets/clear':
                 return self.reply({'removed': asset_clear(json.loads(raw or b'{}').get('slot'))})
+            if url.path == '/__draw/open':
+                return self.reply(draw_open(json.loads(raw or b'{}')))
+            if url.path == '/__draw/animate':
+                return self.reply(draw_open(json.loads(raw or b'{}'), animate=True))
+            if url.path == '/__draw/app':
+                d = json.loads(raw or b'{}')
+                return self.reply({'path': drawtable().remember_app(d.get('app'), d.get('path'))})
+            if url.path == '/__draw/use':
+                d = json.loads(raw or b'{}')
+                return self.reply(draw_use(d.get('slot'), d.get('name')))
+            if url.path == '/__draw/frames':
+                d = json.loads(raw or b'{}')
+                return self.reply(draw_frames(d.get('slot'), d.get('fps')))
+            if url.path == '/__draw/reveal':
+                d = json.loads(raw or b'{}')
+                return self.reply(draw_reveal(d.get('slot'), bool(d.get('frames'))))
             if url.path == '/__templates/make':
                 return self.reply(templates_make())
             if url.path == '/__records/add':

@@ -16,3 +16,7 @@ tools/templates/
 
 # python keeps compiled copies of the tools here when it runs them: never needed
 __pycache__/
+
+# the drawing table (tools/drawtable.py): your working files, exports and animation frames, and where your art programs
+# are. they stay on your computer: what goes on the site is only what you put in a slot
+tools/drawing/
