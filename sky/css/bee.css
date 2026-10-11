@@ -51,6 +51,10 @@ body.bee-talking .front .bee-home {
     pointer-events: none;
     transition: left 1.2s cubic-bezier(.45, .05, .3, 1), top 1.2s cubic-bezier(.45, .05, .3, 1), width 1.2s cubic-bezier(.45, .05, .3, 1);
 }
+/* dimmed with the porch as night falls (porch.css darkens each of its pieces by --pd; in the garden the whole stage is
+   dimmed, the bee with it) */
+.porch .bee-home,
+.porch .bee-trail { filter: brightness(var(--pd, 1)); }
 /* talking: up close, over the porch roof's shadow, facing the menu */
 body.bee-talking .porch .bee-home { left: 36%; top: 28%; width: clamp(76px, 8vw, 150px); --face: -1; }
 @media (max-width: 620px) {

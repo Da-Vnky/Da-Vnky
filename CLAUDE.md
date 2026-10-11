@@ -260,6 +260,16 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - **Frames → the slot** (`assemble`, `POST /__draw/frames`): one animated WebP (`<name>-animation.webp`, see-through kept), with
   FFmpeg (the animator's `ffmpeg`, or one on the PATH: `libwebp_anim`, yuva420p) or Pillow; over the 30 MB upload limit at full
   size → made again at half size, and the card says so.
+- **Pictures that repeat** (11 Oct, Victor: "like the waves"): slots.json `"tile": "x" | "y" | "xy"` (the waves: x, with
+  `"tileGuide": "assets/templates/wave-N-guide.png"`; the rope: y), `"canvas": "W x H"` (the canvas as it is, not doubled:
+  waves 3024 x 1008, rope 60 x 240). `make` then builds one tile on a blank page (`tile_canvas`, `TILE_GUIDE`: the tileGuide
+  picture with the joining edges marked, shaded bands, "joins the right edge" labels), layer `repeat guide: the edges join`;
+  `what to do.txt` gets `NOTE_TILE`. **"wrap it"** (`drawtable.py wrap <slot> <export|current> [app]`, `POST /__draw/wrap`,
+  content.py `draw_wrap`): `WRAP` moves the picture by half a tile, wrapping round (Photoshop's Offset, which Clip Studio
+  lacks), into `<stem>-wrapped.psd` (the join guide at opacity 200, the moved picture, an empty layer), opened in the program
+  last used on that card (`localStorage dt-app`). No need to move it back: a tile shifted by half repeats the same. The card
+  (assets.html `repeatStrip`): every export, and the slot's picture now, laid out three times with the joins marked, and
+  whether the join shows (the edge columns/rows compared with neighbouring ones inside: seam > 2.5 × inside + 6 → red).
 - After changing content.py: Victor restarts the content manager (close its window, double-click `tools\content.bat`).
 
 ## The attic (sky/attic.js)
@@ -542,6 +552,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   lowpassed, fluttering at `3 / flap` Hz, straight to the speakers (not through the voice's master, whose gain `perform`
   sets), `HUM` .035 × the sound effects level, louder/higher with `speed` (from `fly()`), × .35 while it talks, panned to
   where it is, 0 when not `here()` or the tab's hidden; measured about -34 dB; slot `assets/sounds/bee-hum`, a loop).
+  **Night on the porch**: porch.css dims each of its pieces by `--pd` (not the whole porch), so `.porch .bee-home` and
+  `.porch .bee-trail` take `brightness(var(--pd))` too (bee.css); in the garden the whole `.front-stage` is dimmed already.
   The code still moves and tints his. A word bubble over its head (`.bee-bubble`).
 - skizy's model and name: credited in the menu's foot ("its brain is BeeLLM 42P Chaos, by skizy").
 - The sing switch is a music note (`NOTE_ART`, `.bt-sing-ic`, slot `assets/living/bee-sing`; drawn in `currentColor`, so
