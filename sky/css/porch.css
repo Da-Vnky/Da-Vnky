@@ -37,25 +37,61 @@
 .porch .room-arrow.porch-back:focus-visible {
     transform: translateX(-4px);
 }
-/* down the steps to the front garden: a down arrow at the gap in the railing (x 700-900 of the 1600-wide porch-frame),
-   its right-hand side (the traveller stands in front of the rest) */
-.porch .room-arrow.porch-steps {
-    left: 57%;
-    top: auto;
-    bottom: calc(var(--bar-bottom, 12px) + 66px);
-    margin-left: -27px;
-    z-index: 6;                                              /* (over the traveller) */
+/* down the steps to the front garden (11 Oct, Victor: "make the center of the porch glow be clickable", and no arrow: it
+   was confusing). the gap in the railing (x 700-900 of the 1600-wide porch-frame, from just above the railing's top down to
+   the floor) breathes a soft warm light (.porch-steps-glow, below), brighter when you point at it, and a click there goes
+   down into the garden. this is the click: see-through, over the traveller (z 6), who stands in front of it */
+.porch .porch-steps {
+    position: absolute;
+    left: 43.75%;
+    width: 12.5%;
+    top: 60%;
+    bottom: var(--floor-h);
+    z-index: 6;
+    padding: 0;
+    border: 0;
+    background: none;
 }
-@media (max-width: 620px) {
-    .porch .room-arrow.porch-steps { left: 76%; }
+.porch .porch-steps:focus-visible {
+    outline: none;
 }
-.porch-steps>svg,
-.porch-steps>.art {
-    transform: rotate(90deg);
+/* the light itself: under the traveller (z 2, after the floor), over the boards and the path in the gap, pooling where the
+   steps go down and rising up between the railing's ends */
+.porch .porch-steps-glow,
+.porch .porch-steps-glow::after {
+    left: 40%;
+    width: 20%;
+    top: 52%;
+    bottom: calc(var(--floor-h) * .35);
+    z-index: 2;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    background:
+        radial-gradient(ellipse 46% 30% at 50% 82%, rgba(255, 222, 150, .75), rgba(255, 200, 120, .3) 55%, rgba(255, 190, 110, 0) 100%),
+        radial-gradient(ellipse 34% 60% at 50% 62%, rgba(255, 214, 140, .4), rgba(255, 190, 110, 0) 100%);
 }
-.porch .room-arrow.porch-steps:hover,
-.porch .room-arrow.porch-steps:focus-visible {
-    transform: translateY(4px);
+.porch .porch-steps-glow {
+    position: absolute;
+    animation: ps-breathe 3.4s ease-in-out infinite;
+}
+.porch .porch-steps-glow::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: auto;
+    opacity: 0;
+    transition: opacity .3s;
+}
+.porch:has(.porch-steps:hover) .porch-steps-glow::after,
+.porch:has(.porch-steps:focus-visible) .porch-steps-glow::after {
+    opacity: 1;
+}
+@keyframes ps-breathe {
+    0%, 100% { opacity: .55; }
+    50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .porch .porch-steps-glow { animation: none; opacity: .8; }
 }
 .porch .porch-character.going-down {
     animation: pc-down .45s ease-in forwards;
@@ -215,9 +251,9 @@ body.in-porch .sky-links * {
     opacity: 1;
 }
 .porch .porch-door {
-    left: 1.6%;
+    left: .4%;
     bottom: calc(var(--floor-h) - 1vh);
-    width: 7.6%;
+    width: 10.2%;                                           /* (11 Oct, Victor: it was far too narrow at 7.6%) */
     height: 54vh;
 }
 .porch .porch-door>svg,
@@ -225,8 +261,8 @@ body.in-porch .sky-links * {
     object-fit: fill;
 }
 .porch .porch-lamp {
-    left: 9.4%;
-    bottom: 46vh;
+    left: calc(5.5% - max(1.1vw, 11px));                    /* (over the door, now the door's wider) */
+    bottom: calc(var(--floor-h) + 54vh);
     width: 2.2vw;
     min-width: 22px;
     aspect-ratio: 30 / 50;
@@ -468,8 +504,65 @@ body.in-porch .sky-links * {
         height: 17vh;
     }
     .porch .porch-door {
-        width: 12%;
+        width: 11.5%;
         height: 40vh;
+    }
+    .porch .porch-lamp {
+        left: calc(6.15% - max(1.1vw, 11px));
+        bottom: calc(var(--floor-h) + 40vh);
+    }
+}
+
+/* an upright phone (11 Oct, Victor: "just have it scroll across the porch scene if you tap right"): the porch is two and a
+   half screens wide instead of squeezed into one, and you see a part of it at a time: the door end, the steps, the mailbox
+   end. porch.js sets --porch-pan (how far along, px) and moves the view with the arrows at the screen's sides (.porch-look,
+   outside the porch so they stay put) or a swipe; the view follows the traveller when they walk */
+.porch-look {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+@media (max-width: 620px) {
+    .porch {
+        width: 250vw;
+        translate: calc(var(--porch-pan, 0) * -1px) 0;
+    }
+    body.in-porch .porch {
+        transition: transform .9s cubic-bezier(.55, 0, .25, 1), translate .8s cubic-bezier(.45, 0, .25, 1), visibility 0s;
+    }
+    body.porch-look-now .porch {
+        transition: none !important;
+    }
+    .room-arrow.porch-look {
+        position: fixed;
+        top: auto;
+        bottom: 16px;
+        margin-top: 0;
+        z-index: 4;
+    }
+    .room-arrow.porch-look.look-left {
+        left: 8px;
+    }
+    .room-arrow.porch-look.look-right {
+        right: 8px;
+    }
+    .room-arrow.porch-look.look-left>svg,
+    .room-arrow.porch-look.look-left>.art {
+        transform: scaleX(-1);
+    }
+    .room-arrow.porch-look.look-left:hover,
+    .room-arrow.porch-look.look-left:focus-visible {
+        transform: translateX(-4px);
+    }
+    body.in-porch.porch-look-l:not(.porch-panning):not(.bee-talking):not(.sky-view) .porch-look.look-left,
+    body.in-porch.porch-look-r:not(.porch-panning):not(.bee-talking):not(.sky-view) .porch-look.look-right {
+        visibility: visible;
+        opacity: .5;
+        pointer-events: auto;
+    }
+    body.in-porch.porch-look-l:not(.porch-panning):not(.bee-talking):not(.sky-view) .porch-look.look-left:hover,
+    body.in-porch.porch-look-r:not(.porch-panning):not(.bee-talking):not(.sky-view) .porch-look.look-right:hover {
+        opacity: 1;
     }
 }
 @media (prefers-reduced-motion: reduce) {

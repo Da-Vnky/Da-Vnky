@@ -1444,7 +1444,9 @@
         var r = art.getBoundingClientRect();
         if (!r.width) return;
         shade(r);
-        var x = r.left + r.width / 2 - faceSign * r.width * .44, y = r.top + r.height * .55;
+        // (measured against the ground it flies over, so the porch moving under it on a phone isn't flying)
+        var hb = home.parentNode.getBoundingClientRect();
+        var x = r.left + r.width / 2 - faceSign * r.width * .44 - hb.left, y = r.top + r.height * .55 - hb.top;
         if (lastAt) {
             var dt = Math.max(1, now - lastAt.t), v = Math.hypot(x - lastAt.x, y - lastAt.y) / dt * 1000 / r.width;   // (its own widths a second)
             speed += (Math.min(1, v / 1.4) - speed) * Math.min(1, dt / 250);
@@ -1453,7 +1455,7 @@
         if (!lastDot) { lastDot = { x: x, y: y }; return; }
         var step = r.width * .1;
         if (STILL || Math.hypot(x - lastDot.x, y - lastDot.y) < step) return;
-        drop(x, y, r.width);
+        drop(x + hb.left, y + hb.top, r.width);
         lastDot = { x: x, y: y };
     }
     requestAnimationFrame(fly);

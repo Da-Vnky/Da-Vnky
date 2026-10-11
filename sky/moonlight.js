@@ -1,8 +1,9 @@
 /* =====================================================================
    moonlight.js — the moon's light through the house's windows (28 Sep,
-   Victor: like skizy's apartment). By night, a soft glow round the window
-   and a beam falling from it into the room, onto the floor, slanting away
-   from wherever the moon is. By day, nothing. And where a room's window
+   Victor: like skizy's apartment). By night, a soft glow round the window.
+   By day, nothing. (11 Oct, Victor: the beams falling from the windows onto
+   the floor are gone from the house, "they look bad": the beams stay a thing
+   of skizy's room.) And where a room's window
    is only painted on (the kitchen's, the attic's round one), a hole is cut
    in the wall behind the glass so the site's real sky shows through it:
    the sun, the moon, the clouds, the stars, day and night.
@@ -13,15 +14,13 @@
            pad: px,                             or the same in pixels, all round (the living room's frame)
            round: true,                         a round window (the hole's a circle)
            cut: '.kitchen-wall, .kitchen > .art',   the wall's pictures, to cut the hole in (none: it's already open)
-           slot: 'assets/living/kitchen-'       its pictures: <slot>moonlight, <slot>moonbeam
+           slot: 'assets/living/kitchen-'       its picture: <slot>moonlight
        })
 
    Its look: sky/css/moonlight.css. How bright: the sky's --night (0 by day, 1 at night) times --moon-up (1 while the
-   moon's above the horizon); which way the beam slants: --moon-x (sky.js sets all three).
-   Your own art: assets/living/moonlight / moonbeam (the living room), kitchen-moonlight / kitchen-moonbeam,
-   attic-moonlight / attic-moonbeam: drawn light on black or see-through, screened over the room (only light adds).
-   The glow's box is 2½ times the glass, centred on it; the beam's is the glass's width, from the glass down to
-   the floor (it's slanted for you).
+   moon's above the horizon) (sky.js sets both).
+   Your own art: assets/living/moonlight (the living room), kitchen-moonlight, attic-moonlight: drawn light on black or
+   see-through, screened over the room (only light adds). The glow's box is 2½ times the glass, centred on it.
    ===================================================================== */
 
 (function () {
@@ -29,30 +28,20 @@
     if (!Sky || Sky.moonlight) return;
     var n = 0;
 
-    // the stand-ins: a soft blue-white glow, and a beam fading as it falls, with the window's panes lit on the floor
+    // the stand-in: a soft blue-white glow
     function glowArt(id) {
         return '<svg class="placeholder" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' +
             '<defs><radialGradient id="' + id + '"><stop offset="0" stop-color="#c4d4ff" stop-opacity=".55"/>' +
             '<stop offset=".45" stop-color="#9fb6f0" stop-opacity=".22"/><stop offset="1" stop-color="#8aa2e0" stop-opacity="0"/></radialGradient></defs>' +
             '<ellipse cx="50" cy="50" rx="50" ry="50" fill="url(#' + id + ')"/></svg>';
     }
-    function beamArt(id) {
-        return '<svg class="placeholder" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' +
-            '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8d8ff" stop-opacity=".34"/>' +
-            '<stop offset=".7" stop-color="#b4c8f4" stop-opacity=".13"/><stop offset=".9" stop-color="#b4c8f4" stop-opacity=".06"/></linearGradient></defs>' +
-            '<rect x="0" y="0" width="100" height="90" fill="url(#' + id + ')"/>' +
-            '<g fill="#d4e0ff" opacity=".32"><rect x="0" y="89" width="47" height="4.6"/><rect x="53" y="89" width="47" height="4.6"/>' +
-            '<rect x="0" y="95.2" width="47" height="4.8"/><rect x="53" y="95.2" width="47" height="4.8"/></g></svg>';
-    }
-
     function moonlight(host, o) {
         if (!host) return null;
         var k = ++n;
         var box = document.createElement('div');
         box.className = 'moonlight';
         box.setAttribute('aria-hidden', 'true');
-        box.innerHTML = '<div class="ml-glow" data-asset="' + o.slot + 'moonlight">' + glowArt('ml-g' + k) + '</div>' +
-                        '<div class="ml-beam" data-asset="' + o.slot + 'moonbeam">' + beamArt('ml-b' + k) + '</div>';
+        box.innerHTML = '<div class="ml-glow" data-asset="' + o.slot + 'moonlight">' + glowArt('ml-g' + k) + '</div>';
         host.appendChild(box);
         if (Sky.fillAssets) Sky.fillAssets(box);
         if (o.cut) {

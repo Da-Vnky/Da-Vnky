@@ -543,7 +543,7 @@
       },
       {
        "slot": "assets/ui/cursor-pointer",
-       "what": "over anything you can click",
+       "what": "over anything you can click: a pointing hand, the fingertip its hotspot (12, 3). Pressed (assets/ui/cursor-pointer-press): only the finger moves, tapping down",
        "size": "32 x 32"
       },
       {
@@ -553,7 +553,7 @@
       },
       {
        "slot": "assets/ui/cursor-grab",
-       "what": "the open hand, seen from the back: over things you take hold of and pull (the boards on skizy’s window, the book that opens the wall, the bath plug, the hallway’s cord and lamp, the wallpaper, the sky’s loose corner) and things you pick up (the boat, the traveller by the sea, a bottle’s cork). Its hotspot is 16, 14",
+       "what": "the open hand, seen from the back, reaching down: over things you take hold of and pull (the boards on skizy’s window, the book that opens the wall, the bath plug, the hallway’s cord and lamp, the wallpaper, the sky’s loose corner) and things you pick up (the boat, the traveller by the sea, a bottle’s cork). Its hotspot is 16, 18",
        "size": "32 x 32"
       },
       {
@@ -609,7 +609,7 @@
       },
       {
        "slot": "assets/ui/cursor-pat",
-       "what": "over the bee’s head: a hand turned over it, to pat it (the palm is the hotspot, 16, 21). Pressed: assets/ui/cursor-pat-press",
+       "what": "over the bee’s head: an open hand, to pat it (the middle of the hand is the hotspot, 17, 17). Pressed: assets/ui/cursor-pat-press",
        "size": "32 x 32",
        "optional": true
       },
@@ -1320,11 +1320,6 @@
        "size": "2½ times the window's glass, centred on it: e.g. 1250 x 1000"
       },
       {
-       "slot": "assets/living/moonbeam",
-       "what": "by night, the moon's light falling from the window to the floor, with the panes lit on the floor at the bottom (drawn straight down: it's slanted away from the moon for you). light on black or see-through, screened over the room",
-       "size": "the glass's width, from the window to the floor: e.g. 500 x 1000, stretched to fit"
-      },
-      {
        "slot": "assets/living/view-night",
        "what": "the view at night (crossfades in)",
        "size": "3840 x 1600",
@@ -1768,11 +1763,6 @@
        "size": "2½ times the glass, centred on it: e.g. 600 x 600"
       },
       {
-       "slot": "assets/living/attic-moonbeam",
-       "what": "by night, the moon's light falling from the round window to the floor (drawn straight down: it's slanted for you): light on black or see-through",
-       "size": "the glass's width, from the window to the floor: e.g. 240 x 1000, stretched to fit"
-      },
-      {
        "slot": "assets/living/attic-clutter",
        "what": "the junk on the left: trunk, boxes, a sheet over something",
        "size": "about 1200 x 480, see-through, standing on the bottom edge"
@@ -1922,11 +1912,6 @@
        "slot": "assets/living/kitchen-moonlight",
        "what": "by night, the moon's glow round the kitchen window: light on black or see-through, screened over the kitchen",
        "size": "2½ times the glass, centred on it: e.g. 900 x 750"
-      },
-      {
-       "slot": "assets/living/kitchen-moonbeam",
-       "what": "by night, the moon's light falling from the kitchen window to the floor (drawn straight down: it's slanted for you): light on black or see-through",
-       "size": "the glass's width, from the window to the floor: e.g. 360 x 1000, stretched to fit"
       },
       {
        "slot": "assets/living/kitchen-counter",

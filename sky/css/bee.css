@@ -58,8 +58,10 @@ body.bee-talking .front .bee-home {
 /* talking: up close, over the porch roof's shadow, facing the menu */
 body.bee-talking .porch .bee-home { left: 36%; top: 28%; width: clamp(76px, 8vw, 150px); --face: -1; }
 @media (max-width: 620px) {
-    .porch .bee-home { left: 25%; top: 52%; }
-    body.bee-talking .porch .bee-home { left: 38%; top: 24%; --face: 1; }
+    /* (the porch is 2½ screens wide on an upright phone and you look along it, porch.css: the bee's in the view the
+       traveller stands in, and talking it comes to wherever you're looking, --porch-pan) */
+    .porch .bee-home { left: 30%; top: 52%; }
+    body.bee-talking .porch .bee-home { left: calc(var(--porch-pan, 0) * 1px + 38vw); top: 24%; --face: 1; }
 }
 @media (max-height: 500px) and (min-width: 621px) {
     .porch .bee-home { left: 33%; top: 44%; }

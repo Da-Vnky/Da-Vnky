@@ -977,6 +977,8 @@
             </svg>
         </div>
         <div class="room-floor" data-asset="assets/living/porch-floor"><div class="placeholder"></div></div>
+        <!-- the light in the gap where the steps go down (behind the traveller: .porch-steps, further on, takes the click) -->
+        <div class="porch-steps-glow" aria-hidden="true"></div>
         <button type="button" class="furnish porch-door" data-asset="assets/living/porch-door" aria-label="back inside">
             <svg class="placeholder" viewBox="0 0 90 190" preserveAspectRatio="none" aria-hidden="true">
                 <rect x="0" y="0" width="90" height="190" fill="#e8e0cc"/><rect x="8" y="8" width="74" height="182" fill="#5a2a1c"/>
@@ -1005,12 +1007,17 @@
             <span class="kh-hint">the mailbox</span>
         </button>
         <button type="button" class="room-arrow porch-back" aria-label="back inside" data-asset="assets/living/arrow"><span class="ra-hint">back inside</span></button>
-        <button type="button" class="room-arrow porch-steps" aria-label="down the steps: the front garden" data-asset="assets/living/arrow"><span class="ra-hint">the front garden</span></button>
+        <!-- down the steps to the front garden (11 Oct, Victor: no arrow, "make the center of the porch glow be clickable"):
+             the gap in the railing glows (.porch-steps-glow, behind the traveller), and a click there takes the traveller down -->
+        <button type="button" class="porch-steps" aria-label="down the steps: the front garden"><span class="kh-hint">the front garden</span></button>
         <!-- dancing while a record plays (sky/music.js GROOVES): wind chimes under the eave, a gnome on the boards (slots porch-wind-chimes, porch-gnome) -->
         <div class="groove porch-chimes" data-groove="wind-chimes" data-asset="assets/living/porch-wind-chimes"></div>
         <div class="groove porch-gnome" data-groove="gnome" data-asset="assets/living/porch-gnome"></div>
         <div class="furnish character scene-character porch-character" data-asset="assets/characters/porch" aria-label="the traveller"></div>
     </div>
+    <!-- on an upright phone the porch is wider than the screen (11 Oct, Victor): these look along it (sky/porch.js) -->
+    <button type="button" class="room-arrow porch-look look-left" aria-label="look left along the porch" data-asset="assets/living/arrow"><span class="ra-hint">look left</span></button>
+    <button type="button" class="room-arrow back-right porch-look look-right" aria-label="look right along the porch" data-asset="assets/living/arrow"><span class="ra-hint">look right</span></button>
 
     <!-- the front of the house (sky/front.js): the homepage's "visit home" sign comes here (living.html#front). the house from
          the front path, under the site's own sky; click the front door and the traveller walks up the path and in, to the hallway.
