@@ -84,8 +84,8 @@ export const NARRATION = {
   oven: {
     label: 'oven (tater tots, pending)',
     lines: [
-      far('mel', 'i was gonna make tater tots later. you can have some i guess,'),
-      far('mel', 'and tater tots in the freezer. do you guys want tater tots'),
+      far('skizy', 'i was gonna make tater tots later. you can have some i guess,'),
+      far('skizy', 'and tater tots in the freezer. do you guys want tater tots'),
     ],
   },
   sinkmugs: {
@@ -98,7 +98,7 @@ export const NARRATION = {
   htrash: {
     label: 'trash',
     lines: [
-      far('mel', 'i should take the trash out. im not going to, but i should'),
+      far('skizy', 'i should take the trash out. im not going to, but i should'),
       far('mira', 'Trash is not my job. Trash is a shared environmental variable.'),
     ],
   },
@@ -123,7 +123,7 @@ export const NARRATION = {
     label: 'tater tots (three bags)',
     lines: [
       note('three bags of tater tots. one is open, folded shut, and held with a binder clip.'),
-      far('mel', 'and tater tots in the freezer. do you guys want tater tots'),
+      far('skizy', 'and tater tots in the freezer. do you guys want tater tots'),
     ],
   },
   'kf-ssd': {
@@ -144,7 +144,7 @@ export const NARRATION = {
     lines: [
       note('motherboards, sorted by nothing. some of them work. which ones is a matter of faith.'),
       note('a box of boards labelled SPARE. everything in it is spare because none of it works yet.'),
-      far('mel', 'everything in here is temporary except the server and the CRT'),
+      far('skizy', 'everything in here is temporary except the server and the CRT'),
     ],
   },
 
@@ -205,7 +205,7 @@ export const MORE = {
     lines: [
       note('an olive green hiking pack, packed. water, a filter, a knife, a first aid kit, a headlamp, a rain shell, three days of food that doesn\'t need cooking. the straps are already adjusted.'),
       note('a tag on the zipper, in skizy\'s handwriting: "just in case."'),
-      far('mel', 'thats packed. dont unpack it. its not for anything. its just packed'),
+      far('skizy', 'thats packed. dont unpack it. its not for anything. its just packed'),
     ],
   },
   sleepbag: { label: 'sleeping bag', lines: [note('a sleeping bag, rolled tight, for when the bean bag is occupied.')] },
@@ -259,7 +259,7 @@ export const MIRROR = note('the mirror fogs over for a moment, and something is 
 export const PEEPHOLE = note('the hallway outside. the door across the hall is open a crack, and someone is standing just behind it. they were already looking this way.');
 
 // the first time you open the closet in the bedroom. the one place the AIs don't narrate
-export const CLOSET_FIRST = far('mel', 'thats mine. you can look but dont go in. its calibrated');
+export const CLOSET_FIRST = far('skizy', 'thats mine. you can look but dont go in. its calibrated');
 
 // clicking the variable star on the roof enough times. once, no fanfare
 export const STAR_RARE = [far('mira', 'You keep checking.', RIG), far('mira', "I'm still here.", RIG)];

@@ -7,7 +7,7 @@ const store = {
 };
 const pan = x => Math.max(-.9, Math.min(.9, x / 800 - 1));
 const rand = (a, b) => a + Math.random() * (b - a);
-const POS = { window: 180, mira: 520, crt: 750, mel: 1012, clock: 1120, server: 1242, aether: 1228, claube: 1400, fridge: 1550 };
+const POS = { window: 180, mira: 520, crt: 750, skizy: 1012, clock: 1120, server: 1242, aether: 1228, claube: 1400, fridge: 1550 };
 
 export const audio = {
   ctx: null,
@@ -275,19 +275,19 @@ export const audio = {
     for (let i = 0; i < n; i++) {
       at += rand(.05, .17) + (Math.random() < .08 ? rand(.2, .5) : 0);
       const space = Math.random() < .12;
-      this.burst({ x: POS.mel, freq: space ? 1400 : rand(2400, 4200), q: 2.5, dur: space ? .035 : .018, gain: .045 * g, at });
-      this.burst({ x: POS.mel, freq: 500, q: 1, type: 'lowpass', dur: .03, gain: .05 * g, at });
+      this.burst({ x: POS.skizy, freq: space ? 1400 : rand(2400, 4200), q: 2.5, dur: space ? .035 : .018, gain: .045 * g, at });
+      this.burst({ x: POS.skizy, freq: 500, q: 1, type: 'lowpass', dur: .03, gain: .05 * g, at });
     }
     if (Math.random() < .35) { // enter, then a considered pause
       at += rand(.15, .3);
-      this.burst({ x: POS.mel, freq: 1200, q: 2, dur: .05, gain: .07 * g, at });
+      this.burst({ x: POS.skizy, freq: 1200, q: 2, dur: .05, gain: .07 * g, at });
     }
   },
 
   mouse() {
     if (this.room !== 'main') return;
-    this.burst({ x: POS.mel + 60, freq: 4500, q: 4, dur: .01, gain: .04 });
-    if (Math.random() < .5) this.burst({ x: POS.mel + 60, freq: 4500, q: 4, dur: .01, gain: .04, at: .11 });
+    this.burst({ x: POS.skizy + 60, freq: 4500, q: 4, dur: .01, gain: .04 });
+    if (Math.random() < .5) this.burst({ x: POS.skizy + 60, freq: 4500, q: 4, dur: .01, gain: .04, at: .11 });
   },
 
   hdd() {
@@ -330,7 +330,7 @@ export const audio = {
 
 
   blip(who) {
-    const f = { mira: 880, claube: 330, mel: 520, aether: 1180 }[who] || 440;
+    const f = { mira: 880, claube: 330, skizy: 520, aether: 1180 }[who] || 440;
     this.tone({ x: POS[who], type: 'square', freq: f, dur: .06, gain: .018 });
   },
 

@@ -1,7 +1,7 @@
 // THE ROOM
 // an SVG apartment with the whole site running on the CRT.
 import {
-  CAST, SCENE_WINDOW, SCENE_SSD, SCENE_MIRA, OBJECTS, MEL_TALK, MEL_WORK, WHAT_IS_THIS_ROOM,
+  CAST, SCENE_WINDOW, SCENE_SSD, SCENE_MIRA, OBJECTS, SKIZY_TALK, SKIZY_WORK, WHAT_IS_THIS_ROOM,
   FRIDGE_FIRST, CLAUBE_TALK, MIRA_TALK, AMBIENT, LINGER, LEAVING, FUNGER_AFTER, DRAWING_HOVER,
   JUST_STAY, HOVER_WRITING, NOT_WRITING, SCENE_AFTERNOON, SLEEP_TALK,
 } from './script.js';
@@ -48,11 +48,11 @@ function bag(list) {
   };
 }
 // an exchange ([[who, text, dir], ...]) or a single caption ([who, text, via]) with skizy talking, not in her sleep
-const skizyAwakeIn = item => Array.isArray(item) && (item[0] === 'mel'
-  || item.some(line => Array.isArray(line) && line[0] === 'mel' && line[2] !== 'asleep'));
+const skizyAwakeIn = item => Array.isArray(item) && (item[0] === 'skizy'
+  || item.some(line => Array.isArray(line) && line[0] === 'skizy' && line[2] !== 'asleep'));
 
 const bags = {
-  mel: bag(MEL_TALK), melWork: bag(MEL_WORK), claube: bag(CLAUBE_TALK), mira: bag(MIRA_TALK),
+  skizy: bag(SKIZY_TALK), skizyWork: bag(SKIZY_WORK), claube: bag(CLAUBE_TALK), mira: bag(MIRA_TALK),
   ambient: bag([...AMBIENT, ...AMBIENT_MORE]), linger: bag(LINGER), leaving: bag(LEAVING),
   hushMira: bag(AFTERNOON_HUSH.mira), hushClaube: bag(AFTERNOON_HUSH.claube),
   music: bag(MUSIC), funger: bag(FUNGER_AFTER), watching: bag(FUNGER_WATCHING), sleeptalk: bag(SLEEP_TALK),
@@ -62,9 +62,9 @@ for (const [f, list] of Object.entries(RADIO)) bags['fm:' + f] = bag(list);
 for (const [id, o] of Object.entries(OBJECTS)) if (o.lines.length) bags[id] = bag(o.lines);
 for (const [id, o] of Object.entries(NARRATION)) if (o.lines?.length) bags['n:' + id] = bag(o.lines);
 
-const NAMES = { mira: CAST.mira.name, claube: 'Claube / WATCHLION', mel: 'skizy' };
+const NAMES = { mira: CAST.mira.name, claube: 'Claube / WATCHLION', skizy: 'skizy' };
 // bubble alignment per speaker, so the ones near the edge don't fall off the stage
-const ALIGN = { mira: ['-40%', '40%'], mel: ['-50%', '50%'], claube: ['-78%', '78%'], aether: ['-62%', '62%'] };
+const ALIGN = { mira: ['-40%', '40%'], skizy: ['-50%', '50%'], claube: ['-78%', '78%'], aether: ['-62%', '62%'] };
 
 const body = document.body;
 const stage = $('#stage');
@@ -118,7 +118,7 @@ async function say(exchange) {
   const claube = svg.querySelector('#claube');
   for (let [who, text, dir] of exchange) {
     if (token !== talkToken) return;
-    if (who === 'mel' && afternoon) dir ||= 'asleep';
+    if (who === 'skizy' && afternoon) dir ||= 'asleep';
     if (who === 'aether' && svg.querySelector('#aether').classList.contains('off')) continue;
     if (who === '-') { // a beat. a 'hush' beat silences the whole room for a moment
       clearBubbles();
@@ -127,7 +127,7 @@ async function say(exchange) {
       continue;
     }
     ledPulse(who);
-    const a = who === 'mel' && afternoon ? anchors.lump : anchors[who];
+    const a = who === 'skizy' && afternoon ? anchors.lump : anchors[who];
     const b = document.createElement('div');
     b.className = 'bubble';
     b.style.setProperty('--c', CAST[who].color);
@@ -467,7 +467,7 @@ function toggleFridge(open) {
   audio.fridge(open);
   if (open && !toggleFridge.seen) {
     toggleFridge.seen = true;
-    say(FRIDGE_FIRST.filter(line => !afternoon || line[0] !== 'mel'));
+    say(FRIDGE_FIRST.filter(line => !afternoon || line[0] !== 'skizy'));
   }
 }
 let fridgeOpen = false;
@@ -493,7 +493,7 @@ function interact(id) {
         ['look at it', () => say(bags.crt())],
       ]);
     case 'console':
-      return openMenu('the console', CAST.mel.color, [
+      return openMenu('the console', CAST.skizy.color, [
         ['play funger', playConsole],
         ['look at it', () => say(bags.console())],
       ]);
@@ -514,13 +514,13 @@ function interact(id) {
         ['what is this room?', () => talkBox(WHAT_IS_THIS_ROOM)],
         ['back to the rooftop', () => { location.href = ROOFTOP; }],
       ]);
-    case 'mel':
-      return openMenu(CAST.mel.name, CAST.mel.color, [
+    case 'skizy':
+      return openMenu(CAST.skizy.name, CAST.skizy.color, [
         ...(carryingMeds ? [['give her the bottle', () => (DAV.key ? talkMeds() : caption(QUIET_NOTES.notYet))]] : []),
         ['say something', talkToSkizy],
-        ['ask her about computers', () => converse('mel', ASK_SKIZY)],
-        ['talk', () => talkBox(bags.mel())],
-        ['watch her work', () => talkBox(bags.melWork())],
+        ['ask her about computers', () => converse('skizy', ASK_SKIZY)],
+        ['talk', () => talkBox(bags.skizy())],
+        ['watch her work', () => talkBox(bags.skizyWork())],
         ['what is this room?', () => talkBox(WHAT_IS_THIS_ROOM)],
       ]);
     case 'fridge':
@@ -674,7 +674,7 @@ async function startAfternoon() {
   $('#hover-label').classList.remove('show');
   fade.classList.add('dark', 'on');
   await sleep(1400);
-  for (const [sel, show] of [['#mel', false], ['#blanket', false], ['#afternoon-chair', true], ['#lump', true], ['#daylight', true]]) {
+  for (const [sel, show] of [['#skizy', false], ['#blanket', false], ['#afternoon-chair', true], ['#lump', true], ['#daylight', true]]) {
     svg.querySelector(sel).style.display = show ? '' : 'none';
   }
   body.classList.add('afternoon');
@@ -699,7 +699,7 @@ async function wakeUp() {
   $('#hover-label').classList.remove('show');
   fade.classList.add('dark', 'on');
   await sleep(1400);
-  for (const [sel, show] of [['#mel', true], ['#blanket', true], ['#afternoon-chair', false], ['#lump', false], ['#daylight', false]]) {
+  for (const [sel, show] of [['#skizy', true], ['#blanket', true], ['#afternoon-chair', false], ['#lump', false], ['#daylight', false]]) {
     svg.querySelector(sel).style.display = show ? '' : 'none';
   }
   body.classList.remove('afternoon');
@@ -753,7 +753,7 @@ async function goDark() {
   $('#hover-label').classList.remove('show');
   fade.classList.add('dark', 'on');
   await sleep(3200);
-  for (const [sel, show] of [['#mira', false], ['#claube', false], ['#aether', false], ['#hydra', false], ['#mel', false], ['#lump', false],
+  for (const [sel, show] of [['#mira', false], ['#claube', false], ['#aether', false], ['#hydra', false], ['#skizy', false], ['#lump', false],
     ['#light', false], ['#daylight', false], ['#afternoon-chair', true], ['#alone-dark', true], ['#alone', true]]) {
     svg.querySelector(sel).style.display = show ? '' : 'none';
   }
@@ -1689,7 +1689,7 @@ function restoredOnce() {
 // the ending's dark room (goDark, without the fade), with whatever's come back so far
 function quietRoom(stage) {
   alone = true;
-  const show = { '#mira': stage >= 3, '#claube': stage >= 4, '#aether': stage >= 4, '#hydra': stage >= 4, '#mel': false, '#lump': false,
+  const show = { '#mira': stage >= 3, '#claube': stage >= 4, '#aether': stage >= 4, '#hydra': stage >= 4, '#skizy': false, '#lump': false,
     '#light': stage >= 2, '#daylight': false, '#afternoon-chair': true, '#alone-dark': stage < 2, '#alone': true,
     '[data-art$="objects/main/mugs-3.svg"]': stage >= 4 };  // (Claube's mug: not hanging in the air where he sits before he's back)
   for (const [sel, on] of Object.entries(show)) { const el = svg.querySelector(sel); if (el) el.style.display = on ? '' : 'none'; }
@@ -1719,7 +1719,7 @@ async function davArrive(stage) {
     await sleep(readTime(QUIET_NOTES.getsUp[1]) + 600);
     fade.classList.add('dark', 'on');
     await sleep(1100);
-    for (const [sel, on] of Object.entries({ '#alone': false, '#alone-dark': false, '#afternoon-chair': false, '#mel': true })) {
+    for (const [sel, on] of Object.entries({ '#alone': false, '#alone-dark': false, '#afternoon-chair': false, '#skizy': true })) {
       const el = svg.querySelector(sel); if (el) el.style.display = on ? '' : 'none';
     }
     alone = false;
@@ -1741,7 +1741,7 @@ function aloneClicked() {
   closeMenu();
   const gifted = store.get('skizy-remedy') !== null;
   if (!gifted && DAV.hasRecord) {
-    return openMenu('skizy', CAST.mel.color, [
+    return openMenu('skizy', CAST.skizy.color, [
       ['give her the record', () => {
         store.set('skizy-remedy', '0');
         quietNote(QUIET_NOTES.gift);

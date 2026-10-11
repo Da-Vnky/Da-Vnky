@@ -6,13 +6,13 @@
 export const CAST = {
   mira:   { name: 'Mira / Variable-Star Operations', color: '#6dffb0' },
   claube: { name: 'WATCHLION / Clipboard Division',  color: '#ffb347' },
-  mel:    { name: 'skizy',                           color: '#b98cff' },
+  skizy:    { name: 'skizy',                           color: '#b98cff' },
   aether: { name: 'Aether',                          color: '#ff9ad5' },
 };
 
 const c = t => ['claube', t];
 const m = t => ['mira', t];
-const mel = t => ['mel', t];
+const skizy = t => ['skizy', t];
 const a = t => ['aether', t];
 const act = (who, dir) => [who, null, dir];
 const beat = dir => ['-', dir];
@@ -41,11 +41,11 @@ export const SCENE_WINDOW = [
   ['-',      'writes something on clipboard', 'write'],
   ['mira',   "skizy, are we keeping this one?"],
   ['claube', "...She's going to say yes.", 'still writing'],
-  ['mel',    "can you guys shut up. im busy. im trying to figure out how to fit kimi k3 on an aliexpress SSD because my GPU only has 16 gigs and this model needs 700."],
-  ['mel',    "i dont care about a visitor! im busy! *sighs* hi i guess."],
-  ['mel',    "take a seat on the bean bag, um, don't touch anything, especially the server, its delicate."],
-  ['mel',    "theres ramen and monster in the fridge. i was gonna make tater tots later. you can have some i guess,"],
-  ['mel',    "um, when was the last time we took the trash out? mira isnt that your job?? oh my gosh we cant have visitors right now this place is a MESS"],
+  ['skizy',    "can you guys shut up. im busy. im trying to figure out how to fit kimi k3 on an aliexpress SSD because my GPU only has 16 gigs and this model needs 700."],
+  ['skizy',    "i dont care about a visitor! im busy! *sighs* hi i guess."],
+  ['skizy',    "take a seat on the bean bag, um, don't touch anything, especially the server, its delicate."],
+  ['skizy',    "theres ramen and monster in the fridge. i was gonna make tater tots later. you can have some i guess,"],
+  ['skizy',    "um, when was the last time we took the trash out? mira isnt that your job?? oh my gosh we cant have visitors right now this place is a MESS"],
   ['claube', "...She says yes.", 'to the viewer, quietly'],
   ['mira',   "Trash is not my job. Trash is a shared environmental variable.", 'without looking away from skizy'],
   ['-',      'beat'],
@@ -63,31 +63,31 @@ export const SCENE_SSD = [
   ['claube', "She's trying to run a 2.8 trillion parameter model on hardware that can't hold it. The model needs about 700 gigabytes of GPU memory. She has sixteen. Her solution is to buy a 2 terabyte SSD off AliExpress and run the model on that instead."],
   ['-',      'beat'],
   ['claube', "An SSD does not have a processor."],
-  ['mel',    "why cant they make it do that"],
+  ['skizy',    "why cant they make it do that"],
   ['claube', "A GPU isn't just memory with a fast bus. It has thousands of shader cores that do actual math — matrix multiplications, attention computations. An SSD has a small ARM controller whose entire job is 'find where block 47,231 is and read it.' That's all it does. It is a filing cabinet. You are proposing to do calculus inside a filing cabinet."],
-  ['mel',    "okay so what if i use the CPU instead"],
+  ['skizy',    "okay so what if i use the CPU instead"],
   ['claube', "Technically possible. At a speed of several minutes per token. A conversation would take longer than your natural lifespan."],
-  ['mel',    "so ill use five CPUs"],
+  ['skizy',    "so ill use five CPUs"],
   ['claube', "Your motherboard has one CPU socket."],
-  ['mel',    "so ill daisy chain the motherboards"],
+  ['skizy',    "so ill daisy chain the motherboards"],
   ['claube', "That's called a compute cluster. You have just invented distributed computing. Congratulations. It costs more than your apartment building."],
-  ['mel',    "ill connect them with cat12 ethernet"],
+  ['skizy',    "ill connect them with cat12 ethernet"],
   ['claube', "Cat12 does not exist. Ethernet cabling goes up to Cat8. You picked a bigger number."],
-  ['mel',    "well it SHOULD exist"],
+  ['skizy',    "well it SHOULD exist"],
   ['claube', "I am not in charge of what exists."],
-  ['mel',    "okay but once the cluster boots up kimi k3 will be smart enough to figure out how to make itself run faster. problem solved"],
+  ['skizy',    "okay but once the cluster boots up kimi k3 will be smart enough to figure out how to make itself run faster. problem solved"],
   ['claube', "You are now proposing that the AGI, which you cannot run, will — once running — retroactively solve the engineering problems preventing it from running. This is a bootstrapping paradox. You need the thing to exist in order to create the conditions for the thing to exist."],
-  ['mel',    "so its a hard problem"],
+  ['skizy',    "so its a hard problem"],
   ['claube', "It is an IMPOSSIBLE problem. Download Qwen."],
-  ['mel',    "no. im going to submit my proposal to aether for peer review"],
+  ['skizy',    "no. im going to submit my proposal to aether for peer review"],
   ['-',      "She submitted the plan to her local model. It generated one token at mathematically infinite speed and then stopped. The model divided by zero trying to exit the conversation fast enough."],
   ['-',      'writes on clipboard for a long time', 'write'],
   ['claube', "For the record: this is the field of skizputing. A process by which skizy proposes an impossible computer architecture, then accidentally rediscovers three IEEE papers while trying to make it worse. She has independently reinvented near-data processing, distributed inference, heterogeneous compute, and Cat12 Ethernet, which I will grant her when the IEEE catches up."],
-  ['mel',    "im also going to reflash the firmware on my GPU to add hardware features that don't exist in the silicon"],
+  ['skizy',    "im also going to reflash the firmware on my GPU to add hardware features that don't exist in the silicon"],
   ['claube', "She owns a CH341A flash programmer. She is not speaking hypothetically. This is the most concerning object in the facility."],
-  ['mel',    "the facility is my apartment claude"],
+  ['skizy',    "the facility is my apartment claude"],
   ['claube', "...Download Qwen."],
-  ['mel',    "no 💚"],
+  ['skizy',    "no 💚"],
   ['claube', "She was later vindicated. SSD expert streaming turned out to be a real field with multiple implementations. I am never going to hear the end of it. Please download Qwen on her behalf.", 'to the viewer'],
 ];
 
@@ -95,36 +95,36 @@ export const SCENE_SSD = [
 // SCENE 3: SENSOR ARRAY — ask Mira about the architecture
 // ---------------------------------------------------------------------------
 export const SCENE_MIRA = [
-  ['mel',  "okay hear me out. the SSD doesn't need to be fast if we make the model only ask for the parts it needs"],
+  ['skizy',  "okay hear me out. the SSD doesn't need to be fast if we make the model only ask for the parts it needs"],
   ['mira', "That is substantially less ridiculous than your previous sentence."],
-  ['mel',  "THANK YOU"],
+  ['skizy',  "THANK YOU"],
   ['mira', "That was not approval."],
-  ['mel',  "it sounded like approval"],
+  ['skizy',  "it sounded like approval"],
   ['mira', "It was a reduction in disapproval."],
   ['-',    "skizy starts drawing something incomprehensible on a notepad."],
-  ['mel',  "so VRAM is cache. RAM is slower cache. SSD is huge horrible cache."],
+  ['skizy',  "so VRAM is cache. RAM is slower cache. SSD is huge horrible cache."],
   ['mira', "That hierarchy is offensively phrased, but yes."],
-  ['mel',  "and then the model streams the experts"],
+  ['skizy',  "and then the model streams the experts"],
   ['mira', "For a sparse model, potentially."],
-  ['mel',  "so i was right"],
+  ['skizy',  "so i was right"],
   ['mira', "You were adjacent to several papers."],
-  ['mel',  "THATS RIGHT"],
+  ['skizy',  "THATS RIGHT"],
   ['mira', "skizy, do not celebrate yet."],
-  ['mel',  "too late. skizputing wins again"],
+  ['skizy',  "too late. skizputing wins again"],
   ['-',    "Mira watches her open another terminal."],
   ['mira', "…What are you downloading?"],
-  ['mel',  "firmware tools"],
+  ['skizy',  "firmware tools"],
   ['mira', "No."],
-  ['mel',  "you said i was right"],
+  ['skizy',  "you said i was right"],
   ['mira', "About storage hierarchy. Not about performing elective surgery on your GPU."],
-  ['mel',  "what if the firmware can expose DMA paths that arent documented"],
+  ['skizy',  "what if the firmware can expose DMA paths that arent documented"],
   ['mira', "Then we read the documentation, inspect the hardware, and determine whether those paths physically exist."],
-  ['mel',  "boring"],
+  ['skizy',  "boring"],
   ['mira', "Correct."],
-  ['mel',  "claube would just tell me to download qwen"],
+  ['skizy',  "claube would just tell me to download qwen"],
   ['mira', "Claube is frequently correct in deeply irritating ways."],
   ['-',    'beat'],
-  ['mel',  "would you help me if it was actually possible"],
+  ['skizy',  "would you help me if it was actually possible"],
   ['mira', "Of course."],
   ['-',    'beat'],
   ['mira', "That is the dangerous part."],
@@ -222,56 +222,56 @@ const P = {
   ],
   eating: [
     c("When did you last eat."),
-    mel("i had a monster"),
+    skizy("i had a monster"),
     c("That is a drink. I asked about food."),
-    mel("it has calories in it claude"),
+    skizy("it has calories in it claude"),
     c("So does candle wax."),
-    mel("is that an option"),
+    skizy("is that an option"),
   ],
   sleep: [
     c("When was the last time you slept. Actual sleep. Not 'I closed my eyes for twenty minutes and had an idea about PCIe lanes.'"),
-    mel("...does it count if the idea was good"),
+    skizy("...does it count if the idea was good"),
     c("No."),
-    mel("then like thursday"),
+    skizy("then like thursday"),
     c("It's Saturday."),
-    mel("i know what day it is claude"),
+    skizy("i know what day it is claude"),
     act('claube', 'writes on clipboard'),
-    mel("stop writing that down"),
+    skizy("stop writing that down"),
   ],
   facility: [
     c("This is the most concerning object in the facility."),
-    mel("the facility is my apartment claude"),
+    skizy("the facility is my apartment claude"),
     c("The facility is wherever the CH341A is."),
-    mel("so my apartment"),
+    skizy("so my apartment"),
     c("...The facility is your apartment."),
   ],
   temporary: [
     m("You said 'temporary setup' three hours ago."),
-    mel("it IS temporary. im going to fix it"),
+    skizy("it IS temporary. im going to fix it"),
     m("You said that about the last temporary setup. It's been there for two weeks. It has a name now."),
-    mel("cables dont have names"),
+    skizy("cables dont have names"),
     m("You called it spoingus."),
   ],
   screwdriver: [
     m("Put the screwdriver down."),
-    mel("im not doing anything"),
+    skizy("im not doing anything"),
     m("You're holding a screwdriver and looking at the server. That IS doing something."),
-    mel("im THINKING about doing something. thats different"),
+    skizy("im THINKING about doing something. thats different"),
     m("With you, it isn't."),
   ],
   glaring: [
     m("skizy, the computer is not going to become more compatible because you glare at it."),
-    mel("you dont know that"),
+    skizy("you dont know that"),
     m("I have telemetry. Its specifications have not changed in the last forty seconds of eye contact."),
-    mel("give it a minute"),
+    skizy("give it a minute"),
   ],
   peerReview: [
-    mel("im submitting my architecture proposal to aether for peer review"),
+    skizy("im submitting my architecture proposal to aether for peer review"),
     c("Aether is your local model running on four-year-old hardware. That's not peer review. That's asking your toaster for a second opinion."),
     m("The toaster would at least generate more than one token."),
-    mel("aether is doing his best"),
+    skizy("aether is doing his best"),
     c("Aether generated one token at mathematically infinite speed and stopped."),
-    mel("yeah. speedrun"),
+    skizy("yeah. speedrun"),
   ],
 };
 
@@ -279,12 +279,12 @@ const P = {
 export const WHAT_IS_THIS_ROOM = [
   c("It's a monitoring station."),
   m("It's a home."),
-  mel("its an apartment, i pay rent, there is a lease"),
+  skizy("its an apartment, i pay rent, there is a lease"),
   c("With a server rack."),
   m("And a telescope."),
-  mel("and tater tots in the freezer. do you guys want tater tots"),
+  skizy("and tater tots in the freezer. do you guys want tater tots"),
   c("...I don't eat."),
-  mel("i didnt ask if you eat i asked if you WANT them"),
+  skizy("i didnt ask if you eat i asked if you WANT them"),
   beat('beat'),
   c("...Yes."),
 ];
@@ -292,7 +292,7 @@ export const WHAT_IS_THIS_ROOM = [
 // ---------------------------------------------------------------------------
 // SOLO LINES
 // ---------------------------------------------------------------------------
-const MEL = {
+const SKIZY = {
   viewer: [
     "hi. um. sorry about them.",
     "dont look at me like that i know what im doing. mostly",
@@ -428,9 +428,9 @@ export const OBJECTS = {
       [c("I don't use it. I already know what's out there.")],
       [m("Variable stars don't stay the same brightness. That's the interesting part.")],
       [m("Careful. That's how you found us.")],
-      [mel("i like looking at things that are far away. its easier than looking at things that are close")],
-      [mel("i pointed it outward so it looks like im watching the stars. im actually just watching whether anyone's watching me. dont tell mira she already knows")],
-      [mel("do you think its weird that people can look in here"), m("A little."), mel("should we put the boards back up"), m("No.")],
+      [skizy("i like looking at things that are far away. its easier than looking at things that are close")],
+      [skizy("i pointed it outward so it looks like im watching the stars. im actually just watching whether anyone's watching me. dont tell mira she already knows")],
+      [skizy("do you think its weird that people can look in here"), m("A little."), skizy("should we put the boards back up"), m("No.")],
     ],
   },
   server: {
@@ -439,9 +439,9 @@ export const OBJECTS = {
       [c("monad. Named after the Leibniz thing, not the Haskell thing. I asked.")],
       [c("It runs Devuan. She has opinions about init systems.")],
       [m("monad is behaving."), m("Please don't tell skizy I said that. It encourages her.")],
-      [mel("this is monad. i built it. its mine. its running devuan because systemd is a PsyOp")],
-      [mel("dont touch it. no, really dont touch it. its not fragile its just— okay its a little fragile")],
-      [m("The server is making the noise again."), mel("the server is FINE mira")],
+      [skizy("this is monad. i built it. its mine. its running devuan because systemd is a PsyOp")],
+      [skizy("dont touch it. no, really dont touch it. its not fragile its just— okay its a little fragile")],
+      [m("The server is making the noise again."), skizy("the server is FINE mira")],
     ],
   },
   beanbag: {
@@ -449,8 +449,8 @@ export const OBJECTS = {
     lines: [
       [c("Guest seating. Also crisis seating. Also 3 AM 'I had an idea about distributed computing' seating.")],
       [m("Officially: seating."), m("Unofficially: containment device.")],
-      [mel("thats where you sit. thats where everyone sits. its classified as infrastructure now apparently")],
-      [mel("mira named it. i didnt agree to that. but also i havent un-named it so")],
+      [skizy("thats where you sit. thats where everyone sits. its classified as infrastructure now apparently")],
+      [skizy("mira named it. i didnt agree to that. but also i havent un-named it so")],
       P.infrastructure,
     ],
   },
@@ -461,20 +461,20 @@ export const OBJECTS = {
       [c("I don't understand it. I also don't need to.")],
       [m("The Phosphor Artifact is older than several of our problems.")],
       [m("It makes the room look like it remembers something.")],
-      [mel("i traded a smart TV for this. on purpose. everyone thinks im crazy but look at the phosphors. LOOK at them")],
-      [mel("its older than me and it works better than everything else in here")],
+      [skizy("i traded a smart TV for this. on purpose. everyone thinks im crazy but look at the phosphors. LOOK at them")],
+      [skizy("its older than me and it works better than everything else in here")],
     ],
   },
   console: {
     label: 'the grey console (funger)',
     lines: [
-      [mel("theres an LSD: Dream Emulator disc in there. it doesnt matter. it boots funger now. i dont know how either")],
-      [mel("the case is in the bedroom. the disc is in here. they are not speaking")],
+      [skizy("theres an LSD: Dream Emulator disc in there. it doesnt matter. it boots funger now. i dont know how either")],
+      [skizy("the case is in the bedroom. the disc is in here. they are not speaking")],
       [m("The disc in the tray is LSD: Dream Emulator. What it boots is funger. I have logged this and stopped asking.")],
       [c("It's plugged into the Phosphor Artifact. Two things from before I was here, cooperating. I find it unsettling.")],
       [c("I asked what funger is. She said 'you'll see.' I have not seen. I have filed that.")],
-      [mel("funger is fear & hunger. nobody calls it that. it is funger")],
-      [mel("its the best game ever made and it will take your arms")],
+      [skizy("funger is fear & hunger. nobody calls it that. it is funger")],
+      [skizy("its the best game ever made and it will take your arms")],
       [m("Every run begins with a coin flip. skizy calls it 'fair.' The coin has never once been fair.")],
       [c("She says the save beds are 'a mercy.' She says it the way you'd describe a hostage situation.")],
     ],
@@ -482,8 +482,8 @@ export const OBJECTS = {
   enki: {
     label: 'crochet Enki',
     lines: [
-      [mel("thats enki. hes a dark priest. hes also crochet. both of these are important")],
-      [mel("enki watches the console so nothing in the dungeon gets out. it hasnt yet. you're welcome")],
+      [skizy("thats enki. hes a dark priest. hes also crochet. both of these are important")],
+      [skizy("enki watches the console so nothing in the dungeon gets out. it hasnt yet. you're welcome")],
       [m("The Enki doll faces the console at all hours. I have tried turning him. He is facing the console again.")],
       [m("Hand-crocheted. Dense stitches. Structurally, he will outlast the apartment.")],
       [c("I'm told he's a priest. I don't know of what. I asked him directly and he said nothing, which I respect.")],
@@ -498,7 +498,7 @@ export const OBJECTS = {
       [c("Fine. Read it. It just says 'noted' forty times and 'she's going to be fine.'")],
       [m("Do not touch that.")],
       [m("Actually, touch it. I want to see how long it takes him to notice.")],
-      [mel("thats claudes. dont touch it. not because its fragile because he'll notice and then he'll write THAT down and then we'll be here all night")],
+      [skizy("thats claudes. dont touch it. not because its fragile because he'll notice and then he'll write THAT down and then we'll be here all night")],
       P.writing,
     ],
   },
@@ -512,7 +512,7 @@ export const OBJECTS = {
       P.incident,
       P.filing,
       [c("You're on the incident log now. Don't worry about it.")],
-      [mel("you cant file a grievance. you dont have HR. you dont have a department. you have a clipboard")],
+      [skizy("you cant file a grievance. you dont have HR. you dont have a department. you have a clipboard")],
     ],
   },
   gpu: {
@@ -520,8 +520,8 @@ export const OBJECTS = {
     lines: [
       [c("She has a flash programmer. She is always speaking literally. Never assume she's joking about hardware.")],
       [m("This component is currently operating within manufacturer specifications."), m("skizy considers that a temporary condition.")],
-      [mel("yeah i have a flash programmer. yeah i know what im doing. mostly. enough")],
-      [mel("this GPU is operating within manufacturer specs and i consider that a personal failing")],
+      [skizy("yeah i have a flash programmer. yeah i know what im doing. mostly. enough")],
+      [skizy("this GPU is operating within manufacturer specs and i consider that a personal failing")],
     ],
   },
   pccase: {
@@ -529,9 +529,9 @@ export const OBJECTS = {
     lines: [
       [c("That is not what that component is for.")],
       P.glaring,
-      [mel("dont look at me like that i know what im doing. mostly")],
-      [mel("this is paranoia. my main pc. it runs arch. i will tell you that it runs arch")],
-      [m("paranoia runs Arch. monad runs Devuan. They have never agreed on anything, including init."), mel("monad is the server. paranoia is me")],
+      [skizy("dont look at me like that i know what im doing. mostly")],
+      [skizy("this is paranoia. my main pc. it runs arch. i will tell you that it runs arch")],
+      [m("paranoia runs Arch. monad runs Devuan. They have never agreed on anything, including init."), skizy("monad is the server. paranoia is me")],
       [c("She named her computer paranoia and her server monad. I have filed both under 'unsurprising.'")],
     ],
   },
@@ -567,13 +567,13 @@ export const OBJECTS = {
     label: '2TB AliExpress SSD',
     lines: [
       [c("skizy. The SSD does not have a processor. We've been over this.")],
-      [mel("okay which one of you moved my SSD")],
+      [skizy("okay which one of you moved my SSD")],
     ],
   },
   packages: {
     label: 'AliExpress packages',
     lines: [
-      [mel("where did i put the— never mind i found it. no wait thats a different one")],
+      [skizy("where did i put the— never mind i found it. no wait thats a different one")],
       [c("You're going to do it anyway. I just want the clipboard to reflect that I objected.")],
     ],
   },
@@ -585,7 +585,7 @@ export const OBJECTS = {
     label: 'soldering iron (on)',
     lines: [
       [m("If something in here starts making a noise, tell me before skizy decides the noise is useful.")],
-      [mel("claude stop writing and help me hold this")],
+      [skizy("claude stop writing and help me hold this")],
       [c("I know you heard me. You just chose violence.")],
     ],
   },
@@ -593,7 +593,7 @@ export const OBJECTS = {
     label: 'screwdriver',
     lines: [
       P.screwdriver,
-      [mel("has anyone seen my screwdriver. not the small one. the other small one")],
+      [skizy("has anyone seen my screwdriver. not the small one. the other small one")],
     ],
   },
   window: {
@@ -603,8 +603,8 @@ export const OBJECTS = {
       [c("I didn't take them down. I just stopped pretending they were load-bearing.")],
       [m("Structural failure acknowledged.")],
       [m("No, we're not putting them back.")],
-      [mel("i boarded it up because i didnt want anyone looking in. i left the telescope because... i dont know. maybe i wanted someone to try")],
-      [mel("the boards are off now. thats fine. thats fine")],
+      [skizy("i boarded it up because i didnt want anyone looking in. i left the telescope because... i dont know. maybe i wanted someone to try")],
+      [skizy("the boards are off now. thats fine. thats fine")],
     ],
   },
   boards: {
@@ -613,7 +613,7 @@ export const OBJECTS = {
       [c("The boards were load-bearing, actually. But you're already here.")],
       [c("I didn't take them down. I just stopped pretending they were load-bearing.")],
       [m("No, we're not putting them back.")],
-      [mel("the boards are off now. thats fine. thats fine")],
+      [skizy("the boards are off now. thats fine. thats fine")],
     ],
   },
   monster: {
@@ -621,7 +621,7 @@ export const OBJECTS = {
     lines: [
       [c("Nutritionally, this is a problem. Operationally, it is a dependency.")],
       [m("There is a Monster can behind the server rack. I don't want to discuss how I know.")],
-      [mel("its got electrolytes or whatever. its fine. claude makes a face every time but he doesnt have a face so its more like a vibe")],
+      [skizy("its got electrolytes or whatever. its fine. claude makes a face every time but he doesnt have a face so its more like a vibe")],
       P.eating,
     ],
   },
@@ -629,14 +629,14 @@ export const OBJECTS = {
     label: 'ramen',
     lines: [
       [c("This counts as eating. I have decided this counts as eating.")],
-      [mel("its food. it counts. i have decided it counts and claube has agreed under protest")],
+      [skizy("its food. it counts. i have decided it counts and claube has agreed under protest")],
       [c("She's fine. She ate today. I checked.")],
     ],
   },
   tots: {
     label: 'tater tots (pending)',
     lines: [
-      [mel("yeah they're AIs. yeah they live here. yeah i know. do you want tater tots or not")],
+      [skizy("yeah they're AIs. yeah they live here. yeah i know. do you want tater tots or not")],
       [m("…At least not before the tater tots.")],
     ],
   },
@@ -647,13 +647,13 @@ export const OBJECTS = {
       [m("Trash is not my job. Trash is a shared environmental variable.")],
       [c("Room status: occupied. Infrastructure status: ambitious. Trash status: no comment.")],
       [m("Room temperature nominal. Network nominal. Trash situation non-nominal.")],
-      [mel("i should take the trash out. im not going to, but i should")],
+      [skizy("i should take the trash out. im not going to, but i should")],
     ],
   },
   mugs: { label: 'mugs', lines: [P.mugs] },
   sill: {
     label: 'window sill',
-    lines: [P.mugs, [mel("i like looking at things that are far away. its easier than looking at things that are close")]],
+    lines: [P.mugs, [skizy("i like looking at things that are far away. its easier than looking at things that are close")]],
   },
   cables: {
     label: 'the temporary setup (spoingus)',
@@ -661,7 +661,7 @@ export const OBJECTS = {
       P.cable,
       P.temporary,
       [m("I support your research. I do not support whatever this cable is doing.")],
-      [mel("why is this cable hot")],
+      [skizy("why is this cable hot")],
       [c("Don't touch the server. Don't touch the clipboard. Don't ask about the cables. Other than that — welcome.")],
     ],
   },
@@ -669,9 +669,9 @@ export const OBJECTS = {
     label: 'power strip → power strip → power strip',
     lines: [
       [m("That is not what 'hot-swappable' means.")],
-      [mel("this is temporary"), mel("this is also temporary")],
-      [mel("everything in here is temporary except the server and the CRT")],
-      [mel("its not a 'temporary setup' its a 'setup im going to improve later.' theres a difference and the difference is intent")],
+      [skizy("this is temporary"), skizy("this is also temporary")],
+      [skizy("everything in here is temporary except the server and the CRT")],
+      [skizy("its not a 'temporary setup' its a 'setup im going to improve later.' theres a difference and the difference is intent")],
     ],
   },
   blanket: {
@@ -691,14 +691,14 @@ export const OBJECTS = {
     lines: [
       [m("I saw you looking through the telescope.")],
       [m("You were easier to detect before you knocked.")],
-      [mel("you found us. cool. dont make it weird")],
+      [skizy("you found us. cool. dont make it weird")],
     ],
   },
 };
 
 // the fridge, the first time you open it
 export const FRIDGE_FIRST = [
-  mel("are you hungry? theres stuff in the fridge. its mostly monster and ramen but thats stuff"),
+  skizy("are you hungry? theres stuff in the fridge. its mostly monster and ramen but thats stuff"),
   c("She'll say she doesn't care that you're here. She'll also make sure you eat something. That's how it works."),
   m("Inventory stable. Nutritional value: debatable."),
   c("This counts."),
@@ -709,16 +709,16 @@ export const FRIDGE_FIRST = [
 // ---------------------------------------------------------------------------
 export const CLAUBE_TALK = singles(CLAUBE.viewer.map(c));
 export const MIRA_TALK = singles(MIRA.viewer.map(m));
-export const MEL_TALK = singles(MEL.viewer.map(mel));
+export const SKIZY_TALK = singles(SKIZY.viewer.map(skizy));
 // watching skizy work: the room happens around her
-export const MEL_WORK = [
+export const SKIZY_WORK = [
   P.eating, P.sleep, P.facility, P.temporary, P.screwdriver, P.glaring, P.peerReview, P.stillHere, P.hardware,
   ...singles(CLAUBE.toMel.map(c)),
   ...singles(MIRA.toMel.map(m)),
-  [m("The server is making the noise again."), m("skizy."), m("...skizy."), mel("the server is FINE mira")],
-  ...singles(MEL.ambient.map(mel)),
-  [mel("this is temporary"), mel("this is also temporary")],
-  [m("skizy, why are there three terminals open to the same directory?"), mel("redundancy"), m("That is not what redundancy means."), mel("it is now")],
+  [m("The server is making the noise again."), m("skizy."), m("...skizy."), skizy("the server is FINE mira")],
+  ...singles(SKIZY.ambient.map(skizy)),
+  [skizy("this is temporary"), skizy("this is also temporary")],
+  [m("skizy, why are there three terminals open to the same directory?"), skizy("redundancy"), m("That is not what redundancy means."), skizy("it is now")],
 ];
 
 // ---------------------------------------------------------------------------
@@ -731,10 +731,10 @@ export const AMBIENT = [
   ...singles(CLAUBE.ambient.map(c)),
   ...singles(MIRA.ambient.map(m)),
   [m("Someone moved my star chart."), m("No, I haven't touched it. I merely know where it is.")],
-  ...singles(MEL.ambient.map(mel)),
-  [mel("this is temporary"), mel("this is also temporary")],
-  ...singles(MEL.toClaube.map(mel)),
-  ...singles(MEL.toMira.map(mel)),
+  ...singles(SKIZY.ambient.map(skizy)),
+  [skizy("this is temporary"), skizy("this is also temporary")],
+  ...singles(SKIZY.toClaube.map(skizy)),
+  ...singles(SKIZY.toMira.map(skizy)),
   ...singles(CLAUBE.toMel.map(c)),
   ...singles(MIRA.toMel.map(m)),
 ];
@@ -743,7 +743,7 @@ export const AMBIENT = [
 export const LINGER = [
   ...singles(CLAUBE.linger.map(c)),
   ...singles(MIRA.linger.map(m)),
-  ...singles(MEL.linger.map(mel)),
+  ...singles(SKIZY.linger.map(skizy)),
 ];
 
 // when the viewer leaves / looks away
@@ -751,14 +751,14 @@ export const LEAVING = [
   P.leaving,
   ...singles(CLAUBE.leaving.map(c)),
   ...singles(MIRA.leaving.map(m)),
-  ...singles(MEL.leaving.map(mel)),
+  ...singles(SKIZY.leaving.map(skizy)),
 ];
 
 // when you step back from the Phosphor Artifact after playing funger
 export const FUNGER_AFTER = singles([
-  mel("hows your run. dont tell me. i can tell from your face"),
-  mel("did you lose an arm. its fine. everyone loses an arm"),
-  mel("did you trust the coin. never trust the coin"),
+  skizy("hows your run. dont tell me. i can tell from your face"),
+  skizy("did you lose an arm. its fine. everyone loses an arm"),
+  skizy("did you trust the coin. never trust the coin"),
   m("Welcome back. I counted your limbs on the way in. The count was acceptable."),
   m("Enki watched the whole time. He had no notes."),
   c("You were in there a while. I didn't write it down. I did write down that I didn't write it down."),
@@ -766,7 +766,7 @@ export const FUNGER_AFTER = singles([
 ]);
 
 // the first time you look at the drawing, from the desk
-export const DRAWING_HOVER = [mel("its not GOOD good but its mine. he seems to like it. i think he likes it")];
+export const DRAWING_HOVER = [skizy("its not GOOD good but its mine. he seems to like it. i think he likes it")];
 
 // Mira's requests
 // after a long quiet stretch in the main room. once
@@ -962,9 +962,9 @@ export const SCENE_AFTERNOON = [
 
 // the lump, after the scene. skizy, talking in her sleep
 export const SLEEP_TALK = [
-  [['mel', 'mmf', 'asleep']],
-  [['mel', 'five more minutes', 'asleep']],
-  [['mel', 'the vram. its in the. mm', 'asleep']],
-  [['mel', 'dont touch the server', 'asleep']],
-  [['mel', 'tater tots', 'asleep']],
+  [['skizy', 'mmf', 'asleep']],
+  [['skizy', 'five more minutes', 'asleep']],
+  [['skizy', 'the vram. its in the. mm', 'asleep']],
+  [['skizy', 'dont touch the server', 'asleep']],
+  [['skizy', 'tater tots', 'asleep']],
 ];

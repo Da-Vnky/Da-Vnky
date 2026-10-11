@@ -628,6 +628,7 @@ MEASURE = r"""
 }
 """
 MEASURES_NAME = 'measurements (hide me before you export)'
+NO_PLAYWRIGHT = 'Playwright isn\'t installed on this computer (the hidden browser that photographs the scene for the guide)'
 
 
 def marks_for(s, W, H):
@@ -739,7 +740,7 @@ def look(slot, s, sc, view_name, then):
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
-        return None
+        raise ValueError(NO_PLAYWRIGHT)
     if not sc or not sc.get('map'):
         return None
     sys.path.insert(0, HERE)
@@ -1091,7 +1092,7 @@ def make(slot, fresh=False, view=None, app=None):
             with open(os.path.join(folder, 'layers', k + '.png'), 'wb') as f:
                 f.write(base64.b64decode(b))
     with open(os.path.join(folder, '.made.json'), 'w', encoding='utf-8') as f:
-        json.dump({'psd': int(os.path.getmtime(path)), 'measured': any(L['name'] == MEASURES_NAME for L in layers)}, f)
+        json.dump({'psd': int(os.path.getmtime(path)), 'measured': any(L['name'] == MEASURES_NAME for L in layers), 'guide': guide}, f)
     with open(os.path.join(folder, 'what to do.txt'), 'w', encoding='utf-8') as f:
         f.write(NOTE.format(name=stem, slot=slot, w=W, h=H))
         if result.get('tile'):
@@ -1099,24 +1100,41 @@ def make(slot, fresh=False, view=None, app=None):
             f.write(NOTE_TILE.format(name=stem, how={'x': 'side to side', 'y': 'top to bottom', 'xy': 'both ways'}[a],
                                      times={'x': 'three times side by side', 'y': 'three times one above another', 'xy': 'three by three'}[a]))
     measured = any(L['name'] == MEASURES_NAME for L in layers)
+    guide_why = None
+    if not guide:
+        why = result.get('why') or (MEASURE_WHY[0] if MEASURE_WHY else '')
+        if 'playwright' in why.lower() or "executable doesn't exist" in why.lower():
+            guide_why = NO_PLAYWRIGHT
+        elif why:
+            guide_why = why
+        elif not (sc and sc.get('map')) and not under:
+            guide_why = "it isn't on any page with a map, so there's no scene to take a guide from"
+        else:
+            guide_why = "it isn't showing on its page right now"
     return {'file': path, 'folder': folder, 'w': W, 'h': H, 'guide': guide, 'made': True, 'view': result.get('view'), 'on': result.get('on'),
             'tile': result.get('tile'), 'measured': measured,
-            'measureWhy': None if measured else (MEASURE_WHY[0] if MEASURE_WHY else result.get('why') or 'no browser to draw it in')}
+            'measureWhy': None if measured else (MEASURE_WHY[0] if MEASURE_WHY else result.get('why') or 'no browser to draw it in'),
+            'guideWhy': guide_why, 'playwright': bool(guide_why == NO_PLAYWRIGHT or 'playwright' in str(MEASURE_WHY).lower())}
 
 
 def untouched_old(have, folder):
-    """the .psd the table made, never saved over, and without the measurements layer (made before 11 Oct): safe to make again"""
+    """the .psd the table made, never saved over, and missing the measurements layer (made before 11 Oct) or the guide
+    (made with no browser to take one): safe to make again"""
     if not have.lower().endswith('.psd'):
         return False
     try:
         with open(have, 'rb') as f:
-            if MEASURES_NAME.encode('ascii')[:24] in f.read():
-                return False
+            whole = MEASURES_NAME.encode('ascii')[:24] in f.read()
         try:
             with open(os.path.join(folder, '.made.json'), encoding='utf-8') as f:
-                return int(os.path.getmtime(have)) == json.load(f).get('psd')
-        except (OSError, ValueError):               # (older still: it was written a moment before its "what to do.txt")
-            return abs(os.path.getmtime(have) - os.path.getmtime(os.path.join(folder, 'what to do.txt'))) < 10
+                made = json.load(f)
+            return int(os.path.getmtime(have)) == made.get('psd') and not (whole and made.get('guide', True))
+        except (OSError, ValueError):
+            pass
+        if whole:
+            return False
+        # (older still, no .made.json: it was written a moment before its "what to do.txt")
+        return abs(os.path.getmtime(have) - os.path.getmtime(os.path.join(folder, 'what to do.txt'))) < 10
     except OSError:
         return False
 

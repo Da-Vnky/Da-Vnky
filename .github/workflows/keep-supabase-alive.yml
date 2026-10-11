@@ -1,0 +1,65 @@
+# keeps the site's Supabase project (the bottles' inbox) from falling asleep.
+# a free Supabase project pauses after about a week with nothing happening, so every two days this asks it
+# one small question: "is there a letter?" the rules say visitors can only send letters, never read them,
+# so the answer is always an empty list ([]). that's fine: the question still reaches the database, which is
+# what keeps it awake, and nothing is added or read.
+# it runs on GitHub's computers (the GitHub copy of the site), not on the site itself. turn it off on GitHub:
+# the repo → Actions → "keep supabase awake" → the ⋯ button → Disable workflow.
+name: keep supabase awake
+
+on:
+  schedule:
+    - cron: '23 16 */2 * *'        # every second day, 9:23 in the morning in Phoenix (16:23 UTC)
+  workflow_dispatch:               # the "Run workflow" button, to run it by hand
+  pull_request:                    # (and once when this file changes in a pull request, to check it works)
+    paths:
+      - .github/workflows/keep-supabase-alive.yml
+
+permissions:
+  contents: read
+  actions: write                   # (only to keep this workflow switched on: see the last step)
+
+jobs:
+  ping:
+    # only on GitHub. (if the Forgejo copy ever runs these, it skips this one: that server isn't ours to use)
+    if: github.server_url == 'https://github.com'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: get the site's code (just sky/sky.js, where the project's address and public key are)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: sky/sky.js
+          sparse-checkout-cone-mode: false
+
+      - name: ask the database one question
+        env:
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}   # (not needed: only if you ever want a different key than the site's)
+        run: |
+          # the address and the publishable key, from the same place the site reads them (SUPABASE in sky/sky.js).
+          # that key is public by design: all it can do is send a letter.
+          line=$(grep -m1 "var SUPABASE *=" sky/sky.js)
+          url=$(printf '%s' "$line" | grep -o "url: *'[^']*'" | cut -d"'" -f2)
+          key="${SUPABASE_KEY:-$(printf '%s' "$line" | grep -o "key: *'[^']*'" | cut -d"'" -f2)}"
+          if [ -z "$url" ] || [ -z "$key" ]; then
+            echo "::error::couldn't find the Supabase address and key in sky/sky.js (SUPABASE near the top)"; exit 1
+          fi
+          # the same headers the site sends (an older "anon" key, eyJ…, also wants it as Authorization)
+          auth=()
+          case "$key" in eyJ*) auth=(-H "Authorization: Bearer $key") ;; esac
+          code=$(curl -sS -o answer.txt -w '%{http_code}' --max-time 30 --retry 3 --retry-delay 20 --retry-all-errors \
+                 "$url/rest/v1/post?select=id&limit=1" -H "apikey: $key" "${auth[@]}") || code=000
+          echo "Supabase answered $code: $(head -c 300 answer.txt 2>/dev/null)"
+          if [ "$code" != 200 ]; then
+            echo "::error::Supabase answered $code, not 200. If the project is paused, restore it at supabase.com/dashboard (project da-vnky)."
+            exit 1
+          fi
+
+      - name: keep this workflow switched on
+        # GitHub switches off timed workflows in a public repo after 60 days with no new commits. telling it
+        # "enable" each run (it's on already, so nothing changes) counts as activity and keeps it running.
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/keep-supabase-alive.yml/enable"

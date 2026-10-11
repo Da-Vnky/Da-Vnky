@@ -405,6 +405,27 @@
         var opts = el('div', 'dt-opts'), fresh = el('label', '', '<input type="checkbox"> a fresh canvas'), wait = el('div', 'dt-wait');
         fresh.title = 'start again from a new canvas, instead of the one you saved last time';
         var all = [];
+        // no Playwright on this computer (no guide, no measurements): a button that installs it, once
+        function offerPlaywright() {
+            if (box.querySelector('.dt-pw')) return;
+            var row = el('div', 'dt-row dt-pw', '<span class="dt-l">the guide</span>');
+            var b = btn('install Playwright (once: a few minutes, about 150 MB)', function () {
+                b.disabled = true;
+                api('/__draw/playwright', {}).then(function (r) {
+                    if (r.error) { say(r.error, true); b.disabled = false; return; }
+                    (function check() {
+                        api('/__draw/playwright').then(function (st) {
+                            if (st.running) { say('installing Playwright… ' + (st.at || '')); setTimeout(check, 2000); return; }
+                            if (st.error) { say(st.error, true); b.disabled = false; return; }
+                            row.remove();
+                            say('Playwright is in. Press your program’s button again: an untouched canvas is made again, with its guide and measurements.');
+                        });
+                    })();
+                });
+            }, 'sm');
+            row.appendChild(b);
+            box.insertBefore(row, opts);
+        }
         function go(path, app, name) {
             if (busy) return;
             busy = true;
@@ -428,9 +449,11 @@
                 var size = r.w ? ' (' + r.w + ' × ' + r.h + (r.on ? ', on ' + r.on.replace(/^assets\//, '').replace(/\.\w+$/, '') + ' as the guide' : r.guide ? ', with a guide' : '') + ')' : '';
                 say((r.opened ? 'opened in ' + r.name : 'made') + ': ' + (r.made === false ? 'your working file, as you left it' : r.animator ? 'a new animation' + size : 'a new canvas' + size) +
                     '. export into ' + (r.animator || path.indexOf('animate') > -1 ? r.folder + '/frames' : r.folder) + ' and it’ll show on this card.' +
-                    (r.made && !r.measured ? ' (no measurements layer this time: ' + (r.measureWhy || 'no reason given') + ')' : '') +
+                    (r.made && r.guideWhy ? ' No guide this time: ' + r.guideWhy + '.' : '') +
+                    (r.made && !r.measured && !r.playwright ? ' (no measurements layer this time: ' + (r.measureWhy || 'no reason given') + ')' : '') +
                     (r.rebelle === 'sized' ? ' Rebelle can’t open a .psd’s layers: once it’s up it gets a new ' + (r.w || '') + (r.w ? ' × ' + r.h : '') + ' canvas; File › Import the guide and measurements from ' + r.folder + '/layers.' :
-                     r.rebelle === 'open' ? ' Rebelle was open already, so its canvas wasn’t touched: File › New at the size above, then File › Import the pictures in ' + r.folder + '/layers.' : ''), !!(r.made && !r.measured));
+                     r.rebelle === 'open' ? ' Rebelle was open already, so its canvas wasn’t touched: File › New at the size above, then File › Import the pictures in ' + r.folder + '/layers.' : ''), !!(r.made && (!r.measured || r.guideWhy)));
+                if (r.playwright) offerPlaywright();
                 poll();
             }).then(function () { busy = false; all.forEach(function (b) { b.disabled = false; }); });
         }

@@ -1061,6 +1061,40 @@ def templates_state():
     return {'running': False}
 
 
+# ---------------- Playwright (the hidden browser the drawing table and the template pictures look at the site with) ----------------
+# installed from the asset manager's button, once: python -m pip install playwright, then python -m playwright install chromium
+PW_LOG = os.path.join(HERE, 'drawing', 'playwright-install.log')
+pw_job = {'proc': None}
+
+
+def pw_install():
+    p = pw_job['proc']
+    if p and p.poll() is None:
+        return {'running': True}
+    os.makedirs(os.path.dirname(PW_LOG), exist_ok=True)
+    log = open(PW_LOG, 'w', encoding='utf-8')
+    py = '"' + sys.executable + '"'
+    pw_job['proc'] = subprocess.Popen(py + ' -m pip install --upgrade playwright && ' + py + ' -m playwright install chromium',
+                                      shell=True, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                                      env=dict(os.environ, PYTHONIOENCODING='utf-8'))
+    return {'running': True}
+
+
+def pw_state():
+    p = pw_job['proc']
+    lines = []
+    if os.path.exists(PW_LOG):
+        with open(PW_LOG, encoding='utf-8', errors='replace') as f:
+            lines = [x.strip() for x in f if x.strip()]
+    if p and p.poll() is None:
+        return {'running': True, 'at': (lines[-1] if lines else 'starting')[:160]}
+    if p and p.returncode:
+        return {'running': False, 'error': 'the install stopped: ' + (' / '.join(lines[-3:]) or 'no reason given')[:600]}
+    if p:
+        return {'running': False, 'done': True}
+    return {'running': False}
+
+
 # ---------------- the drawing table (tools/drawtable.py): a slot's canvas, opened in your art program ----------------
 def drawtable():
     import drawtable as dt                            # (tools/drawtable.py, next to this file)
@@ -1656,6 +1690,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply(templates_state())
             if url.path == '/__draw/state':
                 return self.reply({'table': drawtable().table()})
+            if url.path == '/__draw/playwright':
+                return self.reply(pw_state())
             if url.path == '/__draw/file':
                 pth = draw_file(q.get('slot', [''])[0], q.get('name', [''])[0], q.get('frames', [''])[0] == '1')
                 with open(pth, 'rb') as f:
@@ -1816,6 +1852,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply(draw_frames(d.get('slot'), d.get('fps')))
             if url.path == '/__draw/wrap':
                 return self.reply(draw_wrap(json.loads(raw or b'{}')))
+            if url.path == '/__draw/playwright':
+                return self.reply(pw_install())
             if url.path == '/__draw/reveal':
                 d = json.loads(raw or b'{}')
                 return self.reply(draw_reveal(d.get('slot'), bool(d.get('frames'))))

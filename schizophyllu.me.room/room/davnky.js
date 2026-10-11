@@ -4,7 +4,7 @@
 
 const c = t => ['claube', t];
 const m = t => ['mira', t];
-const skizy = t => ['mel', t];
+const skizy = t => ['skizy', t];
 
 // reset 3: after she's taken them and the lights have gone out. the visitor, one line at a time, then black
 export const GUILT = [

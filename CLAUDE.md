@@ -103,6 +103,16 @@ this before changing anything; keep it up to date when something here stops bein
     folder integration-only (and say what you changed there), test in the browser first (`python3 tools/content.py` serves
     the site on :8001; `python3 tools/smoke.py`; Playwright's Chromium is in the cloud VM). skizy's newest work reaches GitHub
     only when Victor runs github-publish, so if a pull request clashes, rebase on `main` first.
+- **Keeping Supabase awake** (11 Oct, Victor: the free project paused after a quiet week): `.github/workflows/keep-supabase-alive.yml`
+  runs on GitHub every second day (16:23 UTC, 9:23 Phoenix; also "Run workflow" by hand, and on a pull request that changes it).
+  It reads the URL and publishable key from the `var SUPABASE =` line in sky/sky.js (or a repo secret `SUPABASE_KEY` if one's
+  ever set) and does one `GET /rest/v1/post?select=id&limit=1`: RLS lets anon only INSERT, so the answer is `[]` and nothing is
+  read or added. Not 200 → the job fails and GitHub emails him. The repo is public, so GitHub would switch timed workflows off
+  after 60 days with no commits: its last step calls the "enable" API each run to count as activity. The job is skipped off
+  github.com (`github.server_url`), so the Forgejo copy, if its Actions are on, never runs it. Never add a SELECT policy for it.
+  **The weekly letter**: a Claude Routine (claude.ai, not in the repo; Sundays 8:53 Phoenix) writes a letter from the week's
+  commits (or a trivia fact) and inserts it into `public.post` as `kind 'bottle'`, `from_name 'Claude'`, for Victor to approve
+  like any bottle. It calls her skizy, whatever a commit's author field says.
 - `tools/update-lists.sh` runs on every publish (publish.bat, and the pre-commit hook in `tools/hooks`).
   It writes, and you never hand-edit:
   - `assets/<folder>/list.txt`, `content/<scene>/list.txt`, `content/<scene>/<sub>/list.txt`
@@ -285,6 +295,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   made before this and never saved over (`untouched_old`: `.made.json` holds the .psd's time; older ones, written within 10 s
   of their `what to do.txt`) is made again by the button, so it gets the layer; one he's saved keeps as it is ("a fresh
   canvas" for a new one). The guide and measurements are also saved as `layers/guide.png`, `layers/measurements.png`.
+- **No guide → the card says why** (11 Oct, Victor: right sizes, no guide; it was Playwright missing on his computer, which
+  `look()` used to skip in silence): `make` returns `guideWhy` (`NO_PLAYWRIGHT`, or the error, or "isn't on any page") and
+  `playwright: true` when that's the reason; the card then offers "install Playwright" (assets.html `offerPlaywright`,
+  `POST /__draw/playwright` → content.py `pw_install`: `python -m pip install --upgrade playwright && python -m playwright
+  install chromium` in the background, log `tools/drawing/playwright-install.log`; `GET` → `pw_state`). `.made.json` keeps
+  `guide`, so an untouched canvas made without one is made again once it can have one.
 - **Rebelle** (11 Oct, Victor: it opened at the wrong size; his animator, over the live link, gets it right): Rebelle doesn't
   open a .psd handed to it on start. So `open_in('rebelle', path, size)`, if Rebelle isn't already listening on its port,
   starts a detached helper (`drawtable.py rebelle-canvas W H port`) that waits for the live link (`REBELLE_WAIT` 90 s), then
@@ -1221,8 +1237,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - The repo is public: nothing private goes in any committed file (this one included).
 - **Her handle, never her first name** (10 Oct, Victor): the site and the repo are public, so the friend whose room is across
   the street is **skizy** everywhere: on the page, in code, file and folder names, slots, saves, comments, these notes and
-  CHANGES.txt. (Her own code in `schizophyllu.me.room/` still uses an older internal id for her character: hers to rename, and
-  our integration code (`'#…'` selectors and `CAST.…` in the DaV-nky part of room.js, the speaker id in davnky.js) matches it until she does.)
+  CHANGES.txt. Her room's own code too, since 11 Oct (she asked, through Victor): her character's id and speaker id are `skizy`
+  (`#skizy`, `data-id`/`data-anchor="skizy"` in room.svg, `CAST.skizy`, `--skizy` in room.css, `SKIZY`/`SKIZY_TALK`/`SKIZY_WORK`
+  in script.js, `skizy(…)` lines in extra.js, narration.js and davnky.js, `POS.skizy` in audio.js). Never bring the old one back.
 
 ## Still to do / ideas on hold
 
