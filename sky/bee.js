@@ -1397,7 +1397,7 @@
         var host = where === 'porch' && porch ? porch : stage;
         if (home.parentNode === host) { wanderSoon(1500); return; }
         close();
-        ['--wx', '--wy', '--wd', '--wt'].forEach(function (v) { home.style.removeProperty(v); });   // (back over its roses there)
+        ['--bee-wx', '--bee-wy', '--bee-wd', '--bee-wt', '--bee-wface'].forEach(function (v) { home.style.removeProperty(v); });   // (back over its roses there)
         lastSpot = null;
         if (host === porch) porch.insertBefore(home, porch.querySelector('.porch-frame'));
         else stage.appendChild(home);
@@ -1408,7 +1408,7 @@
     // while nobody's talking to it, it flies from one spot over the lawn to the next, hovering a while at each, its dotted
     // trail behind it and its shadow under it. LAWN, in shares of where it is (the garden's 1600 x 900 picture; the porch,
     // the screen): x across, g the ground it's over (the lawn from the hedge, y 711, to just behind the fence, y 787: the
-    // further back, the smaller it looks, --wd), up how high over the ground it flies, door: never in front of the front
+    // further back, the smaller it looks, --bee-wd), up how high over the ground it flies, door: never in front of the front
     // door near the house (x between, ground further back than). on a phone the garden's sides are off the screen: it keeps
     // to what shows. those who'd rather nothing moved: it stays over its roses
     var LAWN = {
@@ -1431,12 +1431,16 @@
         var d = .82 + .3 * (g - L.g[0]) / (L.g[1] - L.g[0]);                     // (.82 at the back of the lawn, 1.12 at the front)
         var px = (host === stage ? .042 * box.width : clamp(.038 * innerWidth, 48, 76)) * d, ph = px * 100 / 120;
         var cy = g - L.up, M = MOODS[home.dataset.mood] || MOODS.calm;
-        var from = lastSpot || { x: x, y: cy }, far = Math.hypot((x - from.x) * box.width, (cy - from.y) * box.height);
+        var hb = home.getBoundingClientRect();                                     // (where it really is now, even mid-flight)
+        var from = hb.width ? { x: (hb.left + hb.width / 2 - box.left) / box.width, y: (hb.top + hb.height / 2 - box.top) / box.height } : lastSpot || { x: x, y: cy }, far = Math.hypot((x - from.x) * box.width, (cy - from.y) * box.height);
         var secs = clamp(far / (110 * 5 / Math.max(1.5, M.hover)), 1.6, 8);       // (quicker when it's excited or cross, slower sleepy)
-        home.style.setProperty('--wt', secs.toFixed(2) + 's');
-        home.style.setProperty('--wd', d.toFixed(3));
-        home.style.setProperty('--wx', ((x - px / box.width / 2) * 100).toFixed(2) + '%');
-        home.style.setProperty('--wy', ((cy - ph / box.height / 2) * 100).toFixed(2) + '%');
+        home.style.setProperty('--bee-wt', secs.toFixed(2) + 's');
+        // it turns to face the way it's going (11 Oct: "flip on its axis when it goes from left to right"): the
+        // picture turns round its middle (bee.css .bee-art: scaleX(--face), .5 s), then off it flies
+        if (Math.abs(x - from.x) * box.width > 8) home.style.setProperty('--bee-wface', x > from.x ? '1' : '-1');
+        home.style.setProperty('--bee-wd', d.toFixed(3));
+        home.style.setProperty('--bee-wx', ((x - px / box.width / 2) * 100).toFixed(2) + '%');
+        home.style.setProperty('--bee-wy', ((cy - ph / box.height / 2) * 100).toFixed(2) + '%');
         lastSpot = { x: x, y: cy, g: g };
         wanderSoon(secs * 1000 + rnd(1500, 5500));
     }
@@ -1446,6 +1450,14 @@
         if ((name === 'front' || name === 'porch') && what === 'enter') perch(name);
     });
     Sky.escape(function () { return open; }, close);
+    // a click anywhere else closes it too (11 Oct: "a secondary exit outside of the x"): not on its menu, not on the
+    // bee itself, not the hotbar or the control panel, and not while holding something (that click's a shot, or a mark)
+    document.addEventListener('pointerdown', function (e) {
+        if (!open || !e.isPrimary || e.button > 0 || body.classList.contains('inv-holding')) return;
+        var t = e.target;
+        if (!t || !t.closest || (menu && menu.contains(t)) || home.contains(t) || t.closest('.hotbar, .cp, .place-tabs')) return;
+        close();
+    }, true);
 
     /* ======================================================================
        as it flies: a dotted trail behind it, its shadow on the ground, and its wings' soft hum
@@ -1458,7 +1470,7 @@
     trail.setAttribute('aria-hidden', 'true');
     var dotArt = null;
     Sky.findAsset('assets/living/bee-trail', function (url) { dotArt = url; });
-    var lastDot = null, lastAt = null, faceSign = 1, faceT = 0, speed = 0;
+    var lastDot = null, lastAt = null, faceSign = 1, faceT = 0, speed = 0, accel = 0;
     // its shadow on the ground below it: follows it about, smaller, softer and fainter the higher it flies (and faint at
     // night). slot: assets/living/bee-shadow (else a soft dark oval). the ground: the lawn in front of the roses (the
     // garden, a share of the garden picture's height), or the yard beyond the railing (the porch, from the screen's bottom)
@@ -1500,7 +1512,7 @@
     // every frame while you can see it: where its tail is, how far it's come, how fast (for the hum, below)
     function fly(now) {
         requestAnimationFrame(fly);
-        if (MAPPING || !here()) { lastDot = lastAt = null; speed = 0; return; }
+        if (MAPPING || !here()) { lastDot = lastAt = null; speed = accel = 0; return; }
         if (trail.parentNode !== home.parentNode || trail.nextSibling !== home) { home.parentNode.insertBefore(trail, home); lastDot = lastAt = null; }
         if (shadow.nextSibling !== trail) home.parentNode.insertBefore(shadow, trail);
         if (now - faceT > 400) { faceT = now; faceSign = parseFloat(getComputedStyle(home).getPropertyValue('--face')) < 0 ? -1 : 1; }
@@ -1512,7 +1524,10 @@
         var x = r.left + r.width / 2 - faceSign * r.width * .44 - hb.left, y = r.top + r.height * .55 - hb.top;
         if (lastAt) {
             var dt = Math.max(1, now - lastAt.t), v = Math.hypot(x - lastAt.x, y - lastAt.y) / dt * 1000 / r.width;   // (its own widths a second)
+            var was = speed;
             speed += (Math.min(1, v / 1.4) - speed) * Math.min(1, dt / 250);
+            // (and how fast that's changing: speeding up, slowing down. the hum's pitch swoops with it, tuneHum below)
+            accel += ((speed - was) / (dt / 1000) - accel) * Math.min(1, dt / 160);
         }
         lastAt = { x: x, y: y, t: now };
         if (!lastDot) { lastDot = { x: x, y: y }; return; }
@@ -1528,6 +1543,7 @@
     // silent when you can't see it. the sound effects slider sets how loud. it starts with your first click or key
     // (browsers insist). your own: assets/sounds/bee-hum (a loop, a second or two), else this one
     var HUM = .035;                                                  // (how loud, at the usual sound effects level)
+    var SWOOP = 4;                                                   // (how far its pitch bends with its speeding up and slowing, in semitones)
     var hum = null, humLoop = null;
     Sky.findAsset('assets/sounds/bee-hum.ogg|assets/sounds/bee-hum.mp3', function (url) { humLoop = url; });
     function startHum() {
@@ -1570,9 +1586,13 @@
         hum.out.gain.setTargetAtTime(vol, t, on ? .25 : .08);
         if (!on) return;
         if (c.state !== 'running') c.resume().catch(function () {});
-        var f = M.hz * .5 * (1 + .12 * speed);
-        hum.oscs.forEach(function (x) { x.o.frequency.setTargetAtTime(f * x.k, t, .2); });
-        if (hum.src) hum.src.playbackRate.setTargetAtTime(1 + .1 * speed, t, .2);
+        // its pitch: a little higher the faster it goes, and it swoops with how its speed changes (11 Oct: "increase
+        // and lower in pitch in accordance to its acceleration"): up to SWOOP semitones higher as it speeds off, lower as it
+        // slows to a stop, like a toy plane
+        var bend = Math.pow(2, Math.max(-SWOOP, Math.min(SWOOP, accel * 3)) / 12);
+        var f = M.hz * .5 * (1 + .12 * speed) * bend;
+        hum.oscs.forEach(function (x) { x.o.frequency.setTargetAtTime(f * x.k, t, .09); });
+        if (hum.src) hum.src.playbackRate.setTargetAtTime((1 + .1 * speed) * bend, t, .09);
         hum.lfo.frequency.setTargetAtTime(Math.max(14, Math.min(60, 3 / M.flap)), t, .3);
         hum.lp.frequency.setTargetAtTime(520 + 500 * speed, t, .2);
         var r = art.getBoundingClientRect();
@@ -1590,6 +1610,7 @@
         aimedAt: aimedAt, shot: shot, get gun() { return gun; }, get grudge() { return grudge; },   // (sky/revolver.js)
         get mood() { return mood(); }, get fond() { return fond; },
         puff: puff,                                                         // (a mark out of its face: Sky.bee.puff('vein'))
+        get flight() { return { speed: speed, accel: accel }; },           // (how fast it's flying, and speeding up: the hum follows)
         // (for testing and for the asset manager: what it'd say, and a reply played into any sound context)
         think: function (m, len) { return load().then(function () { return think(m || mood(), { len: len || MOODS[m || 'calm'].len, seed: [MOODS[m || 'calm'].seed[0]] }); }); },
         plan: function (w, m, sing, dread) { return sing ? composeSing(w, m, dread) : composeTalk(w, m); },

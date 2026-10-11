@@ -560,7 +560,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - **The ground** (11 Oct, Victor: "front of house 4 bee", the ground its shadow falls on): `.front-ground`, slot
   `assets/living/front-ground` (the same 1600 x 900 canvas, laid under `front-house`): the lawn and the path from the steps to
   the gate (the stand-in's were moved out of front-house's drawing). His front-house can leave the ground see-through, or
-  paint it in (then front-ground stays hidden underneath).
+  paint it in (then front-ground stays hidden underneath). The stand-in house's lattice and bottom step reach its foot (y 692)
+  and its corner boards (11 Oct, Victor: a line of the wall's blue showed between them and the lawn).
 - Slots: `assets/living/front-ground`, `front-house`, `front-door`, `front-door-open`, `assets/characters/front` (+ `front-walking`);
   asset manager scene "the front of the house". **From the porch too** (11 Oct, Victor): the glow at the steps (no arrow since
   11 Oct, Victor: "confusing"): `.porch-steps-glow` (z 2, behind the traveller, a warm light breathing on the path and boards in
@@ -583,15 +584,24 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `clamp(48px, 3.8vw, 76px)`; talking left 36% top 28%, `clamp(76px, 8vw, 150px)`; upright phones 30% / 54%, sideways 33% / 47%.
   **It wanders the whole lawn** (11 Oct, Victor; garden and porch, not while talking, not in `?map` or with reduced motion):
   bee.js `wander()` every few seconds picks a spot over the lawn (`LAWN`: x, the ground `g`, how high it flies `up`; the garden
-  never in front of the door near the house, and on a phone only the part of the garden that shows) and sets `--wx --wy`
-  (left/top, which the CSS reads with its old spots as the fallback), `--wd` (.82 at the back of the lawn to 1.12 at the front:
-  smaller further off) and `--wt` (the flight's length, by distance and mood). It's **smaller out there** (garden 4.2% of the
-  stage × `--wd`, was 6.2%; porch as above, was `clamp(58px, 5.6vw, 110px)`) and the same size as ever talking. The shadow
+  never in front of the door near the house, and on a phone only the part of the garden that shows) and sets `--bee-wx --bee-wy`
+  (left/top, which the CSS reads with its old spots as the fallback), `--bee-wd` (.82 at the back of the lawn to 1.12 at the
+  front: smaller further off), `--bee-wt` (the flight's length, by distance and mood) and `--bee-wface` (it turns to face the
+  way it's flying: `--face: var(--bee-wface, 1)`, the turn is `.bee-art`'s .5 s scaleX; talking, the rules set `--face`; the
+  gun it may be holding turns with it, `.bee-gun` scaleX(--face), its aim × --face so it still points at you).
+  **Not `--wx`/`--wy`**: sky.js sets those on the page for the living room's window, and the bee inherited them (it sat near
+  the top of the screen till its first flight, 11 Oct). It's **smaller out there** (garden 4.2% of the
+  stage × `--bee-wd`, was 6.2%; porch as above, was `clamp(58px, 5.6vw, 110px)`) and the same size as ever talking. The shadow
   falls under it wherever it is (`shade`: its own box + `up`; talking, under the spot it left). `perch()` clears the
-  `--w*` so it starts over its roses in the other place. **After talking** its face goes back to the everyday one 2.8 s
+  `--bee-w*` so it starts over its roses in the other place. **After talking** its face goes back to the everyday one 2.8 s
   after the menu shuts (`restFace`), unless it's angry or sad (or has your gun); what it feels is kept. **Angry**, its first
   word always throws up the cross vein, then CAPS words take turns between steam and veins (`act.veined`; before, every
-  CAPS word was steam and an angry bee shouts nearly every word, so the vein never showed, Victor, 11 Oct). `here()` is
+  CAPS word was steam and an angry bee shouts nearly every word, so the vein never showed, Victor, 11 Oct). **A click anywhere
+  else closes its menu** (11 Oct, Victor: a second way out besides the ✕): a pointerdown not on the menu, the bee, the hotbar,
+  the control panel or the place tabs, and not while holding something (a shot). **Its hum swoops** (11 Oct, Victor: "increase
+  and lower in pitch in accordance to its acceleration"): `fly()` keeps `accel` (how fast `speed` changes, smoothed), and
+  `tuneHum` bends the pitch by `accel × 3` semitones, at most `SWOOP` (4) either way: up as it speeds off, down as it slows.
+  `Sky.bee.flight` reads `{ speed, accel }` (measured: ±4 over a few flights). `here()` is
   the garden or `Sky.porch.outside`, so its menu and the revolver work there too. (bee.js already had a `settle()`: its feelings
   fading. Don't reuse the name.) The bee's own rules in bee.css are `.bee-home …` (not `.front …`) so they work in both. Clicking the bee while talking is a poke (a giggle, then crosser; 5 in 6 s: it stings, `*STINGS YOU*`, the traveller
   says "Ow." at most every 20 s; not a death). `Sky.bee = { open, close, say, poke, aimedAt, shot, think, plan, render, hear, moods, brain }`, and values to read (not
