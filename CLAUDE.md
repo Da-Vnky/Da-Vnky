@@ -434,7 +434,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   into `.front-stage` (`.bee-home`, over the right-hand roses: left 63.5% top 66% of the 1600 x 900 garden; upright phones 56.5%,
   inside what a phone shows). Click it: its menu (`.bee-talk`, fixed bottom left; a bottom sheet upright, a left panel
   sideways), and it flies up close (`body.bee-talking`). Escape closes it; leaving the garden (`Sky.house.on` 'leave' front)
-  too. Clicking the bee while talking is a poke (a giggle, then crosser; 5 in 6 s: it stings, `*STINGS YOU*`, the traveller
+  too. **From the porch too** (11 Oct, Victor): the same bee, moved (`perch(where)`, on `Sky.house.on` 'enter' front/porch)
+  into `.porch`, before `.porch-frame` (z 1: in front of the street, behind the posts and railing), out over the yard left of
+  the steps (from the porch you face the street, so its roses are on the left): `.porch .bee-home` left 32% top 51%, width
+  `clamp(58px, 5.6vw, 110px)`; talking left 36% top 28%; upright phones 25% / 52%, sideways 33% / 44% (bee.css). `here()` is
+  the garden or `Sky.porch.outside`, so its menu and the revolver work there too. (bee.js already had a `settle()`: its feelings
+  fading. Don't reuse the name.) The bee's own rules in bee.css are `.bee-home …` (not `.front …`) so they work in both. Clicking the bee while talking is a poke (a giggle, then crosser; 5 in 6 s: it stings, `*STINGS YOU*`, the traveller
   says "Ow." at most every 20 s; not a death). `Sky.bee = { open, close, say, poke, aimedAt, shot, think, plan, render, hear, moods, brain }`, and values to read (not
   call): `mood`, `fond`, `gun`, `grudge` (`Sky.bee.mood` is the mood name now).
 - **Its brain runs in the visitor's browser**: `content/bee/beellm.json` (the server won't serve .gguf), written by

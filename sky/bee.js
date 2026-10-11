@@ -1,7 +1,9 @@
 /* =====================================================================
    bee.js — the bee in the front garden (living.html#front): skizy's
    BeeLLM ("Scintilla BeeLLM 42P Chaos", made by skizy), living over the
-   roses by the steps. click it and you can talk to it.
+   roses by the steps. click it and you can talk to it. from the porch
+   (living.html#porch) it's there too, out over the yard past the railing:
+   the same bee (it moves itself to whichever of the two you're in)
 
      its brain    skizy's own model, run right here in the visitor's browser:
                   content/bee/beellm.json (written from her .gguf by
@@ -56,6 +58,7 @@
 (function () {
     var Sky = window.Sky;
     var front = document.querySelector('.front'), stage = front && front.querySelector('.front-stage');
+    var porch = document.querySelector('.porch');
     if (!Sky || !stage || Sky.bee) return;
     var body = document.body, root = document.documentElement;
     var MODEL = 'content/bee/beellm.json';
@@ -909,7 +912,7 @@
     function note(t) { entry('bt-note', t); }
 
     function openMenu() {
-        if (open || !Sky.front || !Sky.front.here) return;
+        if (open || !here()) return;
         open = true;
         if (!menu) build();
         voice();
@@ -1013,7 +1016,8 @@
     var NOT_SORRY = /\b(not|never|no|nt)\s+(even\s+|really\s+|at all\s+)?(sorry|apolog\w*|regret\w*)|n['’]?t\s+(be\s+)?(sorry|apolog\w*)/i;
     var shots = [], unsorry = 0, returned = !MAPPING && visit('bee-returned') === '1';
     function mine(id) { return GUNS[id].replace(/^the /, 'your '); }
-    function here() { return !!(Sky.front && Sky.front.here); }
+    // (in the garden, or out on the porch: either way it's there to see)
+    function here() { return !!((Sky.front && Sky.front.here) || (porch && Sky.porch && Sky.porch.outside)); }
 
     // weaving: only when you actually fire. the shot sends it jinking out of the way (a quick zig and zag, then back
     // over its roses); the rest of the time it just hovers, gun or no gun
@@ -1185,7 +1189,20 @@
     if (gun) arm(true); else if (grudge) setMood('angry');
 
     // gone from the garden: it stops talking
-    if (Sky.house && Sky.house.on) Sky.house.on(function (what, name) { if (name === 'front' && what === 'leave') close(); });
+    // where it is: over its roses in the garden, or, seen from the porch, out over the yard (the roses are left of the steps
+    // from there: from the garden you're facing the house, from the porch you're facing the street). one bee: it's moved
+    // to whichever you're in (behind the porch's posts and railing, in front of the street)
+    function perch(where) {
+        var host = where === 'porch' && porch ? porch : stage;
+        if (home.parentNode === host) return;
+        close();
+        if (host === porch) porch.insertBefore(home, porch.querySelector('.porch-frame'));
+        else stage.appendChild(home);
+    }
+    if (Sky.house && Sky.house.on) Sky.house.on(function (what, name) {
+        if ((name === 'front' || name === 'porch') && what === 'leave') close();
+        if ((name === 'front' || name === 'porch') && what === 'enter') perch(name);
+    });
     Sky.escape(function () { return open; }, close);
 
     Sky.bee = {
