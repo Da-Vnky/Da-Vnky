@@ -14,6 +14,10 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+
+== published ==
+
+2026-10-11 06:10 · V
 - The cursors: the grabbing hand and the patting hand are upside down now (fingers down to grab, up to pat), and the ordinary pointer is a pointing hand (on the front door too): a click only bends its index finger.
 - The porch: no more down arrow to the front garden: the gap in the railing glows softly (brighter when you point at it), and a click there goes down the steps. The porch's front door is wider, its lamp above it.
 - On an upright phone the porch isn't squeezed any more: it's wider than the screen and you look along it with the arrows at the sides (or a swipe): the door end, the steps, the mailbox end.
@@ -21,8 +25,6 @@ How it works
 - The first visit's loading screen has a WIP stamp under the name ("a work in progress: some of it is still in pencil"). Its size readout shows both numbers in the same unit and to the same decimal ("1.5 of 2.2 MB"; KB when it's under a megabyte).
 - The sizes in catalog.txt are now the sizes the site actually sends (text files were measured with Windows line endings, about 1% too big). After the next publish every visitor's browser refreshes its kept copy once; after that a publish from Windows or from Linux gives the same checksums.
 - The artist's name is gone from everything the site serves (code comments, CHANGES.txt, skizy's room's comments and one line in its made.txt, which now says dav-nky's javascript). Rule for the future: never write it in served files.
-
-== published ==
 
 2026-10-11 03:36 · V
 - The bee: over its body the cursor is a poking finger (a click pokes it, as before), and over its head a patting hand. A pat on the head makes it happy, loving or excited: it dips under your hand, a note, heart or spark comes off it, and it buzzes back in that mood (your own hands: assets/ui/cursor-poke and cursor-pat).
