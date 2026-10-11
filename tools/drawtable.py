@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 drawtable.py — the drawing table: a picture for one slot, started for you in your own art program.
 
 The asset manager's "draw it in" buttons (Clip Studio, Photoshop, Rebelle) run this through the content manager.
@@ -548,7 +548,7 @@ def write_psd(path, w, h, layers, composite=None):
 
 
 # ---------------- the guide and your picture, from the scene itself (a hidden browser, like the templates) ----------------
-FIND = '''
+FIND = r'''
 ([slot, shape]) => {
   const list = DavMap.boxes(window, n => n === slot ? n : null);
   if (!list.length) return null;
@@ -1028,6 +1028,9 @@ def make(slot, fresh=False, view=None, app=None):
     """make the starting file (unless there's one already). → { file, folder, w, h, guide, made, view }"""
     folder, stem, _ = where(slot)
     s, sc, _ = described(slot)
+    if s.get('handwriting'):                            # (your handwriting: a sheet of boxes to write in, tools/handwriting.py)
+        import handwriting
+        return handwriting.template(fresh, app)
     have = None if fresh else working_file(folder, stem, app)
     if have and untouched_old(have, folder):            # (made before the measurements, and never saved over: no work to lose)
         have = None
@@ -1273,6 +1276,8 @@ def main():
                 out[k] = os.path.relpath(out[k], ROOT).replace(os.sep, '/')
     except Exception as e:
         out = {'error': str(e)}
+        if getattr(e, 'need', None):                    # (the handwriting sheet without Pillow: the card offers to install it)
+            out['need'] = e.need
     print(json.dumps(out), flush=True)
     sys.exit(1 if 'error' in out else 0)
 

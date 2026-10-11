@@ -1156,7 +1156,7 @@ def draw_run(*args):
     if not lines:
         raise ValueError('the drawing table stopped: ' + ((r.stderr or '').strip().splitlines() or ['no reason given'])[-1])
     out = json.loads(lines[-1])
-    if out.get('error'):
+    if out.get('error') and not out.get('need'):        # (need: something the card can install for you, so it's passed on)
         raise ValueError(out['error'])
     return out
 
@@ -1213,6 +1213,51 @@ def draw_wrap(d):
     if app and app not in ('csp', 'ps', 'rebelle'):
         raise ValueError('which program?')
     return draw_run(*(['wrap', slot, name] + ([app] if app else [])))
+
+
+# ---------------- your handwriting (tools/handwriting.py): the sheet you exported -> the letters' font ----------------
+FONT_LOG = os.path.join(HERE, 'drawing', 'font-tools-install.log')
+font_job = {'proc': None}
+
+
+def font_build(name):
+    """an export of the writing sheet, traced into the font, and put in the slot (a fresh Python, so tools just installed are found)"""
+    hw_slot = 'assets/fonts/handwriting'
+    pth = draw_file(hw_slot, name)
+    r = subprocess.run([sys.executable, os.path.join(HERE, 'handwriting.py'), 'build', pth, '--use', '--json'], cwd=ROOT, capture_output=True,
+                       text=True, timeout=600, env=dict(os.environ, PYTHONIOENCODING='utf-8'), stdin=subprocess.DEVNULL)
+    lines = [x for x in (r.stdout or '').splitlines() if x.strip().startswith('{')]
+    if not lines:
+        raise ValueError('the font maker stopped: ' + ((r.stderr or '').strip().splitlines() or ['no reason given'])[-1])
+    out = json.loads(lines[-1])
+    if not out.get('error'):
+        drawtable().mark_used(hw_slot, os.path.basename(name))
+    return out
+
+
+def font_install():
+    p = font_job['proc']
+    if p and p.poll() is None:
+        return {'running': True}
+    os.makedirs(os.path.dirname(FONT_LOG), exist_ok=True)
+    log = open(FONT_LOG, 'w', encoding='utf-8')
+    font_job['proc'] = subprocess.Popen('"' + sys.executable + '" -m pip install --upgrade pillow numpy fonttools brotli potracer',
+                                        shell=True, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                                        env=dict(os.environ, PYTHONIOENCODING='utf-8'))
+    return {'running': True}
+
+
+def font_install_state():
+    p = font_job['proc']
+    lines = []
+    if os.path.exists(FONT_LOG):
+        with open(FONT_LOG, encoding='utf-8', errors='replace') as f:
+            lines = [x.strip() for x in f if x.strip()]
+    if p and p.poll() is None:
+        return {'running': True, 'at': (lines[-1] if lines else 'starting')[:160]}
+    if p and p.returncode:
+        return {'running': False, 'error': 'the install stopped: ' + (' / '.join(lines[-3:]) or 'no reason given')[:600]}
+    return {'running': False, 'done': bool(p)}
 
 
 def draw_reveal(slot, in_frames=False):
@@ -1739,6 +1784,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'table': drawtable().table()})
             if url.path == '/__draw/playwright':
                 return self.reply(pw_state())
+            if url.path == '/__font/install':
+                return self.reply(font_install_state())
             if url.path == '/__draw/file':
                 pth = draw_file(q.get('slot', [''])[0], q.get('name', [''])[0], q.get('frames', [''])[0] == '1')
                 with open(pth, 'rb') as f:
@@ -1902,6 +1949,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply(draw_wrap(json.loads(raw or b'{}')))
             if url.path == '/__draw/playwright':
                 return self.reply(pw_install())
+            if url.path == '/__font/install':
+                return self.reply(font_install())
+            if url.path == '/__font/build':
+                return self.reply(font_build(json.loads(raw or b'{}').get('name')))
             if url.path == '/__draw/reveal':
                 d = json.loads(raw or b'{}')
                 return self.reply(draw_reveal(d.get('slot'), bool(d.get('frames'))))

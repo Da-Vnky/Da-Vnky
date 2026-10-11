@@ -907,6 +907,15 @@
        "size": "300 x 300"
       },
       {
+       "slot": "assets/fonts/handwriting",
+       "what": "your own handwriting, as the font the letters are written in (their words, date and subtitle; the titles stay as they are). \"draw it in\" opens a sheet with a box for every letter; export it as a PNG into its folder and press \"make the font\"",
+       "size": "made for you from your sheet (.woff2); or your own .woff2 / .woff / .ttf / .otf",
+       "optional": true,
+       "kind": "font",
+       "handwriting": true,
+       "demo": "Dear sea, the little bottle came back today. \u2665 It's 2026, and still: hello!"
+      },
+      {
        "slot": "assets/sea/bottle",
        "what": "the bottle’s glass, empty, on its side, neck to the right (all three pieces share one 2000 x 900 canvas)",
        "size": "2000 x 900"

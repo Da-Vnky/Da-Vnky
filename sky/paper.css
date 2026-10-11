@@ -232,3 +232,10 @@
     .bottle-wrap { width: 130px; left: 30vw; }
     .bottle-hint { font-size: 1.1rem; left: calc(30vw + 65px); bottom: calc(12% + 70px); }
 }
+
+/* ---------- your handwriting (sky/hand.js: once there's a font in assets/fonts/handwriting) ----------
+   the words, the date and the subtitle in it; the titles, the big first letter and the embeds' cards stay in IM Fell.
+   (a size to taste: --hand-size, 1 = the same size as the usual lettering) */
+html.has-hand .letter .content { font-family: "dav-hand", "IM Fell English", Georgia, serif; font-size: calc(var(--hand-size, 1) * 1em); }
+html.has-hand .letter .content :is(.date, .subtitle) { font-style: normal; }     /* (handwriting has no italic of its own) */
+html.has-hand .letter .content figure { font-family: "IM Fell English", Georgia, serif; }

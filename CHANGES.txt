@@ -17,6 +17,12 @@ How it works
 
 == published ==
 
+2026-10-11 11:53 · V
+- Letters: they can be written in the artist's own handwriting. The asset manager's new slot fonts/handwriting opens a sheet to write on (a box for every letter, three tries at each small letter) in Clip Studio, Photoshop or Rebelle; "make the font" traces the exported sheet into a font, and the sea, the desk and the letter writer use it as soon as it's there (tools/handwriting.py, sky/hand.js). Neighbouring letters never look stamped: each letter takes its versions in turn.
+- Drawing table: tools/drawtable.py no longer prints two warnings about backslashes when it starts.
+- Living space: the revolver's rack hangs left of the secret door now, over the washed-up crate (from reset 2 it used to hang on the door's panel, and floated over nothing once the door opened).
+- Living space: the secret door sits under everything else in the room, so the potted plant (and anything else near it) is never cut off by it.
+
 2026-10-11 10:52 · V
 - Letters: a picture on a line of its own is taped onto the paper like the embeds, each at its own slight angle, a little off centre, with its tape strips at their own angles (always the same for the same picture).
 - Letters: leaving the letters any way (clicking outside, the close button, Escape) now always stops their videos and songs (before, one could keep playing hidden after the letters were put away).

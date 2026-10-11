@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1476 3274912243
-city.html 9813 4064785296
-desk.html 5899 1111679583
-index.html 5149 264514399
-living.html 132959 3552177488
-window-sky.html 1328 26327532
-workshop.html 22036 1602173189
+beyond.html 1480 241583496
+city.html 9866 1200584983
+desk.html 5939 3517477933
+index.html 5247 2238867689
+living.html 133346 2508823652
+window-sky.html 1334 3024231033
+workshop.html 22101 1057914518
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/bathroom.js 29419 3573512770
@@ -28,6 +28,7 @@ sky/ground-city.js 21686 1654325007
 sky/ground-countryside.js 13331 1871014694
 sky/ground-sea.js 46704 1683644155
 sky/ground-view.js 6301 1081822792
+sky/hand.js 1836 1437817105
 sky/hell.js 23866 1668939081
 sky/house.js 11177 2717587795
 sky/inventory.js 17335 1835204345
@@ -63,7 +64,7 @@ sky/tub.js 14927 953816602
 sky/veil.js 18751 509778180
 sky/watchers.js 14154 3869253767
 sky/weather.js 25754 4255422177
-sky/paper.css 7388 392067971
+sky/paper.css 8047 1201821797
 sky/sky.css 58055 1791733890
 sky/css/ambient.css 435 4199751144
 sky/css/attic.css 15736 521837829

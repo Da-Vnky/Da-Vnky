@@ -74,6 +74,7 @@
     .lthumb .stock-pic { width: 100%; height: 100%; }
     .card .look .stock { font-style: italic; color: #8a7258; text-align: center; padding: 10px; background: rgba(243,234,210,.85); border: 1.5px dashed rgba(110,82,54,.45); border-radius: 8px; font-size: .9rem; }
     .card .look .fontdemo { font-size: 2.2rem; }
+    .card .look .fontdemo.long { font-size: 1.35rem; line-height: 1.45; padding: 8px 12px; text-align: left; }
     .card .look pre { margin: 0; padding: 10px; width: 100%; height: 100%; overflow: hidden; font-size: .72rem; white-space: pre-wrap; background: rgba(255,255,255,.6); }
     .card .tag { position: absolute; top: 8px; right: 8px; padding: 0 9px; border-radius: 999px; font-size: .78rem; font-style: italic; background: rgba(110,82,54,.85); color: #f3e6c2; }
     .card .tag.yours { background: var(--green); }
@@ -390,14 +391,14 @@
         if (VIDS.test(f.name)) return '<video muted loop autoplay playsinline src="' + f.url + '"></video>';
         if (SOUNDS.test(f.name)) return '<audio controls preload="none" src="' + f.url + '"></audio>';
         if (/\.json$/i.test(f.name)) return '<pre data-json="' + f.url + '">…</pre>';
-        return '<div class="fontdemo">Aa</div>';
+        return '<div class="fontdemo' + (s && s.demo ? ' long' : '') + '">' + esc(s && s.demo || 'Aa') + '</div>';
     }
     /* ---------------- the drawing table: draw it, or animate it, in your own program ---------------- */
     // (tools/drawtable.py through the content manager: a canvas twice the size it's shown at, with a guide of the scene,
     // opened in Clip Studio, Photoshop or Rebelle; or an animation in Clip Studio or the Rebelle Animator. what you export
     // back into its folder shows here, with "use this")
     var DT = { table: {}, key: '', panels: [] };
-    function drawable(s, kind) { return kind === 'image' && s.kind !== 'svg' && !/^assets\/(sounds|fonts)\//.test(s.slot) && !/^assets\/resets\/[^\/]+$/.test(s.slot); }
+    function drawable(s, kind) { return s.handwriting || kind === 'image' && s.kind !== 'svg' && !/^assets\/(sounds|fonts)\//.test(s.slot) && !/^assets\/resets\/[^\/]+$/.test(s.slot); }
     function ago(t) { var m = Math.round((Date.now() / 1000 - t) / 60); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' days ago'; }
     function drawPanel(s, viewName) {
         var slot = s.slot, box = el('div', 'dt'), busy = false;
@@ -431,9 +432,11 @@
             busy = true;
             if (app !== 'animator') try { localStorage.setItem('dt-app', app); } catch (e) {}
             all.forEach(function (b) { b.disabled = true; });
-            say('setting up ' + slot.replace(/^assets\//, '') + ' for ' + name + '… (it opens the scene to take the guide: a few seconds, longer for skizy’s room)');
+            say(s.handwriting ? 'setting up your writing sheet for ' + name + '… (a few seconds)' :
+                'setting up ' + slot.replace(/^assets\//, '') + ' for ' + name + '… (it opens the scene to take the guide: a few seconds, longer for skizy’s room)');
             var body = { slot: slot, app: app, fresh: fresh.querySelector('input').checked, view: viewName || '' };
             api(path, body).then(function done(r) {
+                if (r.need === 'fonttools') { offerFontTools(function () { busy = false; go(path, app, name); }); say(r.error, true); return; }
                 if (r.need) {                                     // (it couldn't find the program: where is it?)
                     var where = prompt(r.need === 'animator'
                         ? 'Where is the Rebelle Animator folder (the one with "Rebelle Animator.bat" in it)? In File Explorer, right-click it and choose "Copy as path", then paste it here.'
@@ -462,7 +465,7 @@
         [['csp', 'Clip Studio'], ['animator', 'Rebelle Animator']].forEach(function (a) { var b = btn(a[1], function () { go('/__draw/animate', a[0], a[1]); }, 'sm'); all.push(b); rowA.appendChild(b); });
         opts.appendChild(fresh);
         opts.appendChild(btn('show its folder', function () { api('/__draw/reveal', { slot: slot }).then(function (r) { say(r.error || 'opened ' + r.folder, !!r.error); }); }, 'linkish'));
-        box.appendChild(rowD); box.appendChild(rowA); box.appendChild(opts);
+        box.appendChild(rowD); if (!s.handwriting) box.appendChild(rowA); box.appendChild(opts);
         // a picture that repeats (slots.json "tile"): how yours repeats now, and a way to mend the join
         var mineNow = s.tile && fileFor(slot);
         if (mineNow) {
@@ -491,6 +494,7 @@
                     it.querySelector('.dt-pic').replaceWith(repeatStrip(url, s.tile, it.querySelector('small')));
                     it.appendChild(wrapBtn(e.name));
                 }
+                if (s.handwriting) { it.appendChild(fontBtn(e)); wait.appendChild(it); return; }
                 it.appendChild(e.used ? el('span', 'done', 'in the slot') : btn('use this', function () {
                     api('/__draw/use', { slot: slot, name: e.name }).then(function (r) { if (r.error) say(r.error, true); else { artChanged++; say('put ' + e.name + ' in ' + slot.replace(/^assets\//, '') + '. publish when you’re ready.'); load(); poll(); } });
                 }, 'sm yes'));
@@ -521,6 +525,50 @@
                 if (!ex.length) wait.appendChild(el('p', '', 'on the drawing table'));
                 wait.appendChild(it);
             }
+        }
+        // your handwriting (tools/handwriting.py): the sheet you exported, traced into the letters' font, straight into the slot
+        function fontBtn(e) {
+            var b = btn(e.used ? 'make it again' : 'make the font', function () {
+                if (busy) return;
+                busy = true; b.disabled = true;
+                say('tracing every box on ' + e.name + ' into a letter… (half a minute or so)');
+                api('/__font/build', { name: e.name }).then(function done(r) {
+                    if (r.need) { offerFontTools(function () { return api('/__font/build', { name: e.name }).then(done); }); say(r.error, true); return; }
+                    if (r.error) { say(r.error, true); return; }
+                    artChanged++;
+                    var bits = [r.drawn + ' characters' + (r.pairs && r.pairs.length ? ' and the pairs ' + r.pairs.join(' ') : '')];
+                    if (r.made && r.made.length) bits.push(r.made.length + ' more made from them (accents, curly quotes, dashes, …)');
+                    if (r.missing && r.missing.length) bits.push('not drawn, so in the usual lettering: ' + r.missing.join(' '));
+                    if (r.edge && r.edge.length) bits.push('over their box’s edge (cut off there): ' + r.edge.join(' '));
+                    if (r.pale && r.pale.length) bits.push('too pale to read (a darker colour?): ' + r.pale.join(' '));
+                    say('your handwriting is the letters’ font now (' + kb(r.size) + '): ' + bits.join('; ') + '. publish when you’re ready.', !!((r.edge && r.edge.length) || (r.pale && r.pale.length)));
+                    load(); poll();
+                }).then(function () { busy = false; b.disabled = false; });
+            }, 'sm yes');
+            b.title = 'traces every box on this sheet into a letter, and puts the font in ' + slot.replace(/^assets\//, '') + ' (the letters use it straight away). as often as you like';
+            return b;
+        }
+        // the font maker's Python pieces (Pillow, numpy, fontTools, brotli, potracer): a button that installs them, once
+        function offerFontTools(then) {
+            if (box.querySelector('.dt-ft')) return;
+            var row = el('div', 'dt-row dt-ft', '<span class="dt-l">the font tools</span>');
+            var b = btn('install them (once: a minute or so, about 40 MB)', function () {
+                b.disabled = true;
+                api('/__font/install', {}).then(function (r) {
+                    if (r.error) { say(r.error, true); b.disabled = false; return; }
+                    (function check() {
+                        api('/__font/install').then(function (st) {
+                            if (st.running) { say('installing the font tools… ' + (st.at || '')); setTimeout(check, 2000); return; }
+                            if (st.error) { say(st.error, true); b.disabled = false; return; }
+                            row.remove();
+                            say('the font tools are in.');
+                            if (then) then();
+                        });
+                    })();
+                });
+            }, 'sm');
+            row.appendChild(b);
+            box.insertBefore(row, opts);
         }
         // "wrap it": the picture moved by half a tile (so the join's in the middle), opened in the program you last drew in
         function wrapBtn(name) {
@@ -623,7 +671,7 @@
         c.appendChild(el('span', 'tag' + (f ? ' yours' : ''), f ? 'yours' : 'stand-in'));
         var pre = c.querySelector('pre[data-json]');
         if (pre) fetch(pre.dataset.json).then(function (r) { return r.text(); }).then(function (t) { pre.textContent = t; });
-        if (kind === 'font' && f) { try { var ff = new FontFace('slot-' + s.slot.replace(/\W/g, ''), 'url(' + f.url + ')'); ff.load().then(function (x) { document.fonts.add(x); c.querySelector('.fontdemo').style.fontFamily = x.family; }); } catch (e) {} }
+        if (kind === 'font' && f) { try { var ff = new FontFace('slot-' + s.slot.replace(/\W/g, '') + '-' + (f.time || 0), 'url(' + f.url + ')'); ff.load().then(function (x) { document.fonts.add(x); c.querySelector('.fontdemo').style.fontFamily = x.family; }); } catch (e) {} }
         c.appendChild(el('div', 'meta', '<b>' + esc(s.slot.replace(/^assets\//, '')) + '</b><div class="what">' + esc(s.what) + '</div>' +
             (s.size ? '<div class="size">' + esc(s.size) + '</div>' : '') +
             (f ? '<div class="file">' + esc(f.name) + ' · ' + kb(f.size) + '</div>' : '')));

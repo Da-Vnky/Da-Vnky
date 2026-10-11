@@ -215,6 +215,51 @@ this before changing anything; keep it up to date when something here stops bein
   Publishing (desk.py) **puts the two together** rather than taking the desk's (`merge_written`: both lists, the desk's wins a
   tie), then drops letters that are gone (`tidy_written`).
 
+## The letters in Victor's handwriting (tools/handwriting.py, sky/hand.js, 11 Oct)
+
+- Victor asked for the letters to be written in his own handwriting, and for Claude to build it on the drawing table.
+  Slot **`assets/fonts/handwriting`** (slots.json, in the sea's letters group, next to the ink: `kind: font`,
+  **`handwriting: true`**, `demo`: the card's sample line). Its card has the drawing table's "draw it in" buttons
+  (`drawable()` lets `s.handwriting` through; no "animate in" row). drawtable.py `make()` hands that slot to
+  `handwriting.template()`.
+- **The sheet**: `tools/drawing/fonts--handwriting/handwriting.psd` (4106 x 7648; a fresh one moves the old one aside as
+  `_handwriting-<time>.psd`). Its layers are paper (white, locked), guide (locked) and "write here". There is a box per
+  character: `SECTIONS` (lowercase x3, capitals x2, numbers and marks x1, six accents, the joined pairs th ll oo ee tt ss ff
+  st ck). Each box shows the baseline (solid), x-height (dashed, with a faint band down to the baseline), capital line and
+  tail line (dotted), with the character and a hint in the corner. Units: 1000 to the em, a box from +1000 to -400,
+  CAP 700, XH 480, DESC -260, `UPP` ≈ 3.9 units to the sheet's pixel. Every box's place is saved in `.sheet.json` (the
+  builder reads that, not the code, so an old sheet still builds). `layers/guide.png` is for Rebelle; `layers/sheet.png`
+  is for printing. The guide's colours are pale on purpose, so it is never taken for writing even if it was exported
+  showing.
+- **The font** ("make the font" on the export, `/__font/build` → `handwriting.py build <png> --use --json`; or by hand,
+  `python tools/handwriting.py build [png] [--use]`):
+  - Each pixel's darkness × solidity (`inkness`, `INK` 0.5) works on both see-through and white exports. Each box is
+    traced at twice its size with potracer (pure-Python potrace; `opticurve` is retried off when it trips its
+    math-domain bug), and specks are dropped.
+  - Outlines are oriented by nesting (`orient`). Letters are spaced by their middle between the baseline and the x-height
+    (`OVERHANG` 0.6 of what reaches past it hangs over its neighbours), plus `LSB`/`RSB` 46.
+  - Made from what he drew: curly quotes ↔ straight; – and — from - (or the reverse); … from three periods; ı ȷ (i and j
+    with the contours above the x-height dropped); every precomposed Latin letter (U+00C0–017F) whose accent he drew
+    (`with_accent`: centred, lifted by CAP−XH for capitals, kept clear of the letter, in every version of the letter).
+  - **Turns** (calt): every glyph, the space included, has three states (`.s1`, `.s2`); a character with n versions
+    shows version `turn % n`. The rules are `sub @t0 @t0' → t1; sub @t1 @t0' → t2`, so each glyph in a line takes the
+    next turn (no two neighbours alike; the same word differs from one place to the next). The three spaces have
+    slightly different widths. The pairs are `liga`, defined before calt so they form from the plain letters.
+  - It is a CFF .otf (`FontBuilder`). The woff2 goes into the slot through content.py's `asset_put` (which writes the
+    folder's list), and `handwriting.otf` stays on the table for him to install. The family is "DaV hand": **no person's
+    name in the font's name table**.
+  - The report says what was drawn, what was made, what's missing, what crossed its box's edge, and what was too pale
+    (the guide's own pixels are left out of that check).
+- **Needs** Pillow, numpy, fontTools, brotli and potracer (the sheet needs only Pillow). When any is missing, the
+  replies carry `need: 'fonttools'`. drawtable.py's main and content.py's `draw_run` pass that through, and the card
+  shows "install them": `/__font/install` (POST starts `pip install`, GET says how far; log
+  `tools/drawing/font-tools-install.log`).
+- **On the site**: `sky/hand.js` (loaded by index.html, template.html, desk.html and tools/letters.html; not living.html,
+  whose bottles are the visitors' words) reads `assets/fonts/list.txt`. If the font's there it loads it as `dav-hand`
+  (FontFace) and puts `has-hand` on `<html>`. paper.css: `html.has-hand .letter .content` is in it (the words, the date
+  and the subtitle, not italic). h2/h3, the drop capital and the embeds' figures keep IM Fell. `--hand-size` scales it
+  (1 = same size). With no font there, nothing is fetched but the list.
+
 ## The pages
 
 - `index.html` — the sea (homepage): scroll = the day turning; ship you can pick up; dock; bottles. Its signpost
@@ -231,7 +276,7 @@ this before changing anything; keep it up to date when something here stops bein
 - `living.html` — the living space, plus the bathroom (right), hallway (left) and the dungeon (under the
   bookshelf: pull the real book; the wall under the right-hand paintings slides open onto stairs). The
   opening is in the wall only (`.secret-door` sits on `--floor-h`); its inside is `assets/living/secret-stairs`,
-  the sliding panel `assets/living/secret-panel`. The washed-up crate (`.room .bottle-crate`, z 3) stands in front of it (z 2). Above the hallway: **the attic** (`sky/attic.js`, below).
+  the sliding panel `assets/living/secret-panel`. The washed-up crate (`.room .bottle-crate`, z 3) stands in front of it. **The door is z 1** (`.room .secret-door`, 11 Oct, Victor: it was over the potted plant): under everything else in the room (all z 2 and up), over only the wall and the window (z 0); keep anything new in the room at z 2 or more. Above the hallway: **the attic** (`sky/attic.js`, below).
 - `template.html` — the starting point for a new page.
 - `beyond.html` — the end, for those who went home (see *The end*): from then on every page sends them here.
 - `schizophyllu.me.room/` — **skizy's room. Her code, not ours** (see *skizy's room*).
@@ -1020,7 +1065,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     from a saved `music-now`), the slot says "at skizy's", and claubes.js `isDoom` is false for it (no Claubes, no party lights:
     skizy's wish). `special` is kept in the `music-now` save.
 - **Only ever one ordinary revolver** (27 Sep, Victor; revolver.js removes the others): reset 1 on the rooftop
-  (`.revolver-pickup`), from reset 2 hung on the living-room wall under the right-hand frames (`.wall-revolver` on
+  (`.revolver-pickup`), from reset 2 hung on the living-room wall left of the secret door, over the washed-up crate (11 Oct, Victor: on the
+  door's panel it floated over nothing once the door opened) (`.wall-revolver` on
   `.revolver-rack`, slot `assets/living/revolver-rack`, which stays when the gun's taken; the rack is hidden in resets 1
   and 4 by `html[data-reset]` in living.html). **Reset 4 has none** (and it's taken out of the bag): the only gun is the
   white one from below. So nothing can be shot or broken the wrong way.
