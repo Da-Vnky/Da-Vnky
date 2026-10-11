@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 changes.py: the change log's helper. CHANGES.txt (at the top of the repo) says what's changed on the site,
-newest first, in plain words, so Victor, skizy and any Claude working here can catch up. Its top section,
+newest first, in plain words, so the artist, skizy and any Claude working here can catch up. Its top section,
 "not published yet", is where you write what you've just changed (a line each, starting with "- ").
 
 Publishing (tools/publish.bat, tools/publish.sh, the content manager's publish button) runs

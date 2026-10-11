@@ -29,12 +29,12 @@
     if (!Sky || Sky.eye) return;
 
     var FROM = 3;                                  // the first reset the eye is in
-    // how big the eye is in the sky (27 Sep, Victor): in reset 3 the size of the ordinary sun it replaces, then a
+    // how big the eye is in the sky (27 Sep): in reset 3 the size of the ordinary sun it replaces, then a
     // little bigger every reset after, till it's GROWN (from reset FROM + STEPS on). the width of the screen caps it too
     var START = 192, GROWN = 320, STEPS = 4;
     // the pupil: its centre in the eye (% across, % down), its width (% of the eye's width),
     // and how far it can look (% of the eye's width)
-    var EYE = { x: 50, y: 50, size: 34, reach: 14 };          // (reach: a little more room to look about, 27 Sep, Victor)
+    var EYE = { x: 50, y: 50, size: 34, reach: 14 };          // (reach: a little more room to look about, 27 Sep)
     // without eyelids: how tall the pupil is on each frame, counting from 1 as your animation program
     // does (1 = open, 0 = hidden). frames that aren't listed: open.
     var BLINK = { 4: 0.45, 5: 0.12, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0.5 };

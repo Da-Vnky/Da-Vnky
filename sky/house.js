@@ -11,7 +11,7 @@
        Sky.house.go('kitchen')
    which works out the way there from wherever the traveller is (bath → living → hall → kitchen), one room at a time.
 
-   Changing your mind on the way (27 Sep, Victor): each way out has two parts. The walk to it: another click cuts it
+   Changing your mind on the way (27 Sep): each way out has two parts. The walk to it: another click cuts it
    short, and they stop, turn and head for the new place from where they are. And the going through (the rooms
    sliding, the ladder, the front door): that can't be stopped, so a click then waits, and once they're through they
    carry straight on to it without stopping. The arrows stay while they walk (so they can be clicked) and hide while

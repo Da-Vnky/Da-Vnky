@@ -1,6 +1,6 @@
 /* =====================================================================
    static.js — the screen's static: a veil of TV snow over the page, like the
-   grain in skizy's room. Very faint in the dungeon, always (27 Sep, Victor). In
+   grain in skizy's room. Very faint in the dungeon, always (27 Sep). In
    reset 4 there's none till they've been down in the dungeon; then it creeps up
    the longer they stay, thicker with every Claube and every picture destroyed
    down there, until the false god's bullet, and while the inverted P(Doom) record
@@ -15,7 +15,7 @@
                                        the page before; the false god's bullet)
    Sky.staticNoise.burst(amount, ms)   a surge for a moment (a scream, a shot)
    Sky.staticNoise.level               what shows now
-   It thickens gradually (27 Sep, Victor): RISE a second at most, so each new
+   It thickens gradually (27 Sep): RISE a second at most, so each new
    wanting creeps in; it thins faster (FALL). A burst is always at once.
 
    Its look: sky/css/static.css (--static on <html>: the veil's strength).

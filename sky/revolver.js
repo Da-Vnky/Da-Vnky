@@ -266,12 +266,12 @@
         return true;
     });
 
-    // where the ordinary revolver is (27 Sep, Victor): only ever one. reset 1: on the rooftop. from reset 2: hung on the
+    // where the ordinary revolver is (27 Sep): only ever one. reset 1: on the rooftop. from reset 2: hung on the
     // living-room wall (.wall-revolver, on its rack), where it only jams on the traveller: a thing to shoot things with.
     // reset 4 (so nothing can go wrong): nowhere, and not in the bag: the only revolver is the white one, from the pact
     // (and while the bee in the front garden has it, or once it's stung it to pieces, this visit: sky/bee.js)
     function withBee(id) { try { return sessionStorage.getItem('bee-gun') === id || (' ' + (sessionStorage.getItem('bee-broke') || '') + ' ').indexOf(' ' + id + ' ') !== -1; } catch (e) { return false; } }
-    // and once the bee's had it for good (11 Oct, Victor: in reset 1 it takes it and shoots them with it; in 2 to 7, given
+    // and once the bee's had it for good (11 Oct: in reset 1 it takes it and shoots them with it; in 2 to 7, given
     // back and shot at again, it stings it to pieces), it's gone: off the wall till reset 8, where everything's as it was
     // (localStorage revolver-gone: bee / broken)
     function destroyed(r) { try { return r < 8 && !!localStorage.getItem('revolver-gone'); } catch (e) { return false; } }

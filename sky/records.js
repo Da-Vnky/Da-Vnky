@@ -28,7 +28,7 @@
 
    P(DOOM)'S OWN SLOT: the record "I'm Upping My P(Doom)" (any song with p(doom) in
    its name) isn't with the others: it has a slot of its own at the end of the crate
-   (Victor, 27 Sep):
+   (27 Sep):
      • resets 1-3: an empty slot, "???" under it, until it's found (sky/loot.js: behind the
        false god's picture); then P(Doom) sits in it, plain, its name underneath.
      • reset 4: P(Doom) goes missing, and the slot's empty ("???"), until the grimoire's pact
@@ -36,7 +36,7 @@
        turned inside out; a red staticky light instead of the party; its Claubes wear black
        robes, pull the book and run down to the dungeon: sky/claubes.js). So reset 4 always has
        the record that calls the Claubes, and only once they can be dealt with: nobody gets
-       stuck. It plays Victor's reversed song, assets/sounds/evilrecord (.ogg or .mp3), or
+       stuck. It plays the artist's reversed song, assets/sounds/evilrecord (.ogg or .mp3), or
        until he adds one, P(Doom) played backwards, made in the browser (sky/music.js).
      • reset 5 on: P(Doom) is back, found or not, purified: glowing rainbow, a rainbow ring
        on the record. Now it can be given to skizy (her room sets localStorage skizy-remedy):
@@ -462,7 +462,7 @@
         }).filter(Boolean);
     }
     function refill() { entries = visible(); special = specialNow(); flatten(); M.setTracks(tracks.slice()); drawSleeves(); drawNow(); evilGlow(); }
-    // reset 4, once the pact's made and till the inverted record's been put on (27 Sep, Victor): the record player glows red
+    // reset 4, once the pact's made and till the inverted record's been put on (27 Sep): the record player glows red
     // and evil, calling them to it (body.evil-waiting, records.css). putting it on calls the robed Claubes out (sky/claubes.js),
     // and until then the book won't open the dungeon (sky/bathroom.js says why)
     function evilWaiting() {

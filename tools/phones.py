@@ -9,6 +9,7 @@
 #     python tools/phones.py --sizes all        also a small phone (360 x 740) and a big one (412 x 915)
 #
 # it needs Playwright, like the smoke test (see tools/smoke.py). nothing shows on screen, and it never changes a file.
+# a place you look along, a part at a time (the porch on an upright phone), is checked in each of its views.
 # a few things it finds are fine: the living room's letter pile, empty, is see-through (it says "covered by div.room"),
 # and the window, seen past its constellations. skizy's room is hers: it isn't checked.
 
@@ -28,7 +29,7 @@ SIZES = {
 # what's on screen that can be tapped, and whether a tap there reaches it
 LOOK = r'''
 () => {
-  const W = innerWidth, H = innerHeight, out = [];
+  const W = innerWidth, H = innerHeight, out = [], shows = [];
   const name = el => (el.tagName.toLowerCase() + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).slice(0, 3).join('.') : '') + (el.dataset && el.dataset.asset ? ' [' + el.dataset.asset.split('/').pop() + ']' : '')).slice(0, 80);
   const shown = el => { for (let e = el; e && e !== document.body; e = e.parentElement) { const c = getComputedStyle(e); if (c.visibility === 'hidden' || +c.opacity < .05 || c.display === 'none') return false; } return true; };
   const owner = el => { let o = el; while (o.parentElement && o.parentElement !== document.body && !(o instanceof HTMLElement && typeof o.className === 'string' && o.className.trim())) o = o.parentElement; return o; };
@@ -42,6 +43,7 @@ LOOK = r'''
     const l = Math.max(r.left, 0), t = Math.max(r.top, 0), rr = Math.min(r.right, W), b = Math.min(r.bottom, H);
     const seen = Math.max(0, rr - l) * Math.max(0, b - t), all = r.width * r.height;
     if (seen === 0) continue;                                             // (wholly off screen: another room, a closed drawer)
+    shows.push(name(el));
     const at = Math.round(r.left) + ',' + Math.round(r.top) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height);
     if (seen < all * .7) { out.push(name(el) + ' at ' + at + ': ' + Math.round(100 - 100 * seen / all) + '% off the screen'); continue; }
     let hit = 0; const over = {};
@@ -55,9 +57,29 @@ LOOK = r'''
     const covered = Object.values(over).reduce((a, n) => a + n, 0);
     if (covered >= 4 && hit <= 4) out.push(name(el) + ' at ' + at + ': covered (' + hit + ' of 9 taps reach it) by ' + Object.keys(over).join(', '));
   }
-  return out;
+  return { out, shows };
 }
 '''
+
+# a place you look along (the porch, on an upright phone: sky/porch.js): each view in turn. something's only trouble if
+# it's in trouble in every view it shows in (the rocking chair, cut off at the edge of the middle view, is whole in the first)
+VIEWS = '() => (window.Sky && Sky.porch && Sky.porch.views && Sky.porch.outside) ? Sky.porch.views() : 0'
+
+
+def look(page):
+    n = page.evaluate(VIEWS)
+    if not n:
+        return page.evaluate(LOOK)['out']
+    bad, ok = {}, set()
+    for i in range(n):
+        page.evaluate('Sky.porch.look(%d, true)' % i)
+        time.sleep(.3)
+        got = page.evaluate(LOOK)
+        names = set(t.split(' at ')[0] for t in got['out'])
+        for t in got['out']:
+            bad.setdefault(t.split(' at ')[0], t + ' (in view %d)' % (i + 1))
+        ok.update(x for x in got['shows'] if x not in names)
+    return [t for k, t in bad.items() if k not in ok]
 
 
 def main():
@@ -86,7 +108,7 @@ def main():
                 page.goto('about:blank')
                 page.goto(base + url, wait_until='load')
                 time.sleep(3.5)
-                trouble = page.evaluate(LOOK)
+                trouble = look(page)
                 print(('  ok %s' % name) if not trouble else ('  x  %s' % name))
                 for t in trouble:
                     print('       ' + t)

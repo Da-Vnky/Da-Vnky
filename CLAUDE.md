@@ -449,7 +449,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 ## The moon's light through the house's windows (sky/moonlight.js, 28 Sep)
 
 - Victor: the kitchen's window and the attic's round window show the real sky, and every house window (the living room's
-  too) gets a moon glow and a moonbeam by night, like skizy's apartment. `Sky.moonlight(host, { glass, inset|pad, round, cut,
+  too) gets a moon glow by night, like skizy's apartment (the beams to the floor went on 11 Oct, Victor: "they look bad";
+  they stay a thing of skizy's room). `Sky.moonlight(host, { glass, inset|pad, round, cut,
   slot })` (living.html only, loaded after house.js; its look: sky/css/moonlight.css). The living room's window opts in with
   `data-moonlight="assets/living/"`; kitchen.js and attic.js call it for theirs.
 - The glass's place in its room: `--gx --gy --gw --gh` (`--gr` for the round one) on the host, measured from the window's
@@ -459,10 +460,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (CSS mask), and the room's own background colour is dropped, so the page's fixed sky shows through (it stays still while
   the room slides: a real window). The stand-in window drawings no longer paint a sky in the glass. Those rooms also darken
   as night falls (`.ml-dark`, `--dusk`, not over the window) so the moonlight shows.
-- `.moonlight` (z-index 4, `mix-blend-mode: screen`, opacity `--night × --moon-up`): `.ml-glow` (2½ × the glass) and
-  `.ml-beam` (the glass's width, to the floor, skewed away from the moon by `--moon-x`). sky.js sets `--moon-x` and
-  `--moon-up` beside the moon's position. Slots: assets/living/moonlight, moonbeam, kitchen-moonlight, kitchen-moonbeam,
-  attic-moonlight, attic-moonbeam. (The attic's old static `.attic-beam` is gone.)
+- `.moonlight` (z-index 4, `mix-blend-mode: screen`, opacity `--night × --moon-up`): `.ml-glow` (2½ × the glass). sky.js
+  sets `--moon-x` and `--moon-up` beside the moon's position. Slots: assets/living/moonlight, kitchen-moonlight,
+  attic-moonlight. (No `.ml-beam` and no `*-moonbeam` slots any more; the attic's old static `.attic-beam` is gone too.)
 
 ## Things that dance sit behind the traveller (28 Sep)
 
@@ -484,7 +484,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (a ring and six strokes, .42 s; `assets/ui/click` replaces it; sky.css "a click"; not while holding the revolver/marker, in a
   field, the easel, or with reduced motion; touches get the ink only).
 - **The hand**: `cursor-grab` is now drawn as a right hand from the back (nails, knuckles, thumb left), `cursor-grabbing` the fist
-  round something; cursor-grab's pressed twin is cursor-grabbing. sky.css "things you take hold of and pull": `.pullable`, the
+  round something; cursor-grab's pressed twin is cursor-grabbing. Both flipped upside down (11 Oct, Victor: fingers reaching
+  down, a `<g transform="translate(0 32) scale(1 -1)">` round the drawing; hotspot 16, 18).
+- **The pointer is a pointing hand** (11 Oct, Victor: "the default cursor, which will be a pointer hand"; it was a pen nib):
+  `handPointing(tip)` in sky.js, hotspot 12, 3, on everything clickable (the front door included). Its press doesn't squeeze:
+  `CURSOR_PRESS_ART` gives a cursor its own pressed drawing (the pointer: the same hand with the index finger bent down,
+  `handPointing(9.2)`, and two tap marks), no pop frame after. `cursor-poke` is the same hand. sky.css "things you take hold of and pull": `.pullable`, the
   hall cord and reset 4's lamp take the open hand (not while `inv-holding`); `html.grabbing` puts the fist on everything while
   you hold on, so it stays closed as you drag off it.
 - **`Sky.pull(el, { dir, need, can, move(k, dx, dy), give(dx, dy), back, tap })`**: pointer capture, `k` 0…1 along `dir` (or
@@ -498,7 +503,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (`tryTear`, refused before the key with the lives line). The cord and the lamp keep their own drag code (attic.js `hand()`).
 - Slots: `assets/ui/<cursor>-press` ×5, `assets/ui/click`, sound `board-creak` (stand-in `tap`).
 - **The bee's two hands** (11 Oct, Victor): `cursor-poke` (a finger out, hotspot 12, 3) over its body and `cursor-pat` (the
-  open hand turned over, hotspot 16, 21, no click strokes) over its head: bee.js `onHead` (within .62 of `.bee-fx`'s width of
+  open hand, flipped upside down on 11 Oct so its fingers point up, hotspot 17, 17, no click strokes) over its head: bee.js `onHead` (within .62 of `.bee-fx`'s width of
   its centre: the box round its face) sets `.bee-home.on-head` on pointermove; bee.css picks the hand. A click on the head is
   `pat()`: happy, loving, happy or excited (`PAT`), .9 of it (so `fond` goes up too), `.patted` (it dips and bobs), a note,
   heart or spark (`PAT_FX`), "you pat the bee on the head." and a short reply in that mood; with the menu shut it opens it, its
@@ -556,8 +561,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   the gate (the stand-in's were moved out of front-house's drawing). His front-house can leave the ground see-through, or
   paint it in (then front-ground stays hidden underneath).
 - Slots: `assets/living/front-ground`, `front-house`, `front-door`, `front-door-open`, `assets/characters/front` (+ `front-walking`);
-  asset manager scene "the front of the house". **From the porch too** (11 Oct, Victor): the arrow at the steps
-  (`.porch-steps`, the gap in the railing; left 57%, upright phones 76%, z 6 over the traveller): porch.js `goDown()` walks
+  asset manager scene "the front of the house". **From the porch too** (11 Oct, Victor): the glow at the steps (no arrow since
+  11 Oct, Victor: "confusing"): `.porch-steps-glow` (z 2, behind the traveller, a warm light breathing on the path and boards in
+  the railing's gap, brighter on hover via `.porch:has(.porch-steps:hover)`) and `.porch-steps` (an invisible button over the
+  gap, x 700-900 of 1600, from 60% down to the floor, z 6 over the traveller, hint "the front garden"): porch.js `goDown()` walks
   them to the steps (`STEPS` 50), `.going-down`, then `Sky.front.fromPorch(inBlack)`: the black, and in it the porch put away
   and `Sky.sides.homeNow()` (bathroom.js: back in the living space at once, so the garden has the living space behind it,
   hidden by `in-front`, as from the homepage, not the hallway showing through its sky), then the garden opens.
@@ -682,7 +689,16 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - Out of the front door: the down arrow at the bottom of the hallway (`.hall-out`, left 57%, skipped by `placeArrows`).
   The hall traveller walks to it and steps out, the hallway lifts (`translate: 0 -100%`) and the porch comes up
   (`body.in-porch`). Back: the arrow on the left (`.porch-back`), the front door (`.porch-door`) or Escape.
-  `living.html#porch` starts out there. `Sky.porch` = { outside, out, in, inNow, open, events, event(n) }.
+  `living.html#porch` starts out there. `Sky.porch` = { outside, events, event(n), look(i, now), views() }.
+- The door is 10.2% wide (11 Oct, Victor: "far too narrow" at 7.6%), the lamp centred above it (`--floor-h` + its height).
+- **Upright phones: you look along it** (11 Oct, Victor: "just have it scroll across the porch scene if you tap right"):
+  porch.css makes `.porch` 250vw wide there and moves it by `translate` (`--porch-pan`, px, set by porch.js `look(i)`), three
+  views (`VIEWS` [0, .43, 1] of the part that doesn't fit): the door and chair; the bee, the traveller and the steps; the
+  mailbox and gnome. `.porch-look.look-left/-right` (room arrows outside `.porch`, so they stay put; shown by `body.porch-look-l/-r`)
+  and a sideways swipe change view; it follows the traveller (out of the door: view 0 then theirs; to the steps; back in: 0).
+  The bee's phone spot is `left: 30%` (of the wide porch), talking `calc(var(--porch-pan) * 1px + 38vw)`; bee.js measures its
+  trail against the porch, not the screen. tools/phones.py checks each view (`Sky.porch.views`, `look`) and only reports
+  something that's in trouble in every view it shows in.
 - **Open to the sky**: the porch's upper half is see-through, so the page's own sky (sun/eye, moon, clouds, weather,
   the reset 1–2 ropes) shows; `body.in-porch` turns the constellations back on (in-side hides them elsewhere).
   Dusk dims the porch (`--pd` from `--dusk`), the streetlight, windows and porch lamp glow.
@@ -1004,6 +1020,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - Once per visit the loader reads `catalog.txt`, compares checksums with `localStorage["dav-seen"]` and
   deletes changed/removed files from the cache (they're refetched when next needed); on a first visit it
   precaches only pages/code/lists (~1 MB). If the current page, `sky/*`, `assets/*` or any `.txt` list changed, it reloads once (28 Sep: art and lists too, or the first page after a publish showed the old ones).
+- **The first visit's screen** says the site's a work in progress (11 Oct, Victor): a red-ink "WIP" stamp under the name
+  and "a work in progress: some of it is still in pencil" (`.dl-wip`, shown by `#dav-loader.first`: `screen(title, first)`),
+  never on a later visit's "unpacking what's new". The size reads `amount(got, total)`: both in one unit to the same decimal
+  ("1.5 of 2.2 MB", or KB under a megabyte; 1024 × 1024 bytes, as Windows counts). Checked 11 Oct with a fresh catalog: it
+  said 2.2 MB for 175 files that came to 2.16 MB. **catalog.txt's sizes are the served ones**: update-lists.sh measures
+  text files (html js css json txt svg xml) with every `\r` taken out (`tr -d '\r' | cksum`), since Victor's Windows copy has
+  CRLF line ends and the published one doesn't (before, his sizes were ~1% too big and his checksums never matched a
+  publish made on Linux, so each switch of publisher made every visitor's browser forget everything once).
 - Cache keys ignore `?v=`. "Forget your stay… (Clear cache)" asks first; then it **forgets everything**
   (Victor's call, 26 Sep): the cache, sessionStorage and all of localStorage (the reset number, hearts, P(Doom)
   record, settings), plays the white-out and lands on the homepage as a brand-new visitor
@@ -1273,6 +1297,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - Don't change Victor's Supabase setup without asking; he runs SQL himself (`tools/*.sql`).
 - ntfy topics must be long and random.
 - The repo is public: nothing private goes in any committed file (this one included).
+- **Victor's name is never on the site** (11 Oct, Victor): nothing the server sends (html, js, css, json, txt, svg, xml:
+  code comments, CHANGES.txt, skizy's room included) says "Victor". In comments and change lines write "the artist" (or just
+  the date: "(11 Oct: …)" rather than "(11 Oct, Victor: …)"). These notes (.md, never served) and the tools' .py/.sh/.bat
+  may still say Victor. Check with `git grep -i victor -- ':!*.md' ':!tools/*.py' ':!tools/*.sh' ':!tools/*.bat'` (nothing).
 - **Her handle, never her first name** (10 Oct, Victor): the site and the repo are public, so the friend whose room is across
   the street is **skizy** everywhere: on the page, in code, file and folder names, slots, saves, comments, these notes and
   CHANGES.txt. Her room's own code too, since 11 Oct (she asked, through Victor): her character's id and speaker id are `skizy`

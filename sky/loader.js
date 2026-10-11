@@ -2,8 +2,10 @@
    loader.js — the loading screen, and the copy of the site kept in the
    visitor's browser (sw.js keeps it).
    The first time someone comes, it fetches just the skeleton of the site
-   (every page, the code, the folder lists: about a megabyte) with a progress
-   bar, and in they go. Pictures, songs and videos are kept as they come
+   (every page, the code, the folder lists: about two megabytes) with a progress
+   bar, and in they go. That first time the screen says the site's a work in
+   progress: a WIP stamp under the name (only then, not when it's catching up on
+   what's new on a later visit). Pictures, songs and videos are kept as they come
    across them, not all at the start. It stays kept between visits.
    Each new visit it checks catalog.txt (tools\publish.bat writes it, with a
    checksum for every file) and forgets whatever you've changed or deleted
@@ -56,6 +58,14 @@
         '#dav-loader .dl-walk { animation: dl-bob .42s ease-in-out infinite alternate; transform-origin: 50% 100%; }' +
         '@keyframes dl-bob { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-5px) rotate(2deg); } }' +
         '#dav-loader .dl-title { font: normal 2rem "IM Fell English SC", Georgia, serif; letter-spacing: .04em; margin-bottom: 14px; }' +
+        // the WIP stamp: red ink, pressed on a little crooked, as if someone stamped the notebook's first page
+        '#dav-loader .dl-wip { display: none; margin: -4px auto 16px; }' +
+        '#dav-loader.first .dl-wip { display: block; }' +
+        '#dav-loader .dl-stamp { display: inline-block; padding: 2px 12px 1px; border: 2px solid #c8553a; border-radius: 4px; color: #d8664a;' +
+            'font: normal 1.35rem "IM Fell English SC", Georgia, serif; letter-spacing: .22em; text-indent: .22em; rotate: -6deg; opacity: .9;' +
+            'box-shadow: inset 0 0 0 2px rgba(200,85,58,.25); text-shadow: 0 0 1px rgba(200,85,58,.6); animation: dl-stamp .5s cubic-bezier(.3,1.6,.5,1) .3s both; }' +
+        '#dav-loader .dl-wip-note { margin-top: 8px; font-style: italic; font-size: .9rem; color: rgba(243,230,194,.6); }' +
+        '@keyframes dl-stamp { from { opacity: 0; scale: 1.8; } to { opacity: .9; scale: 1; } }' +
         '#dav-loader .dl-bar { position: relative; height: 10px; border-radius: 99px; background: rgba(243,230,194,.14); overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,.5); }' +
         '#dav-loader .dl-bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 99px; background: linear-gradient(90deg, #9a3b1f, #e0b070); transition: width .25s; }' +
         '#dav-loader .dl-note { margin-top: 10px; font-style: italic; font-size: .95rem; color: rgba(243,230,194,.75); min-height: 1.4em; }' +
@@ -63,7 +73,7 @@
             'font: italic 1rem "IM Fell English", Georgia, serif; cursor: pointer; opacity: 0; transition: opacity .6s; }' +
         '#dav-loader .dl-go.on { opacity: 1; }' +
         '#dav-loader .dl-go:hover { background: rgba(243,230,194,.1); }' +
-        '@media (prefers-reduced-motion: reduce) { #dav-loader .dl-walk { animation: none; } }';
+        '@media (prefers-reduced-motion: reduce) { #dav-loader .dl-walk, #dav-loader .dl-stamp { animation: none; } }';
 
     // the stand-in: the traveller, walking along with a trunk
     var WALKER = '<svg class="dl-walk" viewBox="0 0 110 120" width="110" height="120" aria-hidden="true">' +
@@ -73,14 +83,17 @@
         '<rect x="54" y="78" width="50" height="36" rx="4" fill="#6e4a30" stroke="#f3e6c2" stroke-width=".6"/><path d="M54 90 H104 M66 78 V114 M92 78 V114" stroke="#3a2716" stroke-width="2"/>' +
         '<path d="M70 78 Q79 68 88 78" fill="none" stroke="#c49a52" stroke-width="3"/><path d="M44 72 Q52 76 58 80" stroke="#9a3b1f" stroke-width="5" stroke-linecap="round"/></svg>';
     var el = null, bar, note, go, done = false;
-    function screen(title) {                                                // (only when there's something to fetch)
-        if (el) return;
+    function screen(title, first) {                                         // (only when there's something to fetch)
+        if (el) { if (first) el.classList.add('first'); return; }
         document.head.appendChild(css);
         el = document.createElement('div');
         el.id = 'dav-loader';
         el.setAttribute('role', 'status');
         el.setAttribute('aria-live', 'polite');
+        if (first) el.classList.add('first');
         el.innerHTML = '<div class="dl-box"><div class="dl-art">' + WALKER + '</div><div class="dl-title">DaV-nky</div>' +
+            '<div class="dl-wip"><span class="dl-stamp" aria-label="work in progress">WIP</span>' +
+            '<div class="dl-wip-note">a work in progress: some of it is still in pencil</div></div>' +
             '<div class="dl-bar"><i></i></div><div class="dl-note"></div>' +
             '<button type="button" class="dl-go">go in now (the rest keeps loading)</button></div>';
         document.documentElement.appendChild(el);
@@ -98,7 +111,13 @@
         el.classList.add('gone');
         setTimeout(function () { el.remove(); }, 700);
     }
-    function mb(n) { return (n / 1048576).toFixed(n > 10485760 ? 0 : 1); }
+    // how much, out of how much: "0.4 of 2.2 MB" (or "120 of 450 KB" for a little), both in the same unit and to the same
+    // decimal place. (a megabyte here is 1024 × 1024 bytes, as Windows counts them, so it matches what you'd see there)
+    function amount(got, total) {
+        if (total < 1048576) return Math.round(got / 1024) + ' of ' + Math.max(1, Math.round(total / 1024)) + ' KB';
+        var dp = total >= 10485760 ? 0 : 1;
+        return (got / 1048576).toFixed(dp) + ' of ' + (total / 1048576).toFixed(dp) + ' MB';
+    }
 
     /* ---------------- what's on the site, and what this browser has kept ---------------- */
     // catalog.txt lines: "path size checksum"
@@ -126,7 +145,7 @@
     var here = decodeURIComponent(location.pathname.replace(/^.*\//, '')) || 'index.html';
     var base = new URL('./', location.href);
     function abs(u) { return new URL(u, base).href.split('?')[0]; }
-    if (!seen()) screen('packing up…');                                // (a first visit: the screen straight away)
+    if (!seen()) screen('packing up…', true);                          // (a first visit: the screen straight away)
 
     // the page is being looked after by sw.js (the very first time, it takes a moment to start)
     function looked() {
@@ -167,13 +186,13 @@
                         .then(function (need) {
                             if (!need.length) { if (stale) { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} location.reload(); return; } finish(); return; }
                             var loud = first || stale;                          // (otherwise it's done quietly, while they look around)
-                            if (loud) screen(first ? 'packing up…' : 'unpacking what’s new…');
+                            if (loud) screen(first ? 'packing up…' : 'unpacking what’s new…', first);
                             var total = 0, got = 0, n = 0, i = 0;
                             need.forEach(function (f) { total += f.size; });
                             function show() {
                                 if (!loud || !bar) return;
                                 bar.style.width = ((total ? got / total : n / need.length) * 100).toFixed(1) + '%';
-                                note.textContent = (first ? 'packing up… ' : 'unpacking what’s new… ') + n + ' of ' + need.length + (total ? ' · ' + mb(got) + ' of ' + mb(total) + ' MB' : '');
+                                note.textContent = (first ? 'packing up… ' : 'unpacking what’s new… ') + n + ' of ' + need.length + (total ? ' · ' + amount(got, total) : '');
                             }
                             return looked().then(function (viaSW) {
                                 function next() {

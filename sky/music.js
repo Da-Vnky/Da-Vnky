@@ -13,9 +13,9 @@
    While music plays, <body> has the class "music-playing": anything can
    dance along (see .groove in sky.css, and the -dancing pose slots).
 
-   LO-FI (27 Sep, Victor): every song plays through a bitcrush, live: every
+   LO-FI (27 Sep): every song plays through a bitcrush, live: every
    4th sample held (a quarter of 44.1 kHz) and rounded to 8 bits, the same as
-   Victor's plugin (measured against his "Aerie" / "Aerie-bitcrush": the
+   the artist's plugin (measured against his "Aerie" / "Aerie-bitcrush": the
    same tones, to a tenth of a decibel). The lo-fi slider (the record player's,
    and the music panel's) turns it off and on: over LOFI_MS the sample rate
    climbs and the bits grow (or the other way), so it glides rather than cuts,
@@ -239,11 +239,11 @@
 
     /* ---------------- lo-fi: the bitcrush, live ---------------- */
     var LOFI_KEY = 'records-lofi', LOFI_MS = 1200;     // how long the slider takes, and the sound with it
-    var LOFI_RATE = 11025, LOFI_BITS = 8;              // Victor's plugin: a quarter of 44.1 kHz, 8 bits
+    var LOFI_RATE = 11025, LOFI_BITS = 8;              // the artist's plugin: a quarter of 44.1 kHz, 8 bits
     // the effect itself, sample by sample (it runs in the browser's audio thread: an AudioWorklet)
     var LOFI_PROC = [
         "// the lo-fi effect, sample by sample (runs in the browser's audio thread: an AudioWorklet)",
-        "//   amount 1: every 4th sample held (a quarter of 44.1 kHz: 11025) and rounded to 8 bits, like Victor's plugin",
+        "//   amount 1: every 4th sample held (a quarter of 44.1 kHz: 11025) and rounded to 8 bits, like the artist's plugin",
         "//   amount 0: the song untouched. in between, the sample rate climbs and the bits grow as the slider comes down",
         "class DavLofi extends AudioWorkletProcessor {",
         "    static get parameterDescriptors() { return [{ name: 'amount', defaultValue: 1, minValue: 0, maxValue: 1, automationRate: 'a-rate' }]; }",
@@ -355,7 +355,7 @@
     /* ---------------- a song played backwards (the inverted P(Doom) record, sky/records.js) ----------------
        a track with reverse: true and from: <the song's file> is made here, in the browser: the file is decoded, every
        sample turned round, and it's played from memory (a WAV, made once per page). if the browser can't (or the file
-       won't decode), it plays forwards. Victor's own reversed file (assets/sounds/evilrecord) makes all this unneeded */
+       won't decode), it plays forwards. the artist's own reversed file (assets/sounds/evilrecord) makes all this unneeded */
     var backwards = {};
     function srcFor(t, done) {
         if (!t.reverse || !t.from) { done(t.url); return; }

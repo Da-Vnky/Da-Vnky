@@ -16,7 +16,7 @@
    Picking the key up unlocks the heart, the ground shakes, the dark comes back and the
    hands push them up through the attic floor again. Back up there the book that opens the
    dungeon is on the living-room shelf again (it went missing at the start of reset 4:
-   sky/bathroom.js). (27 Sep, Victor: the pact no longer needs the key first; the key is
+   sky/bathroom.js). (27 Sep: the pact no longer needs the key first; the key is
    down here now, so nobody can get stuck.)
    A reload down there (or leaving the page) before the key: the grimoire on the lectern
    pulls them straight back down (sky/attic.js), the eye as they left it (run:hell-eye).
@@ -126,7 +126,7 @@
         Sky.findAsset('assets/characters/hell', function (u) { if (u) who.innerHTML = '<img alt="" src="' + u + '">'; });
         if (Sky.fillAssets) Sky.fillAssets(h);
         // no eye of its own for down here (assets/hell/eye)? then the sun's eye (sky/eye.js: sun-eyeball, sun-pupil), if
-        // it's drawn: the same one, its pupil following the pointer (27 Sep, Victor)
+        // it's drawn: the same one, its pupil following the pointer (27 Sep)
         Sky.findAsset('assets/hell/eye', function (u) {
             if (u || !Sky.eye || !Sky.eye.make) return;
             Sky.eye.make().then(function (e) {

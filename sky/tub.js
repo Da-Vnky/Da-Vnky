@@ -2,7 +2,7 @@
    tub.js — the bathroom's bathtub.
      • the tap: click it and the tub fills (click again to turn it off)
      • the plug (on its chain, at the tub's near end): take hold of its chain and
-       pull it up (11 Oct, Victor: grabbed, then pulled: sky.js Sky.pull) till it
+       pull it up (11 Oct: grabbed, then pulled: sky.js Sky.pull) till it
        pops out, and the tub drains, gurgling; click it to push it back in
      • the traveller in the bathroom can be picked up (they struggle) and
        dropped in the tub (a cold one, or a dry one: nothing worse).

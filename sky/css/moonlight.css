@@ -21,17 +21,6 @@
     width: calc(var(--gw) * 2.5);
     height: calc(var(--gh) * 2.5);
 }
-/* the beam: the glass's width, from a little way down the glass to the floor, slanting away from the moon */
-.ml-beam {
-    left: var(--gx);
-    width: var(--gw);
-    top: calc(var(--gy) + var(--gh) * .15);
-    bottom: calc(var(--floor-h, 9vh) * .35);
-    transform-origin: 50% 0;
-    transform: skewX(clamp(-34deg, calc((50 - var(--moon-x, 30)) * .9deg), 34deg));
-    transition: transform 3s linear;
-}
-
 /* the room darkening as night falls, over everything in it but the moon's light (and not over the window) */
 .ml-dark {
     position: absolute;

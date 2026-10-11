@@ -89,7 +89,7 @@
             };
         });
     }
-    // in through the door (27 Sep, Victor: the hallway used to show up behind the see-through sky of the house while
+    // in through the door (27 Sep: the hallway used to show up behind the see-through sky of the house while
     // the garden faded, and things slid): a short black, the hallway set up in it with nothing moving, and out of the
     // black the traveller steps in from the front door
     var black = document.createElement('div');

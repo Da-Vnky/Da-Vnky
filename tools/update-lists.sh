@@ -101,7 +101,13 @@ done
         case "$f" in
             assets/templates/*) continue ;;
         esac
-        set -- $(cksum < "$f")
+        # (text files are measured as the site sends them: on windows git keeps a copy with an extra "\r" at the end of
+        # every line, but the copy that's published, and served, has none. measured as they are, the sizes came out too
+        # big, and the checksums differed from a publish made on linux, so every visitor's browser forgot everything)
+        case "$f" in
+            *.html|*.js|*.css|*.json|*.txt|*.svg|*.xml) set -- $(tr -d '\r' < "$f" | cksum) ;;
+            *) set -- $(cksum < "$f") ;;
+        esac
         echo "$f $2 $1"
     done
 } > catalog.txt
