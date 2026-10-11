@@ -584,7 +584,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   breaking it softlocked): `breakIt` → `stingToDeath(id)`: `strike(me, onHit)` (it flies at the traveller and back,
   `.striking` / `bee-strike` in bee.css on `--strike-x/y`, facing them; sound `bee-dive`, stand-in `throw`); on the hit the
   sting (`bee-sting`), the gun's out of the bag and in its hands (`.armed`, aimed at them by `aimAt`), `revolver-gone` = bee;
-  1.5 s later it fires (`.firing`: muzzle flash and kick; `bee-bang`, stand-in `bang`), `Sky.gore.splat` on the traveller,
+  1.5 s later it fires (`.firing`: the gun kicks; `muzzleFlash(me)`: `.bee-shot` over the whole screen, a starburst at the
+  muzzle turned towards them (`--ang`; `FLASH_ART`, slot `assets/living/bee-muzzle-flash`, drawn pointing right), a streak of
+  light to them (`--len`), the screen lit for .4 s; `bee-bang`, stand-in `bang`), `Sky.gore.splat` on the traveller,
   then `Sky.stay.reset('Stung, then shot.')`: straight to reset 2, no key or heart needed (lives.js isn't asked). No grudge
   kept and `fond` set back to 0, so it's itself in reset 2. Singing while armed or grudging: `composeSing(w, m, dread)`, `DREAD` scale
   (0 1 3 6 7), a sixth lower, slow, every note sagging and growling, CAPS clusters, a heartbeat

@@ -2290,6 +2290,12 @@
        "optional": true
       },
       {
+       "slot": "assets/living/bee-muzzle-flash",
+       "what": "the flash when the bee fires the revolver at the traveller (reset 1). it's turned to point at them, so draw it pointing right, with the muzzle a third of the way in from the left (it flares out from there). until yours is in, a drawn starburst",
+       "size": "about 300 x 300, see-through",
+       "optional": true
+      },
+      {
        "slot": "assets/living/bee-sing",
        "what": "the music note on the sing switch in the bee's menu (talk | ♪): small, see-through. the drawn one takes the colour of the button's words (light when sing is on); yours is shown as it is",
        "size": "about 48 x 48, see-through",
