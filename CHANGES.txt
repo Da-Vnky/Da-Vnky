@@ -14,11 +14,13 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+
+== published ==
+
+2026-10-11 01:39 · V
 - Supabase keep-alive: .github/workflows/keep-supabase-alive.yml (the GitHub copy only; it skips itself anywhere else) asks the bottles' database one harmless question every two days, so the free project doesn't pause after a quiet week. It reads the address and public key from SUPABASE in sky/sky.js, adds and reads nothing, and fails (GitHub emails you) if Supabase doesn't answer 200.
 - Drawing table: when a canvas comes without its guide, the card now says why. Usually Playwright isn't installed on this computer (the hidden browser that photographs the scene), and the card then has a button that installs it, once. An untouched canvas made without its guide is made again, with it, the next time you press the button. Restart the content manager (tools/content.py changed).
 - skizy's room: at her request, every last trace of her old name in her room's code is now skizy (her character's id, her speaker name in every line, her colour, her lists of lines). Nothing a visitor sees changes; her room was checked in resets 1 and 4.
-
-== published ==
 
 2026-10-11 01:08 · V
 - Drawing table: a canvas made before the measurements layer (and never saved over) is made again when you press the button, so it gets the layer; if the layer can't be drawn, the card says why. Rebelle now gets a canvas of the right size once it's open (asked over its live link, like the animator), and the guide and measurements are also saved as pictures in the slot's layers folder, to import into Rebelle.
