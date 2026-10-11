@@ -15,12 +15,12 @@ saying what to do. Export your finished picture into that same folder as a PNG o
 the slot's card in the asset manager shows it with a "use this" button. Your working file stays there too, so
 pressing the button again opens it as you left it (a fresh canvas only if you ask for one).
 
-    python tools/drawtable.py make assets/living/bee            make it (or find the one that's there), say where
-    python tools/drawtable.py make assets/living/bee --fresh    a fresh one, even if there's one there already
-    python tools/drawtable.py open assets/living/bee csp        make it if need be, and open it in Clip Studio
-                                                                (csp, ps or rebelle)
-    python tools/drawtable.py animate assets/living/bee animator
-                                                                an animation: Victor's Rebelle Animator (or csp)
+    python tools/drawtable.py make assets/living/bee-body          make it (or find the one that's there), say where
+    python tools/drawtable.py make assets/living/bee-body --fresh  a fresh one, even if there's one there already
+    python tools/drawtable.py open assets/living/bee-body csp      make it if need be, and open it in Clip Studio
+                                                                   (csp, ps or rebelle)
+    python tools/drawtable.py animate assets/living/bee-body animator
+                                                                   an animation: Victor's Rebelle Animator (or csp)
 
 Animating (the asset manager's "animate in" buttons): the frames go in the slot's frames/ folder on the table.
   csp        opens the same layered canvas in Clip Studio (you set up the timeline: 12 fps, 60 frames is the usual);
@@ -508,7 +508,7 @@ async ([shot, art, W, H, place, artFit]) => {
   const out = {};
   let g = null, a = null;
   if (shot) {
-    const im = await load('data:image/png;base64,' + shot);
+    const im = await load(shot.startsWith('data:') ? shot : 'data:image/png;base64,' + shot);
     g = canvas(); const x = g.getContext('2d');
     x.imageSmoothingQuality = 'high';
     x.drawImage(im, place[0] * W, place[1] * H, place[2] * W, place[3] * H);
@@ -609,6 +609,40 @@ def look(slot, s, sc, view_name, then):
     return None
 
 
+def data_url(path):
+    ext = path.rsplit('.', 1)[-1].lower()
+    kind = {'svg': 'svg+xml', 'jpg': 'jpeg'}.get(ext, ext)
+    with open(path, 'rb') as f:
+        return 'data:image/%s;base64,%s' % (kind, base64.b64encode(f.read()).decode('ascii'))
+
+
+def guide_file(s):
+    """a slot that's one piece of another (the bee's faces, on its body): slots.json's "guide" names the slot(s) it's laid
+    on ("a|b": the first there is). → that picture of yours, if it's in"""
+    for g in (s.get('guide') or '').split('|'):
+        p = g.strip() and current_file(g.strip())
+        if p:
+            return p
+    return None
+
+
+def from_guide(gpath, art):
+    """the canvas from the picture it's laid on: exactly its size (so what you draw lines up by itself), that picture as
+    the guide, and yours (if any) as it is now. no scene to open: a blank page does the squeezing"""
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        page = browser.new_page()
+        g = data_url(gpath)
+        W, H = page.evaluate('src => new Promise((ok, no) => { const i = new Image(); i.onload = () => ok([i.naturalWidth, i.naturalHeight]); '
+                             'i.onerror = () => no(new Error("couldn\'t read the guide picture")); i.src = src; })', g)
+        k = min(1, BIGGEST / max(W, H))
+        W, H = max(8, round(W * k)), max(8, round(H * k))
+        px = page.evaluate(BUILD, [g, data_url(art) if art else None, W, H, [0, 0, 1, 1], 'fill'])
+        browser.close()
+    return W, H, px
+
+
 def canvas_size(s, box):
     """twice the size it's shown at (or the size it says, doubled), the right shape, never over BIGGEST a side"""
     want = stated_size(s)
@@ -655,7 +689,14 @@ def make(slot, fresh=False, view=None, app=None):
     def built(found):                                   # (the scene's open: the canvas's size, and its pixels)
         W, H = canvas_size(s, found['box'])
         result.update(W=W, H=H, px=found['build'](W, H, art, 'fill'), view=found.get('view'))
-    if sc and sc.get('map'):
+    under = guide_file(s)
+    if under:
+        try:
+            result['W'], result['H'], result['px'] = from_guide(under, mine)
+            result['on'] = os.path.relpath(under, ROOT).replace(os.sep, '/')
+        except Exception as e:
+            result['why'] = str(e).splitlines()[0]
+    if not result.get('px') and sc and sc.get('map'):
         try:
             look(slot, s, sc, view, built)
         except Exception as e:
@@ -684,7 +725,7 @@ def make(slot, fresh=False, view=None, app=None):
     write_psd(path, W, H, layers, composite)
     with open(os.path.join(folder, 'what to do.txt'), 'w', encoding='utf-8') as f:
         f.write(NOTE.format(name=stem, slot=slot, w=W, h=H))
-    return {'file': path, 'folder': folder, 'w': W, 'h': H, 'guide': guide, 'made': True, 'view': result.get('view')}
+    return {'file': path, 'folder': folder, 'w': W, 'h': H, 'guide': guide, 'made': True, 'view': result.get('view'), 'on': result.get('on')}
 
 
 def psd_size(path):

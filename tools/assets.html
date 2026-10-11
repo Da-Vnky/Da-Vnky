@@ -417,7 +417,7 @@
                 }
                 if (r.error) { say(r.error, true); return; }
                 fresh.querySelector('input').checked = false;
-                var size = r.w ? ' (' + r.w + ' × ' + r.h + (r.guide ? ', with a guide' : '') + ')' : '';
+                var size = r.w ? ' (' + r.w + ' × ' + r.h + (r.on ? ', on ' + r.on.replace(/^assets\//, '').replace(/\.\w+$/, '') + ' as the guide' : r.guide ? ', with a guide' : '') + ')' : '';
                 say((r.opened ? 'opened in ' + r.name : 'made') + ': ' + (r.made === false ? 'your working file, as you left it' : r.animator ? 'a new animation' + size : 'a new canvas' + size) +
                     '. export into ' + (r.animator || path.indexOf('animate') > -1 ? r.folder + '/frames' : r.folder) + ' and it’ll show on this card.');
                 poll();
