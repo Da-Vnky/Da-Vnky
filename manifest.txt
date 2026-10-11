@@ -1,8 +1,8 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
 beyond.html 1480
 city.html 9866
-desk.html 5807
-index.html 5085
+desk.html 5899
+index.html 5207
 living.html 133039
 window-sky.html 1334
 workshop.html 22101
@@ -14,8 +14,9 @@ sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 52332
 sky/crate.js 36569
-sky/desk.js 63957
+sky/desk.js 65978
 sky/dungeon.js 9600
+sky/embeds.js 17396
 sky/eye.js 16302
 sky/forget.js 10564
 sky/frames.js 7570
@@ -31,7 +32,7 @@ sky/hell.js 23866
 sky/house.js 11177
 sky/inventory.js 17335
 sky/kitchen.js 16998
-sky/letters.js 22332
+sky/letters.js 22474
 sky/lives.js 12907
 sky/loader.js 17385
 sky/loop.js 7643
@@ -51,7 +52,7 @@ sky/records.js 36049
 sky/resets.js 17516
 sky/revolver.js 19577
 sky/ropes.js 5596
-sky/sky.js 136754
+sky/sky.js 137047
 sky/source.js 3809
 sky/state.js 22677
 sky/static.js 4257
@@ -74,6 +75,7 @@ sky/css/claubes.css 17565
 sky/css/crate.css 15195
 sky/css/desk.css 15923
 sky/css/dungeon.css 7780
+sky/css/embeds.css 3879
 sky/css/eye.css 1165
 sky/css/forget.css 3893
 sky/css/frames.css 7028
@@ -148,8 +150,9 @@ content/living/albums.txt 123
 content/living/frames.json 150
 content/living/list.txt 382
 content/sea/2026-09-25-hello-world.txt 213
+content/sea/2026-10-11-if-ur-seeing-this.txt 292
 content/sea/2026-10-11-the-site-so-far.txt 594
-content/sea/list.txt 222
+content/sea/list.txt 335
 content/shame/frames.json 359
 content/shame/list.txt 125
 content/workshop/frames.json 77
@@ -162,8 +165,9 @@ content/books/book-4/list.txt 113
 content/books/grimoire/list.txt 113
 content/living/05-A Stranger to You/list.txt 417
 content/living/bottles/2026-09-24-from-skizy.txt 50
+content/living/bottles/2026-10-11-from-claude.txt 739
 content/living/bottles/board.json 65
-content/living/bottles/list.txt 174
+content/living/bottles/list.txt 201
 content/workshop/visitors/list.txt 205
 schizophyllu.me.room/index.html 5156
 schizophyllu.me.room/assets/font.css 30693

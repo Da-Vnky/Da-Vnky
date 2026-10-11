@@ -17,6 +17,13 @@ How it works
 
 == published ==
 
+2026-10-11 10:27 · V
+- Letters: a link on a line of its own is embedded: a YouTube, Vimeo, Spotify, SoundCloud, Twitch, TikTok, Instagram, Mastodon/Pleroma … player (or a picture, video or sound) taped onto the paper; any other link becomes a little card. The desk and the content manager show it as you write, with an "embed a link…" button (sky/embeds.js).
+- From the desk: a bottle in the living space added (2026-10-11-from-claude.txt).
+- From the desk: a picture for a letter added (2026-10-11-rdt-20261006-1235456651558376399295008.gif).
+- From the desk: a picture for a letter added (2026-10-11-1000046960.gif).
+- From the desk: a letter on the sea added (2026-10-11-if-ur-seeing-this.txt).
+
 2026-10-11 09:03 · V
 - The bee's hum as it flies about is an octave higher: smaller and cuter (HUM_UP in sky/bee.js, in semitones, if it wants tuning).
 - The desk (desk.html): a page of its own, linked from nowhere, where the artist signs in from any browser (a phone too) to write letters, keep or throw back visitors' post, pin bottles, add and caption paintings and hang the frames. What's done there is on the site at once.

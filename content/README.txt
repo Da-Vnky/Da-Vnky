@@ -22,6 +22,10 @@ Take a file out, and it's gone. That's the whole job.
                         *italic*  **bold**  [a link](https://…)  ![a picture](content/sea/pic.jpg)
                         ---      on its own = a drawn line
                         ~ bye    on its own = a sign-off (right-aligned)
+                        a link   on its own = embedded: a YouTube / Vimeo / Spotify /
+                                 SoundCloud / Twitch / TikTok … player, a picture, a
+                                 video or a sound plays right on the paper; any other
+                                 link becomes a little card (sky/embeds.js)
                       .html letters: anything that goes inside a letter
                         (<h2>, <p>, <p class="lede">, <img>, <p class="signoff"> …)
 

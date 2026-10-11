@@ -165,6 +165,28 @@ this before changing anything; keep it up to date when something here stops bein
   frames tab, the sea / living space / workshop showing all of it, a phone (390 wide, no sideways scroll), a session
   running out, then `desk.py file` (files, backups, CHANGES lines) and again (tidied). Not yet against the real project.
 
+## Links embedded in letters (sky/embeds.js, 11 Oct)
+
+- Victor: "drop in a link and if it has an embed available have it automatically be embedded into my letter". In a .txt
+  letter, **a paragraph that's only a link** (bare, or `<in angle brackets>`) becomes `DavEmbed.html(url)`: a `figure.embed`
+  (`data-url`) on the paper like a taped-in print (sky/css/embeds.css). A link in a sentence or `[words](url)` stays as before.
+- `DavEmbed.SITES` turns known links into players with nothing fetched: YouTube (nocookie; `t=` → `start`; shorts tall;
+  playlists), Vimeo, SoundCloud, Spotify, Bandcamp's own `EmbeddedPlayer` links (an album page can't be: no id in it),
+  Twitch (`parent` = the page's host), Dailymotion, Streamable, Loom, CodePen, Sketchfab, Instagram, TikTok, X, the Internet
+  Archive, Google Drive; `fedi()`: Mastodon `/@who/123` → `/embed`, Pleroma/Akkoma `/notice/ID` → `/embed/ID`. Links to
+  picture / video / sound files show or play. Anything else: a card (`figure.em-card`: the site, the path, the address),
+  then `dress()` asks noembed.com (`ASK`, 6 s): a player in its answer → the card becomes a sandboxed iframe of it (only
+  the iframe's https src is taken, never its html); a title / thumbnail → the card gets those. `ratio` (height / width)
+  or `height` (a strip: Spotify 152/352, SoundCloud 166/380…); `.em-tall` stays narrow. The figure's class for a player is
+  `em-player` (`em-frame` is the box inside it: don't give the figure that name, it squashed it to a sliver).
+- Where: `Sky.txtToHtml(t, { embeds: true })` (sky.js; only letters.js asks for it, so visitors' bottles never embed),
+  index.html and template.html load `sky/embeds.js` + `sky/css/embeds.css` before letters.js; the desk and the content
+  manager's letters page (`../sky/embeds.js`) use the same file for their previews, have an "embed a link…" button, and a
+  link pasted on an empty line is put on its own paragraph. Previews redraw with `DavEmbed.patch(content, html)`, which
+  lays the new version in around the players already there (an iframe moved in the page reloads), so typing doesn't
+  restart a video. Iframes are `loading="lazy"`: the letters on the board load theirs only when shown.
+- Inside a player the cursor is the other site's own (a page can't change it there).
+
 ## The pages
 
 - `index.html` — the sea (homepage): scroll = the day turning; ship you can pick up; dock; bottles. Its signpost

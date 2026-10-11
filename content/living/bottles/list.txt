@@ -2,4 +2,5 @@
 # no need to edit it; it's rewritten each commit.
 2026-09-24-from-skizy.txt
 2026-09-24-untitled.png
+2026-10-11-from-claude.txt
 board.json

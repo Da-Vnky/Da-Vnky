@@ -512,11 +512,11 @@
                         '<div class="dk-tools dk-txt">' +
                             '<button type="button" data-wrap="*"><i>italic</i></button><button type="button" data-wrap="**"><b>bold</b></button>' +
                             '<button type="button" data-do="link">link</button><button type="button" data-do="picture">picture…</button>' +
-                            '<button type="button" data-do="line">a line ——</button><button type="button" data-do="signoff">sign-off</button>' +
+                            '<button type="button" data-do="embed">embed a link…</button><button type="button" data-do="line">a line ——</button><button type="button" data-do="signoff">sign-off</button>' +
                             '<input type="file" class="dk-l-pic" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" hidden></div>' +
                         '<textarea class="dk-l-body" spellcheck="true" placeholder="write your letter here.\n\na blank line starts a new paragraph."></textarea>' +
                         '<p class="dk-hint dk-txt">a blank line = a new paragraph · <code>*italics*</code> · <code>**bold**</code> · <code>[words](https://…)</code> a link · ' +
-                            '<code>---</code> alone = a drawn line · <code>~ bye</code> alone = a sign-off</p>' +
+                            '<code>---</code> alone = a drawn line · <code>~ bye</code> alone = a sign-off · a link alone on its line = embedded (a video, a song, a post…)</p>' +
                         '<p class="dk-hint dk-htmlnote" hidden>this letter is written in HTML (a .html file): edit the code as it is.</p>' +
                         '<div class="dk-actions"><button type="button" class="dk-btn dk-main dk-l-save">save it to the site</button>' +
                             '<button type="button" class="dk-btn dk-l-look">preview</button>' +
@@ -569,11 +569,29 @@
             setLetterDirty(pane, true); renderLetter(pane);
         }
         $$('[data-wrap]', pane).forEach(function (b) { b.addEventListener('click', function () { insert(b.dataset.wrap, b.dataset.wrap, 'these words'); }); });
+        // a link pasted on an empty line: on a line of its own, with space round it, so it's embedded
+        body.addEventListener('paste', function (e) {
+            var t = (e.clipboardData && e.clipboardData.getData('text/plain') || '').trim();
+            if (!window.DavEmbed || !DavEmbed.lone(t) || /\s/.test(t)) return;
+            var v = body.value, a = body.selectionStart, z = body.selectionEnd;
+            var lineStart = v.lastIndexOf('\n', a - 1) + 1, lineEnd = v.indexOf('\n', z);
+            if (v.slice(lineStart, a).trim() || v.slice(z, lineEnd === -1 ? v.length : lineEnd).trim()) return;   // (in a sentence: just a link)
+            e.preventDefault();
+            var pre = v.slice(0, lineStart).replace(/\s*$/, ''), post = v.slice(lineEnd === -1 ? v.length : lineEnd).replace(/^\s*/, '');
+            body.value = pre + (pre ? '\n\n' : '') + t + '\n\n' + post;
+            var c = pre.length + (pre ? 2 : 0) + t.length + 2;
+            body.setSelectionRange(c, c);
+            setLetterDirty(pane, true); renderLetter(pane);
+        });
         var pic = $('.dk-l-pic', pane);
         $$('[data-do]', pane).forEach(function (b) {
             b.addEventListener('click', function () {
                 var w = b.dataset.do;
                 if (w === 'link') { var u = prompt('the web address to link to:', 'https://'); if (u && u !== 'https://') insert('[', '](' + u.trim() + ')', 'these words'); }
+                if (w === 'embed') {
+                    var e = prompt('a link to a video, a song, a post… (it goes on a line of its own and plays right there in the letter):', 'https://');
+                    if (e && /^https?:\/\/\S+$/.test(e.trim())) block(e.trim());
+                }
                 if (w === 'line') block('---');
                 if (w === 'signoff') { var so = prompt('sign off with:', 'more soon'); if (so) block('~ ' + so); }
                 if (w === 'picture') pic.click();
@@ -669,6 +687,8 @@
             if (!b) return;
             if (/^-{3,}$/.test(b)) { out += '<hr>'; return; }
             if (/^~\s/.test(b)) { out += '<p class="signoff">' + inline(b.replace(/^~\s*/, '')) + '</p>'; return; }
+            var link = window.DavEmbed && DavEmbed.lone(b);                 // (a link on its own: its player, sky/embeds.js)
+            if (link) { out += DavEmbed.html(link); return; }
             out += '<p' + (i === 0 ? ' class="lede"' : '') + '>' + inline(b).replace(/\n/g, '<br>') + '</p>';
         });
         return out;
@@ -679,9 +699,15 @@
         var html = L.kind === 'txt' ? txtToHtml($('.dk-l-title', pane).value, $('.dk-l-sub', pane).value, $('.dk-l-body', pane).value)
             : $('.dk-l-body', pane).value.replace(/(<img[^>]+src=")(content\/[^"]+)"/gi, function (m, a, src) { return a + (urlOf(decodeURIComponent(src)) || '') + '"'; })
                                        .replace(/<script[\s\S]*?<\/script>/gi, '');
-        var label = d ? niceDate(d, true) : '';
-        prev.innerHTML = '<p class="dk-note">how it looks on the site</p><article class="letter"><div class="curl curl-top"></div><div class="sheet"><div class="content">' +
-            (label ? '<p class="date">' + label + '</p>' : '') + html + '</div></div><div class="curl curl-bottom"></div></article>';
+        var label = d ? niceDate(d, true) : '', inner = (label ? '<p class="date">' + label + '</p>' : '') + html;
+        // (drawn again around the players already there, so a video doesn't start over at every key: sky/embeds.js)
+        var content = $('.letter .content', prev);
+        if (content && window.DavEmbed) { DavEmbed.patch(content, inner); }
+        else {
+            prev.innerHTML = '<p class="dk-note">how it looks on the site</p><article class="letter"><div class="curl curl-top"></div><div class="sheet"><div class="content">' +
+                inner + '</div></div><div class="curl curl-bottom"></div></article>';
+            if (window.DavEmbed) DavEmbed.dress(prev);
+        }
         $('.dk-later', pane).hidden = !(d && d > today());
     }
     function saveLetter(pane) {

@@ -1910,8 +1910,10 @@
         return el;
     }
     // plain-text letters: first line is the title, blank lines separate paragraphs,
-    // *italic*, **bold**, [link](url), ![picture](url), --- for a rule, "~ " starts a sign-off
-    function txtToHtml(t) {
+    // *italic*, **bold**, [link](url), ![picture](url), --- for a rule, "~ " starts a sign-off.
+    // { embeds: true } (the letters): a link alone in its paragraph becomes its player or a card (sky/embeds.js)
+    function txtToHtml(t, opts) {
+        var embed = opts && opts.embeds && window.DavEmbed;
         function esc(x) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
         function inline(x) {
             return esc(x)
@@ -1931,6 +1933,8 @@
             }
             if (/^-{3,}$/.test(b)) { out += '<hr>'; return; }
             if (/^~\s/.test(b)) { out += '<p class="signoff">' + inline(b.replace(/^~\s*/, '')) + '</p>'; return; }
+            var link = embed && DavEmbed.lone(b);
+            if (link) { out += DavEmbed.html(link); return; }
             out += '<p' + (i === 1 ? ' class="lede"' : '') + '>' + inline(b).replace(/\n/g, '<br>') + '</p>';
         });
         return out;

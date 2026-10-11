@@ -57,7 +57,8 @@
                         a.dataset.id = f.name;
                         var d = Sky.fileDate(f.name);
                         if (d) a.dataset.date = d; else a.setAttribute('data-nodate', '');
-                        a.innerHTML = /\.txt$/i.test(f.name) ? Sky.txtToHtml(text) : text;
+                        a.innerHTML = /\.txt$/i.test(f.name) ? Sky.txtToHtml(text, { embeds: true }) : text;
+                        if (window.DavEmbed) DavEmbed.dress(a);                // (links it has no player for: asked about)
                         // (a picture in it that's still on the desk: desk.html)
                         a.querySelectorAll('img[src^="content/"]').forEach(function (im) { var u = Sky.desk.url(im.getAttribute('src')); if (u) im.src = u; });
                         return a;
