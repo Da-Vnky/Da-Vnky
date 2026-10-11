@@ -295,6 +295,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   made before this and never saved over (`untouched_old`: `.made.json` holds the .psd's time; older ones, written within 10 s
   of their `what to do.txt`) is made again by the button, so it gets the layer; one he's saved keeps as it is ("a fresh
   canvas" for a new one). The guide and measurements are also saved as `layers/guide.png`, `layers/measurements.png`.
+- **No guide → the card says why** (11 Oct, Victor: right sizes, no guide; it was Playwright missing on his computer, which
+  `look()` used to skip in silence): `make` returns `guideWhy` (`NO_PLAYWRIGHT`, or the error, or "isn't on any page") and
+  `playwright: true` when that's the reason; the card then offers "install Playwright" (assets.html `offerPlaywright`,
+  `POST /__draw/playwright` → content.py `pw_install`: `python -m pip install --upgrade playwright && python -m playwright
+  install chromium` in the background, log `tools/drawing/playwright-install.log`; `GET` → `pw_state`). `.made.json` keeps
+  `guide`, so an untouched canvas made without one is made again once it can have one.
 - **Rebelle** (11 Oct, Victor: it opened at the wrong size; his animator, over the live link, gets it right): Rebelle doesn't
   open a .psd handed to it on start. So `open_in('rebelle', path, size)`, if Rebelle isn't already listening on its port,
   starts a detached helper (`drawtable.py rebelle-canvas W H port`) that waits for the live link (`REBELLE_WAIT` 90 s), then

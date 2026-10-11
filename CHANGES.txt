@@ -15,6 +15,7 @@ How it works
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
 - Supabase keep-alive: .github/workflows/keep-supabase-alive.yml (the GitHub copy only; it skips itself anywhere else) asks the bottles' database one harmless question every two days, so the free project doesn't pause after a quiet week. It reads the address and public key from SUPABASE in sky/sky.js, adds and reads nothing, and fails (GitHub emails you) if Supabase doesn't answer 200.
+- Drawing table: when a canvas comes without its guide, the card now says why. Usually Playwright isn't installed on this computer (the hidden browser that photographs the scene), and the card then has a button that installs it, once. An untouched canvas made without its guide is made again, with it, the next time you press the button. Restart the content manager (tools/content.py changed).
 
 == published ==
 
