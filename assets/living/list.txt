@@ -11,4 +11,5 @@ bee-face-sad.webp
 bee-face-scared.webp
 bee-face-sleepy.webp
 bee-face.webp
+bee-gun.webp
 vinyl-texture.webp
