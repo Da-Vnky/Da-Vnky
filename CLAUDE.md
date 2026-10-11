@@ -281,7 +281,18 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   x, y}` a point, `{label, box: [x,y,w,h]}`, `{label, line: [x1,y1,x2,y2]}`, in the units of `"marksIn": "W x H"` (else the
   slot's stated size), scaled to the canvas; `"marksFrom": "<another slot>"` borrows that one's (front-house, front-door(-open)
   use front-ground's). Marked so far: front-ground, porch-frame, porch-street, porch-yard. Labels that would cover each other
-  step aside (the other slots' ones last). A canvas made before this has no such layer: "a fresh canvas" makes one.
+  step aside (the other slots' ones last). It can't be drawn → the card says why (`measured`, `measureWhy`). A canvas the table
+  made before this and never saved over (`untouched_old`: `.made.json` holds the .psd's time; older ones, written within 10 s
+  of their `what to do.txt`) is made again by the button, so it gets the layer; one he's saved keeps as it is ("a fresh
+  canvas" for a new one). The guide and measurements are also saved as `layers/guide.png`, `layers/measurements.png`.
+- **Rebelle** (11 Oct, Victor: it opened at the wrong size; his animator, over the live link, gets it right): Rebelle doesn't
+  open a .psd handed to it on start. So `open_in('rebelle', path, size)`, if Rebelle isn't already listening on its port,
+  starts a detached helper (`drawtable.py rebelle-canvas W H port`) that waits for the live link (`REBELLE_WAIT` 90 s), then
+  sends `REBELLE_NEW` (Motion IO's `{"event_type": "NEW_ARTWORK", "width", "height"}`) with a stdlib WebSocket client
+  (`ws_send`); it logs to `tools/drawing/rebelle.log`. Rebelle already open: nothing is sent (its canvas could hold work).
+  Unverified against a real Rebelle (checked against a test WebSocket server only): if it wants different wording, copy what
+  the animator sends into `REBELLE_NEW`. Rebelle's own `.reb` in the slot's folder is opened first next time (like `.clip`
+  for Clip Studio; neither is handed to another program).
 - After changing content.py: Victor restarts the content manager (close its window, double-click `tools\content.bat`).
 
 ## The attic (sky/attic.js)

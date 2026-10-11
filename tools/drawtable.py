@@ -50,7 +50,7 @@ APPS_FILE = os.path.join(TABLE, 'apps.json')           # where your art programs
 SLOT = re.compile(r'^assets/((?:resets/reset-[1-8](?:/[a-z0-9-]+)?)|[a-z0-9-]+)/([a-z0-9-]+)$')
 PICTURES = ('png', 'webp', 'gif', 'jpg', 'jpeg', 'svg')
 EXPORTS = ('png', 'webp', 'gif', 'jpg', 'jpeg')
-WORKING = ('clip', 'psd', 'psb', 'kra', 'tif', 'tiff')   # (what the programs save their own working files as)
+WORKING = ('clip', 'reb', 'psd', 'psb', 'kra', 'tif', 'tiff')   # (what the programs save their own working files as)
 SCALE = 2                                               # twice the size it's shown at on a 1920 x 1080 screen
 BIGGEST = 8000                                          # (no side bigger than this: the programs and the file stay happy)
 GUIDE_OPACITY = 128                                     # the guide layer at half strength (of 255)
@@ -80,6 +80,11 @@ ANIMATOR_BAT = 'Rebelle Animator.bat'
 # Rebelle only takes the animator's live link if it was started like this (harmless otherwise)
 LINK = ['-websocket-server-enable', '-websocket-port', '{port}', '-websocket-allowed-ip-addresses', '::ffff:127.0.0.1,127.0.0.1']
 NEW_CONSOLE, DETACHED, NEW_GROUP = 0x00000010, 0x00000008, 0x00000200
+# Rebelle doesn't open a .psd it's handed when it starts (11 Oct, Victor: the wrong size), so once it's up the table tells
+# it, over that same live link, to make a new canvas of the right size (Rebelle's Motion IO "NEW_ARTWORK" event: what the
+# animator does). if Rebelle wants it worded differently, this is the one place to change
+REBELLE_NEW = {'event_type': 'NEW_ARTWORK', 'width': '{w}', 'height': '{h}'}
+REBELLE_WAIT = 90                                       # (seconds to wait for Rebelle to start listening)
 FPS = 12                                                # (Victor's usual: 12 frames a second)
 
 
@@ -192,21 +197,94 @@ def find_app(app):
     return sorted(found)[-1] if found else None
 
 
-def open_in(app, path):
+def open_in(app, path, size=None):
     """open the file in the program. returns {opened: True} or {need: app} (it couldn't find the program)"""
     exe = find_app(app)
     if not exe:
         return {'opened': False, 'need': app, 'name': APPS[app]['name']}
-    args = [exe, path]
+    args, told = [exe, path], None
     if app == 'rebelle':                                # (with the live link on, so the animator can talk to it too)
         port = str(animator_settings().get('websocketPort') or 8265)
         args = [exe] + [x.replace('{port}', port) for x in LINK] + [path]
+        if size and listening(int(port)):               # (it's open already: a new canvas there could lose what's on it)
+            told = 'open'
+        elif size:                                      # (a helper waits for it to start, then asks for the canvas)
+            told = 'sized'
+            flags = DETACHED | NEW_GROUP if sys.platform == 'win32' else 0
+            subprocess.Popen([sys.executable, os.path.abspath(__file__), 'rebelle-canvas', str(size[0]), str(size[1]), port],
+                             creationflags=flags, close_fds=True, cwd=ROOT, stdin=subprocess.DEVNULL,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if sys.platform == 'darwin':
         subprocess.Popen(['open', '-a', exe, path])
     else:
         flags = DETACHED | NEW_GROUP if sys.platform == 'win32' else 0   # (on its own: closing the content manager won't close it)
         subprocess.Popen(args, creationflags=flags, close_fds=True, cwd=os.path.dirname(path))
-    return {'opened': True, 'name': APPS[app]['name'], 'program': exe}
+    out = {'opened': True, 'name': APPS[app]['name'], 'program': exe}
+    if told:
+        out['rebelle'] = told
+    return out
+
+
+def listening(port):
+    import socket
+    try:
+        socket.create_connection(('127.0.0.1', port), timeout=.5).close()
+        return True
+    except OSError:
+        return False
+
+
+def ws_send(port, text):
+    """one text message to a WebSocket on this computer (Rebelle's live link), with only the standard library"""
+    import socket
+    k = base64.b64encode(os.urandom(16)).decode()
+    s = socket.create_connection(('127.0.0.1', port), timeout=5)
+    try:
+        s.sendall(('GET / HTTP/1.1\r\nHost: 127.0.0.1:%d\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n'
+                   'Sec-WebSocket-Key: %s\r\nSec-WebSocket-Version: 13\r\n\r\n' % (port, k)).encode())
+        head = b''
+        while b'\r\n\r\n' not in head:
+            got = s.recv(1024)
+            if not got:
+                raise OSError('no answer')
+            head += got
+        if b' 101 ' not in head.split(b'\r\n', 1)[0]:
+            raise OSError('it said no: ' + head.split(b'\r\n', 1)[0].decode('latin-1'))
+        data, mask = text.encode('utf-8'), os.urandom(4)
+        n = len(data)
+        frame = bytes([0x81]) + (bytes([0x80 | n]) if n < 126 else bytes([0x80 | 126]) + struct.pack('>H', n) if n < 65536
+                                  else bytes([0x80 | 127]) + struct.pack('>Q', n))
+        s.sendall(frame + mask + bytes(b ^ mask[i % 4] for i, b in enumerate(data)))
+        s.settimeout(1.5)
+        try:                                        # (anything it says back, for the log)
+            back = s.recv(4096)
+        except OSError:
+            back = b''
+        s.sendall(bytes([0x88, 0x80]) + os.urandom(4))      # (goodbye)
+        return back
+    finally:
+        s.close()
+
+
+def rebelle_canvas(w, h, port):
+    """(the helper open_in starts) wait for Rebelle to listen, then ask it for a new canvas w x h. notes in rebelle.log"""
+    log = os.path.join(TABLE, 'rebelle.log')
+    os.makedirs(TABLE, exist_ok=True)
+    def say(t):
+        with open(log, 'a', encoding='utf-8') as f:
+            f.write(time.strftime('%d %b %H:%M:%S ') + t + '\n')
+    end = time.time() + REBELLE_WAIT
+    while not listening(port):
+        if time.time() > end:
+            say('Rebelle never opened its live link on port %d (was it already open without it?)' % port); return
+        time.sleep(1.5)
+    time.sleep(4)                                       # (listening comes before it's ready for a canvas)
+    msg = json.dumps({k: (int(v.format(w=w, h=h)) if isinstance(v, str) and v.startswith('{') else v) for k, v in REBELLE_NEW.items()})
+    try:
+        back = ws_send(port, msg)
+        say('asked for a %d x %d canvas: %s%s' % (w, h, msg, ('  (it said: ' + back[2:].decode('utf-8', 'replace')[:300] + ')') if back else ''))
+    except Exception as e:
+        say('couldn\'t ask Rebelle for the canvas: %s' % e)
 
 
 # ---------------- the slot: its folder on the drawing table, its description, its files ----------------
@@ -254,15 +332,18 @@ def current_file(slot):
 
 
 def working_file(folder, stem, app=None):
-    """what's on the table already: the program's own file if you saved one (Clip Studio saves .clip), else the .psd"""
+    """what's on the table already: the program's own file if you saved one (Clip Studio's .clip, Rebelle's .reb), else the newest"""
     if not os.path.isdir(folder):
         return None
     have = [os.path.join(folder, n) for n in os.listdir(folder)
             if n.rsplit('.', 1)[-1].lower() in WORKING and not n.startswith(('.', '_'))]
-    if app == 'csp':
-        clip = [p for p in have if p.lower().endswith('.clip')]
-        if clip:
-            return max(clip, key=os.path.getmtime)
+    own = {'csp': '.clip', 'rebelle': '.reb'}.get(app)
+    if own:                                             # (Clip Studio's .clip, Rebelle's .reb: that program's own, first)
+        mine = [p for p in have if p.lower().endswith(own)]
+        if mine:
+            return max(mine, key=os.path.getmtime)
+    if app:                                             # (not another program's own file: Photoshop can't open a .clip)
+        have = [p for p in have if not p.lower().endswith(('.clip', '.reb'))]
     return max(have, key=os.path.getmtime) if have else None
 
 
@@ -572,11 +653,15 @@ def marks_for(s, W, H):
     return out
 
 
+MEASURE_WHY = []                                        # (why the last measurements layer couldn't be drawn, if it couldn't)
+
+
 def measures(page, slot, s, W, H, others=None):
     """the measurements layer's picture (a data: URL), drawn in the page"""
     try:
         return page.evaluate(MEASURE, [W, H, others or [], marks_for(s, W, H), slot.replace('assets/', '')])
-    except Exception:
+    except Exception as e:
+        MEASURE_WHY[:] = [str(e).splitlines()[0] if str(e) else type(e).__name__]
         return None
 
 
@@ -617,6 +702,7 @@ async ([shot, art, W, H, place, artFit, measure]) => {
     x.imageSmoothingQuality = 'high';
     x.drawImage(im, place[0] * W, place[1] * H, place[2] * W, place[3] * H);
     out.guide = squeeze(g, [3, 0, 1, 2]);
+    out.guidePng = g.toDataURL('image/png').split(',')[1];
   }
   if (art) {
     const im = await load(art);
@@ -631,6 +717,7 @@ async ([shot, art, W, H, place, artFit, measure]) => {
     const im = await load(measure);
     const m = canvas(); m.getContext('2d').drawImage(im, 0, 0, W, H);
     out.measure = squeeze(m, [3, 0, 1, 2]);
+    out.measurePng = measure.split(',')[1];
   }
   // the flattened picture (only for thumbnails): white, the guide at half strength, then your picture
   const f = canvas(), fx = f.getContext('2d');
@@ -913,6 +1000,8 @@ NOTE = '''what to do (the drawing table: tools/drawtable.py)
   measurements       on top: rulers in this canvas's pixels, the other slots on it (blue dashes, with where they
                      are), and the lines that matter for this picture (red: where the ground starts, the door…).
                      locked. hide it before you export
+layers/guide.png and layers/measurements.png are the same two as pictures of their own, for a program that can't
+read a .psd's layers (Rebelle: File > Import each one, as a layer of its own, and hide them before you export).
 
 when it's done: hide the guide, and export a PNG (or WebP) into this same folder, with a see-through background
 if the slot wants one. the slot's card in the asset manager will show it, with a "use this" button.
@@ -931,6 +1020,8 @@ def make(slot, fresh=False, view=None, app=None):
     folder, stem, _ = where(slot)
     s, sc, _ = described(slot)
     have = None if fresh else working_file(folder, stem, app)
+    if have and untouched_old(have, folder):            # (made before the measurements, and never saved over: no work to lose)
+        have = None
     if have:
         return {'file': have, 'folder': folder, 'made': False}
     mine = current_file(slot)
@@ -972,6 +1063,7 @@ def make(slot, fresh=False, view=None, app=None):
             layers.append({'name': MEASURES_NAME, 'chans': chans('measure'), 'opacity': 235, 'locked': True})
         composite = base64.b64decode(px['flat']) if px.get('flat') else None
         guide = bool(px.get('guide'))
+        pngs = {'guide': px.get('guidePng'), 'measurements': px.get('measurePng')}
     else:
         size = canvas_size(s, None)
         if not size:
@@ -979,25 +1071,54 @@ def make(slot, fresh=False, view=None, app=None):
                              "in tools/slots.json doesn't give a size like 800 x 600")
         W, H = size
         layers = [{'name': 'draw here', 'rgba': None}]
-        composite, guide = None, False
+        composite, guide, pngs = None, False, {}
         try:                                            # (the measurements still, on a blank page, if there's a browser)
             px = blank_page(lambda page: page.evaluate(BUILD, [None, None, W, H, [0, 0, 1, 1], 'fill', measures(page, slot, s, W, H)]))
             if px and px.get('measure'):
                 layers.append({'name': MEASURES_NAME, 'chans': list(zip((-1, 0, 1, 2), (base64.b64decode(x) for x in px['measure']))),
                                'opacity': 235, 'locked': True})
-        except Exception:
-            pass
+                pngs = {'measurements': px.get('measurePng')}
+        except Exception as e:
+            MEASURE_WHY[:] = MEASURE_WHY or [str(e).splitlines()[0] if str(e) else type(e).__name__]
     os.makedirs(folder, exist_ok=True)               # (only now: a slot it can't size leaves nothing behind)
     path = os.path.join(folder, stem + '.psd')
     write_psd(path, W, H, layers, composite)
+    # the guide and the measurements as pictures of their own too (layers/), for a program that can't read the .psd's
+    # layers (Rebelle): File > Import them, each as a layer of its own
+    for k, b in pngs.items():
+        if b:
+            os.makedirs(os.path.join(folder, 'layers'), exist_ok=True)
+            with open(os.path.join(folder, 'layers', k + '.png'), 'wb') as f:
+                f.write(base64.b64decode(b))
+    with open(os.path.join(folder, '.made.json'), 'w', encoding='utf-8') as f:
+        json.dump({'psd': int(os.path.getmtime(path)), 'measured': any(L['name'] == MEASURES_NAME for L in layers)}, f)
     with open(os.path.join(folder, 'what to do.txt'), 'w', encoding='utf-8') as f:
         f.write(NOTE.format(name=stem, slot=slot, w=W, h=H))
         if result.get('tile'):
             a = result['tile']
             f.write(NOTE_TILE.format(name=stem, how={'x': 'side to side', 'y': 'top to bottom', 'xy': 'both ways'}[a],
                                      times={'x': 'three times side by side', 'y': 'three times one above another', 'xy': 'three by three'}[a]))
+    measured = any(L['name'] == MEASURES_NAME for L in layers)
     return {'file': path, 'folder': folder, 'w': W, 'h': H, 'guide': guide, 'made': True, 'view': result.get('view'), 'on': result.get('on'),
-            'tile': result.get('tile')}
+            'tile': result.get('tile'), 'measured': measured,
+            'measureWhy': None if measured else (MEASURE_WHY[0] if MEASURE_WHY else result.get('why') or 'no browser to draw it in')}
+
+
+def untouched_old(have, folder):
+    """the .psd the table made, never saved over, and without the measurements layer (made before 11 Oct): safe to make again"""
+    if not have.lower().endswith('.psd'):
+        return False
+    try:
+        with open(have, 'rb') as f:
+            if MEASURES_NAME.encode('ascii')[:24] in f.read():
+                return False
+        try:
+            with open(os.path.join(folder, '.made.json'), encoding='utf-8') as f:
+                return int(os.path.getmtime(have)) == json.load(f).get('psd')
+        except (OSError, ValueError):               # (older still: it was written a moment before its "what to do.txt")
+            return abs(os.path.getmtime(have) - os.path.getmtime(os.path.join(folder, 'what to do.txt'))) < 10
+    except OSError:
+        return False
 
 
 def psd_size(path):
@@ -1096,6 +1217,9 @@ def assemble(slot, fps=None, half=False):
 
 def main():
     a = sys.argv[1:]
+    if a[:1] == ['rebelle-canvas'] and len(a) == 4:      # (open_in's helper)
+        rebelle_canvas(int(a[1]), int(a[2]), int(a[3]))
+        return
     if len(a) < 2 or a[0] not in ('make', 'open', 'animate', 'wrap'):
         sys.exit(__doc__)
     if a[0] == 'wrap':                                  # wrap <slot> <export name | current> [app]
@@ -1116,7 +1240,8 @@ def main():
         else:
             out = make(slot, fresh=fresh, view=view, app=app)
             if app:
-                out.update(open_in(app, out['file']))
+                size = (out['w'], out['h']) if out.get('w') else psd_size(out['file'])
+                out.update(open_in(app, out['file'], size))
         for k in ('file', 'folder'):
             if out.get(k):
                 out[k] = os.path.relpath(out[k], ROOT).replace(os.sep, '/')
