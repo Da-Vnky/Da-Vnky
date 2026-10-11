@@ -947,3 +947,24 @@ body.bee-talking .hotbar {
     border-radius: 1px;
     pointer-events: none;
 }
+
+/* the hand over it (11 Oct, Victor): a poking finger over its body, a patting hand over its head (bee.js onHead sets
+   .on-head; the hands are sky.js's cursor-poke and cursor-pat, with the click squeeze every cursor has) */
+html body:not(.inv-holding) .bee-home .bee,
+html body:not(.inv-holding) .bee-home .bee * {
+    cursor: var(--cursor-poke, pointer) !important;
+}
+html body:not(.inv-holding) .bee-home.on-head .bee,
+html body:not(.inv-holding) .bee-home.on-head .bee * {
+    cursor: var(--cursor-pat, pointer) !important;
+}
+/* patted: it dips under your hand, squashes, and bobs back up */
+.bee-home .bee-pose.patted .bee-art {
+    animation: bee-patted .5s ease-out;
+}
+@keyframes bee-patted {
+    0%   { translate: 0 0;   scale: 1 1; }
+    30%  { translate: 0 7%;  scale: 1.1 .86; }
+    62%  { translate: 0 -3%; scale: .97 1.05; }
+    100% { translate: 0 0;   scale: 1 1; }
+}

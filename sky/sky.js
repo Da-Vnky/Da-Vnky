@@ -103,13 +103,15 @@
     //   cursor-star      over the constellations        cursor-grab      over things you can take hold of and pull
     //   cursor-grabbing  while holding something        cursor-look      over things to look into
     //   cursor-brush     over the easel you paint on (its tip is the hotspot, bottom left)
+    //   cursor-poke      over the bee's body: a finger to poke it with  cursor-pat   over its head: a hand to pat it (sky/bee.js)
     // (11 Oct, Victor) each has a pressed twin too, shown while the button's down: assets/ui/<name>-press (cursor-grab's
     // is cursor-grabbing: the open hand closes). with none, the drawn ones squeeze in, and yours stays as it is. every
     // click also leaves a little burst of ink where it lands: assets/ui/click, if you draw your own (a small picture).
     // set CURSORS = null to keep the computer's usual cursors.
     var CURSORS = {
         'cursor': [3, 2], 'cursor-pointer': [4, 3], 'cursor-star': [16, 16],
-        'cursor-grab': [16, 14], 'cursor-grabbing': [16, 14], 'cursor-look': [12, 12], 'cursor-brush': [3, 29]
+        'cursor-grab': [16, 14], 'cursor-grabbing': [16, 14], 'cursor-look': [12, 12], 'cursor-brush': [3, 29],
+        'cursor-poke': [12, 3], 'cursor-pat': [16, 21]
     };
 
     // things that cross the sky while you're looking at it (the sky view):
@@ -1360,11 +1362,21 @@
             '<circle cx="12" cy="12" r="8.5" fill="rgba(220,235,245,.45)" stroke="#c49a52" stroke-width="3"/><circle cx="12" cy="12" r="8.5" fill="none" stroke="#2a1d14" stroke-width="1" opacity=".6"/>' +
             '<path d="M8 9 a5 5 0 0 1 4 -3" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/>'
     };
+    // (11 Oct, Victor) the bee: a hand from the back with its finger out, to poke it with (the tip's the hotspot)…
+    CURSOR_ART['cursor-poke'] =
+        '<path d="M8.6 19 L5.6 15.8 a1.9 1.9 0 0 1 2.8-2.5 L10.6 15.4 V4.4 a1.9 1.9 0 0 1 3.8 0 V13.6 a1.9 1.9 0 0 1 3.8 0 V14.4 a1.9 1.9 0 0 1 3.8 0 V15.4 a1.9 1.9 0 0 1 3.8 0 V20 c0 5-3.4 9-8.6 9 h-1.4 c-3.4 0-5.8-1.8-7-4.4 Z" fill="#f3e6c2" stroke="#2a1d14" stroke-width="1.4" stroke-linejoin="round"/>' +
+        '<path d="M11.5 5.3 h2" stroke="#c9a77a" stroke-width="1.6" stroke-linecap="round"/>' +
+        '<path d="M15.2 15.4 q.9 .8 1.8 0 M19 16.2 q.9 .8 1.8 0 M22.8 17.2 q.9 .8 1.8 0" stroke="#2a1d14" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".7"/>';
+    // …and over its head, the same hand turned over it, fingers together, to pat it (the hotspot's the palm)
+    CURSOR_ART['cursor-pat'] =
+        '<g transform="rotate(200 16 15)"><path d="M10.2 19.5 L6.4 15.6 a1.9 1.9 0 0 1 2.7-2.7 L11.6 15 V7.2 a1.9 1.9 0 0 1 3.8 0 V13 V5.4 a1.9 1.9 0 0 1 3.8 0 V13 V6.2 a1.9 1.9 0 0 1 3.8 0 V13.6 V8.8 a1.9 1.9 0 0 1 3.8 0 V19 c0 5.6-3.6 10-9.2 10 h-1.4 c-3.4 0-5.8-1.9-7.1-4.4 Z" fill="#f3e6c2" stroke="#2a1d14" stroke-width="1.4" stroke-linejoin="round"/>' +
+        '<path d="M12.5 6.1 h2 M16.3 4.3 h2 M20.1 5.1 h2 M23.9 7.6 h2" stroke="#c9a77a" stroke-width="1.6" stroke-linecap="round"/></g>' +
+        '<path d="M4 3 q2 1.6 0 3.2 M8 1.6 q2 1.6 0 3.2" stroke="#2a1d14" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".55"/>';
     CURSOR_ART['cursor-brush'] =
         '<path d="M27 2.5 L29.5 5 L15.5 19 L13 16.5 Z" fill="#8a5a34" stroke="#2a1d14" stroke-width="1.2" stroke-linejoin="round"/>' +
         '<path d="M13 16.5 L15.5 19 L13.5 21 L11 18.5 Z" fill="#c49a52" stroke="#2a1d14" stroke-width="1.1" stroke-linejoin="round"/>' +
         '<path d="M11 18.5 L13.5 21 C11.5 25.5 7.5 28.5 3 29 C3.5 24.5 6.5 20.5 11 18.5 Z" fill="#9a3b1f" stroke="#2a1d14" stroke-width="1.1" stroke-linejoin="round"/>';
-    var CURSOR_FALLBACK = { 'cursor-brush': 'crosshair', 'cursor': 'auto', 'cursor-pointer': 'pointer', 'cursor-star': 'pointer', 'cursor-grab': 'grab', 'cursor-grabbing': 'grabbing', 'cursor-look': 'zoom-in' };
+    var CURSOR_FALLBACK = { 'cursor-brush': 'crosshair', 'cursor': 'auto', 'cursor-pointer': 'pointer', 'cursor-star': 'pointer', 'cursor-grab': 'grab', 'cursor-grabbing': 'grabbing', 'cursor-look': 'zoom-in', 'cursor-poke': 'pointer', 'cursor-pat': 'pointer' };
     // a click, in three frames (11 Oct, Victor: "animated when clicking"): the button goes down and the cursor squeezes in
     // towards its tip, with three little strokes round it (PRESS); it comes up and the cursor springs a touch too big (POP);
     // then it's itself again after POP_MS. the open hand closes instead, and stays closed while you're holding something
@@ -1391,7 +1403,7 @@
             var grab = name === 'cursor-grab' || name === 'cursor-grabbing';
             cursorNow[name] = cursorValue(svgUrl(cursorSvg(art, h, 1)), h, name);
             cursorPress[name] = grab ? cursorValue(svgUrl(cursorSvg(CURSOR_ART['cursor-grabbing'], CURSORS['cursor-grabbing'], 1)), CURSORS['cursor-grabbing'], name)
-                                     : cursorValue(svgUrl(cursorSvg(art, h, PRESS, true)), h, name);
+                                     : cursorValue(svgUrl(cursorSvg(art, h, PRESS, name !== 'cursor-pat')), h, name);
             cursorPop[name] = grab ? cursorNow[name] : cursorValue(svgUrl(cursorSvg(art, h, POP)), h, name);
             root.style.setProperty('--' + name, cursorNow[name]);
             findAsset('assets/ui/' + name, function (url) {
