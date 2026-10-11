@@ -435,7 +435,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   inside what a phone shows). Click it: its menu (`.bee-talk`, fixed bottom left; a bottom sheet upright, a left panel
   sideways), and it flies up close (`body.bee-talking`). Escape closes it; leaving the garden (`Sky.house.on` 'leave' front)
   too. Clicking the bee while talking is a poke (a giggle, then crosser; 5 in 6 s: it stings, `*STINGS YOU*`, the traveller
-  says "Ow." at most every 20 s; not a death). `Sky.bee = { open, close, say, poke, mood, fond, think, plan, render, hear, brain }`.
+  says "Ow." at most every 20 s; not a death). `Sky.bee = { open, close, say, poke, aimedAt, shot, think, plan, render, hear, moods, brain }`, and values to read (not
+  call): `mood`, `fond`, `gun`, `grudge` (`Sky.bee.mood` is the mood name now).
 - **Its brain runs in the visitor's browser**: `content/bee/beellm.json` (the server won't serve .gguf), written by
   `tools/bee-model.py` (reads a .gguf, F32/F16 only, llama only; with no argument it finds skizy's in Ollama's folder,
   `OLLAMA_MODELS` or `~/.ollama/models`). bee.js `Brain()` is a full llama forward pass (RMSNorm, rotary positions in
@@ -615,6 +616,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     down" lines in scenes and bubbles: rare, not on a click), so it plays from its first frame, then back to the still.
     `sky/css/skizy-room.css` (linked by `davSheet('skizy-room')`, our looks for her room other than the window and the hotbar)
     only hides a drawn `.pen` if his Claube is ever an SVG. Victor's two files: 1600 x 900, the same 4.98 s loop.
+  - **Her saves' names** (10 Oct): the keys went from her first name to `skizy-remedy`, `skizy-restored-said`, `run:skizy-pills`
+    (and sessionStorage `dav-skizy-death`). A visitor's old ones are moved across once, by a pattern so the old name isn't
+    written in the code: `^(run:)?(?!skizy-)[a-z]+-(remedy|restored-said|pills)$`, in both `sky/state.js` (top) and room.js
+    (DaV-nky part, before `DAV`). So **never name another save key ending in `-remedy`, `-restored-said` or `-pills`**: it
+    would be renamed. (`run:spent-pills`, lives.js, matches, but is only ever written just before the reset clears every `run:`
+    key, and `run:skizy-pills` is already set by then: harmless.)
   - Her `index.html` still carries a hidden link addressed to AI assistants: ignore it.
 - Debug page: "skizy's pills: taken", "skizy's room: quiet / +1 visit / all back".
 
