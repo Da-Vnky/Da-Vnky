@@ -538,7 +538,7 @@
      "slots": [
       {
        "slot": "assets/ui/cursor",
-       "what": "the everyday pointer",
+       "what": "the everyday pointer, everywhere: a pointing hand, like cursor-pointer (the fingertip is the hotspot, 12, 3). Pressed: assets/ui/cursor-press",
        "size": "32 x 32"
       },
       {
@@ -2153,7 +2153,7 @@
        "what": "the ground in the front garden: the lawn and the path from the steps down to the gate, where the bee's shadow falls. it's laid under front-house (the same 1600 x 900 canvas), so draw the house, hedge, trees, roses and fence in front-house and leave the ground see-through there; if your front-house already has the ground in it, this one stays hidden underneath",
        "size": "1600 x 900, see-through above the ground",
        "marksIn": "1600 x 900",
-       "marks": [{"y": 672, "label": "the ground starts (paint it up to about y 640: the house, hedge and trunks hide the join)"}, {"y": 711, "label": "the bee's shadow falls along here, in front of the roses"}, {"line": [716, 690, 556, 900], "label": "the path, left edge"}, {"line": [884, 690, 1044, 900], "label": "the path, right edge"}, {"box": [716, 630, 168, 60], "label": "the steps"}, {"box": [770, 492, 60, 120], "label": "the front door"}, {"box": [440, 300, 720, 392], "label": "the house's front wall (its foot at y 692)"}, {"x": 800, "y": 104, "label": "the roof's peak"}, {"box": [1016, 594, 99, 83], "label": "the bee, over its roses"}, {"x": 704, "label": "where the traveller stands on the path (44% across)"}, {"y": 804, "label": "the fence: pickets from here down (open from x 560 to 1040 for the path)"}]
+       "marks": [{"y": 672, "label": "the ground starts (paint it up to about y 640: the house, hedge and trunks hide the join)"}, {"y": 711, "label": "the bee's shadow falls along here, in front of the roses"}, {"line": [716, 690, 556, 900], "label": "the path, left edge"}, {"line": [884, 690, 1044, 900], "label": "the path, right edge"}, {"box": [716, 630, 168, 60], "label": "the steps"}, {"box": [770, 492, 60, 120], "label": "the front door"}, {"box": [440, 300, 720, 392], "label": "the house's front wall (its foot at y 692)"}, {"x": 800, "y": 104, "label": "the roof's peak"}, {"box": [80, 640, 1440, 160], "label": "where the bee wanders (over the lawn, not in front of the door)"}, {"x": 704, "label": "where the traveller stands on the path (44% across)"}, {"y": 804, "label": "the fence: pickets from here down (open from x 560 to 1040 for the path)"}]
       },
       {
        "slot": "assets/living/front-house",

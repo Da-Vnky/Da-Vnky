@@ -489,7 +489,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - **The pointer is a pointing hand** (11 Oct, Victor: "the default cursor, which will be a pointer hand"; it was a pen nib):
   `handPointing(tip)` in sky.js, hotspot 12, 3, on everything clickable (the front door included). Its press doesn't squeeze:
   `CURSOR_PRESS_ART` gives a cursor its own pressed drawing (the pointer: the same hand with the index finger bent down,
-  `handPointing(9.2)`, and two tap marks), no pop frame after. `cursor-poke` is the same hand. sky.css "things you take hold of and pull": `.pullable`, the
+  `handPointing(9.2)`, and two tap marks), no pop frame after. `cursor-poke` is the same hand, and since 11 Oct (Victor: "it's
+  still the black arrow") so is the everyday `cursor` (hotspot 12, 3; the dark arrow is gone). Victor will redraw the pat hand. sky.css "things you take hold of and pull": `.pullable`, the
   hall cord and reset 4's lamp take the open hand (not while `inv-holding`); `html.grabbing` puts the fist on everything while
   you hold on, so it stays closed as you drag off it.
 - **`Sky.pull(el, { dir, need, can, move(k, dx, dy), give(dx, dy), back, tap })`**: pointer capture, `k` 0…1 along `dir` (or
@@ -573,13 +574,24 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 
 - Victor: skizy's BeeLLM ("Scintilla BeeLLM 42P Chaos", her model on Hugging Face as `hf.co/schizophyllume/BeeLLM`), living on
   the site so visitors can talk to it. `sky/bee.js` + `sky/css/bee.css`, living.html only (after front.js). It builds itself
-  into `.front-stage` (`.bee-home`, over the right-hand roses: left 63.5% top 66% of the 1600 x 900 garden; upright phones 56.5%,
-  inside what a phone shows). Click it: its menu (`.bee-talk`, fixed bottom left; a bottom sheet upright, a left panel
+  into `.front-stage` (`.bee-home`, starting over the right-hand roses: left 63.5% top 67% of the 1600 x 900 garden; upright
+  phones 56.5%, inside what a phone shows; then it wanders the lawn: see "It wanders" below). Click it: its menu (`.bee-talk`, fixed bottom left; a bottom sheet upright, a left panel
   sideways), and it flies up close (`body.bee-talking`). Escape closes it; leaving the garden (`Sky.house.on` 'leave' front)
   too. **From the porch too** (11 Oct, Victor): the same bee, moved (`perch(where)`, on `Sky.house.on` 'enter' front/porch)
   into `.porch`, before `.porch-frame` (z 1: in front of the street, behind the posts and railing), out over the yard left of
-  the steps (from the porch you face the street, so its roses are on the left): `.porch .bee-home` left 32% top 51%, width
-  `clamp(58px, 5.6vw, 110px)`; talking left 36% top 28%; upright phones 25% / 52%, sideways 33% / 44% (bee.css). `here()` is
+  the steps (from the porch you face the street, so its roses are on the left): `.porch .bee-home` left 32% top 54%, width
+  `clamp(48px, 3.8vw, 76px)`; talking left 36% top 28%, `clamp(76px, 8vw, 150px)`; upright phones 30% / 54%, sideways 33% / 47%.
+  **It wanders the whole lawn** (11 Oct, Victor; garden and porch, not while talking, not in `?map` or with reduced motion):
+  bee.js `wander()` every few seconds picks a spot over the lawn (`LAWN`: x, the ground `g`, how high it flies `up`; the garden
+  never in front of the door near the house, and on a phone only the part of the garden that shows) and sets `--wx --wy`
+  (left/top, which the CSS reads with its old spots as the fallback), `--wd` (.82 at the back of the lawn to 1.12 at the front:
+  smaller further off) and `--wt` (the flight's length, by distance and mood). It's **smaller out there** (garden 4.2% of the
+  stage × `--wd`, was 6.2%; porch as above, was `clamp(58px, 5.6vw, 110px)`) and the same size as ever talking. The shadow
+  falls under it wherever it is (`shade`: its own box + `up`; talking, under the spot it left). `perch()` clears the
+  `--w*` so it starts over its roses in the other place. **After talking** its face goes back to the everyday one 2.8 s
+  after the menu shuts (`restFace`), unless it's angry or sad (or has your gun); what it feels is kept. **Angry**, its first
+  word always throws up the cross vein, then CAPS words take turns between steam and veins (`act.veined`; before, every
+  CAPS word was steam and an angry bee shouts nearly every word, so the vein never showed, Victor, 11 Oct). `here()` is
   the garden or `Sky.porch.outside`, so its menu and the revolver work there too. (bee.js already had a `settle()`: its feelings
   fading. Don't reuse the name.) The bee's own rules in bee.css are `.bee-home …` (not `.front …`) so they work in both. Clicking the bee while talking is a poke (a giggle, then crosser; 5 in 6 s: it stings, `*STINGS YOU*`, the traveller
   says "Ow." at most every 20 s; not a death). `Sky.bee = { open, close, say, poke, aimedAt, shot, think, plan, render, hear, moods, brain }`, and values to read (not
