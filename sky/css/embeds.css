@@ -237,30 +237,3 @@ a.em-card:hover { background: rgba(252, 245, 228, .9); border-color: #9a3b1f; }
     content: " · it falls out for whoever opens the letter (the first time), plays, and goes in their record player";
     color: #9a3b1f;
 }
-
-/* in the previews: the ▷ on each player and song (DavEmbed.autoButtons). hollow: it waits for the reader to press play;
-   filled: it starts by itself when the letter's opened */
-figure.embed > .em-auto {
-    position: absolute;
-    top: -15px;
-    right: -15px;
-    z-index: 3;
-    display: grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    border: 1.5px solid #6e5236;
-    border-radius: 50%;
-    background: #f6ecd2;
-    color: #6e5236;
-    box-shadow: 0 2px 6px rgba(60, 35, 15, .3);
-    cursor: pointer;
-    transition: background .2s, color .2s, border-color .2s, transform .2s;
-}
-figure.embed > .em-auto svg { width: 17px; height: 17px; overflow: visible; }
-figure.embed > .em-auto path { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; transition: fill .2s; }
-figure.embed > .em-auto:hover { color: #9a3b1f; border-color: #9a3b1f; transform: scale(1.08); }
-figure.embed > .em-auto[aria-pressed="true"] { background: #9a3b1f; border-color: #9a3b1f; color: #f6ecd2; }
-figure.embed > .em-auto[aria-pressed="true"] path { fill: currentColor; }
-figure.em-song > .em-auto { top: -18px; right: auto; left: 128px; }

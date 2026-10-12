@@ -17,6 +17,10 @@ How it works
 
 == published ==
 
+2026-10-11 21:41 · V
+- Letters: the ▷ in the previews is gone again; the "embed a link…" button asks whether it should play by itself, as before (▶ in front of a link still does it).
+- From the desk: a picture for a letter added (2026-10-11-handwritten-2.png).
+
 2026-10-11 21:31 · V
 - Letters: in the previews (the desk and the content manager's letters page) every player and song has a little ▷ on its corner: click it and it fills in, and the letter plays it by itself when it's opened (it puts ▶ in front of the line); click again to undo. The "embed a link…" button doesn't ask any more. A record that falls out of the letter has none (it always plays).
 - The desk: songs added there now go up (the desk page's code had no version stamp, so a browser could keep using yesterday's copy after a publish: it gets one now, desk.html ?v=); an .ogg goes up as audio/ogg in Firefox too; and anything that goes wrong shows a message instead of the button seeming to do nothing.

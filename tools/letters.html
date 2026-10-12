@@ -131,7 +131,7 @@
 
 a blank line starts a new paragraph."></textarea>
             <p class="hint txt-only">a blank line = a new paragraph · <code>*italics*</code> · <code>**bold**</code> · <code>[words](https://…)</code> a link ·
-                <code>---</code> on its own line = a drawn line · <code>~ bye</code> on its own = a sign-off · a link on its own line = embedded (a video, a song, a post…) · click the ▷ on it in the preview and it plays by itself when the letter's opened (it puts <code>▶</code> in front)</p>
+                <code>---</code> on its own line = a drawn line · <code>~ bye</code> on its own = a sign-off · a link on its own line = embedded (a video, a song, a post…) · <code>▶</code> in front of one: it plays by itself when the letter's opened</p>
             <p class="hint html-only" hidden>this letter is written in HTML (a .html file): edit the code as it is.</p>
             <div class="actions">
                 <button type="button" class="save">save <small>(ctrl+s)</small></button>
@@ -277,11 +277,6 @@ a blank line starts a new paragraph."></textarea>
                 inner + '</div></div><div class="curl curl-bottom"></div></article>';
             if (window.DavEmbed) DavEmbed.dress(prev);
         }
-        // ▷ on each player and song: click it, it plays by itself when the letter's opened (sky/embeds.js)
-        if (window.DavEmbed && DavEmbed.autoButtons && kind === 'txt') {
-            DavEmbed.autoButtons(prev);
-            DavEmbed.autoSwitch(prev, bodyIn, function () { setDirty(true); render(); });
-        }
         document.querySelector('.later-note').hidden = !(dateIn.value && today && dateIn.value > today);
     }
     [titleIn, subIn, dateIn, bodyIn].forEach(function (el) { el.addEventListener('input', function () { setDirty(true); render(); }); });
@@ -326,7 +321,7 @@ a blank line starts a new paragraph."></textarea>
             if (d === 'link') { var u = prompt('the web address to link to:', 'https://'); if (u && u !== 'https://') insert('[', '](' + u.trim() + ')', 'these words'); }
             if (d === 'embed') {
                 var e = prompt('a link to a video, a song, a post… (it goes on a line of its own and plays right there in the letter):', 'https://');
-                if (e && /^https?:\/\/\S+$/.test(e.trim())) block(e.trim());                // (the ▷ on it in the preview: click to make it start by itself)
+                if (e && /^https?:\/\/\S+$/.test(e.trim())) block((confirm('start it playing by itself when the letter\u2019s opened? (YouTube, SoundCloud, Vimeo and song files can; Spotify and Bandcamp wait for their own play button)') ? '\u25B6 ' : '') + e.trim());
             }
             if (d === 'line') block('---');
             if (d === 'signoff') block('~ ' + (prompt('sign off with:', 'more soon') || 'more soon'));

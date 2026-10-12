@@ -301,14 +301,9 @@ this before changing anything; keep it up to date when something here stops bein
 - **▶ before a link** (`▶ https://youtu.be/…`, a paragraph of its own): `DavEmbed.plays(block)` → `html(url, { autoplay })` →
   `data-autoplay` (and `data-key`, which `patch()` matches players by). `DavEmbed.start(fig)` turns it on: the sites' own autoplay
   parameters (YouTube, Vimeo, SoundCloud, Dailymotion, Twitch, Streamable, Loom; others just load), a `<video>`/`<audio>` played
-  (`calm(src)` takes them off again). Browsers may refuse
+  (`calm(src)` takes them off again). The "embed a link…" button asks (confirm) whether to put ▶ in front (a ▷ toggle in the
+  previews was tried 11 Oct and taken out again at Victor's request). Browsers may refuse
   sound before the visitor's first click on the page; the letter's open click usually counts.
-- **The ▷ in the previews** (11 Oct, Victor: "a hollow version of the play icon … if clicked makes it play automatically"): the
-  desk's `renderLetter` and the letters page's `render` call `DavEmbed.autoButtons(prev)` (a `button.em-auto` on every
-  `figure.embed[data-url]` but pictures and gifts; `aria-pressed` = `data-autoplay`; hollow/filled triangle, embeds.css) and
-  `DavEmbed.autoSwitch(prev, textarea, changed)` (one capture click listener per preview: `switchAuto(text, fig)` finds the
-  figure's line, by `lone()` for a link or `song().src` for a song, and puts ▶ in front or takes it off). Only the previews
-  call it: the sea never shows the buttons. The "embed a link…" button no longer asks (confirm) about ▶.
 - **A song line**: `▶ ♫ [Title](content/sea/<date>-name.mp3 content/sea/<date>-name.png) → record player`: ▶ = plays by itself,
   the second path = its sleeve (optional), `→ record player` = a gift. `DavEmbed.song(block)` reads it (`SONG` regex),
   `songLine(t)` writes it, `songHtml(t, where)` draws `figure.embed.em-song` (`data-url`, `-title`, `-sleeve`, `-autoplay`,

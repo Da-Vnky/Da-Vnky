@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1476 3245333124
-city.html 9813 3789203806
-desk.html 6182 1243296428
-index.html 5189 3212838967
-living.html 133266 2088000423
-window-sky.html 1328 3349780328
-workshop.html 22036 3738670318
+beyond.html 1480 3729372586
+city.html 9866 2977527447
+desk.html 6191 328978671
+index.html 5247 3966439134
+living.html 133346 1799771842
+window-sky.html 1334 3119292882
+workshop.html 22101 3045797116
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/bathroom.js 29419 3573512770
@@ -14,9 +14,9 @@ sky/beyond.js 10960 423359035
 sky/books.js 13450 616855077
 sky/claubes.js 52332 2508345692
 sky/crate.js 36569 3934218302
-sky/desk.js 74904 1648628899
+sky/desk.js 74619 1311710456
 sky/dungeon.js 9600 328112207
-sky/embeds.js 31049 1112769519
+sky/embeds.js 28094 2944414207
 sky/eye.js 16302 1561931541
 sky/forget.js 10564 1871474324
 sky/frames.js 7570 2003764363
@@ -78,7 +78,7 @@ sky/css/claubes.css 17565 3697391751
 sky/css/crate.css 15195 526352604
 sky/css/desk.css 16259 3308899224
 sky/css/dungeon.css 7780 2252711842
-sky/css/embeds.css 11052 1732908466
+sky/css/embeds.css 9867 82469728
 sky/css/eye.css 1165 2492654789
 sky/css/forget.css 3893 1029278307
 sky/css/frames.css 7028 2345002776
@@ -227,12 +227,13 @@ content/sea/2026-10-11-1739877026713f.gif 2774744 3208548333
 content/sea/2026-10-11-aerie.mp3 9023573 813840972
 content/sea/2026-10-11-concierto-de-aranjuez-2-satz-adagio-musikkapelle-l.mp3 11314280 3696836528
 content/sea/2026-10-11-handwriting-test.txt 119 3848642082
+content/sea/2026-10-11-handwritten-2.png 447652 1112768135
 content/sea/2026-10-11-handwritten.png 178954 4018374124
 content/sea/2026-10-11-if-ur-seeing-this-video.txt 86 1342626792
 content/sea/2026-10-11-if-ur-seeing-this.txt 274 700905633
 content/sea/2026-10-11-rdt-20261006-1235456651558376399295008.gif 251967 3217743450
 content/sea/2026-10-11-the-site-so-far.txt 594 839400045
-content/sea/list.txt 533 316599893
+content/sea/list.txt 562 2753084365
 content/sea/written.json 68 3586333723
 content/shame/frames.json 359 3564234737
 content/shame/list.txt 125 95844360

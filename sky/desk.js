@@ -544,7 +544,7 @@
                             '<input type="file" class="dk-l-pic" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" hidden></div>' +
                         '<textarea class="dk-l-body" spellcheck="true" placeholder="write your letter here.\n\na blank line starts a new paragraph."></textarea>' +
                         '<p class="dk-hint dk-txt">a blank line = a new paragraph · <code>*italics*</code> · <code>**bold**</code> · <code>[words](https://…)</code> a link · ' +
-                            '<code>---</code> alone = a drawn line · <code>~ bye</code> alone = a sign-off · a link alone on its line = embedded (a video, a song, a post…) · its \u25B7 in the preview: click, and it plays by itself when the letter\u2019s opened</p>' +
+                            '<code>---</code> alone = a drawn line · <code>~ bye</code> alone = a sign-off · a link alone on its line = embedded (a video, a song, a post…) · <code>\u25B6</code> in front of one: it plays by itself</p>' +
                         '<p class="dk-hint dk-htmlnote" hidden>this letter is written in HTML (a .html file): edit the code as it is.</p>' +
                         '<div class="dk-actions"><button type="button" class="dk-btn dk-main dk-l-save">save it to the site</button>' +
                             '<button type="button" class="dk-btn dk-l-look">preview</button>' +
@@ -618,7 +618,7 @@
                 if (w === 'link') { var u = prompt('the web address to link to:', 'https://'); if (u && u !== 'https://') insert('[', '](' + u.trim() + ')', 'these words'); }
                 if (w === 'embed') {
                     var e = prompt('a link to a video, a song, a post… (it goes on a line of its own and plays right there in the letter):', 'https://');
-                    if (e && /^https?:\/\/\S+$/.test(e.trim())) block(e.trim());                // (the ▷ on it in the preview: click to make it start by itself)
+                    if (e && /^https?:\/\/\S+$/.test(e.trim())) block((confirm('start it playing by itself when the letter\u2019s opened? (YouTube, SoundCloud, Vimeo and song files can; Spotify and Bandcamp wait for their own play button)') ? '\u25B6 ' : '') + e.trim());
                 }
                 if (w === 'line') block('---');
                 if (w === 'signoff') { var so = prompt('sign off with:', 'more soon'); if (so) block('~ ' + so); }
@@ -811,11 +811,6 @@
             prev.innerHTML = '<p class="dk-note">how it looks on the site</p><article class="letter"><div class="curl curl-top"></div><div class="sheet"><div class="content">' +
                 inner + '</div></div><div class="curl curl-bottom"></div></article>';
             if (window.DavEmbed) DavEmbed.dress(prev);
-        }
-        // ▷ on each player and song: click it, it plays by itself when the letter's opened (sky/embeds.js)
-        if (window.DavEmbed && DavEmbed.autoButtons && L.kind === 'txt') {
-            DavEmbed.autoButtons(prev);
-            DavEmbed.autoSwitch(prev, $('.dk-l-body', pane), function () { setLetterDirty(pane, true); renderLetter(pane); });
         }
         $('.dk-later', pane).hidden = !(d && d > today());
     }

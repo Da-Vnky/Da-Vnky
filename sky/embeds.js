@@ -333,54 +333,6 @@
             '<audio preload="none" src="' + esc(src) + '"></audio>' +
         '</figure>';
     }
-    /* ---------------- in the previews (the desk, the content manager): ▷ on each player and song ----------------
-       hollow ▷: it waits for the reader to press play. click it: ▶, filled, and the line gets its ▶ in front, so it starts
-       by itself when the letter's opened. click again: back to waiting. (a gift always plays: it has none.) the page
-       hands over its writing box and what to do once the words have changed (draw the preview again, mark it unsaved) */
-    var AUTO_ART = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.2 3.2v9.6l7.6-4.8z"/></svg>';
-    function autoButtons(box) {
-        Array.prototype.forEach.call((box || document).querySelectorAll('figure.embed[data-url]'), function (fig) {
-            var b = fig.querySelector(':scope > .em-auto');
-            if (fig.classList.contains('em-image') || fig.hasAttribute('data-gift')) { if (b) b.remove(); return; }
-            if (!b) { b = document.createElement('button'); b.type = 'button'; b.className = 'em-auto'; b.innerHTML = AUTO_ART; fig.appendChild(b); }
-            var on = fig.hasAttribute('data-autoplay');
-            b.setAttribute('aria-pressed', on ? 'true' : 'false');
-            b.title = on ? 'plays by itself when the letter’s opened (click: it waits for the reader to press play)'
-                         : 'click: it starts playing by itself when the letter’s opened';
-        });
-    }
-    // the writing with that player's line switched (▶ in front, or taken off); null if its line isn't found
-    function switchAuto(text, fig) {
-        var url = fig.getAttribute('data-url'), on = fig.hasAttribute('data-autoplay'), isSong = fig.classList.contains('em-song'), done = false;
-        var lines = String(text).split('\n').map(function (line) {
-            if (done) return line;
-            var t = line.trim(), lead = line.slice(0, line.length - line.replace(/^\s+/, '').length);
-            if (isSong) {
-                var s = song(t);
-                if (!s || s.src !== url || s.autoplay !== on) return line;
-                done = true; s.autoplay = !on;
-                return lead + songLine(s);
-            }
-            if (!t || lone(t) !== url || plays(t) !== on) return line;
-            done = true;
-            return lead + (on ? t.replace(PLAYS, '') : '▶ ' + t);
-        });
-        return done ? lines.join('\n') : null;
-    }
-    function autoSwitch(box, input, changed) {
-        if (box.davAuto) return;
-        box.davAuto = true;
-        box.addEventListener('click', function (e) {
-            var b = e.target.closest && e.target.closest('.em-auto');
-            if (!b) return;
-            e.preventDefault(); e.stopPropagation();
-            var t = switchAuto(input.value, b.closest('figure.embed'));
-            if (t == null) return;
-            input.value = t;
-            changed();
-        }, true);
-    }
-
     function mmss(t) { if (!isFinite(t)) return '0:00'; t = Math.floor(t); return Math.floor(t / 60) + ':' + ('0' + t % 60).slice(-2); }
     function wireSong(fig) {
         fig.davWired = true;
@@ -437,5 +389,5 @@
     }
 
     window.DavEmbed = { find: find, lone: lone, plays: plays, calm: calm, html: html, dress: dress, patch: patch, taped: taped, isHand: isHand, handwritten: handwritten,
-                        song: song, songLine: songLine, songHtml: songHtml, discSvg: discSvg, start: start, autoButtons: autoButtons, switchAuto: switchAuto, autoSwitch: autoSwitch, SITES: SITES };
+                        song: song, songLine: songLine, songHtml: songHtml, discSvg: discSvg, start: start, SITES: SITES };
 })();
