@@ -2,12 +2,11 @@
    beerush.js — "I'm just here for the bee" (12 Oct). For a while only: the
    bee's going round on Twitter, and people are coming for it.
 
-   In the front garden (living.html#front), a paper tag in the sky's corner,
-   for a new visitor (reset 1, where everyone starts) who hasn't got the
-   revolver yet: one click and it's in their hand, ready to point at the
-   bee (sky/bee.js does the rest). It isn't there if the revolver's
-   already in their bag, or the bee has it, or it's been stung to pieces.
-   It goes the moment they take it.
+   In the front garden (living.html#front: skizy's bee links straight
+   there), a paper tag in the sky's corner, for everyone: one click and the
+   revolver's in their hand (out of the bag if it's there already, else a
+   new one), ready to point at the bee (sky/bee.js does the rest). It goes
+   while they hold it, and comes back if they put it away.
 
    Switching it off: ON = false below (or take this file and
    sky/css/beerush.css out of living.html).
@@ -17,17 +16,8 @@
     if (!ON || !window.Sky || !Sky.inventory) return;
     var I = Sky.inventory, body = document.body;
 
-    // the ordinary revolver, not anywhere else yet (sky/revolver.js keeps the same rules)
-    function free() {
-        var S = window.davSave;
-        if (!S || S.reset !== 1 || I.has('revolver')) return false;
-        try {
-            if (localStorage.getItem('revolver-gone')) return false;
-            if (sessionStorage.getItem('bee-gun') === 'revolver') return false;
-            if ((' ' + (sessionStorage.getItem('bee-broke') || '') + ' ').indexOf(' revolver ') !== -1) return false;
-        } catch (e) {}
-        return true;
-    }
+    // shown to anyone in the front garden who isn't already holding a gun (12 Oct: kept simple, any reset)
+    function free() { return I.holding !== 'revolver' && I.holding !== 'white-revolver'; }
 
     var tag = document.createElement('button');
     tag.type = 'button';
@@ -45,15 +35,16 @@
     tag.addEventListener('click', function (e) {
         e.stopPropagation();
         if (!free()) { check(); return; }
-        I.add('revolver', { quiet: true });
-        I.hold('revolver');
+        var gun = I.has('white-revolver') ? 'white-revolver' : 'revolver';
+        if (!I.has(gun)) I.add(gun, { quiet: true });
+        I.hold(gun);
         if (Sky.sfx) Sky.sfx('reload', { or: 'pickup' });
         I.say('the revolver’s in your hand. the bee is right there.', 4200);
         tag.classList.add('taken');
         setTimeout(function () { tag.classList.remove('taken'); check(); }, 700);
     });
     check();
-    setInterval(check, 1500);      // (the bee can take it, or give it back)
+    setInterval(check, 1000);      // (put away, or taken by the bee)
 
     Sky.beeRush = { check: check };
 })();

@@ -17,6 +17,9 @@ How it works
 
 == published ==
 
+2026-10-12 01:44 · V
+- The front garden: "I'm just here for the bee" is there for everyone in the garden now (skizy's link comes straight to the front of the house), in any reset, whenever they aren't already holding a gun; put the gun away and it's back.
+
 2026-10-12 01:37 · V
 - The front garden: for a while (the bee's going round on Twitter), a new visitor (reset 1) who hasn't got the revolver yet sees a paper tag taped up in the sky's top left corner, "I'm just here for the bee": one click and the revolver's in their hand. Gone once they have it, or while the bee has it. To switch it off: ON = false at the top of sky/beerush.js.
 - skizy's room: DaV-nky's hair is black now, and shorter (to his jaw); asleep he also mumbles about light and colour: subsurface scattering, the Tyndall effect, Rayleigh and Mie scattering, chromostereopsis.

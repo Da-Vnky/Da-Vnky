@@ -10,7 +10,7 @@ sky/ambient.js 5331
 sky/attic.js 34823
 sky/bathroom.js 29419
 sky/bee.js 114096
-sky/beerush.js 2671
+sky/beerush.js 2350
 sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 52332
