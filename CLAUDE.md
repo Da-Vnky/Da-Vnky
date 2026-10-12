@@ -921,6 +921,16 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (0 1 3 6 7), a sixth lower, slow, every note sagging and growling, CAPS clusters, a heartbeat
   (dun-dun every .95 s) and a low tritone hum; its log line `.dread` (dark red).
 
+## "I'm just here for the bee" (sky/beerush.js, 12 Oct: for a while only)
+
+- Victor: "a button to the front of the house for first time visitors that says 'I'm just here for the bee' that spawns a gun
+  directly on their hand. a temporary thing" (the bee's going round on Twitter; skizy links the site with it). `sky/beerush.js` +
+  `sky/css/beerush.css`, living.html after bee.js. A `button.bee-rush` (a taped paper tag, top left of the screen, the revolver's
+  own art from `Sky.inventory.art`) shown by `body.in-front.bee-rush-on` (not while `bee-talking` or going in). `free()`: reset 1
+  only, not in the bag, not `revolver-gone`, not the bee's (`bee-gun`/`bee-broke`: revolver.js's own rules), checked every
+  1.5 s. Click: `I.add('revolver', {quiet})`, `I.hold('revolver')`, a line. The rooftop's pickup hides itself once it's in the
+  bag (inventory.js). **To take it away**: `ON = false` at its top, or remove the two lines from living.html and the two files.
+
 ## The porch (sky/porch.js)
 
 - Out of the front door: the down arrow at the bottom of the hallway (`.hall-out`, left 57%, skipped by `placeArrows`).

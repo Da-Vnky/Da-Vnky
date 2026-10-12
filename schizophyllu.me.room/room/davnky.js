@@ -94,6 +94,15 @@ NARRATION.davnky = {
     dv('...just need to finish the lineart... then i can sleep... wait...'),
     dv('...more animation frames... twelve a second... no, twenty-four...'),
     dv("...don't look at the sketch layer..."),
+    // light, colour and the eye
+    dv("...skin isn't flat... subsurface scattering... the ears go red when the light's behind them..."),
+    dv('...light goes in the skin and comes out somewhere else... warmer... subsurface...'),
+    dv("...it's not god rays, it's the tyndall effect... the dust is doing it..."),
+    dv('...rayleigh makes the sky blue... mie makes the clouds white... write that down...'),
+    dv("...sunset's just rayleigh taking the blue out... the long way through the air..."),
+    dv("...mie scattering... that's why fog's white... big drops scatter all of it the same..."),
+    dv('...chromostereopsis... red jumps forward... blue sinks back... paint the background blue...'),
+    dv('...the red and the blue are fighting on the screen... chromostereopsis... my eyes...'),
     // just sleeping
     dv('mrrnh.'),
     dv('...hhhnnnkk... shhhh...'),

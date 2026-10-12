@@ -1,0 +1,57 @@
+/* beerush.css — "I'm just here for the bee" (sky/beerush.js, 12 Oct, for a while): a paper tag taped up in the front
+   garden's sky, top left, for a new visitor without the revolver. one click: it's in their hand */
+
+.bee-rush {
+    display: none;
+    position: fixed;
+    left: clamp(14px, 3vw, 52px);
+    top: clamp(14px, 5vh, 54px);
+    z-index: 60;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px 10px 12px;
+    border: 1px solid rgba(80, 55, 25, .35);
+    border-radius: 3px;
+    background: linear-gradient(170deg, #f6ecd2, #ead9b4);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .45), inset 0 0 18px rgba(140, 100, 50, .2);
+    color: #3a2716;
+    font: italic 1.2rem/1.1 "IM Fell English", Georgia, serif;
+    cursor: pointer;
+    transform: rotate(-3deg);
+    transform-origin: 50% 0;
+    transition: transform .25s ease, color .2s;
+}
+/* the tape it hangs by */
+.bee-rush::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    width: 64px;
+    height: 18px;
+    margin-left: -32px;
+    background: linear-gradient(to bottom, rgba(236, 226, 196, .8), rgba(214, 198, 160, .72));
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+    transform: rotate(4deg);
+}
+.bee-rush .br-gun { flex: none; display: block; width: 42px; height: 42px; }
+.bee-rush .br-gun > * { display: block; width: 100%; height: 100%; object-fit: contain; }
+.bee-rush:hover, .bee-rush:focus-visible { color: #9a3b1f; transform: rotate(-1deg) scale(1.05); outline: none; }
+
+/* only in the front garden, and not while talking to the bee or going in */
+body.in-front.bee-rush-on:not(.bee-talking):not(.front-going-in) .bee-rush {
+    display: flex;
+    animation: br-hang .7s cubic-bezier(.3, .7, .3, 1.3) both, br-nudge 6s ease-in-out 2s infinite;
+}
+.bee-rush.taken { animation: br-taken .6s ease-in forwards !important; pointer-events: none; }
+@keyframes br-hang { from { opacity: 0; transform: translateY(-30px) rotate(-9deg); } to { opacity: 1; transform: rotate(-3deg); } }
+@keyframes br-nudge { 0%, 88%, 100% { transform: rotate(-3deg); } 92% { transform: rotate(-6deg); } 96% { transform: rotate(0deg); } }
+@keyframes br-taken { to { opacity: 0; transform: translateY(18px) rotate(8deg) scale(.8); } }
+
+@media (max-width: 620px) {
+    .bee-rush { left: 12px; top: 14px; padding: 8px 14px 8px 10px; font-size: 1.02rem; }
+    .bee-rush .br-gun { width: 34px; height: 34px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    body.in-front.bee-rush-on:not(.bee-talking):not(.front-going-in) .bee-rush { animation: none; }
+}

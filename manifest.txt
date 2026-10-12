@@ -3,13 +3,14 @@ beyond.html 1480
 city.html 9866
 desk.html 6191
 index.html 5247
-living.html 133346
+living.html 133470
 window-sky.html 1334
 workshop.html 22101
 sky/ambient.js 5331
 sky/attic.js 34823
 sky/bathroom.js 29419
 sky/bee.js 114096
+sky/beerush.js 2671
 sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 52332
@@ -72,6 +73,7 @@ sky/css/ambient.css 435
 sky/css/attic.css 15736
 sky/css/bathroom.css 16836
 sky/css/bee.css 33143
+sky/css/beerush.css 2538
 sky/css/beyond.css 2644
 sky/css/books.css 4721
 sky/css/claubes.css 17565
@@ -180,7 +182,7 @@ schizophyllu.me.room/index.html 5156
 schizophyllu.me.room/assets/font.css 30693
 schizophyllu.me.room/room/audio.js 15832
 schizophyllu.me.room/room/davinv.js 3811
-schizophyllu.me.room/room/davnky.js 7443
+schizophyllu.me.room/room/davnky.js 8242
 schizophyllu.me.room/room/extra.js 33335
 schizophyllu.me.room/room/music.js 4978
 schizophyllu.me.room/room/narration.js 14169

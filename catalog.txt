@@ -1,15 +1,16 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1480 1244792853
-city.html 9866 1490651937
-desk.html 6191 4236987627
-index.html 5247 1919757067
-living.html 133346 1379050245
-window-sky.html 1334 3530694168
-workshop.html 22101 1179228905
+beyond.html 1480 3911314603
+city.html 9866 3334511825
+desk.html 6191 2252139815
+index.html 5247 1642075465
+living.html 133470 3220922300
+window-sky.html 1334 687008239
+workshop.html 22101 2998531959
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/bathroom.js 29419 3573512770
 sky/bee.js 114096 3452333838
+sky/beerush.js 2671 1550462675
 sky/beyond.js 10960 423359035
 sky/books.js 13450 616855077
 sky/claubes.js 52332 2508345692
@@ -72,6 +73,7 @@ sky/css/ambient.css 435 4199751144
 sky/css/attic.css 15736 521837829
 sky/css/bathroom.css 16836 855192362
 sky/css/bee.css 33143 2350296565
+sky/css/beerush.css 2538 1614178349
 sky/css/beyond.css 2644 3959879294
 sky/css/books.css 4721 4205520486
 sky/css/claubes.css 17565 3697391751
@@ -282,7 +284,7 @@ schizophyllu.me.room/room/bathroom.svg 10897 782084363
 schizophyllu.me.room/room/bedroom.svg 18713 1434030946
 schizophyllu.me.room/room/closet.svg 8678 40838899
 schizophyllu.me.room/room/davinv.js 3811 2458123722
-schizophyllu.me.room/room/davnky.js 7443 4169200905
+schizophyllu.me.room/room/davnky.js 8242 3566853157
 schizophyllu.me.room/room/extra.js 33335 171487496
 schizophyllu.me.room/room/hallway.svg 7936 4202888856
 schizophyllu.me.room/room/music.js 4978 3071417838
@@ -325,7 +327,7 @@ schizophyllu.me.room/room/objects/bedroom/bwindow-blink.svg 603 1631090840
 schizophyllu.me.room/room/objects/bedroom/bwindow.svg 4443 1667767423
 schizophyllu.me.room/room/objects/bedroom/cans.svg 9310 2088011086
 schizophyllu.me.room/room/objects/bedroom/corkboard.svg 1650 4190754887
-schizophyllu.me.room/room/objects/bedroom/davnky.svg 11124 2542745265
+schizophyllu.me.room/room/objects/bedroom/davnky.svg 11116 2611170955
 schizophyllu.me.room/room/objects/bedroom/eboards.svg 669 2331585320
 schizophyllu.me.room/room/objects/bedroom/glow-clock-radio.svg 769 443655397
 schizophyllu.me.room/room/objects/bedroom/glow-laptop.svg 783 123309187
