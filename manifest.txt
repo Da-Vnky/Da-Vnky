@@ -157,10 +157,10 @@ content/sea/2026-09-25-hello-world.txt 213
 content/sea/2026-10-11-handwriting-test.txt 119
 content/sea/2026-10-11-if-ur-seeing-this-video.txt 86
 content/sea/2026-10-11-if-ur-seeing-this.txt 274
-content/sea/2026-10-11-testtttt.txt 228
+content/sea/2026-10-11-test.txt 105
 content/sea/2026-10-11-the-site-so-far.txt 594
-content/sea/list.txt 536
-content/sea/written.json 125
+content/sea/list.txt 553
+content/sea/written.json 121
 content/shame/frames.json 359
 content/shame/list.txt 125
 content/workshop/frames.json 77
