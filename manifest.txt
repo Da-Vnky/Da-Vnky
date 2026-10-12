@@ -10,7 +10,7 @@ sky/ambient.js 5331
 sky/attic.js 34823
 sky/bathroom.js 29419
 sky/bee.js 114096
-sky/beerush.js 2350
+sky/beerush.js 7878
 sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 52332
@@ -47,7 +47,7 @@ sky/music.js 61630
 sky/noise.js 11398
 sky/notes.js 5607
 sky/paint.js 41912
-sky/panel.js 69861
+sky/panel.js 70116
 sky/peeper.js 31642
 sky/porch.js 19007
 sky/post.js 21656
@@ -73,7 +73,7 @@ sky/css/ambient.css 435
 sky/css/attic.css 15736
 sky/css/bathroom.css 16836
 sky/css/bee.css 33143
-sky/css/beerush.css 2538
+sky/css/beerush.css 2904
 sky/css/beyond.css 2644
 sky/css/books.css 4721
 sky/css/claubes.css 17565

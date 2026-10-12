@@ -1,16 +1,16 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1480 2062412876
-city.html 9866 2998952242
-desk.html 6191 1447835017
-index.html 5247 57793159
-living.html 133470 2181085597
-window-sky.html 1334 2989899208
-workshop.html 22101 2790454244
+beyond.html 1480 816634792
+city.html 9866 2862249076
+desk.html 6191 1747482143
+index.html 5247 470315561
+living.html 133470 429267582
+window-sky.html 1334 574717407
+workshop.html 22101 1882109408
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/bathroom.js 29419 3573512770
 sky/bee.js 114096 3452333838
-sky/beerush.js 2350 831786997
+sky/beerush.js 7878 116953179
 sky/beyond.js 10960 423359035
 sky/books.js 13450 616855077
 sky/claubes.js 52332 2508345692
@@ -47,7 +47,7 @@ sky/music.js 61630 2836453616
 sky/noise.js 11398 890663370
 sky/notes.js 5607 2800503109
 sky/paint.js 41912 972334459
-sky/panel.js 69861 1078170668
+sky/panel.js 70116 343766282
 sky/peeper.js 31642 2382478789
 sky/porch.js 19007 2031860182
 sky/post.js 21656 2013340171
@@ -73,7 +73,7 @@ sky/css/ambient.css 435 4199751144
 sky/css/attic.css 15736 521837829
 sky/css/bathroom.css 16836 855192362
 sky/css/bee.css 33143 2350296565
-sky/css/beerush.css 2538 1614178349
+sky/css/beerush.css 2904 3932341659
 sky/css/beyond.css 2644 3959879294
 sky/css/books.css 4721 4205520486
 sky/css/claubes.css 17565 3697391751

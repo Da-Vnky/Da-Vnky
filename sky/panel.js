@@ -772,6 +772,10 @@
         'blip': function (out, t) {                                    // one letter of a text box typing out
             tone(out, t, 'square', 330, 330, 0.035, 0.05);
         },
+        // one letter of the bee typing out (sky/beerush.js): a short angry buzz (a stand-in for assets/sounds/bee-blip)
+        'bee-blip': function (out, t) {
+            tone(out, t, 'sawtooth', 190 + Math.random() * 60, 240, 0.045, 0.045);
+        },
         // a Claube, shot with the white revolver: a shriek that tears and falls away (about 1.5 s)
         'shriek': function (out, t) {
             [[1400, 0.22], [1870, 0.14], [2640, 0.08]].forEach(function (h, i) {

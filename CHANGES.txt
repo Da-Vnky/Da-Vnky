@@ -17,6 +17,9 @@ How it works
 
 == published ==
 
+2026-10-12 02:15 · V
+- The front garden: once "I'm just here for the bee" has given them the gun, a little voice in a typed text box eggs them on to shoot the bee; each shot at it then cuts it off and it turns on them ("Oh my god why would you have done that you monster??", "What did the bee ever do to you?", "How can you even look in the mirror?"); the fourth shot, the bee itself delivers a bee version of the Navy Seal copypasta, typed out with its own buzz (new sound slot assets/sounds/bee-blip); the fifth, the bee takes the gun as before.
+
 2026-10-12 01:44 · V
 - The front garden: "I'm just here for the bee" is there for everyone in the garden now (skizy's link comes straight to the front of the house), in any reset, whenever they aren't already holding a gun; put the gun away and it's back.
 

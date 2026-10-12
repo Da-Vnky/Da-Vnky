@@ -930,7 +930,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   convoluted"; skizy's link goes straight to living.html#front): there for everyone in the garden, any reset, unless they're
   holding a gun already (checked every second). Click: the revolver (the white one if they have it) out of the bag or added,
   `I.hold`, a line. It ignores the revolver's own rules (the bee's, `revolver-gone`, reset 4): revolver.js tidies those on the
-  next page load. **To take it away**: `ON = false` at its top, or remove the two lines from living.html and the two files.
+  next page load. **The little voice** (12 Oct, Victor): after the tag gives the gun (`tempt`, once a visit, sessionStorage
+  `bee-rush-used`) `TEMPT` lines in its own typed box (`talk`: the `.mc-say` look, `.bee-rush-say` lets shots through; not
+  `Sky.speak`, whose typing carried on after `hush`). `Sky.bee.shot` is wrapped: shots counted as bee.js counts them (2 min),
+  1-3 `AFTER`, 4 `RANT` ("the bee", `.bee-rant`, typing sound `bee-blip`: panel.js stand-in, slot assets/sounds/bee-blip), 5 quiet
+  (bee.js grabs the gun); a shot cuts off whatever's being said; nothing while the bee's armed. **To take it away**: `ON = false` at its top, or remove the two lines from living.html and the two files.
 
 ## The porch (sky/porch.js)
 

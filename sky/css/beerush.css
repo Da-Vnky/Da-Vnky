@@ -55,3 +55,8 @@ body.in-front.bee-rush-on:not(.bee-talking):not(.front-going-in) .bee-rush {
 @media (prefers-reduced-motion: reduce) {
     body.in-front.bee-rush-on:not(.bee-talking):not(.front-going-in) .bee-rush { animation: none; }
 }
+
+/* the little voice, and the bee's rant (sky/beerush.js): the traveller's text box (sky.css .mc-say), but shots go through it */
+.mc-say.bee-rush-say { pointer-events: none; z-index: 61; }
+.mc-say.bee-rant { border-color: rgba(255, 190, 60, .6); box-shadow: 0 12px 30px rgba(0, 0, 0, .6), 0 0 0 2px rgba(255, 190, 60, .15); }
+.mc-say.bee-rant b { color: #ffc23a; }

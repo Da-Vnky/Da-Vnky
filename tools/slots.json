@@ -3360,6 +3360,12 @@
        "optional": true
       },
       {
+       "slot": "assets/sounds/bee-blip",
+       "what": "the bee's angry rant typing out, a letter at a time (the front garden's \"I'm just here for the bee\", the fourth shot): a very short buzz. until yours is in, a made-up one",
+       "kind": "sound",
+       "optional": true
+      },
+      {
        "slot": "assets/sounds/bee-hum",
        "what": "its wings as it flies about (the front garden and the porch): a soft buzz, a loop of a second or two, played very quietly the whole time you can see it, a little faster when it darts about, quieter while it talks. until yours is in, a made-up hum like its voice",
        "kind": "sound",
