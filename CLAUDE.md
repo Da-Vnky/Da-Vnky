@@ -139,6 +139,10 @@ this before changing anything; keep it up to date when something here stops bein
   `dav-desk-session` and refreshed a minute before it runs out (and once more on a 401 / "JWT expired"). A signed-in
   account that isn't the owner sees the one line that makes it so (`insert into public.desk_owner (uid) values ('…')`):
   so no email ever goes in the (public) repo. Victor should switch off "Allow new users to sign up".
+- **desk.html's `sky/` links carry `?v=`** (11 Oct: it had none, so publishing never stamped them and a browser could run
+  yesterday's embeds.js with today's desk.js after a publish: the likely reason the song button did nothing in Victor's Firefox, with no upload reaching Supabase). The desk shows any
+  uncaught error as a toast (`window` error / unhandledrejection), and `songHere` says when the page's code is out of date.
+  Songs go up typed by their extension (Firefox calls .ogg video/ogg or application/ogg, which the bucket refuses).
 - **A change at the desk is a file**: `rows[path]` = a new copy in storage (`obj`: the same folder, a fresh name each
   time, `<stamp>-<slug>.<ext>`, so no cache ever serves an old one; the old copy is deleted) or `gone: true` (deleted; a
   file only ever on the desk is just removed). Names are made exactly as content.py makes them (`save`, `keep`,
@@ -297,8 +301,14 @@ this before changing anything; keep it up to date when something here stops bein
 - **▶ before a link** (`▶ https://youtu.be/…`, a paragraph of its own): `DavEmbed.plays(block)` → `html(url, { autoplay })` →
   `data-autoplay` (and `data-key`, which `patch()` matches players by). `DavEmbed.start(fig)` turns it on: the sites' own autoplay
   parameters (YouTube, Vimeo, SoundCloud, Dailymotion, Twitch, Streamable, Loom; others just load), a `<video>`/`<audio>` played
-  (`calm(src)` takes them off again). The "embed a link…" button asks (confirm) whether to put ▶ in front. Browsers may refuse
+  (`calm(src)` takes them off again). Browsers may refuse
   sound before the visitor's first click on the page; the letter's open click usually counts.
+- **The ▷ in the previews** (11 Oct, Victor: "a hollow version of the play icon … if clicked makes it play automatically"): the
+  desk's `renderLetter` and the letters page's `render` call `DavEmbed.autoButtons(prev)` (a `button.em-auto` on every
+  `figure.embed[data-url]` but pictures and gifts; `aria-pressed` = `data-autoplay`; hollow/filled triangle, embeds.css) and
+  `DavEmbed.autoSwitch(prev, textarea, changed)` (one capture click listener per preview: `switchAuto(text, fig)` finds the
+  figure's line, by `lone()` for a link or `song().src` for a song, and puts ▶ in front or takes it off). Only the previews
+  call it: the sea never shows the buttons. The "embed a link…" button no longer asks (confirm) about ▶.
 - **A song line**: `▶ ♫ [Title](content/sea/<date>-name.mp3 content/sea/<date>-name.png) → record player`: ▶ = plays by itself,
   the second path = its sleeve (optional), `→ record player` = a gift. `DavEmbed.song(block)` reads it (`SONG` regex),
   `songLine(t)` writes it, `songHtml(t, where)` draws `figure.embed.em-song` (`data-url`, `-title`, `-sleeve`, `-autoplay`,

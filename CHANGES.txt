@@ -17,6 +17,10 @@ How it works
 
 == published ==
 
+2026-10-11 21:31 · V
+- Letters: in the previews (the desk and the content manager's letters page) every player and song has a little ▷ on its corner: click it and it fills in, and the letter plays it by itself when it's opened (it puts ▶ in front of the line); click again to undo. The "embed a link…" button doesn't ask any more. A record that falls out of the letter has none (it always plays).
+- The desk: songs added there now go up (the desk page's code had no version stamp, so a browser could keep using yesterday's copy after a publish: it gets one now, desk.html ?v=); an .ogg goes up as audio/ogg in Firefox too; and anything that goes wrong shows a message instead of the button seeming to do nothing.
+
 2026-10-11 20:38 · V
 - Writing by hand keeps up with the pen better: the line now reaches right under the pen while it moves (it used to trail half a step behind), Chrome and Edge take the tablet's points the moment they arrive, the paper's place isn't measured again at every point, and the page underneath is hidden while writing.
 - Letters: a video or song link can start playing by itself when its letter's opened (put ▶ before the link; the "embed a link…" button asks). It starts when the letter comes into view and stops when the letters are put away, like the others.

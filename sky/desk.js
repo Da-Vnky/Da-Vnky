@@ -63,6 +63,9 @@
         if (text) toastTimer = setTimeout(function () { t.classList.remove('show'); }, bad ? 9000 : 4200);
     }
     function oops(e) { toast((e && e.message) || String(e), true); }
+    // anything that goes wrong without saying so says so here (a button that seemed to do nothing, 11 Oct)
+    window.addEventListener('error', function (e) { if (e.message) toast('something went wrong: ' + e.message + ' (reloading the page often helps)', true); });
+    window.addEventListener('unhandledrejection', function (e) { var r = e.reason; toast('something went wrong: ' + ((r && r.message) || r) + ' (reloading the page often helps)', true); });
 
     // one change at a time: buttons wait while something's being saved
     var busy = 0;
@@ -541,7 +544,7 @@
                             '<input type="file" class="dk-l-pic" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" hidden></div>' +
                         '<textarea class="dk-l-body" spellcheck="true" placeholder="write your letter here.\n\na blank line starts a new paragraph."></textarea>' +
                         '<p class="dk-hint dk-txt">a blank line = a new paragraph · <code>*italics*</code> · <code>**bold**</code> · <code>[words](https://…)</code> a link · ' +
-                            '<code>---</code> alone = a drawn line · <code>~ bye</code> alone = a sign-off · a link alone on its line = embedded (a video, a song, a post…) · <code>\u25B6</code> in front of one: it plays by itself</p>' +
+                            '<code>---</code> alone = a drawn line · <code>~ bye</code> alone = a sign-off · a link alone on its line = embedded (a video, a song, a post…) · its \u25B7 in the preview: click, and it plays by itself when the letter\u2019s opened</p>' +
                         '<p class="dk-hint dk-htmlnote" hidden>this letter is written in HTML (a .html file): edit the code as it is.</p>' +
                         '<div class="dk-actions"><button type="button" class="dk-btn dk-main dk-l-save">save it to the site</button>' +
                             '<button type="button" class="dk-btn dk-l-look">preview</button>' +
@@ -615,7 +618,7 @@
                 if (w === 'link') { var u = prompt('the web address to link to:', 'https://'); if (u && u !== 'https://') insert('[', '](' + u.trim() + ')', 'these words'); }
                 if (w === 'embed') {
                     var e = prompt('a link to a video, a song, a post… (it goes on a line of its own and plays right there in the letter):', 'https://');
-                    if (e && /^https?:\/\/\S+$/.test(e.trim())) block((confirm('start it playing by itself when the letter\u2019s opened? (YouTube, SoundCloud, Vimeo and song files can; Spotify and Bandcamp wait for their own play button)') ? '\u25B6 ' : '') + e.trim());
+                    if (e && /^https?:\/\/\S+$/.test(e.trim())) block(e.trim());                // (the ▷ on it in the preview: click to make it start by itself)
                 }
                 if (w === 'line') block('---');
                 if (w === 'signoff') { var so = prompt('sign off with:', 'more soon'); if (so) block('~ ' + so); }
@@ -659,7 +662,9 @@
         function putFile(file, kind) {
             var ext = (/\.[a-z0-9]+$/i.exec(file.name) || [''])[0].toLowerCase().replace('.jpeg', '.jpg');
             var path = FOLDERS.sea + unique(FOLDERS.sea, today() + '-' + slug(stemOf(file.name), kind), ext);
-            return put(path, file, file.type || (ext === '.ogg' ? 'audio/ogg' : ext === '.mp3' ? 'audio/mpeg' : 'application/octet-stream'))
+            // (a song's type by its name: Firefox calls an .ogg video/ogg or application/ogg, which the desk's storage won't take)
+            var type = ext === '.ogg' ? 'audio/ogg' : ext === '.mp3' ? 'audio/mpeg' : file.type || 'application/octet-stream';
+            return put(path, file, type)
                 .then(function () { return path; }, function (e) {
                     if (kind === 'song' && /mime|type|not supported|invalid/i.test(String(e && e.message || e)))
                         throw new Error('the desk can\u2019t take songs yet: run tools/supabase-desk.sql in Supabase\u2019s SQL editor once more (it lets songs in now), then try again');
@@ -667,7 +672,8 @@
                 });
         }
         function songHere() {
-            if (!window.DavSong || L.kind !== 'txt') return;
+            if (L.kind !== 'txt') { toast('a song goes in a letter written as words (.txt): this one\u2019s html', true); return; }
+            if (!window.DavSong || !window.DavEmbed || !DavEmbed.song) { toast('the desk\u2019s code is out of date in this browser: reload the page (ctrl+shift+r) and try again', true); return; }
             var at = paraAt(body.value, body.selectionStart), was = DavEmbed.song(at.text);
             DavSong.open({ was: was, where: function (x) { return /^content\//.test(x) ? urlOf(decodeURIComponent(x)) || '' : x; }, done: function (r) {
                 work(r.file ? 'putting the song in… (a big one takes a moment)' : 'changing it…', function () {
@@ -805,6 +811,11 @@
             prev.innerHTML = '<p class="dk-note">how it looks on the site</p><article class="letter"><div class="curl curl-top"></div><div class="sheet"><div class="content">' +
                 inner + '</div></div><div class="curl curl-bottom"></div></article>';
             if (window.DavEmbed) DavEmbed.dress(prev);
+        }
+        // ▷ on each player and song: click it, it plays by itself when the letter's opened (sky/embeds.js)
+        if (window.DavEmbed && DavEmbed.autoButtons && L.kind === 'txt') {
+            DavEmbed.autoButtons(prev);
+            DavEmbed.autoSwitch(prev, $('.dk-l-body', pane), function () { setLetterDirty(pane, true); renderLetter(pane); });
         }
         $('.dk-later', pane).hidden = !(d && d > today());
     }
