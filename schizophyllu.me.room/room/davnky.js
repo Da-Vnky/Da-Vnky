@@ -63,3 +63,63 @@ export const RESTORED = [
   [m('P(doom) is going down, by the way.'), skizy('is it'), m('In here, it is.')],
   [skizy('whoever brought that record'), skizy('thanks i guess'), m('She means it.'), skizy('i mean it')],
 ];
+
+// ------------------------------------------------------------ DaV-nky himself, in the bedroom (11 Oct)
+// passed out face down on skizy's bed, surrounded by cans (room/objects/bedroom/davnky.svg and cans.svg; their places in
+// room/bedroom.svg). the same as anything else in the bedroom: a label and lines, here added to narration.js's NARRATION.
+// clicked, he mumbles one of these into the pillow, lifts his head a little, and goes straight back to sleep (room.js, the end)
+import { NARRATION } from './narration.js';
+import { CAST } from './script.js';
+CAST.davnky = { name: 'DaV-nky', color: '#ff8a5c' };
+const dv = t => ['davnky', t, 'into the pillow'];
+NARRATION.davnky = {
+  label: 'DaV-nky (out cold)',
+  lines: [
+    dv('mmh... this place needs a dungeon...'),
+    dv('...every good apartment has a dungeon. you pull a book and the wall just... goes...'),
+    dv("skizy... where's the dungeon... there's gotta be a dungeon"),
+    dv('no dungeon... how do you even live like this...'),
+    dv("...i'll draw you one. a dungeon. five more minutes"),
+    dv('the closet could be a dungeon... if it believed in itself...'),
+    dv('...put the dungeon under the bed... nobody checks under the bed...'),
+    // skizy
+    dv("...skizy's my bee... my little bee... bzz..."),
+    dv('...good girl, skizy... good girl...'),
+    // ARAM Mayhem
+    dv('...one more aram... just one... mayhem...'),
+    dv("no... don't take that augment... take the other one... the other one..."),
+    dv('...why is it always the bridge... every game is the bridge...'),
+    dv('we had them... we had them and then the poro...'),
+    dv('...ff at fifteen... no... wait... we can still...'),
+    // art
+    dv('...the line weight is wrong... redo the hands...'),
+    dv('...ctrl z... ctrl z... ctrl z...'),
+    dv('...just need to finish the lineart... then i can sleep... wait...'),
+    dv('...more animation frames... twelve a second... no, twenty-four...'),
+    dv("...don't look at the sketch layer..."),
+    // just sleeping
+    dv('mrrnh.'),
+    dv('...hhhnnnkk... shhhh...'),
+    dv('*snores like a dying lawnmower*'),
+    dv('mm. mhm. mmm.'),
+    dv('...zzzhhh... pff...'),
+    dv('*rolls over halfway, thinks better of it*'),
+  ],
+};
+// what's said once he's back asleep (room.js, the end)
+export const DAV_ASLEEP = [
+  ['note', "...and he's out again."],
+  ['note', 'his head goes back down on the pillow. the zzz resume.'],
+  ['note', 'he falls asleep in the middle of the word "dungeon".'],
+];
+NARRATION.cans = {
+  label: 'energy drink cans',
+  lines: [
+    ['note', "red bull cans. eight that you can see. one of them is still half full and nobody is going to find out which."],
+    ['note', "they're laid out round the bed like a ritual circle. it isn't a ritual. it was a long night."],
+    ['note', "the crushed one was crushed on purpose. there's a dent in the shape of a forehead."],
+    ['claube', 'Visitor asleep in the bedroom. Cans: eight. Noted.', 'from the other room'],
+    ['mira', 'He came over to draw. He drew for eleven minutes.', 'from the other room'],
+    ['skizy', 'hes fine. let him sleep', 'from the other room'],
+  ],
+};

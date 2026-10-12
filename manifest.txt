@@ -113,7 +113,7 @@ sky/css/records.css 19836
 sky/css/resets.css 4109
 sky/css/revolver.css 2245
 sky/css/skizy-inventory.css 386
-sky/css/skizy-room.css 694
+sky/css/skizy-room.css 1429
 sky/css/skizy-window.css 2285
 sky/css/source.css 2410
 sky/css/static.css 2050
@@ -180,12 +180,12 @@ schizophyllu.me.room/index.html 5156
 schizophyllu.me.room/assets/font.css 30693
 schizophyllu.me.room/room/audio.js 15832
 schizophyllu.me.room/room/davinv.js 3811
-schizophyllu.me.room/room/davnky.js 4419
+schizophyllu.me.room/room/davnky.js 7559
 schizophyllu.me.room/room/extra.js 33335
 schizophyllu.me.room/room/music.js 4978
 schizophyllu.me.room/room/narration.js 14169
 schizophyllu.me.room/room/radio.js 6517
 schizophyllu.me.room/room/room.css 23952
-schizophyllu.me.room/room/room.js 94304
+schizophyllu.me.room/room/room.js 95222
 schizophyllu.me.room/room/script.js 46793
 schizophyllu.me.room/assets/playlist/playlist.json 648

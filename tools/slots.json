@@ -3917,6 +3917,13 @@
        "crop": "406 135 100 116"
       },
       {
+       "slot": "assets/skizy-room/bedroom-davnky",
+       "what": "DaV-nky, passed out on her bed (clicked: he lifts his head and mumbles)",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/davnky.svg"
+      },
+      {
        "slot": "assets/skizy-room/bedroom-eboards",
        "what": "circuit boards",
        "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
@@ -3939,6 +3946,13 @@
        "optional": true,
        "stock": "schizophyllu.me.room/room/objects/bedroom/laptop.svg",
        "crop": "1280 560 108 75"
+      },
+      {
+       "slot": "assets/skizy-room/bedroom-cans",
+       "what": "the energy drink cans round DaV-nky",
+       "size": "1600 x 900: the whole room, see-through, the thing drawn where it sits",
+       "optional": true,
+       "stock": "schizophyllu.me.room/room/objects/bedroom/cans.svg"
       },
       {
        "slot": "assets/skizy-room/bedroom-lavalamp",

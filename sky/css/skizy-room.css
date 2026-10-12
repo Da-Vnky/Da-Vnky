@@ -7,3 +7,13 @@
    pen picture takes its place */
 #claube.dav-has-pen > .pen,
 #claube.dav-has-pen > g:not(.dav-hit) .pen { display: none; }
+
+/* DaV-nky, asleep on her bed (room/objects/bedroom/davnky.svg; 11 Oct). clicked (room.js "dav-stir"): he lifts his head off
+   the pillow, eyes half open, while he mumbles, then it goes back down. asleep, the half-open eyes are hidden */
+[data-id="davnky"] .dv-head { transform-box: fill-box; transform-origin: 30% 90%; transition: transform .45s ease; }
+[data-id="davnky"] .dv-eyes { opacity: 0; transition: opacity .3s; }
+[data-id="davnky"] .dv-shut { transition: opacity .3s; }
+[data-id="davnky"].dav-stir .dv-head { transform: translate(-2px, -8px) rotate(-7deg); }
+[data-id="davnky"].dav-stir .dv-eyes { opacity: 1; }
+[data-id="davnky"].dav-stir .dv-shut { opacity: 0; }
+[data-id="davnky"].dav-stir .zzz { visibility: hidden; }

@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1480 3729372586
-city.html 9866 2977527447
-desk.html 6191 328978671
-index.html 5247 3966439134
-living.html 133346 1799771842
-window-sky.html 1334 3119292882
-workshop.html 22101 3045797116
+beyond.html 1480 1244792853
+city.html 9866 1490651937
+desk.html 6191 4236987627
+index.html 5247 1919757067
+living.html 133346 1379050245
+window-sky.html 1334 3530694168
+workshop.html 22101 1179228905
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/bathroom.js 29419 3573512770
@@ -113,7 +113,7 @@ sky/css/records.css 19836 2189892337
 sky/css/resets.css 4109 4173273641
 sky/css/revolver.css 2245 3732291808
 sky/css/skizy-inventory.css 386 2310895767
-sky/css/skizy-room.css 694 2908609191
+sky/css/skizy-room.css 1429 1050754832
 sky/css/skizy-window.css 2285 804630433
 sky/css/source.css 2410 3323991040
 sky/css/static.css 2050 1333689408
@@ -180,12 +180,12 @@ schizophyllu.me.room/index.html 5156 668732473
 schizophyllu.me.room/assets/font.css 30693 1584298999
 schizophyllu.me.room/room/audio.js 15832 3536447765
 schizophyllu.me.room/room/davinv.js 3811 2458123722
-schizophyllu.me.room/room/davnky.js 4419 719729585
+schizophyllu.me.room/room/davnky.js 7559 3673117959
 schizophyllu.me.room/room/extra.js 33335 171487496
 schizophyllu.me.room/room/music.js 4978 3071417838
 schizophyllu.me.room/room/narration.js 14169 2324333307
 schizophyllu.me.room/room/radio.js 6517 830110350
 schizophyllu.me.room/room/room.css 23952 631220628
-schizophyllu.me.room/room/room.js 94304 1239203258
+schizophyllu.me.room/room/room.js 95222 1578611549
 schizophyllu.me.room/room/script.js 46793 2522559
 schizophyllu.me.room/assets/playlist/playlist.json 648 1146689824

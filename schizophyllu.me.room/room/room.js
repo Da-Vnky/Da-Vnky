@@ -7,7 +7,7 @@ import {
 } from './script.js';
 import { NARRATION, ROOMS, PEEPHOLE, FOG, MIRROR, RADIO, CLOSET_FIRST, STAR_RARE } from './narration.js';
 import { RETURNING, MUSIC, AMBIENT_MORE, VIEWER_TALK, FUNGER_WATCHING, AFTERNOON_HUSH, MEDS_TALK, WAKE_UP, ASK_MIRA, ASK_CLAUBE, HEXLEY_SAYS, OPI, ASK_SKIZY } from './extra.js';
-import { GUILT, QUIET_NOTES, REMEDY_BACK, RESTORED_FIRST, RESTORED } from './davnky.js';   // (DaV-nky: see the end of this file)
+import { GUILT, QUIET_NOTES, REMEDY_BACK, RESTORED_FIRST, RESTORED, DAV_ASLEEP } from './davnky.js';   // (DaV-nky: see the end of this file)
 import { audio } from './audio.js';
 import { music } from './music.js';
 import { radio, STATIONS } from './radio.js';
@@ -2045,3 +2045,21 @@ music.load = async function () {
 };
 // the way back to the rooftop in the HUD, next door too (see ROOFTOP above)
 document.querySelectorAll('a[href="https://dav-nky.pleroma.nexus/city.html"]').forEach(a => { a.href = ROOFTOP; });
+
+// DaV-nky asleep on skizy's bed (11 Oct; room/objects/bedroom/davnky.svg, his lines in room/davnky.js). clicked, his
+// mumble shows (narrate, as for anything in the bedroom) while he lifts his head a little; then it goes back down on the
+// pillow and the room says he's asleep again. how he lifts it: DaV-nky's sky/css/skizy-room.css
+davSheet('skizy-room');
+const davAsleep = bag(DAV_ASLEEP);
+let davStirTimer = 0;
+$('#svg-host').addEventListener('click', e => {
+  const me = e.target.closest?.('[data-id="davnky"]');
+  if (!me || current !== 'bedroom' || mode !== 'room' || alone) return;
+  const said = $('#cap-text').textContent;
+  me.classList.add('dav-stir');
+  clearTimeout(davStirTimer);
+  davStirTimer = setTimeout(() => {
+    me.classList.remove('dav-stir');
+    if (!$('#caption').hidden && $('#cap-text').textContent === said) caption(davAsleep());
+  }, Math.min(readTime(said), 4200));
+});

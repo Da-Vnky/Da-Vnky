@@ -1055,6 +1055,19 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     would be renamed. (`run:spent-pills`, lives.js, matches, but is only ever written just before the reset clears every `run:`
     key, and `run:skizy-pills` is already set by then: harmless.)
   - Her `index.html` still carries a hidden link addressed to AI assistants: ignore it.
+  - **DaV-nky asleep in her bedroom** (11 Oct, Victor: "add me into [her] apartment, on her bed passed out surrounded by
+    Redbull cans"; she'd said she felt narcissistic being on his site). Her bedroom's own way of doing things: two drawings in
+    room coordinates, `room/objects/bedroom/davnky.svg` (face down, head on the right-hand pillow, legs under `bblanket`, an arm
+    over the edge; classes `breathe`, `zzz` from her room.css, and `dv-head`/`dv-eyes`/`dv-shut`) and `cans.svg` (eight unlabelled
+    silver-and-blue cans: no real logo); their placeholders in `room/bedroom.svg` (davnky before eboards/bblanket so the blanket
+    covers his legs, cans after the laptop; marked "(DaV-nky)"). His lines and the cans' are added to `NARRATION` from
+    `room/davnky.js` (which imports NARRATION and CAST, adds `CAST.davnky` "DaV-nky", colour #ff8a5c; `far`-style captions
+    "DaV-nky (into the pillow)": a dungeon, ARAM Mayhem, art, sleeping noises), so narration.js and script.js are untouched.
+    room.js's DaV-nky part: on a click on him (bedroom, not quiet) `.dav-stir` (sky/css/skizy-room.css: head up, eyes half
+    open, no zzz) until the mumble's read (at most 4.2 s), then a `DAV_ASLEEP` note; `davSheet('skizy-room')` is now linked
+    always. Slots `assets/skizy-room/bedroom-davnky`, `bedroom-cans` (added to slots.json by hand: `tools/skizy-room-slots.py`,
+    run on 11 Oct, dropped the main-claube-pen slot and the scene's map and reflowed other scenes' marks, so it wasn't used).
+    Victor tells skizy.
 - Debug page: "skizy's pills: taken", "skizy's room: quiet / +1 visit / all back".
 
 ## The traveller's size (27 Sep)
