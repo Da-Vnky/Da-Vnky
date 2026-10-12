@@ -18,7 +18,7 @@ How it works
 == published ==
 
 2026-10-11 23:34 · V
-- skizy's room: DaV-nky is passed out face down on her bed in the bedroom, legs under the blanket formation, one arm hanging off the edge, surrounded by energy drink cans. Click him: he lifts his head and mumbles (a dungeon the apartment needs, skizy being his bee, ARAM Mayhem, art, or just sleeping noises), then he's out again. The cans have lines of their own. Both are slots in the asset manager (skizy's room: bedroom-davnky, bedroom-cans). In her folder: two new drawings (room/objects/bedroom/davnky.svg, cans.svg), two placeholder lines in room/bedroom.svg, the lines in room/davnky.js, and a few lines at the end of room/room.js (the DaV-nky part).
+- skizy's room: DaV-nky is passed out face down on her bed in the bedroom, legs under the blanket formation, one arm hanging off the edge, surrounded by energy drink cans. Click him: he lifts his head and mumbles (a dungeon the apartment needs, ARAM Mayhem, art, or just sleeping noises), then he's out again. The cans have lines of their own. Both are slots in the asset manager (skizy's room: bedroom-davnky, bedroom-cans). In her folder: two new drawings (room/objects/bedroom/davnky.svg, cans.svg), two placeholder lines in room/bedroom.svg, the lines in room/davnky.js, and a few lines at the end of room/room.js (the DaV-nky part).
 
 2026-10-11 21:41 · V
 - Letters: the ▷ in the previews is gone again; the "embed a link…" button asks whether it should play by itself, as before (▶ in front of a link still does it).

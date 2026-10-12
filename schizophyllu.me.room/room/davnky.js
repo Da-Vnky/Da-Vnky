@@ -82,9 +82,6 @@ NARRATION.davnky = {
     dv("...i'll draw you one. a dungeon. five more minutes"),
     dv('the closet could be a dungeon... if it believed in itself...'),
     dv('...put the dungeon under the bed... nobody checks under the bed...'),
-    // skizy
-    dv("...skizy's my bee... my little bee... bzz..."),
-    dv('...good girl, skizy... good girl...'),
     // ARAM Mayhem
     dv('...one more aram... just one... mayhem...'),
     dv("no... don't take that augment... take the other one... the other one..."),

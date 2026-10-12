@@ -282,7 +282,7 @@ schizophyllu.me.room/room/bathroom.svg 10897 782084363
 schizophyllu.me.room/room/bedroom.svg 18713 1434030946
 schizophyllu.me.room/room/closet.svg 8678 40838899
 schizophyllu.me.room/room/davinv.js 3811 2458123722
-schizophyllu.me.room/room/davnky.js 7559 3673117959
+schizophyllu.me.room/room/davnky.js 7443 4169200905
 schizophyllu.me.room/room/extra.js 33335 171487496
 schizophyllu.me.room/room/hallway.svg 7936 4202888856
 schizophyllu.me.room/room/music.js 4978 3071417838

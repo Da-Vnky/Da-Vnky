@@ -180,7 +180,7 @@ schizophyllu.me.room/index.html 5156 668732473
 schizophyllu.me.room/assets/font.css 30693 1584298999
 schizophyllu.me.room/room/audio.js 15832 3536447765
 schizophyllu.me.room/room/davinv.js 3811 2458123722
-schizophyllu.me.room/room/davnky.js 7559 3673117959
+schizophyllu.me.room/room/davnky.js 7443 4169200905
 schizophyllu.me.room/room/extra.js 33335 171487496
 schizophyllu.me.room/room/music.js 4978 3071417838
 schizophyllu.me.room/room/narration.js 14169 2324333307

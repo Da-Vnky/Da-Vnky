@@ -1067,7 +1067,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     open, no zzz) until the mumble's read (at most 4.2 s), then a `DAV_ASLEEP` note; `davSheet('skizy-room')` is now linked
     always. Slots `assets/skizy-room/bedroom-davnky`, `bedroom-cans` (added to slots.json by hand: `tools/skizy-room-slots.py`,
     run on 11 Oct, dropped the main-claube-pen slot and the scene's map and reflowed other scenes' marks, so it wasn't used).
-    Victor tells skizy.
+    Victor tells skizy. No lines of affection about skizy there (Victor, 11 Oct: two were added, published and taken out
+    again, with the publish rewritten: "cringe for visitors that would wander in").
 - Debug page: "skizy's pills: taken", "skizy's room: quiet / +1 visit / all back".
 
 ## The traveller's size (27 Sep)
