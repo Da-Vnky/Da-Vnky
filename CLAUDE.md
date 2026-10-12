@@ -934,7 +934,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `bee-rush-used`) `TEMPT` lines in its own typed box (`talk`: the `.mc-say` look, `.bee-rush-say` lets shots through; not
   `Sky.speak`, whose typing carried on after `hush`). `Sky.bee.shot` is wrapped: shots counted as bee.js counts them (2 min),
   1-3 `AFTER`, 4 `RANT` ("the bee", `.bee-rant`, typing sound `bee-blip`: panel.js stand-in, slot assets/sounds/bee-blip), 5 quiet
-  (bee.js grabs the gun); a shot cuts off whatever's being said; nothing while the bee's armed. **To take it away**: `ON = false` at its top, or remove the two lines from living.html and the two files.
+  (bee.js grabs the gun); a shot cuts off whatever's being said; nothing while the bee's armed. **Once only** (12 Oct, Victor): the click sets localStorage `bee-rush-taken`; the tag never shows again, and
+  revolver.js puts the revolver back in the bag at each visit for that visitor (not reset 4, not `revolver-gone`, not the bee's),
+  so the rooftop's / wall's pickup stays empty (`.taken`). **To take it away**: `ON = false` at its top, or remove the two lines from living.html and the two files.
 
 ## The porch (sky/porch.js)
 

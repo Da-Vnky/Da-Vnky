@@ -17,6 +17,9 @@ How it works
 
 == published ==
 
+2026-10-12 10:03 · V
+- The front garden: "I'm just here for the bee" goes for good once it's been used (it came back after the bee took the gun), and the revolver it gave stays in that visitor's bag from visit to visit, so the rooftop's (or the living room wall's) stays empty: not in reset 4, not once it's been destroyed, not while the bee has it.
+
 2026-10-12 02:15 · V
 - The front garden: once "I'm just here for the bee" has given them the gun, a little voice in a typed text box eggs them on to shoot the bee; each shot at it then cuts it off and it turns on them ("Oh my god why would you have done that you monster??", "What did the bee ever do to you?", "How can you even look in the mirror?"); the fourth shot, the bee itself delivers a bee version of the Navy Seal copypasta, typed out with its own buzz (new sound slot assets/sounds/bee-blip); the fifth, the bee takes the gun as before.
 

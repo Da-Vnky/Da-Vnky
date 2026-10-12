@@ -1,16 +1,16 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1480 816634792
-city.html 9866 2862249076
-desk.html 6191 1747482143
-index.html 5247 470315561
-living.html 133470 429267582
-window-sky.html 1334 574717407
-workshop.html 22101 1882109408
+beyond.html 1480 1445079561
+city.html 9866 3733585163
+desk.html 6191 38879918
+index.html 5247 207892678
+living.html 133470 1828866964
+window-sky.html 1334 4159341522
+workshop.html 22101 4078618300
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/bathroom.js 29419 3573512770
 sky/bee.js 114096 3452333838
-sky/beerush.js 7878 116953179
+sky/beerush.js 8186 121989627
 sky/beyond.js 10960 423359035
 sky/books.js 13450 616855077
 sky/claubes.js 52332 2508345692
@@ -53,7 +53,7 @@ sky/porch.js 19007 2031860182
 sky/post.js 21656 2013340171
 sky/records.js 37374 197731851
 sky/resets.js 17516 2785905217
-sky/revolver.js 19577 3874064095
+sky/revolver.js 20186 2694897367
 sky/ropes.js 5596 4224145225
 sky/sky.js 137833 314625685
 sky/songpad.js 8196 2333869894

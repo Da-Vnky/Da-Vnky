@@ -1,12 +1,12 @@
 /* =====================================================================
    beerush.js — "I'm just here for the bee" (12 Oct). For a while only: the
-   bee's going round on Twitter, and people are coming for it.
+   bee's popular, and people come just for it.
 
    In the front garden (living.html#front: skizy's bee links straight
    there), a paper tag in the sky's corner, for everyone: one click and the
    revolver's in their hand (out of the bag if it's there already, else a
-   new one), ready to point at the bee (sky/bee.js does the rest). It goes
-   while they hold it, and comes back if they put it away.
+   new one), ready to point at the bee (sky/bee.js does the rest). Used
+   once, it's gone for good (12 Oct: it came back after the bee took the gun).
 
    Switching it off: ON = false below (or take this file and
    sky/css/beerush.css out of living.html).
@@ -16,8 +16,10 @@
     if (!ON || !window.Sky || !Sky.inventory) return;
     var I = Sky.inventory, body = document.body;
 
-    // shown to anyone in the front garden who isn't already holding a gun (12 Oct: kept simple, any reset)
-    function free() { return I.holding !== 'revolver' && I.holding !== 'white-revolver'; }
+    // shown to anyone in the front garden who isn't already holding a gun (12 Oct: kept simple, any reset), until they've
+    // used it once: then never again, on any visit (localStorage bee-rush-taken; "forget your stay" clears it)
+    function taken() { try { return localStorage.getItem('bee-rush-taken') === '1'; } catch (e) { return false; } }
+    function free() { return !taken() && I.holding !== 'revolver' && I.holding !== 'white-revolver'; }
 
     var tag = document.createElement('button');
     tag.type = 'button';
@@ -35,6 +37,7 @@
     tag.addEventListener('click', function (e) {
         e.stopPropagation();
         if (!free()) { check(); return; }
+        try { localStorage.setItem('bee-rush-taken', '1'); } catch (e) {}
         var gun = I.has('white-revolver') ? 'white-revolver' : 'revolver';
         if (!I.has(gun)) I.add(gun, { quiet: true });
         I.hold(gun);
@@ -58,7 +61,7 @@
         'go on.',
         'it’s just a bee.',
         'nobody’s watching. probably.',
-        'the tweet said you could shoot it. so shoot it.',
+        'everyone else did. go on.',
         'point it at the bee and click. one little shot.',
         '…what are you waiting for?'
     ];

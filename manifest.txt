@@ -10,7 +10,7 @@ sky/ambient.js 5331
 sky/attic.js 34823
 sky/bathroom.js 29419
 sky/bee.js 114096
-sky/beerush.js 7878
+sky/beerush.js 8186
 sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 52332
@@ -53,7 +53,7 @@ sky/porch.js 19007
 sky/post.js 21656
 sky/records.js 37374
 sky/resets.js 17516
-sky/revolver.js 19577
+sky/revolver.js 20186
 sky/ropes.js 5596
 sky/sky.js 137833
 sky/songpad.js 8196

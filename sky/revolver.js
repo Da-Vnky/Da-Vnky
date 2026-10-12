@@ -283,6 +283,14 @@
         });
         if (gone && I.has('revolver')) I.remove('revolver');
     })();
+    // the revolver the front garden's "I'm just here for the bee" handed over (sky/beerush.js, 12 Oct) stays theirs: put
+    // back in the bag each visit, so the rooftop's (or the wall's) stays empty. not in reset 4, not once it's gone, not
+    // while the bee has it (localStorage bee-rush-taken)
+    (function () {
+        var S = window.davSave, r = S ? S.reset : 1, mine = false;
+        try { mine = localStorage.getItem('bee-rush-taken') === '1'; } catch (e) {}
+        if (mine && r !== 4 && !destroyed(r) && !withBee('revolver') && !I.has('revolver')) I.add('revolver', { quiet: true });
+    })();
     // the white revolver stays theirs for the rest of reset 4 (the bag itself only lasts the visit)
     (function () {
         var S = window.davSave;
