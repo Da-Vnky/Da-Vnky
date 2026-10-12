@@ -140,6 +140,9 @@
         if (m) return { name: u.hostname, src: u.origin + '/embed/' + m[1], height: 420, tall: true };
         return null;
     }
+    // a line that starts with ▶ plays by itself when its letter's opened (letters.js), a song or a player alike
+    var PLAYS = /^\u25B6\uFE0E?\s*/;
+    function plays(block) { return PLAYS.test(String(block || '').trim()); }
     var FILE = { image: /\.(png|jpe?g|gif|webp|avif|svg)$/i, video: /\.(mp4|webm|mov|m4v|ogv)$/i, audio: /\.(mp3|ogg|oga|wav|m4a|flac|opus)$/i };
 
     // what a link is: { kind: 'frame', src, ratio | height, name, tall } · { kind: 'image' | 'video' | 'audio', src } · { kind: 'card' }
@@ -160,7 +163,7 @@
 
     // a paragraph that's only a link (bare, or in <angle brackets>): its address, else ''
     function lone(block) {
-        var m = /^<?(https?:\/\/[^\s<>"]+?)>?$/i.exec(String(block || '').trim());
+        var m = /^<?(https?:\/\/[^\s<>"]+?)>?$/i.exec(String(block || '').trim().replace(PLAYS, ''));
         if (!m) return '';
         return parse(m[1]) ? m[1].replace(/[.,;:!?)]+$/, function (tail) { return /\(/.test(m[1]) && tail.charAt(0) === ')' ? tail : ''; }) : '';
     }
@@ -180,10 +183,11 @@
     }
 
     // the html for a link on its own line
-    function html(url) {
-        var f = find(url);
+    function html(url, o) {
+        var f = find(url), auto = o && o.autoplay;
         if (!f) return '<p><a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(url) + '</a></p>';
-        var open = '<figure class="embed em-' + (f.kind === 'frame' ? 'player' : f.kind) + (f.tall ? ' em-tall' : '') + '" data-url="' + esc(url) + '">';
+        var open = '<figure class="embed em-' + (f.kind === 'frame' ? 'player' : f.kind) + (f.tall ? ' em-tall' : '') + '" data-url="' + esc(url) + '"' +
+            (auto ? ' data-autoplay data-key="' + esc('\u25B6' + url) + '"' : '') + '>';
         if (f.kind === 'frame') return open + frameHtml(f) + caption(url, f.name) + '</figure>';
         if (f.kind === 'image') return open + '<img src="' + esc(f.src) + '" alt="" loading="lazy">' + caption(url, f.name) + '</figure>';
         if (f.kind === 'video') return open + '<video src="' + esc(f.src) + '" controls preload="metadata" playsinline></video>' + caption(url, f.name) + '</figure>';
@@ -206,6 +210,8 @@
     }
     // every card inside root that hasn't been asked about yet
     function dress(root) {
+        // (marked on the element itself, not in its html: a letter built again from its html needs wiring again)
+        Array.prototype.forEach.call((root || document).querySelectorAll('figure.em-song'), function (f) { if (!f.davWired) wireSong(f); });
         Array.prototype.forEach.call((root || document).querySelectorAll('figure.em-card:not([data-asked])'), function (fig) {
             fig.setAttribute('data-asked', '');
             var url = fig.getAttribute('data-url');
@@ -240,8 +246,9 @@
         tmp.innerHTML = html;
         var olds = Array.prototype.filter.call(box.childNodes, function (n) { return n.nodeType === 1 && n.matches('figure.embed[data-url]'); });
         var cursor = box.firstChild;
+        function key(n) { return n.getAttribute('data-key') || n.getAttribute('data-url'); }
         Array.prototype.slice.call(tmp.childNodes).forEach(function (n) {
-            var same = n.nodeType === 1 && n.matches('figure.embed[data-url]') ? olds.filter(function (o) { return o.getAttribute('data-url') === n.getAttribute('data-url'); })[0] : null;
+            var same = n.nodeType === 1 && n.matches('figure.embed[data-url]') ? olds.filter(function (o) { return key(o) === key(n); })[0] : null;
             if (same) {
                 olds.splice(olds.indexOf(same), 1);
                 while (cursor && cursor !== same) { var next = cursor.nextSibling; box.removeChild(cursor); cursor = next; }
@@ -275,5 +282,112 @@
     function isHand(block) { return /^!\[handwritten[^\]]*\]\([^)\s]+\)$/i.test(block); }
     function handwritten(img) { return '<figure class="handwritten">' + img + '</figure>'; }
 
-    window.DavEmbed = { find: find, lone: lone, html: html, dress: dress, patch: patch, taped: taped, isHand: isHand, handwritten: handwritten, SITES: SITES };
+    /* ---------------- a song of your own, in the letter: a record in its sleeve ----------------
+       written on a line of its own as
+           ▶ ♫ [Aerie](content/sea/2026-10-11-aerie.mp3 content/sea/2026-10-11-aerie.jpg) → record player
+       ♫ [its name](the song, and its sleeve if it has one): the ▶ in front, it plays by itself when the letter's opened;
+       "→ record player" after it, whoever reads the letter finds it in their record player once they roll the letter up
+       (letters.js; records.js puts it in the crate). the content manager's and the desk's "a song…" button writes it */
+    var SONG = /^(▶︎?\s*)?♫\s*\[([^\]]*)\]\(([^)\s]+)(?:\s+([^)\s]+))?\)(\s*(?:→|->)\s*record player)?$/i;
+    function song(block) {
+        var m = SONG.exec(String(block || '').trim());
+        return m ? { title: m[2] || 'a song', src: m[3], sleeve: m[4] || '', autoplay: !!m[1], gift: !!m[5] } : null;
+    }
+    function songLine(t) {
+        return (t.autoplay ? '▶ ' : '') + '♫ [' + String(t.title || 'a song').replace(/[\[\]]/g, '') + '](' + t.src + (t.sleeve ? ' ' + t.sleeve : '') + ')' +
+            (t.gift ? ' → record player' : '');
+    }
+    var LABELS = ['#9a3b1f', '#c49a52', '#3f5a55', '#6e2f24', '#56636f', '#8a3f6e', '#b88c5e', '#28323b'];   // (the record player's)
+    function hash(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+    // the record itself: the site's own (Sky.music.disc: your record and its light, where the page has them), else drawn here
+    function discSvg(color, pic) {
+        if (window.Sky && Sky.music && Sky.music.disc) return Sky.music.disc(color, pic);
+        var id = 'emd' + hash(String(pic) + color + Math.random());
+        var rings = '';
+        for (var r = 46; r > 20; r -= 2.6) rings += '<circle cx="50" cy="50" r="' + r.toFixed(1) + '" fill="none" stroke="rgba(255,255,255,.05)" stroke-width=".5"/>';
+        return '<svg class="rp-disc" viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="' + id + '"><circle cx="50" cy="50" r="17"/></clipPath>' +
+            '<radialGradient id="' + id + 's" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#2b2b30"/><stop offset="1" stop-color="#09090b"/></radialGradient></defs>' +
+            '<circle cx="50" cy="50" r="49" fill="url(#' + id + 's)"/>' + rings +
+            '<circle cx="50" cy="50" r="17" fill="' + color + '"/>' +
+            (pic ? '<image href="' + esc(pic) + '" x="33" y="33" width="34" height="34" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/>' : '') +
+            '<path d="M18 30 A38 38 0 0 1 40 13" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="3" stroke-linecap="round"/>' +
+            '<circle cx="50" cy="50" r="2" fill="#0c0c0e"/></svg>';
+    }
+    // t: from song(); where(path) → the address to fetch it from (the page's own way: the desk's copy, a leading /…)
+    function songHtml(t, where) {
+        var at = where || function (p) { return p; };
+        var src = at(t.src), pic = t.sleeve ? at(t.sleeve) : '', color = LABELS[hash(t.src) % LABELS.length];
+        var key = (t.autoplay ? '▶' : '') + t.src + ' ' + t.sleeve + (t.gift ? ' +' : '') + ' ' + t.title;
+        return '<figure class="embed em-song" data-url="' + esc(t.src) + '" data-key="' + esc(key) + '" data-title="' + esc(t.title) + '" data-sleeve="' + esc(t.sleeve) +
+                (t.autoplay ? '" data-autoplay' : '"') + (t.gift ? ' data-gift' : '') + ' style="--sl: ' + color + '">' +
+            '<button type="button" class="es-record" aria-label="play ' + esc(t.title) + '">' +
+                '<span class="es-disc">' + discSvg(color, pic) + '</span>' +
+                '<span class="es-sleeve">' + (pic ? '<img src="' + esc(pic) + '" alt="" loading="lazy">' : '<span class="es-plain">' + esc(t.title) + '</span>') + '</span>' +
+            '</button>' +
+            '<figcaption class="es-side">' +
+                '<b class="es-title">' + esc(t.title) + '</b>' +
+                '<span class="es-note">' + (t.gift ? 'a record, slipped in with the letter: yours to keep' : 'a record, slipped in with the letter') + '</span>' +
+                '<span class="es-controls"><button type="button" class="es-play">play</button>' +
+                '<input class="es-seek" type="range" min="0" max="1000" value="0" aria-label="where in the song"><span class="es-time">0:00</span></span>' +
+            '</figcaption>' +
+            '<audio preload="none" src="' + esc(src) + '"></audio>' +
+        '</figure>';
+    }
+    function mmss(t) { if (!isFinite(t)) return '0:00'; t = Math.floor(t); return Math.floor(t / 60) + ':' + ('0' + t % 60).slice(-2); }
+    function wireSong(fig) {
+        fig.davWired = true;
+        var au = fig.querySelector('audio'), btn = fig.querySelector('.es-play'), seek = fig.querySelector('.es-seek'), time = fig.querySelector('.es-time');
+        function toggle() { if (au.paused) { var p = au.play(); if (p && p.catch) p.catch(function () {}); } else au.pause(); }
+        btn.addEventListener('click', toggle);
+        fig.querySelector('.es-record').addEventListener('click', toggle);
+        au.addEventListener('play', function () { fig.classList.add('playing'); btn.textContent = 'pause'; });
+        au.addEventListener('pause', function () { fig.classList.remove('playing'); btn.textContent = 'play'; });
+        au.addEventListener('ended', function () { fig.classList.remove('playing'); btn.textContent = 'play'; });
+        au.addEventListener('timeupdate', function () {
+            if (!seeking && au.duration) seek.value = Math.round(au.currentTime / au.duration * 1000);
+            time.textContent = mmss(au.currentTime) + (au.duration ? ' / ' + mmss(au.duration) : '');
+        });
+        var seeking = false;
+        seek.addEventListener('input', function () { seeking = true; if (au.duration) time.textContent = mmss(seek.value / 1000 * au.duration) + ' / ' + mmss(au.duration); });
+        seek.addEventListener('change', function () { seeking = false; if (au.duration) au.currentTime = seek.value / 1000 * au.duration; else { au.preload = 'auto'; } });
+    }
+
+    /* ---------------- playing by itself (letters.js, when the letter's opened) ----------------
+       a page may start a player as soon as someone's clicked on it (opening the letter counts). a song or a video file:
+       play(). another site's player: its address again, with that site's own word for "start" (the ones that have one:
+       Spotify and Bandcamp don't, so they wait for their own play button). a browser set to block it: it just waits */
+    var AUTO = { 'youtube-nocookie.com': ['autoplay', '1'], 'youtube.com': ['autoplay', '1'], 'player.vimeo.com': ['autoplay', '1'],
+                 'w.soundcloud.com': ['auto_play', 'true'], 'dailymotion.com': ['autoplay', '1'], 'player.twitch.tv': ['autoplay', 'true'],
+                 'streamable.com': ['autoplay', '1'], 'loom.com': ['autoplay', '1'] };
+    function start(fig) {
+        var media = fig.querySelector('audio, video');
+        if (media) {
+            if (media.preload === 'none') media.preload = 'auto';
+            var p = media.play();
+            if (p && p.catch) p.catch(function () {});
+            return true;
+        }
+        var fr = fig.querySelector('iframe');
+        if (!fr) return false;
+        var u = parse(fr.src);
+        if (!u) return false;
+        var word = AUTO[u.hostname.replace(/^www\./, '')];
+        if (!word) return false;
+        u.searchParams.set(word[0], word[1]);
+        fr.loading = 'eager';
+        fr.src = u.href;
+        return true;
+    }
+
+    // the same address without the word that starts it (so a player put back, silent, doesn't start on its own when it loads again)
+    function calm(src) {
+        var u = parse(src);
+        if (!u) return src;
+        var word = AUTO[u.hostname.replace(/^www\./, '')];
+        if (word && u.searchParams.has(word[0])) { u.searchParams.delete(word[0]); return u.href; }
+        return src;
+    }
+
+    window.DavEmbed = { find: find, lone: lone, plays: plays, calm: calm, html: html, dress: dress, patch: patch, taped: taped, isHand: isHand, handwritten: handwritten,
+                        song: song, songLine: songLine, songHtml: songHtml, discSvg: discSvg, start: start, SITES: SITES };
 })();

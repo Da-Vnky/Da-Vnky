@@ -1933,8 +1933,11 @@
             }
             if (/^-{3,}$/.test(b)) { out += '<hr>'; return; }
             if (/^~\s/.test(b)) { out += '<p class="signoff">' + inline(b.replace(/^~\s*/, '')) + '</p>'; return; }
+            // a song of your own (a record in its sleeve), or a link alone on its line (its player); ▶ in front: it plays by itself
+            var sg = embed && DavEmbed.song && DavEmbed.song(b);
+            if (sg) { out += DavEmbed.songHtml(sg, function (p) { return /^content\//.test(p) ? deskUrl(p) || p : p; }); return; }
             var link = embed && DavEmbed.lone(b);
-            if (link) { out += DavEmbed.html(link); return; }
+            if (link) { out += DavEmbed.html(link, { autoplay: DavEmbed.plays && DavEmbed.plays(b) }); return; }
             // a page written by hand (sky/inkpad.js): straight on the paper
             if (embed && DavEmbed.isHand && DavEmbed.isHand(b)) { out += DavEmbed.handwritten(inline(b)); return; }
             // a picture on its own line: taped onto the paper, like the embeds (sky/css/embeds.css)

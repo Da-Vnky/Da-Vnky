@@ -3,13 +3,15 @@
    (the desk and the content manager's letters page)
    ===================================================================== */
 html.ink-pad-open { overflow: hidden; }
+/* (the page underneath is hidden while writing: nothing else for the browser to keep drawing, videos in the preview included) */
+html.ink-pad-open body > :not(.ink-pad) { visibility: hidden; }
 .ink-pad {
     position: fixed;
     inset: 0;
     z-index: 2147483000;
     display: flex;
     flex-direction: column;
-    background: rgba(20, 13, 8, .95);
+    background: #1a110a;
     color: #f3e6c2;
     font: italic 15px/1.4 "IM Fell English", Georgia, serif;
 }
@@ -76,7 +78,8 @@ html.ink-pad-open { overflow: hidden; }
     border-radius: 2px;
 }
 .ink-pad .ip-sheet.no-lines { background-image: radial-gradient(ellipse at 30% 20%, var(--paper-light, #f3e8cc), transparent 70%); }
-.ink-pad .ip-canvas {
+.ink-pad .ip-canvas,
+.ink-pad .ip-live {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -84,6 +87,7 @@ html.ink-pad-open { overflow: hidden; }
     touch-action: none;
     cursor: none;
 }
+.ink-pad .ip-live { pointer-events: none; }
 /* where the pen is, and how big it writes */
 .ink-pad .ip-tip {
     position: absolute;
@@ -96,6 +100,7 @@ html.ink-pad-open { overflow: hidden; }
     border: 1px solid rgba(42, 28, 17, .8);
     box-shadow: 0 0 0 1px rgba(243, 230, 194, .7);
     pointer-events: none;
+    will-change: transform;
 }
 .ink-pad .ip-tip.rub { border-style: dashed; }
 .ink-pad .ip-tip[hidden] { display: none; }
@@ -105,4 +110,66 @@ html.ink-pad-open { overflow: hidden; }
 @media (max-width: 620px) {
     .ink-pad .ip-bar { padding: 8px 10px; gap: 8px; }
     .ink-pad .ip-title { display: none; }
+}
+
+/* ---------- a song in the letter (sky/songpad.js): the little card that asks for it ---------- */
+.song-pad {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgba(20, 13, 8, .72);
+    font: 15px/1.45 "IM Fell English", Georgia, serif;
+    color: #2a1c11;
+}
+.song-pad .sp-card {
+    width: min(560px, 100%);
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+    padding: 22px 26px 18px;
+    border-radius: 4px;
+    background: var(--paper, #e9dbb8);
+    background-image: radial-gradient(ellipse at 30% 20%, var(--paper-light, #f3e8cc), transparent 70%);
+    box-shadow: 0 0 0 1px rgba(60, 40, 20, .3), inset 0 0 50px rgba(110, 70, 30, .25), 0 20px 50px rgba(0, 0, 0, .55);
+}
+.song-pad h2 { margin: 0 0 14px; font: normal 1.5rem "IM Fell English SC", Georgia, serif; }
+.song-pad .sp-row { display: flex; gap: 22px; align-items: center; }
+.song-pad .sp-sleeve { position: relative; flex: none; width: 128px; height: 128px; margin-right: 40px; cursor: pointer; }
+.song-pad .sp-disc { position: absolute; left: 6%; top: 6%; width: 88%; height: 88%; transform: translateX(32%); }
+.song-pad .sp-disc svg { display: block; width: 100%; height: 100%; }
+.song-pad .sp-cover { position: absolute; inset: 0; overflow: hidden; border-radius: 2px; background: #9a3b1f;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(0, 0, 0, .15); }
+.song-pad .sp-cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.song-pad .sp-plain-cover { position: absolute; inset: 0; display: grid; place-items: center; padding: 14%; text-align: center;
+    color: #f3e6c2; font-style: italic; line-height: 1.15; background: linear-gradient(135deg, rgba(255, 255, 255, .12), rgba(0, 0, 0, .18)); }
+.song-pad .sp-sleeve:hover .sp-cover { outline: 2px dashed rgba(58, 39, 22, .5); outline-offset: 4px; }
+.song-pad .sp-fields { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.song-pad .sp-file { display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
+.song-pad .sp-btn, .song-pad .sp-actions button {
+    align-self: flex-start;
+    padding: 5px 14px;
+    border: 1px solid rgba(58, 39, 22, .4);
+    border-radius: 999px;
+    background: #f8f0dc;
+    font: italic .95rem "IM Fell English", Georgia, serif;
+    color: inherit;
+    cursor: pointer;
+}
+.song-pad .sp-name, .song-pad .sp-small { font-size: .85rem; color: #6e5236; margin: 0; overflow-wrap: anywhere; }
+.song-pad .sp-plain { border: 0; padding: 0; background: none; font: inherit; color: #9a3b1f; text-decoration: underline; cursor: pointer; }
+.song-pad .sp-title-row { display: flex; flex-direction: column; gap: 2px; font-size: .85rem; color: #6e5236; }
+.song-pad .sp-title { font: 1.05rem "IM Fell English", Georgia, serif; padding: 6px 8px; border: 1px solid rgba(58, 39, 22, .35); border-radius: 3px; background: #fbf5e6; color: #2a1c11; }
+.song-pad .sp-how { margin: 16px 0 0; padding: 10px 14px 12px; border: 1px solid rgba(58, 39, 22, .25); border-radius: 4px; display: flex; flex-direction: column; gap: 6px; }
+.song-pad .sp-how legend { padding: 0 6px; font-style: italic; color: #6e5236; }
+.song-pad .sp-how label { cursor: pointer; }
+.song-pad .sp-how .sp-sub { margin-left: 24px; font-size: .92rem; }
+.song-pad .sp-how .sp-sub.off { opacity: .45; }
+.song-pad .sp-say { min-height: 1.2em; margin: 10px 0 0; color: #9a3b1f; font-style: italic; }
+.song-pad .sp-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+.song-pad .sp-actions .sp-ok { background: #3a2716; color: #f3e6c2; border-color: #3a2716; }
+.song-pad .sp-actions .sp-ok:disabled { opacity: .4; cursor: default; }
+@media (max-width: 520px) {
+    .song-pad .sp-row { flex-direction: column; align-items: flex-start; }
 }

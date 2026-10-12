@@ -536,11 +536,12 @@
                             '<button type="button" data-do="link">link</button>' +
                             '<button type="button" data-do="hand" class="dk-hand" title="write with a pen (a drawing tablet\u2019s pressure works), a mouse or a finger. with the cursor on a page you wrote by hand: carry on with that one">\u270e write by hand</button>' +
                             '<button type="button" data-do="picture">picture…</button>' +
+                            '<button type="button" data-do="song" title="a song of your own (.mp3 / .ogg), as a record in its sleeve. it can play by itself, and fall out of the letter into the reader\u2019s record player. with the cursor on a song\u2019s line: change it">\u266B a song…</button>' +
                             '<button type="button" data-do="embed">embed a link…</button><button type="button" data-do="line">a line ——</button><button type="button" data-do="signoff">sign-off</button>' +
                             '<input type="file" class="dk-l-pic" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" hidden></div>' +
                         '<textarea class="dk-l-body" spellcheck="true" placeholder="write your letter here.\n\na blank line starts a new paragraph."></textarea>' +
                         '<p class="dk-hint dk-txt">a blank line = a new paragraph · <code>*italics*</code> · <code>**bold**</code> · <code>[words](https://…)</code> a link · ' +
-                            '<code>---</code> alone = a drawn line · <code>~ bye</code> alone = a sign-off · a link alone on its line = embedded (a video, a song, a post…)</p>' +
+                            '<code>---</code> alone = a drawn line · <code>~ bye</code> alone = a sign-off · a link alone on its line = embedded (a video, a song, a post…) · <code>\u25B6</code> in front of one: it plays by itself</p>' +
                         '<p class="dk-hint dk-htmlnote" hidden>this letter is written in HTML (a .html file): edit the code as it is.</p>' +
                         '<div class="dk-actions"><button type="button" class="dk-btn dk-main dk-l-save">save it to the site</button>' +
                             '<button type="button" class="dk-btn dk-l-look">preview</button>' +
@@ -614,12 +615,13 @@
                 if (w === 'link') { var u = prompt('the web address to link to:', 'https://'); if (u && u !== 'https://') insert('[', '](' + u.trim() + ')', 'these words'); }
                 if (w === 'embed') {
                     var e = prompt('a link to a video, a song, a post… (it goes on a line of its own and plays right there in the letter):', 'https://');
-                    if (e && /^https?:\/\/\S+$/.test(e.trim())) block(e.trim());
+                    if (e && /^https?:\/\/\S+$/.test(e.trim())) block((confirm('start it playing by itself when the letter\u2019s opened? (YouTube, SoundCloud, Vimeo and song files can; Spotify and Bandcamp wait for their own play button)') ? '\u25B6 ' : '') + e.trim());
                 }
                 if (w === 'line') block('---');
                 if (w === 'signoff') { var so = prompt('sign off with:', 'more soon'); if (so) block('~ ' + so); }
                 if (w === 'picture') pic.click();
                 if (w === 'hand') byHand(handAt(body.value, body.selectionStart));
+                if (w === 'song') songHere();
             });
         });
         // writing by hand (sky/inkpad.js): a page of it, put on the desk as a picture beside the letters
@@ -644,6 +646,40 @@
                             setLetterDirty(pane, true); renderLetter(pane);
                         } else block(line);
                         toast('your handwriting’s on the desk. save the letter to put it up.');
+                    });
+                });
+            } });
+        }
+        // a song of your own (sky/songpad.js): the song and its sleeve put on the desk beside the letters, its line written
+        function paraAt(v, c) {
+            var a = v.lastIndexOf('\n\n', Math.max(0, c - 1)), z = v.indexOf('\n\n', c);
+            a = a < 0 ? 0 : a + 2; z = z < 0 ? v.length : z;
+            return { a: a, z: z, text: v.slice(a, z).trim() };
+        }
+        function putFile(file, kind) {
+            var ext = (/\.[a-z0-9]+$/i.exec(file.name) || [''])[0].toLowerCase().replace('.jpeg', '.jpg');
+            var path = FOLDERS.sea + unique(FOLDERS.sea, today() + '-' + slug(stemOf(file.name), kind), ext);
+            return put(path, file, file.type || (ext === '.ogg' ? 'audio/ogg' : ext === '.mp3' ? 'audio/mpeg' : 'application/octet-stream'))
+                .then(function () { return path; }, function (e) {
+                    if (kind === 'song' && /mime|type|not supported|invalid/i.test(String(e && e.message || e)))
+                        throw new Error('the desk can\u2019t take songs yet: run tools/supabase-desk.sql in Supabase\u2019s SQL editor once more (it lets songs in now), then try again');
+                    throw e;
+                });
+        }
+        function songHere() {
+            if (!window.DavSong || L.kind !== 'txt') return;
+            var at = paraAt(body.value, body.selectionStart), was = DavEmbed.song(at.text);
+            DavSong.open({ was: was, where: function (x) { return /^content\//.test(x) ? urlOf(decodeURIComponent(x)) || '' : x; }, done: function (r) {
+                work(r.file ? 'putting the song in… (a big one takes a moment)' : 'changing it…', function () {
+                    return Promise.all([r.file ? putFile(r.file, 'song') : was.src, r.sleeveFile ? putFile(r.sleeveFile, 'sleeve') : r.sleeve]).then(function (got) {
+                        var line = DavEmbed.songLine({ title: r.title, src: got[0], sleeve: got[1] || '', autoplay: r.autoplay, gift: r.gift });
+                        if (was) {
+                            var v = body.value;
+                            body.value = v.slice(0, at.a) + line + v.slice(at.z);
+                            body.setSelectionRange(at.a + line.length, at.a + line.length);
+                            setLetterDirty(pane, true); renderLetter(pane);
+                        } else block(line);
+                        toast('the song\u2019s on the desk. save the letter to put it up.');
                     });
                 });
             } });
@@ -745,8 +781,10 @@
             if (!b) return;
             if (/^-{3,}$/.test(b)) { out += '<hr>'; return; }
             if (/^~\s/.test(b)) { out += '<p class="signoff">' + inline(b.replace(/^~\s*/, '')) + '</p>'; return; }
+            var sg = window.DavEmbed && DavEmbed.song(b);                   // (a song of your own: a record in its sleeve)
+            if (sg) { out += DavEmbed.songHtml(sg, function (p) { return /^content\//.test(p) ? urlOf(decodeURIComponent(p)) || '' : p; }); return; }
             var link = window.DavEmbed && DavEmbed.lone(b);                 // (a link on its own: its player, sky/embeds.js)
-            if (link) { out += DavEmbed.html(link); return; }
+            if (link) { out += DavEmbed.html(link, { autoplay: DavEmbed.plays(b) }); return; }
             if (window.DavEmbed && DavEmbed.isHand(b)) { out += DavEmbed.handwritten(inline(b)); return; }      // (written by hand: sky/inkpad.js)
             if (window.DavEmbed && /^!\[[^\]]*\]\([^)\s]+\)$/.test(b)) { out += DavEmbed.taped(inline(b), b); return; }   // (a picture alone: taped on)
             out += '<p' + (i === 0 ? ' class="lede"' : '') + '>' + inline(b).replace(/\n/g, '<br>') + '</p>';

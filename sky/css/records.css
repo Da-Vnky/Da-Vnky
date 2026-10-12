@@ -813,3 +813,16 @@ body.evil-waiting .turntable .tt-hint {
         padding: 16px 70px 16px 8px;
     }
 }
+
+/* a record that fell out of a letter (sky/letters.js): a small red wax seal on its sleeve's corner */
+.rp-sleeve.from-letter .sl-cover::after {
+    content: "";
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 35%, #c9573a, #8a2a14 60%, #5e1a0b);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+}

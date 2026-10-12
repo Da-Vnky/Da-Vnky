@@ -151,6 +151,7 @@
         if (d && d > today) { a.style.display = 'none'; return; }    // not its day yet
         if (!a.dataset.id) a.dataset.id = 'page:' + d + ':' + a.textContent.trim().slice(0, 30);
         buildLetter(a);
+        if (window.DavEmbed) DavEmbed.dress(a);                         // (its songs' buttons, wired again: the letter was just rebuilt)
         shown.push(a);
     });
     var ids = shown.map(function (a) { return a.dataset.id; });
@@ -205,16 +206,22 @@
     function openAll() {
         lv.scrollTop = 0;
         lv.classList.add('open');
+        watch(lv);
         document.body.classList.add('letter-reading');
         lv.querySelector('.lv-close').focus({ preventScroll: true });
     }
-    function closeAll() { stopPlayers(lv); lv.classList.remove('open'); document.body.classList.remove('letter-reading'); quiet(false); }
+    function closeAll() { stopPlayers(lv); lv.classList.remove('open'); document.body.classList.remove('letter-reading'); quiet(false); unwatch(lv); }
     // letters put away: their players stop. each one is taken out of the page and a fresh copy put in its place (only
     // that stops it for certain: an iframe sent back to its address while hidden may never load again, and keeps
     // playing). the copy waits, silent, to be played again next time
     function stopPlayers(box) {
-        Array.prototype.forEach.call(box.querySelectorAll('figure.embed iframe'), function (f) { f.parentNode.replaceChild(f.cloneNode(false), f); });
+        Array.prototype.forEach.call(box.querySelectorAll('figure.embed iframe'), function (f) {
+            var c = f.cloneNode(false);
+            if (window.DavEmbed && DavEmbed.calm) c.src = DavEmbed.calm(f.src);       // (one that played by itself: put back silent)
+            f.parentNode.replaceChild(c, f);
+        });
         Array.prototype.forEach.call(box.querySelectorAll('figure.embed video, figure.embed audio'), function (m) { m.pause(); });
+        Array.prototype.forEach.call(box.querySelectorAll('figure.embed[data-started]'), function (f) { f.removeAttribute('data-started'); });
     }
     board.addEventListener('click', openAll);
 
@@ -256,13 +263,145 @@
         }, 0);
     });
     document.addEventListener('play', function (e) { if (e.target.closest && e.target.closest('figure.embed')) quiet(true); }, true);
-    Sky.letters = { get quiet() { return quietFor; } };
+
+    /* ---------------- a player that plays by itself, and a record that falls out (sky/embeds.js: ▶, "→ record player") ----------------
+       when the letter's open and the player's come into view (the bottle's letter once it's unrolled; in the pile, as you
+       scroll to it): one with ▶ starts (opening the letter was the click a browser wants before anything may play; one set
+       to block it anyway just waits for its own play button), and only one at a time. a song "→ record player" the visitor
+       hasn't got yet falls out of the letter instead: it plays on the site's own record player, and it's theirs to keep
+       (localStorage letter-records; sky/records.js puts it in the crate). had already: it stays in its sleeve, a song to play */
+    var GIFTS = 'letter-records', started = null, FALL_WAIT = 900;
+    function gifts() { try { var l = JSON.parse(localStorage.getItem(GIFTS) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
+    function have(src) { return gifts().some(function (g) { return g.src === src; }); }
+    var IO = 'IntersectionObserver' in window ? new IntersectionObserver(function (seen) {
+        seen.forEach(function (e) { if (e.isIntersecting) startPlayer(e.target); });
+    }, { threshold: 0.45 }) : null;
+    function players(box) { return box.querySelectorAll('figure.embed[data-autoplay], figure.em-song[data-gift]'); }
+    function watch(box) {
+        Array.prototype.forEach.call(box.querySelectorAll('figure.em-song[data-gift]'), function (f) {
+            if (have(f.getAttribute('data-url'))) { f.classList.add('kept'); f.querySelector('.es-note').textContent = 'it\u2019s in your record player: it fell out of this letter'; }
+        });
+        showKept();
+        if (IO) Array.prototype.forEach.call(players(box), function (f) { IO.observe(f); });
+    }
+    function unwatch(box) {
+        if (IO) Array.prototype.forEach.call(players(box), function (f) { IO.unobserve(f); });
+        started = null;
+    }
+    function startPlayer(fig) {
+        var a = fig.closest('.letter');
+        var open = (lo.classList.contains('open') && lo.contains(fig)) || (lv.classList.contains('open') && lv.contains(fig));
+        if (!a || !open || fig.hasAttribute('data-started')) return;
+        if (a.classList.contains('corked')) {                       // (the bottle's letter, still unrolling: once it's out)
+            setTimeout(function () { var r = fig.getBoundingClientRect(); if (r.bottom > 0 && r.top < innerHeight) startPlayer(fig); }, 400);
+            return;
+        }
+        fig.setAttribute('data-started', '');
+        if (fig.matches('.em-song[data-gift]') && !have(fig.getAttribute('data-url'))) {
+            // (a moment to see it in its sleeve first; then it comes out, if the letter's still open)
+            setTimeout(function () { if (fig.isConnected && fig.hasAttribute('data-started') && !have(fig.getAttribute('data-url'))) fallOut(fig); }, FALL_WAIT);
+            return;
+        }
+        if (!fig.hasAttribute('data-autoplay')) return;
+        if (started && started !== fig && started.isConnected) stopPlayers(started);
+        started = fig;
+        if (window.DavEmbed && DavEmbed.start(fig) && fig.querySelector('iframe')) quiet(true);   // (a song or a video file says so itself)
+    }
+    // the record slides out of its sleeve, drops out of the letter and off the bottom, spinning, and starts playing as it goes
+    function fallOut(fig) {
+        var src = fig.getAttribute('data-url'), title = fig.getAttribute('data-title') || 'a song', sleeve = fig.getAttribute('data-sleeve') || '';
+        var au = fig.querySelector('audio'), url = au ? au.getAttribute('src') : src;
+        var img = fig.querySelector('.es-sleeve img'), pic = img ? img.getAttribute('src') : null;
+        var color = (fig.getAttribute('style') || '').replace(/^.*--sl:\s*([^;]+).*$/, '$1').trim() || '#9a3b1f';
+        var l = gifts();
+        if (!l.some(function (g) { return g.src === src; })) l.push({ src: src, title: title, sleeve: sleeve, color: color, at: Date.now(), letter: (fig.closest('.letter') || {}).dataset ? fig.closest('.letter').dataset.id : '' });
+        try { localStorage.setItem(GIFTS, JSON.stringify(l)); } catch (e) {}
+        var disc = fig.querySelector('.es-disc'), r = disc.getBoundingClientRect();
+        var flying = document.createElement('div');
+        flying.className = 'falling-record';
+        flying.innerHTML = disc.innerHTML;
+        flying.style.left = r.left + 'px'; flying.style.top = r.top + 'px'; flying.style.width = r.width + 'px'; flying.style.height = r.height + 'px';
+        document.body.appendChild(flying);
+        fig.classList.add('fallen', 'kept');
+        fig.querySelector('.es-note').textContent = 'it fell out of the letter: it\u2019s in your record player now';
+        Sky.sfx('record-fall', { or: 'throw', volume: .7 });
+        var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var dx = Math.min(r.width * .9, innerWidth - r.right + r.width * .3), fall = innerHeight - r.top + 40;
+        // out of the sleeve (slowly, the way a record's drawn out), a moment on the edge, then down, turning as it goes
+        var go = calm ? flying.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, fill: 'forwards' }) : flying.animate([
+            { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
+            { transform: 'translate(' + dx + 'px, -6px) rotate(90deg)', opacity: 1, offset: .34, easing: 'ease-in-out' },
+            { transform: 'translate(' + (dx + 8) + 'px, -16px) rotate(130deg)', opacity: 1, offset: .44, easing: 'cubic-bezier(.45,0,.9,.6)' },
+            { transform: 'translate(' + (dx + 70) + 'px, ' + fall + 'px) rotate(640deg)', opacity: .95 }
+        ], { duration: 2300, fill: 'forwards' });
+        setTimeout(function () { playRecord({ url: url, title: title, artist: '', pic: pic, color: color, kind: 'single', fromLetter: true }, fig); }, calm ? 0 : 1000);
+        go.onfinish = function () { flying.remove(); };
+        setTimeout(function () { landed(title, color, pic); }, calm ? 0 : 1400);
+    }
+    // on the site's own record player (so it carries on from page to page, and the record player shows it on): the crate
+    // it has, with this one added; no record player on the page: the letter's own player plays it
+    function playRecord(t, fig) {
+        var M = Sky.music;
+        if (!M || !M.setTracks) { if (window.DavEmbed) DavEmbed.start(fig); return; }
+        var abs = function (u) { try { return new URL(u, location.href).href; } catch (e) { return u; } };
+        var list = (M.tracks || []).slice(), i = list.findIndex(function (x) { return abs(x.url) === abs(t.url); });
+        if (i === -1) { list.push(t); M.setTracks(list); i = list.length - 1; }
+        if (M.hush) M.hush(false, 'embed');
+        M.play(i);
+    }
+    // a word at the foot of the screen: what fell out, and where it is now
+    function landed(title, color, pic) {
+        var note = document.createElement('div');
+        note.className = 'record-landed';
+        note.setAttribute('role', 'status');
+        note.style.setProperty('--sl', color);
+        note.innerHTML = '<span class="rl-disc"></span><span class="rl-words"><small>a record fell out of the letter</small><b></b>' +
+            '<small>it\u2019s yours: in the record player, in the living space</small></span>';
+        note.querySelector('.rl-disc').innerHTML = window.DavEmbed ? DavEmbed.discSvg(color, pic) : '';
+        note.querySelector('b').textContent = title;
+        document.body.appendChild(note);
+        requestAnimationFrame(function () { note.classList.add('in'); });
+        setTimeout(function () { note.classList.remove('in'); setTimeout(function () { note.remove(); }, 700); }, 7000);
+        note.addEventListener('click', function () { note.classList.remove('in'); });
+    }
+    // a record that's theirs now: its button in the letter plays it on the site's record player (the one it fell into), and
+    // shows whether that's playing it; the letter's own little player stays out of it (two copies would play at once)
+    function trackOf(fig) {
+        var au = fig.querySelector('audio'), img = fig.querySelector('.es-sleeve img');
+        return { url: au ? au.getAttribute('src') : fig.getAttribute('data-url'), title: fig.getAttribute('data-title') || 'a song', artist: '',
+                 pic: img ? img.getAttribute('src') : null, color: (fig.getAttribute('style') || '').replace(/^.*--sl:\s*([^;]+).*$/, '$1').trim() || '#9a3b1f',
+                 kind: 'single', fromLetter: true };
+    }
+    function isOn(fig) {
+        var M = Sky.music, t = M && M.current && M.current();
+        if (!t) return false;
+        try { return new URL(t.url, location.href).href === new URL(trackOf(fig).url, location.href).href; } catch (e) { return false; }
+    }
+    document.addEventListener('click', function (e) {
+        var fig = e.target.closest && e.target.closest('figure.em-song.kept');
+        if (!fig || !e.target.closest('.es-play, .es-record') || !Sky.music || !Sky.music.setTracks) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if (isOn(fig)) { Sky.music.toggle(); return; }
+        playRecord(trackOf(fig), fig);
+    }, true);
+    function showKept() {
+        Array.prototype.forEach.call(document.querySelectorAll('figure.em-song.kept'), function (fig) {
+            var on = isOn(fig) && Sky.music.playing();
+            fig.classList.toggle('playing', on);
+            var b = fig.querySelector('.es-play');
+            if (b) b.textContent = on ? 'pause' : 'play';
+        });
+    }
+    if (Sky.music && Sky.music.on) Sky.music.on(function (what) { if (what === 'play' || what === 'pause' || what === 'track' || what === 'stop') showKept(); });
+    Sky.letters = { get quiet() { return quietFor; }, get kept() { return gifts(); } };
 
     var reading = null;
     // read one letter over the sea
     function openLetter(a, from) {
         reading = a;
         inner.appendChild(a);
+        watch(a);
         lo.scrollTop = 0;
         lo.classList.add('open');
         document.body.classList.add('letter-reading');
@@ -274,6 +413,7 @@
         var a = reading;
         if (!a) return;
         reading = null;
+        unwatch(a);
         stopPlayers(a);
         quiet(false);
         Sky.sfx('paper-roll');

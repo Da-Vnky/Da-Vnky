@@ -1833,6 +1833,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 forget_written(name)
                 write_list()
                 return self.reply({'deleted': name})
+            if url.path == '/__letters/song':                 # (a song of your own in a letter: sky/songpad.js; .mp3 / .ogg, what the server plays)
+                ext = os.path.splitext(urllib.parse.unquote(self.headers.get('X-Name', '')))[1].lower()
+                if ext not in ('.mp3', '.ogg'):
+                    raise ValueError('songs can be .mp3 or .ogg (what the site plays)')
+                if len(raw) > UPLOAD_LIMIT:
+                    raise ValueError('that song is over 30 MB')
+                stem = slug(urllib.parse.unquote(self.headers.get('X-Name', 'song')).rsplit('.', 1)[0]) or 'song'
+                name, i = datetime.date.today().isoformat() + '-' + stem + ext, 2
+                while os.path.exists(os.path.join(SEA, name)):
+                    name, i = datetime.date.today().isoformat() + '-' + stem + '-' + str(i) + ext, i + 1
+                with open(os.path.join(SEA, name), 'wb') as f:
+                    f.write(raw)
+                write_list()
+                return self.reply({'path': 'content/sea/' + name})
             if url.path == '/__letters/picture':
                 ext = PICTURE_TYPES.get(self.headers.get('Content-Type', '').split(';')[0].strip())
                 if not ext:

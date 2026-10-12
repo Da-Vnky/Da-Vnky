@@ -105,7 +105,7 @@
                 '<button type="button" class="ip-btn ip-cancel">cancel</button>' +
                 '<button type="button" class="ip-btn ip-done">put it in the letter</button>' +
             '</div>' +
-            '<div class="ip-scroll"><div class="ip-sheet"><canvas class="ip-canvas"></canvas><div class="ip-tip"></div></div>' +
+            '<div class="ip-scroll"><div class="ip-sheet"><canvas class="ip-canvas"></canvas><canvas class="ip-live"></canvas><div class="ip-tip"></div></div>' +
                 '<button type="button" class="ip-btn ip-more">+ more paper</button>' +
                 '<p class="ip-hint">it goes into the letter as wide as the writing on the site, so write at the size you’d like to see it. ' +
                     'a pen’s pressure makes the line thicker, its other end rubs out · ctrl+z undoes · [ and ] change the size</p></div>';
@@ -113,7 +113,12 @@
         document.documentElement.classList.add('ink-pad-open');
         pad = root;
 
-        var sheet = root.querySelector('.ip-sheet'), cv = root.querySelector('.ip-canvas'), ctx = cv.getContext('2d');
+        // (desynchronized: the browser may show the canvas straight away, without waiting for the rest of the page. Chrome and
+        //  Edge take it; Firefox ignores it)
+        var sheet = root.querySelector('.ip-sheet'), cv = root.querySelector('.ip-canvas'), ctx = cv.getContext('2d', { desynchronized: true });
+        // the last little bit of the line, from where it's been drawn to right under the pen (drawn again on every move, so
+        // the line never trails behind the pen while it waits for the next point)
+        var lv = root.querySelector('.ip-live'), lctx = lv.getContext('2d', { desynchronized: true }), tail = null;
         var tip = root.querySelector('.ip-tip'), scroller = root.querySelector('.ip-scroll');
 
         function fit() {                                         // (narrower than a letter: the sheet's shrunk to fit, the writing the same)
@@ -121,10 +126,11 @@
             sheet.style.width = W * k + 'px';
             sheet.style.height = H * k + 'px';
             sheet.style.setProperty('--line', LINE * k + 'px');
+            box = null;
         }
         function size2canvas() {
-            cv.width = W * S;
-            cv.height = H * S;
+            cv.width = lv.width = W * S;
+            cv.height = lv.height = H * S;
             fit();
             redraw();
         }
@@ -156,14 +162,18 @@
         function grow(by) { H += by; size2canvas(); }
 
         /* the pen */
+        // where the paper is on the screen: measured when the pen goes down (and on scrolling), not at every point, so the
+        // browser never has to stop and work out the page's layout in the middle of a line
+        var box = null;
+        function measure() { box = cv.getBoundingClientRect(); }
         function at(e) {
-            var r = cv.getBoundingClientRect();
+            var r = box || (measure(), box);
             return { x: (e.clientX - r.left) / k, y: (e.clientY - r.top) / k, p: e.pointerType === 'pen' || (e.pointerType === 'touch' && e.pressure && e.pressure !== 0.5) ? (e.pressure || 0.5) : null };
         }
         var smooth = null;
         function add(e) {
             var p = at(e);
-            if (p.p !== null) { smooth = smooth === null ? p.p : smooth * 0.55 + p.p * 0.45; p.p = smooth; }
+            if (p.p !== null) { smooth = smooth === null ? p.p : smooth * 0.4 + p.p * 0.6; p.p = smooth; }
             var P = cur.pts, last = P[P.length - 1];
             if (last && Math.abs(last.x - p.x) < 0.35 && Math.abs(last.y - p.y) < 0.35) return;     // (no move: nothing to add)
             P.push(p);
@@ -171,29 +181,74 @@
             piece(ctx, cur, P.length - 1);
             ctx.globalCompositeOperation = 'source-over';
         }
+        function clearTail() {
+            if (!tail) return;
+            lctx.setTransform(1, 0, 0, 1, 0, 0);
+            lctx.clearRect(tail[0], tail[1], tail[2], tail[3]);
+            tail = null;
+        }
+        // from the middle of the last two points to the newest one (and on to where the browser guesses the pen's going)
+        function drawTail(ahead) {
+            clearTail();
+            var P = cur.pts, n = P.length;
+            if (cur.erase || n < 2) return;
+            var from = { x: (P[n - 2].x + P[n - 1].x) / 2, y: (P[n - 2].y + P[n - 1].y) / 2, p: P[n - 1].p }, pts = [from, P[n - 1]].concat(ahead || []);
+            lctx.setTransform(S, 0, 0, S, 0, 0);
+            begin(lctx, cur);
+            var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, wmax = 0;
+            for (var i = 1; i < pts.length; i++) {
+                var w = widthAt(cur, pts[i].p);
+                lctx.lineWidth = w;
+                lctx.beginPath();
+                lctx.moveTo(pts[i - 1].x, pts[i - 1].y);
+                lctx.lineTo(pts[i].x, pts[i].y);
+                lctx.stroke();
+                wmax = Math.max(wmax, w);
+            }
+            pts.forEach(function (q) { x0 = Math.min(x0, q.x); y0 = Math.min(y0, q.y); x1 = Math.max(x1, q.x); y1 = Math.max(y1, q.y); });
+            var pad = wmax + 2;
+            tail = [Math.floor((x0 - pad) * S), Math.floor((y0 - pad) * S), Math.ceil((x1 - x0 + 2 * pad) * S), Math.ceil((y1 - y0 + 2 * pad) * S)];
+        }
         cv.addEventListener('pointerdown', function (e) {
             if (busy) return;
             if (e.pointerType === 'pen') penSeen = true;
             else if (e.pointerType === 'touch' && penSeen) return;          // (a hand resting on the screen while the pen writes)
             if (e.button !== 0 && e.button !== 5) return;
             e.preventDefault();
+            measure();
             try { cv.setPointerCapture(e.pointerId); } catch (err) {}    // (so the line carries on off the paper's edge)
             var erase = rubbing || e.button === 5 || (e.buttons & 32) === 32;  // (the pen turned round: its rubber end)
             cur = { pts: [], size: SIZES[size][1], color: INKS[ink][1], erase: erase, id: e.pointerId };
             smooth = null;
             add(e);
         });
-        cv.addEventListener('pointermove', function (e) {
-            var r = cv.getBoundingClientRect();
-            tip.style.transform = 'translate(' + (e.clientX - r.left) + 'px,' + (e.clientY - r.top) + 'px)';
-            tip.classList.toggle('rub', rubbing || (e.buttons & 32) === 32);
+        // the points: as soon as the tablet sends them where the browser can (pointerrawupdate: Chrome and Edge), else with
+        // each frame's move (Firefox), with every point in between (getCoalescedEvents), not just one a frame
+        function moved(e) {
             if (!cur || e.pointerId !== cur.id) return;
-            var list = e.getCoalescedEvents ? e.getCoalescedEvents() : [];   // (every point the tablet sent, not one a frame)
+            if (e.type === 'pointerrawupdate') cur.raw = true;      // (then the frame-by-frame moves are left alone: no point twice)
+            else if (cur.raw) return;
+            var list = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
             if (!list.length) list = [e];
             list.forEach(add);
+            var guess = e.getPredictedEvents ? e.getPredictedEvents() : [];
+            drawTail(guess.slice(0, 2).map(function (g) { var q = at(g); if (q.p !== null) q.p = smooth; return q; }));
+        }
+        cv.addEventListener('pointerrawupdate', moved);
+        var rubShown = false;
+        cv.addEventListener('pointermove', function (e) {
+            var r = box || (measure(), box);
+            tip.style.transform = 'translate(' + (e.clientX - r.left) + 'px,' + (e.clientY - r.top) + 'px)';
+            var rub = rubbing || (e.buttons & 32) === 32;
+            if (rub !== rubShown) { rubShown = rub; tip.classList.toggle('rub', rub); }
+            moved(e);
         });
+        cv.addEventListener('pointerenter', measure);
+        scroller.addEventListener('scroll', function () { box = null; }, { passive: true });
+        window.addEventListener('resize', function () { box = null; });
         function lift(e) {
             if (!cur || (e && e.pointerId !== cur.id)) return;
+            clearTail();
             ctx.setTransform(S, 0, 0, S, 0, 0);
             finish(ctx, cur);
             ctx.globalCompositeOperation = 'source-over';

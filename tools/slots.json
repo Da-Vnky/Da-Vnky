@@ -2843,6 +2843,12 @@
        "kind": "sound"
       },
       {
+       "slot": "assets/sounds/record-fall",
+       "what": "a record falling out of a letter (a song the letter gives to the record player)",
+       "kind": "sound",
+       "optional": true
+      },
+      {
        "slot": "assets/sounds/cork-in",
        "what": "a cork pushed back in",
        "kind": "sound"

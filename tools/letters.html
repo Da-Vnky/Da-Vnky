@@ -15,6 +15,7 @@
 <script src="../sky/hand.js"></script>
 <link rel="stylesheet" href="../sky/css/inkpad.css">
 <script src="../sky/inkpad.js"></script>
+<script src="../sky/songpad.js"></script>
 <style>
     :root { --ink: #3a2716; --ink-faded: #6e5236; --sanguine: #9a3b1f; --desk: #2a1d14; --card: #eadcb9; }
     * { box-sizing: border-box; }
@@ -120,6 +121,7 @@
                 <button type="button" data-do="link">link</button>
                 <button type="button" data-do="hand" class="hand-btn" title="write with a pen (a drawing tablet's pressure works), a mouse or a finger. with the cursor on a page you wrote by hand: carry on with that one">✎ write by hand</button>
                 <button type="button" data-do="picture">picture…</button>
+                <button type="button" data-do="song" title="a song of your own (.mp3 / .ogg), as a record in its sleeve. it can play by itself, and fall out of the letter into the reader's record player. with the cursor on a song's line: change it">♫ a song…</button>
                 <button type="button" data-do="embed">embed a link…</button>
                 <button type="button" data-do="line">a line ———</button>
                 <button type="button" data-do="signoff">sign-off</button>
@@ -129,7 +131,7 @@
 
 a blank line starts a new paragraph."></textarea>
             <p class="hint txt-only">a blank line = a new paragraph · <code>*italics*</code> · <code>**bold**</code> · <code>[words](https://…)</code> a link ·
-                <code>---</code> on its own line = a drawn line · <code>~ bye</code> on its own = a sign-off · a link on its own line = embedded (a video, a song, a post…)</p>
+                <code>---</code> on its own line = a drawn line · <code>~ bye</code> on its own = a sign-off · a link on its own line = embedded (a video, a song, a post…) · <code>▶</code> in front of one: it plays by itself when the letter's opened</p>
             <p class="hint html-only" hidden>this letter is written in HTML (a .html file): edit the code as it is.</p>
             <div class="actions">
                 <button type="button" class="save">save <small>(ctrl+s)</small></button>
@@ -247,8 +249,10 @@ a blank line starts a new paragraph."></textarea>
             if (!b) return;
             if (/^-{3,}$/.test(b)) { out += '<hr>'; return; }
             if (/^~\s/.test(b)) { out += '<p class="signoff">' + inline(b.replace(/^~\s*/, '')) + '</p>'; return; }
+            var sg = window.DavEmbed && DavEmbed.song(b);                   // (a song of your own: a record in its sleeve)
+            if (sg) { out += DavEmbed.songHtml(sg, function (p) { return /^(https?:|\/)/.test(p) ? p : '/' + p; }); return; }
             var link = window.DavEmbed && DavEmbed.lone(b);                 // (a link on its own: its player, sky/embeds.js)
-            if (link) { out += DavEmbed.html(link); return; }
+            if (link) { out += DavEmbed.html(link, { autoplay: DavEmbed.plays(b) }); return; }
             if (window.DavEmbed && DavEmbed.isHand(b)) { out += DavEmbed.handwritten(inline(b)); return; }      // (written by hand: sky/inkpad.js)
             if (window.DavEmbed && /^!\[[^\]]*\]\([^)\s]+\)$/.test(b)) { out += DavEmbed.taped(inline(b), b); return; }   // (a picture alone: taped on)
             out += '<p' + (i === 0 ? ' class="lede"' : '') + '>' + inline(b).replace(/\n/g, '<br>') + '</p>';
@@ -317,12 +321,13 @@ a blank line starts a new paragraph."></textarea>
             if (d === 'link') { var u = prompt('the web address to link to:', 'https://'); if (u && u !== 'https://') insert('[', '](' + u.trim() + ')', 'these words'); }
             if (d === 'embed') {
                 var e = prompt('a link to a video, a song, a post… (it goes on a line of its own and plays right there in the letter):', 'https://');
-                if (e && /^https?:\/\/\S+$/.test(e.trim())) block(e.trim());
+                if (e && /^https?:\/\/\S+$/.test(e.trim())) block((confirm('start it playing by itself when the letter\u2019s opened? (YouTube, SoundCloud, Vimeo and song files can; Spotify and Bandcamp wait for their own play button)') ? '\u25B6 ' : '') + e.trim());
             }
             if (d === 'line') block('---');
             if (d === 'signoff') block('~ ' + (prompt('sign off with:', 'more soon') || 'more soon'));
             if (d === 'picture') picIn.click();
             if (d === 'hand') byHand(handAt(bodyIn.value, bodyIn.selectionStart));
+            if (d === 'song') songHere();
         });
     });
     /* ---------- writing by hand (sky/inkpad.js): a page of it, saved as a picture beside the letters ---------- */
@@ -350,6 +355,36 @@ a blank line starts a new paragraph."></textarea>
                     } else block(line);
                     say('your handwriting is in the letter (saved in content/sea/; publish takes it along). save the letter to keep it.');
                 }, function () { say('couldn’t put the handwriting in', true); });
+        } });
+    }
+    /* ---------- a song of your own (sky/songpad.js): the song and its sleeve saved beside the letters, its line written ---------- */
+    function paraAt(v, c) {
+        var a = v.lastIndexOf('\n\n', Math.max(0, c - 1)), z = v.indexOf('\n\n', c);
+        a = a < 0 ? 0 : a + 2; z = z < 0 ? v.length : z;
+        return { a: a, z: z, text: v.slice(a, z).trim() };
+    }
+    function sendFile(route, file) {
+        return fetch(route, { method: 'POST', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream', 'X-Name': encodeURIComponent(file.name) } })
+            .then(function (r) { return r.json(); });
+    }
+    function songHere() {
+        if (!window.DavSong || kind !== 'txt') return;
+        var at = paraAt(bodyIn.value, bodyIn.selectionStart), was = DavEmbed.song(at.text);
+        DavSong.open({ was: was, where: function (x) { return /^(https?:|\/)/.test(x) ? x : '/' + x; }, done: function (r) {
+            say(r.file ? 'putting the song in… (a big one takes a moment)' : 'changing it…');
+            Promise.all([r.file ? sendFile('/__letters/song', r.file) : { path: was.src }, r.sleeveFile ? sendFile('/__letters/picture', r.sleeveFile) : { path: r.sleeve }])
+                .then(function (got) {
+                    var bad = got[0].error || got[1].error;
+                    if (bad) { say(bad, true); return; }
+                    var line = DavEmbed.songLine({ title: r.title, src: got[0].path, sleeve: got[1].path || '', autoplay: r.autoplay, gift: r.gift });
+                    if (was) {
+                        var v = bodyIn.value;
+                        bodyIn.value = v.slice(0, at.a) + line + v.slice(at.z);
+                        bodyIn.setSelectionRange(at.a + line.length, at.a + line.length);
+                        setDirty(true); render();
+                    } else block(line);
+                    say('the song is in the letter (saved in content/sea/; publish takes it along). save the letter to keep it.');
+                }, function () { say('couldn\u2019t put the song in', true); });
         } });
     }
     // a page written by hand, clicked in the preview: carry on writing on it

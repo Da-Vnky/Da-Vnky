@@ -138,3 +138,102 @@ a.em-card:hover { background: rgba(252, 245, 228, .9); border-color: #9a3b1f; }
     filter: none;
     box-shadow: none;
 }
+
+/* ---------- a song of your own (DavEmbed.songHtml): a record half out of its sleeve, taped on, its name and a play button beside it.
+   the sleeve and the record as the record player draws them (records.css: .rp-sleeve), so a song given to the record player
+   looks the same there ---------- */
+.letter figure.em-song,
+.content figure.em-song {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 2em auto 1.8em;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    transform: rotate(-1.2deg);
+}
+.letter figure.em-song::before, .content figure.em-song::before { left: -14px; top: -6px; width: 58px; transform: rotate(-38deg); }
+.letter figure.em-song::after, .content figure.em-song::after { display: none; }
+.em-song .es-record {
+    position: relative;
+    flex: none;
+    width: 150px;
+    height: 150px;
+    margin-right: 46px;                               /* (room for the record peeking out) */
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+.em-song .es-disc {
+    position: absolute;
+    left: 6%;
+    top: 6%;
+    width: 88%;
+    height: 88%;
+    transform: translateX(30%);
+    transition: transform .6s cubic-bezier(.3, .7, .3, 1.2);
+}
+.em-song .es-disc svg { display: block; width: 100%; height: 100%; }
+.em-song .es-record:hover .es-disc { transform: translateX(38%); }
+.em-song.playing .es-disc { transform: translateX(52%); }
+.em-song.playing .es-disc svg { animation: es-spin 1.8s linear infinite; }
+@keyframes es-spin { to { transform: rotate(360deg); } }
+.em-song .es-sleeve {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--sl, #9a3b1f);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(0, 0, 0, .15), inset 0 0 26px rgba(0, 0, 0, .18);
+}
+.em-song .es-sleeve img { display: block; width: 100%; height: 100%; object-fit: cover; margin: 0; box-shadow: none; filter: none; }
+.em-song .es-plain {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 14%;
+    text-align: center;
+    color: #f3e6c2;
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.15;
+    background: radial-gradient(circle at 50% 50%, transparent 0 30%, rgba(255, 240, 210, .14) 30.5% 31.5%, transparent 32% 44%, rgba(255, 240, 210, .1) 44.5% 45.5%, transparent 46%),
+                linear-gradient(135deg, rgba(255, 255, 255, .12), rgba(0, 0, 0, .18));
+}
+.em-song .es-side { display: flex; flex-direction: column; gap: 4px; min-width: 0; max-width: 260px; margin: 0; text-align: left; }
+.em-song .es-title { font: normal 1.25rem/1.15 "IM Fell English SC", Georgia, serif; }
+.em-song .es-note { font-style: italic; font-size: .88rem; color: var(--ink-faded, #6e5236); line-height: 1.3; }
+.em-song .es-controls { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.em-song .es-play {
+    flex: none;
+    padding: 3px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: #3a2716;
+    color: #f3e6c2;
+    font: italic .95rem "IM Fell English", Georgia, serif;
+    cursor: pointer;
+}
+.em-song .es-play:hover { background: #9a3b1f; }
+.em-song .es-seek { flex: 1; min-width: 60px; accent-color: #9a3b1f; }
+.em-song .es-time { flex: none; font-size: .8rem; color: var(--ink-faded, #6e5236); font-variant-numeric: tabular-nums; }
+@media (max-width: 620px) {
+    .letter figure.em-song, .content figure.em-song { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .em-song .es-record { width: 120px; height: 120px; }
+}
+
+/* in the content manager and at the desk: what each will do, written over it (the site itself doesn't say) */
+.preview figure.embed[data-autoplay] > figcaption::before, .dk-preview figure.embed[data-autoplay] > figcaption::before,
+.preview figure.em-song[data-autoplay] .es-note::before, .dk-preview figure.em-song[data-autoplay] .es-note::before {
+    content: "\25B6\FE0E  plays by itself when the letter's opened · ";
+    color: #9a3b1f;
+}
+.preview figure.em-song[data-gift] .es-note::after, .dk-preview figure.em-song[data-gift] .es-note::after {
+    content: " · it falls out for whoever opens the letter (the first time), plays, and goes in their record player";
+    color: #9a3b1f;
+}

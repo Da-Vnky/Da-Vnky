@@ -246,7 +246,7 @@
             var album = t.kind === 'album';
             var s = document.createElement('button');
             s.type = 'button';
-            s.className = 'rp-sleeve' + (album ? ' album' : '') + (t.special ? ' ' + t.special : '');
+            s.className = 'rp-sleeve' + (album ? ' album' : '') + (t.special ? ' ' + t.special : '') + (t.fromLetter ? ' from-letter' : '');
             s.style.zIndex = i + 1;
             s.style.setProperty('--tilt', (((Sky.hashStr(t.url || t.key || t.title) % 7) - 3) * 0.8).toFixed(1) + 'deg');
             s.style.setProperty('--sl', t.color);
@@ -433,7 +433,7 @@
     // the song that's on is the same record wherever it's listed: that one object, so the player knows it
     function same(t) {
         var on = M.current();
-        if (on && abs(on.url) === abs(t.url)) { if (!on.album && t.album) on.album = t.album; if (!on.pic) on.pic = t.pic; on.skin = t.skin; on.discCls = t.discCls; on.special = t.special; on.title = t.title; return on; }
+        if (on && abs(on.url) === abs(t.url)) { if (!on.album && t.album) on.album = t.album; if (!on.pic) on.pic = t.pic; on.skin = t.skin; on.discCls = t.discCls; on.special = t.special; on.title = t.title; on.fromLetter = t.fromLetter; return on; }
         return t;
     }
     // the special slot: P(Doom) while it's theirs (found, not given, not shot this visit) and it isn't reset 4; else its inverted twin
@@ -487,6 +487,22 @@
         deck: deck
     };
 
+    /* ---------------- records that fell out of letters (sky/letters.js: a song "→ record player") ----------------
+       the visitor's own, kept in localStorage letter-records ({ src, title, sleeve }), at the end of the crate like any
+       other record; the song's own place (content/sea/…), or the desk's copy of it if it's still only on the desk */
+    function fromLetters() {
+        var l = [];
+        try { l = JSON.parse(localStorage.getItem('letter-records') || '[]'); } catch (e) {}
+        if (!Array.isArray(l)) return [];
+        var where = function (p) { return p && Sky.desk && Sky.desk.url ? Sky.desk.url(p) : p; };
+        return l.map(function (g) {
+            var url = where(g.src);
+            if (!url) return null;                                           // (taken off the desk since)
+            return { kind: 'single', url: url, title: g.title || Sky.fileTitle(g.src.split('/').pop()), artist: '', pic: g.sleeve ? where(g.sleeve) : null,
+                     color: g.color || LABELS[Sky.hashStr(g.src) % LABELS.length], name: g.src.split('/').pop(), skin: null, fromLetter: true };
+        }).filter(Boolean);
+    }
+
     /* ---------------- fill the crate from the folder (and its albums) ---------------- */
     drawNow();
     var folder = deck.dataset.folder.replace(/\/?$/, '/');
@@ -523,14 +539,14 @@
         // P(Doom) leaves the row for its own slot
         doomEntry = all.filter(function (e) { return e.kind !== 'album' && DOOM.test(e.title + ' ' + e.name); })[0] || null;
         if (doomEntry) { doomEntry.special = 'doom'; all = all.filter(function (e) { return e !== doomEntry; }); }
-        allEntries = all;
+        allEntries = all.concat(fromLetters());
         refill();
         // their own tags: title, artist, a picture (an album's cover stays its cover)
         tracks.forEach(function (t) {
             if (!/\.mp3$/i.test(t.url) || t.special === 'inverted') return;
             M.readTags(t.url).then(function (tags) {
                 if (!tags) return;
-                if (tags.title) t.title = tags.title;
+                if (tags.title && !t.fromLetter) t.title = tags.title;          // (a letter's record keeps the name it was given)
                 if (tags.artist) t.artist = tags.artist;
                 if (tags.bpm) t.tagBpm = tags.bpm;
                 if (tags.picture && !t.pic) { t.pic = tags.picture; if (t.kind === 'single') t.pic = tags.picture; }

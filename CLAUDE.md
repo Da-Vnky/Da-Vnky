@@ -274,6 +274,13 @@ this before changing anything; keep it up to date when something here stops bein
   point the tablet sends), drawn as curves through the midpoints with the width from the pen's pressure (`widthAt`: × 0.28 to
   1.72; a mouse: the size as it is); undo draws them all again. A finger is ignored once a pen's been used (a hand resting on a
   Cintiq). Writing near the bottom adds paper (`MORE`). The picture: trimmed to the ink top and bottom, full width, PNG.
+- **Keeping up with the pen** (11 Oct, Victor: "kind of laggy", in Firefox): the curves through midpoints end half a step
+  behind the pen, so `.ip-live` (a second canvas) draws the rest, from the last midpoint to the newest point and on to
+  `getPredictedEvents` (Chrome), cleared each move (`drawTail`/`clearTail`); points come from `pointerrawupdate` where the
+  browser has it (Chrome/Edge, secure pages; then that stroke's `pointermove`s are skipped, `cur.raw`), else `pointermove` with
+  `getCoalescedEvents`; the canvas's place is measured on pointerdown/enter and after a scroll or resize (`box`), never per
+  point (a layout read per point, after moving the tip, was the likely Firefox cost); both canvases `desynchronized`; the page
+  under the pad is `visibility: hidden` (`html.ink-pad-open body > :not(.ink-pad)`). A point costs ~0.015 ms (Chromium).
 - **Into the letter**: a paragraph `![handwritten](content/sea/<date>-handwritten.png)`. The content manager saves it with
   `/__letters/picture`; the desk `put`s it like any picture (`unique(… '-handwritten', '.png')`). With the cursor in such a
   paragraph, or clicking one in a preview, the pad opens with it as the first thing on the sheet (can be rubbed out), and the
@@ -281,6 +288,44 @@ this before changing anything; keep it up to date when something here stops bein
 - **Shown**: `DavEmbed.isHand(block)` / `DavEmbed.handwritten(img)` (embeds.js) in all three renderers (sky.js `txtToHtml` with
   `embeds`, the desk, the letters page), before the taped pictures: `figure.handwritten`, width 100%, no filter or shadow
   (embeds.css).
+
+## Players that start by themselves, songs in letters, and records that fall out (11 Oct)
+
+- Victor: "have music start playing as soon as it's opened", "the option to embed a song/sound file", "have the embedded song
+  added to the record player as disc" ("the same UI as the records"), and "the record should fall out of the letter when opened.
+  This triggers the music to play and then it gets added to the record player."
+- **▶ before a link** (`▶ https://youtu.be/…`, a paragraph of its own): `DavEmbed.plays(block)` → `html(url, { autoplay })` →
+  `data-autoplay` (and `data-key`, which `patch()` matches players by). `DavEmbed.start(fig)` turns it on: the sites' own autoplay
+  parameters (YouTube, Vimeo, SoundCloud, Dailymotion, Twitch, Streamable, Loom; others just load), a `<video>`/`<audio>` played
+  (`calm(src)` takes them off again). The "embed a link…" button asks (confirm) whether to put ▶ in front. Browsers may refuse
+  sound before the visitor's first click on the page; the letter's open click usually counts.
+- **A song line**: `▶ ♫ [Title](content/sea/<date>-name.mp3 content/sea/<date>-name.png) → record player`: ▶ = plays by itself,
+  the second path = its sleeve (optional), `→ record player` = a gift. `DavEmbed.song(block)` reads it (`SONG` regex),
+  `songLine(t)` writes it, `songHtml(t, where)` draws `figure.embed.em-song` (`data-url`, `-title`, `-sleeve`, `-autoplay`,
+  `-gift`, `--sl` the sleeve colour): `.es-record` (`.es-disc`, `discSvg`: `Sky.music.disc` where there is one, so the same record
+  as the crate's; `.es-sleeve`), `.es-side` (title, note, ▶ play, seek, time) and its own `<audio preload="none">`. `wireSong`
+  (marked by the JS property `fig.davWired`, not an attribute: buildLetter re-serializes the letter after dress, so an
+  attribute survived the listeners and blocked wiring again; `dress()` wires every unwired song, and letters.js calls it after
+  `buildLetter`). Playing: `.playing` slides the disc out and turns it (embeds.css). The site hushes for it like any player.
+- **Writing one**: "♫ a song…" (`data-do="song"`) at the desk and on the content manager's letters page → `DavSong.open({ was,
+  where, done })` (sky/songpad.js, a paper card, styles at the end of sky/css/inkpad.css): the song (.mp3/.ogg, 30 MB), a sleeve
+  picture (click the sleeve; 4 MB), its name, and "how the reader gets it": in the letter (+ "starts playing by itself") or
+  "it falls out of the letter" (the gift; no autoplay tick, it always plays). The cursor on a song line opens it to edit.
+  Content manager: `/__letters/song` (content.py, `content/sea/<date>-<slug>.mp3|ogg`) and `/__letters/picture`; the desk `put`s
+  both like a picture. **The desk's bucket needs the audio types**: tools/supabase-desk.sql (Victor runs it again).
+  Previews say what each will do (embeds.css: `.preview` / `.dk-preview` notes, the site itself doesn't).
+- **The gift** (letters.js "GIFTS"): an IntersectionObserver (`threshold` .45) on `figure.embed[data-autoplay]` and
+  `figure.em-song[data-gift]` while a letter or the letters are open (`watch`/`unwatch` from openAll/openLetter and
+  closeAll/closeLetter). A gift the visitor hasn't got: after `FALL_WAIT` 900 ms `fallOut`: the disc copied into `.falling-record`
+  (letters.css), out of the sleeve and down off the letter over 2.3 s; saved to **localStorage `letter-records`** (`{ src, title,
+  sleeve, color, at, letter }`; forever: a reset keeps it, "forget your stay" wipes it); at 1 s `playRecord` puts it in
+  `Sky.music`'s tracks and plays it (so the letter's own audio never plays it); at 1.4 s `.record-landed` says it's in the record
+  player. Already theirs (`.kept`): the sleeve shows empty, no seek/time, and its button (or the record) plays it through
+  `Sky.music`; `showKept` follows `Sky.music.on`. records.js `fromLetters()` adds them at the end of the crate (`fromLetter`,
+  `.rp-sleeve.from-letter` with a wax seal, records.css; desk paths through `Sky.desk.url`); tags never rename them.
+- Tested 11 Oct (Playwright, the mock Supabase): the gift line written, falling, kept, played on the record player, in the crate,
+  not falling a second time, its button after; the desk writing an autoplay song; on the sea starting when in view, stopping when
+  the letters are put away, the disc turning, the play button.
 
 ## The pages
 

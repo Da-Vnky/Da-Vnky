@@ -62,10 +62,11 @@ create policy "the owner reads the post" on public.post for select to authentica
 drop policy if exists "the owner clears the post" on public.post;
 create policy "the owner clears the post" on public.post for delete to authenticated using (public.dav_is_owner());
 
--- the desk's files: public to read (like the site), up to 30 MB each
+-- the desk's files: public to read (like the site), up to 30 MB each: pictures, letters, lists, videos and songs
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('desk', 'desk', true, 31457280, array['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml',
-        'text/plain', 'text/html', 'application/json', 'video/mp4', 'video/webm'])
+        'text/plain', 'text/html', 'application/json', 'video/mp4', 'video/webm',
+        'audio/mpeg', 'audio/mp3', 'audio/ogg'])                         -- (songs in letters: 11 Oct)
 on conflict (id) do update
     set public = true, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
 

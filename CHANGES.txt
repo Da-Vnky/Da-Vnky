@@ -17,6 +17,13 @@ How it works
 
 == published ==
 
+2026-10-11 20:38 · V
+- Writing by hand keeps up with the pen better: the line now reaches right under the pen while it moves (it used to trail half a step behind), Chrome and Edge take the tablet's points the moment they arrive, the paper's place isn't measured again at every point, and the page underneath is hidden while writing.
+- Letters: a video or song link can start playing by itself when its letter's opened (put ▶ before the link; the "embed a link…" button asks). It starts when the letter comes into view and stops when the letters are put away, like the others.
+- Letters: a song of the artist's own can go in a letter ("♫ a song…" at the desk and on the content manager's letters page: an .mp3 or .ogg, a picture for its sleeve if wanted). It shows as a record half out of its sleeve, like the record player's, with a play button; it can start by itself too.
+- Letters: a song can instead be a gift: the record falls out of the letter as it's opened, starts playing on the record player, and stays in the visitor's crate from then on (marked with a wax seal). It falls only the first time; after that the letter shows the empty sleeve and its button plays it on the record player.
+- The desk's storage now takes songs (.mp3, .ogg): tools/supabase-desk.sql has to be run again in Supabase for songs added at the desk.
+
 2026-10-11 12:17 · V
 - tools/webp.bat (and webp.py, webp.sh): drag a folder of animation frames onto it (Clip Studio: Export animation > Image sequence, PNG) and it makes one animated WebP at their full size (3200 x 1800 or bigger; Clip Studio's own WebP export stops at about 2000 across). It asks how fast and how good; FFmpeg if there is one, else Pillow. Also makes an animated GIF/PNG/WebP again at another size or quality.
 - Letters can be written by hand: "✎ write by hand" at the desk and on the content manager's letters page opens a sheet of the letters' paper to write on with a pen (a drawing tablet's pressure makes the line thicker, the pen's other end rubs out; a mouse or a finger work too). It goes into the letter as a page of handwriting straight on the paper, as wide as the writing (no tape, no tilt); clicking it in the preview carries on writing on it (sky/inkpad.js).
