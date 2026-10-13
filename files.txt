@@ -167,7 +167,7 @@ content/shame/frames.json 359 3564234737
 content/shame/list.txt 125 95844360
 content/workshop/frames.json 77 3506889498
 content/workshop/list.txt 198 1723977824
-content/workshop/notes.json 543 1126478583
+content/workshop/notes.json 114 2593788045
 content/books/book-1/list.txt 113 3293401086
 content/books/book-2/list.txt 113 3293401086
 content/books/book-3/list.txt 113 3293401086
