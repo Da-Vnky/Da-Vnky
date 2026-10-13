@@ -3,4 +3,5 @@
 2026-09-24-from-skizy.txt
 2026-09-24-untitled.png
 2026-10-11-from-claude.txt
+2026-10-13-a-bottle.jpg
 board.json
