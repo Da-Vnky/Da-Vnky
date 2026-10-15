@@ -17,6 +17,10 @@ How it works
 
 == published ==
 
+2026-10-14 17:51 · V
+- From the desk: a letter on the sea added (2026-10-14-traffic.txt).
+- From the desk: when its letters were written (content/sea/written.json).
+
 2026-10-12 10:03 · V
 - The front garden: "I'm just here for the bee" goes for good once it's been used (it came back after the bee took the gun), and the revolver it gave stays in that visitor's bag from visit to visit, so the rooftop's (or the living room wall's) stays empty: not in reset 4, not once it's been destroyed, not while the bee has it.
 

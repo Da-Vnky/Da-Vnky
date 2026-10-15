@@ -1,5 +1,6 @@
 # written by tools/update-lists.sh: every art file in this folder.
 # no need to edit it; it's rewritten each commit.
+blimp.webp
 cloud-1.webp
 cloud-2.webp
 cloud-3.webp
@@ -12,6 +13,7 @@ skybox-dusk.jpg
 skybox-golden.jpg
 skybox-night.jpg
 skybox-sunset.jpg
+storm-cloud.webp
 sun-eyeball.gif
 sun-glow.gif
 sun-pupil.png
