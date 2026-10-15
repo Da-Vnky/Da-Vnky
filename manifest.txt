@@ -135,7 +135,7 @@ assets/items/list.txt 117
 assets/living/list.txt 363
 assets/resets/index.txt 77
 assets/resets/list.txt 127
-assets/sea/list.txt 127
+assets/sea/list.txt 175
 assets/skizy-room/list.txt 207
 assets/sky/list.txt 377
 assets/sounds/list.txt 243

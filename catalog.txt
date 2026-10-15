@@ -148,8 +148,12 @@ assets/living/list.txt 363 3476233613
 assets/living/vinyl-texture.webp 3298872 1062159737
 assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
-assets/sea/list.txt 127 4287524664
+assets/sea/list.txt 175 2648420221
 assets/sea/ship.webp 1095340 3289159705
+assets/sea/wave-1.webp 4208206 4080738087
+assets/sea/wave-2.webp 3530856 839739073
+assets/sea/wave-3.webp 2627164 2620290093
+assets/sea/wave-4.webp 1546640 823320624
 assets/skizy-room/bedroom-bwindow.png 32159 4245744638
 assets/skizy-room/list.txt 207 1532630783
 assets/skizy-room/main-claube-pen.webp 33288 580577739

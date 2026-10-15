@@ -341,7 +341,8 @@ def working_file(folder, stem, app=None):
     if not os.path.isdir(folder):
         return None
     have = [os.path.join(folder, n) for n in os.listdir(folder)
-            if n.rsplit('.', 1)[-1].lower() in WORKING and not n.startswith(('.', '_'))]
+            if n.rsplit('.', 1)[-1].lower() in WORKING and not n.startswith(('.', '_'))
+            and '-wrapped.' not in n.lower()]
     own = {'csp': '.clip', 'rebelle': '.reb'}.get(app)
     if own:                                             # (Clip Studio's .clip, Rebelle's .reb: that program's own, first)
         mine = [p for p in have if p.lower().endswith(own)]

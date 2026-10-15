@@ -1070,6 +1070,15 @@ def asset_clear(slot):
         write_list(folder)
     if folder.startswith(RESETS_DIR):
         write_resets_index()
+    try:
+        dt_folder, dt_stem, _ = drawtable().where(slot)
+        for p in (os.path.join(dt_folder, dt_stem + '.psd'),
+                  os.path.join(dt_folder, dt_stem + '-wrapped.psd'),
+                  os.path.join(dt_folder, '.made.json')):
+            if os.path.isfile(p):
+                os.remove(p)
+    except Exception:
+        pass
     return gone
 
 
