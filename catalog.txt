@@ -155,6 +155,7 @@ assets/skizy-room/main-claube-pen.webp 33288 580577739
 assets/skizy-room/main-claube.webp 126410 1810541095
 assets/skizy-room/main-mira.webp 61712 1354009711
 assets/skizy-room/main-window.webp 10718 3012613204
+assets/sky/birds.webp 212912 3577861858
 assets/sky/blimp.webp 346132 4249188855
 assets/sky/cloud-1.webp 124972 2532275583
 assets/sky/cloud-2.webp 35010 3142914853
@@ -162,7 +163,7 @@ assets/sky/cloud-3.webp 48514 32872620
 assets/sky/cloud-4.webp 37152 764510579
 assets/sky/cloud-5.webp 41906 2625160310
 assets/sky/cloud.webp 164358 205180145
-assets/sky/list.txt 366 1707796789
+assets/sky/list.txt 377 1348619206
 assets/sky/moon.webp 20958 550342124
 assets/sky/skybox-day.jpg 507563 3898106660
 assets/sky/skybox-dusk.jpg 936292 1272459089
