@@ -8,14 +8,12 @@ rem =====================================================================
 cd /d "%~dp0.."
 where py >nul 2>nul
 if %errorlevel%==0 (
-    start "" http://localhost:8000/
-    py tools\serve.py 8000
+    py tools\serve.py 8000 --open
     goto :eof
 )
 where python >nul 2>nul
 if %errorlevel%==0 (
-    start "" http://localhost:8000/
-    python tools\serve.py 8000
+    python tools\serve.py 8000 --open
     goto :eof
 )
 where npx >nul 2>nul

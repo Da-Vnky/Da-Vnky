@@ -13,7 +13,7 @@
 # otherwise close them there: their changes are in).
 
 [ -f tools/update-lists.sh ] || cd "$(dirname "$0")/.." || exit 1
-GENERATED='(^|/)list\.txt$|^catalog\.txt$|^files\.txt$|^manifest\.txt$|^assets/resets/index\.txt$|^content/living/albums\.txt$'
+GENERATED='(^|/)list\.txt$|^catalog\.txt$|^files\.txt$|^manifest\.txt$|^assets/resets/index\.txt$|^content/living/albums\.txt$|^baked/'
 git config merge.regen.driver true
 git config merge.regen.name "the site's lists: written again by update-lists.sh"
 

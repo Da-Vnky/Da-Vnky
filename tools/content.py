@@ -22,7 +22,8 @@ import datetime, hashlib, http.server, json, os, re, subprocess, sys, threading,
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..'))
 SEA = os.path.join(ROOT, 'content', 'sea')
-PORT = 8001
+PORT = 8001                                           # (if another folder's content manager, or some other program, already has it: the next free one, see main())
+FOLDER = os.path.basename(ROOT)                       # "DaV-nky", or a copy's own name ("DaVnky-A"): shown on the pages when it isn't the real one
 LETTER = re.compile(r'^[\w .,()\'&!+-]+\.(txt|html)$', re.I)
 PICTURE_TYPES = {'image/png': '.png', 'image/jpeg': '.jpg', 'image/gif': '.gif', 'image/webp': '.webp', 'image/svg+xml': '.svg'}
 PICTURE_LIMIT = 4 * 1024 * 1024
@@ -1749,6 +1750,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a):
         pass
 
+    def copy_page(self, path):
+        # a copy of the site (DaVnky-A …): its content manager's pages say so in big letters, so it's never taken for the real one
+        full = os.path.normpath(os.path.join(ROOT, path.lstrip('/')))
+        if not full.startswith(os.path.join(ROOT, 'tools')) or not os.path.isfile(full):
+            return super().do_GET()
+        with open(full, 'rb') as f:
+            raw = f.read()
+        tag = ('<div style="position:fixed;top:0;left:50%%;transform:translateX(-50%%);z-index:99999;background:#7a1f1f;color:#fff;'
+               'font:600 13px system-ui,sans-serif;padding:4px 14px;border-radius:0 0 8px 8px;pointer-events:none">'
+               'this is the copy in %s, not your real DaV-nky folder</div>' % FOLDER).encode('utf-8')
+        raw = raw.replace(b'</body>', tag + b'</body>', 1)
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.send_header('Content-Length', str(len(raw)))
+        self.end_headers()
+        self.wfile.write(raw)
+
     def reply(self, obj, code=200):
         body = json.dumps(obj).encode('utf-8')
         self.send_response(code)
@@ -1816,6 +1834,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if url.path == '/__letters/read':
                 name = safe(q.get('name', [''])[0])
                 return self.reply({'name': name, 'text': read(name)})
+            if url.path == '/__whoami':                                   # which folder this content manager works on (main() asks, before opening a second one)
+                return self.reply({'dav': 'content', 'root': os.path.normcase(ROOT), 'folder': FOLDER})
+            if FOLDER != 'DaV-nky' and url.path.startswith('/tools/') and url.path.endswith('.html'):
+                return self.copy_page(url.path)
         except Exception as e:
             return self.reply({'error': str(e)}, 400)
         if url.path.startswith('/.inbox') or url.path.startswith('/.git'):      # private: never served
@@ -2056,18 +2078,43 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return self.reply({'error': 'unknown'}, 404)
 
 
+def who_has(port):
+    # what's on that port: 'me' (this folder's content manager, already open), a folder's name (another copy's), or '' (some other program)
+    try:
+        with urllib.request.urlopen('http://127.0.0.1:%d/__whoami' % port, timeout=2) as r:
+            got = json.loads(r.read().decode('utf-8'))
+        if got.get('dav') == 'content':
+            return 'me' if got.get('root') == os.path.normcase(ROOT) else (got.get('folder') or 'another copy')
+    except Exception:
+        pass
+    return ''
+
+
 def main():
+    global PORT
     if not os.path.isdir(SEA):
         print("Can't find the letters folder:", SEA)
         return
-    try:
-        server = http.server.ThreadingHTTPServer(('127.0.0.1', PORT), Handler)
-    except OSError:
-        print('\n  The content manager seems to be open already: http://localhost:%d/\n' % PORT)
-        webbrowser.open('http://localhost:%d/tools/letters.html' % PORT)
+    server = None
+    for port in [PORT] + list(range(8002, 8021)):
+        try:
+            server = http.server.ThreadingHTTPServer(('127.0.0.1', port), Handler)
+            PORT = port
+            break
+        except OSError:
+            who = who_has(port)
+            if who == 'me':
+                print('\n  The content manager for this folder is open already: http://localhost:%d/\n' % port)
+                webbrowser.open('http://localhost:%d/tools/letters.html' % port)
+                return
+            print('  (port %d is taken by %s, so this one opens on another)' % (port, ("the content manager of " + who) if who else 'some other program'))
+    if not server:
+        print('\n  Every port from 8001 to 8020 is taken. Close some programs and try again.\n')
         return
     url = 'http://localhost:%d/tools/letters.html' % PORT
-    print('\n  DaV-nky content manager: %s\n  (close this window to stop it)\n' % url)
+    if sys.platform == 'win32':
+        os.system('title content manager: ' + FOLDER)            # the black window's title says which folder it's for
+    print('\n  DaV-nky content manager%s: %s\n  (close this window to stop it)\n' % ('' if FOLDER == 'DaV-nky' else ' (the copy in ' + FOLDER + ')', url))
     threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:
         server.serve_forever()

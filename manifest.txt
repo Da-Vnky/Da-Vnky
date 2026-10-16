@@ -3,7 +3,7 @@ beyond.html 1480
 city.html 9866
 desk.html 6191
 index.html 5247
-living.html 133470
+living.html 133462
 window-sky.html 1334
 workshop.html 22101
 sky/ambient.js 5331
@@ -27,7 +27,7 @@ sky/gnosis.js 16234
 sky/gore.js 18520
 sky/ground-city.js 21686
 sky/ground-countryside.js 13331
-sky/ground-sea.js 46704
+sky/ground-sea.js 46744
 sky/ground-view.js 6301
 sky/hand.js 1836
 sky/hell.js 23866
@@ -54,8 +54,8 @@ sky/post.js 21656
 sky/records.js 37374
 sky/resets.js 17516
 sky/revolver.js 20186
-sky/ropes.js 5596
-sky/sky.js 137833
+sky/ropes.js 18748
+sky/sky.js 141806
 sky/songpad.js 8196
 sky/source.js 3809
 sky/state.js 22677
@@ -68,7 +68,7 @@ sky/veil.js 18751
 sky/watchers.js 14154
 sky/weather.js 25754
 sky/paper.css 8047
-sky/sky.css 58055
+sky/sky.css 59769
 sky/css/ambient.css 435
 sky/css/attic.css 15736
 sky/css/bathroom.css 16836
@@ -90,12 +90,12 @@ sky/css/gnosis.css 7584
 sky/css/gore.css 5281
 sky/css/ground-city.css 5505
 sky/css/ground-countryside.css 834
-sky/css/ground-sea.css 8871
+sky/css/ground-sea.css 9159
 sky/css/ground-view.css 788
 sky/css/hell.css 10082
 sky/css/inkpad.css 8326
 sky/css/inventory.css 6010
-sky/css/kitchen.css 17248
+sky/css/kitchen.css 17618
 sky/css/letters.css 4656
 sky/css/lives.css 2940
 sky/css/loop.css 2368
@@ -180,6 +180,7 @@ content/living/bottles/2026-10-11-from-claude.txt 739
 content/living/bottles/board.json 132
 content/living/bottles/list.txt 225
 content/workshop/visitors/list.txt 235
+baked/baked.json 11417
 schizophyllu.me.room/index.html 5156
 schizophyllu.me.room/assets/font.css 30693
 schizophyllu.me.room/room/audio.js 15832

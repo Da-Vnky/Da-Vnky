@@ -140,7 +140,7 @@
     Sky.findAsset('assets/sea/dock', function (url, img) {
         if (!url) return;
         dockArt = { url: url, ratio: img.naturalWidth / img.naturalHeight || 1.6 };
-        Sky.findAsset(url.replace(/\.\w+$/, '') + '-glow', function (g) { dockArt.glow = g; buildDock(); });
+        Sky.findAsset((Sky.baked ? Sky.baked.original(url) : url).replace(/\.\w+$/, '') + '-glow', function (g) { dockArt.glow = g; buildDock(); });
         dock.classList.add('has-art');
         buildDock();
         Sky.refresh();

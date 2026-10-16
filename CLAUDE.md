@@ -27,7 +27,7 @@ this before changing anything; keep it up to date when something here stops bein
 - Change only what the task needs. Victor (or skizy) may have edited a file since you last read it: read it again
   before changing it, and never overwrite their edits.
 - **Never write** `list.txt` (any), `catalog.txt`, `files.txt`, `manifest.txt`, `assets/resets/index.txt` or
-  `content/living/albums.txt`: publishing writes those (`tools/update-lists.sh`).
+  `content/living/albums.txt`, or anything in `baked/`: publishing writes those (`tools/update-lists.sh`, `tools/bake.py`).
 - **The `?v=` on the pages' code and styles is stamped by publishing** (28 Sep): `tools/update-lists.sh` sets it to a
   checksum of everything in `sky/`, on every page, so it changes whenever the code does. Don't bump it by hand any more
   (Victor's old rule: it's automatic now). A new page gets it on its first publish.
@@ -120,10 +120,36 @@ this before changing anything; keep it up to date when something here stops bein
   - `content/living/albums.txt` (the record player's albums: every folder of songs in content/living/ but `bottles`)
   - `catalog.txt` (every file + size + checksum: the loader's source of truth)
   - `files.txt` / `manifest.txt` (pages and code only, for visitors still on an old loading screen)
+  - (`tools/bake.py`'s `baked/`, when it's switched on, is listed in catalog.txt too: see *Lighter pictures for visitors*.)
 - Local preview: `tools\preview.bat` (http://localhost:8000) or the content manager `tools\content.bat`
   (http://localhost:8001: `tools/content.py` serves the site *and* the manager's API). Victor previews
   constantly. **On localhost nothing is kept**: `sky/loader.js` unregisters the service worker and deletes
   its cache, and `sw.js` passes every request straight through, so every edit shows on refresh.
+- **The content manager's port** (16 Oct): content.py `main()` asks whoever has 8001 `/__whoami` (`{dav: 'content', root,
+  folder}`): this folder's own → it just opens the browser there, as before; another folder's (DaVnky-A) or another program →
+  it takes the next free port (8002 to 8020) and says so. A copy's pages carry a red "this is the copy in DaVnky-A" tag
+  (`copy_page`, any folder not named DaV-nky) and the black window's title names the folder. preview.bat → `serve.py 8000
+  --open`: 8000 busy → 8030 to 8049 (8001-8020 are left for the content manager), and it opens the browser on what it got.
+  (Victor, 16 Oct: "the bat tools all open on localhost:8001" after Antigravity/Gemini set up MCP servers; nothing in the
+  repo pointed there, so this guards against a server from the other folder, or anything else, holding the port.)
+- **Branch workspace: DaVnky-A** (16 Oct, Victor; made by Gemini/Antigravity): `C:\Users\Victor\Desktop\DaVnky-A` is a
+  copy of the site (no .git) for Victor, Gemini or Argon to try changes in without touching the real folder.
+  `tools/sync-a.py` / `sync-a.bat` (rewritten by Claude the same day: the first version treated every difference as the copy's
+  edit, so `apply` would have put DaVnky-A's older waves back over Victor's new ones): `DaVnky-A/.sync-base.json` holds every
+  file's sha256 as it was when the two last agreed (made on the first run from the copy as it stood). `status` (default):
+  changed in the copy only → `apply`; changed here only → `refresh`; changed on both → listed, left alone. `apply` (asks, or
+  `--yes`) copies the copy's own changes in (DaV-nky's old versions → `_your-versions/backup-before-a-<timestamp>/`, deletions
+  too) and adds the copy's new CHANGES.txt lines through changes.py; never commits. `refresh` copies DaV-nky's newer files (and
+  its CHANGES.txt) into the copy. Never synced: anything git ignores, the generated lists, `baked/`. `AGENTS.md` / `GEMINI.md`
+  (Gemini's, at the top): **an AI never runs `sync-a.py apply` (or copies files across by hand) unless Victor asks for it in
+  the chat.** `refresh` only writes inside DaVnky-A. Each folder keeps its own `GEMINI.md` / `AGENTS.md` (never synced): DaVnky-A's
+  (16 Oct, Victor: Gemini now only has that folder) tell Gemini how to work there: check the red "copy" tag, never run publish,
+  pull, sync-a, desk.py or bake.py, never stop a process it didn't start, CHANGES.txt lines, and how its work comes back.
+- **What Antigravity/Gemini set up on Victor's computer** (seen 16 Oct, outside the repo): MCP servers in `~/.gemini/settings.json`
+  and `~/.gemini/config/mcp_config.json` (blender, davinci-resolve, comfyui, cheatengine, a "prism-relay"), a venv
+  `C:\Users\Victor\mcp_bridge_env` (Python 3.14, ollama-mcp-bridge, fastapi/uvicorn) and Python 3.14 from the new Python install
+  manager (`%LocalAppData%\Python\pythoncore-3.14-64`). If `py` now starts 3.14, the tools' extras (Pillow, Playwright, fontTools)
+  may be missing there: the drawing table says "install them", `bake.py` skips with a note.
 
 ## The desk (desk.html: letters, post, bottles, paintings and frames from anywhere, signed in; 11 Oct)
 
@@ -610,7 +636,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   traveller walks there through the rooms in between (`Sky.house.go('kitchen')`, see "The house: its rooms");
   `tabHere()` marks it "you are here" while inside.
 - **The fridge** (`.kitchen-fridge`: `.kf-door` over `.kf-inside`, slots `kitchen-fridge`, `kitchen-fridge-inside`):
-  click → the traveller walks over (`reach()`), the door swings open (rotateY); click the inside or the door to shut.
+  click → the traveller walks over (`reach()`), the door swings open (rotateY); click the inside or the door to shut. The
+  inside (the whole fridge's body) is hidden only once the door has swung shut (`transition: visibility 0s .55s`; 16 Oct,
+  Victor: hidden at once, the fridge vanished behind the closing door).
   On the bottom shelf **the apple pie** (`.kitchen-pie`, slot `kitchen-pie`): **reset 3's key is stuck in it**
   (`RESETS[2].key = { page: 'living', in: '.kitchen-pie' }`; CSS rotates the key ring-up and clips the blade off with
   `clip-path` so it looks pushed in). Opening the fridge with the key there: "There's something stuck in the pie."
@@ -1281,6 +1309,56 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - The canvas (`canvas-*`) lies over just the painted picture (`fitCanvas`: object-fit contain is allowed
   for), not its whole box. No canvas texture exists yet, so paintings show none.
 
+## Lighter pictures for visitors: baked/ (tools/bake.py, 16 Oct)
+
+- **Switched off for now** (16 Oct, Victor: "no bake then, we'll leave it till the site is about done"): publish.bat /
+  publish.sh have the step as a comment, and `baked/` is in .gitignore (a test bake's folder may still sit in his folder and
+  DaVnky-A: harmless, never published). **To switch it on**: uncomment the step in both, take `baked/` out of .gitignore.
+  sky.js asks for baked.json only when catalog.txt lists it, so with no bake published nothing is fetched.
+
+- Victor: "baking assets to help load times … convert images to .webp", keeping his raw files and edits where they are. So:
+  **the originals stay the truth** (assets/, content/: the content manager, the drawing table, the preview all use them), and
+  publishing (publish.bat / publish.sh step 3, before update-lists) runs `tools/bake.py --quiet`, which writes a lighter copy of
+  each big picture to **`baked/<the same path>.webp`** (`baked/assets/sea/wave-3.webp`; `<name>.<ext>.webp` if two originals
+  would share a name) and `baked/baked.json` (`files: { "<original>": { to, of: "size:cksum" (as catalog.txt says it), was, now,
+  from: [w,h], size: [w,h], frames } }`, or `{ none: "size:cksum" }` for one not worth it, so it isn't tried again till it changes).
+- Rules (top of bake.py): stills at most `MAX_SIDE` 2560 across, moving ones `MAX_ANIM` 1280; repeating slots (slots.json `tile`)
+  `TILE_SIDE` 720 tall (the waves: 3024 x 1008 → 2160 x 720), shrunk laid three times side by side so the edges still join;
+  WebP `QUALITY` 88 (alpha 90), PNG/GIF also tried lossless, the lighter kept; a moving GIF → a moving WebP (Pillow merges identical
+  frames, the timing is kept: checked); a WebP original only if it gets smaller in pixels; kept only at ≤ `KEEP` .85 of the
+  original's bytes or fewer pixels. `SKIP`: templates, cursors/loading/click, fonts, `sun-eyeball|eyelids|pupil` (eye.js reads
+  the GIF itself), `assets/hell/eye`, bottles (their words are inside the file: crate.js `readMeta`), `content/post/`,
+  `assets/skizy-room/` (her room finds its pictures itself). The checksum: Git Bash's `cksum.exe` (or PATH's), else the same CRC in
+  Python. No Pillow: a note, nothing baked, the site uses originals. First bake (16 Oct): 37 copies, 55 MB → 13 MB (the workshop's
+  9 MB jpg → 0.7 MB, the P(Doom) sleeve GIF 4.8 → 2.4 MB, wave-3 2.5 → 0.5 MB). Again with nothing changed: under a second.
+- **The site** (sky.js "baked pictures": `bakedReady`, `bakedUrl`, `unbaked`; `Sky.baked = { ready, url, original }`): reads
+  baked.json and catalog.txt once a page; a copy is used only while catalog.txt says its original is still `of` and lists the copy
+  (so an original changed and published without a bake simply shows as itself). Wired into `findAsset` (the image probe and its
+  answer; if the copy fails to load, the original), `listFolder` (every listed file's `url`; `name` stays the original's),
+  `deskUrl` (so `Sky.desk.url`: frames.js, letters.js's pictures, records.js; `Sky.desk.ready` waits for it too). `glowOf` and
+  ground-sea.js's dock glow go back to the original's name first. **On localhost the originals show**, unless the address has
+  `?baked` (then baked.json is trusted as it is: run `tools\bake.bat` first); never in `?map`.
+- `baked/` is generated like the lists: in pull.sh / github-publish.sh / merge-prs.sh `GENERATED`, `.gitattributes`
+  `baked/** merge=regen`; update-lists.sh's catalog includes `baked/baked.json baked/*/*/* … /*/*`. Tested 16 Oct (Playwright):
+  every page uses the copies with ?baked and on a non-localhost name, none without; a stale catalog entry → that one original;
+  no errors; smoke test all good.
+- **The lag on the sea was drawing, not file size** (16 Oct, measured in the browser pane on Victor's computer, scrolling the sea
+  by script): his four new full-width waves (with their drop-shadows) were repainted every frame: ~30 fps with them, ~40 with no
+  waves at all, the same with originals or baked copies. `.ground-sea .wave { will-change: transform }` (css/ground-sea.css)
+  gives each wave its own layer: back to ~40 (= no waves). Baking only halved the download (21.6 → 11.6 MB on the sea).
+- **The living space on entering**: no stutter measured (no frames over 40 ms while it loads), ~4 s to load locally, ~30 MB of
+  pictures (13.6 baked): the dungeon's paintings (Elo Maw 8 MB jpg, the False God 4.3 MB GIF), vinyl-texture 3.2 MB,
+  sun-glow.gif, record sleeves, all fetched up front though most aren't on screen. On the live site that's what makes it slow.
+  Not changed yet: baking, or loading those only when shown (frames.js / records.js), would fix it.
+
+## Argon (Victor's browser-based helper, 16 Oct)
+
+- Victor also works with **Argon**, an AI in his browser that only sees what he gives it (it fixed content.py's `asset_clear`
+  and drawtable.py's `working_file` for the waves on 15 Oct: commit f620113). `tools/FOR-ARGON.md` is its brief (the rules that
+  matter, what's in its zip, how to hand work back through DaVnky-A + sync-a, what to leave to Claude). `tools\argon-pack.bat`
+  (`argon-pack.py [--with-skizy]`) zips the code, notes and small text files (never .inbox, .git, _your-versions, baked,
+  the drawing table, the debug page, pictures or sounds) into `_your-versions/argon/`. Keep FOR-ARGON.md true too.
+
 ## Caching (sw.js + sky/loader.js)
 
 - The service worker is cache-first for everything on the site; pictures/sounds/videos are kept the
@@ -1421,6 +1499,21 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   sets `--rope-a` (each rope tilts about where it's tied) and, for the sun and moon (one rope each), `--prop-tilt` (their
   pictures tilt with it); sky.css "props on ropes". The numbers (swing time, how fast it settles, breeze, wind, nudge, the
   furthest it goes) are at the top of ropes.js. Big swings ease off (tanh) rather than hitting a wall.
+- **Ropes that move like rope** (16 Oct, Victor: "a more realistic rope like physics", and the birds' rope jerking when they
+  flap): ropes.js builds a `.rope-chain` in each prop at each tie point (`TIES`: the same places as sky.css's pseudo-element
+  ropes, which `html.ropes-live` hides; `?map` keeps the old ones), `PIECES` 12 `<b>`s up to the top of the screen + `.rope-top`
+  on to 300vh. The chain is turned by `--rope-a` (sky.css, `transform: rotate(var(--rope-a))`), so the pieces are laid in the
+  rope's own frame: a taut string (`shake`: each point pulled toward its neighbours, `STIFF = (RIPPLE·PIECES)²`, damped by
+  `CALM`, sub-steps of 8 ms), pushed by the tie point's sideways acceleration (`-ta·LAG·(1−s)`: the middle lags behind when the
+  prop is jerked; only when |ta| > 60), a pluck (pointermove crossing the rope's line, `PLUCK`) and the birds' beat. **At rest
+  it's `.calm`**: one long piece, no writes; the pieces show and move only while bowing/rippling (big w or v), then it settles
+  back (measured in headless Chromium: the page's main-thread work with the new ropes = the old swinging ropes, 110 vs 108 ms
+  a second; an earlier version that moved every piece every frame cost 164). **The birds' beat**: `readBirds` fetches the
+  birds' picture once, `ImageDecoder` (Chrome, Edge, Firefox 133+) decodes each frame to 96 × 64 and finds where the top of the
+  picture drops by > 15% from one frame to the next (the wings coming down: frame 8 of 12 in Victor's wind-up bird, at 664 of
+  996 ms); at each flight (`.flying` added, a MutationObserver) the `<img>` gets a fresh blob URL so it plays from frame 0 in
+  step with our clock (`beat.t0` on its load); each beat: the bird is tugged up `BEAT_LIFT` 4 px (a spring on `st.bob`, in
+  `translate`'s second value) and the bottom of its rope kicked sideways (`BEAT_KICK`). `Sky.ropes.beat` for checking.
 - Resets 1–2: the sky's props hang on ropes (`html.stage-strings`, sky.css "props on ropes") — the "true
   reality" hint. Ropes are 5 px (3.5 on phones), drawn as twisted strands or Victor's `assets/sky/rope`
   (repeats down its length; sky.js sets `--rope-art` + `html.has-rope-art`). Each rope's end is tucked behind

@@ -1121,6 +1121,28 @@ html.stage-strings :is(.sun, .moon, .cloud).has-art::after { box-shadow: none; }
 html.stage-strings :is(.flyer-blimp, .flyer-balloon, .flyer-birds) { filter: brightness(calc(1 - .55 * var(--dusk))) drop-shadow(var(--stage-shadow)); }
 html.stage-strings :is(.flyer-blimp, .flyer-balloon, .flyer-birds)::before,
 html.stage-strings :is(.flyer-blimp, .flyer-balloon, .flyer-birds)::after { box-shadow: none; }      /* (their shadow comes with the rest of them) */
+/* (16 Oct) the ropes that move like rope (sky/ropes.js): each one drawn in short pieces end to end (.rope-chain, tied on where
+   the drawn rope above was), so it can bow and ripple. the plain ropes above stay for the asset manager's map and for
+   anyone who's asked their computer for less motion */
+html.stage-strings.ropes-live :is(.sun, .moon, .cloud, .flyer-blimp, .flyer-balloon, .flyer-birds)::before,
+html.stage-strings.ropes-live :is(.cloud, .flyer-blimp)::after { display: none; }
+.rope-chain { position: absolute; z-index: -1; width: 0; height: 0; pointer-events: none; display: none; }
+html.stage-strings .rope-chain { display: block; rotate: none; transform: rotate(var(--rope-a, 0rad)); }
+/* (a rope at rest is one long piece; the short ones show only while it's bowing or rippling) */
+.rope-chain.calm > b:not(.rope-top) { display: none; }
+.rope-chain > b {
+    position: absolute; left: calc(var(--rope-w) / -2); bottom: 0; width: var(--rope-w); height: 40px;
+    transform-origin: 50% 100%;
+    background:
+        linear-gradient(90deg, rgba(0,0,0,.38), rgba(0,0,0,0) 38%, rgba(255,236,200,.22) 52%, rgba(0,0,0,.42)),
+        repeating-linear-gradient(-58deg, #5b4229 0 1.6px, #8d6c45 1.6px 3.6px, #6e5234 3.6px 5.2px);
+    filter: brightness(calc(1 - .45 * var(--dusk, 0)));
+    box-shadow: var(--stage-shadow);
+}
+.rope-chain > b.rope-top { height: 300vh; }
+html.has-rope-art .rope-chain > b { background: var(--rope-art) center bottom / 100% auto repeat-y; }
+/* (with your picture, or on a flyer, the prop's own shadow carries the rope's, as above) */
+:is(.sun, .moon, .cloud).has-art > .rope-chain > b, :is(.flyer-blimp, .flyer-balloon, .flyer-birds) > .rope-chain > b { box-shadow: none; }
 
 /* ================= a picture, not a page of text =================
    a double-click or a drag doesn't highlight things like text (or bring up the browser's little

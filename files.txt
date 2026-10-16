@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1480 1445079561
-city.html 9866 3733585163
-desk.html 6191 38879918
-index.html 5247 207892678
-living.html 133470 1828866964
-window-sky.html 1334 4159341522
-workshop.html 22101 4078618300
+beyond.html 1480 194054100
+city.html 9866 1678492793
+desk.html 6191 2712644321
+index.html 5247 3565980024
+living.html 133462 1442495763
+window-sky.html 1334 3607794743
+workshop.html 22101 1484934484
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/bathroom.js 29419 3573512770
@@ -27,7 +27,7 @@ sky/gnosis.js 16234 566364789
 sky/gore.js 18520 1677760609
 sky/ground-city.js 21686 1654325007
 sky/ground-countryside.js 13331 1871014694
-sky/ground-sea.js 46704 1683644155
+sky/ground-sea.js 46744 1829128240
 sky/ground-view.js 6301 1081822792
 sky/hand.js 1836 1437817105
 sky/hell.js 23866 1668939081
@@ -54,8 +54,8 @@ sky/post.js 21656 2013340171
 sky/records.js 37374 197731851
 sky/resets.js 17516 2785905217
 sky/revolver.js 20186 2694897367
-sky/ropes.js 5596 4224145225
-sky/sky.js 137833 314625685
+sky/ropes.js 18748 1787434452
+sky/sky.js 141806 762494832
 sky/songpad.js 8196 2333869894
 sky/source.js 3809 654057405
 sky/state.js 22677 242285796
@@ -68,7 +68,7 @@ sky/veil.js 18751 509778180
 sky/watchers.js 14154 3869253767
 sky/weather.js 25754 4255422177
 sky/paper.css 8047 1201821797
-sky/sky.css 58055 1791733890
+sky/sky.css 59769 3349578452
 sky/css/ambient.css 435 4199751144
 sky/css/attic.css 15736 521837829
 sky/css/bathroom.css 16836 855192362
@@ -90,12 +90,12 @@ sky/css/gnosis.css 7584 1910191903
 sky/css/gore.css 5281 3967197097
 sky/css/ground-city.css 5505 2510993983
 sky/css/ground-countryside.css 834 2965982463
-sky/css/ground-sea.css 8871 1730813069
+sky/css/ground-sea.css 9159 1911428048
 sky/css/ground-view.css 788 375225604
 sky/css/hell.css 10082 3168670266
 sky/css/inkpad.css 8326 4156737891
 sky/css/inventory.css 6010 1973479581
-sky/css/kitchen.css 17248 3013673126
+sky/css/kitchen.css 17618 2309699175
 sky/css/letters.css 4656 2777016701
 sky/css/lives.css 2940 2301746507
 sky/css/loop.css 2368 1703632058
@@ -180,6 +180,7 @@ content/living/bottles/2026-10-11-from-claude.txt 739 2900152306
 content/living/bottles/board.json 132 3001581082
 content/living/bottles/list.txt 225 1104328745
 content/workshop/visitors/list.txt 235 2157225356
+baked/baked.json 11417 2994304259
 schizophyllu.me.room/index.html 5156 668732473
 schizophyllu.me.room/assets/font.css 30693 1584298999
 schizophyllu.me.room/room/audio.js 15832 3536447765

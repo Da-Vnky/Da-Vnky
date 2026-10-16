@@ -7,6 +7,11 @@
     height: 30vh;
     min-height: 200px;
 }
+/* (16 Oct) each wave its own layer: painted once, then only slid about as you scroll. without it the four full-width waves
+   and their shadows were painted again every frame, and the sea ran at about 30 frames a second instead of 60 */
+.ground-sea .wave {
+    will-change: transform;
+}
 .ground-sea .wave-1 {
     color: #56636f;
     filter: drop-shadow(0 -3px 5px rgba(0, 0, 0, .35));

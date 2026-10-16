@@ -18,7 +18,7 @@
 # usage: sh tools/github-publish.sh
 
 [ -f tools/update-lists.sh ] || cd "$(dirname "$0")/.." || exit 1
-GENERATED='(^|/)list\.txt$|^catalog\.txt$|^files\.txt$|^manifest\.txt$|^assets/resets/index\.txt$|^content/living/albums\.txt$'
+GENERATED='(^|/)list\.txt$|^catalog\.txt$|^files\.txt$|^manifest\.txt$|^assets/resets/index\.txt$|^content/living/albums\.txt$|^baked/'
 lists() { tr -d '\r' < tools/update-lists.sh | sh; }
 
 if ! git remote get-url github >/dev/null 2>&1; then

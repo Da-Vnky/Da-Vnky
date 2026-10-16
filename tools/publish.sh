@@ -26,6 +26,7 @@ echo " 2. bringing in what you changed at the desk..."
 if [ -n "$PY" ]; then "$PY" tools/desk.py file; else echo "   (no python: the desk's changes wait for the next publish)"; fi
 echo
 echo " 3. updating the file lists..."
+# ("$PY" tools/bake.py --quiet would make lighter copies of the big pictures here: off until the site is nearly done)
 sh tools/update-lists.sh
 echo
 git status --short

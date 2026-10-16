@@ -22,7 +22,7 @@ QUIET=
 say() { [ -n "$QUIET" ] || echo "$@"; }
 
 # the lists: made by update-lists.sh, so on a clash just keep either and write them again after
-GENERATED='(^|/)list\.txt$|^catalog\.txt$|^files\.txt$|^manifest\.txt$|^assets/resets/index\.txt$|^content/living/albums\.txt$'
+GENERATED='(^|/)list\.txt$|^catalog\.txt$|^files\.txt$|^manifest\.txt$|^assets/resets/index\.txt$|^content/living/albums\.txt$|^baked/'
 git config merge.regen.driver true
 git config merge.regen.name "the site's lists: written again by update-lists.sh after a pull"
 # (.gitattributes marks the lists "merge=regen"; this tells git what that means, on this computer)

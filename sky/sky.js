@@ -188,6 +188,59 @@
     // it can't find out about gets each file type tried in turn instead.
     var EXTS = ['svg', 'gif', 'webp', 'png', 'jpg'];
     var assetDirs = {}, assetMemo = {};
+
+    /* ---------------- baked pictures (tools/bake.py, 16 Oct) ----------------
+       publishing makes a lighter copy of each big picture in baked/ (webp, no bigger than it's ever shown), listed in
+       baked/baked.json with the size and checksum of the picture it was made from. a copy is used only while catalog.txt
+       still says that picture is the same one (so a picture changed without a new bake shows as itself). the originals
+       stay where they are and stay the truth: on your own computer (localhost) they're what's shown, unless the address
+       has ?baked. bakedUrl('assets/sea/wave-1.webp') → 'baked/assets/sea/wave-1.webp', or the same address back. */
+    var BAKED = {}, UNBAKED = {};
+    function bakedKey(u) {
+        u = String(u || '').split(/[?#]/)[0];
+        if (u.indexOf(location.origin + '/') === 0) u = u.slice(location.origin.length);
+        u = u.replace(/^(\.\/|\/)+/, '');
+        try { u = decodeURIComponent(u); } catch (e) {}
+        return u;
+    }
+    function bakedUrl(u) {
+        var to = BAKED[bakedKey(u)];
+        return to ? to.split('/').map(encodeURIComponent).join('/') : u;
+    }
+    function unbaked(u) {
+        var from = UNBAKED[bakedKey(u)];
+        return from ? from.split('/').map(encodeURIComponent).join('/') : u;
+    }
+    var bakedReady = (function () {
+        var local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+        if (location.protocol === 'file:' || /[?&]map\b/.test(location.search) || (local && !/[?&]baked\b/.test(location.search))) return Promise.resolve();
+        function get(u, json) {
+            return fetch(u, { cache: 'no-cache' }).then(function (r) { return r.ok ? (json ? r.json() : r.text()) : null; }).catch(function () { return null; });
+        }
+        // (on your computer with ?baked, the bake you've just run is trusted: catalog.txt there is from the last publish.
+        // on the site, baked.json is only asked for when catalog.txt lists it: no bake published, nothing asked)
+        return (local ? Promise.resolve(null) : get('catalog.txt')).then(function (cat) {
+            var now = null;
+            if (cat) {
+                now = {};
+                cat.replace(/\r/g, '').split('\n').forEach(function (l) {
+                    var m = /^(.+) (\d+) (\d+)$/.exec(l.trim());
+                    if (m && m[1].charAt(0) !== '#') now[m[1]] = m[2] + ':' + m[3];
+                });
+                if (!('baked/baked.json' in now)) return null;
+            } else if (!local) return null;
+            return get('baked/baked.json', true).then(function (j) { return [j, now]; });
+        }).then(function (got) {
+            var files = got && got[0] && got[0].files, now = got && got[1];
+            if (!files) return;
+            Object.keys(files).forEach(function (from) {
+                var f = files[from];
+                if (!f || !f.to) return;
+                if (now && (now[from] !== f.of || !(f.to in now))) return;      // changed since it was baked (or the copy isn't up)
+                BAKED[from] = f.to; UNBAKED[f.to] = from;
+            });
+        }).catch(function () {});
+    })();
     function assetDir(dir) {
         // (a reset's own folder: assets/resets/index.txt already says what's in it)
         if (!assetDirs[dir] && /^assets\/resets\//.test(dir) && window.davSave) assetDirs[dir] = window.davSave.overrides().then(function (have) {
@@ -1151,7 +1204,8 @@
     // a matching bench-glow.(svg|png|webp|gif) is laid on top and fades in at dusk.
     // several names can be given, best first: "assets/sky/cloud-2|assets/sky/cloud"
     function findAsset(base, cb) {
-        if (!assetMemo[base]) assetMemo[base] = (window.davSave ? window.davSave.overrides() : Promise.resolve({})).then(function (have) {
+        if (!assetMemo[base]) assetMemo[base] = Promise.all([window.davSave ? window.davSave.overrides() : Promise.resolve({}), bakedReady]).then(function (both) {
+            var have = both[0];
             var list = [];
             base.split('|').forEach(function (b) {
                 b = b.trim();
@@ -1184,16 +1238,16 @@
                             .then(function (j) { done({ url: url, data: j }); }, next);
                         return;
                     }
-                    var im = new Image();
-                    im.onload = function () { done({ url: url, img: im }); };
-                    im.onerror = next;
-                    im.src = url;
+                    var show = bakedUrl(url), im = new Image();             // (its lighter copy, if it has one: "baked pictures")
+                    im.onload = function () { done({ url: show, img: im }); };
+                    im.onerror = function () { if (show === url) return next(); show = url; im.src = url; };   // (no copy after all: the original)
+                    im.src = show;
                 })();
             });
         });
         assetMemo[base].then(function (hit) { hit ? cb(hit.url, hit.img || hit.data) : cb(null); });
     }
-    function glowOf(url) { return url.replace(/\.\w+$/, '') + '-glow'; }
+    function glowOf(url) { return unbaked(url).replace(/\.\w+$/, '') + '-glow'; }
     // put art into a drawn SVG group, keeping the group (and anything animating it):
     // the picture is laid on the same canvas as the drawing (x, y, w, h in its viewBox)
     function svgArt(g, base, box, done) {
@@ -1763,10 +1817,11 @@
     var LOCALHOST = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
     function deskReady() {
         if (deskRows) return deskRows;
-        if (!SUPABASE.url || !SUPABASE.key || location.protocol === 'file:' || /[?&]map\b/.test(location.search)) return (deskRows = Promise.resolve(deskList));
+        // (Sky.desk.ready also waits for the list of baked pictures, so Sky.desk.url can hand out their lighter copies)
+        if (!SUPABASE.url || !SUPABASE.key || location.protocol === 'file:' || /[?&]map\b/.test(location.search)) return (deskRows = bakedReady.then(function () { return deskList; }));
         var stop = typeof AbortController === 'function' ? new AbortController() : null;
         var late = setTimeout(function () { if (stop) stop.abort(); }, DESK_WAIT);
-        deskRows = fetch(SUPABASE.url.replace(/\/+$/, '') + '/rest/v1/desk?select=path,gone,obj,at,filed_at', { headers: sbHeaders(), cache: 'no-store', signal: stop ? stop.signal : undefined })
+        deskRows = Promise.all([fetch(SUPABASE.url.replace(/\/+$/, '') + '/rest/v1/desk?select=path,gone,obj,at,filed_at', { headers: sbHeaders(), cache: 'no-store', signal: stop ? stop.signal : undefined })
             .then(function (r) { return r.ok ? r.json() : []; })
             .catch(function () { return []; })
             .then(function (rows) {
@@ -1777,7 +1832,7 @@
                     deskList[r.path] = r;
                 });
                 return deskList;
-            });
+            }), bakedReady]).then(function (both) { return both[0]; });
         return deskRows;
     }
     function deskPath(p) {
@@ -1792,7 +1847,7 @@
     // (call it once Sky.desk.ready has answered.) deleted at the desk: null
     function deskUrl(path) {
         var r = deskList[deskPath(path)];
-        if (!r) return path;
+        if (!r) return bakedUrl(path);                                   // (as published: its lighter copy, if it has one)
         return r.gone || !r.obj ? null : deskFileUrl(r);
     }
     // a folder's files, with the desk's new, changed and deleted ones
@@ -1833,8 +1888,9 @@
             if (!t || /<html/i.test(t)) return null;
             return clean(t.split(/\r?\n/).filter(function (l) { return l.trim() && !/^\s*#/.test(l); }));
         });
-        var published = fromList.then(function (listed) {
-            if (listed) return listed.map(function (n) { return { name: n, url: dir + encodeURIComponent(n) }; });
+        var published = Promise.all([fromList, bakedReady]).then(function (got) {
+            var listed = got[0];
+            if (listed) return listed.map(function (n) { return { name: n, url: bakedUrl(dir + encodeURIComponent(n)) }; });
             return askAround();
         });
         // (the content folders also get what's waiting on the desk)
@@ -2146,6 +2202,8 @@
         // the desk's changes (desk.html): Sky.desk.ready.then(…), then Sky.desk.url('content/…') for a content file's
         // address (the desk's copy, the published one, or null if it was deleted at the desk)
         desk: { get ready() { return deskReady(); }, url: deskUrl },
+        // the lighter copies publishing makes of big pictures (tools/bake.py): ready, the copy's address, and back
+        baked: { ready: bakedReady, url: bakedUrl, original: unbaked },
         inbox: BOTTLE_INBOX,
         sendPost: sendPost,
         // a glass bottle drawing (viewBox 0 0 200 90): .b-scroll (the note inside), .b-cork

@@ -12,6 +12,8 @@ files.txt                 merge=regen
 manifest.txt              merge=regen
 assets/resets/index.txt   merge=regen
 content/living/albums.txt merge=regen
+# (the lighter copies of the pictures, tools/bake.py, are made again on every publish too)
+baked/**                  merge=regen
 
 # the change log: two people adding lines at once keep both (never a clash)
 CHANGES.txt               merge=union

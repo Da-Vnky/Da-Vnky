@@ -92,6 +92,7 @@ done
 {
     echo "# written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum."
     for f in *.html sky/*.js sky/*.css sky/css/*.css assets/*/* assets/resets/*/* assets/resets/*/*/* content/*/* content/*/*/* \
+             baked/baked.json baked/*/*/* baked/*/*/*/* baked/*/*/*/*/* \
              schizophyllu.me.room/* schizophyllu.me.room/*/* schizophyllu.me.room/*/*/* schizophyllu.me.room/*/*/*/*; do
         [ -f "$f" ] || continue
         name=$(basename "$f")

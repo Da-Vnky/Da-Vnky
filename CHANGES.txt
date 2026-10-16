@@ -17,6 +17,19 @@ How it works
 
 == published ==
 
+2026-10-16 16:05 · V
+- Made DaVnky-A branch folder on Desktop and tools/sync-a.py to review and commit edits safely
+- The kitchen fridge no longer vanishes while its door swings shut: the shelves stay until the door's closed (sky/css/kitchen.css).
+- tools/bake.py (and bake.bat) can make lighter WebP copies of the big pictures in baked/ for visitors (the originals stay as they are; sky.js uses a copy only while catalog.txt says its original is unchanged, and only if catalog.txt lists baked/baked.json). Switched off for now: publishing doesn't run it and baked/ is in .gitignore, until the site is nearly done. A test bake made 55 MB of pictures into 13 MB.
+- baked/ is generated like the lists when it's on (never edit it by hand: .gitattributes and pull.sh treat it as generated).
+- The content manager checks who already has port 8001: if it's another folder's (the DaVnky-A copy) or another program, it opens on the next free port instead of showing the wrong one, and a copy's pages say which folder they belong to. preview.bat takes the next free port too (8030 up) if 8000 is busy.
+- tools/sync-a.py knows which side changed a file (DaVnky-A/.sync-base.json): apply only brings the copy's own changes and never puts an older file back over a newer one here; refresh brings this folder's newer files into the copy; both-sides changes are left alone. It no longer commits.
+- Argon (the browser-based helper) has a brief, tools/FOR-ARGON.md, and tools/argon-pack.bat makes the zip to give it (code and notes only, never the private keys).
+- DaVnky-A has its own GEMINI.md / AGENTS.md (how Gemini works in the copy); sync-a never carries those two files across.
+- The sea scrolls smoothly again with the painted waves: each wave is its own layer now (will-change), so it isn't repainted every frame (measured in the artist's browser: from about 30 to 60 frames a second, the same as with no waves at all).
+- The sky's ropes (resets 1 and 2) move like rope now: each is drawn in pieces and is a taut string, so it bows behind its prop when the prop is jerked about, ripples when the pointer is drawn across it, and settles back to one straight piece (costing nothing) when it's still.
+- The birds tug on their rope with each beat of their wings: their animated picture is read once (ImageDecoder) to find where the wings come down, and restarted at each flight so the beat lines up. Browsers without ImageDecoder (older Firefox) just fly as before.
+
 2026-10-14 17:51 · V
 - From the desk: a letter on the sea added (2026-10-14-traffic.txt).
 - From the desk: when its letters were written (content/sea/written.json).

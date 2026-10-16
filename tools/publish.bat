@@ -49,6 +49,7 @@ if defined PY (
 
 echo.
 echo  3. updating the file lists...
+rem (tools\bake.py --quiet would make lighter copies of the big pictures here: off until the site is nearly done)
 "%GITSH%" -c "tr -d '\r' < tools/update-lists.sh | sh"
 
 echo.

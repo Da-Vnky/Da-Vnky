@@ -183,6 +183,11 @@ body.kitchen-now .hallway {
 .kitchen .kitchen-fridge:not(.open) .kf-inside,
 .kitchen .kitchen-fridge:not(.open) .kitchen-pie {
     visibility: hidden;
+    transition: visibility 0s .55s;                 /* (16 Oct) shut: hidden only once the door's closed (.55 s, the door's swing): hidden at once, the whole fridge but the door vanished as it closed */
+}
+.kitchen .kitchen-fridge.open .kf-inside,
+.kitchen .kitchen-fridge.open .kitchen-pie {
+    transition: visibility 0s;                      /* open: there at once */
 }
 .kitchen .kf-inside {
     cursor: pointer;
