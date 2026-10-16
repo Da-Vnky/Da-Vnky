@@ -148,7 +148,8 @@ assets/living/list.txt 363 3476233613
 assets/living/vinyl-texture.webp 3298872 1062159737
 assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
-assets/sea/list.txt 175 2648420221
+assets/sea/dock.webp 376262 20467367
+assets/sea/list.txt 185 4152957058
 assets/sea/ship.webp 1095340 3289159705
 assets/sea/wave-1.webp 980256 2042540993
 assets/sea/wave-2.webp 439110 518776194
