@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
-beyond.html 1480
-city.html 9866
-desk.html 6191
-index.html 5247
-living.html 133462
-window-sky.html 1334
-workshop.html 22101
+beyond.html 1476
+city.html 9813
+desk.html 6182
+index.html 5189
+living.html 133380
+window-sky.html 1328
+workshop.html 22036
 sky/ambient.js 5331
 sky/attic.js 34823
 sky/bathroom.js 29419
@@ -54,8 +54,8 @@ sky/post.js 21656
 sky/records.js 37374
 sky/resets.js 17516
 sky/revolver.js 20186
-sky/ropes.js 18748
-sky/sky.js 141806
+sky/ropes.js 19084
+sky/sky.js 147551
 sky/songpad.js 8196
 sky/source.js 3809
 sky/state.js 22677
@@ -68,7 +68,7 @@ sky/veil.js 18751
 sky/watchers.js 14154
 sky/weather.js 25754
 sky/paper.css 8047
-sky/sky.css 59769
+sky/sky.css 61058
 sky/css/ambient.css 435
 sky/css/attic.css 15736
 sky/css/bathroom.css 16836

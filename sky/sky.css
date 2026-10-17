@@ -652,7 +652,8 @@ body.sky-view .scene-character {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 16px 6px 6px;
+    max-width: calc(100vw - 16px);
+    padding: 6px 16px 6px 10px;
     border-radius: 999px;
     background: #eadcb9;
     box-shadow: 0 8px 18px rgba(0, 0, 0, .45), inset 0 0 18px rgba(120, 80, 30, .25);
@@ -676,7 +677,8 @@ body.sky-view .sky-player {
     font: inherit;
     cursor: pointer;
 }
-.sky-player .sp-play {
+.sky-player .sp-play,
+.sky-player .sp-pause {
     display: grid;
     place-items: center;
     width: 40px;
@@ -684,24 +686,35 @@ body.sky-view .sky-player {
     border-radius: 50%;
     background: var(--ink);
     color: #f3e6c2;
-    transition: background .2s;
+    transition: background .2s, opacity .2s;
 }
-.sky-player .sp-play:hover { background: var(--sanguine); }
-.sky-player .sp-play svg { width: 18px; height: 18px; fill: currentColor; }
-.sky-player .i-pause,
-.sky-player.playing .i-play { display: none; }
-.sky-player.playing .i-pause { display: block; }
-.sky-player .sp-speeds { display: flex; gap: 2px; margin-left: 4px; }
-.sky-player .sp-speeds button {
+.sky-player .sp-play { width: 50px; border-radius: 999px; }
+.sky-player .sp-play:hover, .sky-player .sp-pause:hover { background: var(--sanguine); }
+.sky-player .sp-play svg { width: 30px; height: 15px; fill: currentColor; overflow: visible; }
+.sky-player .sp-pause svg { width: 16px; height: 16px; fill: currentColor; }
+/* (16 Oct) ▶ ▶▶ ▶▶▶: the triangles overlap, one more for each speed; stopped, it's one, and the pause button rests */
+.sky-player .sp-play path { stroke: var(--ink); stroke-width: 1.2; stroke-linejoin: round; paint-order: stroke; transition: opacity .2s, transform .2s; }
+.sky-player .sp-play .t2, .sky-player .sp-play .t3 { opacity: 0; }
+.sky-player .sp-play .t1 { transform: translate(10.5px, 0); }
+.sky-player.playing[data-speed="2"] .sp-play .t1 { transform: translate(8.75px, 0); }
+.sky-player.playing[data-speed="2"] .sp-play .t2 { opacity: 1; transform: translate(12.25px, 0); }
+.sky-player.playing[data-speed="3"] .sp-play .t1 { transform: translate(7px, 0); }
+.sky-player.playing[data-speed="3"] .sp-play .t2 { opacity: 1; transform: translate(10.5px, 0); }
+.sky-player.playing[data-speed="3"] .sp-play .t3 { opacity: 1; transform: translate(14px, 0); }
+.sky-player.playing .sp-play { background: var(--sanguine); }
+.sky-player:not(.playing) .sp-pause { opacity: .45; }
+.sky-player .sp-times { display: flex; gap: 2px; margin-right: 4px; }
+.sky-player .sp-times button {
     position: relative;
     padding: 6px 9px;
     border-radius: 999px;
     color: var(--ink-faded);
     font-size: 1rem;
+    white-space: nowrap;
 }
-.sky-player .sp-speeds button:hover { color: var(--ink); background: rgba(110, 82, 54, .12); }
-.sky-player .sp-speeds button[aria-pressed="true"] { color: var(--ink); }
-.sky-player .sp-speeds button[aria-pressed="true"]::after {           /* a red-chalk dot under the chosen speed */
+.sky-player .sp-times button:hover { color: var(--ink); background: rgba(110, 82, 54, .12); }
+.sky-player .sp-times button[aria-pressed="true"] { color: var(--ink); }
+.sky-player .sp-times button[aria-pressed="true"]::after {           /* a red-chalk dot under the chosen time */
     content: "";
     position: absolute;
     left: 50%;
@@ -876,7 +889,7 @@ img.furnish { object-fit: contain; object-position: 50% 100%; }
 @media (max-width: 620px) {
     .sky-player { gap: 2px; padding-right: 10px; }
     .sky-player .sp-time { display: none; }
-    .sky-player .sp-speeds button { padding: 6px 7px; }
+    .sky-player .sp-times button { padding: 6px 5px; font-size: .9rem; }
     .telescope { width: 120px; left: 3vw; }
     body.scope-view .sky-link { width: 96px; }
     body.scope-view .sky-link.l1 { left: calc(50% - 150px); top: 40vh; }
@@ -1026,6 +1039,7 @@ svg[data-bottle] .b-cork.has-art { transform-box: view-box; transform-origin: 17
 .flyer.flying { visibility: visible; }
 .flyer .placeholder, .flyer > .art { display: block; width: 100%; height: auto; }
 .flyer > .glow-layer { position: absolute; left: 0; top: 0; opacity: var(--dusk); }
+.flyer > img.flock { position: absolute; display: block; height: auto; }          /* (the birds' flock: sky.js FLOCK) */
 .flyer-blimp, .flyer-balloon, .flyer-birds { filter: brightness(calc(1 - .55 * var(--dusk))) drop-shadow(0 4px 5px rgba(0,0,0,.25)); }
 .flyer-blimp .glow-bits { opacity: calc(.25 + .75 * var(--dusk)); }
 .flyer-blimp .prop { animation: blimp-prop .18s linear infinite; }

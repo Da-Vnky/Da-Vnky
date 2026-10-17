@@ -422,6 +422,23 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 
 ## The sky's clock (sky.js: `sunClock`, `sunTimes`, `SKY_AT`)
 
+- **The sky view** (a room's window, the telescope, anything `.sky-viewer`; sky.js `openSkyView`), 16 Oct, Victor: **a window
+  (`mode: 'window'`) shows the sky as it is now where the visitor is** (no nightfall; on a clock page `celest.theta` is the
+  clock's, else the page's own time); other views still let night fall (the telescope: stars, the gaze). **The player**
+  (`.sky-player`): `TIMES` dawn / dusk (whichever of π/2 sunset or 3π/2 sunrise comes first going forward), day (0), night (π),
+  now (`clockTheta()`, or the time the view opened at) → `jumpTo(at)`: `clock.fade` with `th0`/`th1`, forwards unless the target is
+  just behind (> 1.5π ahead: back to it), 0.9 to 3.2 s; the chosen one gets the red dot (`pressTime`). `.sp-play`: stopped → plays
+  at `SPEEDS[0]`; playing → one speed faster each click, round to the first (`data-speed` 1/2/3 on the player: sky.css shows one,
+  two or three overlapping triangles, `.t1-.t3`); `.sp-pause` beside it stops. Space: play (slow) / pause. Speeds unchanged
+  (120, 60, 25 s from midday to midnight). The old slow / gentle / brisk word buttons are gone.
+- **The birds' flock** (16 Oct, Victor: "two more staggered around it so they look like they're flying in a flock"): sky.js
+  `FLOCK` (% of the flyer's box: left, top, width, and a start lag in s), `makeFlock` on the birds' `asset` event clones his
+  picture twice (`img.art.flock`, behind the first), `flockStart` at each flight starts each one's picture again from frame 0
+  (a fresh blob URL each, `lag` apart, `img._t0` on load) so they flap out of step. `Sky.flock = { members, layout, start }`.
+  ropes.js (resets 1–2) adds a rope per bird (`flockRopes`, on the flyer's `flock` event), and each bird's beat tugs it and its
+  own rope (`beats`: per chain `bob`, the bird's `img.style.translate` and its chain's together). The drawn stand-in is a little
+  flock of its own and gets none of this.
+
 - Away from the homepage's scroll, the sky follows the **real sun where the visitor is**: sunrise and sunset
   are calculated in the browser (almanac sums, no service) from `localStorage["weather-place"]` (the city
   the visitor's time zone names, geocoded once via open-meteo and shared with weather.js; or their exact

@@ -911,6 +911,52 @@
             c.style.transform = 'translateX(' + (x - home).toFixed(1) + 'px)';
         });
     }
+    /* the birds fly as a flock (16 Oct): the artist's bird three times over, staggered around the first, smaller further
+       off, and each starting its wingbeat a moment after the one before (a fresh copy of the picture plays from its first
+       frame), so they don't flap in step. in % of the flyer's box: left, top, width; lag in seconds.
+       (the drawn stand-in is a little flock of its own already.) sky/ropes.js hangs each one on its own rope. */
+    var FLOCK = [
+        { x: 0,   y: 0,   w: 100, lag: 0 },
+        { x: 66,  y: -60, w: 76,  lag: .31 },
+        { x: -52, y: 46,  w: 86,  lag: .62 }
+    ];
+    var flockBlob = null, flockUrls = [];
+    function flockMembers(el) { return Array.prototype.slice.call(el.querySelectorAll(':scope > img.art:not(.glow-layer)')); }
+    function makeFlock(el) {
+        var main = el.querySelector(':scope > img.art:not(.flock):not(.glow-layer)');
+        if (!main) return;
+        el.querySelectorAll(':scope > img.flock').forEach(function (im) { im.remove(); });
+        main._flock = 0;
+        FLOCK.forEach(function (m, i) {
+            if (!i) return;
+            var im = document.createElement('img');
+            im.className = 'art flock';
+            im.alt = '';
+            im.decoding = 'async';
+            im.style.left = m.x + '%'; im.style.top = m.y + '%'; im.style.width = m.w + '%';
+            im.src = main.src;
+            im._flock = i;
+            el.insertBefore(im, main);                                   // (behind the first: further off)
+        });
+        var src = main.currentSrc || main.src;
+        fetch(src).then(function (r) { return r.ok ? r.blob() : null; }).then(function (b) { flockBlob = b; }).catch(function () {});
+        el.dispatchEvent(new CustomEvent('flock', { detail: { members: FLOCK } }));
+    }
+    // each flight: every bird's picture started again from its first frame, one after another (its start kept as _t0)
+    function flockStart(el) {
+        if (!flockBlob) return;
+        flockUrls.forEach(function (u) { URL.revokeObjectURL(u); });
+        flockUrls = [];
+        flockMembers(el).forEach(function (im) {
+            var m = FLOCK[im._flock || 0] || FLOCK[0];
+            setTimeout(function () {
+                var u = URL.createObjectURL(flockBlob);
+                flockUrls.push(u);
+                im.addEventListener('load', function () { im._t0 = performance.now(); }, { once: true });
+                im.src = u;
+            }, m.lag * 1000);
+        });
+    }
     var flyLayer = document.createElement('div');
     flyLayer.className = 'flyers';
     flyLayer.setAttribute('aria-hidden', 'true');
@@ -921,6 +967,7 @@
         el.dataset.asset = 'assets/sky/' + f.name;
         el.style.width = f.size + 'px';
         el.innerHTML = FLYER_ART[f.name] || '';                 // a new flyer waits for its picture
+        if (f.name === 'birds') el.addEventListener('asset', function () { makeFlock(el); });
         flyLayer.appendChild(el);
         return { cfg: f, el: el, x: 0, y: 0, on: false, next: 0 };
     });
@@ -946,6 +993,7 @@
                 f.y = H * (c.high[0] + Math.random() * (c.high[1] - c.high[0])) / 100;
                 f.born = t;
                 f.el.classList.add('flying');
+                if (c.name === 'birds') flockStart(f.el);
             }
             f.x += c.speed * dt;
             var bob = c.name === 'shooting-star' ? (f.x - f.x0) * 0.28 : Math.sin(t * 0.9 + f.born) * 6;
@@ -969,7 +1017,8 @@
 
     /* ---------------- the sky view: look at the sky, let the day turn ---------------- */
     // opened by a room's window, a telescope, or anything with class="sky-viewer".
-    // it lets night fall, then offers a player that loops day ⇄ night, gently.
+    // a window shows the sky as it is now where the visitor is (16 Oct); a telescope lets night fall. then a player:
+    // jump to dawn or dusk, day, night or now, ▶ to let the day turn (each click a speed faster: ▶ ▶▶ ▶▶▶), ❚❚ to stop.
     var SPEEDS = [
         { name: 'slow',   half: 120 },     // seconds from midday to midnight (a full day is twice that)
         { name: 'gentle', half: 60 },
@@ -990,14 +1039,29 @@
     playerEl.className = 'sky-player';
     playerEl.setAttribute('role', 'group');
     playerEl.setAttribute('aria-label', 'day and night');
+    // the times to jump to (θ: 0 midday, π/2 sunset, π midnight, 3π/2 sunrise; "dawn or dusk" takes whichever comes first)
+    var TIMES = [
+        { name: 'dawn / dusk', at: 'twilight' },
+        { name: 'day',         at: 0 },
+        { name: 'night',       at: Math.PI },
+        { name: 'now',         at: 'now' }
+    ];
+    // the play button: one, two or three triangles, overlapping (the speed it's playing at)
+    var TRI = 'M0 0 L10 6 L0 12 Z';
     playerEl.innerHTML =
-        '<button type="button" class="sp-play" aria-label="play">' +
-            '<svg class="i-play"  viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4 L16 10 L6 16 Z"/></svg>' +
-            '<svg class="i-pause" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4h3.5v12H5zM11.5 4H15v12h-3.5z"/></svg>' +
-        '</button>' +
-        '<span class="sp-speeds">' + SPEEDS.map(function (s, i) {
-            return '<button type="button" data-speed="' + i + '">' + s.name + '</button>';
+        '<span class="sp-times">' + TIMES.map(function (t, i) {
+            return '<button type="button" data-time="' + i + '">' + t.name + '</button>';
         }).join('') + '</span>' +
+        '<button type="button" class="sp-play" aria-label="play">' +
+            '<svg viewBox="0 0 24 12" aria-hidden="true">' +
+                '<path class="t1" d="' + TRI + '" transform="translate(7 0)"/>' +
+                '<path class="t2" d="' + TRI + '" transform="translate(10.5 0)"/>' +
+                '<path class="t3" d="' + TRI + '" transform="translate(14 0)"/>' +
+            '</svg>' +
+        '</button>' +
+        '<button type="button" class="sp-pause" aria-label="pause">' +
+            '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4h3.5v12H5zM11.5 4H15v12h-3.5z"/></svg>' +
+        '</button>' +
         '<span class="sp-time"></span>';
     body.appendChild(playerEl);
 
@@ -1010,16 +1074,18 @@
 
     function setSpeed(i) {
         clock.speed = i;
-        playerEl.querySelectorAll('[data-speed]').forEach(function (b) {
-            b.setAttribute('aria-pressed', String(+b.dataset.speed === i));
-        });
+        playerEl.dataset.speed = String(i + 1);                    // (sky.css shows that many triangles)
+        player.play.setAttribute('aria-label', clock.playing ? 'faster (' + SPEEDS[i].name + ' now)' : 'play');
     }
-    setSpeed(1);
+    setSpeed(0);
+    function pressTime(i) {
+        playerEl.querySelectorAll('[data-time]').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.time === i)); });
+    }
 
     function setPlaying(on) {
         clock.playing = on;
         playerEl.classList.toggle('playing', on);
-        player.play.setAttribute('aria-label', on ? 'pause' : 'play');
+        setSpeed(clock.speed);
         body.classList.toggle('sky-playing', on);
         if (on) {
             clock.fade = null;
@@ -1039,10 +1105,33 @@
         clock.last = performance.now();
         requestAnimationFrame(tick);
     }
-    player.play.addEventListener('click', function () { setPlaying(!clock.playing); });
-    playerEl.querySelector('.sp-speeds').addEventListener('click', function (e) {
-        var b = e.target.closest('[data-speed]');
-        if (b) setSpeed(+b.dataset.speed);
+    // ▶: stopped, it starts slowly; playing, each click is a speed faster (▶ ▶▶ ▶▶▶, then round to ▶ again)
+    player.play.addEventListener('click', function () {
+        if (!clock.playing) { setSpeed(0); setPlaying(true); }
+        else setSpeed((clock.speed + 1) % SPEEDS.length);
+    });
+    playerEl.querySelector('.sp-pause').addEventListener('click', function () { setPlaying(false); });
+    // a time: the sun and moon turn on to it (forwards, as they always go, unless that's nearly all the way round)
+    function angleNow() {
+        if (celest.theta !== null && celest.theta !== undefined) return celest.theta;
+        return (override === null ? shown : override) * Math.PI;
+    }
+    function jumpTo(at) {
+        var th0 = angleNow(), TAU = 2 * Math.PI, fwd = function (t) { return ((t - th0) % TAU + TAU) % TAU; }, d;
+        if (at === 'now') at = clockMode ? clockTheta() : (view && view.from !== undefined ? view.from * Math.PI : th0);
+        if (at === 'twilight') at = fwd(Math.PI / 2) <= fwd(3 * Math.PI / 2) ? Math.PI / 2 : 3 * Math.PI / 2;
+        d = fwd(at);
+        if (d > 1.5 * Math.PI) d -= TAU;                          // (just behind: go back to it instead)
+        if (Math.abs(d) < 0.01) return;
+        celest.w = 1;
+        clock.fade = { th0: th0, th1: th0 + d, t0: performance.now(), ms: Math.min(3200, 900 + 1400 * Math.abs(d) / Math.PI) };
+        ensureLoop();
+    }
+    playerEl.querySelector('.sp-times').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-time]');
+        if (!b) return;
+        pressTime(+b.dataset.time);
+        jumpTo(TIMES[+b.dataset.time].at);
     });
 
     // the loop: the sun and moon keep turning the same way, a full circle each day,
@@ -1066,7 +1155,7 @@
                 override = dayPart(celest.theta);
             } else override = f.from + (f.to - f.from) * e;
             kick();
-            if (t >= 1) { clock.fade = null; celest.theta = Math.PI; }
+            if (t >= 1) { clock.fade = null; celest.theta = f.th1 !== undefined ? f.th1 : Math.PI; override = dayPart(celest.theta); }
         } else if (view && clock.playing) {
             celest.theta += dt * Math.PI / SPEEDS[clock.speed].half;
             override = dayPart(celest.theta);
@@ -1089,10 +1178,19 @@
         setPlaying(false);
         var from = override === null ? shown : override;
         override = from;
+        view.from = from;
         var th0 = clockMode ? celest.theta : undefined;
         celest.theta = clockMode ? th0 : null;
         var ms = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 2400;
-        clock.fade = { from: from, to: 1, t0: performance.now(), ms: ms, th0: th0, th1: th0 !== undefined ? (th0 <= Math.PI ? Math.PI : 3 * Math.PI) : undefined };
+        if (view.mode === 'window') {
+            // a window: the sky as it is now, where the visitor is (no nightfall)
+            if (!clockMode) celest.theta = from * Math.PI;
+            clock.fade = null;
+            pressTime(3);
+        } else {
+            clock.fade = { from: from, to: 1, t0: performance.now(), ms: ms, th0: th0, th1: th0 !== undefined ? (th0 <= Math.PI ? Math.PI : 3 * Math.PI) : undefined };
+            pressTime(2);
+        }
         blendCelest(1, ms);
         ensureLoop();
         flyers.forEach(function (f) { f.next = 0; });
@@ -1118,7 +1216,7 @@
     exitBtn.addEventListener('click', closeSkyView);
     escape(function () { return !!view; }, closeSkyView);
     document.addEventListener('keydown', function (e) {
-        if (view && e.key === ' ' && e.target === body) { e.preventDefault(); setPlaying(!clock.playing); }
+        if (view && e.key === ' ' && e.target === body) { e.preventDefault(); if (clock.playing) setPlaying(false); else { setSpeed(0); setPlaying(true); } }
     });
 
     // anything marked class="sky-viewer" (a telescope, a hatch …) opens the sky view
@@ -1175,8 +1273,8 @@
         if (window.ResizeObserver) new ResizeObserver(function () { fitWindow(); }).observe(room);
         if (window.visualViewport) window.visualViewport.addEventListener('resize', fitWindow);
 
-        // stepping outside lets night fall (so Polaris and the constellations come out)
-        // and brings up the day/night player; going back inside returns to the scroll's time
+        // looking out shows the sky as it is now, where the visitor is (16 Oct: it used to let night fall), and brings up
+        // the day/night player (night brings Polaris and the constellations out); going back inside returns to the page's time
         if (win) {
             win.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -2197,6 +2295,7 @@
         leave: function (href) { leave(href); },
         stroll: stroll, setArrival: setArrival, takeArrival: takeArrival,
         openSkyView: openSkyView,
+        flock: { members: flockMembers, layout: FLOCK, start: flockStart },
         closeSkyView: closeSkyView,
         listFolder: listFolder,
         // the desk's changes (desk.html): Sky.desk.ready.then(…), then Sky.desk.url('content/…') for a content file's

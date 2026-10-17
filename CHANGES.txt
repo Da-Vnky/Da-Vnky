@@ -17,6 +17,11 @@ How it works
 
 == published ==
 
+2026-10-17 03:28 · V
+- Looking out of a window (the living space, the workshop) shows the sky as it is now where the visitor is, instead of letting night fall. The telescope still lets night fall.
+- The sky view's player: dawn / dusk, day, night and now (the sun and moon turn on to it; dawn or dusk, whichever comes first), a play button that goes one speed faster with each click (one, two, then three overlapping triangles, then back to one) and a pause button beside it. Space still plays and pauses.
+- The birds fly as a flock: the artist's bird three times, staggered (smaller further off), each flapping a moment after the other, each on its own rope (resets 1 and 2) that tugs with its own wingbeat. Sky.flock in sky.js (FLOCK: where each sits).
+
 2026-10-16 16:05 · V
 - Made DaVnky-A branch folder on Desktop and tools/sync-a.py to review and commit edits safely
 - The kitchen fridge no longer vanishes while its door swings shut: the shelves stay until the door's closed (sky/css/kitchen.css).

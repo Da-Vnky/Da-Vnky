@@ -66,7 +66,7 @@
         Array.prototype.forEach.call(document.querySelectorAll(PROPS), function (el) {
             if (el._rope) return;
             var st = el._rope = { s: 0, u: 0, x: null, v: 0, ph: Math.random() * 6.3, tilt: TILTS.test(el.className),
-                                  chains: [], bob: 0, bobv: 0, tx: null, tv: 0, ta: 0 };
+                                  chains: [], tx: null, tv: 0, ta: 0 };
             if (LIVE) tiesOf(el).forEach(function (t) { st.chains.push(chain(el, t)); });
             props.push(el);
         });
@@ -90,7 +90,7 @@
         el.insertBefore(box, el.firstChild);
         var w = [], v = [];
         for (var i = 0; i <= PIECES; i++) { w.push(0); v.push(0); }
-        return { el: box, tie: tie, bits: bits, w: w, v: v, base: 0, shown: '', line: null, calm: true };
+        return { el: box, tie: tie, bits: bits, w: w, v: v, base: 0, shown: '', line: null, calm: true, bob: 0, bobv: 0, last: -1 };
     }
     // the string: each point pulled towards its neighbours (so a ripple runs along it), slowed a little, pushed by the forces
     function shake(c, dt, force) {
@@ -139,16 +139,16 @@
     /* ---------------- the birds' wingbeat ----------------
        a page can't ask a moving picture which frame it's on, so: the birds' picture is read once (ImageDecoder: Chrome,
        Edge, Firefox 133 on), to find each frame's length and the frames where the wings come down (the top of the
-       picture drops most from one frame to the next); then at each flight the picture is started again from its first
-       frame (a fresh copy of it), so its clock and ours run together. no ImageDecoder, or no picture of yours: no beat. */
-    var beat = { times: null, loop: 0, t0: 0, last: -1, bird: null };
+       picture drops most from one frame to the next). sky.js flies it as a flock (Sky.flock) and starts each bird's
+       picture again from its first frame at each flight, noting when (_t0), so each bird's clock and ours run together.
+       each bird hangs on its own rope; at each beat it's tugged up and its rope twitches. no ImageDecoder: no beat. */
+    var beat = { times: null, loop: 0 };
     function readBirds(img) {
         if (beat.reading || typeof ImageDecoder !== 'function' || !img || !img.src) return;
         beat.reading = true;
         var src = img.currentSrc || img.src;
         fetch(src).then(function (r) { return r.ok ? r.blob() : null; }).then(function (blob) {
             if (!blob) return;
-            beat.blob = blob;
             var type = blob.type || ({ webp: 'image/webp', gif: 'image/gif', png: 'image/png' })[(/\.(\w+)(\?|#|$)/.exec(src) || [])[1]];
             return blob.arrayBuffer().then(function (buf) {
                 var dec = new ImageDecoder({ data: buf, type: type });
@@ -186,43 +186,52 @@
             });
         }).catch(function () {});
     }
-    function restartBirds(el) {
-        var img = el.querySelector(':scope > img.art');
-        if (!img) return;
-        if (!beat.blob) { readBirds(img); return; }
-        if (beat.url) URL.revokeObjectURL(beat.url);
-        beat.url = URL.createObjectURL(beat.blob);
-        img.addEventListener('load', function () { beat.t0 = performance.now(); beat.last = -1; }, { once: true });
-        img.src = beat.url;                                                  // (a fresh copy: it plays from its first frame)
+    // the flock's ropes: one more chain for each bird sky.js adds, tied on just above its middle
+    function flockRopes(el) {
+        var st = el._rope;
+        if (!st || !LIVE) return;
+        var lay = (Sky.flock && Sky.flock.layout) || [];
+        var members = Sky.flock ? Sky.flock.members(el) : [];
+        members.forEach(function (im) {
+            var m = lay[im._flock || 0];
+            if (!m) return;
+            var tie = [(m.x + m.w * .5) / 100, (m.y + m.w * .45) / 100];
+            var c = st.chains.filter(function (ch) { return Math.abs(ch.tie[0] - tie[0]) < .001 && Math.abs(ch.tie[1] - tie[1]) < .001; })[0];
+            if (!c) { c = chain(el, tie); st.chains.push(c); }
+            c.member = im;
+        });
+        readBirds(members[0]);
     }
     function watchBirds() {
         var el = document.querySelector('.flyer-birds');
         if (!el || el._beat) return;
         el._beat = true;
-        beat.bird = el;
-        var was = el.classList.contains('flying');
-        new MutationObserver(function () {
-            var now = el.classList.contains('flying');
-            if (now && !was) restartBirds(el);
-            was = now;
-        }).observe(el, { attributes: true, attributeFilter: ['class'] });
-        var img = el.querySelector(':scope > img.art');
-        if (img) readBirds(img);
-        else el.addEventListener('asset', function () { readBirds(el.querySelector(':scope > img.art')); }, { once: true });
+        el.addEventListener('flock', function () { flockRopes(el); });
+        if (el.querySelector(':scope > img.flock')) flockRopes(el);
     }
-    function beats(now, el, st) {
-        if (!beat.times || !beat.t0 || el !== beat.bird || !el.classList.contains('flying')) return;
-        var t = (now - beat.t0) % beat.loop, loopNo = Math.floor((now - beat.t0) / beat.loop);
-        beat.times.forEach(function (b, i) {
-            var id = loopNo * 100 + i;
-            if (t >= b.t && id > beat.last) {
-                beat.last = id;
-                st.bobv -= BEAT_LIFT * 13.4 * b.k;                                 // (tugged up…)
-                st.chains.forEach(function (c) {                                 // (…and the rope twitches, from the bottom)
-                    var side = Math.random() < 0.5 ? -1 : 1;
-                    c.v[1] += side * BEAT_KICK * b.k; c.v[2] += side * BEAT_KICK * 0.5 * b.k;
+    function beats(now, el, st, dt) {
+        if (!el.classList.contains('flyer-birds')) return;
+        var flying = el.classList.contains('flying');
+        st.chains.forEach(function (c) {
+            var im = c.member;
+            if (!im) return;
+            if (beat.times && im._t0 && flying) {
+                var since = now - im._t0, t = since % beat.loop, loopNo = Math.floor(since / beat.loop);
+                beat.times.forEach(function (b, i) {
+                    var id = loopNo * 100 + i;
+                    if (t >= b.t && id > c.last) {
+                        c.last = id;
+                        c.bobv -= BEAT_LIFT * 13.4 * b.k;                      // (tugged up…)
+                        var side = Math.random() < 0.5 ? -1 : 1;                 // (…and its rope twitches, from the bottom)
+                        c.v[1] += side * BEAT_KICK * b.k; c.v[2] += side * BEAT_KICK * 0.5 * b.k;
+                    }
                 });
             }
+            // (sprung back down)
+            c.bobv += (-180 * c.bob - 14 * c.bobv) * dt;
+            c.bob += c.bobv * dt;
+            var y = Math.abs(c.bob) < 0.02 && Math.abs(c.bobv) < 0.05 ? '' : '0 ' + c.bob.toFixed(2) + 'px';
+            if (y !== c.bobShown) { c.bobShown = y; im.style.translate = y; c.el.style.translate = y; }
         });
     }
 
@@ -280,12 +289,10 @@
             var shown = MAX * Math.tanh(st.s / MAX);                         // (big swings ease off, rather than hitting a wall)
             var L = r.top + r.height / 2 + H * 0.4;                          // down from a point above the top of the screen
             var ang = -Math.asin(Math.max(-0.5, Math.min(0.5, shown / Math.max(120, L))));
-            // the birds' wingbeat: a tug up, sprung back down
-            beats(now, el, st);
-            st.bobv += (-180 * st.bob - 14 * st.bobv) * dt;
-            st.bob += st.bobv * dt;
+            // the birds' wingbeats: each bird tugged up on its rope, sprung back down
+            beats(now, el, st, dt);
             st.shown = shown;
-            el.style.translate = shown.toFixed(2) + 'px ' + st.bob.toFixed(2) + 'px';
+            el.style.translate = shown.toFixed(2) + 'px 0';
             el.style.setProperty('--rope-a', ang.toFixed(4) + 'rad');
             if (st.tilt) el.style.setProperty('--prop-tilt', ang.toFixed(4) + 'rad');
             // the ropes: how the tie point itself is being thrown about (the prop carried, swinging, bobbing)
