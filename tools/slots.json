@@ -2539,6 +2539,969 @@
    ]
   },
   {
+   "id": "companion",
+   "name": "the little companion",
+   "page": "living.html",
+   "note": "the little word-spirits that bounce along the floor (sky/kotodama.js): they think in pictures and babble in voices of their own (sky/babble.js). a different one comes each day of the week and follows the traveller from room to room; on everyone’s day (sunday) they’re all in, one in each room, and they stay in their own rooms. the menu just below changes how each one looks and behaves, and who comes which day (on your own computer, living.html?kotodama=imp shows the imp, ?kotodama=sunday everyone’s day). each kind’s pictures share one square canvas, facing right, its bottom on the canvas’s bottom edge, so they stack exactly: the body, then a face over it. every picture here is optional: until yours is in, the drawn one (as the menu sets it).",
+   "map": {
+    "page": "living.html",
+    "views": [
+     {
+      "name": "thinking",
+      "do": "Sky.kotodama.think(['pie', 'heart'], 'hold')",
+      "wait": 1500
+     },
+     {
+      "name": "talking",
+      "do": "Sky.kotodama.say('say', { icon: 'star', words: 4, hold: true })",
+      "wait": 1600
+     },
+     {
+      "name": "the forest pixie",
+      "do": "Sky.kotodama.become('pixie')",
+      "wait": 600
+     },
+     {
+      "name": "the fox spirit",
+      "do": "Sky.kotodama.become('kitsune')",
+      "wait": 600
+     },
+     {
+      "name": "the imp",
+      "do": "Sky.kotodama.become('imp')",
+      "wait": 600
+     },
+     {
+      "name": "the hollow guardian",
+      "do": "Sky.kotodama.become('hollow')",
+      "wait": 600
+     },
+     {
+      "name": "the bunny mochi",
+      "do": "Sky.kotodama.become('mochi')",
+      "wait": 600
+     }
+    ]
+   },
+   "groups": [
+    {
+     "name": "the sugar drop (una) (sky/kotodama.js)",
+     "slots": [
+      {
+       "slot": "assets/characters/kotodama-una",
+       "what": "the sugar drop (una): fridays, and the living space on sunday. a soft pink gumdrop with a swirl on top, sugar crystals and a ribbon bow, voiced by your Vocaloid sheet (AI Una Sugar). its body with no face (the face goes on top, in the pictures below): facing right, standing on the bottom edge of the canvas, still and upright (the code does the hopping, squashing and leaning). until yours is in, the drawn one",
+       "size": "400 x 400 (or bigger, square), see-through around it",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-una-moving",
+       "what": "the same body, moving: an animated WebP or GIF (a loop): ears twitching, wings fluttering, a tail swishing. keep the body itself still in it, so the faces stay put on top. used instead of the still one (not for visitors who’ve asked their computer for less motion)",
+       "size": "the same canvas as kotodama-una",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face",
+       "what": "its everyday face (calm, a small smile), drawn on the same canvas as its body, where its face is: the drawing table’s “draw it in” gives you that canvas with the body as the guide. a face it hasn’t got uses this one",
+       "size": "the same canvas as kotodama-una, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-happy",
+       "what": "its face when it’s happy (eyes smiling, cheeks pink): patted, pleased with a thought, bopping to a record",
+       "size": "the same canvas as kotodama-una, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-curious",
+       "what": "its face when it’s curious (eyes wide open, a little \"o\" mouth): looking at something, asking",
+       "size": "the same canvas as kotodama-una, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-thinking",
+       "what": "its face when it’s thinking (eyes looking up and aside, one brow up, mouth wavy): while its thought cloud fills",
+       "size": "the same canvas as kotodama-una, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-idea",
+       "what": "its face when it’s it has an idea (eyes big and sparkly, mouth open): the lightbulb moment, exclaiming",
+       "size": "the same canvas as kotodama-una, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-puzzled",
+       "what": "its face when it’s puzzled (one brow up, wobbly mouth; the head tilts by itself): a thought it can’t work out",
+       "size": "the same canvas as kotodama-una, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-sleepy",
+       "what": "its face when it’s sleepy (eyes shut, a small mouth): at night, yawning, dozing off",
+       "size": "the same canvas as kotodama-una, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-startled",
+       "what": "its face when it’s startled (little dot eyes, mouth an \"o\"): poked, woken, a gunshot",
+       "size": "the same canvas as kotodama-una, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-scared",
+       "what": "its face when it’s scared (little dot eyes, worried brows, wobbly mouth): the dungeon, the revolver. it shivers by itself",
+       "size": "the same canvas as kotodama-una, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-giggle",
+       "what": "its face when it’s giggling (eyes squeezed shut like > <, mouth open): poked and tickled",
+       "size": "the same canvas as kotodama-una, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-talking",
+       "what": "its mouth open, as it says each syllable (flashed over whatever face it’s making: just the open mouth, the rest see-through, or a whole face)",
+       "size": "the same canvas as kotodama-una",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-una-face-blink",
+       "what": "its eyes shut for a blink, every few seconds over its everyday face (just the shut eyes, or a whole face)",
+       "size": "the same canvas as kotodama-una",
+       "optional": true,
+       "guide": "assets/characters/kotodama-una|assets/characters/kotodama-una-moving"
+      }
+     ]
+    },
+    {
+     "name": "the forest pixie",
+     "slots": [
+      {
+       "slot": "assets/characters/kotodama-pixie",
+       "what": "the forest pixie: a green dewdrop with two glowing antennae and fairy wings. its body with no face (the face goes on top, in the pictures below): facing right, standing on the bottom edge of the canvas, still and upright (the code does the hopping, squashing and leaning). until yours is in, the drawn one",
+       "size": "400 x 400 (or bigger, square), see-through around it",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-moving",
+       "what": "the same body, moving: an animated WebP or GIF (a loop): ears twitching, wings fluttering, a tail swishing. keep the body itself still in it, so the faces stay put on top. used instead of the still one (not for visitors who’ve asked their computer for less motion)",
+       "size": "the same canvas as kotodama-pixie",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face",
+       "what": "its everyday face (calm, a small smile), drawn on the same canvas as its body, where its face is: the drawing table’s “draw it in” gives you that canvas with the body as the guide. a face it hasn’t got uses this one",
+       "size": "the same canvas as kotodama-pixie, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-happy",
+       "what": "its face when it’s happy (eyes smiling, cheeks pink): patted, pleased with a thought, bopping to a record",
+       "size": "the same canvas as kotodama-pixie, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-curious",
+       "what": "its face when it’s curious (eyes wide open, a little \"o\" mouth): looking at something, asking",
+       "size": "the same canvas as kotodama-pixie, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-thinking",
+       "what": "its face when it’s thinking (eyes looking up and aside, one brow up, mouth wavy): while its thought cloud fills",
+       "size": "the same canvas as kotodama-pixie, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-idea",
+       "what": "its face when it’s it has an idea (eyes big and sparkly, mouth open): the lightbulb moment, exclaiming",
+       "size": "the same canvas as kotodama-pixie, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-puzzled",
+       "what": "its face when it’s puzzled (one brow up, wobbly mouth; the head tilts by itself): a thought it can’t work out",
+       "size": "the same canvas as kotodama-pixie, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-sleepy",
+       "what": "its face when it’s sleepy (eyes shut, a small mouth): at night, yawning, dozing off",
+       "size": "the same canvas as kotodama-pixie, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-startled",
+       "what": "its face when it’s startled (little dot eyes, mouth an \"o\"): poked, woken, a gunshot",
+       "size": "the same canvas as kotodama-pixie, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-scared",
+       "what": "its face when it’s scared (little dot eyes, worried brows, wobbly mouth): the dungeon, the revolver. it shivers by itself",
+       "size": "the same canvas as kotodama-pixie, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-giggle",
+       "what": "its face when it’s giggling (eyes squeezed shut like > <, mouth open): poked and tickled",
+       "size": "the same canvas as kotodama-pixie, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-talking",
+       "what": "its mouth open, as it says each syllable (flashed over whatever face it’s making: just the open mouth, the rest see-through, or a whole face)",
+       "size": "the same canvas as kotodama-pixie",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-pixie-face-blink",
+       "what": "its eyes shut for a blink, every few seconds over its everyday face (just the shut eyes, or a whole face)",
+       "size": "the same canvas as kotodama-pixie",
+       "optional": true,
+       "guide": "assets/characters/kotodama-pixie|assets/characters/kotodama-pixie-moving"
+      }
+     ]
+    },
+    {
+     "name": "the fox spirit",
+     "slots": [
+      {
+       "slot": "assets/characters/kotodama-kitsune",
+       "what": "the fox spirit: a round amber fox with pointed ears, a flame mark, a fluffy tail and two little lights floating round it. its body with no face (the face goes on top, in the pictures below): facing right, standing on the bottom edge of the canvas, still and upright (the code does the hopping, squashing and leaning). until yours is in, the drawn one",
+       "size": "400 x 400 (or bigger, square), see-through around it",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-moving",
+       "what": "the same body, moving: an animated WebP or GIF (a loop): ears twitching, wings fluttering, a tail swishing. keep the body itself still in it, so the faces stay put on top. used instead of the still one (not for visitors who’ve asked their computer for less motion)",
+       "size": "the same canvas as kotodama-kitsune",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face",
+       "what": "its everyday face (calm, a small smile), drawn on the same canvas as its body, where its face is: the drawing table’s “draw it in” gives you that canvas with the body as the guide. a face it hasn’t got uses this one",
+       "size": "the same canvas as kotodama-kitsune, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-happy",
+       "what": "its face when it’s happy (eyes smiling, cheeks pink): patted, pleased with a thought, bopping to a record",
+       "size": "the same canvas as kotodama-kitsune, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-curious",
+       "what": "its face when it’s curious (eyes wide open, a little \"o\" mouth): looking at something, asking",
+       "size": "the same canvas as kotodama-kitsune, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-thinking",
+       "what": "its face when it’s thinking (eyes looking up and aside, one brow up, mouth wavy): while its thought cloud fills",
+       "size": "the same canvas as kotodama-kitsune, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-idea",
+       "what": "its face when it’s it has an idea (eyes big and sparkly, mouth open): the lightbulb moment, exclaiming",
+       "size": "the same canvas as kotodama-kitsune, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-puzzled",
+       "what": "its face when it’s puzzled (one brow up, wobbly mouth; the head tilts by itself): a thought it can’t work out",
+       "size": "the same canvas as kotodama-kitsune, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-sleepy",
+       "what": "its face when it’s sleepy (eyes shut, a small mouth): at night, yawning, dozing off",
+       "size": "the same canvas as kotodama-kitsune, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-startled",
+       "what": "its face when it’s startled (little dot eyes, mouth an \"o\"): poked, woken, a gunshot",
+       "size": "the same canvas as kotodama-kitsune, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-scared",
+       "what": "its face when it’s scared (little dot eyes, worried brows, wobbly mouth): the dungeon, the revolver. it shivers by itself",
+       "size": "the same canvas as kotodama-kitsune, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-giggle",
+       "what": "its face when it’s giggling (eyes squeezed shut like > <, mouth open): poked and tickled",
+       "size": "the same canvas as kotodama-kitsune, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-talking",
+       "what": "its mouth open, as it says each syllable (flashed over whatever face it’s making: just the open mouth, the rest see-through, or a whole face)",
+       "size": "the same canvas as kotodama-kitsune",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-kitsune-face-blink",
+       "what": "its eyes shut for a blink, every few seconds over its everyday face (just the shut eyes, or a whole face)",
+       "size": "the same canvas as kotodama-kitsune",
+       "optional": true,
+       "guide": "assets/characters/kotodama-kitsune|assets/characters/kotodama-kitsune-moving"
+      }
+     ]
+    },
+    {
+     "name": "the imp",
+     "slots": [
+      {
+       "slot": "assets/characters/kotodama-imp",
+       "what": "the imp: a violet imp with horns, bat wings and a pointy tail. its body with no face (the face goes on top, in the pictures below): facing right, standing on the bottom edge of the canvas, still and upright (the code does the hopping, squashing and leaning). until yours is in, the drawn one",
+       "size": "400 x 400 (or bigger, square), see-through around it",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-moving",
+       "what": "the same body, moving: an animated WebP or GIF (a loop): ears twitching, wings fluttering, a tail swishing. keep the body itself still in it, so the faces stay put on top. used instead of the still one (not for visitors who’ve asked their computer for less motion)",
+       "size": "the same canvas as kotodama-imp",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face",
+       "what": "its everyday face (calm, a small smile), drawn on the same canvas as its body, where its face is: the drawing table’s “draw it in” gives you that canvas with the body as the guide. a face it hasn’t got uses this one",
+       "size": "the same canvas as kotodama-imp, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-happy",
+       "what": "its face when it’s happy (eyes smiling, cheeks pink): patted, pleased with a thought, bopping to a record",
+       "size": "the same canvas as kotodama-imp, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-curious",
+       "what": "its face when it’s curious (eyes wide open, a little \"o\" mouth): looking at something, asking",
+       "size": "the same canvas as kotodama-imp, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-thinking",
+       "what": "its face when it’s thinking (eyes looking up and aside, one brow up, mouth wavy): while its thought cloud fills",
+       "size": "the same canvas as kotodama-imp, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-idea",
+       "what": "its face when it’s it has an idea (eyes big and sparkly, mouth open): the lightbulb moment, exclaiming",
+       "size": "the same canvas as kotodama-imp, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-puzzled",
+       "what": "its face when it’s puzzled (one brow up, wobbly mouth; the head tilts by itself): a thought it can’t work out",
+       "size": "the same canvas as kotodama-imp, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-sleepy",
+       "what": "its face when it’s sleepy (eyes shut, a small mouth): at night, yawning, dozing off",
+       "size": "the same canvas as kotodama-imp, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-startled",
+       "what": "its face when it’s startled (little dot eyes, mouth an \"o\"): poked, woken, a gunshot",
+       "size": "the same canvas as kotodama-imp, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-scared",
+       "what": "its face when it’s scared (little dot eyes, worried brows, wobbly mouth): the dungeon, the revolver. it shivers by itself",
+       "size": "the same canvas as kotodama-imp, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-giggle",
+       "what": "its face when it’s giggling (eyes squeezed shut like > <, mouth open): poked and tickled",
+       "size": "the same canvas as kotodama-imp, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-talking",
+       "what": "its mouth open, as it says each syllable (flashed over whatever face it’s making: just the open mouth, the rest see-through, or a whole face)",
+       "size": "the same canvas as kotodama-imp",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-imp-face-blink",
+       "what": "its eyes shut for a blink, every few seconds over its everyday face (just the shut eyes, or a whole face)",
+       "size": "the same canvas as kotodama-imp",
+       "optional": true,
+       "guide": "assets/characters/kotodama-imp|assets/characters/kotodama-imp-moving"
+      }
+     ]
+    },
+    {
+     "name": "the hollow guardian",
+     "slots": [
+      {
+       "slot": "assets/characters/kotodama-hollow",
+       "what": "the hollow guardian: a carved sea-glass totem with a ring floating over it. its body with no face (the face goes on top, in the pictures below): facing right, standing on the bottom edge of the canvas, still and upright (the code does the hopping, squashing and leaning). until yours is in, the drawn one",
+       "size": "400 x 400 (or bigger, square), see-through around it",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-moving",
+       "what": "the same body, moving: an animated WebP or GIF (a loop): ears twitching, wings fluttering, a tail swishing. keep the body itself still in it, so the faces stay put on top. used instead of the still one (not for visitors who’ve asked their computer for less motion)",
+       "size": "the same canvas as kotodama-hollow",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face",
+       "what": "its everyday face (calm, a small smile), drawn on the same canvas as its body, where its face is: the drawing table’s “draw it in” gives you that canvas with the body as the guide. a face it hasn’t got uses this one",
+       "size": "the same canvas as kotodama-hollow, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-happy",
+       "what": "its face when it’s happy (eyes smiling, cheeks pink): patted, pleased with a thought, bopping to a record",
+       "size": "the same canvas as kotodama-hollow, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-curious",
+       "what": "its face when it’s curious (eyes wide open, a little \"o\" mouth): looking at something, asking",
+       "size": "the same canvas as kotodama-hollow, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-thinking",
+       "what": "its face when it’s thinking (eyes looking up and aside, one brow up, mouth wavy): while its thought cloud fills",
+       "size": "the same canvas as kotodama-hollow, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-idea",
+       "what": "its face when it’s it has an idea (eyes big and sparkly, mouth open): the lightbulb moment, exclaiming",
+       "size": "the same canvas as kotodama-hollow, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-puzzled",
+       "what": "its face when it’s puzzled (one brow up, wobbly mouth; the head tilts by itself): a thought it can’t work out",
+       "size": "the same canvas as kotodama-hollow, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-sleepy",
+       "what": "its face when it’s sleepy (eyes shut, a small mouth): at night, yawning, dozing off",
+       "size": "the same canvas as kotodama-hollow, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-startled",
+       "what": "its face when it’s startled (little dot eyes, mouth an \"o\"): poked, woken, a gunshot",
+       "size": "the same canvas as kotodama-hollow, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-scared",
+       "what": "its face when it’s scared (little dot eyes, worried brows, wobbly mouth): the dungeon, the revolver. it shivers by itself",
+       "size": "the same canvas as kotodama-hollow, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-giggle",
+       "what": "its face when it’s giggling (eyes squeezed shut like > <, mouth open): poked and tickled",
+       "size": "the same canvas as kotodama-hollow, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-talking",
+       "what": "its mouth open, as it says each syllable (flashed over whatever face it’s making: just the open mouth, the rest see-through, or a whole face)",
+       "size": "the same canvas as kotodama-hollow",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-hollow-face-blink",
+       "what": "its eyes shut for a blink, every few seconds over its everyday face (just the shut eyes, or a whole face)",
+       "size": "the same canvas as kotodama-hollow",
+       "optional": true,
+       "guide": "assets/characters/kotodama-hollow|assets/characters/kotodama-hollow-moving"
+      }
+     ]
+    },
+    {
+     "name": "the bunny mochi",
+     "slots": [
+      {
+       "slot": "assets/characters/kotodama-mochi",
+       "what": "the bunny mochi: a squishy pink mochi with long bunny ears, one of them floppy. its body with no face (the face goes on top, in the pictures below): facing right, standing on the bottom edge of the canvas, still and upright (the code does the hopping, squashing and leaning). until yours is in, the drawn one",
+       "size": "400 x 400 (or bigger, square), see-through around it",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-moving",
+       "what": "the same body, moving: an animated WebP or GIF (a loop): ears twitching, wings fluttering, a tail swishing. keep the body itself still in it, so the faces stay put on top. used instead of the still one (not for visitors who’ve asked their computer for less motion)",
+       "size": "the same canvas as kotodama-mochi",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face",
+       "what": "its everyday face (calm, a small smile), drawn on the same canvas as its body, where its face is: the drawing table’s “draw it in” gives you that canvas with the body as the guide. a face it hasn’t got uses this one",
+       "size": "the same canvas as kotodama-mochi, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-happy",
+       "what": "its face when it’s happy (eyes smiling, cheeks pink): patted, pleased with a thought, bopping to a record",
+       "size": "the same canvas as kotodama-mochi, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-curious",
+       "what": "its face when it’s curious (eyes wide open, a little \"o\" mouth): looking at something, asking",
+       "size": "the same canvas as kotodama-mochi, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-thinking",
+       "what": "its face when it’s thinking (eyes looking up and aside, one brow up, mouth wavy): while its thought cloud fills",
+       "size": "the same canvas as kotodama-mochi, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-idea",
+       "what": "its face when it’s it has an idea (eyes big and sparkly, mouth open): the lightbulb moment, exclaiming",
+       "size": "the same canvas as kotodama-mochi, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-puzzled",
+       "what": "its face when it’s puzzled (one brow up, wobbly mouth; the head tilts by itself): a thought it can’t work out",
+       "size": "the same canvas as kotodama-mochi, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-sleepy",
+       "what": "its face when it’s sleepy (eyes shut, a small mouth): at night, yawning, dozing off",
+       "size": "the same canvas as kotodama-mochi, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-startled",
+       "what": "its face when it’s startled (little dot eyes, mouth an \"o\"): poked, woken, a gunshot",
+       "size": "the same canvas as kotodama-mochi, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-scared",
+       "what": "its face when it’s scared (little dot eyes, worried brows, wobbly mouth): the dungeon, the revolver. it shivers by itself",
+       "size": "the same canvas as kotodama-mochi, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-giggle",
+       "what": "its face when it’s giggling (eyes squeezed shut like > <, mouth open): poked and tickled",
+       "size": "the same canvas as kotodama-mochi, see-through but the face",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-talking",
+       "what": "its mouth open, as it says each syllable (flashed over whatever face it’s making: just the open mouth, the rest see-through, or a whole face)",
+       "size": "the same canvas as kotodama-mochi",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      },
+      {
+       "slot": "assets/characters/kotodama-mochi-face-blink",
+       "what": "its eyes shut for a blink, every few seconds over its everyday face (just the shut eyes, or a whole face)",
+       "size": "the same canvas as kotodama-mochi",
+       "optional": true,
+       "guide": "assets/characters/kotodama-mochi|assets/characters/kotodama-mochi-moving"
+      }
+     ]
+    },
+    {
+     "name": "the pictures it thinks in (in its thought cloud, and beside its words when it tells you about one)",
+     "slots": [
+      {
+       "slot": "assets/characters/kotodama-idea-star",
+       "what": "a star. drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-heart",
+       "what": "a heart. drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-note",
+       "what": "a music note (a record playing, the music box). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-sun",
+       "what": "the sun (by day). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-moon",
+       "what": "the moon (by night). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-cloud",
+       "what": "a cloud. drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-rain",
+       "what": "a rain cloud. drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-pie",
+       "what": "the apple pie (the kitchen fridge). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-cup",
+       "what": "a cup of tea (the stove). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-flame",
+       "what": "a candle flame (the stove, the dungeon). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-fish",
+       "what": "a fish. drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-bottle",
+       "what": "a message in a bottle (the washed-up crate). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-letter",
+       "what": "a letter (the pinboard, the mailbox). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-book",
+       "what": "a book (the shelf). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-cat",
+       "what": "the cat (on the armchair). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-bird",
+       "what": "a bird (the crows on the porch). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-flower",
+       "what": "a flower (the plant, the steps). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-bubbles",
+       "what": "soap bubbles (the bath, the sink). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-duck",
+       "what": "a rubber duck (the bath). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-key",
+       "what": "a key (when it thinks about where the reset’s key is). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-eye",
+       "what": "an eye (the dungeon, the watcher). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-ghost",
+       "what": "a ghost (the dungeon). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-hat",
+       "what": "the traveller’s hat (when it thinks about the traveller). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-zzz",
+       "what": "Zzz (the armchair, the rocking chair, bedtime). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-clock",
+       "what": "a clock (the microwave). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-brush",
+       "what": "a paintbrush (the workshop door). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-bulb",
+       "what": "a lightbulb (the hall’s pull cord). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-house",
+       "what": "a little house (the way out, the way home). drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-idea-question",
+       "what": "a question mark. drawn small (about 40 px on the screen), so keep it simple and bold. until yours is in, an ink sketch",
+       "size": "96 x 96, see-through",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "the little marks that puff out of its head",
+     "slots": [
+      {
+       "slot": "assets/characters/kotodama-fx-exclaim",
+       "what": "\"!\" over its head (startled, an idea). the code floats it, pops it or drips it",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-fx-question",
+       "what": "\"?\" over its head (puzzled). the code floats it, pops it or drips it",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-fx-bulb",
+       "what": "a lightbulb over its head (an idea). the code floats it, pops it or drips it",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-fx-heart",
+       "what": "a heart floating up (patted, happy). the code floats it, pops it or drips it",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-fx-note",
+       "what": "a music note floating up (humming, bopping). the code floats it, pops it or drips it",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-fx-spark",
+       "what": "a sparkle (patted). the code floats it, pops it or drips it",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-fx-sweat",
+       "what": "a drop of sweat (scared). the code floats it, pops it or drips it",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-fx-zzz",
+       "what": "Zzz drifting up (asleep). the code floats it, pops it or drips it",
+       "size": "96 x 96, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/characters/kotodama-fx-vein",
+       "what": "a cross vein 💢 (poked too much). the code floats it, pops it or drips it",
+       "size": "96 x 96, see-through",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "its voice and its hops (sounds)",
+     "slots": [
+      {
+       "slot": "assets/sounds/kotodama-una",
+       "what": "the sugar drop’s voice: your Vocaloid sheet (AI Una Sugar). every syllable sung once on its own note with a gap after each, the way the companion’s midi sings them (a i u e o, ka ki ku ke ko, ma mi mu me mo, pa pi pu pe po, ta te to, na ni no, ra ri ru ro: at A4, then again at C5, then at G4). the site cuts it up where it goes quiet and plays each syllable nudged to the note it wants. until it’s in, a made-up sweet voice",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/kotodama-pixie",
+       "what": "the forest pixie’s voice: a sheet like the sugar drop’s (render the same midi with another voicebank). until there is one, its own made-up voice (Argon’s synth)",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/kotodama-kitsune",
+       "what": "the fox spirit’s voice: a sheet like the sugar drop’s (render the same midi with another voicebank). until there is one, its own made-up voice (Argon’s synth)",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/kotodama-imp",
+       "what": "the imp’s voice: a sheet like the sugar drop’s (render the same midi with another voicebank). until there is one, its own made-up voice (Argon’s synth)",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/kotodama-hollow",
+       "what": "the hollow guardian’s voice: a sheet like the sugar drop’s (render the same midi with another voicebank). until there is one, its own made-up voice (Argon’s synth)",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/kotodama-mochi",
+       "what": "the bunny mochi’s voice: a sheet like the sugar drop’s (render the same midi with another voicebank). until there is one, its own made-up voice (Argon’s synth)",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/kotodama-hop",
+       "what": "its hop, as it springs up (a soft little squish). until yours is in, a made-up gel squish in its own voice",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/kotodama-land",
+       "what": "its landing (a squishier squish). until yours is in, a made-up one",
+       "kind": "sound",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "how they look, and who comes which day",
+     "sub": "written by the menu at the top of this tab",
+     "slots": [
+      {
+       "slot": "assets/characters/kotodama-looks",
+       "what": "your changes from the menu at the top of this tab (“keep these”): how each one looks and behaves, which one comes each day of the week, and who lives in which room on sunday. only what you changed is in it. you never need to write it yourself; remove it to put them all back as they were made",
+       "kind": "json",
+       "optional": true
+      }
+     ]
+    }
+   ]
+  },
+  {
    "id": "characters",
    "name": "characters",
    "groups": [

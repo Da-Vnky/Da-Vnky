@@ -11,6 +11,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="map.css">
+<!-- the little companion's look: the same drawing and faces as the house (the menu at the top of its tab) -->
+<link rel="stylesheet" href="/sky/css/kotodama.css">
 <style>
     :root { --ink: #3a2716; --faded: #6e5236; --red: #9a3b1f; --card: #efe3c6; --green: #4f7a3a; }
     * { box-sizing: border-box; }
@@ -250,11 +252,72 @@
     .dt-rep.tall canvas { display: block; max-height: 150px; width: auto; }
     .dt-tile { margin: 4px 0; padding: 4px 6px; border-radius: 6px; background: rgba(243,234,210,.55); }
     .details-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; }
+    /* ---------- the little companion: how they look, and who comes which day (the menu at the top of its tab) ---------- */
+    .lk { margin: 14px 0 6px; padding: 16px 20px 18px; background: var(--card); color: var(--ink); border-radius: 4px;
+        box-shadow: 0 8px 18px rgba(0,0,0,.4), inset 0 0 30px rgba(120,80,30,.22); }
+    .lk h2 { margin: 0 0 4px; color: var(--ink); }
+    .lk h2 small { color: var(--faded); }
+    .lk h3 { margin: 16px 0 6px; font: normal 1.05rem "IM Fell English SC", Georgia, serif; color: var(--ink); }
+    .lk p.sub { margin: 0 0 10px; font-style: italic; font-size: .92rem; color: var(--faded); }
+    .lk-kinds { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+    .lk-kind { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 104px; padding: 6px 4px 6px; border: 1.5px solid rgba(110,82,54,.3);
+        border-radius: 12px; background: rgba(255,250,236,.55); color: var(--ink); cursor: pointer; font-style: italic; font-size: .82rem; line-height: 1.15; }
+    .lk-kind:hover { background: rgba(255,250,236,.9); }
+    .lk-kind[aria-pressed=true] { border-color: var(--red); background: #fffaf0; box-shadow: 0 0 0 2px rgba(154,59,31,.25); }
+    .lk-kind .mini { position: relative; width: 58px; height: 58px; }
+    .lk-kind .when { font-size: .72rem; color: var(--faded); font-style: normal; }
+    .lk-kind .changed { color: var(--red); font-style: normal; }
+    .lk-body { display: grid; grid-template-columns: minmax(240px, 300px) 1fr; gap: 18px 26px; align-items: start; }
+    @media (max-width: 900px) { .lk-body { grid-template-columns: 1fr; } }
+    .lk-left { position: sticky; top: calc(var(--head-h, 110px) + 10px); }
+    .lk-stage { position: relative; height: 270px; border-radius: 10px; overflow: hidden;
+        background: linear-gradient(#efe1c0 0 76%, #c9ab7a 76% 100%); box-shadow: inset 0 0 20px rgba(110,70,30,.25); }
+    .lk-stage.night { background: linear-gradient(#3d3550 0 76%, #5a4a3a 76% 100%); }
+    .lk-stage .kd-home { position: absolute; left: 50%; bottom: 16%; width: 190px; height: 190px; margin: 0 0 0 -95px; pointer-events: none; }
+    .lk-kind .kd-home { position: absolute; left: 0; bottom: 0; width: 58px; height: 58px; margin: 0; pointer-events: none; }
+    .lk-stage .kd-squash { transform-origin: 50% 100%; }
+    .lk-stage.hopping .kd-hop { animation: lk-hop .62s cubic-bezier(.3,.6,.4,1); }
+    .lk-stage.hopping .kd-squash { animation: lk-squash .62s ease; }
+    @keyframes lk-hop { 0%, 12% { transform: translateY(0); } 50% { transform: translateY(calc(var(--lk-hop, 1) * -70px)); } 88%, 100% { transform: translateY(0); } }
+    @keyframes lk-squash { 0% { transform: scale(1, 1); } 10% { transform: scale(1.14, .82); } 22% { transform: scale(.9, 1.14); } 50% { transform: scale(.97, 1.04); }
+        86% { transform: scale(1, 1); } 90% { transform: scale(calc(1 + .14 * var(--lk-spring, 1)), calc(1 - .2 * var(--lk-spring, 1))); }
+        95% { transform: scale(.95, 1.07); } 100% { transform: scale(1, 1); } }
+    .lk-faces { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0 4px; }
+    .lk-chip { padding: 2px 9px; border: 1px solid rgba(110,82,54,.35); border-radius: 999px; background: rgba(255,250,236,.6); color: var(--ink);
+        cursor: pointer; font-style: italic; font-size: .82rem; }
+    .lk-chip:hover { background: #fffaf0; }
+    .lk-chip[aria-pressed=true] { background: var(--ink); color: #f3e6c2; border-color: var(--ink); }
+    .lk-note { margin: 6px 0 0; font-size: .82rem; font-style: italic; color: var(--faded); }
+    .lk fieldset { margin: 0 0 12px; padding: 8px 12px 10px; border: 1px solid rgba(110,82,54,.28); border-radius: 10px; }
+    .lk legend { padding: 0 6px; font: normal .98rem "IM Fell English SC", Georgia, serif; color: var(--ink); }
+    .lk-row { display: grid; grid-template-columns: 9.5em 1fr auto; align-items: center; gap: 4px 10px; margin: 4px 0; font-size: .92rem; }
+    .lk-row > span:first-child { font-style: italic; color: var(--faded); }
+    .lk-row select, .lk-row input[type=text] { width: 100%; padding: 3px 8px; border: 1px solid rgba(110,82,54,.4); border-radius: 6px; background: #fbf5e6; color: var(--ink); font: inherit; font-size: .92rem; }
+    .lk-row input[type=range] { width: 100%; accent-color: var(--red); }
+    .lk-row output { min-width: 3.2em; font: .8rem ui-monospace, Menlo, Consolas, monospace; color: var(--faded); text-align: right; }
+    .lk-row .ends { display: flex; justify-content: space-between; font-size: .72rem; font-style: italic; color: var(--faded); grid-column: 2; margin-top: -6px; }
+    .lk-ticks { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 4px 0 2px; font-size: .9rem; }
+    .lk-ticks label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+    .lk-ticks input { accent-color: var(--red); }
+    .lk-colours { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px 12px; }
+    .lk-colours label { display: flex; align-items: center; gap: 8px; font-size: .88rem; font-style: italic; color: var(--faded); cursor: pointer; }
+    .lk-colours input[type=color] { flex: none; width: 34px; height: 26px; padding: 0; border: 1px solid rgba(110,82,54,.45); border-radius: 6px; background: none; cursor: pointer; }
+    .lk-week { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 12px; }
+    .lk-week label { display: flex; flex-direction: column; gap: 2px; font-size: .85rem; font-style: italic; color: var(--faded); }
+    .lk-week label.today { color: var(--red); }
+    .lk-week select { padding: 3px 6px; border: 1px solid rgba(110,82,54,.4); border-radius: 6px; background: #fbf5e6; color: var(--ink); font: inherit; font-size: .9rem; font-style: normal; }
+    .lk-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(110,82,54,.35); }
+    .lk-acts .say { font-style: italic; font-size: .9rem; color: var(--faded); }
+    .lk-acts .say.dirty { color: var(--red); }
+    .lk .yes { padding: 6px 16px; border: 0; border-radius: 999px; background: var(--red); color: #f8eed6; cursor: pointer; font-style: italic; }
+    .lk .yes:disabled { opacity: .45; cursor: default; }
+    .lk .plain { padding: 5px 13px; border: 1px solid rgba(110,82,54,.45); border-radius: 999px; background: none; color: var(--ink); cursor: pointer; font-style: italic; font-size: .9rem; }
+    .lk .plain:hover { background: rgba(255,250,236,.7); }
 </style>
 </head>
 <body>
 <header>
-    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html">your things</a><a href="post.html">visitors</a><a href="notes.html">notes</a><a href="assets.html" class="on">assets</a><a href="debug.html">debug</a></nav>
+    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html">your things</a><a href="post.html">visitors</a><a href="notes.html">notes</a><a href="assets.html" class="on">assets</a><a href="kotodama.html">companion</a><a href="debug.html">debug</a></nav>
     <h1>assets</h1>
     <button type="button" class="btn publish">publish to the live site</button>
     <button type="button" class="btn side-toggle" aria-label="show the list of scenes">&#9776; scenes</button>
@@ -270,6 +333,8 @@
 <script src="/sky/state.js"></script>
 <!-- where each slot sits on a page (the scenes' maps, and tools/templates.py's pictures) -->
 <script src="map.js"></script>
+<!-- how the little companions look, and who comes which day (sky/kotodama.js draws them from it too) -->
+<script src="/sky/kotodama-look.js"></script>
 <script>
 (function () {
     var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -1086,11 +1151,256 @@
         item({ id: 'checklist', name: 'still to do', n: allSlots().filter(function (s) { return !s.optional && !fileFor(s.slot); }).length });
     }
 
+    /* ---------- the little companion's tab: how each one looks and behaves, and who comes which day ----------
+       a menu over sky/kotodama-look.js: the changes are kept in assets/characters/kotodama-looks.json ("keep these"),
+       only what differs from how they were made. it tries them on the map's house as you go, without keeping them */
+    var LK = null;
+    function looksBlock() {
+        var LOOK = window.Sky.kotodamaLook, SLOT = LOOK.file;
+        var NAMES = { una: 'the sugar drop', pixie: 'the forest pixie', kitsune: 'the fox spirit', imp: 'the imp', hollow: 'the hollow guardian', mochi: 'the bunny mochi' };
+        var VOICES = [['una', 'the sugar drop’s (your Vocaloid sheet)'], ['pixie', 'the pixie’s (bright, quick)'], ['kitsune', 'the fox’s (soft, wise)'],
+            ['imp', 'the imp’s (squeaky, cheeky)'], ['hollow', 'the guardian’s (low, slow)'], ['mochi', 'the mochi’s (round, bouncy)']];
+        var WAYS = [['scale', 'its size', 0.6, 1.6, 0.01, 'small', 'big'], ['hop', 'how high it hops', 0.3, 2, 0.01, 'low', 'high'],
+            ['spring', 'how it wobbles', 0.5, 2, 0.01, 'firm', 'jelly'], ['pace', 'how far it hops', 0.4, 2, 0.01, 'little hops', 'big leaps'],
+            ['chat', 'how chatty', 0, 1, 0.01, 'quiet', 'chatty'], ['wonder', 'how curious', 0, 1, 0.01, 'stays put', 'wanders, thinks']];
+        var MADE = [['clear', 'how solid', 0.4, 1, 0.01, 'see-through gummy', 'solid'], ['shine', 'its shine', 0, 1, 0.01, 'matte', 'glossy'],
+            ['face', 'its face', -24, 24, 1, 'higher', 'lower']];
+        function copy(o) { return JSON.parse(JSON.stringify(o || {})); }
+        var f = fileFor(SLOT);
+        if (!LK || LK.file !== (f ? f.url + (f.time || '') : '')) {
+            var keepKind = LK ? LK.kind : 'una';
+            LK = { file: f ? f.url + (f.time || '') : '', saved: {}, draft: {}, kind: keepKind, face: 'calm', dirty: false, read: !f };
+            if (f) fetch(f.url + (f.url.indexOf('?') === -1 ? '?' : '&') + 't=' + Date.now(), { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
+                LK.saved = j && typeof j === 'object' ? j : {}; LK.draft = copy(LK.saved); LK.read = true; LK.dirty = false; paint(true);
+            }, function () { LK.read = true; say('couldn’t read ' + SLOT + '.json: starting from how they were made.', true); paint(true); });
+        }
+        var box = el('section', 'lk');
+        box.appendChild(el('h2', '', 'how they look, and who comes which day <small>a different one each day; on everyone’s day (sunday) they’re all in, one in each room</small>'));
+        box.appendChild(el('p', 'sub', 'these change the drawn ones (and how each one hops, wobbles and chats). a picture of yours in its slots below still wins over the drawing. try things here: they show on the house underneath as you go, and on the site once you press “keep these” and publish.'));
+        var kindsRow = el('div', 'lk-kinds'), bodyEl = el('div', 'lk-body'), weekEl = el('div'), acts = el('div', 'lk-acts');
+        box.appendChild(kindsRow); box.appendChild(bodyEl); box.appendChild(weekEl); box.appendChild(acts);
+
+        function full(k) { return LOOK.spec(k, LK.draft); }
+        function made(k) { return LOOK.spec(k, null); }
+        function mine(k) { LK.draft.kinds = LK.draft.kinds || {}; return (LK.draft.kinds[k] = LK.draft.kinds[k] || {}); }
+        // keep only what differs from how it was made
+        function prune() {
+            Object.keys(LK.draft.kinds || {}).forEach(function (k) {
+                var d = made(k), m = LK.draft.kinds[k];
+                Object.keys(m).forEach(function (key) {
+                    if (key === 'c') {
+                        Object.keys(m.c || {}).forEach(function (n) { if (String(m.c[n]).toLowerCase() === String(d.c[n]).toLowerCase()) delete m.c[n]; });
+                        if (!Object.keys(m.c || {}).length) delete m.c;
+                    } else if (JSON.stringify(m[key]) === JSON.stringify(d[key])) delete m[key];
+                });
+                if (!Object.keys(m).length) delete LK.draft.kinds[k];
+            });
+            if (LK.draft.kinds && !Object.keys(LK.draft.kinds).length) delete LK.draft.kinds;
+            if (LK.draft.week && JSON.stringify(LK.draft.week) === JSON.stringify(LOOK.week)) delete LK.draft.week;
+            if (LK.draft.sunday && JSON.stringify(LK.draft.sunday) === JSON.stringify(LOOK.sunday)) delete LK.draft.sunday;
+        }
+        function clean() {
+            prune();
+            var out = { what: 'the little companions: how each looks and behaves, which one comes each day, and who lives in which room on sunday. kept by the asset manager (the little companion tab); only what was changed from sky/kotodama-look.js is here. remove this file to put them all back as they were made.' };
+            ['kinds', 'week', 'sunday'].forEach(function (k) { if (LK.draft[k]) out[k] = copy(LK.draft[k]); });
+            return out;
+        }
+        function changed() { LK.dirty = JSON.stringify(clean()) !== JSON.stringify((function () { var d = LK.draft; LK.draft = copy(LK.saved); var c = clean(); LK.draft = d; return c; })()); }
+        // the map's house tries it on as you go
+        var pushT = 0;
+        function pushMap() {
+            clearTimeout(pushT);
+            pushT = setTimeout(function () {
+                var fr = document.querySelector('.map-stage iframe');
+                try {
+                    var K = fr && fr.contentWindow.Sky && fr.contentWindow.Sky.kotodama;
+                    if (!K || !K.restyle) return;
+                    K.restyle(clean());
+                    if (K.kind && K.kind !== LK.kind) K.become(LK.kind);         // (the one you're changing, in the house)
+                } catch (e) {}
+            }, 120);
+        }
+        function edit(fn) { fn(); changed(); paint(false); pushMap(); }
+
+        function drawing(k, id, big) {
+            var w = el('div', 'kd-home');
+            w.dataset.kind = k; w.dataset.face = big ? LK.face : 'calm';
+            w.innerHTML = (big ? '<div class="kd-shadow"></div>' : '') + '<div class="kd-hop"><div class="kd-squash"><div class="kd-breathe"><div class="kd-art">' + LOOK.svg(full(k), id) + '</div></div></div></div>';
+            return w;
+        }
+        function row(label, input, out) {
+            var r = el('label', 'lk-row'); r.appendChild(el('span', '', esc(label))); r.appendChild(input); r.appendChild(out || el('span')); return r;
+        }
+        function sel(list, value, on) {
+            var x = document.createElement('select');
+            list.forEach(function (o) { var op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; x.appendChild(op); });
+            x.value = value; x.addEventListener('change', function () { on(x.value); }); return x;
+        }
+        function slider(def, value, on) {
+            var r = document.createElement('input'), out = el('output');
+            r.type = 'range'; r.min = def[2]; r.max = def[3]; r.step = def[4]; r.value = value;
+            out.textContent = (+value).toFixed(def[4] < 1 ? 2 : 0);
+            r.addEventListener('input', function () { out.textContent = (+r.value).toFixed(def[4] < 1 ? 2 : 0); on(+r.value, true); });
+            r.addEventListener('change', function () { on(+r.value, false); });
+            var wrap = el('div'); wrap.appendChild(row(def[1], r, out));
+            var ends = el('div', 'lk-row'); ends.appendChild(el('span')); ends.appendChild(el('div', 'ends', '<span>' + esc(def[5]) + '</span><span>' + esc(def[6]) + '</span>')); wrap.appendChild(ends);
+            return wrap;
+        }
+        function parts(map) { return Object.keys(map).map(function (k) { return [k, map[k].name]; }); }
+
+        var stage = null;
+        function redrawStage() {
+            if (!stage) return;
+            var sp = full(LK.kind), old = stage.querySelector('.kd-home');
+            var n = drawing(LK.kind, 'lk-big', true);
+            if (old) stage.replaceChild(n, old); else stage.appendChild(n);
+            stage.style.setProperty('--lk-hop', Math.min(2, sp.hop));
+            stage.style.setProperty('--lk-spring', Math.min(2, sp.spring));
+            n.querySelector('.kd-art').style.transform = 'scale(' + (0.78 + 0.22 * sp.scale).toFixed(3) + ')';
+            n.querySelector('.kd-art').style.transformOrigin = '50% 100%';
+            [].forEach.call(kindsRow.querySelectorAll('.lk-kind'), function (b) {
+                var m = b.querySelector('.mini'); m.innerHTML = ''; m.appendChild(drawing(b.dataset.k, 'lk-mini-' + b.dataset.k, false));
+                b.querySelector('.changed').textContent = LK.draft.kinds && LK.draft.kinds[b.dataset.k] ? ' · changed' : '';
+            });
+        }
+        function paint(all) {
+            if (!box.isConnected && !all) return;
+            var plan = LOOK.plan(LK.draft), day = new Date().getDay();
+            // the six
+            kindsRow.innerHTML = '';
+            Object.keys(LOOK.kinds).forEach(function (k) {
+                var days = plan.week.map(function (w, i) { return w === k ? LOOK.days[i].slice(0, 3) : null; }).filter(Boolean);
+                var sun = Object.keys(plan.sunday).filter(function (r) { return plan.sunday[r] === k; });
+                if (plan.week.indexOf('all') !== -1 && sun.length) days.push('everyone’s day');
+                var b = el('button', 'lk-kind', '<span class="mini"></span><span>' + esc(full(k).name) + '<span class="changed"></span></span><span class="when">' + (days.length ? esc(days.join(', ')) : 'no day of its own') + '</span>');
+                b.type = 'button'; b.dataset.k = k; b.setAttribute('aria-pressed', String(k === LK.kind));
+                b.addEventListener('click', function () { LK.kind = k; paint(false); pushMap(); });
+                kindsRow.appendChild(b);
+            });
+            // the one picked: the drawing, and everything about it
+            var sp = full(LK.kind), k = LK.kind;
+            bodyEl.innerHTML = '';
+            var left = el('div', 'lk-left'), right = el('div', 'lk-right');
+            stage = el('div', 'lk-stage');
+            left.appendChild(stage);
+            var faces = el('div', 'lk-faces');
+            LOOK.faces.forEach(function (fc) {
+                var b = el('button', 'lk-chip', esc(fc)); b.type = 'button'; b.setAttribute('aria-pressed', String(fc === LK.face));
+                b.addEventListener('click', function () { LK.face = fc; stage.querySelector('.kd-home').dataset.face = fc; [].forEach.call(faces.children, function (x) { x.setAttribute('aria-pressed', String(x === b)); }); });
+                faces.appendChild(b);
+            });
+            left.appendChild(faces);
+            var tools = el('div', 'lk-faces');
+            tools.appendChild(btn('hop', function () { stage.classList.remove('hopping'); void stage.offsetWidth; stage.classList.add('hopping'); }, 'lk-chip'));
+            tools.appendChild(btn('day / night', function () { stage.classList.toggle('night'); }, 'lk-chip'));
+            left.appendChild(tools);
+            left.appendChild(el('p', 'lk-note', 'its pictures in its slots below (kotodama-' + esc(k) + '…) are shown instead of this drawing once you add them; its ways (hops, wobble, chat) still count.'));
+
+            var who = el('fieldset'); who.appendChild(el('legend', '', 'who it is'));
+            var nm = document.createElement('input'); nm.type = 'text'; nm.value = sp.name; nm.maxLength = 40;
+            nm.addEventListener('change', function () { edit(function () { mine(k).name = nm.value.trim() || made(k).name; }); });
+            who.appendChild(row('its name', nm));
+            who.appendChild(row('its voice', sel(VOICES, sp.voice, function (v) { edit(function () { mine(k).voice = v; }); })));
+            var tick2 = el('div', 'lk-ticks');
+            [['brave', 'brave (not frightened in the dungeon)'], ['cheeky', 'cheeky (giggles, answers back)']].forEach(function (t) {
+                var l = el('label'), c = document.createElement('input'); c.type = 'checkbox'; c.checked = !!sp[t[0]];
+                c.addEventListener('change', function () { edit(function () { mine(k)[t[0]] = c.checked; }); });
+                l.appendChild(c); l.appendChild(document.createTextNode(t[1])); tick2.appendChild(l);
+            });
+            who.appendChild(tick2);
+            right.appendChild(who);
+
+            var shape = el('fieldset'); shape.appendChild(el('legend', '', 'its shape'));
+            shape.appendChild(row('its body', sel(parts(LOOK.shapes), sp.shape, function (v) { edit(function () { mine(k).shape = v; }); })));
+            shape.appendChild(row('on its head', sel(parts(LOOK.heads), sp.head, function (v) { edit(function () { mine(k).head = v; }); })));
+            shape.appendChild(row('wings', sel(parts(LOOK.wings), sp.wings, function (v) { edit(function () { mine(k).wings = v; }); })));
+            shape.appendChild(row('a tail', sel(parts(LOOK.tails), sp.tail, function (v) { edit(function () { mine(k).tail = v; }); })));
+            var ticks = el('div', 'lk-ticks');
+            Object.keys(LOOK.extras).forEach(function (x) {
+                var l = el('label'), c = document.createElement('input'); c.type = 'checkbox'; c.checked = sp.extras.indexOf(x) !== -1;
+                c.addEventListener('change', function () {
+                    edit(function () { var now = full(k).extras.filter(function (e) { return e !== x; }); if (c.checked) now.push(x); mine(k).extras = Object.keys(LOOK.extras).filter(function (e) { return now.indexOf(e) !== -1; }); });
+                });
+                l.appendChild(c); l.appendChild(document.createTextNode(LOOK.extras[x].name)); ticks.appendChild(l);
+            });
+            shape.appendChild(el('div', 'lk-row', '<span>little extras</span>'));
+            shape.appendChild(ticks);
+            right.appendChild(shape);
+
+            var col = el('fieldset'); col.appendChild(el('legend', '', 'its colours'));
+            var cg = el('div', 'lk-colours');
+            LOOK.colours.forEach(function (c) {
+                var l = el('label'), i = document.createElement('input'); i.type = 'color'; i.value = sp.c[c[0]];
+                i.addEventListener('input', function () { var m = mine(k); m.c = m.c || {}; m.c[c[0]] = i.value; redrawStage(); pushMap(); });
+                i.addEventListener('change', function () { edit(function () { var m = mine(k); m.c = m.c || {}; m.c[c[0]] = i.value; }); });
+                l.appendChild(i); l.appendChild(document.createTextNode(c[1])); cg.appendChild(l);
+            });
+            col.appendChild(cg);
+            right.appendChild(col);
+
+            [['what it’s made of', MADE], ['its ways', WAYS]].forEach(function (g) {
+                var fs = el('fieldset'); fs.appendChild(el('legend', '', g[0]));
+                g[1].forEach(function (d) {
+                    fs.appendChild(slider(d, sp[d[0]], function (v, live) {
+                        if (live) { mine(k)[d[0]] = v; redrawStage(); pushMap(); return; }
+                        edit(function () { mine(k)[d[0]] = v; });
+                    }));
+                });
+                right.appendChild(fs);
+            });
+            var back = el('div', 'lk-faces');
+            back.appendChild(btn('put ' + made(k).name + ' back as it was made', function () { edit(function () { if (LK.draft.kinds) delete LK.draft.kinds[k]; }); }, 'plain'));
+            right.appendChild(back);
+            bodyEl.appendChild(left); bodyEl.appendChild(right);
+
+            // the week, and everyone's day
+            weekEl.innerHTML = '';
+            weekEl.appendChild(el('h3', '', 'who comes which day'));
+            weekEl.appendChild(el('p', 'sub', 'by the visitor’s own day. “everyone” = they’re all in, one in each room below, and they stay in their rooms (they don’t follow the traveller); the others follow the traveller from room to room.'));
+            var wk = el('div', 'lk-week'), choices = Object.keys(LOOK.kinds).map(function (x) { return [x, full(x).name]; }).concat([['all', 'everyone (all in)']]);
+            [1, 2, 3, 4, 5, 6, 0].forEach(function (i) {
+                var l = el('label', i === day ? 'today' : '', esc(LOOK.days[i]) + (i === day ? ' (today)' : ''));
+                l.appendChild(sel(choices, plan.week[i], function (v) { edit(function () { var w = LOOK.plan(LK.draft).week; w[i] = v; LK.draft.week = w; }); }));
+                wk.appendChild(l);
+            });
+            weekEl.appendChild(wk);
+            weekEl.appendChild(el('h3', '', 'everyone’s day: who lives in which room'));
+            var rm = el('div', 'lk-week'), roomChoices = [['', 'nobody']].concat(Object.keys(LOOK.kinds).map(function (x) { return [x, full(x).name]; }));
+            LOOK.rooms.forEach(function (r) {
+                var l = el('label', '', esc(r[1]));
+                l.appendChild(sel(roomChoices, plan.sunday[r[0]] || '', function (v) { edit(function () { var su = LOOK.plan(LK.draft).sunday; su[r[0]] = v; LK.draft.sunday = su; }); }));
+                rm.appendChild(l);
+            });
+            weekEl.appendChild(rm);
+
+            // keeping it
+            acts.innerHTML = '';
+            var keep = btn('keep these', function () {
+                var text = JSON.stringify(clean(), null, 1);
+                keep.disabled = true;
+                put(SLOT, 'json', new File([text], 'kotodama-looks.json', { type: 'application/json' }));   // (then the page reads it back in)
+            }, 'yes');
+            keep.disabled = !LK.dirty || !LK.read;
+            acts.appendChild(keep);
+            acts.appendChild(btn('forget what I’ve changed since', function () { LK.draft = copy(LK.saved); LK.dirty = false; paint(false); pushMap(); }, 'plain'));
+            acts.appendChild(el('span', 'say' + (LK.dirty ? ' dirty' : ''), !LK.read ? 'reading your last ones…' : LK.dirty ? 'not kept yet: the site still shows the last ones you kept.' : (f ? 'these are the ones the site shows (publish to send them live).' : 'they’re all as they were made.')));
+            redrawStage();
+        }
+        paint(true);
+        // the map's house, when it (re)loads: show it what's being tried
+        setTimeout(function () {
+            var fr = document.querySelector('.map-stage iframe');
+            if (fr) fr.addEventListener('load', function () { if (LK.dirty) setTimeout(pushMap, 1500); });
+        }, 0);
+        return box;
+    }
+
     function drawScene(sc) {
         var slots = []; sc.groups.forEach(function (g) { slots = slots.concat(g.slots); });
         var top = intro(sc.note, sc.map ? '' : sc.page, slots);
         if (!sc.map) top.appendChild(viewSwitch());
         main.appendChild(top);
+        if (sc.id === 'companion' && window.Sky && window.Sky.kotodamaLook) main.appendChild(looksBlock());
         if (sc.map) {
             main.appendChild(mapBlock(sc, slots));
             var dh = el('h2', 'details-h', 'every slot, one by one <small>the same slots as a list: what each is for, and the size to draw it</small>');

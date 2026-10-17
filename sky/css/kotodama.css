@@ -1,0 +1,221 @@
+/* =====================================================================
+   kotodama.css — the little companion in the house (sky/kotodama.js):
+   its size and place on the floor, the drawn stand-in's faces, its
+   thought cloud, its speech bubble and the little marks that puff out.
+   ===================================================================== */
+
+/* ---------- where it stands: on the floor of whichever room it's in, in front of the traveller ----------
+   its size follows the traveller's (a fifth of them, give or take, by kind), so phones are right by themselves.
+   kotodama.js moves it: left (% of the room), and the hop, squash and lean on the parts inside */
+.kd-home {
+    --kd-size: max(46px, calc(var(--traveller-h, calc(60vh - 11px)) * .21 * var(--kd-scale, 1)));
+    position: absolute;
+    left: 50%;
+    bottom: var(--kd-floor, 1.8vh);
+    width: var(--kd-size);
+    height: var(--kd-size);
+    margin-left: calc(var(--kd-size) / -2);
+    z-index: var(--kd-z, 3);
+    pointer-events: none;
+    font-size: calc(var(--kd-size) * .16);
+    font-family: "IM Fell English", Georgia, serif;
+}
+.kd-home.kd-away { display: none; }
+.kd-shadow {
+    position: absolute; left: 50%; bottom: -3%;
+    width: 64%; height: 10%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(20, 12, 6, .38), rgba(20, 12, 6, 0));
+    transform: translateX(-50%);
+    transform-origin: 50% 50%;
+}
+.kd-hop, .kd-squash, .kd-breathe, .kd-art { position: absolute; inset: 0; }
+.kd-hop { will-change: transform; }
+.kd-squash { transform-origin: 50% 100%; will-change: transform; }
+.kd-breathe { transform-origin: 50% 100%; animation: kd-breathe 2.7s ease-in-out infinite; }
+@keyframes kd-breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, .975); } }
+.kd-art { transform: scaleX(var(--kd-dir, 1)); transition: transform .18s ease; }
+.kd-art > svg, .kd-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.kd-img { display: none; object-fit: contain; object-position: 50% 100%; }
+.kd-art.has-art .kd-drawn { display: none; }
+.kd-art.has-art .kd-body-img { display: block; }
+.kd-art.has-face .kd-face-img { display: block; }
+.kd-home.mouth-open .kd-art.has-talk .kd-talk-img { display: block; }
+.kd-home.mouth-open .kd-art.has-talk .kd-face-img { visibility: hidden; }
+/* the artist's blink: a blink every few seconds over the everyday faces */
+.kd-art.has-blink .kd-blink-img { display: block; opacity: 0; animation: kd-blink-img 4.6s steps(1) infinite; }
+.kd-home:not([data-face="calm"]):not([data-face="curious"]) .kd-blink-img,
+.kd-home.mouth-open .kd-blink-img { animation: none; opacity: 0; }
+@keyframes kd-blink-img { 0%, 94% { opacity: 0; } 95%, 97% { opacity: 1; } 98%, 100% { opacity: 0; } }
+
+/* the click: poke its body, pat its head (sky.js draws the two hands) */
+.kd-hit {
+    position: absolute; left: 14%; right: 14%; top: 16%; bottom: 0;
+    padding: 0; border: 0; border-radius: 46% 46% 40% 40%;
+    background: none;
+    pointer-events: auto;
+    cursor: var(--cursor-poke, pointer);
+}
+.kd-home.on-head .kd-hit { cursor: var(--cursor-pat, pointer); }
+.kd-hit:focus-visible { outline: 2px dashed rgba(255, 240, 210, .7); outline-offset: 2px; }
+body.inv-holding .kd-hit { cursor: inherit; }
+
+/* ---------- the drawn stand-in: one face that makes every expression ---------- */
+.kd-drawn .e-open, .kd-drawn .e-wide, .kd-drawn .e-dot, .kd-drawn .e-happy, .kd-drawn .e-shut, .kd-drawn .e-squint,
+.kd-drawn .b-raise, .kd-drawn .b-worry, .kd-drawn .mouths > * { display: none; }
+.kd-drawn .k-cheeks { opacity: .45; transition: opacity .3s; }
+/* calm */            .kd-home[data-face="calm"] .e-open, .kd-home[data-face="calm"] .m-smile { display: inline; }
+/* happy */           .kd-home[data-face="happy"] .e-happy, .kd-home[data-face="happy"] .m-cat { display: inline; }
+/* curious */         .kd-home[data-face="curious"] .e-open, .kd-home[data-face="curious"] .m-o { display: inline; }
+/* thinking */        .kd-home[data-face="thinking"] .e-open, .kd-home[data-face="thinking"] .b-raise, .kd-home[data-face="thinking"] .m-flat { display: inline; }
+/* idea */            .kd-home[data-face="idea"] .e-wide, .kd-home[data-face="idea"] .m-open { display: inline; }
+/* puzzled */         .kd-home[data-face="puzzled"] .e-open, .kd-home[data-face="puzzled"] .b-raise, .kd-home[data-face="puzzled"] .m-wobble { display: inline; }
+/* sleepy */          .kd-home[data-face="sleepy"] .e-shut, .kd-home[data-face="sleepy"] .m-o { display: inline; }
+/* startled */        .kd-home[data-face="startled"] .e-dot, .kd-home[data-face="startled"] .m-o { display: inline; }
+/* scared */          .kd-home[data-face="scared"] .e-dot, .kd-home[data-face="scared"] .b-worry, .kd-home[data-face="scared"] .m-wobble { display: inline; }
+/* giggle */          .kd-home[data-face="giggle"] .e-squint, .kd-home[data-face="giggle"] .m-open { display: inline; }
+.kd-home[data-face="happy"] .k-cheeks, .kd-home[data-face="giggle"] .k-cheeks, .kd-home[data-face="idea"] .k-cheeks { opacity: .85; }
+.kd-home[data-face="scared"] .k-cheeks { opacity: .15; }
+.kd-home[data-face="curious"] .m-o { transform: scale(.7); transform-box: fill-box; transform-origin: center; }
+/* talking: the mouth opens on each syllable, round for o and u */
+.kd-home.mouth-open .kd-drawn .mouths > * { display: none; }
+.kd-home.mouth-open:not([data-vowel="o"]):not([data-vowel="u"]) .kd-drawn .m-open,
+.kd-home.mouth-open[data-vowel="o"] .kd-drawn .m-round,
+.kd-home.mouth-open[data-vowel="u"] .kd-drawn .m-round { display: inline; }
+/* where it's looking (set from the pointer, or what it's looking at): the eyes, and the face a little */
+.kd-drawn .look { transform: translate(calc(var(--lx, 0) * 3.5px), calc(var(--ly, 0) * 3px)); transition: transform .25s ease; }
+.kd-drawn .kf { transform: translate(calc(var(--lx, 0) * 2px), calc(var(--ly, 0) * 1.6px)); transition: transform .3s ease; }
+/* a blink every few seconds */
+.kd-drawn .e-open { transform-box: fill-box; transform-origin: 50% 50%; animation: kd-blink 4.6s infinite; }
+@keyframes kd-blink { 0%, 93%, 100% { transform: scaleY(1); } 95.5% { transform: scaleY(.08); } }
+/* puzzled: its head tilts. scared: it shivers */
+.kd-drawn { transform-origin: 50% 100%; transition: transform .3s ease; }
+.kd-home[data-face="puzzled"] .kd-drawn { transform: rotate(-7deg); }
+.kd-home[data-face="scared"] .kd-breathe, .kd-home[data-mood="scared"] .kd-breathe { animation: kd-shiver .16s linear infinite; }
+@keyframes kd-shiver { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1.2px); } 75% { transform: translateX(1.2px); } }
+/* asleep: slow, deep breaths, sunk down a little */
+.kd-home.napping .kd-breathe { animation: kd-doze 4.4s ease-in-out infinite; }
+@keyframes kd-doze { 0%, 100% { transform: scale(1.03, .9); } 50% { transform: scale(1.06, .86); } }
+
+/* its bits that move by themselves (wings, tails, ears, the lights around it) */
+.kd-drawn .k-wings, .kd-drawn .k-tail, .kd-drawn .k-flop, .kd-drawn .k-orb, .kd-drawn .k-halo, .kd-drawn .k-glow, .kd-drawn .k-antennae, .kd-drawn .k-bow {
+    transform-box: fill-box; transform-origin: 50% 100%;
+}
+.kd-drawn .k-wings.fairy { transform-origin: 50% 60%; animation: kd-flutter .22s ease-in-out infinite alternate; }   /* (whoever wears fairy wings) */
+@keyframes kd-flutter { from { transform: scaleX(1); } to { transform: scaleX(.9); } }
+.kd-drawn .k-glow { transform-origin: 50% 50%; animation: kd-glow 2.4s ease-in-out infinite; }
+@keyframes kd-glow { 0%, 100% { opacity: .85; } 50% { opacity: 1; filter: drop-shadow(0 0 4px var(--kd-glow, #fff)); } }
+.kd-drawn .k-antennae { transform-origin: 50% 100%; animation: kd-sway 3.1s ease-in-out infinite; }
+.kd-drawn .k-tail { transform-origin: 0% 100%; animation: kd-sway 2.6s ease-in-out infinite; }
+.kd-drawn .k-flop { transform-origin: 0% 100%; animation: kd-flop 3.4s ease-in-out infinite; }
+.kd-drawn .k-bow { transform-origin: 50% 50%; animation: kd-sway 3.8s ease-in-out infinite; }
+@keyframes kd-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes kd-flop { 0%, 80%, 100% { transform: rotate(0); } 86% { transform: rotate(-9deg); } 92% { transform: rotate(3deg); } }
+.kd-drawn .k-orb { transform-origin: 50% 50%; animation: kd-float 3.2s ease-in-out infinite; }
+.kd-drawn .k-orb.o2 { animation-delay: -1.6s; }
+.kd-drawn .k-halo { transform-origin: 50% 50%; animation: kd-float 3.6s ease-in-out infinite; }
+@keyframes kd-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+/* ---------- its thoughts: a cloud over its head, "…" first, then the pictures one by one ---------- */
+.kd-think {
+    position: absolute; left: 50%; bottom: calc(100% + .4em);
+    transform: translateX(calc(-50% + var(--think-dx, 0px))) scale(.2);
+    transform-origin: 50% 100%;
+    opacity: 0; visibility: hidden;
+    transition: transform .28s cubic-bezier(.3, 1.6, .5, 1), opacity .2s, visibility 0s .28s;
+}
+.kd-home.thinking .kd-think { transform: translateX(calc(-50% + var(--think-dx, 0px))) scale(1); opacity: 1; visibility: visible; transition: transform .32s cubic-bezier(.3, 1.6, .5, 1), opacity .2s; }
+.kd-home.thought-pop .kd-think { transform: translateX(calc(-50% + var(--think-dx, 0px))) scale(1.25); opacity: 0; transition: transform .22s ease-out, opacity .22s ease-out, visibility 0s .22s; }
+.kd-cloud {
+    position: relative;
+    display: flex; align-items: center; justify-content: center; gap: .25em;
+    min-width: 3.4em; min-height: 2.6em;
+    padding: .45em .8em;
+    background: #f5ecd7;
+    border: 2px solid #5a4632;
+    border-radius: 48% 52% 46% 54% / 58% 56% 44% 42%;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .3), inset 0 0 12px rgba(150, 110, 60, .18);
+    white-space: nowrap;
+}
+.kd-puff { position: absolute; background: #f5ecd7; border: 2px solid #5a4632; border-radius: 50%; }
+.kd-puff.p1 { width: .7em; height: .55em; left: calc(50% - .5em); bottom: -.85em; }
+.kd-puff.p2 { width: .42em; height: .36em; left: calc(50% - .85em); bottom: -1.45em; }
+.kd-dots { display: inline-flex; gap: .22em; }
+.kd-dots i { width: .38em; height: .38em; border-radius: 50%; background: #5a4632; animation: kd-dot 1s ease-in-out infinite; }
+.kd-dots i:nth-child(2) { animation-delay: .15s; } .kd-dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes kd-dot { 0%, 100% { transform: translateY(0); opacity: .45; } 40% { transform: translateY(-.25em); opacity: 1; } }
+.kd-ideas { display: none; align-items: center; gap: .2em; }
+.kd-home.thought-shown .kd-dots { display: none; }
+.kd-home.thought-shown .kd-ideas { display: inline-flex; }
+.kd-pic { display: inline-block; width: 2.3em; height: 2.3em; }
+.kd-pic > svg, .kd-pic > img { width: 100%; height: 100%; display: block; object-fit: contain; }
+.kd-ideas .kd-pic { animation: kd-pop .38s cubic-bezier(.3, 1.7, .5, 1) both; animation-delay: calc(var(--i, 0) * .35s); }
+.kd-glue { font-size: 1.35em; color: #5a4632; line-height: 1; animation: kd-pop .3s ease both; animation-delay: .2s; }
+@keyframes kd-pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* ---------- its speech bubble: the gibberish typed out as it's said ---------- */
+.kd-say {
+    position: absolute; left: 50%; bottom: calc(100% + .5em);
+    display: flex; align-items: center; gap: .3em;
+    max-width: min(70vw, 22em);
+    padding: .3em .75em .35em;
+    background: #f7f0de;
+    border: 2px solid #5a4632;
+    border-radius: .9em;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .3), inset 0 0 10px rgba(150, 110, 60, .15);
+    color: #3b2a1a;
+    font-style: italic;
+    font-size: 1.12em;
+    line-height: 1.2;
+    white-space: nowrap;
+    transform: translateX(calc(-50% + var(--say-dx, 0px))) scale(.3);
+    transform-origin: 50% 100%;
+    opacity: 0; visibility: hidden;
+    transition: transform .2s ease, opacity .2s ease, visibility 0s .2s;
+}
+.kd-say::after {
+    content: ""; position: absolute; left: calc(50% - var(--say-dx, 0px) - .4em); bottom: -.55em;
+    width: .8em; height: .8em;
+    background: #f7f0de; border-right: 2px solid #5a4632; border-bottom: 2px solid #5a4632;
+    transform: rotate(45deg) skew(8deg, 8deg);
+}
+.kd-home.saying .kd-say { transform: translateX(calc(-50% + var(--say-dx, 0px))) scale(1); opacity: 1; visibility: visible; transition: transform .25s cubic-bezier(.3, 1.6, .5, 1), opacity .15s; }
+.kd-home.thinking .kd-say { bottom: calc(100% + 4.1em); }
+.kd-say-ic { display: none; }
+.kd-home.say-ic .kd-say-ic { display: inline-block; }
+.kd-say-ic .kd-pic { width: 1.5em; height: 1.5em; vertical-align: middle; }
+.kd-say[data-kind="exclaim"] { font-weight: bold; }
+.kd-say[data-kind="muse"], .kd-say[data-kind="sigh"] { color: #6b5a44; }
+
+/* ---------- the marks that puff out of its head ---------- */
+.kd-fx { position: absolute; left: 50%; top: 14%; width: 0; height: 0; }
+.kd-mark {
+    position: absolute; left: calc(var(--fx-x, 0) * 1.4em - .95em); top: -1em;
+    width: 1.9em; height: 1.9em;
+    pointer-events: none;
+    animation: kd-rise 1.8s ease-out forwards;
+}
+@keyframes kd-rise { 0% { transform: translateY(.6em) scale(.3); opacity: 0; } 15% { transform: translateY(0) scale(1.1); opacity: 1; } 70% { opacity: 1; } 100% { transform: translateY(-1.8em) scale(.9); opacity: 0; } }
+.kd-mark.fx-question, .kd-mark.fx-exclaim, .kd-mark.fx-bulb { left: 1.1em; top: -2.1em; animation: kd-bob 1.8s ease-out forwards; }
+@keyframes kd-bob { 0% { transform: scale(0) rotate(-20deg); opacity: 0; } 14% { transform: scale(1.25) rotate(6deg); opacity: 1; } 24% { transform: scale(1) rotate(0); } 40% { transform: translateY(-.2em); } 55% { transform: translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; } }
+.kd-mark.fx-sweat { left: 1.6em; top: -.3em; width: 1.2em; height: 1.2em; animation: kd-drip 1.4s ease-in forwards; }
+@keyframes kd-drip { 0% { transform: translateY(0) scale(.4); opacity: 0; } 20% { transform: scale(1); opacity: 1; } 100% { transform: translateY(1.6em); opacity: 0; } }
+.kd-mark.fx-zzz { left: .9em; animation: kd-zzz 2.4s ease-out forwards; }
+@keyframes kd-zzz { 0% { transform: translate(0, 0) scale(.4); opacity: 0; } 20% { opacity: 1; } 100% { transform: translate(1.4em, -2.2em) scale(1.1); opacity: 0; } }
+.kd-mark.fx-vein { left: 1.3em; top: -1.6em; width: 1.6em; height: 1.6em; animation: kd-throb 1.5s ease-out forwards; }
+@keyframes kd-throb { 0% { transform: scale(0); opacity: 0; } 15%, 45% { transform: scale(1.15); opacity: 1; } 30%, 60% { transform: scale(.9); } 100% { transform: scale(1); opacity: 0; } }
+.kd-mark.fx-spark { animation: kd-twinkle 1.4s ease-out forwards; }
+@keyframes kd-twinkle { 0% { transform: scale(0) rotate(0); opacity: 0; } 30% { transform: scale(1.2) rotate(45deg); opacity: 1; } 100% { transform: translateY(-1em) scale(.4) rotate(120deg); opacity: 0; } }
+
+/* ---------- the light in each room ---------- */
+.porch .kd-home { filter: brightness(var(--pd, 1)); }
+.kitchen .kd-home, .attic .kd-home { filter: brightness(calc(1 - var(--dusk, 0) * .35)); }
+.dungeon .kd-hop, .dungeon .kd-shadow { filter: brightness(.5) saturate(.75); }      /* (it's over the dark, for its bubbles: so its body's dimmed here) */
+
+/* less motion, asked for: no breathing, wobbling or drifting, and the marks just fade */
+@media (prefers-reduced-motion: reduce) {
+    .kd-breathe, .kd-drawn *, .kd-home .kd-breathe { animation: none !important; }
+    .kd-mark { animation: kd-fade 1.6s ease forwards !important; }
+    @keyframes kd-fade { 0% { opacity: 0; } 15%, 75% { opacity: 1; } 100% { opacity: 0; } }
+    .kd-art, .kd-think, .kd-say { transition: none !important; }
+}

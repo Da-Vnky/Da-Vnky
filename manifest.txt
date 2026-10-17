@@ -1,13 +1,14 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
-beyond.html 1476
-city.html 9813
-desk.html 6182
-index.html 5189
-living.html 133380
-window-sky.html 1328
-workshop.html 22036
+beyond.html 1480
+city.html 9866
+desk.html 6191
+index.html 5247
+living.html 133705
+window-sky.html 1334
+workshop.html 22101
 sky/ambient.js 5331
 sky/attic.js 34823
+sky/babble.js 50324
 sky/bathroom.js 29419
 sky/bee.js 114096
 sky/beerush.js 8186
@@ -35,6 +36,8 @@ sky/house.js 11177
 sky/inkpad.js 21194
 sky/inventory.js 17335
 sky/kitchen.js 16998
+sky/kotodama-look.js 24071
+sky/kotodama.js 63821
 sky/letters.js 35904
 sky/lives.js 12907
 sky/loader.js 17385
@@ -96,6 +99,7 @@ sky/css/hell.css 10082
 sky/css/inkpad.css 8326
 sky/css/inventory.css 6010
 sky/css/kitchen.css 17618
+sky/css/kotodama.css 15615
 sky/css/letters.css 4656
 sky/css/lives.css 2940
 sky/css/loop.css 2368
@@ -138,7 +142,7 @@ assets/resets/list.txt 127
 assets/sea/list.txt 185
 assets/skizy-room/list.txt 207
 assets/sky/list.txt 377
-assets/sounds/list.txt 243
+assets/sounds/list.txt 260
 assets/textures/list.txt 152
 assets/ui/list.txt 117
 assets/workshop/list.txt 117

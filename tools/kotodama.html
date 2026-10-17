@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>the companion · content manager · DaV-nky</title>
+<!-- the little companion's room to play in (sky/kotodama.js, sky/babble.js): part of the content manager. open it with tools\content.bat.
+     the house is the real page, in a frame; the buttons here make the companion in it think, talk and pull faces,
+     and the sliders try its voice out (they change nothing on the site: copy the numbers, and they go into sky/babble.js) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+    :root { --ink: #3a2716; --faded: #6e5236; --red: #9a3b1f; --card: #efe3c6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #2a1d14; color: #f3e6c2; font: 1.05rem/1.5 "IM Fell English", Georgia, serif; }
+    button, input, select, textarea { font: inherit; }
+    header { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 22px;
+        background: #3a2a1d; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+    header h1 { margin: 0 auto 0 12px; font: normal 1.6rem "IM Fell English SC", Georgia, serif; }
+    .status { width: 100%; margin: 0; font-style: italic; font-size: .92rem; color: rgba(243,230,194,.75); }
+    .cm-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: .92rem; }
+    .cm-nav span { font: normal 1rem "IM Fell English SC", Georgia, serif; color: #e0b070; margin-right: 6px; }
+    .cm-nav a { padding: 3px 10px; border-radius: 999px; color: #f3e6c2; text-decoration: none; font-style: italic; }
+    .cm-nav a:hover { background: rgba(243,230,194,.1); }
+    .cm-nav a.on { background: #f3e6c2; color: #3a2716; }
+    main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 22px; padding: 22px; }
+    @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+    .stage { position: relative; aspect-ratio: 16 / 9; background: #120c08; box-shadow: 0 8px 18px rgba(0,0,0,.45); }
+    .stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .rooms { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .sheet { background: var(--card); color: var(--ink); padding: 18px 20px; box-shadow: 0 8px 18px rgba(0,0,0,.4), inset 0 0 26px rgba(120,80,30,.2); }
+    .sheet + .sheet { margin-top: 18px; }
+    h2 { margin: 0 0 6px; font: normal 1.25rem "IM Fell English SC", Georgia, serif; }
+    .sub { margin: 0 0 10px; font-style: italic; color: var(--faded); font-size: .9rem; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(110,82,54,.35); background: #f8f0dc; color: var(--ink); cursor: pointer; font-style: italic; }
+    .chip:hover { background: #fff8e6; }
+    .chip.on { background: var(--ink); color: #f8f0dc; }
+    .stage-chip { border-color: rgba(243,230,194,.35); background: none; color: #f3e6c2; }
+    .stage-chip:hover { background: rgba(243,230,194,.1); }
+    .row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+    .row input[type=text], .row select { flex: 1; min-width: 0; padding: 4px 8px; border: 1px solid rgba(110,82,54,.35); border-radius: 6px; background: #fbf5e6; color: var(--ink); }
+    label.sl { display: grid; grid-template-columns: 7.5em 1fr 3.4em; gap: 8px; align-items: center; font-size: .92rem; }
+    label.sl output { text-align: right; color: var(--faded); }
+    input[type=range] { accent-color: var(--red); }
+    textarea { width: 100%; height: 7.5em; margin-top: 8px; border: 1px solid rgba(110,82,54,.35); border-radius: 6px; background: #fbf5e6; color: var(--ink); font: .8rem/1.4 ui-monospace, Consolas, monospace; padding: 6px; }
+    .said { min-height: 1.5em; font-style: italic; color: var(--faded); }
+</style>
+</head>
+<body>
+<header>
+    <nav class="cm-nav"><span>content manager</span><a href="letters.html">your letters</a><a href="shelves.html">your things</a><a href="post.html">visitors</a><a href="notes.html">notes</a><a href="assets.html">assets</a><a href="kotodama.html" class="on">companion</a><a href="debug.html">debug</a></nav>
+    <h1>the companion</h1>
+    <p class="status">the little word-spirit in the house (sky/kotodama.js), and its voice (sky/babble.js). nothing here changes the site: it's for watching it, hearing it, and trying its voice out. its pictures are in assets → the little companion.</p>
+</header>
+<main>
+    <section>
+        <div class="stage"><iframe id="house" title="the house, with the companion in it" src="../living.html"></iframe></div>
+        <div class="rooms" id="rooms"></div>
+        <p class="status" style="margin-top:8px">browsers won't play a sound until there's been a click in the page: if it's quiet, click the room once.</p>
+    </section>
+    <aside>
+        <div class="sheet">
+            <h2>which one</h2>
+            <p class="sub">a different one comes each day of the week, and on everyone’s day (sunday) they’re all in, one in each room (today: <b id="liveKind">…</b>). which one comes when, and how each looks: assets → the little companion. trying another here shows it in the frame only.</p>
+            <div class="chips" id="kinds"></div>
+        </div>
+        <div class="sheet">
+            <h2>make it say something</h2>
+            <div class="chips" id="lines"></div>
+            <div class="row"><input type="text" id="words" placeholder="or some real words, turned into its babble…"><button class="chip" id="sayWords">say it</button></div>
+            <p class="said" id="said"></p>
+            <div class="row"><button class="chip" id="wav">save the last line as a sound (WAV)</button></div>
+        </div>
+        <div class="sheet">
+            <h2>make it think</h2>
+            <div class="row"><select id="idea1"></select><select id="idea2"><option value="">(and nothing else)</option></select></div>
+            <div class="row"><select id="end">
+                <option value="">and then whatever it likes</option><option value="idea">… an idea (it tells you)</option><option value="puzzle">… it can't work it out</option>
+                <option value="love">… it just likes it</option><option value="giggle">… it giggles</option><option value="sleepy">… it yawns</option><option value="scared">… it's scared</option>
+            </select><button class="chip" id="think">think</button></div>
+        </div>
+        <div class="sheet">
+            <h2>its faces</h2>
+            <p class="sub">each stays till it does something else.</p>
+            <div class="chips" id="faces"></div>
+            <div class="row"><button class="chip" id="poke">poke it</button><button class="chip" id="pat">pat its head</button></div>
+        </div>
+        <div class="sheet">
+            <h2>its voice</h2>
+            <p class="sub" id="sheetSays">…</p>
+            <div id="sliders"></div>
+            <p class="sub" style="margin-top:8px">liked it? copy this and give it to Claude (or put it into VOICES in sky/babble.js):</p>
+            <textarea id="numbers" readonly></textarea>
+        </div>
+    </aside>
+</main>
+<script>
+(function () {
+    var frame = document.getElementById('house');
+    var KINDS = { una: 'the sugar drop', pixie: 'the forest pixie', kitsune: 'the fox spirit', imp: 'the imp', hollow: 'the hollow guardian', mochi: 'the bunny mochi', sunday: 'everyone (sunday)' };
+    var LINES = { say: 'a remark', ask: 'a question', exclaim: 'an exclamation', muse: 'mm…', giggle: 'a giggle', sigh: 'a sigh', gasp: 'a gasp', hum: 'a little tune' };
+    var FACES = ['calm', 'happy', 'curious', 'thinking', 'idea', 'puzzled', 'sleepy', 'startled', 'scared', 'giggle'];
+    var ROOMS = { 'the living space': '', 'bathroom': 'bathroom', 'hallway': 'hallway', 'kitchen': 'kitchen', 'attic': 'attic', 'dungeon': 'dungeon', 'porch': 'porch' };
+    var SLIDERS = [['base', 'its note (Hz)', 80, 700, 1], ['dur', 'syllable (ms)', 30, 200, 1], ['gap', 'gap after (ms)', 10, 140, 1], ['bounce', 'pitch bounce', -60, 60, 1],
+                   ['formant', 'mouth size', 0.4, 2.2, 0.01], ['q', 'ringing', 1, 20, 0.1], ['reverb', 'room', 0, 0.7, 0.01], ['vib', 'vibrato', 0, 80, 1],
+                   // (these three only for a voice that talks with its sheet: how much each syllable rings out, the pace, the breaths)
+                   ['breathe', 'breathe', 0, 1, 0.01], ['pace', 'pace (ms)', 60, 320, 1], ['air', 'breaths', 0, 1, 0.01]];
+    var kind = 'una', room = '', lastPlan = null, today = '';
+    function W() { return frame.contentWindow; }
+    function K() { var w = W(); return w && w.Sky && w.Sky.kotodama; }
+    function B() { var w = W(); return w && w.Sky && w.Sky.babble; }
+    function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
+    function chips(box, list, on) { Object.keys(list).forEach(function (k) { var b = el('button', 'chip', list[k]); b.dataset.k = k; b.onclick = function () { on(k, b); }; box.appendChild(b); }); }
+    function wake() { var b = B(); if (b) b.wake(); }
+    function load() { frame.src = '../living.html?kotodama=' + kind + (room ? '#' + room : ''); }
+
+    chips(document.getElementById('kinds'), KINDS, function (k) { kind = k; mark('kinds', k); load(); });
+    mark('kinds', kind);
+    var rooms = document.getElementById('rooms');
+    Object.keys(ROOMS).forEach(function (n) { var b = el('button', 'chip stage-chip', n); b.onclick = function () { room = ROOMS[n]; load(); }; rooms.appendChild(b); });
+    chips(document.getElementById('lines'), LINES, function (k) { wake(); var c = K(); if (c) c.say(k, { then: noted }); noteSoon(); });
+    document.getElementById('sayWords').onclick = function () {
+        var t = document.getElementById('words').value.trim(); if (!t) return;
+        wake(); var c = K(); if (c) c.say('say', { text: t }); noteSoon();
+    };
+    var faces = document.getElementById('faces');
+    FACES.forEach(function (f) { var b = el('button', 'chip', f); b.onclick = function () { var c = K(); if (c) c.face(f); }; faces.appendChild(b); });
+    document.getElementById('poke').onclick = function () { wake(); var c = K(); if (c) c.poke(); };
+    document.getElementById('pat').onclick = function () { wake(); var c = K(); if (c) c.pat(); };
+    document.getElementById('think').onclick = function () {
+        wake(); var c = K(); if (!c) return;
+        var a = document.getElementById('idea1').value, b = document.getElementById('idea2').value;
+        c.think(b ? [a, b] : [a], document.getElementById('end').value || undefined);
+    };
+    function mark(box, k) { [].forEach.call(document.getElementById(box).children, function (b) { b.classList.toggle('on', b.dataset.k === k); }); }
+    // what it just said, in letters
+    function noteSoon() { setTimeout(function () { var w = W(), s = w && w.document.querySelector('.kd-words'); document.getElementById('said').textContent = s ? s.textContent : ''; }, 2500); }
+    function noted() {}
+    // every line it says goes through its voice: keep the last one, to save as a sound
+    function watchPlans() {
+        var b = B(); if (!b || b._labWrapped) return;
+        var plan = b.plan;
+        b.plan = function (v, o) { var p = plan(v, o); lastPlan = p; return p; };
+        b._labWrapped = true;
+    }
+
+    // the voice: its numbers, live, in the frame
+    function voice() { var b = B(), c = K(); return b && c ? b.voices[c.kinds[c.kind].voice] : null; }
+    function sliders() {
+        var box = document.getElementById('sliders'), V = voice();
+        box.innerHTML = '';
+        if (!V) return;
+        SLIDERS.forEach(function (s) {
+            if (V[s[0]] === undefined) return;
+            var l = el('label', 'sl'), name = el('span', '', s[1]), r = el('input'), out = el('output');
+            r.type = 'range'; r.min = s[2]; r.max = s[3]; r.step = s[4]; r.value = V[s[0]]; out.textContent = V[s[0]];
+            r.oninput = function () { V[s[0]] = +r.value; out.textContent = r.value; numbers(); };
+            l.append(name, r, out); box.appendChild(l);
+        });
+        numbers();
+        var b = B();
+        b.sheet(K().kinds[K().kind].voice).then(function (s) {
+            document.getElementById('sheetSays').textContent = s
+                ? 'its own sheet is in (' + s.slices.length + ' syllables' + (s.slices.length === 90 ? ', the midi’s whole set' : '') + '): it talks with your recording.'
+                : (b.awake ? 'no sheet of its own yet (assets/sounds/kotodama-' + K().kinds[K().kind].voice + '): it talks with its made-up voice.' : 'click the room once to hear it (and to see whether its sheet is in).');
+        });
+    }
+    function numbers() {
+        var V = voice(); if (!V) return;
+        var keep = {};
+        SLIDERS.forEach(function (s) { if (V[s[0]] !== undefined) keep[s[0]] = V[s[0]]; });
+        document.getElementById('numbers').value = K().kinds[K().kind].voice + ': ' + JSON.stringify(keep).replace(/"(\w+)":/g, '$1: ').replace(/,/g, ', ');
+    }
+    // the ideas it can think in
+    function ideas() {
+        var c = K(); if (!c) return;
+        ['idea1', 'idea2'].forEach(function (id, i) {
+            var s = document.getElementById(id), keep = s.value;
+            s.innerHTML = i ? '<option value="">(and nothing else)</option>' : '';
+            c.ideas.forEach(function (n) { var o = el('option', '', n); o.value = n; s.appendChild(o); });
+            if (keep) s.value = keep;
+        });
+    }
+    frame.addEventListener('load', function () {
+        var tries = 0;
+        (function ready() {
+            if (!K() || !B() || !K().ready) { if (tries++ < 40) setTimeout(ready, 150); return; }
+            if (tries === 0 || !today) { today = K().today; document.getElementById('liveKind').textContent = today === 'all' ? 'everyone, one in each room' : (KINDS[today] || today); }
+            watchPlans(); ideas(); sliders();
+            W().addEventListener('pointerdown', function () { setTimeout(sliders, 400); }, { once: true });
+        })();
+    });
+
+    // a line as a sound file: the frame's voice makes it again, offline, and it's saved as a 16-bit WAV
+    document.getElementById('wav').onclick = function () {
+        var b = B(); if (!b || !lastPlan) return alert('make it say something first');
+        b.render(lastPlan.voice, lastPlan).then(function (buf) {
+            var n = buf.length, ch = buf.numberOfChannels, data = new DataView(new ArrayBuffer(44 + n * ch * 2));
+            function str(o, s) { for (var i = 0; i < s.length; i++) data.setUint8(o + i, s.charCodeAt(i)); }
+            str(0, 'RIFF'); data.setUint32(4, 36 + n * ch * 2, true); str(8, 'WAVEfmt '); data.setUint32(16, 16, true); data.setUint16(20, 1, true);
+            data.setUint16(22, ch, true); data.setUint32(24, buf.sampleRate, true); data.setUint32(28, buf.sampleRate * ch * 2, true); data.setUint16(32, ch * 2, true);
+            data.setUint16(34, 16, true); str(36, 'data'); data.setUint32(40, n * ch * 2, true);
+            var chans = []; for (var c = 0; c < ch; c++) chans.push(buf.getChannelData(c));
+            for (var i = 0, o = 44; i < n; i++) for (var c2 = 0; c2 < ch; c2++, o += 2) data.setInt16(o, Math.max(-1, Math.min(1, chans[c2][i])) * 32767, true);
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([data], { type: 'audio/wav' }));
+            a.download = 'companion-' + lastPlan.voice + '-' + lastPlan.kind + '.wav';
+            a.click();
+        });
+    };
+})();
+</script>
+</body>
+</html>

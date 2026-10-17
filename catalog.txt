@@ -1,13 +1,14 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1476 2116773943
-city.html 9813 3026525575
-desk.html 6182 77729804
-index.html 5189 2299605303
-living.html 133380 101012811
-window-sky.html 1328 2834336155
-workshop.html 22036 360109889
+beyond.html 1480 2539729707
+city.html 9866 1241642564
+desk.html 6191 1572983318
+index.html 5247 426251188
+living.html 133705 33794559
+window-sky.html 1334 9384340
+workshop.html 22101 3948258982
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
+sky/babble.js 50324 4253238308
 sky/bathroom.js 29419 3573512770
 sky/bee.js 114096 3452333838
 sky/beerush.js 8186 121989627
@@ -35,6 +36,8 @@ sky/house.js 11177 2717587795
 sky/inkpad.js 21194 1444381312
 sky/inventory.js 17335 1835204345
 sky/kitchen.js 16998 1806270189
+sky/kotodama-look.js 24071 2300982920
+sky/kotodama.js 63821 329730468
 sky/letters.js 35904 3087320362
 sky/lives.js 12907 1753024506
 sky/loader.js 17385 2560693991
@@ -96,6 +99,7 @@ sky/css/hell.css 10082 3168670266
 sky/css/inkpad.css 8326 4156737891
 sky/css/inventory.css 6010 1973479581
 sky/css/kitchen.css 17618 2309699175
+sky/css/kotodama.css 15615 3748437786
 sky/css/letters.css 4656 2777016701
 sky/css/lives.css 2940 2301746507
 sky/css/loop.css 2368 1703632058
@@ -188,7 +192,8 @@ assets/sounds/door.ogg 38593 2514500049
 assets/sounds/dungeon.ogg 9042074 3983005707
 assets/sounds/evilrecord.ogg 2395055 1207379049
 assets/sounds/hobo.ogg 282187 3952305689
-assets/sounds/list.txt 243 1819917398
+assets/sounds/kotodama-una.ogg 2194576 1509732310
+assets/sounds/list.txt 260 716776462
 assets/sounds/paper-roll.ogg 18779 2371072433
 assets/sounds/paper-unroll.ogg 21868 3550942193
 assets/sounds/rain.ogg 867714 3232814227

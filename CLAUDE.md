@@ -417,6 +417,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `kitchen.js` (the kitchen off the hallway, the fridge, stove, microwave and the serpent), `hell.js` (reset 4: below, the white
   revolver, the eye and the key), `ambient.js` (the house's soundtrack when no record's on), `static.js` (the screen's static),
   `bee.js` (the bee in the front garden, skizy's BeeLLM: see *The bee in the front garden*),
+  `babble.js` / `kotodama.js` (the little companion in the house and its voice: see *The little companion*),
   `veil.js` / `watchers.js` / `loop.js` / `source.js` (resets 5, 6, 7, 8: see *Resets 5 to 8*; on every page, just before
   resets.js, which needs veil.js's wallpaper there to hide reset 5's key in).
 
@@ -982,6 +983,142 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (bee.js grabs the gun); a shot cuts off whatever's being said; nothing while the bee's armed. **Once only** (12 Oct, Victor): the click sets localStorage `bee-rush-taken`; the tag never shows again, and
   revolver.js puts the revolver back in the bag at each visit for that visitor (not reset 4, not `revolver-gone`, not the bee's),
   so the rooftop's / wall's pickup stays empty (`.taken`). **To take it away**: `ON = false` at its top, or remove the two lines from living.html and the two files.
+
+## The little companion (sky/kotodama.js, sky/babble.js, 17 Oct)
+
+- Victor: take Argon's KOTODAMA voice lab (a 3D gummy creature + Ōkami-style formant babble; Victor didn't like the 3D) and make it
+  **a 2D sprite companion on the site that bounces as it moves along the floor**, ready for the asset manager, with the babble as
+  **its own voice module**, speaking **random gibberish with expressions that imply it's thinking things**; the Una Sugar voice gets
+  **its own unique sprite** (each of Argon's archetypes has its own look). Victor rendered a syllable sheet in Vocaloid 6 with AI Una
+  Sugar from a midi Claude made (30 syllables, a i u e o … ra ri ru ro, at A4, then C5, then G4, a rest after each).
+- **sky/babble.js** (`Sky.babble`, no CSS; living.html, and tools/kotodama.html standalone): `VOICES` (una, pixie, kitsune, imp,
+  hollow, mochi: base Hz, scale, wave, formant, q, hpf/lpf, bounce, fm, dur/gap ms, plosive, chirp2, reverb, vib, gliss, favour
+  syllables, squish style). `plan(voice, { kind, words | text, speed, pitch, seed })` → `{ events: [{ t, syl, txt, hz, dur, vowel,
+  loud, sing, muse, first, last, ask, exclaim, word }], total, text }`; kinds say, ask (up at the end), exclaim, muse ("mm…", mouth
+  shut), giggle, sigh, gasp, hum (`TUNES` over the line, snapped to the voice's scale). Real text: each word hashed to syllables
+  keeping its vowels (the same word always sounds the same). `say(voice, plan, { syl(ev), done })` schedules every syllable on the
+  audio clock up front and calls syl() as each sounds; `render(voice, plan)` → an AudioBuffer offline (the companion page's WAV).
+  One AudioContext, made on the first pointerdown/keydown (never before), level = `.75 × Sky.sounds.sfxVolume / .7`, 0 when
+  `Sky.sounds.hushed`, a gentle limiter, a shared small room. **Two engines**: the made-up voice (`synthSyl`: Argon's two oscillators
+  + fm chirp + three formant bandpasses + a consonant puff, tidied) and **a sheet** (`sampleSyl`): `assets/sounds/kotodama-<voice>`
+  (.ogg/.mp3 only: the server won't serve .wav; **findAsset needs the extensions spelled out for sounds**:
+  `slot + '.ogg|' + slot + '.mp3'`, its default EXTS are pictures), loaded once the sound's allowed (`want(voice)`), `chop()` cuts
+  it wherever it's under 2% of its loudest for 60 ms (30 ms kept before, 20 after), measures each piece's note (autocorrelation) and
+  level (`norm`); 90 pieces = the midi's 30 syllables × 3 notes (30 = one row; anything else: unlabelled sounds). A syllable plays
+  the piece with that label nearest the wanted note, nudged by playbackRate (0.6–1.6), a little swoop (`bounce`), held notes loop
+  the vowel's middle with vibrato. Checked: Victor's sheet cuts into exactly 90, rows measured 437 / 519 / 390 Hz.
+  **Breathing** (17 Oct, Victor: the first demo sounded "too spliced"): a sheet voice with `breathe` (una .8) plays most of each
+  syllable as sung (natural length × (.45 + .55 × breathe)), ringing into the next (`ev.next`) and fading by `setTargetAtTime`, not
+  cut; the whole tail at a word's end; a gentler swoop; `pace` (150 ms) replaces dur + gap once the sheet's in (plan reads
+  `V.sheetReady`); `air` (.35) adds a soft filtered-noise breath (`breath()`) out at each word's end and in before a line (plans
+  start .16 s late for it). Measured on the demo: hard cut-offs 21 → 7.
+  **No pitching** (17 Oct, Victor: "don't pitch this one", keep the voicebank's own breathiness): `nopitch: true` on una plays each piece
+  at rate 1 (no swoop, no added vibrato, no loop); held notes and word ends play it out whole, others ring into the next. `air` 0 (no
+  made-up breath). `chop()` now keeps quiet pieces (peak < .3 × the median: Vocaloid's breaths) as the tail of the syllable before
+  (within .5 s; one before the first note is dropped), measures the note on the sung part only (`sung`), and `SHEET_LAYOUTS` gives each
+  row's note by count (30, 90, and 450: Claude's 15-row midi `kotodama_sheet_15rows.mid`, A major pentatonic E3 to C#6), used when
+  the measured note is over 1.5 semitones off. Checked on a made-up 450-note sheet with breaths: 450, rows right, breaths attached.
+  **The sugar scale and the real 450 sheet** (17 Oct, Victor: "make the site character use this for all its babble, no chopping,
+  allow syllables to breathe but do randomize and allow it to slot into the predetermined scales. Also create a proprietary scale
+  or fitting scale for this vocaloid. It should be sweet and endearing"). His `sugar_drop_sheet.wav` (the 15-row midi sung by AI Una
+  Sugar) is in as `assets/sounds/kotodama-una.ogg` (put in through content.py `asset_put`: opus 56 kbps mono, 2.2 MB; Claude
+  shortened the rests between notes to .2 s first, which `chop` doesn't mind: it needs 60 ms). It cuts into exactly 450, rows
+  measured 164 to 1109 Hz, each piece ~.47 s with its breath. una now: `breathe: 1` = **every syllable plays whole**, as sung, never
+  faded early ("no chopping" read as that: the sheet still has to be found syllable by syllable), `pace` 230 ms, and each step's
+  timing jittered .8 to 1.2 so it never ticks. **The sugar scale** (`SCALES.sugar` [0 2 4 7 9]; `SUGAR_NOTES` = the sheet's 15 rows;
+  `SUGAR[kind]` = { range, start, end } in rows; `sugarLine(kind, n, r)` → a row per syllable; on with `V.melody: 'sugar'`, plan's
+  `sweet`; other voices still use `TUNES`): A major pentatonic heard as one A6/9 chord (no half steps, so no two notes ever clash),
+  home high and light round C#5/E5; mostly one-row steps, now and then a little leap up that falls back a step after; a remark rests
+  on C#5 or A4, a question floats up to F#5 or B5 (left open), an exclamation starts on A5 and tumbles, a giggle climbs, a hum rocks
+  like a lullaby (`[0,-1,-1,1,-1,-1,1,1]`), a sigh drifts down to F#4, "mm…" stays on E4/F#4, a gasp is one high note. Every note is
+  one she really sang, so nothing is ever bent.
+  **Moved down to the octave from C4** (17 Oct, Victor: "make c4 the base octave and only go one octave above and below"): its home is
+  now octave 4 (A4, F#4, C#4) and it never leaves C3 to B5 (`SUGAR_LOW`/`SUGAR_HIGH`: rows 0 to 13, so the sheet's top C#6 is never
+  used). Remarks rest on A4/C#4, questions on B4/F#5, exclamations from E5 down to A4/E4, giggles climb to B5 at most, gasps E5,
+  hums round A4, sighs A4 → C#4, "mm…" F#3 to C#4. `sugarHz(row, pitch)`: a pitch slider moves whole rows (2.4 semitones each),
+  clamped to that range. Checked: 400 lines of each kind at pitch 0 and ±12 stay between 165 and 988 Hz (E3 to B5). Checked 17 Oct: every kind of line lands on the rows (e.g. say 659 554 659 554,
+  ask … 740), the demo renders clean (no NaN), the living room loads it with no errors. Not heard by Claude: Victor to listen.
+  `squish(voice, 'jump'|'land', k)`: Argon's gel squishes by style (sugar adds a crystal tinkle), or `assets/sounds/kotodama-hop|land`.
+- **sky/kotodama.js** (`Sky.kotodama`) + **sky/css/kotodama.css**, living.html only (after beerush.js, babble.js first). (no `KIND` any more, 17 Oct: the week decides, below)
+  at the top (localhost: `?kotodama=<kind>`); `HINTS = true`. **Kinds** (`KINDS`: name, voice, hop, spring, pace, chat, wonder, scale,
+  colours): una "the sugar drop" (a pink gumdrop, a swirl on top, sugar crystals, a ribbon bow: original, not the voicebank's
+  character), pixie (dewdrop, antennae, fairy wings), kitsune (fox ears, flame mark, tail, two lights), imp (horns, bat wings, tail),
+  hollow (carved totem, floating ring), mochi (bunny mochi, one floppy ear). The **drawn stand-in** (`standIn`: 200 × 200, bottom at
+  196): `BODY[kind]` (path, face height, back/front parts) + one face (`faceSvg`) with every expression drawn and shown by
+  `.kd-home[data-face]` in the CSS (calm, happy, curious, thinking, idea, puzzled, sleepy, startled, scared, giggle), eyes follow
+  `--lx/--ly`, blinking, mouth open/round per syllable (`.mouth-open[data-vowel]`). **Victor's art**: `assets/characters/
+  kotodama-<kind>[-moving]` (body, facing right, bottom on the canvas's bottom) with `-face`, `-face-<expression>`, `-face-talking`,
+  `-face-blink` over it on the same square canvas (slots.json `guide` = the body), like the bee's pieces.
+- **Where it is**: `ROOMS` (living .room, bath, hall, kitchen, attic, dungeon, porch: host, floor, `z`), appended into the room's own
+  element, `left` % of it, `bottom: --kd-floor` (1.8vh; the dungeon 6.6vh), z = its traveller's + 1 (the dungeon: 5, over the dark so
+  its bubbles read, its body dimmed by CSS instead). Size `max(46px, --traveller-h × .21 × kind scale)`. It follows on
+  `Sky.house.on('enter')`, coming in from the side the traveller's on; **the garden** (`front`): it hides (`.kd-away`) and on the way
+  back in (`leave front`, or the brain noticing) greets them. First placement waits for the traveller to be visible.
+- **Hopping** (rAF only while moving): a 75 ms crouch, a launch (height `.42 × size × hop`, gravity `22 × size`), stretch by vertical
+  speed, lean into the hop, landing squash and a jelly spring (K 150), shadow shrinking with height; following they hop ~2× further and
+  quicker. Reduced motion: it glides, no squash. `clearSpot()` keeps it from stopping on `.room-arrow, .attic-hole, .porch-steps,
+  .hall-out`; `bounds()` is the room less a margin (the phone's wide porch: the part on screen).
+- **Its brain** (`brain()`, every 320 ms): follow when the traveller walks or it's 4+ of its sizes away (back if 3+ when idle); moods
+  (`scared` in the dungeon, `groove` while a record plays, `sleepy` when `--night` > .6); then weighted choices: wander (near them),
+  visit (`ROOM_THOUGHTS`: hop to a thing and think about it), muse (`IDLE_THOUGHTS`), look, chat (turns to them, every 14 s at most),
+  hum, bop (records), nap (night: `.napping`, zzz), cower (dungeon), hint. **A thought** (`muse`): thinking face, maybe a hummed
+  "mm…", the cloud with "…" then the pictures one by one (`IDEAS`: 34 ink sketches, slots `kotodama-idea-<name>`; glue + → …), then
+  `conclude`: idea (lightbulb/!, a gasp, then exclaims about it with the picture in its speech bubble), puzzle (?, a question), love
+  (heart, hum/giggle), giggle, sleepy, scared, hold (the map). **HINTS** (`HINT` by reset: 3 fridge/pie, 5 the peeling wallpaper,
+  6 the still watcher, 7 the microwave, 8 the serpent): after 70 s in that room without the key (or gnosis), at most every 150 s, it
+  goes and wonders "key ?" there.
+- **You**: `.kd-hit` (in `.kd-hop`, moves with it): click the body = poke (startled, then giggle; 4 in 5 s: a vein and it sulks off),
+  the head (top half) = pat (happy, heart); `cursor-poke`/`cursor-pat` like the bee; holding a revolver: it's scared and hops away;
+  `dav:bang` anywhere: scared, back to the traveller. Asleep: a poke wakes it, cross. Bubbles stay on screen (`--say-dx`,
+  `--think-dx`). Porch: `brightness(--pd)`; kitchen/attic dim with dusk.
+- `Sky.kotodama = { el, kinds, ideas, kind, room, mood, expression, become(kind), say(kind, o), think(ideas, end), face, puff, poke,
+  pat, hop(x) }` (talk options: icon, words, text, face, nobubble, hold, then).
+- **Asset manager**: scene `companion` ("the little companion") in tools/slots.json, inserted before "characters" by a script (the
+  file's own formatting kept), 130 slots: a group per kind (body, moving, face, 9 expressions, talking, blink: all with `guide`), the
+  thought pictures, the puffs (`kotodama-fx-<name>`), sounds (`kotodama-<voice>` sheets, hop, land). Its map is living.html with views:
+  thinking (`think([...], 'hold')`), talking (`say(..., { hold: true })`), and each other kind (`become`).
+- **tools/kotodama.html** ("companion" in every content manager page's links; debug.html too): living.html in a frame
+  (`?kotodama=<kind>`, room buttons), make it say each kind of line or real words, think (two pictures + an ending), faces, poke/pat,
+  the voice's sliders (live in the frame only) with the numbers to copy into `VOICES`, whether its sheet is in, and "save the last
+  line as a sound" (`render` → 16-bit WAV).
+- Tested 17 Oct (cloud, Playwright): every voice × every line kind rendered offline (no NaN, peaks .3–.9), the sheet cut into 90,
+  every room on desktop and phones, following into the bathroom, the garden away/welcome, poke/pat, the asset manager's tab and
+  views, the companion page (lines, think, WAV), and the smoke test (resets 1, 4, 8: all good). Not heard by Claude: Victor to
+  listen and tune (the companion page's sliders).
+
+- **A different one each day, everyone on sunday, and a menu for their looks** (17 Oct, Victor: "keep the tweaking menu in the assets
+  manager under the companion tab and make the companion that shows up different for each day of the week with sunday being a day where
+  they're all around the house in different locations"; Argon's lab had a look menu the 2D rework had left out):
+  - **sky/kotodama-look.js** (`Sky.kotodamaLook`, no CSS; living.html just before kotodama.js, and the asset manager): the drawing moved
+    here from kotodama.js. `DEFAULTS` (the six: name, voice, ways, brave/cheeky, parts, colours) and parts any kind can wear: `SHAPES`
+    (gumdrop dewdrop bun plump totem mochi: path, top, face), `HEADS` (swirl antennae foxears horns halo bunnyears none; `at` = the top
+    each was drawn for, moved to the body's top; bunny ears go behind), `WINGS` (fairy bat), `TAILS` (fox devil), `EXTRAS` (crystals bow
+    sheen flame lights carvings stones nose; `skin` ones clipped to the body, `at`/`atFace` moved with the top or the face), `clear` (the
+    body's opacity, .35 to 1: a see-through gummy), `shine`, `face` (its face up or down). `spec(kind, saved)`, `svg(spec, id)`,
+    `plan(saved)` (week + sunday). The defaults draw as before (checked pixel by pixel: at most 21 px differ, anti-aliasing). Fairy wings
+    flutter by `.k-wings.fairy` now (kotodama.css), not `data-kind="pixie"`.
+  - **The week** (`WEEK`, by the visitor's own `getDay()`): sun everyone (`'all'`), mon mochi (the moon's rabbit makes mochi), tue imp
+    (Mars), wed kitsune (the trickster), thu hollow (the thunder), fri una (Venus), sat pixie. **Everyone's day** (`SUNDAY`): living una,
+    bath pixie, kitchen mochi, attic hollow, porch kitsune, dungeon imp (`brave`: calm down there), hall nobody.
+  - **kotodama.js**: everything about one companion is inside `Companion(kind, { stay, at })` (its own element, timers, voice and
+    listeners). A weekday one follows as before. One with `stay` lives in its room (`settle()` at the start, wherever you are): asleep to
+    the world while that room isn't showing (`here()`; `goQuiet()` on leaving stops it mid-word), `comeIn()` when you enter (finds its
+    feet, says hello: hops over if it's far, `welcome()`), watches you while you walk, wanders its whole room, comes over to chat, never
+    follows. `Sky.kotodama` is a front for the one in the room you're in (`lead()`), holding calls until they're made (`ready`); `all`,
+    `today` (the real day's: a kind or 'all'), `kinds` (specs with the tweaks), `restyle(saved)` (try a look without keeping it). It
+    starts once `assets/characters/kotodama-looks.json` has been looked for (findAsset; none = the defaults). The asset manager's map
+    (`?map`) always has the sugar drop alone. Localhost: `?kotodama=<kind | sunday | monday…>`.
+  - **The menu** (tools/assets.html `looksBlock`, at the top of the companion tab; the page links /sky/css/kotodama.css and
+    /sky/kotodama-look.js): the six as little drawings with their days; a big live drawing (every face, a hop, day/night); who it is
+    (name, voice, brave, cheeky), its shape (body, head, wings, tail, extras), nine colours, what it's made of (solid to see-through,
+    shine, where its face sits), its ways (size, hop height, wobble, hop length, chatty, curious), "put it back as it was made"; who comes
+    which day (each day: a kind or everyone) and who lives in which room on everyone's day. As it changes, the map's house tries it on
+    (`restyle`, and `become` the one being changed). "keep these" puts the JSON (only what differs from the defaults: `prune`) in the slot
+    `assets/characters/kotodama-looks` (kind json, its own group in slots.json) through the normal upload, so content.py writes the
+    folder's list; publishing sends it live. Removing that slot's file puts everything back.
+  - Tested 17 Oct (cloud, Playwright): monday, friday, the imp; sunday (six in six rooms, hellos in the kitchen and attic, the imp calm in
+    the dungeon, the fox on the porch on a phone); the menu (the imp given the mochi body, a swirl, a green body, monday → everyone; the
+    map tried it; kept; the file; the site using both); the companion page; the smoke test (resets 1, 4, 8: all good).
 
 ## The porch (sky/porch.js)
 
