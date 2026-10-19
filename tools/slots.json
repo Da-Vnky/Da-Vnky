@@ -857,6 +857,17 @@
        "glow": true
       },
       {
+       "slot": "assets/sea/city",
+       "what": "the port city the dock leads to: from just left of the dock to the right-hand edge, standing on the sea's floor, as tall as the sea plus 34% of the screen, so it rises up past the sign (see-through above the roofs; it's dimmed at night; -glow: its lit windows and lamps, warm, fading in at dusk). it stays still while the sea drifts (it's far off), its right edge at the screen's",
+       "size": "taller than wide, about 3:4, e.g. 920 x 1200, kept to its bottom-left corner",
+       "glow": true
+      },
+      {
+       "slot": "assets/sea/rock",
+       "what": "the rocks in the foreground, bottom left, out of focus (blurred for you, so draw them sharp): one picture, a big rock in its left 64% and a middling one just to its right, overlapping a little (or however your group goes). the big one's right edge drifts from a quarter of the screen in to near the edge as the scene pans. see-through round them, standing on the bottom edge",
+       "size": "about 1.86 : 1, e.g. 1560 x 840"
+      },
+      {
        "slot": "assets/sea/crab",
        "what": "the crab on the dock (dances to music)",
        "size": "about 3:2"

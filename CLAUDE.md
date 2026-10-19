@@ -360,7 +360,8 @@ this before changing anything; keep it up to date when something here stops bein
 
 ## The pages
 
-- `index.html` — the sea (homepage): scroll = the day turning; ship you can pick up; dock; bottles. Its signpost
+- `index.html` — the sea (homepage): on the visitor's clock like every page since 19 Oct (no scrolling: see *The sea drifts*);
+  ship you can pick up; dock; bottles. Its signpost
   has **one sign** since 11 Oct (Victor): **"visit home"** (→ `living.html#front`, the front of the house); "the sea" is a
   tab only. On big screens it hangs lower (sky.css: `top: 50vh` from 1101 px wide), and the post ground-sea.js draws on the
   dock reaches up to wherever the sign actually is (`.signpost`'s top), so it's shorter. The workshop, rooftop and rooms
@@ -421,6 +422,57 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `veil.js` / `watchers.js` / `loop.js` / `source.js` (resets 5, 6, 7, 8: see *Resets 5 to 8*; on every page, just before
   resets.js, which needs veil.js's wallpaper there to hide reset 5's key in).
 
+## The sea drifts: the pan, the rock, the port city, night on the waves (19 Oct)
+
+- Victor: "remove the scroll mechanic, and just make the scene slowly move from one side to another"; a rock in the foreground on
+  the left, out of focus, from a quarter of the way in to the very left "so that it's framing the scene by the end"; "a port city
+  on the right side that overlaps the waves that are in the dock's width … It should light up at night with a warmness"; and his
+  bright waves dimmed by the day/night cycle.
+- **No scroll**: sky.js `still = !body.hasAttribute('data-scroll-time')` (index.html lost `data-voyage`); the sea is on the clock.
+  The homepage's body-level `.credit` is hidden (ground-sea.css; letters.js still puts a copy at the foot of the letters).
+- **The drift** (ground-sea.js `PAN_VW` 7, `PAN_SECS` 120 → `--sea-pan`, `--sea-pan-s`, `html.sea-pan`; not with reduced motion or
+  `?map`): CSS animations on the **`translate` property** (sky.css moves `.ground` with `transform` for the telescope and rooms):
+  `.ground-sea` is `right: -7vw` wider and slides `0 → -7vw` and back (`sea-pan`, ease-in-out, alternate); the waves get their own
+  extra (`sea-wave`, `--wave-pan` on `.wave-move-1…4`: +2.2, -.6, -1.6, -3 vw, so the far ones move least); the signpost the same
+  as the sea from 1101 px wide (its post on the dock is drawn at `W - panPx() - 68`, `panPx()` = how much wider than the screen
+  the sea is). All start in one style pass, so they stay in step. The ship starts at 36% (was 3%), clear of the rocks.
+- **The swell**: `TIDE` (0.2 radians a second: Victor found 0.045 "far too slow", then 0.4 twice too fast; each wave back and forth in 26-31 s; and `SQUASH` .035: each wave's
+  box also scales from its bottom, `scale(1 - q*.3, 1 + q)`, on a slower beat of its own, Victor: "the illusion of changing water
+  depth") added to each wave's sway (`paintWaves`) and the ship's rock (`placeShip`), run by an
+  rAF loop (`swell`, skipped while the ship's sailing off or held). **Each wave is in a box of its own**: `wave()` makes
+  `div.layer.wave-move.wave-move-N > svg.wave.wave-N`; the JS moves the box (`movers`), the svg inside keeps its filter, so the
+  drop-shadow and night dimming are painted into the box once (with the filter on the moving element itself, headless Chromium
+  ran at a third of the speed). `Sky.sea.front` is `.wave-move-4` now (letters.js / post.js insert before it).
+- **The ship stays where it's put** (Victor, later on 19 Oct: "don't lock the boat in place anymore. Wherever you place it, it
+  stays, if you place it near the dock, the character should jump out onto the dock"): on release `placeHere()` turns its spot into
+  `placed` (its left edge as a share of the sea's width, sessionStorage `sea-ship-at`: the visit; a reset clears it) and only `y`
+  and `s` tween back (down onto the water); reset 2's drop no longer drifts back. `shipLeft(p)` returns the placed spot, else the
+  voyage as before. `shipDocked()`: placed → `dockGap()` (dock's end minus the ship's bow) < `NEAR_DOCK` 70 px (or over the dock),
+  else night (p ≥ .965); `shipAway()`: placed → gap > 1.6 × that, else p < .94. `tendCrew` uses them (called after each release):
+  docked → `goAshore` (hop onto the dock, walk to the sign); away while ashore → `goAboard(false)` (startle, then dive after it).
+  Someone who walked in from another page still waits on the dock (`crew.stay`) until the ship is brought to them.
+- **Night on the sea**: `.ground-sea { --sea-dim, --sea-sat }` from `--dusk`/`--night` (down to about .34 brightness, .6
+  saturation at night): every wave (`brightness() saturate()` before its drop-shadow), and his dock and ship pictures
+  (`.dock .art:not(.glow-layer)`, `.ship .art:not(.glow-layer)`: CSS filters on SVG `<image>`s work in Chromium and Firefox).
+- **The rocks** (`.sea-rock`, fixed, z 2, `data-asset="assets/sea/rock"`, a drawn stand-in; Victor, later on 19 Oct: "add a medium
+  sized one directly to the right of it, they should overlap slightly, make it one asset", he'll paint the group himself): one
+  picture (viewBox 780 x 420: the big rock in 0-500, the middling one 440-774 behind it), 47vw x 42vh, `xMinYMax meet` / `contain`
+  left bottom, `blur(7px)`, dimmed at night; `sea-rock`: translate -5vw → -17vw (the big rock's right edge about 25vw → 13vw).
+  Phones 78vw x 30vh, `sea-rock-phone` -25vw → -37vw. Hidden in the sky view and the telescope, **not** while leaving (Victor: it frames the
+  page till the next one loads). **They lean**: a pointermove (not touch, not reduced motion) sets a target from where the pointer
+  is, eased to by rAF (`leanStep`, 6% a frame), as `transform: translate3d()` up to `LEAN_X` 1.2vw / `LEAN_Y` .8vh against the pointer
+  (the drift uses `translate`, so they add up).
+- **The port city** (`.sea-city`, in `.ground-sea` after wave-1, before the dock: in front of the far waves, behind the dock and
+  the nearer waves; `data-asset="assets/sea/city"` + `-glow`): `buildDock` sets its left (dock's left - 40 px; on a phone the right
+  half of the screen), right 0, bottom 0, `height: calc(100% + 34vh)`: up past the sign (Victor, later on 19 Oct; phones + 14vh). The
+  stand-in (`CITY` in ground-sea.js, viewBox 460 x 600: a hill rising to the right with two paler tiers of houses and a castle,
+  then a row of houses, a spire, a dome and a lighthouse on an arched quay, `preserveAspectRatio xMinYMax slice`) dims with `--dusk`; its
+  lights (`.cl`: windows, quay lamps, the lighthouse) come on with `--dusk`. **It doesn't drift** (Victor: "it's in the distance and it
+  moving breaks the illusion of depth"): `sea-still` slides it back exactly as the sea slides on (same length and easing), and
+  `right: var(--sea-pan)` ends it at the screen's edge; so the dock (which drifts) slides along its front. The lights are warm, plus a warm haze (`::after`, screen blend).
+- Tested 19 Oct (Playwright, 1600 x 900 and 390 x 844): day, golden hour and night at both ends of the drift, the ship picked up
+  and dropped, reduced motion (no drift, the rock at its framing place), the smoke test (only this copy's missing sounds).
+
 ## The sky's clock (sky.js: `sunClock`, `sunTimes`, `SKY_AT`)
 
 - **The sky view** (a room's window, the telescope, anything `.sky-viewer`; sky.js `openSkyView`), 16 Oct, Victor: **a window
@@ -433,14 +485,15 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   two or three overlapping triangles, `.t1-.t3`); `.sp-pause` beside it stops. Space: play (slow) / pause. Speeds unchanged
   (120, 60, 25 s from midday to midnight). The old slow / gentle / brisk word buttons are gone.
 - **The birds' flock** (16 Oct, Victor: "two more staggered around it so they look like they're flying in a flock"): sky.js
-  `FLOCK` (% of the flyer's box: left, top, width, and a start lag in s), `makeFlock` on the birds' `asset` event clones his
+  `FLOCK` (% of the flyer's box: left, top, width, and a start lag in s; 19 Oct, Victor: the left one, `y: -78`, a little higher
+  than the other two), `makeFlock` on the birds' `asset` event clones his
   picture twice (`img.art.flock`, behind the first), `flockStart` at each flight starts each one's picture again from frame 0
   (a fresh blob URL each, `lag` apart, `img._t0` on load) so they flap out of step. `Sky.flock = { members, layout, start }`.
   ropes.js (resets 1–2) adds a rope per bird (`flockRopes`, on the flyer's `flock` event), and each bird's beat tugs it and its
   own rope (`beats`: per chain `bob`, the bird's `img.style.translate` and its chain's together). The drawn stand-in is a little
   flock of its own and gets none of this.
 
-- Away from the homepage's scroll, the sky follows the **real sun where the visitor is**: sunrise and sunset
+- Everywhere (the homepage too since 19 Oct; only a page with `data-scroll-time` still turns the day by scrolling), the sky follows the **real sun where the visitor is**: sunrise and sunset
   are calculated in the browser (almanac sums, no service) from `localStorage["weather-place"]` (the city
   the visitor's time zone names, geocoded once via open-meteo and shared with weather.js; or their exact
   spot if they gave it). Until then: latitude 35°, longitude from the clock's UTC offset.

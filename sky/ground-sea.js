@@ -1,26 +1,103 @@
 /* =====================================================================
    ground-sea.js — Hokusai-style paper-cut sea, with a ship you can pick up.
    Load after sky/sky.js.
+
+   (19 Oct) no scrolling any more: the sea follows the visitor's clock like every other page, and the scene drifts
+   by itself, very slowly, from one side to the other and back (the camera panning along the shore: PAN_VW, PAN_SECS):
+   the far waves move least, the near ones most, the port city and the dock with the sea, and a rock in the
+   foreground, out of focus (assets/sea/rock), slides from a quarter of the way in to the very edge, framing the
+   scene by the end. the waves rock gently by themselves (TIDE). on the right, behind the dock, a port city
+   (assets/sea/city, + city-glow: its lights) that lights up warmly at night.
    ===================================================================== */
 
 (function () {
     var Sky = window.Sky;
     var sfx = Sky && Sky.sfx;
+    var PAN_VW = 7;                 // how far the scene drifts, side to side (% of the screen's width)
+    var PAN_SECS = 120;             // seconds to drift one way (then it drifts back)
+    var TIDE = 0.2;                 // how fast the waves rock by themselves (radians a second: each wave back and forth in about 26-31 s)
+    var SQUASH = 0.035;             // and how much each wave squashes and stretches as it goes (the water deepening and shallowing)
+    var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var panning = !calm && !document.documentElement.classList.contains('dav-map');
 
     // (its look is in sky/css/ground-sea.css, linked from each page's head)
 
     /* ---------------- markup ---------------- */
     // each wave: data-base = trough line (fraction of the sea's height from the top),
     // data-h = crest height (fraction), data-w = crest width in px
+    // (19 Oct) each wave sits in a box of its own (.wave-move) and it's the box that moves: the wave's shadow and its night
+    // dimming are then painted into the box once, instead of worked out again every frame as it rocks (half the speed)
     function wave(n, base, h, w, off) {
-        return '<svg class="layer wave wave-' + n + '" data-base="' + base + '" data-h="' + h + '" data-w="' + w + '" data-off="' + off + '" data-seed="' + n + '">' +
-               '<path class="body" fill="currentColor"/><path class="lines"/><path class="foam"/></svg>';
+        return '<div class="layer wave-move wave-move-' + n + '">' +
+               '<svg class="wave wave-' + n + '" data-base="' + base + '" data-h="' + h + '" data-w="' + w + '" data-off="' + off + '" data-seed="' + n + '">' +
+               '<path class="body" fill="currentColor"/><path class="lines"/><path class="foam"/></svg></div>';
     }
+    // the stand-in port city: a harbour town climbing a hill behind the dock, up past the sign: a row of houses and a
+    // lighthouse on a stone quay, more houses up the slope, a castle on top (lights: .cl, lit at dusk)
+    var CITY = (function () {
+        var b = '', l = '', W = 460, H = 600, Q = 530;                    // Q: the quay's top
+        function rnd(n) { var r = Math.sin(n * 12.9898 + 78.233) * 43758.5453; return r - Math.floor(r); }
+        function hill(x) { return 470 - 330 * Math.pow(Math.min(1, Math.max(0, x / W)), 1.15); }
+        function R(x, y, w, h, c) { return '<rect' + (c ? ' class="' + c + '"' : '') + ' x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + h.toFixed(1) + '"/>'; }
+        // a house: its wall, its roof (0 flat, 1 pitched, 2 dome, 3 spire), and windows (dark by day, some lit at dusk)
+        function house(x, w, h, base, roof, wall, top, seed) {
+            var y = base - h;
+            b += R(x, y, w, h, wall);
+            if (roof === 1) b += '<path class="' + top + '" d="M' + (x - 3) + ' ' + y + 'L' + (x + w / 2) + ' ' + (y - w * 0.42) + 'L' + (x + w + 3) + ' ' + y + 'Z"/>';
+            if (roof === 2) b += '<path class="' + top + '" d="M' + x + ' ' + y + 'a' + (w / 2) + ' ' + (w * 0.55) + ' 0 0 1 ' + w + ' 0Z"/>' + R(x + w / 2 - 2, y - w * 0.55 - 14, 4, 16, top);
+            if (roof === 3) b += '<path class="' + top + '" d="M' + (x - 2) + ' ' + y + 'L' + (x + w / 2) + ' ' + (y - 64) + 'L' + (x + w + 2) + ' ' + y + 'Z"/>';
+            if (roof === 0) b += R(x - 2, y - 6, w + 4, 6, top);
+            for (var wy = y + 12; wy < base - 18; wy += 24) for (var wx = x + 7; wx < x + w - 11; wx += 14) {
+                b += R(wx, wy, 6, 10, 'cw');
+                if (rnd(seed * 31 + wx * 0.7 + wy * 1.3) < 0.6) l += R(wx, wy, 6, 10);
+            }
+        }
+        // the hill
+        var hp = 'M0 ' + H;
+        for (var hx = 0; hx <= W; hx += 20) hp += 'L' + hx + ' ' + hill(hx).toFixed(1);
+        b += '<path class="ch" d="' + hp + 'L' + W + ' ' + H + 'Z"/>';
+        // the castle on top
+        var cx = 300, cb = hill(cx + 30) + 16;
+        b += R(cx, cb - 120, 34, 120, 'c6') + R(cx + 34, cb - 70, 60, 70, 'c6');
+        for (var k = 0; k < 4; k++) b += R(cx + k * 9, cb - 128, 6, 8, 'c6');
+        for (k = 0; k < 6; k++) b += R(cx + 36 + k * 10, cb - 77, 6, 7, 'c6');
+        l += R(cx + 13, cb - 100, 8, 12) + R(cx + 52, cb - 52, 7, 11);
+        b += R(cx + 13, cb - 100, 8, 12, 'cw') + R(cx + 52, cb - 52, 7, 11, 'cw');
+        // houses up the slope (two tiers, paler: further off), then the row on the quay
+        var x, n = 0, w;
+        for (x = 4; x < W - 20; x += w + 3) {
+            w = 30 + rnd(++n) * 16; if (x > cx - 30 && x < cx + 96) { w = 8; continue; }
+            house(x, w, 44 + rnd(n + 50) * 40, hill(x + w / 2) + 18, rnd(n + 90) < 0.8 ? 1 : 0, 'c6', 'cr2', n);
+        }
+        for (x = 0; x < W - 10; x += w + 3) {
+            w = 34 + rnd(++n) * 18;
+            house(x, w, 56 + rnd(n + 50) * 50, Math.min(Q - 70, hill(x + w / 2) + 110), rnd(n + 90) < 0.75 ? 1 : (rnd(n) < .5 ? 2 : 0), 'c7', 'cr2', n);
+        }
+        var FRONT = [[0, 44, 110, 1, 'c2'], [42, 40, 140, 1, 'c1'], [80, 58, 100, 0, 'c3'], [136, 34, 165, 3, 'c1'], [168, 52, 120, 1, 'c2'],
+                     [218, 46, 150, 2, 'c3'], [262, 48, 112, 1, 'c1'], [308, 38, 175, 1, 'c2'], [344, 56, 128, 0, 'c1'], [398, 22, 104, 1, 'c3']];
+        FRONT.forEach(function (h, i) { house(h[0], h[1], h[2], Q, h[3], h[4], 'cr', i + 200); });
+        // the lighthouse at the end of the quay, its lamp lit at night
+        var lx = 410;
+        b += '<path class="c4" d="M' + lx + ' ' + Q + 'L' + (lx + 8) + ' ' + (Q - 180) + 'L' + (lx + 30) + ' ' + (Q - 180) + 'L' + (lx + 38) + ' ' + Q + 'Z"/>' +
+             R(lx + 2, Q - 196, 34, 18, 'cr') + '<path class="cr" d="M' + (lx + 4) + ' ' + (Q - 196) + 'L' + (lx + 19) + ' ' + (Q - 216) + 'L' + (lx + 34) + ' ' + (Q - 196) + 'Z"/>' +
+             R(lx + 7, Q - 130, 24, 8, 'c5') + R(lx + 6, Q - 70, 26, 8, 'c5');
+        l += R(lx + 7, Q - 194, 24, 14);
+        // the quay: stone, with arches, and lamps along it
+        b += R(0, Q, W, H - Q, 'cq');
+        for (var ax = 14; ax < W; ax += 60) b += '<path class="ca" d="M' + ax + ' ' + H + 'V' + (Q + 40) + 'a18 18 0 0 1 36 0V' + H + 'Z"/>';
+        for (var px = 30; px < W - 40; px += 90) { b += R(px, Q - 26, 3, 26, 'cr'); l += '<circle cx="' + (px + 1.5) + '" cy="' + (Q - 28) + '" r="4"/>'; }
+        return '<svg class="placeholder" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMinYMax slice" aria-hidden="true">' +
+               '<g class="cb">' + b + '</g><g class="cl">' + l + '</g></svg>';
+    })();
     var sea = document.createElement('div');
     sea.className = 'ground ground-sea';
     sea.setAttribute('aria-hidden', 'true');
     sea.innerHTML =
         wave(1, .36, .15, 135, 40) +
+        // the port city the dock leads to (placed by buildDock: from just left of the dock to the right-hand edge, standing on
+        // the sea's floor so it hides the far waves there; the near ones still lap in front). assets/sea/city, see-through
+        // above the roofs; assets/sea/city-glow: the same picture with only its lights, fading in at dusk
+        '<div class="sea-city" data-asset="assets/sea/city">' + CITY + '</div>' +
         // the dock (drawn by buildDock below): pilings, deck, bollard, lamp, and the signpost's post
         '<svg class="dock" data-slot="assets/sea/dock">' +
             '<path class="d-shade"/><path class="d-wood"/><path class="d-light"/><path class="d-rope"/>' +
@@ -62,6 +139,50 @@
         wave(4, .87, .12, 125, 20);
     document.body.appendChild(sea);
 
+    // the rock in the foreground, on the left, out of focus (a stand-in boulder until assets/sea/rock: see-through round it)
+    var rockEl = document.createElement('div');
+    rockEl.className = 'sea-rock';
+    rockEl.setAttribute('aria-hidden', 'true');
+    rockEl.dataset.asset = 'assets/sea/rock';
+    // (19 Oct) two rocks in one picture: the big one, and a middling one just to its right, overlapping it a little
+    rockEl.innerHTML = '<svg class="placeholder" viewBox="0 0 780 420" preserveAspectRatio="xMinYMax meet" aria-hidden="true">' +
+        // the middling rock, behind (the light from the upper right, moss on top)
+        '<path fill="#352f29" d="M440 420V300C452 252 492 214 540 206C572 172 634 164 674 188C722 194 758 236 768 292C776 342 772 392 774 420Z"/>' +
+        '<path fill="#4d4339" d="M674 188C722 194 758 236 768 292C774 340 772 392 774 420H660C668 360 650 300 664 250C668 228 670 206 674 188Z"/>' +
+        '<path fill="#5a6447" d="M548 202C580 174 630 168 666 186C640 186 616 194 600 206C584 198 566 198 548 202Z"/>' +
+        '<path fill="none" stroke="#1c1815" stroke-width="4" stroke-linecap="round" d="M600 206C612 270 590 340 604 420M664 250C690 300 720 330 752 346"/>' +
+        // the big rock: its body, its lit faces, its cracks, and moss on top
+        '<path fill="#2e2924" d="M0 420V150C26 112 64 90 104 86C136 36 196 12 252 28C306 4 370 30 396 86C446 104 482 156 494 226C502 290 498 360 500 420Z"/>' +
+        '<path fill="#453c34" d="M252 28C306 4 370 30 396 86C446 104 482 156 494 226C500 270 498 330 500 420H330C340 330 316 240 330 170C300 120 270 70 252 28Z"/>' +
+        '<path fill="#5c5045" d="M396 86C446 104 482 156 494 226C470 190 440 170 410 166C400 140 396 112 396 86Z"/>' +
+        '<path fill="#3a332d" d="M104 86C136 36 196 12 252 28C228 60 206 96 200 140C160 120 130 104 104 86Z"/>' +
+        '<path fill="#566146" d="M120 74C160 34 210 18 252 30C290 10 346 22 378 60C344 50 304 54 276 70C240 52 172 56 120 74Z"/>' +
+        '<path fill="#6f7a52" d="M176 40C206 26 236 26 256 34C284 22 320 26 344 44C316 42 292 48 274 58C246 46 210 44 176 40Z"/>' +
+        '<path fill="none" stroke="#1c1815" stroke-width="5" stroke-linecap="round" d="M200 140C214 220 186 300 204 420M330 170C320 240 344 300 330 420M410 166C430 230 470 270 498 300M60 230C100 250 120 300 110 420"/>' +
+        '</svg>';
+    document.body.appendChild(rockEl);
+    // the rocks shift a little against the pointer, as if you leaned to look past them (they're nearest, so only they do):
+    // eased towards where the pointer says, frame by frame, and still once they're there. not for touch or reduced motion
+    var lean = { x: 0, y: 0, tx: 0, ty: 0, on: false }, LEAN_X = 1.2, LEAN_Y = 0.8;   // the most they move: vw, vh
+    function leanStep() {
+        lean.x += (lean.tx - lean.x) * 0.06; lean.y += (lean.ty - lean.y) * 0.06;
+        rockEl.style.transform = 'translate3d(' + (lean.x * LEAN_X).toFixed(3) + 'vw, ' + (lean.y * LEAN_Y).toFixed(3) + 'vh, 0)';
+        if (Math.abs(lean.tx - lean.x) + Math.abs(lean.ty - lean.y) > 0.002) requestAnimationFrame(leanStep); else lean.on = false;
+    }
+    if (!calm) window.addEventListener('pointermove', function (e) {
+        if (e.pointerType === 'touch') return;
+        lean.tx = 1 - 2 * e.clientX / window.innerWidth; lean.ty = 1 - 2 * e.clientY / window.innerHeight;
+        if (!lean.on) { lean.on = true; requestAnimationFrame(leanStep); }
+    }, { passive: true });
+    // the slow drift, side to side: all CSS animations (sky/css/ground-sea.css, "the slow drift"), started together here
+    // so the sea, the waves, the rock and the signpost move as one scene
+    if (panning) {
+        document.documentElement.style.setProperty('--sea-pan', PAN_VW + 'vw');
+        document.documentElement.style.setProperty('--sea-pan-s', PAN_SECS + 's');
+        document.documentElement.classList.add('sea-pan');
+    }
+    function panPx() { return Math.max(0, sea.clientWidth - (document.documentElement.clientWidth || window.innerWidth)); }
+
     var splashLayer = document.createElement('div');
     splashLayer.className = 'splash-layer';
     splashLayer.setAttribute('aria-hidden', 'true');
@@ -98,6 +219,7 @@
     }
 
     var waves = Array.prototype.slice.call(sea.querySelectorAll('.wave'));
+    var movers = waves.map(function (svg) { return svg.parentNode; });     // the boxes that move (see wave() above)
     function buildWaves() {
         var narrow = window.innerWidth < 620 ? 0.7 : 1;
         waves.forEach(function (svg) {
@@ -206,15 +328,20 @@
 
         // on wide screens the signpost's post stands on the dock, reaching up to its plank (wherever the sign hangs:
         // sky.css; one plank since 11 Oct, so it's lower, and the post shorter)
-        if (W > 1100) {
+        // (the sea is wider than the screen while it drifts, by panPx(): the sign drifts with it, so its post stands that much in)
+        var VW = document.documentElement.clientWidth || window.innerWidth;
+        if (VW > 1100) {
             var sp = document.querySelector('.signpost'), sTop = sp ? sp.getBoundingClientRect().top : 0;
-            var vh = window.innerHeight, pTop = (sTop > 0 ? sTop : vh * 0.27) - 26 - (vh - S), px = W - 68;
+            var vh = window.innerHeight, pTop = (sTop > 0 ? sTop : vh * 0.27) - 26 - (vh - S), px = W - panPx() - 68;
             wood  += 'M' + px + ' ' + (y + 1) + 'V' + (pTop + 9) + 'a9 9 0 0 1 18 0V' + (y + 1) + 'Z';
             shade += R(px + 13, pTop + 9, 5, y - pTop - 9);
             for (var ry = pTop + 30; ry < y - 10; ry += 30) shade += R(px, ry, 18, 1.2);
         }
 
-        dockAt = { W: W, S: S, x0: x0, dw: dw, deck: y, small: small, post: W > 1100 ? W - 68 : null };
+        dockAt = { W: W, S: S, x0: x0, dw: dw, deck: y, small: small, post: VW > 1100 ? W - panPx() - 68 : null };
+        // the port city: from a little left of the dock to the right-hand edge, standing on the sea's floor
+        // (on a phone the dock is most of the screen: the city keeps to its right-hand half there, so the sea still shows)
+        sea.querySelector('.sea-city').style.left = (small ? Math.max(x0, W * 0.5) : x0 - 40) + 'px';
         // the letters board stands on the deck
         var lb = sea.querySelector('.dock-board');
         lb.style.left = (x0 + dw * (small ? 0.3 : 0.34)) + 'px'; lb.style.bottom = (S - y - 1) + 'px';
@@ -250,15 +377,27 @@
     // sx = how far it has sailed off toward the right edge when you leave the page
     var drag = { x: 0, y: 0, dip: 0, s: 1, sx: 0 }, held = false, grab = { x: 0, y: 0 }, tweenId = 0;
 
-    // the voyage: from the left edge at midday to a berth beside the dock at midnight
+    // (19 Oct) put down somewhere, the ship stays there: `placed` is where (its left edge, a share of the sea's width), kept
+    // for the visit (sessionStorage sea-ship-at; a reset forgets it). until then it makes its voyage with the clock
+    var placed = null;
+    try { var was = parseFloat(sessionStorage.getItem('sea-ship-at')); if (was >= 0 && was <= 1) placed = was; } catch (e) {}
+    function placeHere() {                                     // where it is now becomes where it stays
+        var W = sea.clientWidth || 1, left = shipLeft(Sky.progress) + drag.x;
+        left = Math.max(0, Math.min(W - ship.clientWidth * 0.5, left));
+        placed = left / W;
+        drag.x = 0;
+        try { sessionStorage.setItem('sea-ship-at', placed.toFixed(4)); } catch (e) {}
+    }
+    // the voyage: from the left edge at midday to a berth beside the dock at midnight (unless it's been put somewhere)
     function shipLeft(p) {
-        var W = sea.clientWidth, start = W * 0.03;
+        if (placed !== null) return placed * sea.clientWidth;
+        var W = sea.clientWidth, start = W * 0.36;              // (19 Oct: it starts clear of the rocks in the foreground)
         var end = dockAt ? dockAt.x0 - ship.clientWidth * 0.93 + 4 : W * 0.97 - ship.clientWidth;
         return start + (end - start) * p;
     }
     var shipBob = { x: 0, y: 0 };
     function placeShip() {
-        var p = Sky.progress, r = p * Math.PI * 2.4;
+        var p = Sky.progress, r = p * Math.PI * 2.4 + tide() * 1.3;
         var rock = held ? 0 : Math.sin(r + 0.8) * 3;
         var bob = Math.sin(r) * 5;
         if (drag.sx) {                                   // under way: pitch and heave with the swell
@@ -293,8 +432,8 @@
     function easeBack(t) { var c = 2.2; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }
 
     /* ---------------- the ship through the resets (sky/state.js) ----------------
-       reset 1: let go, and it swings back where it was. reset 2: it falls where you let it go,
-       straight down, and anyone under it is crushed (then it drifts back, in its own time).
+       reset 1: let go, and it settles on the water just below where you let it go (and stays there: 19 Oct).
+       reset 2: it falls where you let it go, straight down, and anyone under it is crushed.
        after that: an anchor, too heavy to lift it more than a little. */
     var SV = window.davSave;
     function shipMode() { return !SV ? 'snap' : SV.live('boat') ? 'drop' : SV.patched('boat') ? 'anchor' : 'snap'; }
@@ -336,9 +475,7 @@
             drag.s = 1;
             splash(ship, 1.3);
             drag.dip = 22;
-            tween({ dip: 0 }, 650, easeBack, id, function () {
-                setTimeout(function () { if (id === tweenId && !held) tween({ x: 0 }, 4200, function (t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }, id); }, 7000);
-            });
+            tween({ dip: 0 }, 650, easeBack, id, function () { tendCrew(Sky.progress); });
         })(last);
     }
 
@@ -372,12 +509,13 @@
         if (!held) return;
         held = false;
         ship.classList.remove('held');
+        placeHere();                                           // it stays where it's put (sideways); down onto the water
         if (shipMode() === 'drop' && drag.y < -20) { dropShip(); return; }
-        var dist = Math.hypot(drag.x, drag.y), id = ++tweenId;
-        tween({ x: 0, y: 0, s: 1 }, Math.min(520, 220 + dist * 0.6), easeIn, id, function () {
+        var id = ++tweenId;
+        tween({ y: 0, s: 1 }, Math.min(520, 220 + Math.abs(drag.y) * 0.6), easeIn, id, function () {
             splash(ship, 1);
             drag.dip = 16;
-            tween({ dip: 0 }, 650, easeBack, id);
+            tween({ dip: 0 }, 650, easeBack, id, function () { tendCrew(Sky.progress); });   // put by the dock? they hop off
         });
     }
     ship.addEventListener('pointerup', release);
@@ -426,11 +564,17 @@
 
     /* ---------------- the waves (by scroll, and rolling by the clock while under way) ---------------- */
     var sailStart = 0;
+    function tide() { return calm ? 0 : performance.now() / 1000 * TIDE; }
     function paintWaves(p, sailing) {
-        waves.forEach(function (w, i) {
-            var k = SWAY[i], a = p * Math.PI * k[0] + k[1] + (sailing || 0) * (2.2 + i * 0.5);
+        var td = tide();
+        movers.forEach(function (w, i) {
+            var k = SWAY[i], a = p * Math.PI * k[0] + k[1] + td * (1 + i * 0.17) + (sailing || 0) * (2.2 + i * 0.5);
             var lift = sailing ? 1 + Math.min(1, sailing) * 1.4 : 1;          // a livelier swell once we're moving
-            w.style.transform = 'translate(' + (Math.sin(a) * k[2]) + '%, ' + (Math.cos(a) * k[3] * lift) + 'px)';
+            // the squash: out of step with the sway (its own slower beat), a touch shorter and wider, then taller and narrower,
+            // from the bottom of the sea (transform-origin in ground-sea.css), so the water seems to deepen and shallow
+            var q = calm ? 0 : Math.sin(td * (0.73 + i * 0.11) + k[1] * 2.3) * SQUASH;
+            w.style.transform = 'translate3d(' + (Math.sin(a) * k[2]).toFixed(3) + '%, ' + (Math.cos(a) * k[3] * lift).toFixed(2) + 'px, 0) ' +
+                                'scale(' + (1 - q * 0.3).toFixed(4) + ', ' + (1 + q).toFixed(4) + ')';
         });
     }
 
@@ -507,7 +651,12 @@
     }
     function underB() { return -mateH() * 0.2; }               // below the second wave: out of sight
     function surfaceB() { return sea.clientHeight * 0.47 - mateH() * 0.55; }   // head and shoulders above the swell
-    function shipDocked() { return Sky.progress >= 0.965 && !drag.sx && !held; }
+    // at the dock: put down near it (NEAR_DOCK px from the ship's bow to the dock's end, or over it), or, on its voyage, at night.
+    // away again: further than that and a bit (so they don't hop on and off at the edge), or the voyage's morning
+    var NEAR_DOCK = 70;
+    function dockGap() { return dockAt ? landSpot().x - shipBox().r : 1e9; }
+    function shipDocked() { return !drag.sx && !held && (placed !== null ? dockGap() < NEAR_DOCK : Sky.progress >= 0.965); }
+    function shipAway() { return !!drag.sx || (placed !== null ? dockGap() > NEAR_DOCK * 1.6 : Sky.progress < 0.94); }
     function shipBox() {
         var l = shipLeft(Sky.progress) + shipBob.x, sw = ship.clientWidth;
         return { l: l + sw * 0.07, r: l + sw * 0.93 };
@@ -655,9 +804,9 @@
     function tendCrew(p) {
         if (!dockAt || held || crew.state === 'held') return;
         var ashore = crew.state === 'landing' || crew.state === 'ashore';
-        if (p >= 0.965) crew.stay = false;                     // (walked in from another page: they wait on the dock until the ship comes in)
-        if (p >= 0.965 && crew.state === 'aboard' && !drag.sx) goAshore();
-        else if (p < 0.94 && ashore && !crew.stay) goAboard(false);
+        if (shipDocked()) crew.stay = false;                   // (walked in from another page: they wait on the dock until the ship comes in)
+        if (shipDocked() && crew.state === 'aboard') goAshore();
+        else if (shipAway() && ashore && !crew.stay) goAboard(false);   // the ship's leaving: hop on, or dive in after it
         placeMateAboard();
     }
 
@@ -788,6 +937,11 @@
         placeShip();
         tendCrew(p);
     });
+    // the swell: the waves and the ship rock gently by themselves (the day itself turns slowly, with the clock)
+    if (!calm) (function swell() {
+        if (!document.hidden && !drag.sx) { paintWaves(Sky.progress, 0); if (!held) placeShip(); }
+        requestAnimationFrame(swell);
+    })();
 
     // leaving for another page (a sign or a tab): the traveller walks off along the dock, off the right-hand edge.
     // aboard at sea? the ship pulls in to the dock first, and they hop off. (only in the water, or mid-fall,
@@ -882,5 +1036,5 @@
         });
         return true;
     }
-    Sky.sea = { el: sea, front: sea.querySelector('.wave-4'), splash: splash, crew: crew, mate: mate, kill: kill };
+    Sky.sea = { el: sea, front: sea.querySelector('.wave-move-4'), splash: splash, crew: crew, mate: mate, kill: kill };
 })();

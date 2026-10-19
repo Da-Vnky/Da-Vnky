@@ -12,12 +12,12 @@
                              to daylight instead of reloading)
        data-place="workshop" which of the PLACES below this page is, so its
                              sign reads "you are here"
-       data-voyage="110"     (homepage) how much empty sky to scroll through after
+       data-voyage="110"     (with data-scroll-time) how much empty sky to scroll through after
                              your content, in % of the screen height. more = slower sunset.
        data-time="0"         (every other page) the hour it stays at: 0 = midday,
                              0.5 = sunset, 1 = midnight. without it, the page follows
-                             the visitor's own clock (see CLOCK below). only the
-                             homepage's scroll turns the day; elsewhere the sky view
+                             the visitor's own clock (see CLOCK below), the homepage
+                             included (19 Oct: it used to turn the day as you scrolled); the sky view
                              (a window, a telescope) does, and a page can set it
                              (Sky.setTime).
        data-scroll-time      give any page the homepage's scroll-driven day instead
@@ -637,9 +637,10 @@
     });
 
     /* ---------------- the stretch of sky after the content ---------------- */
-    // only the homepage (or a page with data-scroll-time) turns the day as you scroll;
+    // only a page with data-scroll-time turns the day as you scroll (since 19 Oct not the homepage either: the sea follows
+    // the visitor's clock like everywhere else, and drifts gently from side to side by itself: sky/ground-sea.js);
     // every other page stays at its own hour (data-time) until the sky view changes it
-    var still = !isHome && !body.hasAttribute('data-scroll-time');
+    var still = !body.hasAttribute('data-scroll-time');
     var baseTime = still ? (parseFloat(body.dataset.time) || 0) : 0;
     // the visitor's clock: angle 0 = noon, π/2 = 6pm (setting, right), π = midnight, 3π/2 = 6am (rising, left)
     var clockMode = still && CLOCK && !body.hasAttribute('data-time');
@@ -918,7 +919,7 @@
     var FLOCK = [
         { x: 0,   y: 0,   w: 100, lag: 0 },
         { x: 66,  y: -60, w: 76,  lag: .31 },
-        { x: -52, y: 46,  w: 86,  lag: .62 }
+        { x: -52, y: -78, w: 86,  lag: .62 }   // (19 Oct: the left one a little higher than the other two)
     ];
     var flockBlob = null, flockUrls = [];
     function flockMembers(el) { return Array.prototype.slice.call(el.querySelectorAll(':scope > img.art:not(.glow-layer)')); }

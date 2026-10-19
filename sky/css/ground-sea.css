@@ -6,27 +6,41 @@
 .ground-sea {
     height: 30vh;
     min-height: 200px;
+    /* (19 Oct) the sea darkens with the day: the waves, the dock and the ship (the artist's are bright), dimmer and
+       greyer from golden hour on, darkest at night. sky.js sets --dusk and --night */
+    --sea-dim: calc(1 - .5 * var(--dusk, 0) - .16 * var(--night, 0));
+    --sea-sat: calc(1 - .4 * var(--dusk, 0));
 }
 /* (16 Oct) each wave its own layer: painted once, then only slid about as you scroll. without it the four full-width waves
    and their shadows were painted again every frame, and the sea ran at about 30 frames a second instead of 60 */
-.ground-sea .wave {
+.ground-sea .wave-move {
     will-change: transform;
+    transform-origin: 50% 100%;              /* (19 Oct) the waves squash from the sea's floor: ground-sea.js SQUASH */
+}
+/* (19 Oct) the wave itself fills its box; the box moves (ground-sea.js), the wave inside is painted once */
+.ground-sea .wave {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 .ground-sea .wave-1 {
     color: #56636f;
-    filter: drop-shadow(0 -3px 5px rgba(0, 0, 0, .35));
+    filter: brightness(var(--sea-dim)) saturate(var(--sea-sat)) drop-shadow(0 -3px 5px rgba(0, 0, 0, .35));
 }
 .ground-sea .wave-2 {
     color: #45525e;
-    filter: drop-shadow(0 -4px 6px rgba(0, 0, 0, .4));
+    filter: brightness(var(--sea-dim)) saturate(var(--sea-sat)) drop-shadow(0 -4px 6px rgba(0, 0, 0, .4));
 }
 .ground-sea .wave-3 {
     color: #36424d;
-    filter: drop-shadow(0 -5px 7px rgba(0, 0, 0, .45));
+    filter: brightness(var(--sea-dim)) saturate(var(--sea-sat)) drop-shadow(0 -5px 7px rgba(0, 0, 0, .45));
 }
 .ground-sea .wave-4 {
     color: #28323b;
-    filter: drop-shadow(0 -6px 9px rgba(0, 0, 0, .5));
+    filter: brightness(var(--sea-dim)) saturate(var(--sea-sat)) drop-shadow(0 -6px 9px rgba(0, 0, 0, .5));
 }
 .ground-sea .lines {
     fill: none;
@@ -371,4 +385,141 @@
     .ship {
         width: 140px;
     }
+}
+
+/* ================= (19 Oct) the slow drift, the rock, the port city ================= */
+/* the slow drift: the whole sea is a little wider than the screen (--sea-pan, set by ground-sea.js) and slides one way
+   over --sea-pan-s seconds, then back. the far waves move a little less than the sea, the near ones more, and the rock
+   in front most of all, so it feels like looking along the shore. all of it with the translate property (not transform:
+   sky.css moves the ground that way for the telescope and the rooms, and ground-sea.js rocks each wave with it) */
+html.sea-pan .ground-sea {
+    right: calc(-1 * var(--sea-pan));
+    animation: sea-pan var(--sea-pan-s) ease-in-out infinite alternate;
+}
+@keyframes sea-pan { from { translate: 0 0; } to { translate: calc(-1 * var(--sea-pan)) 0; } }
+html.sea-pan .ground-sea .layer.wave-move {
+    left: -10%;
+    width: 120%;
+    animation: sea-wave var(--sea-pan-s) ease-in-out infinite alternate;
+}
+html.sea-pan .ground-sea .wave-move-1 { --wave-pan: 2.2vw; }
+html.sea-pan .ground-sea .wave-move-2 { --wave-pan: -.6vw; }
+html.sea-pan .ground-sea .wave-move-3 { --wave-pan: -1.6vw; }
+html.sea-pan .ground-sea .wave-move-4 { --wave-pan: -3vw; }
+@keyframes sea-wave { from { translate: 0 0; } to { translate: var(--wave-pan, 0) 0; } }
+/* the sign drifts with its post on the dock (big screens: there's no post on smaller ones) */
+@media (min-width: 1101px) {
+    html.sea-pan body[data-page="home"] .signpost { animation: sea-pan var(--sea-pan-s) ease-in-out infinite alternate; }
+}
+
+/* the artist's dock and ship darken with the sea (their -glow twins don't) */
+.ground-sea .dock .art:not(.glow-layer),
+.ship .art:not(.glow-layer) {
+    filter: brightness(var(--sea-dim)) saturate(var(--sea-sat));
+}
+
+/* the rocks in the foreground, out of focus: the big one's right-hand edge from a quarter of the way in to near the very
+   edge, framing the scene at the end of each drift, a middling one just to its right. assets/sea/rock: one picture of both
+   (about 1.86 : 1, the big one in its left 64%), see-through round them, standing on its bottom edge */
+.sea-rock {
+    position: fixed;
+    left: 0;
+    bottom: -3vh;
+    z-index: 2;
+    width: 47vw;
+    height: 42vh;
+    pointer-events: none;
+    translate: -17vw 0;
+    filter: blur(7px) brightness(calc(.86 - .5 * var(--dusk, 0) - .14 * var(--night, 0))) saturate(calc(1 - .4 * var(--dusk, 0)));
+    transition: opacity .9s ease;
+}
+html.sea-pan .sea-rock { animation: sea-rock var(--sea-pan-s) ease-in-out infinite alternate; }
+@keyframes sea-rock { from { translate: -5vw 0; } to { translate: -17vw 0; } }
+@keyframes sea-rock-phone { from { translate: -25vw 0; } to { translate: -37vw 0; } }
+.sea-rock .placeholder,
+.sea-rock > .art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: left bottom;
+}
+body.scope-view .sea-rock,
+body.sky-view .sea-rock { opacity: 0; }  /* (it stays while leaving: framing the scene till the next page) */
+@media (max-width: 620px) {
+    .sea-rock { width: 78vw; height: 30vh; translate: -37vw 0; animation-name: sea-rock-phone !important; filter: blur(4px) brightness(calc(.86 - .5 * var(--dusk, 0) - .14 * var(--night, 0))); }
+}
+
+/* the port city behind the dock: on the sea's floor, so the far waves there are hidden behind its quay and the near ones
+   lap in front. ground-sea.js sets its left (just left of the dock); it runs to the right-hand edge */
+.ground-sea .sea-city {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: calc(100% + 34vh);              /* (19 Oct: up past the sign) */
+    pointer-events: none;
+}
+.ground-sea .sea-city .placeholder,
+.ground-sea .sea-city > .art {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left bottom;
+}
+/* the city is far off, so it stays where it is while the sea drifts: it slides back exactly as far as the sea slides on,
+   and ends at the screen's right-hand edge (19 Oct) */
+html.sea-pan .ground-sea .sea-city {
+    right: var(--sea-pan);
+    animation: sea-still var(--sea-pan-s) ease-in-out infinite alternate;
+}
+@keyframes sea-still { from { translate: 0 0; } to { translate: var(--sea-pan) 0; } }
+/* by day as it is, then dimmer and bluer-grey as night comes (the lights don't dim: they come on) */
+.ground-sea .sea-city .cb,
+.ground-sea .sea-city > .art:not(.glow-layer) {
+    filter: brightness(calc(1 - .55 * var(--dusk, 0) - .15 * var(--night, 0))) saturate(calc(1 - .45 * var(--dusk, 0)));
+}
+.ground-sea .sea-city .c1 { fill: #c9b08a; }
+.ground-sea .sea-city .c2 { fill: #b49a74; }
+.ground-sea .sea-city .c3 { fill: #d3c09c; }
+.ground-sea .sea-city .c4 { fill: #e4dccb; }
+.ground-sea .sea-city .c5 { fill: #9a3b1f; }
+.ground-sea .sea-city .cr { fill: #7e4a32; }
+.ground-sea .sea-city .cq { fill: #8a7f6c; }
+.ground-sea .sea-city .ca { fill: #4c453b; }
+.ground-sea .sea-city .cw { fill: #5d5246; }
+.ground-sea .sea-city .c6 { fill: #ddd0b4; }
+.ground-sea .sea-city .c7 { fill: #d2bf9b; }
+.ground-sea .sea-city .cr2 { fill: #a0705a; }
+.ground-sea .sea-city .ch { fill: #9c9a76; }
+/* the lights: warm, coming on through dusk (the stand-in's windows and lamps, or the artist's city-glow) */
+.ground-sea .sea-city .cl {
+    fill: #ffcf7e;
+    opacity: var(--dusk, 0);
+    filter: drop-shadow(0 0 3px rgba(255, 176, 80, .95)) drop-shadow(0 0 9px rgba(255, 140, 50, .6));
+}
+.ground-sea .sea-city > .glow-layer { opacity: var(--dusk, 0); }
+/* and the warm haze the lit city throws up into the night */
+.ground-sea .sea-city::after {
+    content: "";
+    position: absolute;
+    inset: 10% -10% 0 -10%;
+    pointer-events: none;
+    background: radial-gradient(ellipse 60% 55% at 55% 85%, rgba(255, 160, 70, .5), rgba(255, 140, 60, 0) 70%);
+    mix-blend-mode: screen;
+    opacity: calc(var(--dusk, 0) * .8);
+}
+@media (prefers-reduced-motion: reduce) {
+    .sea-rock { animation: none !important; }
+}
+
+/* the credit used to wait at the very end of the scroll; with no scrolling it would hang in the sky, so it's only at the
+   foot of the letters now (sky/letters.js puts a copy there) */
+body[data-page="home"] > .credit { display: none; }
+
+/* on a phone the city is lower (it stands on the right-hand half of the dock: ground-sea.js) */
+@media (max-width: 620px) {
+    .ground-sea .sea-city { height: calc(100% + 14vh); }
 }
