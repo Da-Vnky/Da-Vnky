@@ -770,13 +770,14 @@
         $('.dk-l-title', pane).focus();
     }
     // the preview, on the site's own paper (the same rules as Sky.txtToHtml in sky/sky.js)
+    function safe(u) { return /^(https?:|mailto:|[^:]*$)/i.test(u) ? u : '#'; }
     function inline(x) {
         return esc(x)
             .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function (m, alt, src) {
-                var u = /^content\//.test(src) ? urlOf(decodeURIComponent(src)) || '' : src;
+                var u = /^content\//.test(src) ? urlOf(decodeURIComponent(src)) || '' : safe(src);
                 return '<img src="' + u + '" alt="' + alt + '">';
             })
-            .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+            .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, text, href) { return '<a href="' + safe(href) + '" target="_blank" rel="noopener">' + text + '</a>'; })
             .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
             .replace(/\*([^*]+)\*/g, '<em>$1</em>');
     }

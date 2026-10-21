@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1476 1886673917
-city.html 9813 1279430893
-desk.html 6182 1383527985
-index.html 5171 2210840071
-living.html 133619 3873908082
-window-sky.html 1328 628785714
-workshop.html 22036 2185871927
+beyond.html 1480 3133021325
+city.html 9866 3322748562
+desk.html 6191 1182162572
+index.html 5242 2296363212
+living.html 133705 1134797418
+window-sky.html 1334 1929532165
+workshop.html 22101 2776723880
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/babble.js 46635 151537111
@@ -16,7 +16,7 @@ sky/beyond.js 10960 423359035
 sky/books.js 13450 616855077
 sky/claubes.js 52332 2508345692
 sky/crate.js 36569 3934218302
-sky/desk.js 74619 1311710456
+sky/desk.js 74768 2666348685
 sky/dungeon.js 9600 328112207
 sky/embeds.js 28094 2944414207
 sky/eye.js 16302 1561931541
@@ -58,7 +58,7 @@ sky/records.js 37374 197731851
 sky/resets.js 17516 2785905217
 sky/revolver.js 20186 2694897367
 sky/ropes.js 19084 2810990965
-sky/sky.js 147789 3626893406
+sky/sky.js 148143 2995928228
 sky/songpad.js 8196 2333869894
 sky/source.js 3809 654057405
 sky/state.js 22677 242285796
@@ -289,7 +289,7 @@ content/living/05-A Stranger to You/cover.jpg 875566 2526375604
 content/living/05-A Stranger to You/list.txt 417 500846178
 content/living/bottles/2026-09-24-from-skizy.txt 50 2780802433
 content/living/bottles/2026-09-24-untitled.png 103361 3665461875
-content/living/bottles/2026-10-11-from-claude.txt 739 2900152306
+content/living/bottles/2026-10-11-from-claude.txt 751 97236426
 content/living/bottles/2026-10-13-a-bottle.jpg 61855 3451892792
 content/living/bottles/board.json 132 3001581082
 content/living/bottles/list.txt 225 1104328745
@@ -298,44 +298,6 @@ content/workshop/visitors/2026-09-24-clutterflies-by-skizy.png 464922 1738138300
 content/workshop/visitors/2026-09-24-untitled.png 65299 1509521949
 content/workshop/visitors/2026-10-13-water-by-louie.png 611338 1745471353
 content/workshop/visitors/list.txt 235 2157225356
-baked/baked.json 11417 2994304259
-baked/assets/sea/wave-1.webp 820736 2381707885
-baked/assets/sea/wave-2.webp 417666 3934367618
-baked/assets/sea/wave-3.webp 507386 2946378441
-baked/assets/sea/wave-4.webp 320350 4169307044
-baked/assets/sky/skybox-day.webp 237216 3156545607
-baked/assets/sky/skybox-dusk.webp 584890 1434655125
-baked/assets/sky/skybox-golden.webp 346388 2230252830
-baked/assets/sky/skybox-night.webp 510908 2802964034
-baked/assets/sky/skybox-sunset.webp 438852 3054554765
-baked/assets/sky/sun-glow.webp 45190 31779325
-baked/assets/sky/sun.webp 24644 1869483630
-baked/content/frames/Elo Maw the Grokikivius.webp 399106 4219606398
-baked/content/frames/Sam GPT.webp 28318 3616717854
-baked/content/frames/Sundar Pichai of Googolian.webp 331728 602059582
-baked/content/frames/The False God.webp 1864728 1892696841
-baked/content/frames/droolers.webp 80012 2344556898
-baked/content/living/02-Song on the Beach.webp 171650 3391617982
-baked/content/living/03-Aerie.webp 105114 1807092595
-baked/content/living/04-Frame of Mind.webp 32732 1412109146
-baked/content/living/06-I'm Upping My P(Doom).webp 2508026 200449081
-baked/content/sea/2026-10-11-1000046960.webp 725510 2579790124
-baked/content/sea/2026-10-11-1739877026713f.webp 896466 569764661
-baked/content/sea/2026-10-11-handwritten-2.webp 142900 80806678
-baked/content/sea/2026-10-11-handwritten.webp 67170 323458966
-baked/content/sea/2026-10-11-rdt-20261006-1235456651558376399295008.webp 61222 632978368
-baked/content/sea/2026-10-13-handwritten.webp 36512 1881041007
-baked/content/sea/2026-10-13-iliiaite.webp 70790 3390748323
-baked/content/workshop/10.webp 210500 4164258506
-baked/content/workshop/The-Broken-Jug.webp 257760 3590365777
-baked/content/workshop/Untitled-1 24 .webp 698086 3183444776
-baked/content/workshop/cat.webp 87842 3354596033
-baked/content/workshop/foot.webp 87226 4046031054
-baked/content/living/05-A Stranger to You/cover.webp 539374 3073271099
-baked/content/workshop/visitors/2026-09-24-claube-by-skizy.webp 88884 1818288684
-baked/content/workshop/visitors/2026-09-24-clutterflies-by-skizy.webp 38682 3631661775
-baked/content/workshop/visitors/2026-09-24-untitled.webp 8142 328840212
-baked/content/workshop/visitors/2026-10-13-water-by-louie.webp 80620 1162417759
 schizophyllu.me.room/index.html 5156 668732473
 schizophyllu.me.room/assets/font.css 30693 1584298999
 schizophyllu.me.room/room/audio.js 15832 3536447765

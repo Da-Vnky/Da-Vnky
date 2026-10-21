@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1476 1886673917
-city.html 9813 1279430893
-desk.html 6182 1383527985
-index.html 5171 2210840071
-living.html 133619 3873908082
-window-sky.html 1328 628785714
-workshop.html 22036 2185871927
+beyond.html 1480 3133021325
+city.html 9866 3322748562
+desk.html 6191 1182162572
+index.html 5242 2296363212
+living.html 133705 1134797418
+window-sky.html 1334 1929532165
+workshop.html 22101 2776723880
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/babble.js 46635 151537111
@@ -16,7 +16,7 @@ sky/beyond.js 10960 423359035
 sky/books.js 13450 616855077
 sky/claubes.js 52332 2508345692
 sky/crate.js 36569 3934218302
-sky/desk.js 74619 1311710456
+sky/desk.js 74768 2666348685
 sky/dungeon.js 9600 328112207
 sky/embeds.js 28094 2944414207
 sky/eye.js 16302 1561931541
@@ -58,7 +58,7 @@ sky/records.js 37374 197731851
 sky/resets.js 17516 2785905217
 sky/revolver.js 20186 2694897367
 sky/ropes.js 19084 2810990965
-sky/sky.js 147789 3626893406
+sky/sky.js 148143 2995928228
 sky/songpad.js 8196 2333869894
 sky/source.js 3809 654057405
 sky/state.js 22677 242285796
@@ -180,11 +180,10 @@ content/books/book-4/list.txt 113 3293401086
 content/books/grimoire/list.txt 113 3293401086
 content/living/05-A Stranger to You/list.txt 417 500846178
 content/living/bottles/2026-09-24-from-skizy.txt 50 2780802433
-content/living/bottles/2026-10-11-from-claude.txt 739 2900152306
+content/living/bottles/2026-10-11-from-claude.txt 751 97236426
 content/living/bottles/board.json 132 3001581082
 content/living/bottles/list.txt 225 1104328745
 content/workshop/visitors/list.txt 235 2157225356
-baked/baked.json 11417 2994304259
 schizophyllu.me.room/index.html 5156 668732473
 schizophyllu.me.room/assets/font.css 30693 1584298999
 schizophyllu.me.room/room/audio.js 15832 3536447765

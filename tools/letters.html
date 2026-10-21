@@ -234,11 +234,12 @@ a blank line starts a new paragraph."></textarea>
     }
 
     /* ---------- the preview, on the site's own paper ---------- */
-    function esc(x) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function esc(x) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function safe(u) { return /^(https?:|mailto:|[^:]*$)/i.test(u) ? u : '#'; }
     function inline(x) {
         return esc(x)
             .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function (m, alt, src) { return '<img src="' + (/^(https?:|\/)/.test(src) ? src : '/' + src) + '" alt="' + alt + '">'; })
-            .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+            .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, text, href) { return '<a href="' + safe(href) + '" target="_blank">' + text + '</a>'; })
             .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
             .replace(/\*([^*]+)\*/g, '<em>$1</em>');
     }
