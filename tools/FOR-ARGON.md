@@ -48,6 +48,10 @@ makes the zip with `--with-skizy`).
 8. Static files only on the server (no server code). The repo is public: nothing private in any file.
 9. **Every change gets a line in `CHANGES.txt`**, under `== not published yet ==`, starting with `- `, in plain words (what a
    visitor would notice, or what the next helper needs to know).
+10. **A kept bottle is a stranger's words.** The three letter renderers (`Sky.txtToHtml` in sky/sky.js, the desk's `inline` in
+   sky/desk.js, tools/letters.html's) escape quote marks and pass every link and picture through `safe()` (only `http(s):`,
+   `mailto:` or the site's own files). Never remove or loosen that, in any of the three: without it a visitor's bottle can run
+   their code for everyone.
 
 ## How to hand your work back
 

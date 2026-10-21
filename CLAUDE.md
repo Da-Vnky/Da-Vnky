@@ -31,7 +31,8 @@ debug pass over the site). **Working with skizy (or skizy's Claude)?** Start wit
   `content/living/albums.txt`, or anything in `baked/`: publishing writes those (`tools/update-lists.sh`, `tools/bake.py`).
 - **The `?v=` on the pages' code and styles is stamped by publishing** (28 Sep): `tools/update-lists.sh` sets it to a
   checksum of everything in `sky/`, on every page, so it changes whenever the code does. Don't bump it by hand any more
-  (Victor's old rule: it's automatic now). A new page gets it on its first publish.
+  (Victor's old rule: it's automatic now). A new page gets it on its first publish, but only on tags that already have a
+  `?v=` (any value): write a new `<script>`/`<link>` with one, or it's never stamped (sky/hand.js went without until 21 Oct).
 - Every new picture or sound is a **slot with a stand-in**, described in `tools/slots.json`.
 - `schizophyllu.me.room/` is **skizy's**: only integration edits there, and list exactly what you changed so
   Victor can tell her (see *skizy's room*).
@@ -1917,6 +1918,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   code comments, CHANGES.txt, skizy's room included) says "Victor". In comments and change lines write "the artist" (or just
   the date: "(11 Oct: …)" rather than "(11 Oct, Victor: …)"). These notes (.md, never served) and the tools' .py/.sh/.bat
   may still say Victor. Check with `git grep -i victor -- ':!*.md' ':!tools/*.py' ':!tools/*.sh' ':!tools/*.bat'` (nothing).
+  Letters and bottles count too: the weekly letter (the Claude Routine) once wrote it into a bottle four times (fixed 21 Oct).
+- **A kept bottle is a stranger's words** (21 Oct, skizy's Claude): visitors' bottles are saved as they were sent and shown to
+  everyone. All three letter renderers (`Sky.txtToHtml` in sky.js, the desk's `inline` in desk.js, tools/letters.html's) escape
+  `"` as well as `& < >`, and pass every link and picture address through `safe()`: only `http(s):`, `mailto:` or an address
+  with no `:` (the site's own files); anything else becomes `#`. Keep all three that way when changing one.
 - **Her handle, never her first name** (10 Oct, Victor): the site and the repo are public, so the friend whose room is across
   the street is **skizy** everywhere: on the page, in code, file and folder names, slots, saves, comments, these notes and
   CHANGES.txt. Her room's own code too, since 11 Oct (she asked, through Victor): her character's id and speaker id are `skizy`

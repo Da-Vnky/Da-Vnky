@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
-beyond.html 1476
-city.html 9813
-desk.html 6182
-index.html 5171
-living.html 133619
-window-sky.html 1328
-workshop.html 22036
+beyond.html 1480
+city.html 9866
+desk.html 6191
+index.html 5242
+living.html 133705
+window-sky.html 1334
+workshop.html 22101
 sky/ambient.js 5331
 sky/attic.js 34823
 sky/babble.js 46635
@@ -16,7 +16,7 @@ sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 52332
 sky/crate.js 36569
-sky/desk.js 74619
+sky/desk.js 74768
 sky/dungeon.js 9600
 sky/embeds.js 28094
 sky/eye.js 16302
@@ -58,7 +58,7 @@ sky/records.js 37374
 sky/resets.js 17516
 sky/revolver.js 20186
 sky/ropes.js 19084
-sky/sky.js 147789
+sky/sky.js 148143
 sky/songpad.js 8196
 sky/source.js 3809
 sky/state.js 22677
@@ -180,11 +180,10 @@ content/books/book-4/list.txt 113
 content/books/grimoire/list.txt 113
 content/living/05-A Stranger to You/list.txt 417
 content/living/bottles/2026-09-24-from-skizy.txt 50
-content/living/bottles/2026-10-11-from-claude.txt 739
+content/living/bottles/2026-10-11-from-claude.txt 751
 content/living/bottles/board.json 132
 content/living/bottles/list.txt 225
 content/workshop/visitors/list.txt 235
-baked/baked.json 11417
 schizophyllu.me.room/index.html 5156
 schizophyllu.me.room/assets/font.css 30693
 schizophyllu.me.room/room/audio.js 15832

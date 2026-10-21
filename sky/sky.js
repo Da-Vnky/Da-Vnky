@@ -2069,11 +2069,13 @@
     // { embeds: true } (the letters): a link alone in its paragraph becomes its player or a card (sky/embeds.js)
     function txtToHtml(t, opts) {
         var embed = opts && opts.embeds && window.DavEmbed;
-        function esc(x) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function esc(x) { return x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+        // only web links, mail and the site's own files: a kept bottle is a stranger's words, so never a "javascript:" one
+        function safe(u) { return /^(https?:|mailto:|[^:]*$)/i.test(u) ? u : '#'; }
         function inline(x) {
             return esc(x)
-                .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, '<img src="$2" alt="$1">')
-                .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>')
+                .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function (m, alt, src) { return '<img src="' + safe(src) + '" alt="' + alt + '">'; })
+                .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, text, href) { return '<a href="' + safe(href) + '">' + text + '</a>'; })
                 .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
                 .replace(/\*([^*]+)\*/g, '<em>$1</em>');
         }
