@@ -17,6 +17,9 @@ How it works
 
 == published ==
 
+2026-10-21 14:53 · V
+- pull merge
+
 2026-10-21 14:35 · skizy
 - AGENTS.md, GEMINI.md and tools/FOR-ARGON.md have the bottle rule too (escape quotes, safe() links in all three letter renderers), so every helper working on the site knows it, not only Claude.
 
