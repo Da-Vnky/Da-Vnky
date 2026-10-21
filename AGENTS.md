@@ -20,3 +20,6 @@ Victor uses this folder to experiment with and edit important site files without
 - **Bring DaV-nky's newer files into the copy**: `python tools/sync-a.py refresh --yes` (safe: it only writes inside DaVnky-A)
 - How it knows which side changed: `DaVnky-A/.sync-base.json` (the files as they were when the two last agreed). Don't delete it.
 - See also CLAUDE.md, which has every other rule for this site.
+
+## Security: letters and bottles
+A kept bottle is a stranger's words, shown to every visitor. The three letter renderers (`Sky.txtToHtml` in sky/sky.js, the desk's `inline` in sky/desk.js, tools/letters.html's) escape quote marks and pass every link and picture through `safe()` (only `http(s):`, `mailto:` or the site's own files). **Never remove or loosen that, in any of the three**: without it a visitor's bottle can run their code for everyone. (CLAUDE.md, *Secrets and safety*.)

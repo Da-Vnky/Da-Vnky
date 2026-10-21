@@ -17,6 +17,9 @@ How it works
 
 == published ==
 
+2026-10-21 14:35 · skizy
+- AGENTS.md, GEMINI.md and tools/FOR-ARGON.md have the bottle rule too (escape quotes, safe() links in all three letter renderers), so every helper working on the site knows it, not only Claude.
+
 2026-10-21 14:06 · skizy
 - Letters and bottles can't carry hidden code any more: a link or picture in one only goes to a web address, an email or the site's own files, and a quote mark can't break out of it (Sky.txtToHtml in sky/sky.js, the desk's preview in sky/desk.js, the content manager's in tools/letters.html). Before this, a visitor's bottle, once kept, could have run a stranger's script for everyone in the living space.
 - The bottle from Claude (content/living/bottles/2026-10-11-from-claude.txt) says "the artist" now instead of a name.
