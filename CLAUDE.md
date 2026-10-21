@@ -4,7 +4,8 @@ Victor's personal site, **dav-nky.pleroma.nexus**: a da Vinci–notebook world (
 feel) that's also a small game. Hosted on his friend skizy's server (pleroma.nexus) as a subdomain. Read
 this before changing anything; keep it up to date when something here stops being true.
 
-**Working with skizy (or skizy's Claude)?** Start with `tools/FOR-SKIZY.md`: the tools on Linux / VS Code (`tools/content.sh`,
+**skizy's Fable** has two jobs waiting in `tools/FOR-FABLE.md` (21 Oct: the asset manager's "open this scene in Blender", and a
+debug pass over the site). **Working with skizy (or skizy's Claude)?** Start with `tools/FOR-SKIZY.md`: the tools on Linux / VS Code (`tools/content.sh`,
 `publish.sh`, `pull.sh`, `preview.sh`, `tools/vscode/tasks.json`), slots, and what's hers. Keep it true too.
 
 ## Working with Victor
@@ -611,7 +612,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   tools/blender/rope.py -- --out <png> [--w 120 --h 480 --colour r,g,b --fuzz .6 --turns 3]`): a straight yarn three tiles long,
   Twist length set so a tile holds a whole number of turns, the middle tile kept and its last rows blended into what follows them,
   so it repeats without a join. The first one (tan wool) is on the table, `tools/drawing/sky--rope/rope-yarn.png`, for "use this".
-  sky.css `--rope-w` 16px (phones 10px; were 5 and 3.5).
+  The ropes were made 16 px wide for it and put back to 5 (3.5 on phones) the same day (Victor): the script stays.
 - **Pictures that repeat** (11 Oct, Victor: "like the waves"): slots.json `"tile": "x" | "y" | "xy"` (the waves: x, with
   `"tileGuide": "assets/templates/wave-N-guide.png"`; the rope: y), `"canvas": "W x H"` (the canvas as it is, not doubled:
   waves 3024 x 1008, rope 60 x 240). `make` then builds one tile on a blank page (`tile_canvas`, `TILE_GUIDE`: the tileGuide
@@ -1074,6 +1075,17 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 
 ## The little companion (sky/kotodama.js, sky/babble.js, 17 Oct)
 
+- **21 Oct, one companion only** (Victor: "remove the little creatures that show up on days of the week, it's too much bloat"):
+  una, the sugar drop, every day, following the traveller. Gone: the other five kinds (pixie, kitsune, imp, hollow, mochi: their
+  `DEFAULTS`, their `VOICES` in babble.js, the voice-only waves pulse-blend/dual-evil/sub-hollow, their scales and squish styles), the
+  week and sunday (`WEEK`, `SUNDAY`, `DAYS`, `ROOMS`, `plan()` in kotodama-look.js), the residents (`opt.stay`, `settle`, `comeIn`,
+  `goQuiet`, `here()`), `today`/`crew`/`lead`/`?kotodama=` in kotodama.js (one `Companion('una')` once the looks file is read), the
+  companion tab's kinds row and week/sunday menus, the companion page's kind chips, the map's five "become" views and 5 × 14 slots +
+  5 voice sheets in slots.json. Kept: the tweaking menu (now for una alone; its parts, any of them, still on offer), `become(kind)`.
+  kotodama-looks.json may still hold `week`/`sunday`/other kinds from before: ignored, and dropped on the next "keep these".
+  Tested 21 Oct: living, kitchen, hallway (one companion, follows from room to room), the asset manager's tab, the companion page,
+  the smoke test. Everything below about the other kinds, the week, sunday and residents is history.
+
 - Victor: take Argon's KOTODAMA voice lab (a 3D gummy creature + Ōkami-style formant babble; Victor didn't like the 3D) and make it
   **a 2D sprite companion on the site that bounces as it moves along the floor**, ready for the asset manager, with the babble as
   **its own voice module**, speaking **random gibberish with expressions that imply it's thinking things**; the Una Sugar voice gets
@@ -1174,7 +1186,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   views, the companion page (lines, think, WAV), and the smoke test (resets 1, 4, 8: all good). Not heard by Claude: Victor to
   listen and tune (the companion page's sliders).
 
-- **A different one each day, everyone on sunday, and a menu for their looks** (17 Oct, Victor: "keep the tweaking menu in the assets
+- **A different one each day, everyone on sunday, and a menu for their looks** (removed 21 Oct, above; 17 Oct, Victor: "keep the tweaking menu in the assets
   manager under the companion tab and make the companion that shows up different for each day of the week with sunday being a day where
   they're all around the house in different locations"; Argon's lab had a look menu the 2D rework had left out):
   - **sky/kotodama-look.js** (`Sky.kotodamaLook`, no CSS; living.html just before kotodama.js, and the asset manager): the drawing moved

@@ -4,17 +4,12 @@
    room, thinks its little thoughts out loud in a bubble of pictures, and
    babbles to you about them in a voice of its own (sky/babble.js).
 
-     which one    a different one each day of the week (the visitor's own
-                  day): una (the sugar drop, voiced by your own Vocaloid
-                  sheet), pixie, kitsune, imp, hollow or mochi. each has its
-                  own look, its own voice and its own ways (how high it hops,
-                  how chatty it is, how curious). on sunday they're all in,
-                  one in each room, and they stay in their own rooms. which
-                  one comes which day, and which room each lives in on
-                  sunday: sky/kotodama-look.js (and the asset manager's
-                  companion tab, which can change both, and how they look).
-                  on localhost, living.html?kotodama=imp shows another one,
-                  ?kotodama=sunday everyone's day, ?kotodama=monday that day's.
+     which one    una, the sugar drop (voiced by your own Vocaloid sheet).
+                  how it looks and its ways (how high it hops, how chatty
+                  it is, how curious): sky/kotodama-look.js, and the asset
+                  manager's companion tab, which can change them. (21 Oct:
+                  the five others, a different one each day, and sunday's
+                  one-in-every-room, were taken out: too much.)
      its body     drawn (sky/kotodama-look.js) until yours is in. slots (assets/characters/,
                   all on one square canvas, so they stack exactly; facing
                   right, its bottom on the canvas's bottom edge):
@@ -156,18 +151,16 @@
 
 
     /* ======================================================================
-       one companion: kind (una, pixie…), opt.stay (a room it lives in, for everyone's day: it never leaves it),
-       opt.at (where in that room, % across). everything from here to the end of Companion is its own
+       the companion (its kind: una). everything from here to the end of Companion is its own
        ====================================================================== */
     var made = 0;
-    function Companion(kind, opt) {
-        opt = opt || {};
+    function Companion(kind) {
         /* ======================================================================
            building it
            ====================================================================== */
         var me = {
             kind: kind, K: spec(kind), room: null, host: null, trav: null, uid: 'k' + (++made),
-            stay: opt.stay || null, awake: false, placed: false,
+            awake: false, placed: false,
             x: 50, h: 0, vx: 0, vh: 0, s: 0, sv: 0, facing: 1, tilt: 0,
             target: null, nextHop: 0, crouch: 0, flying: false, size: 100,
             face: 'calm', mood: 'calm', asleep: false, away: false,
@@ -559,25 +552,8 @@
         /* ======================================================================
            its little brain: every third of a second it looks round and decides
            ====================================================================== */
-        // is it where you are? (one that lives in a room: only when that room is the one showing)
-        function here() { return !me.stay || Sky.house.where() === me.stay; }
         function brain() {
             if (MAPPING || document.hidden) return;
-            if (me.stay) {
-                if (!here() || !me.host) return;
-                var tw = travX(), aw = Math.abs(me.x - tw) / 100 * hostW() / me.size;
-                moods();
-                if (walking()) {                                          // (you're moving about its room: it watches you)
-                    if (!me.act && !me.asleep) { faceTowards(tw); lookAt(0, -0.5); }
-                    return;
-                }
-                if (me.act && now() < me.act.until) return;
-                if (me.act) me.act = null;
-                if (me.greet && !me.asleep) { me.greet = false; return aw > 3.2 ? goTo(nearTraveller(1.8), welcome) : welcome(); }
-                me.greet = false;
-                if (now() < me.idleUntil || me.target !== null || me.asleep) return;
-                return choose();
-            }
             if (me.away) {                                                // (they've come in from the garden: some ways back say nothing)
                 var w = Sky.house.where();
                 if (w !== 'front' && ROOMS[w]) arrive(w);
@@ -626,8 +602,8 @@
             for (var i = 0; i < w.length; i++) { r -= w[i][1]; if (r <= 0) return DO[w[i][0]](); }
         }
         var DO = {
-            wander: function () {                     // hop off a little way, not too far from them (one that lives here: anywhere in its room)
-                var b = bounds(), x = me.stay ? rnd(b[0], b[1]) : clamp(travX() + rnd(-2.6, 2.6) * me.size / hostW() * 100, b[0], b[1]);
+            wander: function () {                     // hop off a little way, not too far from them
+                var b = bounds(), x = clamp(travX() + rnd(-2.6, 2.6) * me.size / hostW() * 100, b[0], b[1]);
                 doing('wander', 4000);
                 goTo(x, function () { face(chance(0.5) ? 'curious' : 'calm'); lookAt(rnd(-1, 1), rnd(-0.5, 0.3)); idleFor(gap()); });
             },
@@ -661,10 +637,6 @@
                 later(function () { lookAt(0, 0); idleFor(gap() * 0.6); }, 2000);
             },
             chat: function () {                       // turns to the traveller and tells them something
-                if (me.stay && Math.abs(me.x - travX()) / 100 * hostW() / me.size > 3.5) {     // (across the room: it goes over first)
-                    doing('visit', 6000);
-                    return goTo(nearTraveller(1.8), function () { me.act = null; DO.chat(); });
-                }
                 interrupt();
                 doing('chat', 6000);
                 faceTowards(travX()); lookAt(0, -0.7);
@@ -782,7 +754,7 @@
         }
         // the eyes follow the pointer when it's close
         window.addEventListener('pointermove', function (e) {
-            if (!me.host || me.away || me.asleep || MAPPING || !here()) return;
+            if (!me.host || me.away || me.asleep || MAPPING) return;
             var r = art.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * 0.6;
             var dx = e.clientX - cx, dy = e.clientY - cy, d = Math.sqrt(dx * dx + dy * dy), reach = Math.max(260, window.innerWidth * 0.28);
             pointer.near = d < reach;
@@ -791,7 +763,7 @@
             if (pointer.near && (!me.act || /look|patted|poked/.test(me.act.name))) lookAt(pointer.lx, pointer.ly);
         }, { passive: true });
         document.addEventListener('dav:bang', function () {
-            if (!me.host || me.away || MAPPING || !here()) return;
+            if (!me.host || me.away || MAPPING) return;
             if (me.asleep) wakeUp(false);
             interrupt(); doing('scared', 2600);
             face('scared'); puff('sweat'); smallHop(1.1);
@@ -840,45 +812,6 @@
             doing('follow', 900);
             later(function () { hopTo(nearTraveller(1.7)); }, 420);
         }
-        // one that lives in a room: put there at the start, wherever you are
-        function settle(room) {
-            var spec = ROOMS[room], host = spec && document.querySelector(spec.host);
-            if (!host) return false;
-            me.room = room; me.host = host;
-            home.dataset.room = room;
-            home.classList.add('kd-resident');
-            host.appendChild(home);
-            me.trav = travellerIn(host);
-            home.style.setProperty('--kd-floor', spec.floor);
-            me.x = opt.at || rnd(25, 75);
-            setFacing(chance(0.5) ? 1 : -1);
-            draw(1, 1);
-            moods();
-            face(me.mood === 'scared' ? 'scared' : 'calm');
-            return true;
-        }
-        // you've come into its room: it finds its feet (the room can be measured now), and says hello
-        function comeIn() {
-            if (!me.host) return;
-            me.trav = travellerIn(me.host);
-            var tz = me.trav ? parseInt(getComputedStyle(me.trav).zIndex, 10) : 2;
-            home.style.setProperty('--kd-z', ROOMS[me.room].z || (isFinite(tz) ? tz : 2) + 1);
-            me.enteredAt = now();
-            me.greet = !MAPPING;
-            idleFor(rnd(600, 1400));
-            setTimeout(function () {                   // (once the room has slid in)
-                if (!here()) return;
-                sizeUp();
-                me.x = clearSpot(me.x);
-                draw(1, 1);
-                me.placed = true;
-            }, 450);
-        }
-        // you've gone: it stops what it was doing (and what it was saying), and carries on quietly where it is
-        function goQuiet() {
-            interrupt();
-            me.greet = false; me.target = null;
-        }
         function away() {                              // the garden: it stays in, and waits
             interrupt();
             me.away = true; me.greet = false;
@@ -891,29 +824,20 @@
         dress(kind);
         face('calm');
         if (!MAPPING) setInterval(brain, 320);
-        window.addEventListener('resize', function () { if (!here()) return; sizeUp(); if (me.host) draw(1, 1); });
-        if (me.stay) {
-            if (!settle(me.stay)) return null;
-            Sky.house.on(function (what, name) {
-                if (what !== 'enter') return;
-                if (name === me.stay) comeIn(); else goQuiet();
-            });
-        } else {
-            Sky.house.on(function (what, name) {
-                if (what === 'leave' && name === 'front') { setTimeout(function () { if (me.away && ROOMS[Sky.house.where()]) arrive(Sky.house.where()); }, 60); return; }
-                if (what !== 'enter') return;
-                if (ROOMS[name]) arrive(name);
-                else if (name === 'front') away();
-            });
-            var first = Sky.house.where();
-            if (ROOMS[first]) arrive(first, true); else if (first === 'front') { arrive('hall', true); away(); }
-        }
+        window.addEventListener('resize', function () { sizeUp(); if (me.host) draw(1, 1); });
+        Sky.house.on(function (what, name) {
+            if (what === 'leave' && name === 'front') { setTimeout(function () { if (me.away && ROOMS[Sky.house.where()]) arrive(Sky.house.where()); }, 60); return; }
+            if (what !== 'enter') return;
+            if (ROOMS[name]) arrive(name);
+            else if (name === 'front') away();
+        });
+        var first = Sky.house.where();
+        if (ROOMS[first]) arrive(first, true); else if (first === 'front') { arrive('hall', true); away(); }
 
         return {
             el: home,
             get kind() { return me.kind; }, get room() { return me.room; }, get mood() { return me.mood; }, get expression() { return me.face; },
-            get stays() { return me.stay; },
-            become: function (k) { if (!LOOK.kinds[k]) return; dress(k); face(me.face); if (me.room && !me.stay) arrive(me.room, true); },
+            become: function (k) { if (!LOOK.kinds[k]) return; dress(k); face(me.face); if (me.room) arrive(me.room, true); },
             restyle: function () { dress(me.kind); face(me.face); },
             say: function (k, o) { interrupt(); return talk(k || 'say', o); },
             think: function (ideas, end) { muse([].concat(ideas || ['star']), end); },
@@ -923,62 +847,26 @@
     }
 
     /* ======================================================================
-       who's in today: one that follows you about (a different one each day), or, on everyone's day,
-       one in each room (sky/kotodama-look.js: the week and sunday's rooms, and the asset manager's tweaks)
+       starting it: the asset manager's tweaks first (a missing file is fine: the defaults), then it's in
        ====================================================================== */
-    var crew = [], ready = false, waiting = [];
-    function today(really) {                        // (really: the visitor's own day, whatever the address asks for)
-        var p = LOOK.plan(SAVED), who = p.week[new Date().getDay()];
-        if (really) return { who: who, rooms: p.sunday };
-        var asked = LOCAL ? (location.search.match(/[?&]kotodama=([a-z]+)/) || [])[1] : '';
-        if (LOCAL) {
-            if (asked === 'sunday' || asked === 'all') who = 'all';
-            else if (asked && LOOK.days.indexOf(asked) !== -1) who = p.week[LOOK.days.indexOf(asked)];
-            else if (asked && LOOK.kinds[asked]) who = asked;
-        }
-        if (MAPPING) who = asked && LOOK.kinds[asked] ? asked : 'una';   // (the asset manager's map: always the sugar drop, so its views can dress it)
-        return { who: who, rooms: p.sunday };
-    }
-    function begin() {
-        var t = today();
-        if (t.who === 'all') {
-            var n = 0;
-            LOOK.rooms.forEach(function (r) {
-                var k = t.rooms[r[0]];
-                if (!k || !LOOK.kinds[k]) return;
-                var c = Companion(k, { stay: r[0], at: [38, 62, 30, 70, 45, 55, 35][n++ % 7] + rnd(-6, 6) });
-                if (c) crew.push(c);
-            });
-        }
-        if (!crew.length) crew.push(Companion(t.who === 'all' || !LOOK.kinds[t.who] ? 'una' : t.who));
-        crew = crew.filter(Boolean);
-        ready = true;
-        waiting.splice(0).forEach(function (f) { f(); });
-    }
-    // the one you're with: in the room you're in (everyone's day), or the only one
-    function lead() {
-        var w = Sky.house.where();
-        return crew.filter(function (c) { return c.room === w; })[0] || crew[0] || null;
-    }
-    function when(fn) { return function () { var a = arguments; if (ready) { var c = lead(); return c ? fn.apply(c, [c].concat([].slice.call(a))) : undefined; } waiting.push(function () { var c = lead(); if (c) fn.apply(c, [c].concat([].slice.call(a))); }); }; }
-
-    // the asset manager's tweaks first (a missing file is fine: the defaults), then everyone in
+    var one = null, ready = false, waiting = [];
+    function when(fn) { return function () { var a = arguments; if (ready) { return one ? fn.apply(one, [one].concat([].slice.call(a))) : undefined; } waiting.push(function () { if (one) fn.apply(one, [one].concat([].slice.call(a))); }); }; }
     Sky.findAsset(LOOK.file + '.json', function (url, data) {
         if (data && typeof data === 'object') SAVED = data;
-        begin();
+        one = Companion('una');
+        ready = true;
+        waiting.splice(0).forEach(function (f) { f(); });
     });
 
     var kindsNow = {};
     Sky.kotodama = {
-        get el() { var c = lead(); return c ? c.el : null; },
+        get el() { return one ? one.el : null; },
         get ready() { return ready; },
-        get all() { return crew.slice(); },
-        get today() { return today(true).who; },        // (who comes today: a kind, or 'all')
         // every kind's look and ways as they are now (the defaults with your tweaks)
         get kinds() { Object.keys(LOOK.kinds).forEach(function (k) { kindsNow[k] = spec(k); }); return kindsNow; },
         ideas: Object.keys(IDEAS),
-        get kind() { var c = lead(); return c ? c.kind : null; }, get room() { var c = lead(); return c ? c.room : null; },
-        get mood() { var c = lead(); return c ? c.mood : null; }, get expression() { var c = lead(); return c ? c.expression : null; },
+        get kind() { return one ? one.kind : null; }, get room() { return one ? one.room : null; },
+        get mood() { return one ? one.mood : null; }, get expression() { return one ? one.expression : null; },
         // become another kind (the asset manager's map, the debug page)
         become: when(function (c, k) { c.become(k); }),
         say: when(function (c, k, o) { return c.say(k, o); }),
@@ -988,6 +876,6 @@
         poke: when(function (c) { c.poke(); }), pat: when(function (c) { c.pat(); }),
         hop: when(function (c, x) { c.hop(x); }),
         // try a look without keeping it (the asset manager's menu, on its map): saved = the same shape as the looks file
-        restyle: function (saved) { SAVED = saved || null; crew.forEach(function (c) { c.restyle(); }); }
+        restyle: function (saved) { SAVED = saved || null; if (one) one.restyle(); }
     };
 })();

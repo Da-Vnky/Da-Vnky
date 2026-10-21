@@ -1,14 +1,14 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1480 833325518
-city.html 9866 1159470487
-desk.html 6191 918106522
-index.html 5229 1592810820
-living.html 133705 2956389424
-window-sky.html 1334 2036036286
-workshop.html 22101 912156046
+beyond.html 1476 1886673917
+city.html 9813 1279430893
+desk.html 6182 1383527985
+index.html 5171 2210840071
+living.html 133619 3873908082
+window-sky.html 1328 628785714
+workshop.html 22036 2185871927
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
-sky/babble.js 50324 4253238308
+sky/babble.js 46635 151537111
 sky/bathroom.js 29419 3573512770
 sky/bee.js 114096 3452333838
 sky/beerush.js 8186 121989627
@@ -36,8 +36,8 @@ sky/house.js 11177 2717587795
 sky/inkpad.js 21194 1444381312
 sky/inventory.js 17335 1835204345
 sky/kitchen.js 16998 1806270189
-sky/kotodama-look.js 24071 2300982920
-sky/kotodama.js 63821 329730468
+sky/kotodama-look.js 20216 2715567855
+sky/kotodama.js 57718 3566172663
 sky/letters.js 35904 3087320362
 sky/lives.js 12907 1753024506
 sky/loader.js 17385 2560693991
@@ -71,7 +71,7 @@ sky/veil.js 18751 509778180
 sky/watchers.js 14154 3869253767
 sky/weather.js 25754 4255422177
 sky/paper.css 8047 1201821797
-sky/sky.css 61575 1548442896
+sky/sky.css 61447 3148439350
 sky/css/ambient.css 435 4199751144
 sky/css/attic.css 15736 521837829
 sky/css/bathroom.css 16836 855192362

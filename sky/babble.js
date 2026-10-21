@@ -3,7 +3,7 @@
    syllable at a time, the way little game characters talk. made for the
    companion in the house (sky/kotodama.js), but anything can use it.
 
-     a voice     each kind of little spirit has one (VOICES below): how
+     a voice     the companion's (una's: VOICES below): how
                  high it sits, the scale its tune keeps to, how long its
                  syllables are, how bright or hollow it sounds, how much
                  its pitch bounces about, a little room around it.
@@ -61,11 +61,6 @@
     // scales, as steps up from the voice's own note (semitones)
     var SCALES = {
         majpent:   [0, 2, 4, 7, 9],              // sunny, can't go wrong
-        lydian:    [0, 2, 4, 6, 7, 9, 11],       // a little magic
-        dorian:    [0, 2, 3, 5, 7, 9, 10],       // calm, old
-        phrygdom:  [0, 1, 4, 5, 7, 8, 10],       // mischief
-        hirajoshi: [0, 2, 3, 7, 8],              // deep and hollow
-        yo:        [0, 2, 5, 7, 9],              // folk-song
         sugar:     [0, 2, 4, 7, 9]               // the sugar scale (below): A B C# E F#, heard as A6/9
     };
 
@@ -154,36 +149,6 @@
             // nopitch: every syllable played exactly as sung, at its own note (the sheet has the notes it needs)
             breathe: 1, pace: 230, air: 0, nopitch: true, melody: 'sugar',
             favour: 'pu mi ra ko no pi ma ni ru'.split(' '), squish: 'sugar'
-        },
-        pixie: {                                   // the forest pixie (Argon's whimsical one)
-            name: 'pixie', base: 420, scale: 'lydian', wave: 'pulse-blend', formant: 1.6, q: 7.5, hpf: 240, lpf: 8200,
-            detune: 8, bounce: 28, fm: 155, fmRatio: 3.2, dur: 60, gap: 42, plosive: 45, chirp2: 30, reverb: 0.14,
-            vib: 28, vibRate: 6.4, gliss: 65, erratic: true, color: 0.3,
-            favour: 'pi ti ki ri mi i pe'.split(' '), squish: 'dew'
-        },
-        kitsune: {                                 // the old fox spirit (Argon's mature one)
-            name: 'kitsune', base: 175, scale: 'dorian', wave: 'sawtooth', formant: 0.9, q: 5.5, hpf: 70, lpf: 3400,
-            detune: 12, bounce: 10, fm: 25, fmRatio: 2.0, dur: 105, gap: 68, plosive: 25, chirp2: 0, reverb: 0.3,
-            vib: 34, vibRate: 5.2, gliss: 115, erratic: false, color: 0.3,
-            favour: 'ko no mo o ra ru a'.split(' '), squish: 'silk'
-        },
-        imp: {                                     // the little imp (Argon's corrupted one)
-            name: 'imp', base: 290, scale: 'phrygdom', wave: 'dual-evil', formant: 1.45, q: 12.5, hpf: 180, lpf: 6400,
-            detune: 38, bounce: -42, fm: 320, fmRatio: 1.4, dur: 75, gap: 48, plosive: 75, chirp2: 15, reverb: 0.22,
-            vib: 54, vibRate: 7.6, gliss: 145, erratic: true, color: 0.3,
-            favour: 'ke ki ka ta te ku'.split(' '), squish: 'berry'
-        },
-        hollow: {                                  // the stone guardian (Argon's deep hollow one)
-            name: 'hollow', base: 130, scale: 'hirajoshi', wave: 'sub-hollow', formant: 0.5, q: 11.5, hpf: 30, lpf: 2800,
-            detune: 16, bounce: -14, fm: 40, fmRatio: 0.5, dur: 125, gap: 75, plosive: 30, chirp2: 0, reverb: 0.46,
-            vib: 32, vibRate: 4.3, gliss: 165, erratic: false, color: 0.3,
-            favour: 'mo o u mu no ro'.split(' '), squish: 'cavern'
-        },
-        mochi: {                                   // the bunny mochi (Argon's custom gummy)
-            name: 'mochi', base: 320, scale: 'yo', wave: 'pulse-blend', formant: 1.35, q: 8.5, hpf: 140, lpf: 7200,
-            detune: 12, bounce: 24, fm: 120, fmRatio: 2.4, dur: 72, gap: 45, plosive: 42, chirp2: 22, reverb: 0.22,
-            vib: 34, vibRate: 6.0, gliss: 85, erratic: true, color: 0.3,
-            favour: 'mo chi mi pu po ni'.split(' '), squish: 'jelly'
         }
     };
     function voiceOf(name) { return VOICES[name] || VOICES.una; }
@@ -524,9 +489,6 @@
         }
         var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g2 = ctx.createGain(), two = true, sub = 1;
         switch (V.wave) {
-            case 'sub-hollow':  o1.type = 'sawtooth'; o2.type = 'triangle'; g2.gain.value = 0.85; sub = 0.5; break;
-            case 'pulse-blend': o1.type = 'triangle'; o2.type = 'square';   g2.gain.value = 0.38; break;
-            case 'dual-evil':   o1.type = 'sawtooth'; o2.type = 'square';   g2.gain.value = 0.65; break;
             case 'tri-sine':    o1.type = 'triangle'; o2.type = 'sine';     g2.gain.value = 0.5; break;
             default:            o1.type = V.wave || 'sawtooth'; o2.type = o1.type; g2.gain.value = 0.55; two = V.detune > 0;
         }
@@ -694,12 +656,7 @@
     });
     var SQUISH = {
         // [wave, sub wave, start, middle, end (Hz, jump), the same landing, sub gain, filter from, to, Q]
-        sugar:  ['sine', 'triangle', [520, 880, 1180], [900, 620, 980], 0.24, [1600, 2600], 5.2],    // a sugary little pip
-        dew:    ['sine', 'triangle', [310, 590, 760], [480, 290, 540], 0.28, [950, 1650], 4.2],     // a dewy droplet
-        silk:   ['triangle', 'sine', [185, 240, 295], [265, 210, 165], 0.45, [520, 380], 2.4],     // a soft cushion
-        berry:  ['sawtooth', 'sine', [260, 470, 340], [420, 175, 290], 0.32, [1250, 640], 6.8],    // a fizzy squelch
-        cavern: ['sine', 'sine', [115, 160, 210], [195, 150, 108], 0.35, [360, 520], 5.5],          // a deep water drop
-        jelly:  ['sine', 'triangle', [270, 360, 460], [400, 300, 250], 0.3, [900, 1200], 4.5]       // a star jelly
+        sugar:  ['sine', 'triangle', [520, 880, 1180], [900, 620, 980], 0.24, [1600, 2600], 5.2]     // a sugary little pip
     };
     function squish(name, phase, k) {
         var now = performance.now();
@@ -709,8 +666,8 @@
         if (ownSquish[own] && Sky.sfx) { Sky.sfx('kotodama-' + own, { volume: clamp(0.25 + (k || 0.7) * 0.5, 0, 1) }); return; }
         var e = running();
         if (!e) return;
-        var V = voiceOf(name), S = SQUISH[V.squish] || SQUISH.jelly, ctx = e.ctx, t = ctx.currentTime;
-        var vel = clamp(k || 0.7, 0.2, 1.4), peak = 0.06 * vel, dur = V.squish === 'cavern' ? 0.16 : 0.12;
+        var V = voiceOf(name), S = SQUISH[V.squish] || SQUISH.sugar, ctx = e.ctx, t = ctx.currentTime;
+        var vel = clamp(k || 0.7, 0.2, 1.4), peak = 0.06 * vel, dur = 0.12;
         var f = jump ? S[2] : S[3], o = ctx.createOscillator(), s = ctx.createOscillator(), sg = ctx.createGain(), bp = ctx.createBiquadFilter(), env = ctx.createGain();
         o.type = S[0]; s.type = S[1]; sg.gain.value = S[4];
         o.frequency.setValueAtTime(f[0], t); o.frequency.exponentialRampToValueAtTime(f[1], t + dur * 0.4); o.frequency.exponentialRampToValueAtTime(f[2], t + dur);

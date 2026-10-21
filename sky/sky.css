@@ -1093,9 +1093,8 @@ body:not([data-page=home]):not(.sky-view) .polaris { opacity: 0 !important; visi
    middle (so it's never seen stopping short in mid-air). your own rope: assets/sky/rope, a short piece
    hanging straight down that repeats along its length (sky.js sets --rope-art). and, like any flat prop in
    front of a painted backdrop, each one throws a shadow onto the sky behind it, lit from the front and above. */
-/* (21 Oct) the ropes are thick yarn now (tools/blender/rope.py makes assets/sky/rope): 16 px, 10 on phones (were 5 and 3.5) */
-:root { --stage-shadow: 14px 19px 7px rgba(22, 13, 5, calc(.46 - .16 * var(--dusk, 0))); --rope-w: 16px; }
-@media (max-width: 620px) { :root { --stage-shadow: 8px 11px 5px rgba(22, 13, 5, calc(.34 - .14 * var(--dusk, 0))); --rope-w: 10px; } }
+:root { --stage-shadow: 14px 19px 7px rgba(22, 13, 5, calc(.46 - .16 * var(--dusk, 0))); --rope-w: 5px; }
+@media (max-width: 620px) { :root { --stage-shadow: 8px 11px 5px rgba(22, 13, 5, calc(.34 - .14 * var(--dusk, 0))); --rope-w: 3.5px; } }
 html.stage-strings .sun::before, html.stage-strings .moon::before,
 html.stage-strings .cloud::before, html.stage-strings .cloud::after,
 html.stage-strings .flyer-blimp::before, html.stage-strings .flyer-blimp::after,

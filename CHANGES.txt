@@ -17,10 +17,14 @@ How it works
 
 == published ==
 
+2026-10-21 13:26 · V
+- The little companion is only una, the sugar drop, now, every day: the five others (one a day of the week, and all of them on sundays) are gone, with their voices, their slots and the week/sunday menus in the asset manager's companion tab (sky/kotodama.js, kotodama-look.js, babble.js, tools/assets.html, tools/kotodama.html, tools/slots.json).
+- tools/FOR-FABLE.md: two jobs written up for skizy's Fable to pick up from Forgejo: an "open this scene in Blender" button in the asset manager (every slot of a scene as layers, and back into the slots), and a debug pass over the whole site.
+
 2026-10-21 13:16 · V
 - The asset manager's "draw it in" row has a Blender button: it makes the slot a Blender scene (tools/blender/slot_scene.py, run by tools/drawtable.py with Blender in the background): a camera framing exactly the slot's canvas, the guide behind it (seen through the camera, never rendered), a Grease Pencil object to draw on in Draw mode, light from the upper right, and Ctrl+F12 rendering a see-through PNG into the slot's folder, where the card shows it. It asks where Blender is the first time if it can't find it.
 - The asset manager's Blender scenes come with yarn: every Grease Pencil stroke becomes thick, fuzzy, twisted yarn (or a crochet chain), with pen pressure for thickness and its settings on the yarn object's modifier (tools/blender/yarn.py; it also runs on its own from Blender's Scripting tab).
-- The ropes the sky's props hang from are thick yarn now: 16 px wide (10 on phones, were 5 and 3.5). tools/blender/rope.py renders a seamless yarn rope picture for the assets/sky/rope slot; one is waiting on the rope's card in the asset manager (use this).
+- tools/blender/rope.py renders a seamless yarn rope picture for the assets/sky/rope slot (one is waiting on the rope's card in the asset manager); the ropes on the site stay as they were (5 px).
 - Fixed: in the mornings the letters' mirror-writing style caught the sky too, so the whole sky was flipped, faded and pushed down, leaving a band of bare colour along the top of the screen (sky.css).
 
 2026-10-19 15:55 · V

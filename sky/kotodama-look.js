@@ -1,18 +1,17 @@
 /* =====================================================================
-   kotodama-look.js — how the little companions look, and who comes which
-   day. the drawing lives here so both the house (sky/kotodama.js) and the
-   asset manager's companion tab (its tweaking menu) draw exactly the same
-   one.
+   kotodama-look.js — how the little companion looks. the drawing lives here
+   so both the house (sky/kotodama.js) and the asset manager's companion tab
+   (its tweaking menu) draw exactly the same one.
 
-     the kinds    six of them, each with its own body, head, wings, tail
-                  and little extras, its colours, how see-through and shiny
-                  it is, and its ways (how high it hops, how it wobbles, how
-                  chatty and curious it is). DEFAULTS below.
-     the parts    any kind can wear any part (the asset manager mixes them):
+     the kind     una, the sugar drop: its body, head, wings, tail and little
+                  extras, its colours, how see-through and shiny it is, and its
+                  ways (how high it hops, how it wobbles, how chatty and curious
+                  it is). DEFAULTS below. (21 Oct: there were six, a different
+                  one each day of the week, and all of them in on sundays: the
+                  other five were taken out.)
+     the parts    it can wear any of these (the asset manager mixes them):
                   SHAPES (its body), HEADS, WINGS, TAILS and EXTRAS. each
                   part is drawn for one body and moved to fit another.
-     the week     which one comes each day (the visitor's own day), and on
-                  "everyone's day" (sunday) which room each one lives in.
      your tweaks  assets/characters/kotodama-looks.json, written by the asset
                   manager's menu ("keep these"): only what you changed is in
                   it, everything else stays as below.
@@ -20,7 +19,7 @@
                   this, as soon as it's in (sky/kotodama.js).
 
    Sky.kotodamaLook = { kinds, shapes, heads, wings, tails, extras, faces,
-     days, rooms, week, sunday, spec(kind, saved), svg(spec, id), plan(saved) }
+     spec(kind, saved), svg(spec, id) }
    ===================================================================== */
 
 (function () {
@@ -28,7 +27,7 @@
     if (Sky.kotodamaLook) return;
 
     /* ======================================================================
-       the six, as they are until you change them
+       the sugar drop, as it is until you change it
        name: what it's called. voice: which of sky/babble.js's voices it speaks with.
        hop: how high it hops. spring: how much it wobbles on landing. pace: how far each hop goes.
        chat: how often it talks. wonder: how often it wanders off and thinks. scale: its size.
@@ -41,21 +40,6 @@
         una:     { name: 'the sugar drop',  voice: 'una',     hop: 1.0,  spring: 1.15, pace: 1.0,  chat: 0.6,  wonder: 0.7, scale: 1,
                    shape: 'gumdrop', head: 'swirl', wings: 'none', tail: 'none', extras: ['crystals', 'bow'],
                    c: { body: '#f9c8d6', shade: '#e98fab', light: '#fff6f9', line: '#7d3a50', cheek: '#ff8fae', eye: '#3c1d2b', iris: '#c95a82', glow: '#ffe3ec', mark: '#ff5f8f' } },
-        pixie:   { name: 'the forest pixie', voice: 'pixie',  hop: 1.3,  spring: 1.2,  pace: 1.25, chat: 0.7,  wonder: 0.8, scale: 0.9,
-                   shape: 'dewdrop', head: 'antennae', wings: 'fairy', tail: 'none', extras: ['sheen'],
-                   c: { body: '#68d6a6', shade: '#2f9e72', light: '#dcfff0', line: '#1d5a43', cheek: '#ffd36e', eye: '#163226', iris: '#2a9a70', glow: '#fef08a', mark: '#fef08a' } },
-        kitsune: { name: 'the fox spirit',  voice: 'kitsune', hop: 0.8,  spring: 0.9,  pace: 0.85, chat: 0.4,  wonder: 0.6, scale: 1.08,
-                   shape: 'bun', head: 'foxears', wings: 'none', tail: 'fox', extras: ['flame', 'lights'],
-                   c: { body: '#f7b35c', shade: '#d4863a', light: '#fff2d8', line: '#6a3c13', cheek: '#ff9b70', eye: '#2a190b', iris: '#b0611f', glow: '#fffbeb', mark: '#e8553a' } },
-        imp:     { name: 'the imp',         voice: 'imp',     hop: 1.15, spring: 1.25, pace: 1.2,  chat: 0.65, wonder: 0.6, scale: 0.95, cheeky: true, brave: true,
-                   shape: 'plump', head: 'horns', wings: 'bat', tail: 'devil', extras: [],
-                   c: { body: '#ab79ea', shade: '#7444b8', light: '#eedfff', line: '#391962', cheek: '#fb7185', eye: '#1d0a33', iris: '#fb7185', glow: '#fb7185', mark: '#f5e6c8' } },
-        hollow:  { name: 'the hollow guardian', voice: 'hollow', hop: 0.55, spring: 0.8, pace: 0.7, chat: 0.3, wonder: 0.5, scale: 1.15,
-                   shape: 'totem', head: 'halo', wings: 'none', tail: 'none', extras: ['carvings', 'stones'],
-                   c: { body: '#82cbe9', shade: '#4a93b8', light: '#e3f7ff', line: '#1c4862', cheek: '#a8e4ff', eye: '#0d2735', iris: '#38bdf8', glow: '#e0f2fe', mark: '#38bdf8' } },
-        mochi:   { name: 'the bunny mochi', voice: 'mochi',   hop: 1.2,  spring: 1.35, pace: 1.05, chat: 0.55, wonder: 0.6, scale: 1,
-                   shape: 'mochi', head: 'bunnyears', wings: 'none', tail: 'none', extras: ['nose'],
-                   c: { body: '#f9d6e8', shade: '#e8a9c9', light: '#ffffff', line: '#7a3d5c', cheek: '#ff8fbf', eye: '#3a1c2b', iris: '#ec4899', glow: '#fef08a', mark: '#ec4899' } }
     };
     var COMMON = { clear: 1, shine: 0.65, face: 0, brave: false, cheeky: false };
     var FACES = ['calm', 'happy', 'curious', 'thinking', 'idea', 'puzzled', 'sleepy', 'startled', 'scared', 'giggle'];
@@ -167,19 +151,6 @@
         ['eye', 'its eyes'], ['iris', 'the glint in its eyes'], ['mark', 'its markings (bow, horns, flame…)'], ['glow', 'what glows (lights, ring, antennae)']];
 
     /* ======================================================================
-       the week: which one comes each day (the visitor's own day: 0 is sunday).
-       'all' = everyone's day: each one lives in its own room (SUNDAY), and stays there
-       ====================================================================== */
-    var DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    var WEEK = ['all', 'mochi', 'imp', 'kitsune', 'hollow', 'una', 'pixie'];
-    //   monday the moon's day: the bunny mochi (the rabbit in the moon pounds mochi). tuesday, mars's: the imp.
-    //   wednesday, the trickster's: the fox. thursday, the thunder's: the guardian. friday, venus's: the sugar
-    //   drop. saturday, a day off: the pixie
-    var ROOMS = [['living', 'the living space'], ['bath', 'the bathroom'], ['hall', 'the hallway'], ['kitchen', 'the kitchen'],
-        ['attic', 'the attic'], ['porch', 'the porch'], ['dungeon', 'the dungeon']];
-    var SUNDAY = { living: 'una', bath: 'pixie', hall: '', kitchen: 'mochi', attic: 'hollow', porch: 'kitsune', dungeon: 'imp' };
-
-    /* ======================================================================
        putting it together: one kind's whole look (yours over the defaults), and its drawing
        ====================================================================== */
     function copy(o) { return JSON.parse(JSON.stringify(o)); }
@@ -199,14 +170,6 @@
         s.kind = kind;
         return s;
     }
-    // the week and sunday's rooms (yours over the defaults)
-    function plan(saved) {
-        var week = WEEK.slice(), sunday = copy(SUNDAY);
-        if (saved && saved.week) saved.week.forEach(function (k, i) { if (i < 7 && (k === 'all' || DEFAULTS[k])) week[i] = k; });
-        if (saved && saved.sunday) Object.keys(sunday).forEach(function (r) { var k = saved.sunday[r]; if (k === '' || DEFAULTS[k]) sunday[r] = k; });
-        return { week: week, sunday: sunday };
-    }
-
     // the face: every expression drawn, and the stylesheet shows the one it's making (drawn at y 128)
     function faceSvg(c, id) {
         var ink = c.line, eye = 'url(#kd-eye-' + id + ')';
@@ -268,8 +231,8 @@
 
     Sky.kotodamaLook = {
         kinds: DEFAULTS, common: COMMON, shapes: SHAPES, heads: HEADS, wings: WINGS, tails: TAILS, extras: EXTRAS, colours: COLOURS,
-        faces: FACES, days: DAYS, rooms: ROOMS, week: WEEK, sunday: SUNDAY,
-        spec: spec, plan: plan, svg: svg,
+        faces: FACES,
+        spec: spec, svg: svg,
         file: 'assets/characters/kotodama-looks'
     };
 })();

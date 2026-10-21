@@ -63,11 +63,6 @@
     </section>
     <aside>
         <div class="sheet">
-            <h2>which one</h2>
-            <p class="sub">a different one comes each day of the week, and on everyone’s day (sunday) they’re all in, one in each room (today: <b id="liveKind">…</b>). which one comes when, and how each looks: assets → the little companion. trying another here shows it in the frame only.</p>
-            <div class="chips" id="kinds"></div>
-        </div>
-        <div class="sheet">
             <h2>make it say something</h2>
             <div class="chips" id="lines"></div>
             <div class="row"><input type="text" id="words" placeholder="or some real words, turned into its babble…"><button class="chip" id="sayWords">say it</button></div>
@@ -100,7 +95,6 @@
 <script>
 (function () {
     var frame = document.getElementById('house');
-    var KINDS = { una: 'the sugar drop', pixie: 'the forest pixie', kitsune: 'the fox spirit', imp: 'the imp', hollow: 'the hollow guardian', mochi: 'the bunny mochi', sunday: 'everyone (sunday)' };
     var LINES = { say: 'a remark', ask: 'a question', exclaim: 'an exclamation', muse: 'mm…', giggle: 'a giggle', sigh: 'a sigh', gasp: 'a gasp', hum: 'a little tune' };
     var FACES = ['calm', 'happy', 'curious', 'thinking', 'idea', 'puzzled', 'sleepy', 'startled', 'scared', 'giggle'];
     var ROOMS = { 'the living space': '', 'bathroom': 'bathroom', 'hallway': 'hallway', 'kitchen': 'kitchen', 'attic': 'attic', 'dungeon': 'dungeon', 'porch': 'porch' };
@@ -108,17 +102,15 @@
                    ['formant', 'mouth size', 0.4, 2.2, 0.01], ['q', 'ringing', 1, 20, 0.1], ['reverb', 'room', 0, 0.7, 0.01], ['vib', 'vibrato', 0, 80, 1],
                    // (these three only for a voice that talks with its sheet: how much each syllable rings out, the pace, the breaths)
                    ['breathe', 'breathe', 0, 1, 0.01], ['pace', 'pace (ms)', 60, 320, 1], ['air', 'breaths', 0, 1, 0.01]];
-    var kind = 'una', room = '', lastPlan = null, today = '';
+    var room = '', lastPlan = null;
     function W() { return frame.contentWindow; }
     function K() { var w = W(); return w && w.Sky && w.Sky.kotodama; }
     function B() { var w = W(); return w && w.Sky && w.Sky.babble; }
     function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
     function chips(box, list, on) { Object.keys(list).forEach(function (k) { var b = el('button', 'chip', list[k]); b.dataset.k = k; b.onclick = function () { on(k, b); }; box.appendChild(b); }); }
     function wake() { var b = B(); if (b) b.wake(); }
-    function load() { frame.src = '../living.html?kotodama=' + kind + (room ? '#' + room : ''); }
+    function load() { frame.src = '../living.html' + (room ? '#' + room : ''); }
 
-    chips(document.getElementById('kinds'), KINDS, function (k) { kind = k; mark('kinds', k); load(); });
-    mark('kinds', kind);
     var rooms = document.getElementById('rooms');
     Object.keys(ROOMS).forEach(function (n) { var b = el('button', 'chip stage-chip', n); b.onclick = function () { room = ROOMS[n]; load(); }; rooms.appendChild(b); });
     chips(document.getElementById('lines'), LINES, function (k) { wake(); var c = K(); if (c) c.say(k, { then: noted }); noteSoon(); });
@@ -188,7 +180,6 @@
         var tries = 0;
         (function ready() {
             if (!K() || !B() || !K().ready) { if (tries++ < 40) setTimeout(ready, 150); return; }
-            if (tries === 0 || !today) { today = K().today; document.getElementById('liveKind').textContent = today === 'all' ? 'everyone, one in each room' : (KINDS[today] || today); }
             watchPlans(); ideas(); sliders();
             W().addEventListener('pointerdown', function () { setTimeout(sliders, 400); }, { once: true });
         })();
