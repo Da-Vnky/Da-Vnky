@@ -17,6 +17,12 @@ How it works
 
 == published ==
 
+2026-10-21 13:16 · V
+- The asset manager's "draw it in" row has a Blender button: it makes the slot a Blender scene (tools/blender/slot_scene.py, run by tools/drawtable.py with Blender in the background): a camera framing exactly the slot's canvas, the guide behind it (seen through the camera, never rendered), a Grease Pencil object to draw on in Draw mode, light from the upper right, and Ctrl+F12 rendering a see-through PNG into the slot's folder, where the card shows it. It asks where Blender is the first time if it can't find it.
+- The asset manager's Blender scenes come with yarn: every Grease Pencil stroke becomes thick, fuzzy, twisted yarn (or a crochet chain), with pen pressure for thickness and its settings on the yarn object's modifier (tools/blender/yarn.py; it also runs on its own from Blender's Scripting tab).
+- The ropes the sky's props hang from are thick yarn now: 16 px wide (10 on phones, were 5 and 3.5). tools/blender/rope.py renders a seamless yarn rope picture for the assets/sky/rope slot; one is waiting on the rope's card in the asset manager (use this).
+- Fixed: in the mornings the letters' mirror-writing style caught the sky too, so the whole sky was flipped, faded and pushed down, leaving a band of bare colour along the top of the screen (sky.css).
+
 2026-10-19 15:55 · V
 - The sea no longer turns the day as you scroll: it follows the visitor's clock like every other page, and the whole scene drifts slowly from side to side by itself (2 minutes each way; the far waves move least, the near ones most, the sign with its post) while the waves rock gently on their own (sky/ground-sea.js, sky/css/ground-sea.css; index.html lost data-voyage).
 - Rocks in the foreground on the left of the sea, out of focus: a big one and a middling one just to its right, overlapping a little, one picture (new slot assets/sea/rock; a drawn stand-in until then). The big one drifts from a quarter of the way in to the very edge as the scene pans; the ship starts its day further right, clear of them.

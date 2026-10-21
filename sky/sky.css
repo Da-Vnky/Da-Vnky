@@ -1084,14 +1084,18 @@ body:not([data-page=home]):not(.sky-view) .polaris { opacity: 0 !important; visi
 /* the golden, sunset and dusk skies are painted with the sun going down on the right; while it's
    on the left (coming up), they're flipped to match (sky.js adds .mirror) */
 .skybox.mirror > [data-sky=golden], .skybox.mirror > [data-sky=sunset], .skybox.mirror > [data-sky=dusk] { transform: scaleX(-1); }
+/* (21 Oct) the letters' mirror writing (paper.css .mirror) was catching the skybox too in the mornings: the whole sky flipped
+   (so the evening skies, flipped twice, weren't), faded to .8 and pushed 36 px down, a band of bare colour along the top */
+.backdrop .skybox.mirror { display: block; transform: none; margin: 0; opacity: 1; text-align: initial; font: inherit; color: inherit; }
 
 /* ================= props on ropes: the sky's a stage set (resets 1 and 2 only: sky/state.js) =================
    each prop hangs on a rope from the flies: the rope runs down behind it and ends out of sight behind its
    middle (so it's never seen stopping short in mid-air). your own rope: assets/sky/rope, a short piece
    hanging straight down that repeats along its length (sky.js sets --rope-art). and, like any flat prop in
    front of a painted backdrop, each one throws a shadow onto the sky behind it, lit from the front and above. */
-:root { --stage-shadow: 14px 19px 7px rgba(22, 13, 5, calc(.46 - .16 * var(--dusk, 0))); --rope-w: 5px; }
-@media (max-width: 620px) { :root { --stage-shadow: 8px 11px 5px rgba(22, 13, 5, calc(.34 - .14 * var(--dusk, 0))); --rope-w: 3.5px; } }
+/* (21 Oct) the ropes are thick yarn now (tools/blender/rope.py makes assets/sky/rope): 16 px, 10 on phones (were 5 and 3.5) */
+:root { --stage-shadow: 14px 19px 7px rgba(22, 13, 5, calc(.46 - .16 * var(--dusk, 0))); --rope-w: 16px; }
+@media (max-width: 620px) { :root { --stage-shadow: 8px 11px 5px rgba(22, 13, 5, calc(.34 - .14 * var(--dusk, 0))); --rope-w: 10px; } }
 html.stage-strings .sun::before, html.stage-strings .moon::before,
 html.stage-strings .cloud::before, html.stage-strings .cloud::after,
 html.stage-strings .flyer-blimp::before, html.stage-strings .flyer-blimp::after,

@@ -460,7 +460,7 @@
     }
     /* ---------------- the drawing table: draw it, or animate it, in your own program ---------------- */
     // (tools/drawtable.py through the content manager: a canvas twice the size it's shown at, with a guide of the scene,
-    // opened in Clip Studio, Photoshop or Rebelle; or an animation in Clip Studio or the Rebelle Animator. what you export
+    // opened in Clip Studio, Photoshop, Rebelle or Blender (a scene: tools/blender/slot_scene.py); or an animation in Clip Studio or the Rebelle Animator. what you export
     // back into its folder shows here, with "use this")
     var DT = { table: {}, key: '', panels: [] };
     function drawable(s, kind) { return s.handwriting || kind === 'image' && s.kind !== 'svg' && !/^assets\/(sounds|fonts)\//.test(s.slot) && !/^assets\/resets\/[^\/]+$/.test(s.slot); }
@@ -515,6 +515,15 @@
                 if (r.error) { say(r.error, true); return; }
                 fresh.querySelector('input').checked = false;
                 var size = r.w ? ' (' + r.w + ' × ' + r.h + (r.on ? ', on ' + r.on.replace(/^assets\//, '').replace(/\.\w+$/, '') + ' as the guide' : r.guide ? ', with a guide' : '') + ')' : '';
+                if (r.blender) {                                  // (Blender: a scene, not a canvas: say how it works)
+                    say((r.opened ? 'opened in Blender' : 'made') + ': ' + (r.made === false ? 'your scene, as you left it' : 'a new scene' + size) +
+                        '. Draw on “draw here” (it opens in Draw mode, looking through the camera); Ctrl+F12 saves a render into ' + r.folder +
+                        ' and it’ll show on this card. The guide is behind, through the camera only (Camera › Background Images also has the measurements and your picture now, switched off).' +
+                        (r.made && r.guideWhy ? ' No guide this time: ' + r.guideWhy + '.' : ''), !!(r.made && r.guideWhy));
+                    if (r.playwright) offerPlaywright();
+                    poll();
+                    return;
+                }
                 say((r.opened ? 'opened in ' + r.name : 'made') + ': ' + (r.made === false ? 'your working file, as you left it' : r.animator ? 'a new animation' + size : 'a new canvas' + size) +
                     '. export into ' + (r.animator || path.indexOf('animate') > -1 ? r.folder + '/frames' : r.folder) + ' and it’ll show on this card.' +
                     (r.made && r.guideWhy ? ' No guide this time: ' + r.guideWhy + '.' : '') +
@@ -526,7 +535,10 @@
                 poll();
             }).then(function () { busy = false; all.forEach(function (b) { b.disabled = false; }); });
         }
-        [['csp', 'Clip Studio'], ['ps', 'Photoshop'], ['rebelle', 'Rebelle']].forEach(function (a) { var b = btn(a[1], function () { go('/__draw/open', a[0], a[1]); }, 'sm'); all.push(b); rowD.appendChild(b); });
+        [['csp', 'Clip Studio'], ['ps', 'Photoshop'], ['rebelle', 'Rebelle'], ['blender', 'Blender']].forEach(function (a) {
+            if (a[0] === 'blender' && s.handwriting) return;     // (the writing sheet is for drawing programs)
+            var b = btn(a[1], function () { go('/__draw/open', a[0], a[1]); }, 'sm'); all.push(b); rowD.appendChild(b);
+        });
         [['csp', 'Clip Studio'], ['animator', 'Rebelle Animator']].forEach(function (a) { var b = btn(a[1], function () { go('/__draw/animate', a[0], a[1]); }, 'sm'); all.push(b); rowA.appendChild(b); });
         opts.appendChild(fresh);
         opts.appendChild(btn('show its folder', function () { api('/__draw/reveal', { slot: slot }).then(function (r) { say(r.error || 'opened ' + r.folder, !!r.error); }); }, 'linkish'));
@@ -638,6 +650,7 @@
         // "wrap it": the picture moved by half a tile (so the join's in the middle), opened in the program you last drew in
         function wrapBtn(name) {
             var app = 'csp'; try { app = localStorage.getItem('dt-app') || 'csp'; } catch (e) {}
+            if (app === 'blender') app = 'csp';                   // (mending a join is a painting job: Blender's not for it)
             var label = { csp: 'Clip Studio', ps: 'Photoshop', rebelle: 'Rebelle' }[app] || 'Clip Studio';
             var b = btn('wrap it', function () {
                 if (busy) return;

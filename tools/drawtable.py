@@ -20,6 +20,7 @@ pressing the button again opens it as you left it (a fresh canvas only if you as
     python tools/drawtable.py open assets/living/bee-body csp      make it if need be, and open it in Clip Studio
                                                                    (csp, ps or rebelle)
     python tools/drawtable.py wrap assets/sea/wave-1 wave-1.png csp   a repeating picture moved by half a tile, to mend its join
+    python tools/drawtable.py open assets/sea/ship blender          a Blender scene for it instead (see "Blender" below)
     python tools/drawtable.py animate assets/living/bee-body animator
                                                                    an animation: Victor's Rebelle Animator (or csp)
 
@@ -33,6 +34,11 @@ Animating (the asset manager's "animate in" buttons): the frames go in the slot'
              every time after. this never touches the animator's library itself
 then the slot's card turns the frames into one moving picture (an animated WebP) for the slot, with FFmpeg if
 there is one (the animator's own, or any on the computer) or Pillow.
+
+Blender (21 Oct): "draw it in > Blender" makes <name>.blend instead, with tools/blender/slot_scene.py run in Blender in the
+background: a camera framing exactly the slot (its size, see-through), the guide behind it (seen through the camera, never
+rendered), a Grease Pencil object to draw on in Draw mode, light from the upper right. Ctrl+F12 renders <name>-render-0001.png
+into the slot's folder, where the card shows it. The .psd canvas is made first as usual: the size and the guide come from it.
 
 The file is a .psd: Clip Studio, Photoshop and Rebelle all open those with their layers. Working out the size and
 taking the guide needs Playwright (the same as the template pictures: pip install playwright, then
@@ -50,7 +56,7 @@ APPS_FILE = os.path.join(TABLE, 'apps.json')           # where your art programs
 SLOT = re.compile(r'^assets/((?:resets/reset-[1-8](?:/[a-z0-9-]+)?)|[a-z0-9-]+)/([a-z0-9-]+)$')
 PICTURES = ('png', 'webp', 'gif', 'jpg', 'jpeg', 'svg')
 EXPORTS = ('png', 'webp', 'gif', 'jpg', 'jpeg')
-WORKING = ('clip', 'reb', 'psd', 'psb', 'kra', 'tif', 'tiff')   # (what the programs save their own working files as)
+WORKING = ('clip', 'reb', 'psd', 'psb', 'kra', 'tif', 'tiff', 'blend')   # (what the programs save their own working files as)
 SCALE = 2                                               # twice the size it's shown at on a 1920 x 1080 screen
 BIGGEST = 8000                                          # (no side bigger than this: the programs and the file stay happy)
 GUIDE_OPACITY = 128                                     # the guide layer at half strength (of 255)
@@ -72,7 +78,15 @@ APPS = {
                         r'C:\Program Files\Steam\steamapps\common\Rebelle*\Rebelle*.exe',
                         r'D:\SteamLibrary\steamapps\common\Rebelle*\Rebelle*.exe'],
                 'mac': ['/Applications/Rebelle*.app']},
+    'blender': {'name': 'Blender', 'exe': 'blender.exe',
+                'win': [r'C:\Program Files\Blender Foundation\Blender*\blender.exe',
+                        r'C:\Program Files (x86)\Steam\steamapps\common\Blender\blender.exe',
+                        r'C:\Program Files\Steam\steamapps\common\Blender\blender.exe',
+                        r'D:\SteamLibrary\steamapps\common\Blender\blender.exe'],
+                'mac': ['/Applications/Blender*.app']},
 }
+BLENDER_SCENE = os.path.join(HERE, 'blender', 'slot_scene.py')   # (makes a slot's .blend: see "Blender" at the top)
+BLENDER_WAIT = 240                                      # (seconds Blender may take to make it, in the background)
 
 
 # Victor's Rebelle Animator (his own program, not the site's: see its REBELLE_ANIMATOR_INTEGRATION notes)
@@ -343,6 +357,10 @@ def working_file(folder, stem, app=None):
     have = [os.path.join(folder, n) for n in os.listdir(folder)
             if n.rsplit('.', 1)[-1].lower() in WORKING and not n.startswith(('.', '_'))
             and '-wrapped.' not in n.lower()]
+    if app == 'blender':                                # (Blender opens only its own: a .blend, or none yet)
+        mine = [p for p in have if p.lower().endswith('.blend')]
+        return max(mine, key=os.path.getmtime) if mine else None
+    have = [p for p in have if not p.lower().endswith('.blend')]    # (and no other program opens a .blend)
     own = {'csp': '.clip', 'rebelle': '.reb'}.get(app)
     if own:                                             # (Clip Studio's .clip, Rebelle's .reb: that program's own, first)
         mine = [p for p in have if p.lower().endswith(own)]
@@ -1027,6 +1045,8 @@ the slot's card then plays them, with a "use as animation" button that makes the
 
 def make(slot, fresh=False, view=None, app=None):
     """make the starting file (unless there's one already). → { file, folder, w, h, guide, made, view }"""
+    if app == 'blender':
+        return blender_scene(slot, fresh, view)
     folder, stem, _ = where(slot)
     s, sc, _ = described(slot)
     if s.get('handwriting'):                            # (your handwriting: a sheet of boxes to write in, tools/handwriting.py)
@@ -1127,6 +1147,53 @@ def make(slot, fresh=False, view=None, app=None):
             'tile': result.get('tile'), 'measured': measured,
             'measureWhy': None if measured else (MEASURE_WHY[0] if MEASURE_WHY else result.get('why') or 'no browser to draw it in'),
             'guideWhy': guide_why, 'playwright': bool(guide_why == NO_PLAYWRIGHT or 'playwright' in str(MEASURE_WHY).lower())}
+
+
+def blender_run(exe):
+    """the program itself, to run in the background (on a Mac, the one inside Blender.app)"""
+    if exe.lower().endswith('.app'):
+        inner = os.path.join(exe, 'Contents', 'MacOS', 'Blender')
+        if os.path.exists(inner):
+            return inner
+    return exe
+
+
+def blender_scene(slot, fresh=False, view=None):
+    """the slot's Blender scene (tools/blender/slot_scene.py), made from its canvas: the same size and guide.
+    -> { file, folder, w, h, guide, made, blender } or { need: 'blender' } when it can't find Blender"""
+    folder, stem, _ = where(slot)
+    have = None if fresh else working_file(folder, stem, 'blender')
+    if have:
+        return {'file': have, 'folder': folder, 'made': False, 'blender': True}
+    exe = find_app('blender')
+    if not exe:
+        return {'opened': False, 'need': 'blender', 'name': APPS['blender']['name'], 'folder': folder}
+    canvas = make(slot, fresh=False, view=view)         # (the .psd's size and its guide pictures in layers/)
+    W, H = (canvas['w'], canvas['h']) if canvas.get('w') else psd_size(canvas['file'])
+    blend = os.path.join(folder, stem + '.blend')
+    if os.path.exists(blend):                           # (a fresh one: the old one is kept, out of the way)
+        os.replace(blend, os.path.join(folder, '_' + stem + time.strftime('-%Y%m%d-%H%M%S') + '.blend'))
+    args = [blender_run(exe), '-b', '--factory-startup', '--python', BLENDER_SCENE, '--',
+            '--w', str(W), '--h', str(H), '--out', blend, '--render', '//' + stem + '-render-', '--slot', slot]
+    for key, name in (('guide', 'guide.png'), ('marks', 'measurements.png')):
+        p = os.path.join(folder, 'layers', name)
+        if os.path.exists(p):
+            args += ['--' + key, p]
+    mine = current_file(slot)
+    if mine and mine.rsplit('.', 1)[-1].lower() in ('png', 'jpg', 'jpeg', 'webp'):
+        args += ['--art', mine]
+    try:
+        r = subprocess.run(args, cwd=ROOT, capture_output=True, text=True, timeout=BLENDER_WAIT, stdin=subprocess.DEVNULL,
+                           encoding='utf-8', errors='replace')
+    except subprocess.TimeoutExpired:
+        raise ValueError('Blender took more than ' + str(BLENDER_WAIT) + " seconds to make the scene, so it was stopped")
+    made = [x for x in (r.stdout or '').splitlines() if x.strip().startswith('{"made"')]
+    if not made or not os.path.exists(blend):
+        why = [x for x in ((r.stderr or '') + '\n' + (r.stdout or '')).splitlines() if x.strip()]
+        raise ValueError("Blender couldn't make the scene: " + (why[-1] if why else 'no reason given'))
+    return {'file': blend, 'folder': folder, 'w': W, 'h': H, 'made': True, 'blender': True,
+            'guide': os.path.exists(os.path.join(folder, 'layers', 'guide.png')), 'measured': True,
+            'guideWhy': canvas.get('guideWhy'), 'playwright': canvas.get('playwright')}
 
 
 def untouched_old(have, folder):
@@ -1269,7 +1336,11 @@ def main():
             out = animate(slot, app, fresh=fresh, view=view)
         else:
             out = make(slot, fresh=fresh, view=view, app=app)
-            if app:
+            if app and out.get('need'):                 # (Blender, not found: the card asks where it is)
+                pass
+            elif app == 'blender':
+                out.update(open_in(app, out['file']))
+            elif app:
                 size = (out['w'], out['h']) if out.get('w') else psd_size(out['file'])
                 out.update(open_in(app, out['file'], size))
         for k in ('file', 'folder'):

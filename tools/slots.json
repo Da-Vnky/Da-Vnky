@@ -102,7 +102,7 @@
       {
        "slot": "assets/sky/rope",
        "what": "the rope the sky's props hang from in resets 1 and 2: a short piece hanging straight down, that repeats along its length",
-       "size": "e.g. 20 x 80 (drawn 5 px wide on the page, so thin detail is lost), see-through at the sides",
+       "size": "e.g. 120 x 480 (drawn 16 px wide on the page, 10 on phones), see-through at the sides. tools/blender/rope.py makes one out of the yarn",
        "tile": "y",
        "canvas": "60 x 240"
       },
@@ -858,7 +858,7 @@
       },
       {
        "slot": "assets/sea/city",
-       "what": "the port city the dock leads to: from just left of the dock to the right-hand edge, standing on the sea's floor, as tall as the sea plus 34% of the screen, so it rises up past the sign (see-through above the roofs; it's dimmed at night; -glow: its lit windows and lamps, warm, fading in at dusk). it stays still while the sea drifts (it's far off), its right edge at the screen's",
+       "what": "the port city the dock leads to: from just left of the dock to the right-hand edge, standing on the sea's floor, as tall as the sea plus 34% of the screen, so it rises up past the sign (see-through above the roofs; it's dimmed at night; -glow: its lit windows and lamps, warm, fading in at dusk). it stays still while the sea drifts (it's far off), its right edge at the screen's right edge",
        "size": "taller than wide, about 3:4, e.g. 920 x 1200, kept to its bottom-left corner",
        "glow": true
       },

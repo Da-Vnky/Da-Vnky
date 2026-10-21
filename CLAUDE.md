@@ -577,6 +577,41 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - **Frames → the slot** (`assemble`, `POST /__draw/frames`): one animated WebP (`<name>-animation.webp`, see-through kept), with
   FFmpeg (the animator's `ffmpeg`, or one on the PATH: `libwebp_anim`, yuva420p) or Pillow; over the 30 MB upload limit at full
   size → made again at half size, and the card says so.
+- **Blender** (21 Oct, Victor: Blender in the "open in" buttons, with templates; a yarn/crochet setup for the strokes is to come
+  from a script Argon wrote, which Claude will fold into slot_scene.py directly: no plug-in folder). `APPS['blender']` (Program
+  Files\Blender Foundation\Blender*, Steam; else the card asks, `remember_app`). `make(app='blender')` → `blender_scene()`: the
+  slot's `.blend` if there is one (`working_file(..., 'blender')` only ever returns a .blend, and no other program is handed one),
+  else the usual .psd canvas first (its size; its `layers/guide.png` and `measurements.png`), then `blender -b --factory-startup
+  --python tools/blender/slot_scene.py -- --w --h --out <stem>.blend --render //<stem>-render- --slot [--guide --marks --art]`
+  (`BLENDER_WAIT` 240 s; a fresh one moves the old .blend aside as `_<stem>-<time>.blend`), then opens it. slot_scene.py (Blender
+  4.0 on; checked with 4.5 and 5.2): the factory scene emptied; an orthographic camera at -Y looking +Y (`VIEW` 10 units across the
+  longer side) framing exactly W x H; camera background images: the guide (shown, .6), the measurements and the slot's picture now
+  (off); a sun from the upper right and a pale world; EEVEE, see-through film, Standard view, PNG RGBA, frame 1 only, so Ctrl+F12
+  (Render Animation) saves `<stem>-render-0001.png` beside the .blend (the card's exports list picks it up); a Grease Pencil
+  object "draw here" (the new kind from 4.3: `grease_pencils_v3` in 4.3-4.5, `grease_pencils` from 5.0) with an "ink" material,
+  drawing on the front plane, active and in Draw mode; every 3D view looking through the camera in Material Preview; a "how to"
+  text; saved with relative paths, no .blend1. The card (assets.html) says how to use it (`r.blender`); "wrap it" never picks
+  Blender (it falls back to Clip Studio). Tested 21 Oct in the cloud with a stand-in `blender` that runs the bpy module: the card's
+  button, the "where is Blender?" prompt, the scene (size, guide, Draw mode, camera views), and a Ctrl+F12-style render.
+- **The yarn** (21 Oct, Victor: "make it look almost crochet like or like a really thick yarn", after SouthernShotty's "Fuzzy
+  Fabric" tutorial; Argon's first script hung the fuzz's curves on the Grease Pencil object, where Blender never draws them):
+  `tools/blender/yarn.py`, imported by slot_scene.py (`yarn.add(scene, drawing)`, Blender 4.3 on) or run alone from the Scripting
+  tab (`add_to_scene()`). A "yarn" **Curves (hair) object** (only those draw curves as hair; it draws the mesh too) with the node
+  group "DaV yarn" reading the drawing (Object Info → Grease Pencil to Curves): `yarn_r` = Thickness × (1 − Pressure + Pressure ×
+  radius / thickest radius), `yarn_color` = Colour, or the brush's vertex colour where used (the scene's brush is in Vertex Color
+  mode); strand: the stroke copied per ply (Duplicate Elements), each wound round it (normal/binormal by angle = ply/plies × 2π +
+  length / (2 × Thickness × Twist length) × 2π), Curve to Mesh with `yarn_along`/`yarn_around` for the fibres, then swollen and
+  thinned by noise (0.3 × Thickness); crochet chain: oval loops instanced along it, every other one tipped; fuzz: points on the
+  surface (Fuzz × 60 / Thickness²), short curling fibres (mostly very short, a few long), tapered, `yarn_fuzz` marks them. Material
+  "DaV yarn": colour unevenness, fibre stripes and fine noise in the bump, roughness 1, sheen .8 tinted by the colour, the fuzz
+  70% see-through (dithered/hashed) so it's a haze not wires; a "yarn rim light" (area, behind). Modifier inputs are set with
+  `set_input` (Blender 5.2 keeps them in `mod.properties.inputs.<id>.value`, earlier ones as ID properties). Shader sockets 'Fac'
+  became 'Factor' in Blender 5 (`ALIAS`). Checked rendering in Blender 4.5 and 5.2 (the bpy module).
+- **The ropes** (21 Oct, Victor: these as the props' ropes): `tools/blender/rope.py` (`blender -b --factory-startup --python
+  tools/blender/rope.py -- --out <png> [--w 120 --h 480 --colour r,g,b --fuzz .6 --turns 3]`): a straight yarn three tiles long,
+  Twist length set so a tile holds a whole number of turns, the middle tile kept and its last rows blended into what follows them,
+  so it repeats without a join. The first one (tan wool) is on the table, `tools/drawing/sky--rope/rope-yarn.png`, for "use this".
+  sky.css `--rope-w` 16px (phones 10px; were 5 and 3.5).
 - **Pictures that repeat** (11 Oct, Victor: "like the waves"): slots.json `"tile": "x" | "y" | "xy"` (the waves: x, with
   `"tileGuide": "assets/templates/wave-N-guide.png"`; the rope: y), `"canvas": "W x H"` (the canvas as it is, not doubled:
   waves 3024 x 1008, rope 60 x 240). `make` then builds one tile on a blank page (`tile_canvas`, `TILE_GUIDE`: the tileGuide
