@@ -184,6 +184,7 @@ content/living/bottles/2026-10-11-from-claude.txt 751 97236426
 content/living/bottles/board.json 132 3001581082
 content/living/bottles/list.txt 225 1104328745
 content/workshop/visitors/list.txt 235 2157225356
+baked/baked.json 11417 2994304259
 schizophyllu.me.room/index.html 5156 668732473
 schizophyllu.me.room/assets/font.css 30693 1584298999
 schizophyllu.me.room/room/audio.js 15832 3536447765
