@@ -132,7 +132,7 @@
 
     // key: where the reset's key is hidden. page: sea, workshop, city, living; in: which part of the page
     // (a selector); left/top: where in it; where: said in the content manager.
-    // or drop: something in the game drops it instead ('claubes': sky/claubes.js), wherever that happens.
+    // or drop: something in the game drops it instead ('hell', 'watcher', 'microwave'), wherever that happens.
     // after: what the traveller says once it's found (a nudge towards the reset's way out)
     // phrase: what the reset's death leaves them with, written on the white as the world resets (sky/forget.js), one line
     //   of the answer to the Demiurge at the end (sky/gnosis.js). claim: what the Demiurge says that line answers: each
@@ -259,7 +259,7 @@
     /* ---------------- the end (reset 8, sky/gnosis.js) ----------------
        localStorage "dav-ending": "escaped" (they went home: every page of the site is beyond.html from then on, its button
        the way back onto the Sophia path) or "stayed" (they stayed to wake the others: the world in its colours again, no more
-       resets: html.free-world). like the reset number, it's kept between visits till "forget your stay" */
+       resets: davSave.free). like the reset number, it's kept between visits till "forget your stay" */
     function ending() { var e = get('dav-ending'); return e === 'escaped' || e === 'stayed' ? e : ''; }
     try {                                                               // (testing, your own computer only: ?ending=stayed / escaped / none)
         var me = LOCAL && /[?&]ending=(stayed|escaped|none)/.exec(location.search);
@@ -276,7 +276,6 @@
         var here = document.currentScript && document.currentScript.src;
         try { location.replace(new URL('../beyond.html', here || location.href).href); } catch (e) { location.replace('beyond.html'); }
     }
-    if (ending() === 'stayed' || posting) document.documentElement.classList.add('free-world');
 
     // resets 1 and 2: the sky's a stage set, its props hung on strings (sky/sky.css)
     if (sphere() <= 2) document.documentElement.classList.add('stage-strings');

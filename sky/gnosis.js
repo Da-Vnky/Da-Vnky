@@ -21,8 +21,8 @@
      the choice    a door of light on the horizon. go home: "escaped", and from then
                    on the whole site is beyond.html (sky/beyond.js): space, and the
                    last of the music. or stay, and wake the others (skizy): "stayed",
-                   the world in its colours again, no more resets (html.free-world;
-                   sky/state.js davSave.ending / free). both are kept between visits
+                   the world in its colours again, no more resets (sky/state.js
+                   davSave.ending / free). both are kept between visits
                    till "forget your stay".
 
    slots: assets/sky/demiurge (the Demiurge come down: a lion-faced eye, see-through

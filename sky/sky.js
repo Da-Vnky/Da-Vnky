@@ -1,15 +1,15 @@
 /* =====================================================================
    sky.js — the shared sky: daylight → sunset → midnight as you scroll,
-   sun, moon, clouds, stars, Ursa Minor, the night-sky links, and Polaris,
-   which is always visible and always takes you home.
+   sun, moon, clouds, stars, Ursa Minor, the night-sky links, and Polaris
+   (an easter egg).
 
    Load it at the END of <body>, before any ground script:
        <script src="sky/sky.js"></script>
        <script src="sky/ground-sea.js"></script>   (or -countryside / -city)
 
    Page options (attributes on <body>):
-       data-page="home"      this page IS the homepage (Polaris scrolls back up
-                             to daylight instead of reloading)
+       data-page="home"      this page IS the homepage (the signpost instead of
+                             the tabs)
        data-place="workshop" which of the PLACES below this page is, so its
                              sign reads "you are here"
        data-voyage="110"     (with data-scroll-time) how much empty sky to scroll through after
@@ -27,7 +27,7 @@
 
     /* ======================= settings you can edit ======================= */
 
-    // where Polaris takes you
+    // the homepage (the sea's tab)
     var HOME = 'https://dav-nky.pleroma.nexus/';
     // previewing on your own computer (tools/preview): home stays on your computer too
     if (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)$/.test(location.hostname)) HOME = 'index.html';
@@ -494,7 +494,6 @@
         sign.appendChild(el);
     });
     // the signpost stands on the homepage's dock; everywhere else there are tabs (below)
-    // (and Polaris, always, takes you home)
     if (isHome) body.appendChild(sign);
     // slots: assets/sky/plank (every sign) and assets/sky/plank-here (the one you're standing at)
     sign.dataset.slot = 'assets/sky/plank assets/sky/plank-here';
@@ -627,7 +626,6 @@
         if (!a || e.defaultPrevented) return;
         if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // new tab etc.
         e.preventDefault();
-        if (a.dataset.place === here) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
         leave(a.href);
     }
     sign.addEventListener('click', onPlaceClick);
@@ -721,7 +719,6 @@
         for (var i = 1; i < at.length; i++) if (t < at[i][0]) { var a = at[i - 1], b = at[i]; p = a[1] + (b[1] - a[1]) * Math.max(0, (t - a[0]) / (b[0] - a[0])); break; }
         return evening ? p * Math.PI : 2 * Math.PI - p * Math.PI;
     }
-    if (still) body.classList.add('still-time');
     var voyage = document.createElement('div');
     voyage.className = 'voyage';
     voyage.setAttribute('aria-hidden', 'true');
