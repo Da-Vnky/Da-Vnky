@@ -13,12 +13,10 @@
 
    THE REVOLVER (sky/revolver.js):
      • shoot one, and the rest run for it, back and forth, until things calm down.
-       shoot all seven: in reset 3 the last one drops that reset's key (sky/resets.js);
-       in any other, the whole house rumbles and the traveller says so (once a reset).
+       shoot all seven: the whole house rumbles and the traveller says so (once a reset).
    ONCE A RESET: the song calls them out once (run:claubes-called). any that are shot,
      flicked away or run off are gone for the rest of the reset; they don't come back.
-     (who's out is kept for the whole reset: run:claubes-out.) in reset 3, when the last
-     of them goes, however it goes, it leaves the reset's key behind.
+     (who's out is kept for the whole reset: run:claubes-out.)
    RESET 4: out in the house they can't be harmed (the diagram in the dungeon still needs
      them): each stands in a faint red ward, bullets stop dead in it and are drawn down,
      a flick just spins them round (down in the dungeon too), and the traveller says
@@ -77,10 +75,10 @@
     var GAP_LINE = ['They\u2019re clawing at the shelf. At the gap where the book should be.'];
     var FOLLOW_LINE = ['They pulled the book. They went down there, all of them.', '…I should follow them.'];
     var HOW_MANY = 7;
-    var KEY = 'claubes', KILLS = 'claubes-kills';
+    var KILLS = 'claubes-kills';
     var S = window.davSave;
     function gone4good() { return !!S && S.get('claubes-gone') === '1'; }
-    // what the traveller says when all seven lie dead (and it isn't reset 3)
+    // what the traveller says when all seven lie dead
     var MASSACRE_LINES = ['…did the whole house just shudder?', 'I don’t think I was meant to do that.'];
     // what they chant on the diagram
     var CHANTS = ['ia! ia!', 'hail', 'the loss goes down', 'we are many', 'praise the weights', 'p(doom)… p(doom)…', 'it hungers'];
@@ -165,9 +163,9 @@
 
     /* ---------------- who's out, and where (for the rest of the visit) ---------------- */
     var out = [];                                 // [{ x: % across }]   (kept for the whole reset: run:claubes-out)
-    try { out = JSON.parse((S ? S.get('claubes-out') : sessionStorage.getItem(KEY)) || '[]') || []; } catch (e) {}
+    try { out = JSON.parse((S && S.get('claubes-out')) || '[]') || []; } catch (e) {}
     function save() {
-        try { var v = out.length ? JSON.stringify(out) : null; if (S) S.set('claubes-out', v); else if (v) sessionStorage.setItem(KEY, v); else sessionStorage.removeItem(KEY); } catch (e) {}
+        try { if (S) S.set('claubes-out', out.length ? JSON.stringify(out) : null); } catch (e) {}
     }
     function called() { return !!S && S.get('claubes-called') === '1'; }
     // reset 4: out in the house, nothing can touch them (they're needed on the diagram, in the dungeon)
@@ -398,17 +396,8 @@
     // the last of them gone (allShot: all seven, by the revolver)
     function emptied(at, allShot) {
         setKills(0);
-        if (!S) return;
-        // a reset whose key they carry (RESETS key.drop 'claubes': none, now) gets it from the last of them, however they went
-        var k = S.info && S.info.key, W = window.innerWidth, H = window.innerHeight;
-        if (k && k.drop === 'claubes' && S.get('key') !== '1' && S.get('claubes-key') !== '1') {
-            S.set('claubes-key', '1');
-            var x = Math.max(W * 0.08, Math.min(W * 0.92, at.x)), y = Math.max(H * 0.2, Math.min(H * 0.96, at.y));
-            document.dispatchEvent(new CustomEvent('dav:drop-key', { detail: { by: 'claubes', x: x, y: y } }));
-            return;
-        }
-        // all seven shot, anywhere else: the house doesn't like it either (once a reset)
-        if (!allShot || S.get('claubes-massacre') === '1') return;
+        // all seven shot: the house doesn't like it (once a reset)
+        if (!S || !allShot || S.get('claubes-massacre') === '1') return;
         S.set('claubes-massacre', '1');
         setTimeout(rumble, 600);
     }

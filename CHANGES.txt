@@ -27,6 +27,12 @@ How it works
 - Letters and bottles can't carry hidden code any more: a link or picture in one only goes to a web address, an email or the site's own files, and a quote mark can't break out of it (Sky.txtToHtml in sky/sky.js, the desk's preview in sky/desk.js, the content manager's in tools/letters.html). Before this, a visitor's bottle, once kept, could have run a stranger's script for everyone in the living space.
 - The bottle from Claude (content/living/bottles/2026-10-11-from-claude.txt) says "the artist" now instead of a name.
 - sky/hand.js has a ?v= on index.html and template.html: publishing only refreshes stamps that are already there, so it never had one and visitors' browsers could keep an old copy.
+2026-10-21 14:31 · skizy
+- Tidy-up, nothing should look or play differently: the Claubes no longer carry code for dropping a reset's key (no reset gives them one since reset 3's key moved into the pie), and their old sessionStorage fallback for who's out is gone, since every page that has them has the game's save (sky/claubes.js, CLAUDE.md).
+- Tidy-up: the voice below no longer has a fallback for when the traveller's speech box is missing; it's always there on the living space (sky/hell.js).
+- Tidy-up: a death no longer counts itself into localStorage lives-lost, which nothing read (sky/gore.js). The reset still forgets any old count.
+- Tidy-up: two classes nothing used are no longer set, html.free-world (the stayed ending: davSave.free is what the scripts check) and body.still-time; and a tab click for the page you're on, which can't happen (that tab isn't a link), is gone (sky/state.js, sky/sky.js, CLAUDE.md).
+- Comments put right: Polaris doesn't take you home (sky/sky.js), which resets drop their key (sky/resets.js, sky/state.js, CLAUDE.md: reset 8 has none, not one on the chimney), the Claubes and reset 3 (sky/claubes.js), the -1 heart that's gone (sky/gore.js), a doubled comment (sky/eye.js), and template.html's sky-viewer note no longer points at city.html.
 
 2026-10-21 13:26 · V
 - The little companion is only una, the sugar drop, now, every day: the five others (one a day of the week, and all of them on sundays) are gone, with their voices, their slots and the week/sunday menus in the asset manager's companion tab (sky/kotodama.js, kotodama-look.js, babble.js, tools/assets.html, tools/kotodama.html, tools/slots.json).

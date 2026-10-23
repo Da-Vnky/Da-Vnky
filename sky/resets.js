@@ -7,7 +7,7 @@
                    on, dying costs a life. its picture: the reset's own
                    assets/resets/reset-<n>/key, or assets/ui/key for all of them.
                    a key with "drop" isn't hidden: something drops it where it
-                   happens (none does now: reset 3's is in the pie in the fridge)
+                   happens (reset 4's eye, 6's watcher, 7's microwave)
      the roof      the jump off the roof, and the street far below (a cutscene): no longer a death of
                    its own (27 Sep: one death a reset). it's how reset 3's ends: back from skizy's room,
                    the traveller goes off the edge (skizyDeath), and the next reset starts on the porch

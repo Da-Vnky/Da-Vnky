@@ -1712,8 +1712,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - **Claubes** (`claubes.js`, the P(Doom) easter egg):
   - **Once a reset**: the song calls them out once (`run:claubes-called`); who's out is kept for the reset
     (`run:claubes-out`, not the visit). Any that are shot, flicked or scatter (the traveller or a record shot)
-    are gone for the rest of the reset. (`emptied()` can still make the last one drop a key for a reset whose
-    `RESETS` key has `drop: 'claubes'`; none does now.) The debug page's Claubes switch clears all this.
+    are gone for the rest of the reset. The debug page's Claubes switch clears all this.
   - **Reset 4, outside the dungeon** (`warded()`): they can't be harmed. A red ward ellipse at their feet
     (`body.claube-warded`); bullets stop in it (the absorb effect), flicks just spin them (in the dungeon too),
     scatters become a panic; the traveller says `WARD_LINES` ("Something is protecting them."). Only the white
@@ -1777,7 +1776,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   etc., the rope's own shadow off), so the picture and its `-glow` twin (two GIFs, never in step) can't flicker.
   From reset 3 the ropes are gone (checked). A reset's own sun is shown at double size.
 - Reset 3's key is in the pie in the kitchen fridge (above); 4's below; 5's behind the peeling wallpaper; 6's dropped by the
-  hallway's unblinking eye and 7's by the microwave (`drop`, with `host`: the room it lands in, resets.js); 8's on the chimney. `nextReset()` in reset 8 starts reset 8 again.
+  hallway's unblinking eye and 7's by the microwave (`drop`, with `host`: the room it lands in, resets.js); 8 has none (`drop: 'gnosis'`, never dropped: the way on is knowing). `nextReset()` in reset 8 starts reset 8 again.
 - The golden/sunset/dusk skyboxes are mirrored while the sun is on the left (sunrise).
 
 ## Resets 5 to 8: the world uncovering itself (5 Oct)
@@ -1839,9 +1838,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     (10 Oct, Victor: the drawn whoosh was too loud and is gone: silence till the reprise, 6 s after the first tap. Only his
     own `assets/sounds/beyond` would play, at 0.35.)
     **Leaving a message** always works: beyond's "leave a message" → `index.html#message`, the one page state.js lets through
-    (`davSave.posting`, `html.posting-only`: free-world look, no signpost/tabs/buttons); post.js opens the desk at once and
+    (`davSave.posting`, `html.posting-only`: the stayed world's look, no signpost/tabs/buttons); post.js opens the desk at once and
     goes back to beyond.html when it's thrown or put away.
-  - `stayed`: `html.free-world`, `davSave.free`: no grey (source.js off), no red sky (sky.js), no eye (eye.js: the ordinary
+  - `stayed`: `davSave.free`: no grey (source.js off), no red sky (sky.js), no eye (eye.js: the ordinary
     sun), no déjà vu; once, "It's quiet. The sky's only the sky now." and skizy still in the dark (`free-said`). Nothing for
     "waking the others" is built yet (skizy's room is the obvious place: *Still to do*).
 - Testing: `?ending=stayed|escaped|none` on any page (localhost only, like `?reset=N`) sets or clears it. Run `?reset=8`

@@ -149,10 +149,7 @@
     }
     function voice(lines, done, low) {
         var o = { who: WHO, cls: 'voice' + (low ? ' low' : ''), blip: 'hell-voice', blipOr: 'murmur', hold: 2400 };
-        if (Sky.speak) { Sky.speak(lines, done, o); return; }
-        if (typeof lines === 'string') lines = [lines];
-        if (Sky.inventory) Sky.inventory.say(lines.join(' '), 6000);
-        if (done) setTimeout(done, 6000);
+        Sky.speak(lines, done, o);
     }
     // the traveller's been dragged down (sky/attic.js): here, then back (back())
     function enter(me, back) {

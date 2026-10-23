@@ -11,7 +11,6 @@
      assets/characters/giblet-1 … giblet-6   bits that fly off (any you add join the stand-ins' places)
      assets/characters/skeleton     what's left after an electrocution (feet at the bottom, like the character)
      assets/characters/zapped       the x-ray frame flickered in while it happens (optional)
-     assets/ui/heart                the heart in the "-1" that floats up when they come back
    sounds: assets/sounds/scream, splat, zap, respawn
    ===================================================================== */
 
@@ -248,7 +247,6 @@
             setTimeout(function () { el.classList.remove('gore-back'); }, 600);
             sfx('respawn');
         }
-        try { var n = +(localStorage.getItem('lives-lost') || 0) + 1; localStorage.setItem('lives-lost', n); } catch (e) {}
         document.dispatchEvent(new CustomEvent('dav:traveller-died'));     // (every death ends here: sky/lives.js counts them)
     }
 
