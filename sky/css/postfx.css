@@ -1,0 +1,49 @@
+/* postfx.css: what the artist added to a scene in Blender (sky/postfx.js): light, mist, glow and bokeh over the scene */
+.postfx-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.postfx-hidden { visibility: hidden !important; }
+
+/* the layer the light goes in: over the scene, under the buttons; in a room it slides with it */
+.postfx-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    overflow: hidden;
+    transition: opacity .6s;
+}
+.postfx-layer.on-page { position: fixed; }
+.postfx-layer.away { opacity: 0; visibility: hidden; transition: opacity .3s, visibility 0s .3s; }
+
+/* light and mist, drawn for a 1920 x 1080 screen: spread over this one */
+.postfx-over {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.postfx-over.blend-screen { mix-blend-mode: screen; }
+.postfx-over.blend-add { mix-blend-mode: plus-lighter; }
+
+/* bokeh: a soft disc of light, brighter at dusk (--dusk, sky.js), breathing and wandering a little */
+.postfx-bokeh {
+    position: absolute;
+    left: var(--bk-x);
+    top: var(--bk-y);
+    width: var(--bk-size);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(var(--bk-c), .85) 0, rgba(var(--bk-c), .55) 42%, rgba(var(--bk-c), .18) 62%, rgba(var(--bk-c), 0) 72%);
+    mix-blend-mode: screen;
+    opacity: calc(var(--bk-s) * (var(--bk-day) + (1 - var(--bk-day)) * var(--dusk, 0)));
+}
+.postfx-bokeh.breathes { animation: postfx-breathe var(--bk-pulse) ease-in-out var(--bk-delay) infinite alternate; }
+@keyframes postfx-breathe {
+    0% { scale: .92; transform: translate(0, 0); filter: brightness(.85); }
+    50% { transform: translate(var(--bk-drift), calc(var(--bk-drift) * -.6)); }
+    100% { scale: 1.06; transform: translate(calc(var(--bk-drift) * -.5), calc(var(--bk-drift) * .4)); filter: brightness(1.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .postfx-bokeh.breathes { animation: none; }
+}

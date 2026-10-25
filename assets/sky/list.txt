@@ -9,6 +9,7 @@ cloud-4.webp
 cloud-5.webp
 cloud.webp
 moon.webp
+plank.webp
 skybox-day.jpg
 skybox-dusk.jpg
 skybox-golden.jpg

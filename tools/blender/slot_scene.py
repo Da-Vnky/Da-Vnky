@@ -91,6 +91,8 @@ def make_scene(w, h, out, render, guide=None, marks=None, art=None, slot=''):
     cam.location = (0.0, -20.0, 0.0)
     cam.rotation_euler = (math.pi / 2, 0.0, 0.0)
     scene.camera = cam
+    # (24 Oct) locked where it is, so the render (Ctrl+F12) always frames exactly the slot, however the view's turned
+    cam.lock_location = cam.lock_rotation = cam.lock_scale = (True, True, True)
     cd.show_passepartout = True
     cd.passepartout_alpha = 0.9
     cd.show_background_images = True

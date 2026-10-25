@@ -1,6 +1,7 @@
 # written by tools/update-lists.sh: every art file in this folder.
 # no need to edit it; it's rewritten each commit.
 dock.webp
+rock.webp
 ship.webp
 wave-1.webp
 wave-2.webp

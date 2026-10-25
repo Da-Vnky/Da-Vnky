@@ -4,8 +4,8 @@ Victor's personal site, **dav-nky.pleroma.nexus**: a da Vinci–notebook world (
 feel) that's also a small game. Hosted on his friend skizy's server (pleroma.nexus) as a subdomain. Read
 this before changing anything; keep it up to date when something here stops being true.
 
-**skizy's Fable** has two jobs waiting in `tools/FOR-FABLE.md` (21 Oct: the asset manager's "open this scene in Blender", and a
-debug pass over the site). **Working with skizy (or skizy's Claude)?** Start with `tools/FOR-SKIZY.md`: the tools on Linux / VS Code (`tools/content.sh`,
+`tools/FOR-FABLE.md` (21 Oct) held two jobs for skizy's Fable: the debug pass (Fable did it) and "open this scene in Blender"
+(Claude did it on 24 Oct: see *A whole scene in Blender*). **Working with skizy (or skizy's Claude)?** Start with `tools/FOR-SKIZY.md`: the tools on Linux / VS Code (`tools/content.sh`,
 `publish.sh`, `pull.sh`, `preview.sh`, `tools/vscode/tasks.json`), slots, and what's hers. Keep it true too.
 
 ## Working with Victor
@@ -579,6 +579,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - **Frames → the slot** (`assemble`, `POST /__draw/frames`): one animated WebP (`<name>-animation.webp`, see-through kept), with
   FFmpeg (the animator's `ffmpeg`, or one on the PATH: `libwebp_anim`, yuva420p) or Pillow; over the 30 MB upload limit at full
   size → made again at half size, and the card says so.
+- **Off the screen** (24 Oct, Victor's rock in Blender: the guide stopped short of the camera's frame): a slot reaching past the
+  screen's edge can only be photographed where it's on screen (`place`), so BUILD now hatches the rest of the guide and writes "off
+  the screen here" in the biggest strip. The sea's rocks stand at the drift's start on the map (`html.dav-map .sea-rock`, -5vw;
+  phones -25vw), the furthest in they come. Every new Blender scene takes a fresh guide (`make(..., fresh=True, psd=False)`: only layers/*.png are written; the .psd and
+  any painting in it are left alone), so a guide from before a change never comes back.
 - **Blender** (21 Oct, Victor: Blender in the "open in" buttons, with templates; a yarn/crochet setup for the strokes is to come
   from a script Argon wrote, which Claude will fold into slot_scene.py directly: no plug-in folder). `APPS['blender']` (Program
   Files\Blender Foundation\Blender*, Steam; else the card asks, `remember_app`). `make(app='blender')` → `blender_scene()`: the
@@ -587,7 +592,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   --python tools/blender/slot_scene.py -- --w --h --out <stem>.blend --render //<stem>-render- --slot [--guide --marks --art]`
   (`BLENDER_WAIT` 240 s; a fresh one moves the old .blend aside as `_<stem>-<time>.blend`), then opens it. slot_scene.py (Blender
   4.0 on; checked with 4.5 and 5.2): the factory scene emptied; an orthographic camera at -Y looking +Y (`VIEW` 10 units across the
-  longer side) framing exactly W x H; camera background images: the guide (shown, .6), the measurements and the slot's picture now
+  longer side) framing exactly W x H, its location/rotation/scale locked (24 Oct: Ctrl+F12 always frames the slot); camera background images: the guide (shown, .6), the measurements and the slot's picture now
   (off); a sun from the upper right and a pale world; EEVEE, see-through film, Standard view, PNG RGBA, frame 1 only, so Ctrl+F12
   (Render Animation) saves `<stem>-render-0001.png` beside the .blend (the card's exports list picks it up); a Grease Pencil
   object "draw here" (the new kind from 4.3: `grease_pencils_v3` in 4.3-4.5, `grease_pencils` from 5.0) with an "ink" material,
@@ -662,6 +667,71 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `-preset drawing`, `yuva420p` when any frame's see-through, else `yuv420p`; lossless keeps RGBA), else Pillow (every frame in
   memory). Saves `<folder>.webp` beside the folder (`<name>-big.webp` for a remade file); says if it's over the site's 30 MB.
   Checked: 30 frames of 3200 x 1800 with see-through, both ways, 83/84 ms a frame at 12 fps, loop forever, the corners clear.
+
+## A whole scene in Blender, and its post-processing back to the site (tools/scenes.py, sky/postfx.js, 24 Oct)
+
+- Victor: "an 'open scene in Blender' button at the very top of all asset lists per specific scene that opens all of the assets
+  … layered as they are on the site, so that I can add in things like depth of field and volumetrics", and beside it "post
+  processing": "an export to site that bakes whatever depth of field or volumetrics I add" (compositing and bokeh too). This
+  was FOR-FABLE.md's Job 1, done by Claude instead. At the top of every scene tab with a map (assets.html `sceneBlock`, above
+  the map): **open this scene in Blender**, **post-processing → site**, "a fresh copy", what's there now, and after a
+  post-processing its summary, "take it off the site" / "put it on the site", and the baked pictures with "use this".
+  Not skizy's room for post-processing (her page doesn't load postfx.js); opening it in Blender works.
+- **The content manager** runs `tools/scenes.py` in the background (content.py `scene_start` / `scene_state`, `POST
+  /__draw/scene { scene, do: open|post, fresh, view }`, `GET /__draw/scene?scene=` → `{ running, at, result, blend, post }`,
+  log `tools/drawing/_scenes/.<scene>-<do>.log`); the card polls every 1.5 s and shows the last line (`note()` in scenes.py).
+  `POST /__draw/scene-on|scene-off { scene }` → `scene_put` / `scene_unput`. Blender not found → `{need}` → the page asks
+  where it is, as the drawing table does.
+- **Open** (`scenes.py open <scene> [--view] [--fresh]`): the scene's map page in Playwright as the map shows it (1920 × 1080,
+  `NOON`, `?map`, the map's current "show" view), `HIDE_UI`, every frame loop and animation frozen. `GATHER` (in the page):
+  every showing slot (this scene's: `mine`; other tabs': the traveller, sun, clouds…), the page's own pieces that hold no slot
+  (`walk`: a letter, words; neighbours in the order merge into "the page itself (n)"), sorted in paint order (`before`:
+  stacking contexts, z-index levels, then the page's order). A slot that holds others and has a painting `::before/::after`
+  with a z-index over them (the living space's `.room` wallpaper texture, the dungeon's darkness) is two layers: itself and
+  "(over)" (`overs`, `above`; `.dav-no-before/-after`, `.dav-over` hide the other part; pseudos see-through at noon, like the
+  bathroom's dusk shade, don't count: `paints`). Each layer is shot alone over the full screen (`SOLO`, `SOLO_CSS`: everything
+  else `visibility: hidden`, its own `filter` off) and cut to what it paints (`trimmed`, Pillow; its shadows past its box
+  kept: the living space's wall colour is the window's 300vmax box-shadow). What's left is the backdrop. Checked by laying
+  the layers back together against `the-whole-page.png`: sea, living, kitchen, city, front, workshop, bathroom, hallway,
+  attic, porch, dungeon, companion match to under 2% of pixels (moving rain, the flyers and the candles' screen-blended glow
+  are the differences); skizy's room 2.6%. Then `tools/blender/scene_set.py` (`-b --factory-startup`): a perspective camera
+  ("the page", 50 mm on a 36 mm film, locked) at the origin looking +Y; each layer a plane at its distance (back 24 to front
+  8, the backdrop 32), built at 1 unit and grown by the geometry node group **"DaV keeps its place"** (position × its own
+  Location Y, through Self Object: a driver on Scale reading Location made a dependency cycle), so G Y keeps it in place;
+  material: the picture as emission, see-through by its alpha, a "Lit" mix to Diffuse; collections "layers" (mine),
+  "the page's other things", "backdrop", "post: put light, mist and glow here"; DOF set up but off ("focus here" empty,
+  F/1.2); the yarn's "draw here" at 6; render 3840 × 2160, see-through, Standard. Saved in `tools/drawing/_scenes/<scene>/`
+  (`<scene>.blend`, `layers/`, `layers.json`, `the-whole-page.png`); pressing it again opens the .blend; "a fresh copy" moves
+  the old one aside (`_<scene>-<time>.blend`). The render matched the page shot within 3.5 levels on average (Blender 5.2 and
+  4.5, as Python modules).
+- **Post-processing** (`scenes.py post <scene>` → `tools/blender/scene_post.py` run on his saved .blend): (1) each of his
+  layers' **blur** from the depth of field (thin-lens circle of confusion at its distance, a third of it as a CSS blur, px
+  on a 1920 screen) and **haze** from World > Volume (1 − e^(−density × distance), towards its colour), for the site to do
+  live; (2) the post collection's objects (and each collection in it) rendered over the pictures twice, the pictures flat
+  black then flat white (`matte`/`unmatte`: difference matting, since EEVEE's Holdout left alpha behind), so the light and
+  mist come out with exactly how much of each picture they cover, nearer pictures hiding them; world fog and the compositor
+  off for these; at 1920 × 1080; (3) Point lights in it → bokeh (`x, y, size, colour, strength`, custom properties `pulse`,
+  `drift`, `day`); (4) a layer is **baked** (rendered alone without DOF or fog, cut to its box, at twice its size) only when
+  the site can't do it itself (`why_baked`: more in its collection than its picture, Lit up, moved/turned/resized, or the
+  compositor on); with the compositor on, what it adds past the box (glare) is the same render without it taken away, summed
+  into a "spill" overlay (blend screen). scenes.py then writes `post-<scene>.json` (the scene's own folder: `home_folder`, the
+  most common of its slots' folders; the sky for "every page"), overlays as WebP `post-<scene>-1…`, baked pictures onto each
+  slot's drawing-table folder as `<name>-blender-post.png` (its card's "use this"), and `post/post.json` for the card. A slot
+  that holds others (`holds`) gets no live blur (it would blur the whole room): the summary says so. The content manager puts
+  the json and overlays in with `asset_put` once the job finishes (`scene_put`, which clears the old `post-<scene>*` first).
+  They aren't described in slots.json (generated, like the lists); assets.html's "files that aren't in any slot" skips `post-*`.
+- **On the site**: `sky/postfx.js` + `sky/css/postfx.css` on index, workshop, city, living and template.html (before veil.js).
+  `SCENES` says each page's scenes and folders (**a new scene with a map: add it there**); `findAsset` of the json (no file:
+  nothing happens). Blur and haze are one SVG filter per picture (`feGaussianBlur` scaled by innerWidth / 1920, then a
+  `feColorMatrix` towards the fog's colour), added after the picture's own filter (`refit` every second, with transitions held
+  so its own fade doesn't play). Overlays and bokeh go in `.postfx-layer` (z 30): in the room that holds all the scene's slots
+  if it fills the screen (slides with it), else fixed on the page; on living.html only while in that scene's room (`ROOM`,
+  `Sky.house.where()`). Bokeh: a radial-gradient disc, screen-blended, `opacity = strength × (day + (1 − day) × --dusk)`,
+  breathing/drifting (`postfx-breathe`; still with reduced motion). Nothing at all in `?map` (or the next "open in Blender"
+  would photograph blur on blur). `Sky.postfx.scenes`.
+- Tested in the cloud (Blender 5.2 and 4.5 as Python modules, a stand-in `blender` that opens the .blend first): every scene
+  opened; the sea post-processed with DOF, world fog, a mist box, a point light, a Lit rock and a fog-glow compositor; the
+  page with them on.
 
 ## The attic (sky/attic.js)
 

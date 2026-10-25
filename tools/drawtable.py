@@ -729,6 +729,31 @@ async ([shot, art, W, H, place, artFit, measure]) => {
     g = canvas(); const x = g.getContext('2d');
     x.imageSmoothingQuality = 'high';
     x.drawImage(im, place[0] * W, place[1] * H, place[2] * W, place[3] * H);
+    // (24 Oct) the part of the slot that was off the screen (nothing to photograph there): hatched and labelled, so an empty
+    // strip of the guide doesn't look like a mistake, or like the edge of the picture
+    const px = place[0] * W, py = place[1] * H, pw = place[2] * W, ph = place[3] * H;
+    if (px > 1 || py > 1 || px + pw < W - 1 || py + ph < H - 1) {
+      x.save();
+      x.beginPath(); x.rect(0, 0, W, H); x.rect(px + pw, py, -pw, ph); x.clip('evenodd');
+      x.fillStyle = 'rgba(120, 120, 130, .22)'; x.fillRect(0, 0, W, H);
+      x.strokeStyle = 'rgba(215, 215, 225, .4)'; x.lineWidth = Math.max(2, W / 400);
+      const step = Math.max(14, Math.round(Math.max(W, H) / 60));
+      x.beginPath();
+      for (let k = -H; k < W + H; k += step) { x.moveTo(k, 0); x.lineTo(k + H, H); }
+      x.stroke();
+      // the label, in the biggest strip
+      const strips = [[0, 0, px, H], [px + pw, 0, W - px - pw, H], [0, 0, W, py], [0, py + ph, W, H - py - ph]].filter(r => r[2] > 0 && r[3] > 0);
+      const big = strips.sort((a, b) => b[2] * b[3] - a[2] * a[3])[0];
+      if (big && Math.min(big[2], big[3]) > 24) {
+        const fs = Math.max(14, Math.min(big[2] / 9, big[3] / 4, W / 30));
+        x.font = 'italic ' + Math.round(fs) + 'px Georgia, serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+        x.fillStyle = 'rgba(245, 245, 250, .95)'; x.shadowColor = 'rgba(0, 0, 0, .8)'; x.shadowBlur = fs / 4;
+        x.translate(big[0] + big[2] / 2, big[1] + big[3] / 2);
+        if (big[3] > big[2] * 1.4) x.rotate(-Math.PI / 2);
+        x.fillText('off the screen here', 0, 0);
+      }
+      x.restore();
+    }
     out.guide = squeeze(g, [3, 0, 1, 2]);
     out.guidePng = g.toDataURL('image/png').split(',')[1];
   }
@@ -1043,8 +1068,9 @@ the slot's card then plays them, with a "use as animation" button that makes the
 '''
 
 
-def make(slot, fresh=False, view=None, app=None):
-    """make the starting file (unless there's one already). → { file, folder, w, h, guide, made, view }"""
+def make(slot, fresh=False, view=None, app=None, psd=True):
+    """make the starting file (unless there's one already). → { file, folder, w, h, guide, made, view }
+    psd=False: only the size and the guide pictures in layers/ (Blender's scene), the .psd and its note left as they are"""
     if app == 'blender':
         return blender_scene(slot, fresh, view)
     folder, stem, _ = where(slot)
@@ -1115,7 +1141,8 @@ def make(slot, fresh=False, view=None, app=None):
             MEASURE_WHY[:] = MEASURE_WHY or [str(e).splitlines()[0] if str(e) else type(e).__name__]
     os.makedirs(folder, exist_ok=True)               # (only now: a slot it can't size leaves nothing behind)
     path = os.path.join(folder, stem + '.psd')
-    write_psd(path, W, H, layers, composite)
+    if psd:
+        write_psd(path, W, H, layers, composite)
     # the guide and the measurements as pictures of their own too (layers/), for a program that can't read the .psd's
     # layers (Rebelle): File > Import them, each as a layer of its own
     for k, b in pngs.items():
@@ -1123,14 +1150,15 @@ def make(slot, fresh=False, view=None, app=None):
             os.makedirs(os.path.join(folder, 'layers'), exist_ok=True)
             with open(os.path.join(folder, 'layers', k + '.png'), 'wb') as f:
                 f.write(base64.b64decode(b))
-    with open(os.path.join(folder, '.made.json'), 'w', encoding='utf-8') as f:
-        json.dump({'psd': int(os.path.getmtime(path)), 'measured': any(L['name'] == MEASURES_NAME for L in layers), 'guide': guide}, f)
-    with open(os.path.join(folder, 'what to do.txt'), 'w', encoding='utf-8') as f:
-        f.write(NOTE.format(name=stem, slot=slot, w=W, h=H))
-        if result.get('tile'):
-            a = result['tile']
-            f.write(NOTE_TILE.format(name=stem, how={'x': 'side to side', 'y': 'top to bottom', 'xy': 'both ways'}[a],
-                                     times={'x': 'three times side by side', 'y': 'three times one above another', 'xy': 'three by three'}[a]))
+    if psd:
+        with open(os.path.join(folder, '.made.json'), 'w', encoding='utf-8') as f:
+            json.dump({'psd': int(os.path.getmtime(path)), 'measured': any(L['name'] == MEASURES_NAME for L in layers), 'guide': guide}, f)
+        with open(os.path.join(folder, 'what to do.txt'), 'w', encoding='utf-8') as f:
+            f.write(NOTE.format(name=stem, slot=slot, w=W, h=H))
+            if result.get('tile'):
+                a = result['tile']
+                f.write(NOTE_TILE.format(name=stem, how={'x': 'side to side', 'y': 'top to bottom', 'xy': 'both ways'}[a],
+                                         times={'x': 'three times side by side', 'y': 'three times one above another', 'xy': 'three by three'}[a]))
     measured = any(L['name'] == MEASURES_NAME for L in layers)
     guide_why = None
     if not guide:
@@ -1143,7 +1171,7 @@ def make(slot, fresh=False, view=None, app=None):
             guide_why = "it isn't on any page with a map, so there's no scene to take a guide from"
         else:
             guide_why = "it isn't showing on its page right now"
-    return {'file': path, 'folder': folder, 'w': W, 'h': H, 'guide': guide, 'made': True, 'view': result.get('view'), 'on': result.get('on'),
+    return {'file': path if psd else None, 'folder': folder, 'w': W, 'h': H, 'guide': guide, 'made': True, 'view': result.get('view'), 'on': result.get('on'),
             'tile': result.get('tile'), 'measured': measured,
             'measureWhy': None if measured else (MEASURE_WHY[0] if MEASURE_WHY else result.get('why') or 'no browser to draw it in'),
             'guideWhy': guide_why, 'playwright': bool(guide_why == NO_PLAYWRIGHT or 'playwright' in str(MEASURE_WHY).lower())}
@@ -1168,8 +1196,9 @@ def blender_scene(slot, fresh=False, view=None):
     exe = find_app('blender')
     if not exe:
         return {'opened': False, 'need': 'blender', 'name': APPS['blender']['name'], 'folder': folder}
-    canvas = make(slot, fresh=False, view=view)         # (the .psd's size and its guide pictures in layers/)
-    W, H = (canvas['w'], canvas['h']) if canvas.get('w') else psd_size(canvas['file'])
+    # (24 Oct) every new scene takes a fresh guide from the page as it is now (the .psd, and any painting in it, left alone)
+    canvas = make(slot, fresh=True, view=view, psd=False)
+    W, H = canvas['w'], canvas['h']
     blend = os.path.join(folder, stem + '.blend')
     if os.path.exists(blend):                           # (a fresh one: the old one is kept, out of the way)
         os.replace(blend, os.path.join(folder, '_' + stem + time.strftime('-%Y%m%d-%H%M%S') + '.blend'))

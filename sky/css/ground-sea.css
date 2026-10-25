@@ -436,6 +436,10 @@ html.sea-pan .ground-sea .wave-move-4 { --wave-pan: -3vw; }
 html.sea-pan .sea-rock { animation: sea-rock var(--sea-pan-s) ease-in-out infinite alternate; }
 @keyframes sea-rock { from { translate: -5vw 0; } to { translate: -17vw 0; } }
 @keyframes sea-rock-phone { from { translate: -25vw 0; } to { translate: -37vw 0; } }
+/* (24 Oct) on the asset manager's map (and so in the drawing table's guide) it stands where the drift starts, as far in as it
+   ever comes, so as much of it as anyone will see is on the screen to draw over */
+html.dav-map .sea-rock { translate: -5vw 0; }
+@media (max-width: 620px) { html.dav-map .sea-rock { translate: -25vw 0; } }
 .sea-rock .placeholder,
 .sea-rock > .art {
     display: block;

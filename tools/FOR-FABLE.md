@@ -27,6 +27,8 @@ two things, written up here so you can pick them up cold. Read these first, in t
 
 ## Job 1: "open this scene in Blender" in the asset manager
 
+**Done (24 Oct, by Claude)**: see CLAUDE.md, *A whole scene in Blender, and its post-processing back to the site*. Kept below as it was.
+
 **What Victor wants**: on each scene's tab in the asset manager (`tools/assets.html`: "the sea", "the living space", "the
 kitchen"…), one button that brings **every slot of that category into Blender as a layered set**: each picture in its place
 and stacking order, in its own collection, so he can draw over it with the yarn, add 3D models or pictures, and send each
@@ -74,6 +76,8 @@ layer back into its slot.
    .blend (collections, boxes, order), and render a frame to compare with the map's own picture of the scene.
 
 ## Job 2: a debug pass over the whole site
+
+**Done (by Fable).** Kept below as it was.
 
 Go through the site looking for what's broken, report it plainly, fix what's clearly a bug, and **ask before changing how
 anything is meant to work**. Don't remove features to make a problem go away.

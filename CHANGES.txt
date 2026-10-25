@@ -17,6 +17,12 @@ How it works
 
 == published ==
 
+2026-10-24 18:40 · V
+- The asset manager's Blender scenes lock their camera, so a render (Ctrl+F12) always frames exactly the slot however the view's been turned (tools/blender/slot_scene.py).
+- The drawing table's guide hatches and labels "off the screen here" wherever a slot reaches past the edge of the screen (nothing there to photograph), instead of leaving it blank. On the asset manager's map the sea's rocks now stand where the drift starts, as far in as they ever come, so their guide shows as much of them as visitors ever see. Every new Blender scene now takes a fresh guide from the page as it is (the .psd and its painting left alone).
+- The asset manager has two new buttons at the top of every scene's tab: "open this scene in Blender" lays the whole scene out in Blender, every picture as its own layer at its own distance in the page's order (tools/scenes.py, tools/blender/scene_set.py), and "post-processing → site" brings back what's added there: depth of field and fog done live on each picture, light and mist as pictures over the scene, Blender's point lights as soft bokeh lights that breathe and glow brighter at dusk, and anything only Blender can do baked into pictures waiting on the slots' cards (tools/blender/scene_post.py).
+- New sky/postfx.js and sky/css/postfx.css on the sea, workshop, rooftop, living space and template pages: they show a scene's post-processing from Blender (assets/<folder>/post-<scene>.json and its post-<scene>-N pictures, put there by the content manager), and do nothing until there is some.
+
 2026-10-24 13:31 · V
 - From the desk: a letter on the sea added (2026-10-21-sigh.txt).
 - From the desk: when its letters were written (content/sea/written.json).

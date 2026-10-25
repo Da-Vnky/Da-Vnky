@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1480 2987285545
-city.html 9866 3051940123
-desk.html 6191 4137680580
-index.html 5242 2428384085
-living.html 133705 2903910703
-window-sky.html 1334 2932443384
-workshop.html 22101 3504863107
+beyond.html 1480 2300833704
+city.html 9988 1554375240
+desk.html 6191 3870904976
+index.html 5364 4291606116
+living.html 133827 2135546945
+window-sky.html 1334 4090670683
+workshop.html 22223 1477274047
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/babble.js 46635 151537111
@@ -54,6 +54,7 @@ sky/panel.js 70116 343766282
 sky/peeper.js 31642 2382478789
 sky/porch.js 19007 2031860182
 sky/post.js 21656 2013340171
+sky/postfx.js 10792 3544204865
 sky/records.js 37374 197731851
 sky/resets.js 17505 2303591725
 sky/revolver.js 20186 2694897367
@@ -93,7 +94,7 @@ sky/css/gnosis.css 7584 1910191903
 sky/css/gore.css 5281 3967197097
 sky/css/ground-city.css 5505 2510993983
 sky/css/ground-countryside.css 834 2965982463
-sky/css/ground-sea.css 16424 1594154739
+sky/css/ground-sea.css 16758 2537770896
 sky/css/ground-view.css 788 375225604
 sky/css/hell.css 10082 3168670266
 sky/css/inkpad.css 8326 4156737891
@@ -115,6 +116,7 @@ sky/css/panel.css 6477 2617790568
 sky/css/peeper.css 10831 2113135204
 sky/css/porch.css 14940 2912709671
 sky/css/post.css 7933 3819112703
+sky/css/postfx.css 2019 3531528981
 sky/css/records.css 19836 2189892337
 sky/css/resets.css 4109 4173273641
 sky/css/revolver.css 2245 3732291808
@@ -153,7 +155,8 @@ assets/living/vinyl-texture.webp 3298872 1062159737
 assets/resets/index.txt 77 782689690
 assets/resets/list.txt 127 1553178456
 assets/sea/dock.webp 377636 2358302873
-assets/sea/list.txt 185 4152957058
+assets/sea/list.txt 195 1982781763
+assets/sea/rock.webp 170866 3739105609
 assets/sea/ship.webp 1095340 3289159705
 assets/sea/wave-1.webp 980256 2042540993
 assets/sea/wave-2.webp 439110 518776194
@@ -173,8 +176,9 @@ assets/sky/cloud-3.webp 48514 32872620
 assets/sky/cloud-4.webp 37152 764510579
 assets/sky/cloud-5.webp 41906 2625160310
 assets/sky/cloud.webp 164358 205180145
-assets/sky/list.txt 377 1348619206
+assets/sky/list.txt 388 3425809627
 assets/sky/moon.webp 20958 550342124
+assets/sky/plank.webp 15162 184616038
 assets/sky/skybox-day.jpg 507563 3898106660
 assets/sky/skybox-dusk.jpg 936292 1272459089
 assets/sky/skybox-golden.jpg 675239 272661867

@@ -1118,6 +1118,127 @@ def templates_state():
     return {'running': False}
 
 
+# ---------------- a whole scene in Blender (tools/scenes.py): made in the background, and its post-processing back ----------------
+# the asset manager's buttons at the top of a scene's tab. "open": the scene photographed layer by layer and built as a
+# Blender set (or your .blend opened as you left it); "post": what you added in Blender baked back for the site
+SCENES_DIR = os.path.join(HERE, 'drawing', '_scenes')
+scene_jobs = {}
+
+
+def scene_log(scene, what):
+    return os.path.join(SCENES_DIR, '.' + scene + '-' + what + '.log')
+
+
+def scene_start(d):
+    scene, what = d.get('scene') or '', d.get('do') or 'open'
+    if not re.match(r'^[a-z0-9-]+$', scene) or what not in ('open', 'post'):
+        raise ValueError('which scene?')
+    j = scene_jobs.get(scene)
+    if j and j['proc'].poll() is None:
+        return {'running': True, 'what': j['what']}
+    args = [sys.executable, os.path.join(HERE, 'scenes.py'), what, scene]
+    if what == 'open' and d.get('fresh'):
+        args.append('--fresh')
+    if what == 'open' and d.get('view'):
+        args += ['--view', str(d['view'])]
+    os.makedirs(SCENES_DIR, exist_ok=True)
+    log = open(scene_log(scene, what), 'w', encoding='utf-8')
+    scene_jobs[scene] = {'what': what, 'proc': subprocess.Popen(args, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                                                               env=dict(os.environ, PYTHONIOENCODING='utf-8', PYTHONUNBUFFERED='1'))}
+    return {'running': True, 'what': what}
+
+
+def scene_put(scene):
+    """the post-processing on the site: post-<scene>.json and its light / mist / glow pictures into the scene's folder
+    (slots assets/<folder>/post-<scene>, -1, -2 …: what was there before goes first). the baked pictures wait on their cards"""
+    folder = os.path.join(SCENES_DIR, scene, 'post')
+    with open(os.path.join(folder, 'post.json'), encoding='utf-8') as f:
+        info = json.load(f)
+    scene_unput(scene, info['folder'])
+    with open(os.path.join(folder, info['json']['file']), 'rb') as f:
+        asset_put(info['json']['slot'], info['json']['file'], f.read(), 'json')
+    for o in info.get('overlays') or []:
+        with open(os.path.join(folder, o['file']), 'rb') as f:
+            asset_put(o['slot'], o['file'], f.read())
+    info['onSite'] = True
+    with open(os.path.join(folder, 'post.json'), 'w', encoding='utf-8') as f:
+        json.dump(info, f, indent=1)
+    return info
+
+
+def scene_unput(scene, folder=None):
+    """the scene's post-processing off the site again (its json and pictures out of the folder)"""
+    if not re.match(r'^[a-z0-9-]+$', scene or ''):
+        raise ValueError('which scene?')
+    if folder is None:
+        with open(os.path.join(SCENES_DIR, scene, 'post', 'post.json'), encoding='utf-8') as f:
+            folder = json.load(f)['folder']
+    d = os.path.join(ASSETS, folder)
+    gone = []
+    for n in sorted(os.listdir(d)) if os.path.isdir(d) else []:
+        stem = os.path.splitext(n)[0]
+        if stem == 'post-' + scene or re.match(r'^post-' + re.escape(scene) + r'-\d+$', stem):
+            gone += asset_clear('assets/' + folder + '/' + stem)
+    p = os.path.join(SCENES_DIR, scene, 'post', 'post.json')
+    if os.path.exists(p):
+        with open(p, encoding='utf-8') as f:
+            info = json.load(f)
+        info['onSite'] = False
+        with open(p, 'w', encoding='utf-8') as f:
+            json.dump(info, f, indent=1)
+    return gone
+
+
+def scene_state(scene):
+    """how the scene's job is going (and what it said when it finished), and what's on the table for it"""
+    if not re.match(r'^[a-z0-9-]+$', scene or ''):
+        raise ValueError('which scene?')
+    out = {'running': False}
+    j = scene_jobs.get(scene)
+    if j:
+        lines = []
+        if os.path.exists(scene_log(scene, j['what'])):
+            with open(scene_log(scene, j['what']), encoding='utf-8', errors='replace') as f:
+                lines = [x.rstrip() for x in f if x.strip()]
+        said = [x for x in lines if x.startswith('{')]
+        out['what'] = j['what']
+        if j['proc'].poll() is None:
+            out.update(running=True, at=([x for x in lines if not x.startswith('{')] or [''])[-1])
+        elif said:
+            try:
+                out['result'] = json.loads(said[-1])
+            except ValueError:
+                out['result'] = {'error': said[-1]}
+            if j['what'] == 'post' and out['result'].get('posted') and not out['result'].get('empty') and not j.get('put'):
+                j['put'] = True                       # (once: straight onto the site)
+                try:
+                    scene_put(scene)
+                    out['result']['onSite'] = True
+                except Exception as e:
+                    out['result'] = {'error': 'made, but it couldn\'t go on the site: ' + str(e)}
+        else:
+            out['result'] = {'error': 'it stopped: ' + (' / '.join(lines[-3:]) or 'no reason given')}
+    folder = os.path.join(SCENES_DIR, scene)
+    info = os.path.join(folder, 'layers.json')
+    if os.path.exists(os.path.join(folder, scene + '.blend')):
+        out['blend'] = {'file': 'tools/drawing/_scenes/' + scene + '/' + scene + '.blend',
+                        'saved': int(os.path.getmtime(os.path.join(folder, scene + '.blend')))}
+        try:
+            with open(info, encoding='utf-8') as f:
+                i = json.load(f)
+            out['blend'].update(made=i.get('made'), view=i.get('view'), layers=sum(1 for L in i.get('layers', []) if L.get('mine')))
+        except (OSError, ValueError):
+            pass
+    post = os.path.join(folder, 'post', 'post.json')
+    if os.path.exists(post):
+        try:
+            with open(post, encoding='utf-8') as f:
+                out['post'] = json.load(f)
+        except (OSError, ValueError):
+            pass
+    return out
+
+
 # ---------------- Playwright (the hidden browser the drawing table and the template pictures look at the site with) ----------------
 # installed from the asset manager's button, once: python -m pip install playwright, then python -m playwright install chromium
 PW_LOG = os.path.join(HERE, 'drawing', 'playwright-install.log')
@@ -1807,6 +1928,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'files': asset_files(), 'tracks': tracks(), 'noise': noise_extra(), 'found': found_slots(), 'resets': resets_state()})
             if url.path == '/__templates/state':
                 return self.reply(templates_state())
+            if url.path == '/__draw/scene':
+                return self.reply(scene_state(q.get('scene', [''])[0]))
             if url.path == '/__draw/state':
                 return self.reply({'table': drawtable().table()})
             if url.path == '/__draw/playwright':
@@ -1979,6 +2102,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.reply({'removed': asset_clear(json.loads(raw or b'{}').get('slot'))})
             if url.path == '/__draw/open':
                 return self.reply(draw_open(json.loads(raw or b'{}')))
+            if url.path == '/__draw/scene':
+                return self.reply(scene_start(json.loads(raw or b'{}')))
+            if url.path == '/__draw/scene-on':
+                d = json.loads(raw or b'{}')
+                if not re.match(r'^[a-z0-9-]+$', d.get('scene') or ''):
+                    raise ValueError('which scene?')
+                return self.reply(scene_put(d['scene']))
+            if url.path == '/__draw/scene-off':
+                return self.reply({'removed': scene_unput(json.loads(raw or b'{}').get('scene'))})
             if url.path == '/__draw/animate':
                 return self.reply(draw_open(json.loads(raw or b'{}'), animate=True))
             if url.path == '/__draw/app':

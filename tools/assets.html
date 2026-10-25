@@ -175,6 +175,24 @@
     [hidden] { display: none !important; }
     /* the map of a scene: the page itself, small, with every slot outlined on it (tools/map.js, map.css) */
     .map { position: relative; margin: 14px 0 6px; }
+    /* the whole scene in Blender, and its post-processing back to the site (the top of a scene's tab) */
+    .scene3d { margin: 6px 0 14px; padding: 10px 14px; border: 1px solid rgba(243,230,194,.22); border-radius: 10px; background: rgba(20,13,8,.35); color: rgba(243,230,194,.85); font-size: .92rem; }
+    .scene3d .s3-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+    .scene3d button { padding: 5px 14px; }
+    .scene3d button:disabled { opacity: .5; cursor: progress; }
+    .scene3d label { display: inline-flex; align-items: center; gap: 6px; font-style: italic; }
+    .scene3d input { accent-color: var(--red); }
+    .scene3d .s3-note { margin: 6px 0 0; font-style: italic; color: rgba(243,230,194,.62); font-size: .86rem; line-height: 1.45; }
+    .scene3d .s3-now { margin: 6px 0 0; font-size: .86rem; color: rgba(243,230,194,.8); }
+    .scene3d .s3-now b { color: #f3e6c2; font-weight: normal; font-style: italic; }
+    .scene3d .s3-busy { color: #e0b070; font-style: italic; }
+    .scene3d .linkish { color: #e0b070; font-style: italic; cursor: pointer; background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; font-size: inherit; }
+    .scene3d .s3-post { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
+    .scene3d .s3-post figure { margin: 0; width: 138px; font-size: .78rem; text-align: center; }
+    .scene3d .s3-post figure span { display: block; height: 78px; border-radius: 6px; background: repeating-conic-gradient(#3a2a1d 0 25%, #2c2016 0 50%) 0 0 / 12px 12px; overflow: hidden; }
+    .scene3d .s3-post img { width: 100%; height: 100%; object-fit: contain; }
+    .scene3d .s3-post figcaption { margin-top: 3px; overflow-wrap: anywhere; }
+    .scene3d .s3-post button { margin-top: 3px; padding: 2px 9px; font-size: .78rem; }
     .map-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 0 0 8px; font-size: .92rem; font-style: italic; color: rgba(243,230,194,.8); }
     .map-bar label { display: inline-flex; align-items: center; gap: 6px; }
     .map-bar select { font: inherit; font-style: normal; font-size: .88rem; padding: 3px 8px; border-radius: 999px; border: 1px solid rgba(243,230,194,.35); background: #3a2a1d; color: #f3e6c2; }
@@ -1355,11 +1373,109 @@
         return box;
     }
 
+    /* ---------------- the whole scene in Blender, and back ---------------- */
+    // (tools/scenes.py through the content manager, in the background: the scene's page photographed slot by slot and
+    // built as a layered Blender set (tools/blender/scene_set.py); "post-processing → site" bakes what you added there
+    // (depth of field, fog, the compositor, lights) back into each slot's picture, and the light/mist/glow you put in
+    // the "post" collection becomes layers over the page)
+    var SCENE3D = {};
+    function sceneBlock(sc) {
+        var box = el('section', 'scene3d'), row = el('div', 's3-row'), now = el('div', 's3-now'), outs = el('div', 's3-post');
+        var openB = btn('open this scene in Blender', function () { start('open'); });
+        var postB = btn('post-processing → site', function () { start('post'); }), noPost = sc.id === 'skizy-room';
+        postB.title = 'bake what you added in Blender (depth of field, fog, the compositor, lights) into the slots’ pictures, and the “post” collection’s light, mist and glow into layers over the page';
+        var fresh = el('label', '', '<input type="checkbox"> a fresh copy');
+        fresh.title = 'photograph the page again as it is now (your .blend is kept beside it, renamed)';
+        row.appendChild(openB); row.appendChild(postB); row.appendChild(fresh);
+        box.appendChild(row);
+        box.appendChild(el('p', 's3-note', 'Every slot of ' + esc(sc.name) + ' that’s showing, each its own layer at its own distance from the camera, in its place and order on the page' +
+            ' (in the map’s “show” view below). Add depth of field, fog, light and compositing in Blender and save; then post-processing → site.'));
+        box.appendChild(now); box.appendChild(outs);
+        var timer = null;
+        var hasBlend = false;
+        function busy(on) { openB.disabled = on; postB.disabled = on || noPost || !hasBlend; }
+        function start(what) {
+            busy(true);
+            var M = MAPS[sc.id], body = { scene: sc.id, do: what, fresh: fresh.querySelector('input').checked, view: (M && M.view) || '' };
+            api('/__draw/scene', body).then(function (r) {
+                if (r.error) { busy(false); say(r.error, true); return; }
+                say(what === 'open' ? 'setting up ' + sc.name + ' in Blender: it photographs the page layer by layer (half a minute or so, more for skizy’s room)…' :
+                                      'baking ' + sc.name + '’s post-processing in Blender: a render for every layer (a minute or two)…');
+                watch(what, body);
+            });
+        }
+        function watch(what, body) {
+            clearTimeout(timer);
+            api('/__draw/scene?scene=' + encodeURIComponent(sc.id)).then(function (st) {
+                show(st);
+                if (st.running) { if (st.at) say(st.at + '…'); timer = setTimeout(function () { watch(what, body); }, 1500); return; }
+                busy(false);
+                var r = st.result || {};
+                if (r.need) {                                     // (it couldn't find Blender: where is it?)
+                    var where = prompt('Where is ' + r.name + '? In File Explorer, find the program itself (its .exe), right-click it and choose "Copy as path", then paste it here.');
+                    if (!where) { say('not opened: it needs to know where ' + r.name + ' is.', true); return; }
+                    return api('/__draw/app', { app: r.need, path: where }).then(function (a) {
+                        if (a.error) { say(a.error, true); return; }
+                        busy(true);
+                        api('/__draw/scene', body).then(function () { watch(what, body); });
+                    });
+                }
+                if (r.error) { say(r.error, true); return; }
+                if (what === 'open') {
+                    fresh.querySelector('input').checked = false;
+                    say((r.opened ? 'opened in Blender: ' : 'made: ') + (r.made === false ? 'your scene, as you left it.' :
+                        'a new scene, ' + r.layers + ' layers of ' + sc.name + (r.others || r.pieces ? ' (and, in their places, ' + [r.others ? r.others + ' of other tabs’ slots that show here, like the traveller and the sky' : '', r.pieces ? r.pieces + ' of the page’s own' : ''].filter(Boolean).join(' and ') + ')' : '') + '.') +
+                        ' It’s ' + r.file + '.' + (r.cut && r.cut.length ? ' Partly off the screen (only what shows is in): ' + r.cut.map(function (x) { return x.replace(/^assets\//, ''); }).join(', ') + '.' : ''));
+                } else {
+                    say('post-processing done: ' + (r.summary || 'nothing to do') + '. ' + (r.onSite ? 'It’s on the site now (have a look at the page; publish to put it live).' : r.empty ? 'Nothing went on the site.' : ''));
+                }
+            });
+        }
+        function show(st) {
+            var b = st.blend;
+            now.innerHTML = b ? 'in Blender: <b>' + esc(b.file) + '</b> · ' + (b.layers || '?') + ' layers, photographed ' + esc(b.made || '') +
+                (b.view ? ' (“' + esc(b.view) + '”)' : '') + ' · saved ' + ago(b.saved) : 'not in Blender yet.';
+            hasBlend = !!b;
+            postB.disabled = !b || !!st.running || noPost;
+            if (noPost) postB.title = 'skizy’s room is hers: the site’s post-processing isn’t loaded there';
+            if (st.running) now.appendChild(el('span', 's3-busy', ' · ' + esc(st.at || 'working') + '…'));
+            outs.innerHTML = '';
+            var p = st.post;
+            if (!p) return;
+            var head = el('p', 's3-note', 'post-processed ' + esc(p.made || '') + ': ' + esc(p.summary || '') + '. ' +
+                (p.onSite ? '<b>On the site now</b> (here; publish to put it live).' : 'Not on the site.') + ' ');
+            head.appendChild(btn(p.onSite ? 'take it off the site' : 'put it on the site', function () {
+                api(p.onSite ? '/__draw/scene-off' : '/__draw/scene-on', { scene: sc.id }).then(function (r) {
+                    if (r.error) return say(r.error, true);
+                    say(p.onSite ? sc.name + '’s post-processing is off the site: the pictures are as drawn again.' : sc.name + '’s post-processing is back on the site.');
+                    api('/__draw/scene?scene=' + encodeURIComponent(sc.id)).then(show);
+                });
+            }, 'linkish'));
+            outs.appendChild(head);
+            if ((p.slots || []).length) outs.appendChild(el('p', 's3-note', 'baked in Blender (what the site can’t do itself: ' +
+                esc(p.slots[0].why) + (p.slots.length > 1 ? '…' : '') + '): these wait on their cards. Use one and it replaces that slot’s picture; the depth of field and fog still go on top, live.'));
+            (p.slots || []).forEach(function (x) {
+                var f = el('figure', '', '<span><img alt="" loading="lazy" src="/__draw/file?slot=' + encodeURIComponent(x.slot) + '&name=' + encodeURIComponent(x.name) + '&t=' + (x.time || 0) + '"></span><figcaption>' + esc(x.slot.replace(/^assets\//, '')) + '</figcaption>');
+                f.appendChild(btn(x.used ? 'in ✓ (again)' : 'use this', function () {
+                    api('/__draw/use', { slot: x.slot, name: x.name }).then(function (u) {
+                        if (u.error) return say(u.error, true);
+                        say(x.slot.replace(/^assets\//, '') + ': the post-processed picture is in.');
+                        artChanged++; load();
+                    });
+                }, 'sm'));
+                outs.appendChild(f);
+            });
+        }
+        api('/__draw/scene?scene=' + encodeURIComponent(sc.id)).then(function (st) { show(st); if (st.running) { busy(true); watch(st.what, { scene: sc.id, do: st.what }); } });
+        return box;
+    }
+
     function drawScene(sc) {
         var slots = []; sc.groups.forEach(function (g) { slots = slots.concat(g.slots); });
         var top = intro(sc.note, sc.map ? '' : sc.page, slots);
         if (!sc.map) top.appendChild(viewSwitch());
         main.appendChild(top);
+        if (sc.map) main.appendChild(sceneBlock(sc));
         if (sc.id === 'companion' && window.Sky && window.Sky.kotodamaLook) main.appendChild(looksBlock());
         if (sc.map) {
             main.appendChild(mapBlock(sc, slots));
@@ -1408,7 +1524,7 @@
         Object.keys(STATE.files).forEach(function (fo) {
             STATE.files[fo].forEach(function (f) {
                 var stem = f.name.replace(/\.[^.]+$/, ''), slot = 'assets/' + fo + '/' + stem;
-                if (known[slot] || /-(glow|dancing|held|startled|walking)$/.test(stem) || (fo === 'sounds' && (stem === 'noise' || STATE.noise.some(function (n) { return n.name === stem; })))) return;
+                if (known[slot] || /-(glow|dancing|held|startled|walking)$/.test(stem) || /^post-[a-z0-9-]+$/.test(stem) || (fo === 'sounds' && (stem === 'noise' || STATE.noise.some(function (n) { return n.name === stem; })))) return;
                 strays.push({ folder: fo, file: f, slot: slot });
             });
         });

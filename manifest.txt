@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
 beyond.html 1480
-city.html 9866
+city.html 9988
 desk.html 6191
-index.html 5242
-living.html 133705
+index.html 5364
+living.html 133827
 window-sky.html 1334
-workshop.html 22101
+workshop.html 22223
 sky/ambient.js 5331
 sky/attic.js 34823
 sky/babble.js 46635
@@ -54,6 +54,7 @@ sky/panel.js 70116
 sky/peeper.js 31642
 sky/porch.js 19007
 sky/post.js 21656
+sky/postfx.js 10792
 sky/records.js 37374
 sky/resets.js 17505
 sky/revolver.js 20186
@@ -93,7 +94,7 @@ sky/css/gnosis.css 7584
 sky/css/gore.css 5281
 sky/css/ground-city.css 5505
 sky/css/ground-countryside.css 834
-sky/css/ground-sea.css 16424
+sky/css/ground-sea.css 16758
 sky/css/ground-view.css 788
 sky/css/hell.css 10082
 sky/css/inkpad.css 8326
@@ -115,6 +116,7 @@ sky/css/panel.css 6477
 sky/css/peeper.css 10831
 sky/css/porch.css 14940
 sky/css/post.css 7933
+sky/css/postfx.css 2019
 sky/css/records.css 19836
 sky/css/resets.css 4109
 sky/css/revolver.css 2245
@@ -139,9 +141,9 @@ assets/items/list.txt 117
 assets/living/list.txt 363
 assets/resets/index.txt 77
 assets/resets/list.txt 127
-assets/sea/list.txt 185
+assets/sea/list.txt 195
 assets/skizy-room/list.txt 207
-assets/sky/list.txt 377
+assets/sky/list.txt 388
 assets/sounds/list.txt 260
 assets/textures/list.txt 152
 assets/ui/list.txt 117
