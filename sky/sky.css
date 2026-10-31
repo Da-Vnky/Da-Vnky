@@ -1097,6 +1097,7 @@ body:not([data-page=home]):not(.sky-view) .polaris { opacity: 0 !important; visi
 @media (max-width: 620px) { :root { --stage-shadow: 8px 11px 5px rgba(22, 13, 5, calc(.34 - .14 * var(--dusk, 0))); --rope-w: 3.5px; } }
 html.stage-strings .sun::before, html.stage-strings .moon::before,
 html.stage-strings .cloud::before, html.stage-strings .cloud::after,
+html.stage-strings .storm-cloud::before, html.stage-strings .storm-cloud::after,
 html.stage-strings .flyer-blimp::before, html.stage-strings .flyer-blimp::after,
 html.stage-strings .flyer-balloon::before, html.stage-strings .flyer-birds::before {
     content: ""; position: absolute; z-index: -1; left: 50%; bottom: 50%; width: var(--rope-w); height: 300vh; margin-left: calc(var(--rope-w) / -2); pointer-events: none;
@@ -1109,6 +1110,7 @@ html.stage-strings .flyer-balloon::before, html.stage-strings .flyer-birds::befo
 }
 html.stage-strings.has-rope-art .sun::before, html.stage-strings.has-rope-art .moon::before,
 html.stage-strings.has-rope-art .cloud::before, html.stage-strings.has-rope-art .cloud::after,
+html.stage-strings.has-rope-art .storm-cloud::before, html.stage-strings.has-rope-art .storm-cloud::after,
 html.stage-strings.has-rope-art .flyer-blimp::before, html.stage-strings.has-rope-art .flyer-blimp::after,
 html.stage-strings.has-rope-art .flyer-balloon::before, html.stage-strings.has-rope-art .flyer-birds::before {
     background: var(--rope-art) center bottom / 100% auto repeat-y;
@@ -1117,14 +1119,17 @@ html.stage-strings.has-rope-art .flyer-balloon::before, html.stage-strings.has-r
 html.stage-strings .moon::before { left: 27%; }                 /* (onto the crescent itself, not the empty middle) */
 html.stage-strings .cloud::before { left: 30%; bottom: 40%; }
 html.stage-strings .cloud::after { left: 70%; bottom: 40%; }
+/* (31 Oct) the storm's clouds hang the same way (sky/weather.js), two ropes each */
+html.stage-strings .storm-cloud::before { left: 30%; bottom: 40%; }
+html.stage-strings .storm-cloud::after { left: 70%; bottom: 40%; }
 html.stage-strings .flyer-blimp::before { left: 32%; bottom: 60%; }
 html.stage-strings .flyer-blimp::after { left: 68%; bottom: 60%; }
 html.stage-strings .flyer-balloon::before { bottom: 62%; }
 html.stage-strings .flyer-birds::before { bottom: 55%; }
 /* and they swing (sky/ropes.js sets --rope-a, and moves the prop sideways): each rope tilts about where it's tied,
    and the sun and moon, each on one rope, tilt with theirs (--prop-tilt) */
-html.stage-strings :is(.sun, .moon, .cloud, .flyer-blimp, .flyer-balloon, .flyer-birds)::before,
-html.stage-strings :is(.cloud, .flyer-blimp)::after { transform: rotate(var(--rope-a, 0rad)); transform-origin: 50% 100%; }
+html.stage-strings :is(.sun, .moon, .cloud, .storm-cloud, .flyer-blimp, .flyer-balloon, .flyer-birds)::before,
+html.stage-strings :is(.cloud, .storm-cloud, .flyer-blimp)::after { transform: rotate(var(--rope-a, 0rad)); transform-origin: 50% 100%; }
 html.stage-strings :is(.sun, .moon) > * { rotate: var(--prop-tilt, 0rad); }
 html.stage-strings .moon > * { transform-origin: 27% 50%; }
 /* the shadows the props throw on the backdrop (the flyers already have a filter of their own: it's added to) */
@@ -1141,8 +1146,8 @@ html.stage-strings :is(.flyer-blimp, .flyer-balloon, .flyer-birds)::after { box-
 /* (16 Oct) the ropes that move like rope (sky/ropes.js): each one drawn in short pieces end to end (.rope-chain, tied on where
    the drawn rope above was), so it can bow and ripple. the plain ropes above stay for the asset manager's map and for
    anyone who's asked their computer for less motion */
-html.stage-strings.ropes-live :is(.sun, .moon, .cloud, .flyer-blimp, .flyer-balloon, .flyer-birds)::before,
-html.stage-strings.ropes-live :is(.cloud, .flyer-blimp)::after { display: none; }
+html.stage-strings.ropes-live :is(.sun, .moon, .cloud, .storm-cloud, .flyer-blimp, .flyer-balloon, .flyer-birds)::before,
+html.stage-strings.ropes-live :is(.cloud, .storm-cloud, .flyer-blimp)::after { display: none; }
 .rope-chain { position: absolute; z-index: -1; width: 0; height: 0; pointer-events: none; display: none; }
 html.stage-strings .rope-chain { display: block; rotate: none; transform: rotate(var(--rope-a, 0rad)); }
 /* (a rope at rest is one long piece; the short ones show only while it's bowing or rippling) */

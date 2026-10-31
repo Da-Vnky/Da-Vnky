@@ -482,6 +482,28 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `right: var(--sea-pan)` ends it at the screen's edge; so the dock (which drifts) slides along its front. The lights are warm, plus a warm haze (`::after`, screen blend).
 - Tested 19 Oct (Playwright, 1600 x 900 and 390 x 844): day, golden hour and night at both ends of the drift, the ship picked up
   and dropped, reduced motion (no drift, the rock at its framing place), the smoke test (only this copy's missing sounds).
+- **The seagulls** (31 Oct, Victor's brief: far off over the water and the port city, and big out-of-focus ones up close):
+  `sky/gulls.js` + `sky/css/gulls.css` (index.html, after ground-sea.js). **Far**: `.sea-gulls` inside `.ground-sea`, just
+  before `.sea-city` (in front of the far wave, behind the city, dock and nearer waves, so they drift with the sea), `bottom 0`,
+  `100% + 40vh` tall; four `.sea-gull.far.wheel` (`FAR`: where, loop width/height, period, delay → `--gx --gy --gr --gh --gs
+  --gd`, wing pace `--gf`) wheel on an ellipse (`sg-wheel`, `translate`) and turn at each end (`sg-face`, `scale`); one
+  `.crossing` crosses the whole sea now and then (`cross()`, every `CROSS_EVERY` 35-80 s, `--gy`/`--gc`, `.leftward`); slot
+  `assets/sea/seagull-far`, dimmed by the sea's `--sea-dim`/`--sea-sat`. **Near**: `.sea-gulls-near` (fixed, z 2 like the rock,
+  overflow hidden, no clicks) > `.sea-gull.near` (slot `assets/sea/seagull-near`, `blur(7px)`, 4px on phones, dimmed by
+  `--dusk`/`--night`); `pass()` every `NEAR_EVERY` 28-70 s: `go-sweep` (7 s across the top) or `go-hang` (11 s hanging in the
+  wind by the top-left corner, then peeling off); `.from-right` mirrors the whole layer. Both stay in the top quarter of the
+  screen, clear of the ship, traveller, dock and signpost. **Day/night**: the far layer's opacity `1 - 2.4 night - .25 dusk`,
+  the two `.early` ones fade first (`1 - 1.7 dusk`); waits stretch by `1 + 1.6 dusk`; no passes at night (`roosting()`: night
+  > .45 or dusk > .85) and fewer at dusk. Not while away (hidden tab, `sky-view`, `scope-view`; the near layer's opacity 0
+  there). Everything moves in CSS (`translate`/`rotate`/`scale`/`opacity`, the drawn wings `transform`); the JS only picks
+  when. Reduced motion: no animation, no passes. `?map`: still, the far layer shown, the near one `.parked` top left
+  (`translate: 3vw 2vh`). Not in post-sea.json's `depths` yet, so the toy camera leaves them alone until a post-processing
+  includes them (their own blur is kept: `ownBlur` only takes `blur()` off slots listed as the scene's). **Calls**: `call()`
+  → `Sky.sfx('seagulls', { or: 'gull-cry' })`: quiet far ones every `CALL_EVERY` 9-26 s, a louder one as the near one passes
+  (and sometimes as one crosses); never before the first click (`navigator.userActivation`), while hushed, away or roosting,
+  or within 2.5 s of the last; quieter at dusk. `Sky.gulls = { far, near, crosser, pass(move), cross() }` for checking.
+  Tested 31 Oct (Playwright): midday, golden hour, night at 1600 x 900 and 390 x 844, the map, a sweep and a hang, the
+  smoke test (resets 1, 3, 4, 8) and phones.py (only the three it reported before).
 
 ## The sky's clock (sky.js: `sunClock`, `sunTimes`, `SKY_AT`)
 
@@ -1578,6 +1600,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   traveller into the sea (ground-sea.js, the fall's splash is then silent: `mateSplash(0.5, true)`; stand-in: the splash).
   **The recorded splash is never slowed**: its playbackRate is `max(1, 1.3 - .55 × size)` (the boat's used to be ~.6, deep
   and slow; a bottle's is still a little brighter).
+- **Seagulls and the sky's birds** (31 Oct): `assets/sounds/seagulls` (sky/gulls.js, see *The sea drifts*; stand-in panel.js
+  `gull-cry`: 2-4 rasping, falling cries through two bandpasses, brighter when near) and `assets/sounds/birds` (sky.js
+  `birdCalls`: twice per flight of the birds' flock, as it sets off and halfway across, on every page; stand-in `chirps`: three
+  birds' quick rising chirps and a wing whirr). Neither before the first click, nor while hushed or in a hidden tab, nor in `?map`.
 - The traveller's dialogue box (`Sky.speak`) sits near the top, not over the traveller (it used to eat clicks
   meant for them).
 - **ElevenLabs** (30 Oct, Victor, trying whether Claude's sound effects are worth it): the CLI is installed (`npm i -g
@@ -1981,6 +2007,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   sets `--rope-a` (each rope tilts about where it's tied) and, for the sun and moon (one rope each), `--prop-tilt` (their
   pictures tilt with it); sky.css "props on ropes". The numbers (swing time, how fast it settles, breeze, wind, nudge, the
   furthest it goes) are at the top of ropes.js. Big swings ease off (tanh) rather than hitting a wall.
+- **The storm's clouds hang on ropes too** (31 Oct, Victor): `.storm-cloud` (weather.js) is in ropes.js `PROPS` and `TIES`
+  (two ropes, at 30% and 70% across, 60% up) and in every sky.css "props on ropes" rule beside `.cloud`.
 - **Ropes that move like rope** (16 Oct, Victor: "a more realistic rope like physics", and the birds' rope jerking when they
   flap): ropes.js builds a `.rope-chain` in each prop at each tie point (`TIES`: the same places as sky.css's pseudo-element
   ropes, which `html.ropes-live` hides; `?map` keeps the old ones), `PIECES` 12 `<b>`s up to the top of the screen + `.rope-top`
