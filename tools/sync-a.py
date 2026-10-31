@@ -51,10 +51,13 @@ def walk(root):
 
 
 def ignored(paths):
-    # what git ignores in DaV-nky (the same rules for the copy, which has no .git of its own)
+    # what git ignores in DaV-nky (the same rules for the copy, which has no .git of its own).
+    # the names go to git as utf-8, each ended by a zero (-z), not as windows' own text: a song called in arabic letters
+    # (31 Oct) couldn't be written that way, the list never finished, and git waited for the rest of it forever.
     try:
-        r = subprocess.run(['git', '-C', MAIN, 'check-ignore', '--stdin'], input='\n'.join(paths), capture_output=True, text=True)
-        return set(x.strip() for x in r.stdout.splitlines() if x.strip())
+        r = subprocess.run(['git', '-C', MAIN, 'check-ignore', '-z', '--stdin'], input='\0'.join(paths).encode('utf-8'),
+                           capture_output=True, timeout=300)
+        return set(x.decode('utf-8', 'replace') for x in r.stdout.split(b'\0') if x)
     except Exception:
         return set()
 

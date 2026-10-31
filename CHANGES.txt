@@ -17,6 +17,11 @@ How it works
 
 == published ==
 
+2026-10-31 06:00 · V
+- The shell versions of the tools (publish.sh, content.sh, preview.sh, webp.sh) now use the first Python that actually runs, so on Windows they no longer pick the Microsoft Store's stand-in python3 (which only says Python was not found) and skip the desk and the CHANGES lines when publishing.
+- New tools/FOR-CLOUD-CLAUDE.md: the brief to give a Claude cloud session (claude.ai/code) working from the GitHub copy: what it can't reach, the rules that matter there, how to test, what to say in its pull request, what's new lately. tools/FOR-CLAUDE-CODE.md brought up to date (the sea drifts on the clock; the bake is off).
+- tools/sync-a.py (keeping DaVnky-A up to date) no longer hangs forever: a song with an Arabic name in an album couldn't be passed to git in Windows' own text encoding, so git waited for the rest of the list; names now go as UTF-8. A status or refresh takes a few seconds again.
+
 2026-10-31 05:48 · V
 - Tidied up leftovers: four test screenshots of reset 5 (r5-*.png) in the top folder, HANDOFF-local.md (the 11 Oct handoff note) and assets/sounds/hobo.ogg (the old jump scare's sound, unused since 26 Sep).
 - Open this scene in Blender now brings in a slot's own 3D Blender scene (like the rock's) instead of its flat picture, in the same place and lit by its own lights, so depth of field, fog and light shafts work on its real shape; post-processing renders it for real (its own render engine, focus and fog included) for its card. The asset manager lists which slots come in as 3D, with a tick to keep any flat.

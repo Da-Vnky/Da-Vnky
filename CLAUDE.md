@@ -99,7 +99,8 @@ now, and a map of this file. `tools/FOR-FABLE.md` (21 Oct) held two jobs for ski
     (the Windows Store's `python3` stub fails). Rehearsed on throwaway repos (5 Oct): first upload; skizy + Claude + his
     unpublished edit; the same file on both sides; a real clash with his own work in progress (kept); upload refused while
     GitHub's ahead; a README'd repo; a GitLab address.
-  - **In a cloud session** (you're working from the GitHub copy, not Victor's folder): there's no device bridge and no
+  - **In a cloud session** (you're working from the GitHub copy, not Victor's folder; Victor gives it `tools/FOR-CLOUD-CLAUDE.md`,
+    the brief written for it on 31 Oct: keep it true while cloud sessions are in use): there's no device bridge and no
     `.inbox/`. Work on the session's branch, commit, push, and open a pull request for Victor to merge on GitHub; don't
     push to `main` unless he asks. Every other rule here still holds: `python3 tools/changes.py add "…"` for each change
     (never `take`: publishing does), never write the lists or the `?v=` stamps, slots for every picture and sound, skizy's
@@ -143,7 +144,7 @@ now, and a map of this file. `tools/FOR-FABLE.md` (21 Oct) held two jobs for ski
   changed in the copy only → `apply`; changed here only → `refresh`; changed on both → listed, left alone. `apply` (asks, or
   `--yes`) copies the copy's own changes in (DaV-nky's old versions → `_your-versions/backup-before-a-<timestamp>/`, deletions
   too) and adds the copy's new CHANGES.txt lines through changes.py; never commits. `refresh` copies DaV-nky's newer files (and
-  its CHANGES.txt) into the copy. Never synced: anything git ignores, the generated lists, `baked/`. `AGENTS.md` / `GEMINI.md`
+  its CHANGES.txt) into the copy. Never synced: anything git ignores, the generated lists, `baked/`. (31 Oct: the names go to `git check-ignore -z` as UTF-8; in Windows' own encoding a song named in Arabic letters made it wait forever.) `AGENTS.md` / `GEMINI.md`
   (Gemini's, at the top): **an AI never runs `sync-a.py apply` (or copies files across by hand) unless Victor asks for it in
   the chat.** `refresh` only writes inside DaVnky-A. Each folder keeps its own `GEMINI.md` / `AGENTS.md` (never synced): DaVnky-A's
   (16 Oct, Victor: Gemini now only has that folder) tell Gemini how to work there: check the red "copy" tag, never run publish,
@@ -153,6 +154,12 @@ now, and a map of this file. `tools/FOR-FABLE.md` (21 Oct) held two jobs for ski
   `C:\Users\Victor\mcp_bridge_env` (Python 3.14, ollama-mcp-bridge, fastapi/uvicorn) and Python 3.14 from the new Python install
   manager (`%LocalAppData%\Python\pythoncore-3.14-64`). If `py` now starts 3.14, the tools' extras (Pillow, Playwright, fontTools)
   may be missing there: the drawing table says "install them", `bake.py` skips with a note.
+  **In Git Bash, `python` and `python3` are the Microsoft Store's stand-ins** (seen 31 Oct: they print "Python was not found";
+  the install manager's real ones are in `%LocalAppData%\Python\bin`, which comes after `WindowsApps` on his PATH). Only `py`
+  works. So every `.sh` tool picks the first of `py python3 python` that actually runs (`"$c" -c "import sys"`), not the first
+  that exists (publish.sh, content.sh, preview.sh, webp.sh, github-publish.sh); the `.bat` tools already try `py` first. Turning
+  off "python.exe" and "python3.exe" (App Installer) in Windows' Settings › Apps › Advanced app settings › App execution aliases
+  would make the real ones answer too: that's his to do.
 
 ## The desk (desk.html: letters, post, bottles, paintings and frames from anywhere, signed in; 11 Oct)
 

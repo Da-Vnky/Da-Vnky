@@ -18,8 +18,8 @@ friend **skizy**'s server pleroma.nexus as a subdomain, published by pushing to 
 - **The look**: a da Vinci notebook come to life. Aged paper, ink, hand-drawn everything, and more and more **mixed media
   of paint and yarn/knitting/crochet** (Victor's direction: thick fuzzy yarn strokes, crocheted ropes, painterly brushwork).
   He always prefers the elaborate, crafted version over a minimal one.
-- **The places** (each a page or a room): the **sea** (`index.html`, the homepage: scroll turns the day; letters wash up in
-  bottles; a ship, a dock, a port city, waves, a rock framing the foreground), the **workshop** (easels, paintings, a notes
+- **The places** (each a page or a room): the **sea** (`index.html`, the homepage: it drifts slowly side to side on the
+  visitor's own clock; letters wash up in bottles; a ship, a dock, a port city, waves, a rock framing the foreground), the **workshop** (easels, paintings, a notes
   board), the **rooftop** (`city.html`: skyline, telescope, skizy's window across the street), and the **house**
   (`living.html`: the living space, bathroom, hallway, kitchen, attic, porch, the front garden with its bee, and a dungeon
   under the bookshelf). A shared sky runs over all of it, following the real sun where the visitor is.
@@ -47,8 +47,10 @@ friend **skizy**'s server pleroma.nexus as a subdomain, published by pushing to 
   **drawing table**, `tools/drawtable.py`: a canvas at the right size with a guide of the scene), "animate in", "use this".
 - **Supabase** (free plan) holds visitors' bottles and the hidden **desk** page (`desk.html`: letters and post from his phone).
   Don't change the Supabase setup; Victor runs the SQL himself.
-- **Publishing** is Victor's (`tools\publish.bat` or the content manager's button): it pulls skizy's work first, bakes lighter
-  copies of pictures into `baked/`, writes the lists (`list.txt`, `catalog.txt`…), and pushes.
+- **Publishing** is Victor's (`tools\publish.bat` or the content manager's button): it pulls skizy's work first, files what he
+  did at the desk, writes the lists (`list.txt`, `catalog.txt`…), and pushes. (Baking lighter copies of the pictures into
+  `baked/` is switched off until the site's nearly done.)
+- **A Claude cloud session** (claude.ai/code, from the GitHub copy, until 4 Nov 2026) starts from `tools/FOR-CLOUD-CLAUDE.md`.
 
 ## What he's working on now (late Oct 2026)
 

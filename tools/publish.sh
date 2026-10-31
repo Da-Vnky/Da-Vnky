@@ -18,9 +18,13 @@ if ! sh tools/pull.sh --quiet; then
     echo " So nothing's been published. Your changes are still here, just as they were."
     exit 1
 fi
+# which python: the first one that really runs. on windows, "python3" and "python" can be the microsoft store's
+# stand-ins, which only say "python was not found", so each is tried, not just looked for. (py first: on windows
+# that's the real one, with the extras the tools need; mac and linux have no py, so they get python3.)
 PY=""
-command -v python3 >/dev/null 2>&1 && PY=python3
-[ -z "$PY" ] && command -v python >/dev/null 2>&1 && PY=python
+for c in py python3 python; do
+    if "$c" -c "import sys" >/dev/null 2>&1; then PY="$c"; break; fi
+done
 echo
 echo " 2. bringing in what you changed at the desk..."
 if [ -n "$PY" ]; then "$PY" tools/desk.py file; else echo "   (no python: the desk's changes wait for the next publish)"; fi
