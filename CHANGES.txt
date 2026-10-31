@@ -27,6 +27,8 @@ How it works
 - The storm's clouds hang on ropes in resets 1 and 2, like the fair-weather clouds (two each).
 - In resets 1 and 2 the seagulls hang on ropes too, like everything else in the sky (thin ones for the far gulls, a thick out-of-focus one for the gull passing the camera).
 
+== published ==
+
 2026-10-31 07:49 · V
 - Thunder has five recorded rolls now (the artist's Zapsplat thunder, as thunder and thunder-2 to thunder-5 in the asset manager, nested under thunder): one is picked at random each time, never the same one twice running.
 - Dropping the traveller into the sea makes a plop, like a stone into deep water (new sound slot assets/sounds/plop; the ship and bottles keep the splash).
