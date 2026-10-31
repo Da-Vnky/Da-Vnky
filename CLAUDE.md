@@ -789,7 +789,10 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - **In Blender**: custom properties on the camera object "the page" (Object Properties › Custom Properties), defined in
   `tools/blender/toycam.py` (`TOY`: name, default, range, what it does; `add(cam)`, `read(cam)`): `toy camera` (1/0), `toy: camera
   move` (Blender units the camera slides, .15), `toy: handheld` (.3), `toy: vignette` (.45), `toy: grain` (.25), `toy: warmth`
-  (-1…1, .12), `toy: punch` (0: a `backdrop-filter`, the dearest part), `toy: rack focus` (seconds, .9; 0 = the focus stays).
+  (-1…1, .12), `toy: punch` (0: a `backdrop-filter`, the dearest part), `toy: rack focus` (seconds, .9; 0 = the focus stays),
+  `toy: keep sharp` (31 Oct: words, slot names with commas, e.g. "sea/ship, sea/city"; empty = the traveller, ship, dock and
+  city) and `toy: focus reach` (31 Oct, .35, 0…1). A camera made before 31 Oct gets the last two by running toycam.py in its
+  Scripting tab again (it only adds what's missing); until then the site uses those defaults.
   scene_set.py adds them (on) to a new scene's camera; a scene made before has none (`read` → off) until toycam.py is run in its
   Scripting tab. scene_post.py writes `camera` (`lens`, `film` mm, `unit`, `fstop`, `focus`, `dof`, `toy`) and `depths` (every
   layer with a slot, the page's other things too: the traveller, the sky) into post-blender.json; scenes.py copies both into
@@ -804,10 +807,17 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   - the camera: pointer (mouse/pen; `(hover: none)` → a slow wander of its own), eased (`1 − e^(−3dt)`), vertical half; plus the
     handheld sway (three sines, `handheld × .08` units). **Edge clamp** (`measure`, every second): a picture reaching past an edge
     of the screen only slides as far as it reaches past it, so no gap shows (the dock at the drift's start can't slide right).
-  - **Rack focus**: blur = scene_post's `blur_px` again (`blurAt(d, focus)`) on every item that `blurs` (not `assets/sky/…`, not
-    baked; the traveller does, so they stay sharp with their ship), written straight through `put(el)` (refit keeps each
-    picture's own filter in `p.own`). The pointer resting 350 ms on something → its distance over `rack` s (ease in-out); on
-    nothing 2.1 s more → Blender's focus (`rest`); a tap/click at once; off the page → home after 1.5 s. **What's under the
+  - **What's sharp** (31 Oct, Victor: the city went out of focus and the boat and traveller drifted in and out, because the
+    focus followed the pointer onto the waves and the rock, which cover most of the screen): a **sharp stretch** `[near, far]`,
+    from the nearest to the furthest of the subjects (`toy.keep`, else postfx.js `KEEP`: `assets/characters/…`, `…/ship`,
+    `boat`, `dock`, `city`; Blender's focus `rest` is always inside it). The sea's: 12.36 (the ship) to 16.73 (the city).
+    Nothing in it blurs; nearer or further, `blurIn(d)` = scene_post's `blur_px` (`blurAt(d, s)`) from the nearer edge, on every
+    item that `blurs` (not `assets/sky/…`, not baked), written straight through `put(el)` (refit keeps each picture's own filter
+    in `p.own`). The pointer resting 350 ms on something only **stretches** it towards that thing, `toy.reach` (else `REACH`
+    .35) of the way, over `rack` s (ease in-out): the subjects never leave it. On nothing 2.1 s more, a tap/click at once, off
+    the page after 1.5 s: back to the subjects' stretch. Measured: over the rock, the waves, the sky and the city the ship,
+    traveller, dock and city stayed at 0 px; the rock went 4.9 → 3.6 px. The camera still turns about `focus` = `rest` as it
+    slides. **What's under the
     pointer** (`onWhat(x, y)`): most of the sea lets clicks through, so items whose box holds the point, nearest first, are tested
     by their painted pixels (`painted`: `<img>` with object-fit/position, svg `<image>` with preserveAspectRatio, the waves' CSS
     `auto 100%` repeat-x strip; `alphaOf` reads each picture once at ≤ 256 px, alpha > 40), and the drawn stand-ins by their shapes
@@ -816,7 +826,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     `.tc-grain` (a 128 px tile drawn once, hopping 8 places in .8 s with `steps(1)`: transform only), `.punch` (backdrop-filter
     saturate/contrast). Settings as `--tc-*` variables.
   - reduced motion: no slide, no sway, still grain, the focus changes at once. `?map`: none of it (postfx.js does nothing there).
-  - `Sky.postfx.camera = { focus, rest, items, rackTo(d), blurAt(d, s), pick(x, y), at }` for checking.
+  - `Sky.postfx.camera = { focus, sharp, rest, items, rackTo(d), blurAt(d, s), blurIn(d), pick(x, y), at }` for checking.
 - Measured 25 Oct (the browser pane, 1600 × 900, a 165 Hz screen): ~0.07 ms of script a frame, no dropped frames while moving the
   pointer or racking focus. The sea's settings so far: the defaults, from a copy of his open sea.blend (his own file wasn't saved:
   it had unsaved changes); the site's post-sea.json got `camera` and `depths` added to his last post's. His next "post-processing

@@ -90,7 +90,7 @@ folder.
   cylinder riding beside the reticle with the rounds in it; R reloads only what's fired (`sky/revolver.js`,
   `sky/css/revolver.css`; *The game: resets* → *Its sounds and its cylinder* in CLAUDE.md).
 - **25 Oct, the toy camera on the sea** (`sky/postfx.js`, `tools/blender/toycam.py`; *The toy camera* in CLAUDE.md): the
-  page slides by each layer's Blender distance as the pointer moves, focus racks to what's pointed at. Its settings come
+  page slides by each layer's Blender distance as the pointer moves; the traveller, ship, dock and city always stay in focus and the pointer only stretches the focus a little (31 Oct). Its settings come
   from Blender's post-processing in `assets/sea/post-sea.json`: that file is generated, and Victor's next "post-processing →
   site" replaces it whole, so don't build on hand edits to it.
 - **24 Oct, Blender scenes and post-processing back to the site** (`tools/scenes.py`, `tools/blender/`).

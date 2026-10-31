@@ -14,7 +14,10 @@ Properties. Change them, save, and press "post-processing -> site" again.
   toy: grain           film grain
   toy: warmth          the colour: up = warmer, below 0 = cooler
   toy: punch           a little more colour and contrast, like a photo of a model (costs the most: keep it low)
-  toy: rack focus      seconds the focus takes to move to what the visitor points at (0 = it stays where you set it)
+  toy: rack focus      seconds the focus takes to move when the visitor points at something (0 = it stays where you set it)
+  toy: keep sharp      the things always in focus, slot names with commas between ("sea/ship, sea/city"): everything from the
+                       nearest of them to the furthest stays sharp (31 Oct). Empty: the traveller, the ship, the dock and the city
+  toy: focus reach     how far the sharp part stretches towards what the pointer rests on, a share of the way (0 = never)
 
 scene_set.py adds them to a new scene's camera (switched on); tools/blender/scene_post.py reads them. Run alone (Blender's
 Scripting tab: open this file, Run Script) it adds whatever's missing to the scene's camera, switched on.
@@ -30,9 +33,12 @@ TOY = [
     ('toy: warmth', 0.12, -1.0, 1.0, 'The colour: up = warmer, below 0 = cooler'),
     ('toy: punch', 0.0, 0.0, 1.0, 'More colour and contrast (costs visitors the most: keep it low)'),
     ('toy: rack focus', 0.9, 0.0, 3.0, 'Seconds the focus takes to move to what the visitor points at; 0 = it stays put'),
+    ('toy: keep sharp', '', None, None, 'Always in focus, slot names with commas ("sea/ship, sea/city"); empty = the traveller, ship, dock and city'),
+    ('toy: focus reach', 0.35, 0.0, 1.0, 'How far the sharp part stretches towards what the pointer rests on; 0 = never'),
 ]
 KEYS = {'toy camera': 'on', 'toy: camera move': 'move', 'toy: handheld': 'handheld', 'toy: vignette': 'vignette',
-        'toy: grain': 'grain', 'toy: warmth': 'warmth', 'toy: punch': 'punch', 'toy: rack focus': 'rack'}
+        'toy: grain': 'grain', 'toy: warmth': 'warmth', 'toy: punch': 'punch', 'toy: rack focus': 'rack',
+        'toy: keep sharp': 'keep', 'toy: focus reach': 'reach'}
 
 
 def add(cam, on=True):
@@ -43,7 +49,9 @@ def add(cam, on=True):
         cam[name] = (1 if on else 0) if name == 'toy camera' else default
         try:
             ui = cam.id_properties_ui(name)
-            if name == 'toy camera':
+            if isinstance(default, str):                     # (words: no range)
+                ui.update(description=what)
+            elif name == 'toy camera':
                 ui.update(min=0, max=1, description=what)
             else:
                 ui.update(min=lo, max=hi, soft_min=lo, soft_max=hi, step=1, precision=2, description=what)
@@ -52,9 +60,12 @@ def add(cam, on=True):
 
 
 def read(cam):
-    """-> {on, move, handheld, vignette, grain, warmth, punch, rack} for the site; none set: off"""
+    """-> {on, move, handheld, vignette, grain, warmth, punch, rack, keep, reach} for the site; none set: off"""
     out = {}
     for name, default, lo, hi, what in TOY:
+        if isinstance(default, str):
+            out[KEYS[name]] = str(cam.get(name, default) or '').strip()
+            continue
         try:
             v = float(cam.get(name, default))
         except (TypeError, ValueError):
