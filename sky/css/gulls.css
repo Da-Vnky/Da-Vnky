@@ -212,7 +212,9 @@ html.stage-strings .ground-sea .sea-gull.far .sg-wing { animation: sg-tick .45s 
     to   { transform: scaleY(-.4); }
 }
 /* the stick: from its belly down, out of sight behind the waves (it's inside the gull's body, so it dims, and for the near one
-   blurs, with it). the artist's own stick: none yet (a slot can come later) */
+   blurs, with it). (31 Oct, the artist: "look more like metal/aluminium") a polished aluminium rod: cool grey, shaded round,
+   a bright highlight a little off its middle and a fainter one on the far side, so it reads as a tube catching the light.
+   the artist's own stick: none yet (a slot can come later) */
 html.stage-strings .sea-gull .sg-body::before {
     content: "";
     position: absolute;
@@ -223,7 +225,26 @@ html.stage-strings .sea-gull .sg-body::before {
     height: 100vh;
     margin-left: calc(var(--stick-w, 2px) / -2);
     pointer-events: none;
-    background: linear-gradient(90deg, #4a3220, #8a6440 45%, #a57c50 55%, #5a3e28);
+    background: linear-gradient(90deg,
+        #5d646c 0%, #9aa3ad 14%, #d8dee4 28%, #fbfdff 36%, #c6ced6 46%,
+        #8d969f 62%, #b3bbc3 78%, #6e767f 92%, #4c535a 100%);
+    box-shadow: 0 0 0 .5px rgba(40, 46, 54, .35);
+}
+/* the big one's rod meets its belly in a little clamp: a ring of darker metal with a screw */
+html.stage-strings .sea-gull.near .sg-body::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 50%;
+    width: calc(var(--stick-w, 10px) * 2.1);
+    height: calc(var(--stick-w, 10px) * 1.5);
+    margin-left: calc(var(--stick-w, 10px) * -1.05);
+    border-radius: 3px;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 50% 50%, #3b4148 0 14%, transparent 16%),
+        linear-gradient(90deg, #4a5158, #a9b2bb 30%, #e9eef2 42%, #8f98a1 64%, #50575f);
 }
 /* the big one past the camera: a puppet on a stick, pushed across lower down, steadily, bobbing; its stick runs off the
    bottom of the screen */

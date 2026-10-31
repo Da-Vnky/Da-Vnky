@@ -509,7 +509,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   shape), each on its own track (gulls.js `TRACK`: start `--sx`, length `--sw`, one way `--st`, row `--sh`, bob `--sb`/`--sa`):
   `sg-track` linear back and forth, `sg-bob` an even sine (ease-in-out, alternate) on `.sg-body`, `sg-turn` a sharp flip at each
   end (steps, twice the track's time, same delay), the drawn wings ticking evenly (`sg-tick`); the crosser the same on its own
-  row (`sg-cross-track`). The stick is `.sg-body::before` (from its belly, 100vh down, wood; inside the body, so it dims, and
+  row (`sg-cross-track`). The stick is `.sg-body::before` (from its belly, 100vh down; a polished aluminium rod since later on 31
+  Oct, Victor: "look more like metal/aluminium": cool greys shaded round with an off-centre highlight; the near one's meets
+  its belly in a little clamp, `.sg-body::after`; inside the body, so it dims, and
   for the near one blurs, with it; the far ones' disappear behind the nearer waves). The near one is a puppet: only sweeps
   (`MOVES`), `sg-push` linear at 34vh (phones 40vh), bobbing, its thick stick (`--stick-w`) off the bottom of the screen, passing in
   front of the ship and traveller as it goes. Elsewhere (resets 3+) it's all as above. The near one's banking is on `.sg-body`
