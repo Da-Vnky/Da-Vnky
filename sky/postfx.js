@@ -495,6 +495,32 @@
         done.push(id);
     }
 
+    // (31 Oct) the sea's lens over every scene of every page (skizy's room has its own grain and doesn't load this): its film
+    // grain, and (WHOLE_LENS) its darker corners and touch of warmth too, at the sea camera's own settings (Blender's "toy:
+    // grain" .25, "toy: vignette" .45, "toy: warmth" .12). Not its focus or its sliding: those stay the sea's. Over the scene,
+    // under the buttons, like the sea's. A scene whose toy camera brings its own lens hides this one while it shows
+    // (postfx.css), so it's never there twice. WHOLE_LENS = false: the grain alone
+    var WHOLE_LENS = true;
+    var LENS = { grain: .25, vignette: .45, warmth: .12 };
+    (function pageLens() {
+        if (document.querySelector('.page-lens')) return;
+        var g = document.createElement('div'), lens = document.createElement('div');
+        g.className = 'page-lens';
+        g.setAttribute('aria-hidden', 'true');
+        lens.className = 'toycam' + (LENS.warmth < 0 ? ' cool' : '');
+        lens.style.setProperty('--tc-grain', LENS.grain);
+        lens.style.setProperty('--tc-vignette', LENS.vignette);
+        lens.style.setProperty('--tc-warmth', Math.abs(LENS.warmth));
+        lens.style.setProperty('--tc-tile', grain());
+        (WHOLE_LENS ? ['tc-grade', 'tc-vignette', 'tc-grain'] : ['tc-grain']).forEach(function (c) {
+            var i = document.createElement('i');
+            i.className = c;
+            lens.appendChild(i);
+        });
+        g.appendChild(lens);
+        document.body.appendChild(g);
+    })();
+
     mine.forEach(function (sf) {
         Sky.findAsset('assets/' + sf[1] + '/post-' + sf[0] + '.json', function (url, data) { if (url) apply(sf[0], data); });
     });

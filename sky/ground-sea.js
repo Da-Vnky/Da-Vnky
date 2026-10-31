@@ -949,8 +949,8 @@
     // does the ship still sail off with them, the old way.)
     var WALK_OFF_SPEED = 300;                                  // px a second: a brisk walk
     function easeInOut(t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
-    Sky.onLeave(function (go) {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+    Sky.onLeave(function (go, quick) {
+        if (quick || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;   // (a place tab: off at once)
         held = false;
         ship.classList.remove('held');
         var st = crew.state;
@@ -986,7 +986,8 @@
         return true;
     });
 
-    // coming back from another page: they walk in along the dock from the right-hand edge, and wait there
+    // coming back from another page: they walk in along the dock from the right-hand edge, and wait there (a place tab: they're
+    // just there, by the sign, 31 Oct)
     var arrived = Sky.takeArrival ? Sky.takeArrival() : null;
     if (arrived) {
         crew.stay = true;
@@ -995,6 +996,14 @@
             if (!dockAt) { setTimeout(walkIn, 80); return; }
             cancelCrew();
             var run = crew.run, W = sea.clientWidth;
+            if (arrived.via === 'tab') {
+                var at = talkSpot();
+                putMate(at.x, at.b);
+                mate.style.visibility = '';
+                settle('ashore');
+                mate.classList.add('talking');
+                return;
+            }
             crew.state = 'landing';
             putMate(W + 10, deckB());
             mate.style.visibility = '';

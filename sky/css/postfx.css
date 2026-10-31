@@ -102,5 +102,16 @@
 @media (prefers-reduced-motion: reduce) {
     .toycam .tc-grain { animation: none; }
 }
+/* (31 Oct) the sea's lens over every scene (sky/postfx.js pageLens): its grain, darker corners and warmth, over the whole
+   screen, taking no clicks. Layer 4, last on the page: over the rooms (3) and the garden (4), under every button (5 and up).
+   Hidden while a scene's own toy camera shows its lens (the sea's), so it's never doubled */
+.page-lens {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+}
+html:has(.postfx-layer:not(.away) .toycam) .page-lens { display: none; }
+
 /* (for a moment, while the toy camera asks what's painted under the pointer: everything can be found there) */
 html.toycam-picking * { pointer-events: auto !important; }

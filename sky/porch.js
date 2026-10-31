@@ -65,7 +65,8 @@
         H.setOff(function () { stop(hallMe); busy = false; });
         walk(hallMe, standAt(hallMe, pctOf(out, hall)), function () { hallMe.classList.remove('face-left'); step(); });
     }
-    function openPorch(now) {
+    // (at: 'steps' = they've come up the front steps from the garden, so that's where they are: sky/front.js)
+    function openPorch(now, at) {
         outside = true;
         body.classList.add(now ? 'porch-now' : 'porch-panning', 'in-porch');
         porch.setAttribute('aria-hidden', 'false');
@@ -74,8 +75,9 @@
         if (hallMe) hallMe.classList.remove('stepping-out');
         H.fire('enter', 'porch');
         if (now) {
-            place(me, STAND);
-            look(viewOf(STAND), true);
+            var spot = at === 'steps' ? standAt(me, STEPS) : STAND;
+            place(me, spot);
+            look(viewOf(spot), true);
             setTimeout(function () { body.classList.remove('porch-now'); busy = false; arrived(); }, 60);
             return;
         }
@@ -109,7 +111,31 @@
         look(0);
         walk(me, DOOR, function () { sfx('door', { size: 0.5 }); shut(); });
     }
-    H.room('porch', { parent: 'hall', here: function () { return outside; }, busy: function () { return busy; }, enter: goOut, leave: goIn });
+    // (a place tab, sky/house.js jump: out here at once, nothing moving; from the garden, at the top of the steps)
+    function shutNow() {
+        if (!outside) return;
+        outside = false; busy = false;
+        quiet();
+        stop(me);
+        me.classList.remove('going-down');
+        body.classList.remove('in-porch', 'porch-panning', 'porch-now');
+        porch.setAttribute('aria-hidden', 'true');
+        H.fire('leave', 'porch');
+    }
+    H.room('porch', { parent: 'hall', here: function () { return outside; }, busy: function () { return busy; }, enter: goOut, leave: goIn,
+                      now: function (from) { busy = false; openPorch(true, from === 'front' ? 'steps' : null); }, gone: shutNow });
+    // up the front steps from the garden (sky/front.js goUp, in its black): the hallway, then the porch, put in place with
+    // nothing moving and the traveller at the top of the steps; once the black's lifted they step along to their spot
+    function fromGarden() {
+        if (Sky.sides) Sky.sides.goNow('hall');
+        busy = false;
+        openPorch(true, 'steps');
+        busy = true;
+        setTimeout(function () {
+            look(viewOf(STAND));
+            H.land(me, STAND, function () { busy = false; me.classList.remove('face-left'); });
+        }, 380);
+    }
     // down the steps (the gap in the railing, the arrow there): out into the front garden, the house seen from the path
     // (sky/front.js: the black, and the garden comes up out of it)
     var steps = porch.querySelector('.porch-steps'), STEPS = 50;
@@ -322,6 +348,6 @@
     });
     chair.addEventListener('animationend', function () { chair.classList.remove('rock'); });
 
-    Sky.porch = { get outside() { return outside; }, look: look, views: function () { return spare() ? VIEWS.length : 0; },
+    Sky.porch = { get outside() { return outside; }, look: look, views: function () { return spare() ? VIEWS.length : 0; }, fromGarden: fromGarden,
                   events: Object.keys(EVENTS), event: function (n) { if (outside && EVENTS[n]) EVENTS[n](); } };      // (the debug page: one of them, now)
 })();

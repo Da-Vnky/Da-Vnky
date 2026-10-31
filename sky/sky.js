@@ -604,19 +604,23 @@
 
     /* ---------------- leaving the page (scenes can play a little send-off first) ---------------- */
     var leaveHooks = [], leaving = false;
-    function leave(href) {
+    // quick: a place tab (31 Oct, the artist: tabs take you there at once, the walking's only for doors and arrows): the
+    // send-offs are told so (fn(done, true)) and leave out their walks (the sea's walk off the dock; the music still fades),
+    // and the next page doesn't walk them in either (arrival 'tab')
+    function leave(href, quick) {
         if (leaving) return;
         leaving = true;
         // (the next page knows you walked in from here: the homepage walks the traveller onto the dock)
         var had = null;
         try { had = JSON.parse(sessionStorage.getItem('arrive') || 'null'); } catch (e) {}
-        if (!had || had.page !== pageOf(href) || Date.now() - had.t > 30000) setArrival(href, 'edge');
+        if (quick) setArrival(href, 'tab');
+        else if (!had || had.page !== pageOf(href) || Date.now() - had.t > 30000) setArrival(href, 'edge');
         var waiting = 0, gone = false;
         function go() { if (gone) return; gone = true; location.href = href; }
         // each send-off gets its own "done"; the page changes once they're all done (or after 4.2 s at most)
         leaveHooks.forEach(function (fn) {
             var called = false;
-            if (fn(function () { if (called) return; called = true; if (--waiting <= 0) go(); })) waiting++;
+            if (fn(function () { if (called) return; called = true; if (--waiting <= 0) go(); }, !!quick)) waiting++;
             else called = true;
         });
         if (waiting > 0) { body.classList.add('leaving'); setTimeout(go, 4200); } else go();
@@ -626,7 +630,7 @@
         if (!a || e.defaultPrevented) return;
         if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // new tab etc.
         e.preventDefault();
-        leave(a.href);
+        leave(a.href, tabs.contains(a));
     }
     sign.addEventListener('click', onPlaceClick);
     tabs.addEventListener('click', onPlaceClick);
@@ -1805,7 +1809,7 @@
     function doorSound(door) { if (window.Sky && window.Sky.sounds && door && door.dataset.sound) window.Sky.sounds.sfx(door.dataset.sound); }
     function arrive() {
         var a = takeArrival(), ch = document.querySelector('.scene-character');
-        if (!a || !ch || a.via === 'edge') return;          // (just passing through: nothing to walk)
+        if (!a || !ch || a.via === 'edge' || a.via === 'tab') return;      // (just passing through, or a place tab: nothing to walk)
         var r = ch.getBoundingClientRect(), rest = r.left + r.width / 2, W = window.innerWidth, dx, door = null;
         if (a.via === 'right') dx = W + r.width * 0.7 - rest;
         else if (a.via === 'left') dx = -(rest + r.width * 0.7);

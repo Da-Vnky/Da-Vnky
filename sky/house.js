@@ -6,7 +6,8 @@
        living ─ bath, hall, dungeon           (sky/bathroom.js)
        hall   ─ kitchen (kitchen.js), porch (porch.js), attic (attic.js), front (front.js: the garden, outside)
    Each room's own script says how to get in and out of it:
-       Sky.house.room('kitchen', { parent: 'hall', here: fn, enter: fn, leave: fn })
+       Sky.house.room('kitchen', { parent: 'hall', here: fn, enter: fn, leave: fn, now: fn, gone: fn })
+   (now / gone: in or out at once, nothing moving, for the place tabs: jump below)
    and every way of going somewhere (the arrows, doors, the ladder, the place tabs, Escape) is just
        Sky.house.go('kitchen')
    which works out the way there from wherever the traveller is (bath → living → hall → kitchen), one room at a time.
@@ -156,6 +157,34 @@
     }
     function go(to) { ask(function () { nav(to); }); }
 
+    /* ---------------- a place tab: there at once, no walking (31 Oct, the artist: "instead of having the character walk to
+       a location when you press a tab, just teleport the character there instantly, the walking should only be for if
+       you're manually clicking on doors and arrows") ----------------
+       every room it's in now that isn't on the way to `to` is shut at once (gone(), deepest first), then every room on the
+       way in is opened at once (now(from), outermost first), all with transitions off for a frame (html.front-snap). A room
+       that can't (no now/gone) means walking there instead, as before */
+    function jump(to) {
+        ask(function () {
+            var from = where();
+            if (from === to || !ROOMS[to]) return;
+            var way = [];
+            for (var x = to; x; x = ROOMS[x].parent) way.unshift(x);              // living … to
+            var open = Object.keys(ROOMS).filter(function (k) { return k !== 'living' && ROOMS[k].here && ROOMS[k].here(); });
+            var shut = open.filter(function (k) { return way.indexOf(k) === -1; }).sort(function (a, b) { return depth(b) - depth(a); });
+            var into = way.filter(function (k) { return k !== 'living' && open.indexOf(k) === -1; });
+            if (shut.some(function (k) { return !ROOMS[k].gone; }) || into.some(function (k) { return !ROOMS[k].now; })) { nav(to); return; }
+            var root = document.documentElement;
+            root.classList.add('front-snap');
+            queued = null;
+            shut.forEach(function (k) { ROOMS[k].gone(); });
+            into.forEach(function (k) { ROOMS[k].now(from); });
+            if (to === 'living') { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} }
+            setTrip(null);
+            tabs();
+            requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.remove('front-snap'); }); });
+        });
+    }
+
     /* ---------------- who wants to know: a room entered or left (as it slides) ---------------- */
     var hooks = [];
     // (fn(what, name). added once a room's already been entered, say by living.html#dungeon: told so, straight away)
@@ -173,7 +202,7 @@
     /* ---------------- the place tabs for the house's rooms ----------------
        the living space's tab is "you are here" in the living space and the bathroom; the kitchen's in the kitchen; the
        porch's on the porch (the hallway, the attic, the dungeon and the garden have none of their own).
-       from anywhere else in the house, clicking one walks the traveller there */
+       from anywhere else in the house, clicking one puts the traveller there at once (jump, above) */
     var TABS = { living: ['living', 'bath'], kitchen: ['kitchen'], porch: ['porch'] };
     function tabs() {
         var w = where();
@@ -196,7 +225,7 @@
         if (!id || !TABS[id]) return;
         e.preventDefault(); e.stopPropagation();
         if (TABS[id].indexOf(where()) !== -1 && (!trip || trip.into)) return;   // (here already, or walking in)
-        go(id === 'living' ? 'living' : TABS[id][0]);
+        jump(id === 'living' ? 'living' : TABS[id][0]);
     }
     window.addEventListener('click', tabClick, true);
     window.addEventListener('keydown', tabClick, true);
@@ -205,7 +234,7 @@
     Sky.escape(function () { var w = where(); return w !== 'living' && !ROOMS[w].away; }, function () { go(ROOMS[where()].parent); }, Sky.ESC.room);
 
     Sky.house = {
-        room: room, where: where, go: go, nav: nav, ask: ask, on: on, fire: fire, tabs: tabs,
+        room: room, where: where, go: go, jump: jump, nav: nav, ask: ask, on: on, fire: fire, tabs: tabs,
         setOff: setOff, through: through, land: land, drop: drop,
         walk: walk, stop: stop, place: place, leftPct: leftPct, walkSecs: walkSecs, pctOf: pctOf, standAt: standAt,
         get going() { return !!trip; },
