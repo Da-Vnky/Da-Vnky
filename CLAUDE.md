@@ -787,12 +787,16 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   site json is `{ baked: true }` and postfx.js leaves it alone. Flat slots' bakes stay `-blender-post.png`, without DOF/fog.
   `only()` keeps whatever was switched off for render off (the rock's hidden brushstroke curves).
 - **The toy camera** (25 Oct) builds on this: see *The toy camera* below.
-- **Film grain on every scene** (31 Oct, Victor: "my claude also added a sort of static overlay to the sea scene, just add that
-  same static to the rest of the scenes except skizy's room which already has that"; it was the sea's toy-camera grain):
-  postfx.js `filmGrain()` puts `.film-grain` (fixed, z 2147479000, no clicks) with a `.toycam > .tc-grain` inside on every page
-  postfx.js runs on (index, workshop, city, living, template; not skizy's room, beyond.html, the desk or `?map`), at `GRAIN` .25
-  (the sea camera's `toy: grain`), the same tile and hop. postfx.css hides it while a scene's own toy-camera grain shows
-  (`html:has(.postfx-layer:not(.away) .tc-grain) .film-grain`), so the sea has it once, at Blender's strength.
+- **The sea's lens on every scene** (31 Oct, Victor: "my claude also added a sort of static overlay to the sea scene, just add that
+  same static to the rest of the scenes except skizy's room which already has that"; it was the sea's toy-camera grain. Then:
+  "as for the whole toy camera look everywhere... sure let me see how it looks, if I don't like it we can just do grain
+  everywhere, however, leave the focus effect to the sea scene"): postfx.js `pageLens()` puts `.page-lens` (fixed, z 4, last on
+  the page: over the rooms (3) and the garden (4), under every button (5 and up), no clicks) holding a `.toycam` with
+  `.tc-grade`, `.tc-vignette` and `.tc-grain`, at `LENS` (the sea camera's own: grain .25, vignette .45, warmth .12), on every
+  page postfx.js runs on (index, workshop, city, living, template; not skizy's room, beyond.html, the desk or `?map`). No focus,
+  slide or sway (those stay the sea's toy camera). **`WHOLE_LENS = false` at the top of it: the grain alone** (if he decides
+  against the corners and warmth). postfx.css hides it while a scene's own toy camera shows its lens
+  (`html:has(.postfx-layer:not(.away) .toycam) .page-lens`), so the sea has its own, once.
 - **Speed on the site**: the blur is the browser's own `blur()` (the graphics card), only the fog's tint is an SVG colour
   matrix; bokeh animate only scale/transform/opacity (`--bk-o`, `will-change`).
 - **The page's own hand-made blur** (the rock's `blur(7px)` in ground-sea.css): the site json's `ownBlur` false takes `blur()`
