@@ -502,6 +502,11 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   → `Sky.sfx('seagulls', { or: 'gull-cry' })`: quiet far ones every `CALL_EVERY` 9-26 s, a louder one as the near one passes
   (and sometimes as one crosses); never before the first click (`navigator.userActivation`), while hushed, away or roosting,
   or within 2.5 s of the last; quieter at dusk. `Sky.gulls = { far, near, crosser, pass(move), cross() }` for checking.
+  **On ropes in resets 1-2** (31 Oct, Victor: those resets are still "fake"): `html.stage-strings .sea-gull::before`, the
+  sky's rope (or `--rope-art`), tied behind the back (left 52%, bottom 46%), 300vh up; far ones 1.6px (`--gull-rope`) and
+  dimmed with the sea, the near one `clamp(5px, .9vw, 12px)` (phones 6px) and blurred like it. The near one's banking is on
+  `.sg-body` (`sg-sweep-tilt`, `sg-hang-tilt`, same length and easing as its `translate`), so its rope stays upright. They're
+  carried by the CSS, not ropes.js (an animation would override its `translate`), so they don't swing.
   Tested 31 Oct (Playwright): midday, golden hour, night at 1600 x 900 and 390 x 844, the map, a sweep and a hang, the
   smoke test (resets 1, 3, 4, 8) and phones.py (only the three it reported before).
 

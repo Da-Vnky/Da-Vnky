@@ -114,13 +114,21 @@ body.sky-view .sea-gulls-near { opacity: 0; }   /* (like the rock: not while loo
 .sea-gull.near .sg-body {
     filter: blur(7px) brightness(calc(.92 - .5 * var(--dusk, 0) - .14 * var(--night, 0))) saturate(calc(1 - .4 * var(--dusk, 0)));
 }
-/* a sweep across the top of the screen, a little rise and fall, two beats of the wings and then gliding */
+/* a sweep across the top of the screen, a little rise and fall, two beats of the wings and then gliding. (31 Oct) the
+   way it moves is on the gull, the way it banks on its body (in step: the same length and easing), so in resets 1 and 2
+   its rope hangs straight down from the flies however it tips (below) */
 .sea-gull.near.go-sweep { animation: sg-sweep 7s cubic-bezier(.35, .1, .65, .9) forwards; }
+.sea-gull.near.go-sweep .sg-body { animation: sg-sweep-tilt 7s cubic-bezier(.35, .1, .65, .9) forwards; }
 .sea-gull.near.go-sweep .sg-wing { animation: sg-flap-big 1.3s ease-in-out 2; }
 @keyframes sg-sweep {
-    0%   { translate: -32vw 5vh; rotate: 5deg; opacity: 1; }
-    45%  { translate: 40vw -2vh; rotate: -3deg; }
-    100% { translate: 112vw 4vh; rotate: 4deg; opacity: 1; }
+    0%   { translate: -32vw 5vh; opacity: 1; }
+    45%  { translate: 40vw -2vh; }
+    100% { translate: 112vw 4vh; opacity: 1; }
+}
+@keyframes sg-sweep-tilt {
+    0%   { rotate: 5deg; }
+    45%  { rotate: -3deg; }
+    100% { rotate: 4deg; }
 }
 @keyframes sg-flap-big {
     0%, 100% { transform: scaleY(1); }
@@ -128,16 +136,27 @@ body.sky-view .sea-gulls-near { opacity: 0; }   /* (like the rock: not while loo
 }
 /* hanging in the wind near the top-left corner: it glides in, holds there, nudged about by the gusts, and peels away */
 .sea-gull.near.go-hang { animation: sg-hang 11s ease-in-out forwards; }
+.sea-gull.near.go-hang .sg-body { animation: sg-hang-tilt 11s ease-in-out forwards; }
 .sea-gull.near.go-hang .sg-wing { animation: sg-trim 2.4s ease-in-out infinite; }
 @keyframes sg-hang {
-    0%   { translate: -30vw -20vh; rotate: 12deg; opacity: 1; }
-    16%  { translate: 2vw 0; rotate: -4deg; }
-    27%  { translate: 3.4vw 1.4vh; rotate: 2deg; }
-    39%  { translate: 1.6vw -.6vh; rotate: -3deg; }
-    52%  { translate: 3.8vw .9vh; rotate: 3deg; }
-    65%  { translate: 2.2vw -.4vh; rotate: -2deg; }
-    78%  { translate: 3vw .7vh; rotate: 1deg; }
-    100% { translate: -26vw -30vh; rotate: -16deg; opacity: 1; }
+    0%   { translate: -30vw -20vh; opacity: 1; }
+    16%  { translate: 2vw 0; }
+    27%  { translate: 3.4vw 1.4vh; }
+    39%  { translate: 1.6vw -.6vh; }
+    52%  { translate: 3.8vw .9vh; }
+    65%  { translate: 2.2vw -.4vh; }
+    78%  { translate: 3vw .7vh; }
+    100% { translate: -26vw -30vh; opacity: 1; }
+}
+@keyframes sg-hang-tilt {
+    0%   { rotate: 12deg; }
+    16%  { rotate: -4deg; }
+    27%  { rotate: 2deg; }
+    39%  { rotate: -3deg; }
+    52%  { rotate: 3deg; }
+    65%  { rotate: -2deg; }
+    78%  { rotate: 1deg; }
+    100% { rotate: -16deg; }
 }
 @keyframes sg-trim {
     0%, 100% { transform: scaleY(1); }
@@ -146,6 +165,30 @@ body.sky-view .sea-gulls-near { opacity: 0; }   /* (like the rock: not while loo
 @media (max-width: 620px) {
     .sea-gull.near { width: 46vw; }
     .sea-gull.near .sg-body { filter: blur(4px) brightness(calc(.92 - .5 * var(--dusk, 0) - .14 * var(--night, 0))); }
+}
+
+/* ---------------- resets 1 and 2: they're props too, hung on ropes from the flies like everything in the sky ----------------
+   (31 Oct) the same rope as the sky's (sky.css "props on ropes", or the artist's assets/sky/rope), tied on behind the gull's
+   back and running up out of sight. the far ones' ropes are thin (far off) and go behind the city with them; the near one's
+   is thick and as out of focus as it is. they're carried along with the gulls (the CSS moves them, not sky/ropes.js, so they
+   don't swing) */
+html.stage-strings .sea-gull::before {
+    content: ""; position: absolute; z-index: -1; left: 52%; bottom: 46%; width: var(--gull-rope, 1.6px); height: 300vh;
+    margin-left: calc(var(--gull-rope, 1.6px) / -2); pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(0,0,0,.38), rgba(0,0,0,0) 38%, rgba(255,236,200,.22) 52%, rgba(0,0,0,.42)),
+        repeating-linear-gradient(-58deg, #5b4229 0 1.6px, #8d6c45 1.6px 3.6px, #6e5234 3.6px 5.2px);
+    filter: brightness(calc(1 - .45 * var(--dusk, 0)));
+}
+html.stage-strings.has-rope-art .sea-gull::before { background: var(--rope-art) center bottom / 100% auto repeat-y; }
+html.stage-strings .ground-sea .sea-gull.far::before { filter: brightness(var(--sea-dim, 1)) saturate(var(--sea-sat, 1)); }
+html.stage-strings .sea-gull.near { --gull-rope: clamp(5px, .9vw, 12px); }
+html.stage-strings .sea-gull.near::before {
+    filter: blur(7px) brightness(calc(.92 - .5 * var(--dusk, 0) - .14 * var(--night, 0)));
+}
+@media (max-width: 620px) {
+    html.stage-strings .sea-gull.near { --gull-rope: 6px; }
+    html.stage-strings .sea-gull.near::before { filter: blur(4px) brightness(calc(.92 - .5 * var(--dusk, 0) - .14 * var(--night, 0))); }
 }
 
 /* ---------------- the asset manager's map: all still and showing (one big one parked top left) ---------------- */
