@@ -3,7 +3,7 @@ slot_scene.py: a slot's canvas as a Blender scene, for the asset manager's "draw
 
 tools/drawtable.py runs it with Blender in the background (nothing shows) and then opens what it made:
 
-    blender -b --factory-startup --python tools/blender/slot_scene.py -- --w 1600 --h 900 --out <folder>/<name>.blend
+    blender -b --python tools/blender/slot_scene.py -- --w 1600 --h 900 --out <folder>/<name>.blend
             --render //<name>-render- [--guide guide.png] [--marks measurements.png] [--art your-picture.png] [--slot assets/x/y]
 
 The scene:
@@ -77,7 +77,7 @@ def grease_pencil(scene):
 
 def make_scene(w, h, out, render, guide=None, marks=None, art=None, slot=''):
     scene = bpy.context.scene
-    for ob in list(scene.objects):                             # (the factory scene's cube, light and camera)
+    for ob in list(scene.objects):                             # (the startup file's own cube, light and camera)
         bpy.data.objects.remove(ob, do_unlink=True)
     scene.name = os.path.splitext(os.path.basename(out))[0]
 
@@ -168,13 +168,15 @@ def make_scene(w, h, out, render, guide=None, marks=None, art=None, slot=''):
     note = bpy.data.texts.new('how to')
     note.from_string('This scene is ' + (slot or 'a canvas') + ' (' + str(w) + ' x ' + str(h) + ').\n\n' + __doc__)
     os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
-    try_set(bpy.context.preferences.filepaths, 'save_version', 0)   # (no .blend1 backup beside it)
+    # (saved once, the pictures by relative path so the folder can move: no .blend1 beside it. it's started with your own
+    # settings, not --factory-startup (24 Oct, Victor: those kept being lost), and nothing here changes them)
+    for img in bpy.data.images:
+        if img.filepath and not img.filepath.startswith('//'):
+            try:
+                img.filepath = bpy.path.relpath(os.path.abspath(bpy.path.abspath(img.filepath)), start=os.path.dirname(os.path.abspath(out)))
+            except ValueError:                                     # (another drive: it stays as it is)
+                pass
     bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(out), relative_remap=True, compress=True)
-    try:                                                       # (the pictures by relative path, so the folder can move)
-        bpy.ops.file.make_paths_relative()
-        bpy.ops.wm.save_mainfile()
-    except Exception:
-        pass
     return drawing
 
 

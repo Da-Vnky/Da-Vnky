@@ -2,7 +2,7 @@
 rope.py: the rope the sky's props hang from (assets/sky/rope), made of the yarn (tools/blender/yarn.py), as a picture
 that repeats top to bottom without a visible join.
 
-    blender -b --factory-startup --python tools/blender/rope.py -- --out tools/drawing/sky--rope/rope-yarn.png
+    blender -b --python tools/blender/rope.py -- --out tools/drawing/sky--rope/rope-yarn.png
             [--w 120] [--h 480] [--colour 0.38,0.22,0.11] [--fuzz 0.6] [--turns 3]
 
 It lays a straight piece of yarn three tiles long, renders it see-through, keeps the middle tile, and blends that tile's

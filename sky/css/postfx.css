@@ -34,16 +34,73 @@
     aspect-ratio: 1;
     translate: -50% -50%;
     border-radius: 50%;
+    pointer-events: none;
     background: radial-gradient(circle, rgba(var(--bk-c), .85) 0, rgba(var(--bk-c), .55) 42%, rgba(var(--bk-c), .18) 62%, rgba(var(--bk-c), 0) 72%);
     mix-blend-mode: screen;
-    opacity: calc(var(--bk-s) * (var(--bk-day) + (1 - var(--bk-day)) * var(--dusk, 0)));
+    --bk-o: calc(var(--bk-s) * (var(--bk-day) + (1 - var(--bk-day)) * var(--dusk, 0)));
+    opacity: var(--bk-o);
+    will-change: transform, opacity;
 }
+.postfx-bokeh.behind { z-index: -1; }
 .postfx-bokeh.breathes { animation: postfx-breathe var(--bk-pulse) ease-in-out var(--bk-delay) infinite alternate; }
+/* (only scale, transform and opacity move: the graphics card does those, nothing is drawn again) */
 @keyframes postfx-breathe {
-    0% { scale: .92; transform: translate(0, 0); filter: brightness(.85); }
+    0% { scale: .92; transform: translate(0, 0); opacity: calc(var(--bk-o) * .85); }
     50% { transform: translate(var(--bk-drift), calc(var(--bk-drift) * -.6)); }
-    100% { scale: 1.06; transform: translate(calc(var(--bk-drift) * -.5), calc(var(--bk-drift) * .4)); filter: brightness(1.1); }
+    100% { scale: 1.06; transform: translate(calc(var(--bk-drift) * -.5), calc(var(--bk-drift) * .4)); opacity: var(--bk-o); }
 }
 @media (prefers-reduced-motion: reduce) {
     .postfx-bokeh.breathes { animation: none; }
 }
+
+/* the toy camera's lens (sky/postfx.js "the toy camera"): over the scene, under the buttons. The settings come from Blender
+   (tools/blender/toycam.py): --tc-vignette, --tc-warmth, --tc-punch, --tc-grain, 0 to 1 */
+.toycam {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+.toycam > i { position: absolute; inset: 0; }
+/* a little more colour and contrast, like a photo of a model (the browser filters what's behind it: the dearest part) */
+.toycam.punch {
+    -webkit-backdrop-filter: saturate(calc(1 + var(--tc-punch) * .6)) contrast(calc(1 + var(--tc-punch) * .2));
+    backdrop-filter: saturate(calc(1 + var(--tc-punch) * .6)) contrast(calc(1 + var(--tc-punch) * .2));
+}
+/* warmth: a warm (or cool) light laid softly over everything */
+.toycam .tc-grade {
+    background: radial-gradient(ellipse at 50% 40%, rgb(255, 196, 120), rgb(255, 150, 80));
+    mix-blend-mode: soft-light;
+    opacity: calc(var(--tc-warmth) * .55);
+}
+.toycam.cool .tc-grade { background: radial-gradient(ellipse at 50% 40%, rgb(150, 190, 255), rgb(90, 130, 230)); }
+/* the corners: the lens lets less light in towards its edges */
+.toycam .tc-vignette {
+    background: radial-gradient(ellipse 72% 78% at 50% 48%, rgba(30, 18, 8, 0) 55%, rgba(30, 18, 8, .38) 78%, rgba(12, 7, 3, .82) 100%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, .35) 100%);
+    opacity: var(--tc-vignette);
+}
+/* film grain: one tile of specks (drawn once by postfx.js), hopping about ten times a second (only translate moves) */
+.toycam .tc-grain {
+    inset: -128px;
+    background: var(--tc-tile) 0 0 / 128px repeat;
+    mix-blend-mode: overlay;
+    opacity: calc(var(--tc-grain) * .55);
+    animation: toycam-grain .8s steps(1) infinite;
+    will-change: transform;
+}
+@keyframes toycam-grain {
+    0% { transform: translate(0, 0); }
+    12.5% { transform: translate(-37px, 21px); }
+    25% { transform: translate(52px, -44px); }
+    37.5% { transform: translate(-71px, -13px); }
+    50% { transform: translate(18px, 63px); }
+    62.5% { transform: translate(84px, 29px); }
+    75% { transform: translate(-25px, -78px); }
+    87.5% { transform: translate(61px, -59px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .toycam .tc-grain { animation: none; }
+}
+/* (for a moment, while the toy camera asks what's painted under the pointer: everything can be found there) */
+html.toycam-picking * { pointer-events: auto !important; }

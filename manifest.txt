@@ -11,7 +11,7 @@ sky/attic.js 34823
 sky/babble.js 46635
 sky/bathroom.js 29419
 sky/bee.js 114096
-sky/beerush.js 8186
+sky/beerush.js 8219
 sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 51344
@@ -34,7 +34,7 @@ sky/hand.js 1836
 sky/hell.js 23672
 sky/house.js 11177
 sky/inkpad.js 21194
-sky/inventory.js 17335
+sky/inventory.js 17361
 sky/kitchen.js 16998
 sky/kotodama-look.js 20216
 sky/kotodama.js 57718
@@ -54,10 +54,10 @@ sky/panel.js 70116
 sky/peeper.js 31642
 sky/porch.js 19007
 sky/post.js 21656
-sky/postfx.js 10792
+sky/postfx.js 29489
 sky/records.js 37374
 sky/resets.js 17505
-sky/revolver.js 20186
+sky/revolver.js 30172
 sky/ropes.js 19084
 sky/sky.js 147896
 sky/songpad.js 8196
@@ -116,10 +116,10 @@ sky/css/panel.css 6477
 sky/css/peeper.css 10831
 sky/css/porch.css 14940
 sky/css/post.css 7933
-sky/css/postfx.css 2019
+sky/css/postfx.css 4723
 sky/css/records.css 19836
 sky/css/resets.css 4109
-sky/css/revolver.css 2245
+sky/css/revolver.css 6200
 sky/css/skizy-inventory.css 386
 sky/css/skizy-room.css 1429
 sky/css/skizy-window.css 2285
@@ -141,10 +141,11 @@ assets/items/list.txt 117
 assets/living/list.txt 363
 assets/resets/index.txt 77
 assets/resets/list.txt 127
-assets/sea/list.txt 195
+assets/sea/list.txt 209
+assets/sea/post-sea.json 3902
 assets/skizy-room/list.txt 207
 assets/sky/list.txt 388
-assets/sounds/list.txt 260
+assets/sounds/list.txt 404
 assets/textures/list.txt 152
 assets/ui/list.txt 117
 assets/workshop/list.txt 117

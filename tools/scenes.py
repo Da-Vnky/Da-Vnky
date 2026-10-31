@@ -168,12 +168,27 @@ GATHER = r'''
     if (entries[k].page && entries[k - 1].page) { entries[k - 1].els = entries[k - 1].els.concat(entries[k].els); entries.splice(k, 1); }
   }
   window.__davLayers = entries;
+  // where the slot's own picture is drawn inside its box (an <img>'s object-fit and object-position), so a Blender scene
+  // rendered as that picture can be laid exactly over it
+  const drawn = el => {
+    const im = el.tagName === 'IMG' ? el : el.querySelector(':scope > img');
+    if (!im || !im.naturalWidth) return null;
+    const r = im.getBoundingClientRect(), c = getComputedStyle(im), nw = im.naturalWidth, nh = im.naturalHeight;
+    let w = r.width, h = r.height;
+    const fit = c.objectFit;
+    if (fit === 'contain' || fit === 'scale-down') { const k = Math.min(r.width / nw, r.height / nh, fit === 'scale-down' ? 1 : 1e9); w = nw * k; h = nh * k; }
+    else if (fit === 'cover') { const k = Math.max(r.width / nw, r.height / nh); w = nw * k; h = nh * k; }
+    else if (fit === 'none') { w = nw; h = nh; }
+    const pos = (c.objectPosition || '50% 50%').split(' ');
+    const at = (v, free) => /%$/.test(v) ? free * parseFloat(v) / 100 : /px$/.test(v) ? parseFloat(v) : free / 2;
+    return { x: r.left + at(pos[0], r.width - w), y: r.top + at(pos[1] || '50%', r.height - h), w, h, nw, nh };
+  };
   // each layer's place: the box round all its pieces, as it is, and as much of it as is on the screen
   return entries.map((o, i) => {
     let l = 1e9, t = 1e9, r = -1e9, b = -1e9;
     o.els.forEach(e => { const q = e.getBoundingClientRect(); l = Math.min(l, q.left); t = Math.min(t, q.top); r = Math.max(r, q.right); b = Math.max(b, q.bottom); });
     o.els.forEach(e => e.classList.add('dav-layer'));
-    return { slot: o.slot, over: !!o.over, page: !!o.page, holds: !!o.holds, mine: want.has(o.slot), pieces: o.els.length, box: { x: l, y: t, w: r - l, h: b - t },
+    return { slot: o.slot, over: !!o.over, page: !!o.page, holds: !!o.holds, drawn: o.over || o.page ? null : drawn(o.first), mine: want.has(o.slot), pieces: o.els.length, box: { x: l, y: t, w: r - l, h: b - t },
              seen: { x: Math.max(0, l), y: Math.max(0, t), w: Math.min(innerWidth, r) - Math.max(0, l), h: Math.min(innerHeight, b) - Math.max(0, t) } };
   });
 }
@@ -208,6 +223,14 @@ SOLO = '''(i) => {
 }'''
 # nothing moves while it's photographed: every frame loop stops, and every CSS animation is held
 FREEZE = '''() => { window.requestAnimationFrame = () => 0; document.getAnimations().forEach(a => { try { a.pause(); } catch (e) {} }); }'''
+
+
+def read_json(path, default=None):
+    try:
+        with open(path, encoding='utf-8') as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return default
 
 
 def note(text):
@@ -332,12 +355,24 @@ def open_scene(scene_id, view=None, fresh=False):
     if os.path.exists(blend):                          # (a fresh copy: the old one kept, out of the way)
         os.replace(blend, os.path.join(out, '_' + scene_id + time.strftime('-%Y%m%d-%H%M%S') + '.blend'))
     layers = gather(sc, view, out)
+    # a slot with a Blender scene of its own on the drawing table comes in as that (if it has something 3D in it), unless
+    # it's been set to stay flat ("flat.json": the asset manager's ticks)
+    flat = set(read_json(os.path.join(out, 'flat.json'), []))
+    for L in layers:
+        if L.get('mine') and not L.get('over') and L.get('slot') and L['slot'] not in flat:
+            try:
+                tf, ts, _ = dt.where(L['slot'])
+            except Exception:
+                continue
+            b = os.path.join(tf, ts + '.blend')
+            if os.path.exists(b):
+                L['blend'] = b
     info = {'scene': scene_id, 'name': sc.get('name'), 'page': sc['map']['page'], 'view': view, 'w': W, 'h': H, 'scale': SCALE,
             'made': time.strftime('%Y-%m-%d %H:%M'), 'layers': layers}
     with open(os.path.join(out, 'layers.json'), 'w', encoding='utf-8') as f:
         json.dump(info, f, indent=1)
     note('building the Blender scene (' + str(len(layers) - 1) + ' layers)')
-    args = [dt.blender_run(exe), '-b', '--factory-startup', '--python', SCENE_SET, '--', '--layers', os.path.join(out, 'layers.json'), '--out', blend]
+    args = [dt.blender_run(exe), '-b', '--python', SCENE_SET, '--', '--layers', os.path.join(out, 'layers.json'), '--out', blend]
     try:
         r = subprocess.run(args, cwd=ROOT, capture_output=True, text=True, timeout=dt.BLENDER_WAIT, stdin=subprocess.DEVNULL,
                            encoding='utf-8', errors='replace')
@@ -345,13 +380,32 @@ def open_scene(scene_id, view=None, fresh=False):
         raise ValueError('Blender took more than ' + str(dt.BLENDER_WAIT) + ' seconds to make the scene, so it was stopped')
     if not os.path.exists(blend) or '{"made"' not in (r.stdout or ''):
         raise ValueError("Blender couldn't make the scene: " + blender_why(r))
+    three = []
+    for x in (r.stdout or '').splitlines():
+        if x.strip().startswith('{"made"'):
+            three = json.loads(x).get('three') or []
+    info['three'] = three
+    with open(os.path.join(out, 'layers.json'), 'w', encoding='utf-8') as f:
+        json.dump(info, f, indent=1)
     res = dt.open_in('blender', blend)
-    res.update(file=blend, made=True, layers=sum(1 for L in layers[1:] if L.get('mine')),
+    res.update(file=blend, made=True, three=three, layers=sum(1 for L in layers[1:] if L.get('mine')),
                others=sum(1 for L in layers[1:] if not L.get('mine') and not L.get('page')),
                pieces=sum(1 for L in layers[1:] if L.get('page')),
                cut=[L['slot'] for L in layers[1:] if L.get('mine') and not L.get('over') and
                     (L['box']['w'] - L['seen']['w'] > 2 or L['box']['h'] - L['seen']['h'] > 2)])
     return res
+
+
+def real_in_use(slot):
+    """the slot's picture on the site is a 3D render from post-processing (its card's "use this" on <name>-blender-3d.png),
+    which has the depth of field and fog in it already"""
+    try:
+        tf, _, _ = dt.where(slot)
+    except Exception:
+        return False
+    used = read_json(os.path.join(tf, '.used.json'), {}) or {}
+    last = max(used.items(), key=lambda kv: kv[1])[0] if used else ''
+    return last.endswith('-blender-3d.png')
 
 
 def blender_why(r):
@@ -427,7 +481,12 @@ def post_scene(scene_id):
     site = {'scene': scene_id, 'page': sc['map']['page'], 'made': time.strftime('%Y-%m-%d %H:%M'), 'w': W, 'h': H,
             'fog': got['fog']['colour'] if got['fog']['density'] > 0 else None,
             'slots': {}, 'overlays': [{'slot': o['slot'], 'name': o['name'], 'blend': o['blend']} for o in overlays],
-            'bokeh': got['bokeh']}
+            'bokeh': got['bokeh'],
+            'mine': sorted({L['slot'] for L in info['layers'] if L.get('mine') and L.get('slot')})}
+    # the page's own hand-made blur (the rock's): off while Blender's depth of field is on, unless the asset manager's tick
+    # says otherwise (settings.json "ownBlur": true / false)
+    own = read_json(os.path.join(out, 'settings.json'), {}).get('ownBlur')
+    site['ownBlur'] = (not got['dof']['on']) if own is None else bool(own)
     skipped = []
     for slot, e in got['slots'].items():
         own = e.get('self') or {}
@@ -439,6 +498,14 @@ def post_scene(scene_id):
             site['slots'][slot] = {'hidden': True}
         elif own.get('blur', 0) > 0.05 or own.get('haze', 0) > 0.002:
             site['slots'][slot] = {k: own[k] for k in ('blur', 'haze') if own.get(k)}
+    for slot in list(site['slots']) + [b['slot'] for b in got['baked'] if b.get('real')]:
+        if real_in_use(slot):                          # (its picture is a 3D render with the focus and fog in it already)
+            site['slots'][slot] = {'baked': True}
+    # the toy camera (25 Oct): the camera's lens, focus and settings, and how far away each picture is (not one that holds
+    # the rest of the room: sliding it would slide everything in it)
+    if got.get('camera'):
+        site['camera'] = got['camera']
+        site['depths'] = {k: v for k, v in got.get('depths', {}).items() if k not in holds}
     with open(os.path.join(work, stem + '.json'), 'w', encoding='utf-8') as f:
         json.dump(site, f, indent=1)
     # the baked pictures: onto each slot's drawing table, where its card shows them with "use this"
@@ -446,10 +513,11 @@ def post_scene(scene_id):
     for b in got['baked']:
         tfolder, tstem, _ = dt.where(b['slot'])
         os.makedirs(tfolder, exist_ok=True)
-        name = tstem + '-blender-post.png'
+        name = tstem + ('-blender-3d.png' if b.get('real') else '-blender-post.png')
         import shutil
         shutil.copyfile(os.path.join(work, b['file']), os.path.join(tfolder, name))
-        baked.append({'slot': b['slot'], 'name': name, 'why': b['why'], 'cut': b.get('cut'), 'time': int(time.time())})
+        baked.append({'slot': b['slot'], 'name': name, 'why': b['why'], 'cut': b.get('cut'), 'time': int(time.time()),
+                      'real': bool(b.get('real'))})
     keep = os.path.join(out, 'post')
     if os.path.isdir(keep):
         import shutil
@@ -468,6 +536,13 @@ def post_scene(scene_id):
         summary.append('%d bokeh light%s' % (len(site['bokeh']), '' if len(site['bokeh']) == 1 else 's'))
     if baked:
         summary.append('%d picture%s baked for the cards' % (len(baked), '' if len(baked) == 1 else 's'))
+    toy = (site.get('camera') or {}).get('toy') or {}
+    if toy.get('on'):
+        bits = [w for w, k in (('slides', 'move'), ('sways', 'handheld'), ('vignette', 'vignette'), ('grain', 'grain'),
+                               ('warmth', 'warmth'), ('punch', 'punch'), ('rack focus', 'rack')) if toy.get(k)]
+        summary.append('toy camera: ' + (', '.join(bits) or 'on, everything at 0') + ' (%d layers)' % len(site.get('depths', {})))
+    elif site.get('camera'):
+        summary.append("toy camera: off (the camera's \"toy camera\" property)")
     if skipped:
         summary.append('not blurred live (they hold the rest of the room): ' + ', '.join(x.replace('assets/', '') for x in skipped))
     post_info = {'made': site['made'], 'summary': '; '.join(summary) or 'nothing to do: no depth of field, fog, post collection or changes',

@@ -1,0 +1,238 @@
+{
+ "scene": "sea",
+ "page": "index.html",
+ "made": "2026-10-24 22:39",
+ "w": 1920,
+ "h": 1080,
+ "fog": [
+  229,
+  236,
+  249
+ ],
+ "slots": {
+  "assets/sea/bottle": {
+   "blur": 3.55,
+   "haze": 0.063
+  },
+  "assets/sea/bottle-cork": {
+   "blur": 5.12,
+   "haze": 0.055
+  },
+  "assets/sea/bottle-scroll": {
+   "blur": 4.28,
+   "haze": 0.059
+  },
+  "assets/sea/city": {
+   "haze": 0.095
+  },
+  "assets/sea/crab": {
+   "blur": 0.63,
+   "haze": 0.088
+  },
+  "assets/sea/dock": {
+   "blur": 0.3,
+   "haze": 0.092
+  },
+  "assets/sea/gull": {
+   "blur": 1.0,
+   "haze": 0.084
+  },
+  "assets/sea/rock": {
+   "blur": 7.27,
+   "haze": 0.047
+  },
+  "assets/sea/ship": {
+   "blur": 2.35,
+   "haze": 0.071
+  },
+  "assets/sea/wave-1": {
+   "blur": 3.88,
+   "haze": 0.213
+  },
+  "assets/sea/wave-2": {
+   "blur": 1.4,
+   "haze": 0.08
+  },
+  "assets/sea/wave-3": {
+   "blur": 2.91,
+   "haze": 0.067
+  },
+  "assets/sea/wave-4": {
+   "blur": 6.11,
+   "haze": 0.051
+  }
+ },
+ "overlays": [],
+ "bokeh": [
+  {
+   "on": "assets/sea/city",
+   "ox": 0.2395,
+   "oy": 0.5949,
+   "behind": true,
+   "name": "city lamp 1",
+   "x": 0.7917,
+   "y": 0.7407,
+   "size": 70.0,
+   "colour": [
+    255,
+    221,
+    166
+   ],
+   "strength": 1.0,
+   "pulse": 4.0,
+   "drift": 3.0,
+   "day": 0.2
+  },
+  {
+   "on": "assets/sea/city",
+   "ox": 0.3916,
+   "oy": 0.4502,
+   "behind": true,
+   "name": "city lamp 2",
+   "x": 0.8333,
+   "y": 0.6481,
+   "size": 85.2,
+   "colour": [
+    255,
+    231,
+    188
+   ],
+   "strength": 0.8,
+   "pulse": 4.7,
+   "drift": 3.0,
+   "day": 0.2
+  },
+  {
+   "on": "assets/sea/city",
+   "ox": 0.5627,
+   "oy": 0.537,
+   "behind": true,
+   "name": "city lamp 3",
+   "x": 0.8802,
+   "y": 0.7037,
+   "size": 54.8,
+   "colour": [
+    255,
+    212,
+    153
+   ],
+   "strength": 1.0,
+   "pulse": 5.4,
+   "drift": 3.0,
+   "day": 0.2
+  },
+  {
+   "on": "assets/sea/city",
+   "ox": 0.6958,
+   "oy": 0.3634,
+   "behind": true,
+   "name": "city lamp 4",
+   "x": 0.9167,
+   "y": 0.5926,
+   "size": 70.0,
+   "colour": [
+    255,
+    229,
+    179
+   ],
+   "strength": 0.8,
+   "pulse": 6.1,
+   "drift": 3.0,
+   "day": 0.2
+  },
+  {
+   "on": "assets/sea/city",
+   "ox": 0.8479,
+   "oy": 0.4792,
+   "behind": true,
+   "name": "city lamp 5",
+   "x": 0.9583,
+   "y": 0.6667,
+   "size": 85.2,
+   "colour": [
+    255,
+    218,
+    170
+   ],
+   "strength": 1.0,
+   "pulse": 6.8,
+   "drift": 3.0,
+   "day": 0.2
+  },
+  {
+   "on": "assets/sea/city",
+   "ox": 0.4867,
+   "oy": 0.2694,
+   "behind": true,
+   "name": "city lamp 6",
+   "x": 0.8594,
+   "y": 0.5324,
+   "size": 54.8,
+   "colour": [
+    255,
+    237,
+    203
+   ],
+   "strength": 0.8,
+   "pulse": 7.5,
+   "drift": 3.0,
+   "day": 0.2
+  }
+ ],
+ "mine": [
+  "assets/sea/bottle",
+  "assets/sea/bottle-cork",
+  "assets/sea/bottle-scroll",
+  "assets/sea/city",
+  "assets/sea/crab",
+  "assets/sea/dock",
+  "assets/sea/gull",
+  "assets/sea/rock",
+  "assets/sea/ship",
+  "assets/sea/wave-1",
+  "assets/sea/wave-2",
+  "assets/sea/wave-3",
+  "assets/sea/wave-4"
+ ],
+ "ownBlur": false,
+ "camera": {
+  "lens": 50.0,
+  "film": 36.0,
+  "unit": 1.0,
+  "fstop": 0.4,
+  "focus": 13.047,
+  "dof": true,
+  "toy": {
+   "on": true,
+   "move": 0.15,
+   "handheld": 0.3,
+   "vignette": 0.45,
+   "grain": 0.25,
+   "warmth": 0.12,
+   "punch": 0.0,
+   "rack": 0.9
+  }
+ },
+ "depths": {
+  "assets/characters/sea": 13.091,
+  "assets/sea/bottle": 10.909,
+  "assets/sea/bottle-cork": 9.455,
+  "assets/sea/bottle-scroll": 10.182,
+  "assets/sea/city": 16.727,
+  "assets/sea/crab": 15.273,
+  "assets/sea/dock": 16.0,
+  "assets/sea/gull": 14.545,
+  "assets/sea/rock": 8.0,
+  "assets/sea/ship": 12.364,
+  "assets/sea/wave-1": 40.0,
+  "assets/sea/wave-2": 13.818,
+  "assets/sea/wave-3": 11.636,
+  "assets/sea/wave-4": 8.727,
+  "assets/sky/cloud-1": 21.818,
+  "assets/sky/cloud-2": 21.091,
+  "assets/sky/cloud-3": 20.364,
+  "assets/sky/cloud-4": 19.636,
+  "assets/sky/cloud-5": 18.909,
+  "assets/sky/sun": 23.273
+ }
+}

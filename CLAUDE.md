@@ -4,7 +4,8 @@ Victor's personal site, **dav-nky.pleroma.nexus**: a da Vinci–notebook world (
 feel) that's also a small game. Hosted on his friend skizy's server (pleroma.nexus) as a subdomain. Read
 this before changing anything; keep it up to date when something here stops being true.
 
-`tools/FOR-FABLE.md` (21 Oct) held two jobs for skizy's Fable: the debug pass (Fable did it) and "open this scene in Blender"
+**New here? Start with `tools/FOR-CLAUDE-CODE.md`** (24 Oct): what DaV-nky is, how it's built, what Victor is working towards
+now, and a map of this file. `tools/FOR-FABLE.md` (21 Oct) held two jobs for skizy's Fable: the debug pass (Fable did it) and "open this scene in Blender"
 (Claude did it on 24 Oct: see *A whole scene in Blender*). **Working with skizy (or skizy's Claude)?** Start with `tools/FOR-SKIZY.md`: the tools on Linux / VS Code (`tools/content.sh`,
 `publish.sh`, `pull.sh`, `preview.sh`, `tools/vscode/tasks.json`), slots, and what's hers. Keep it true too.
 
@@ -732,6 +733,89 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - Tested in the cloud (Blender 5.2 and 4.5 as Python modules, a stand-in `blender` that opens the .blend first): every scene
   opened; the sea post-processed with DOF, world fog, a mist box, a point light, a Lit rock and a fog-glow compositor; the
   page with them on.
+
+- **Real 3D where there is some** (24 Oct, later; Victor: "imports blender objects rather than the flat image … I'd rather that post
+  be as realistic as possible", "without sacrificing site performance"): a slot of the scene with its own drawing-table .blend
+  (its card's "draw it in › Blender", e.g. `tools/drawing/sea--rock/rock.blend`) holding something solid (a mesh, curve, text,
+  volume…, or Grease Pencil with strokes) comes in as that (`scene_set.import_3d`; scenes.py passes `L['blend']`): its scene
+  appended (`libraries.load`, `dst.scenes`), everything but its camera moved into the slot's collection and parented (their
+  own transforms: appended objects' `matrix_world` is still identity) to "<slot> (3D)", which drivers place and scale from
+  the empty named by the slot (what you G Y: `drive()`, `k × y`), so it keeps its place like the pictures. The canvas (its
+  orthographic camera's frame) lands on where the slot's own `<img>` is drawn in its box (`GATHER`'s `drawn`: object-fit and
+  object-position; else the box). Its lights light only it (light linking, `receiver_collection` = its collection) at the
+  same strength (non-sun energy driven `E × (k × y)²`), and the page's lights leave it out ("the page's lights leave out",
+  link state EXCLUDE). The flat picture stays, hidden, as "<slot> (picture)". The card lists the 3D ones with ticks
+  (`/__draw/scene-flat`, `flat.json`: unticked = flat from the next fresh copy). Checked: the rock lands on its picture.
+  Note: city.blend holds only a cube (24 Oct), so the city comes in as that cube until it's unticked.
+- Post-processing a 3D slot: baked **with** the depth of field and fog, in its own engine and samples (`dav_engine`,
+  `dav_samples`, `dav_device`: Cycles for the rock) lit only by its own lights, as `<name>-blender-3d.png` on its card; once
+  that's "use this"d (content.py `draw_use` → `scene_baked_in`, and scenes.py `real_in_use` on later runs) its entry in the
+  site json is `{ baked: true }` and postfx.js leaves it alone. Flat slots' bakes stay `-blender-post.png`, without DOF/fog.
+  `only()` keeps whatever was switched off for render off (the rock's hidden brushstroke curves).
+- **The toy camera** (25 Oct) builds on this: see *The toy camera* below.
+- **Speed on the site**: the blur is the browser's own `blur()` (the graphics card), only the fog's tint is an SVG colour
+  matrix; bokeh animate only scale/transform/opacity (`--bk-o`, `will-change`).
+- **The page's own hand-made blur** (the rock's `blur(7px)` in ground-sea.css): the site json's `ownBlur` false takes `blur()`
+  out of the scene's pictures' own filters (`mine` lists them). Default: off while Blender's depth of field is on; the card's
+  tick "keep the page's own hand-made blur" (`/__draw/scene-ownblur`, `settings.json`) changes it, on the site at once.
+- **Fog for the site only** (24 Oct, found setting up the sea): a World Volume plugged in makes Blender's own render of a
+  sun-lit 3D model go black (an infinite fog swallows light from infinitely far away: Cycles and EEVEE both). So `world_fog`
+  also reads an **unplugged** volume node named or labelled "haze" in the World (the sea's is set up that way: density
+  0.006, a pale blue), and a 3D slot's bake is rendered without fog and hazed afterwards by its distance.
+- **Bokeh hang on a picture**: each point light's `on`, `ox`, `oy` (the scene's picture whose box it's in, nearest in distance,
+  and where in that box); postfx.js puts the disc inside that slot's element when it's a positioned box (the sea's port city),
+  so it moves with it (the sea's pan), else on the page layer. A light further away than the picture it hangs on gets `behind`:
+  drawn inside that box but under it (`z-index: -1`, the box `isolation: isolate`), so the city stands in front of its lamps'
+  glow (24 Oct, Victor: the sea's six lamps moved to just behind the city, 0.8 further than it). The light's Radius sets the disc's size, its Power its
+  brightness (100 W = full).
+- **The sea, set up 24 Oct through the Blender MCP** (Victor): DOF on, focused on the ship, F/0.4; wave-1 pushed to 40 (it
+  keeps its place, blurs and hazes more); "haze" in the World; six "city lamp" point lights in the post collection over the
+  port city (custom properties day .2, pulse, drift; light-linked to leave the 3D rock alone); posted and put on the site.
+- **No more `--factory-startup`** (Victor: it kept dropping his settings): scene_set, slot_scene (drawtable `blender_scene`) and
+  rope.py start Blender with his own preferences, add-ons and GPU. Nothing changes his preferences any more (slot_scene used to
+  set `save_version` 0): each file is saved once, its pictures' paths made relative by hand (`bpy.path.relpath`).
+
+## The toy camera: the page seen through a lens (sky/postfx.js, tools/blender/toycam.py, 25 Oct)
+
+- Victor: a "matchbox car" look, "as if the page is being viewed via a camera", like Blender's depth of field makes the set look
+  like toys and props. Built on the scene post-processing above, so he sets it in Blender and "post-processing → site" carries it.
+- **In Blender**: custom properties on the camera object "the page" (Object Properties › Custom Properties), defined in
+  `tools/blender/toycam.py` (`TOY`: name, default, range, what it does; `add(cam)`, `read(cam)`): `toy camera` (1/0), `toy: camera
+  move` (Blender units the camera slides, .15), `toy: handheld` (.3), `toy: vignette` (.45), `toy: grain` (.25), `toy: warmth`
+  (-1…1, .12), `toy: punch` (0: a `backdrop-filter`, the dearest part), `toy: rack focus` (seconds, .9; 0 = the focus stays).
+  scene_set.py adds them (on) to a new scene's camera; a scene made before has none (`read` → off) until toycam.py is run in its
+  Scripting tab. scene_post.py writes `camera` (`lens`, `film` mm, `unit`, `fstop`, `focus`, `dof`, `toy`) and `depths` (every
+  layer with a slot, the page's other things too: the traveller, the sky) into post-blender.json; scenes.py copies both into
+  post-<scene>.json (`depths` without `holds` slots) and adds "toy camera: …" to the summary. The card's note says where to set it.
+- **On the site** (postfx.js `toyCamera(data, showing)`, called from `apply` when `camera.toy.on` and `depths`; the lens goes in the
+  scene's `.postfx-layer`, which is now made for a toy camera alone too):
+  - every slot element with a distance is an item (`el.toy`: `d`, `x`, `y`, `box`, `blurs`; parts inside an svg skipped, an item
+    inside another moves by the difference, `up`). **The slide**: px = camera offset × `lens / film` × innerWidth × (1/focus − 1/d)
+    (the camera moves and turns to keep the focus still: what Blender's camera would show). Written as a paused Web Animation of
+    `translate` with **`composite: 'add'`** per element (`anim.effect.setKeyframes`), so it adds to the sea's drift, the waves'
+    swell, the rock's lean and ropes.js's own translate instead of replacing them. No `composite` support: no slide (the rest stays).
+  - the camera: pointer (mouse/pen; `(hover: none)` → a slow wander of its own), eased (`1 − e^(−3dt)`), vertical half; plus the
+    handheld sway (three sines, `handheld × .08` units). **Edge clamp** (`measure`, every second): a picture reaching past an edge
+    of the screen only slides as far as it reaches past it, so no gap shows (the dock at the drift's start can't slide right).
+  - **Rack focus**: blur = scene_post's `blur_px` again (`blurAt(d, focus)`) on every item that `blurs` (not `assets/sky/…`, not
+    baked; the traveller does, so they stay sharp with their ship), written straight through `put(el)` (refit keeps each
+    picture's own filter in `p.own`). The pointer resting 350 ms on something → its distance over `rack` s (ease in-out); on
+    nothing 2.1 s more → Blender's focus (`rest`); a tap/click at once; off the page → home after 1.5 s. **What's under the
+    pointer** (`onWhat(x, y)`): most of the sea lets clicks through, so items whose box holds the point, nearest first, are tested
+    by their painted pixels (`painted`: `<img>` with object-fit/position, svg `<image>` with preserveAspectRatio, the waves' CSS
+    `auto 100%` repeat-x strip; `alphaOf` reads each picture once at ≤ 256 px, alpha > 40), and the drawn stand-ins by their shapes
+    (`html.toycam-picking *` → pointer-events for one `elementsFromPoint`).
+  - **The lens** (`.toycam` in postfx.css): `.tc-grade` (soft-light warm or `.cool`), `.tc-vignette` (two radial gradients),
+    `.tc-grain` (a 128 px tile drawn once, hopping 8 places in .8 s with `steps(1)`: transform only), `.punch` (backdrop-filter
+    saturate/contrast). Settings as `--tc-*` variables.
+  - reduced motion: no slide, no sway, still grain, the focus changes at once. `?map`: none of it (postfx.js does nothing there).
+  - `Sky.postfx.camera = { focus, rest, items, rackTo(d), blurAt(d, s), pick(x, y), at }` for checking.
+- Measured 25 Oct (the browser pane, 1600 × 900, a 165 Hz screen): ~0.07 ms of script a frame, no dropped frames while moving the
+  pointer or racking focus. The sea's settings so far: the defaults, from a copy of his open sea.blend (his own file wasn't saved:
+  it had unsaved changes); the site's post-sea.json got `camera` and `depths` added to his last post's. His next "post-processing
+  → site" (after saving) replaces it whole.
+- Not done yet (ideas he raised): the sky blurring too (left sharp: shared, moving pictures), the signpost and other page pieces
+  that aren't slots don't slide or blur, lens warping / colour fringing (whole-page redraws), bloom on bright spots.
 
 ## The attic (sky/attic.js)
 
@@ -1466,6 +1550,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   breaks the sfx"; inside is where the window rain plays). Never schedule sounds per frame.
 - The traveller's dialogue box (`Sky.speak`) sits near the top, not over the traveller (it used to eat clicks
   meant for them).
+- **ElevenLabs** (30 Oct, Victor, trying whether Claude's sound effects are worth it): the CLI is installed (`npm i -g
+  @elevenlabs/cli`, 1.8.0) and signed in (`elevenlabs auth login`, the credential in Windows Credential Manager: never print
+  it). Sound effects: `elevenlabs text-to-sound-effects convert --json - -o out.mp3` with `{text, duration_seconds (≤ 30),
+  loop, model_id: eleven_text_to_sound_v3, prompt_influence}` (no `output_format` in the body: it's a query parameter; the
+  default mp3 44.1 kHz 128 is what the starter plan allows). Its output is quiet (the first house ambience peaked at -40 dB):
+  level it (`loudnorm`) before use. Try-outs live in `_your-versions/elevenlabs/` (gitignored) until he picks one; the house
+  ambience's two takes (30 Oct) are there, not in the `ambient` slot. A take cost ~430 of his 40,000 monthly credits. The
+  companion skills (`npx skills add elevenlabs/skills`) weren't installed by Claude (blocked as outside code): his to run.
 
 ## The record player: singles and albums (records.js, music.js; the content manager's "record player" tab)
 
@@ -1775,10 +1867,26 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   on the last (only) heart skips the death and goes straight to the white-out (`Sky.lives.last` / `final()`).
 - Every death must go through `Sky.gore.respawn(el)` so it's counted. `Sky.gore.lieDown(el)` / `getUp(el)`:
   come to flat on the floor and push up (nothing uses them at the moment; kept for a death that wakes you somewhere).
-- **Revolver** (`revolver.js`): 6 rounds (`ROUNDS`), then a 2.6 s reload (`RELOAD_MS`) during which every
-  bullet hole fades out; `sessionStorage["revolver-fired"]`. Holes are cleared when the telescope comes
-  up or the sky view opens. The traveller test uses `getClientRects()` (the rooftop one is `position:
-  fixed`, so `offsetParent` is null: that's why it used to refuse to die up there).
+- **Revolver** (`revolver.js`): 6 rounds (`ROUNDS`), then a reload during which every bullet hole fades out;
+  `sessionStorage["revolver-fired"]`. Holes are cleared when the telescope comes up or the sky view opens. The traveller
+  test uses `getClientRects()` (the rooftop one is `position: fixed`, so `offsetParent` is null: that's why it used to
+  refuse to die up there).
+- **Its sounds and its cylinder** (30 Oct, Victor's Zapsplat revolver pack, converted to .ogg 48 kHz and put in with
+  `asset_put`): `bang` / `bang-2` (`TAKES`, `turns(k)`: in turn, now and then skipping one; only those found by findAsset),
+  `revolver-cock`, `-open`, `-load` (`-2`…`-4`, in turn), `-close`; `reload` / `reload-click` are gone (beerush.js no longer
+  plays one: revolver.js cocks it whenever `body[data-holding]` becomes a revolver, a MutationObserver). `STEP` holds the
+  recordings' lengths: shot → cock after `shotCock` 260 ms (a second shot before that cocks it silently: `cockNow(true)`,
+  fanned); **reload** = open (480) → one load per empty chamber (320 each) → close (340) → cock → settle: about 3.3 s for six.
+  The sixth shot starts it after 350 ms; **R** while holding loads only what's fired. `warm()` fetches every revolver sound on
+  first taking it in hand (each sfx is a fresh `Audio`, so the first play would otherwise wait for the file).
+  **`.rv-cyl`** (body child, follows the pointer 22/18 px off the reticle; `.pinned` over the bag with no hover; `body.in-hell`
+  raises it): `.rv-swing > .rv-turn > .rv-drum` (drawn `DRUM` svg using `--rv-metal/-edge/-hole`; `.white` ivory; or
+  `assets/ui/revolver-cylinder(-white)`) + six `.rv-ch` at `--a` (28% out, 22% across: `.live`, `.spent`, or empty; Victor's
+  `revolver-round` / `revolver-spent` via `.has-round` / `.has-spent`). `chambers[]` + `turn` (the chamber under the hammer is
+  `turn % 6`, the drum turned `-60deg × --rv-turn`); rebuilt from `fired()` on each page. Classes: `.on` (held), `.fire` (kick
+  + `.rv-flash`), `.cock`, `.open` (swung out), `.rv-ch.out` (casings dropping down the screen: `--ex/--ey` turned back by the
+  drum's angle + the swing's 22°), `.rv-ch.in` (a round popping in; the drum turns the next empty chamber to the top first).
+  Tested 30 Oct (Playwright, sounds logged): take in hand, three shots, R, six quick shots and the automatic reload, put away.
 - **Claubes** (`claubes.js`, the P(Doom) easter egg):
   - **Once a reset**: the song calls them out once (`run:claubes-called`); who's out is kept for the reset
     (`run:claubes-out`, not the visit). Any that are shot, flicked or scatter (the traveller or a record shot)

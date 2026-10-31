@@ -1,13 +1,21 @@
 # written by tools/update-lists.sh: every art file in this folder.
 # no need to edit it; it's rewritten each commit.
+bang-2.ogg
+bang.ogg
 cork-in.ogg
 cork-pop.ogg
 door-metal.ogg
 door.ogg
 dungeon.ogg
 evilrecord.ogg
-hobo.ogg
 kotodama-una.ogg
 paper-roll.ogg
 paper-unroll.ogg
 rain.ogg
+revolver-close.ogg
+revolver-cock.ogg
+revolver-load-2.ogg
+revolver-load-3.ogg
+revolver-load-4.ogg
+revolver-load.ogg
+revolver-open.ogg

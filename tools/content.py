@@ -1166,6 +1166,82 @@ def scene_put(scene):
     return info
 
 
+def scene_baked_in(slot):
+    """the slot's picture now has its post-processing in it: every scene's post-<scene>.json on the site that blurs or
+    hazes it says "baked" for it instead"""
+    if not os.path.isdir(SCENES_DIR):
+        return
+    for scene in os.listdir(SCENES_DIR):
+        p = os.path.join(SCENES_DIR, scene, 'post', 'post.json')
+        if not os.path.exists(p):
+            continue
+        with open(p, encoding='utf-8') as f:
+            info = json.load(f)
+        jp = os.path.join(SCENES_DIR, scene, 'post', info['json']['file'])
+        with open(jp, encoding='utf-8') as f:
+            site = json.load(f)
+        if slot not in site.get('slots', {}) and not any(b['slot'] == slot for b in info.get('slots') or []):
+            continue
+        site.setdefault('slots', {})[slot] = {'baked': True}
+        with open(jp, 'w', encoding='utf-8') as f:
+            json.dump(site, f, indent=1)
+        if info.get('onSite'):
+            with open(jp, 'rb') as f:
+                asset_put(info['json']['slot'], info['json']['file'], f.read(), 'json')
+
+
+def scene_ownblur(scene, keep):
+    """the asset manager's tick: keep the page's own hand-made blur (the sea's rock) or take it off while Blender's depth of
+    field is there. remembered (settings.json) and, if the post-processing is on the site, changed there at once"""
+    if not re.match(r'^[a-z0-9-]+$', scene or ''):
+        raise ValueError('which scene?')
+    folder = os.path.join(SCENES_DIR, scene)
+    os.makedirs(folder, exist_ok=True)
+    sp = os.path.join(folder, 'settings.json')
+    try:
+        with open(sp, encoding='utf-8') as f:
+            settings = json.load(f)
+    except (OSError, ValueError):
+        settings = {}
+    settings['ownBlur'] = bool(keep)
+    with open(sp, 'w', encoding='utf-8') as f:
+        json.dump(settings, f, indent=1)
+    p = os.path.join(folder, 'post', 'post.json')
+    if os.path.exists(p):
+        with open(p, encoding='utf-8') as f:
+            info = json.load(f)
+        jp = os.path.join(folder, 'post', info['json']['file'])
+        with open(jp, encoding='utf-8') as f:
+            site = json.load(f)
+        site['ownBlur'] = bool(keep)
+        with open(jp, 'w', encoding='utf-8') as f:
+            json.dump(site, f, indent=1)
+        if info.get('onSite'):
+            with open(jp, 'rb') as f:
+                asset_put(info['json']['slot'], info['json']['file'], f.read(), 'json')
+            return {'ownBlur': bool(keep), 'onSite': True}
+    return {'ownBlur': bool(keep), 'onSite': False}
+
+
+def scene_flat(scene, slot, flat):
+    """the asset manager's tick: a slot with its own 3D Blender scene comes into the scene as that (flat: False) or as its
+    flat picture (flat.json, read by the next "open this scene in Blender" with a fresh copy)"""
+    if not re.match(r'^[a-z0-9-]+$', scene or ''):
+        raise ValueError('which scene?')
+    folder = os.path.join(SCENES_DIR, scene)
+    os.makedirs(folder, exist_ok=True)
+    fp = os.path.join(folder, 'flat.json')
+    try:
+        with open(fp, encoding='utf-8') as f:
+            lst = set(json.load(f))
+    except (OSError, ValueError):
+        lst = set()
+    (lst.add if flat else lst.discard)(slot)
+    with open(fp, 'w', encoding='utf-8') as f:
+        json.dump(sorted(lst), f, indent=1)
+    return {'flat': sorted(lst)}
+
+
 def scene_unput(scene, folder=None):
     """the scene's post-processing off the site again (its json and pictures out of the folder)"""
     if not re.match(r'^[a-z0-9-]+$', scene or ''):
@@ -1229,6 +1305,17 @@ def scene_state(scene):
             out['blend'].update(made=i.get('made'), view=i.get('view'), layers=sum(1 for L in i.get('layers', []) if L.get('mine')))
         except (OSError, ValueError):
             pass
+    for name, key, default in (('settings.json', 'settings', {}), ('flat.json', 'flat', [])):
+        try:
+            with open(os.path.join(folder, name), encoding='utf-8') as f:
+                out[key] = json.load(f)
+        except (OSError, ValueError):
+            out[key] = default
+    try:
+        with open(info, encoding='utf-8') as f:
+            out['three'] = json.load(f).get('three') or []
+    except (OSError, ValueError):
+        out['three'] = []
     post = os.path.join(folder, 'post', 'post.json')
     if os.path.exists(post):
         try:
@@ -1320,6 +1407,8 @@ def draw_use(slot, name):
         raw = f.read()
     saved = asset_put(slot, name, raw)
     drawtable().mark_used(slot, os.path.basename(name))
+    if name.endswith('-blender-3d.png'):              # (a 3D render with the focus and fog in it: the site stops adding its own)
+        scene_baked_in(slot)
     return {'name': saved, 'size': len(raw)}
 
 
@@ -2109,6 +2198,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 if not re.match(r'^[a-z0-9-]+$', d.get('scene') or ''):
                     raise ValueError('which scene?')
                 return self.reply(scene_put(d['scene']))
+            if url.path == '/__draw/scene-ownblur':
+                d = json.loads(raw or b'{}')
+                return self.reply(scene_ownblur(d.get('scene'), d.get('keep')))
+            if url.path == '/__draw/scene-flat':
+                d = json.loads(raw or b'{}')
+                return self.reply(scene_flat(d.get('scene'), d.get('slot') or '', bool(d.get('flat'))))
             if url.path == '/__draw/scene-off':
                 return self.reply({'removed': scene_unput(json.loads(raw or b'{}').get('scene'))})
             if url.path == '/__draw/animate':

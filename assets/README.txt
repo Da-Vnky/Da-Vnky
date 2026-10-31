@@ -180,10 +180,7 @@ SOUND EFFECTS (.mp3 or .ogg; played once, not looped; volume in the panel)
     assets/sounds/crack          a board splintering off it
     assets/sounds/book           the book pulled on the bookshelf: a click, the wall
                                  grinding open, a thud (about 3 s)
-    assets/sounds/hobo           behind skizy's boards: from the moment the last one comes off.
-                                 12 s of pitch black (you can only call out), then the scare
-                                 (with it in, the drawn unnerve and scare sounds aren't used)
-    assets/sounds/unnerve        behind skizy's boards, before the scare (only without hobo)
+    assets/sounds/unnerve        a low dread: the grimoire's pact, falling below and the eye opening (reset 4)
     assets/sounds/flashbang      "Forget your stay": the bang, and the ringing after
     assets/sounds/scare          the jump scare
     assets/sounds/typing         skizy typing (about 2 s; played over and over)

@@ -757,6 +757,30 @@
        "optional": true
       },
       {
+       "slot": "assets/ui/revolver-cylinder",
+       "what": "the revolver's cylinder seen from behind, beside the reticle while it's held (it turns a sixth on each shot and swings out to reload). draw the six chambers empty, their middles 28% of the width out from the centre: top, then every 60° round",
+       "size": "1:1, e.g. 200 x 200, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/revolver-round",
+       "what": "a live round in a chamber, seen from behind: the brass rim and its primer",
+       "size": "1:1, e.g. 64 x 64, see-through (drawn 22% of the cylinder across)",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/revolver-spent",
+       "what": "a fired casing in its chamber: the primer dented (they stay in till the reload throws them out)",
+       "size": "1:1, e.g. 64 x 64, see-through",
+       "optional": true
+      },
+      {
+       "slot": "assets/ui/revolver-cylinder-white",
+       "what": "the white revolver's cylinder (reset 4), as above. until it's in, the drawn one goes ivory",
+       "size": "1:1, e.g. 200 x 200, see-through",
+       "optional": true
+      },
+      {
        "slot": "assets/ui/heart-empty",
        "what": "a life that's gone",
        "size": "64 x 64, see-through"
@@ -3430,8 +3454,14 @@
       },
       {
        "slot": "assets/sounds/bang",
-       "what": "a gunshot",
+       "what": "a gunshot (the revolver takes it in turn with bang-2, so no two shots in a row sound alike)",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/bang-2",
+       "what": "a second gunshot, played in turn with bang",
+       "kind": "sound",
+       "optional": true
       },
       {
        "slot": "assets/sounds/shatter",
@@ -3503,13 +3533,41 @@
        "what": "the rush of air off the roof's edge (reset 2)"
       },
       {
-       "slot": "assets/sounds/reload",
-       "what": "the revolver reloading, after six shots (about 2.5 s)",
+       "slot": "assets/sounds/revolver-cock",
+       "what": "the revolver's hammer pulled back: when it's taken in hand, and after each shot as the cylinder turns (about 0.4 s)",
        "kind": "sound"
       },
       {
-       "slot": "assets/sounds/reload-click",
-       "what": "the cylinder snapping shut at the end of the reload",
+       "slot": "assets/sounds/revolver-open",
+       "what": "the cylinder swinging out, at the start of a reload (about 0.5 s)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/revolver-load",
+       "what": "one round pushed into a chamber (about 0.3 s): played once per round as it reloads, taking turns with revolver-load-2, -3 and -4",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/revolver-load-2",
+       "what": "another round going in (one of four, taken in turn)",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/revolver-load-3",
+       "what": "another round going in (one of four, taken in turn)",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/revolver-load-4",
+       "what": "another round going in (one of four, taken in turn)",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/revolver-close",
+       "what": "the cylinder snapped shut at the end of a reload (about 0.4 s); the hammer's cocked right after",
        "kind": "sound"
       },
       {

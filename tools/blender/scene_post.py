@@ -9,7 +9,8 @@ It reads the set tools/blender/scene_set.py made (each slot's picture at its dep
 
   1. what the site does itself, live (post.json "slots"): each layer's blur from the camera's depth of field (at its
      distance, with your focus and F-stop) and its haze from the World's fog (World > Volume: its Density and Colour, over the
-     layer's distance). The site lays these on the pictures that are there now, so they fit any screen, and your own
+     layer's distance; or, unplugged, a volume node named "haze" in the World, for the site only, since a plugged-in World
+     fog blacks out a sun-lit 3D model in Blender's own render). The site lays these on the pictures that are there now, so they fit any screen, and your own
      pictures stay as they are.
   2. light, mist and glow (post.json "overlays"): what's in the "post: put light, mist and glow here" collection, rendered
      on its own (every slot's picture holds it out where it's nearer, so a rock in front hides the light shaft behind it).
@@ -23,6 +24,9 @@ It reads the set tools/blender/scene_set.py made (each slot's picture at its dep
      in its collection than its picture (your yarn, a 3D model). Rendered without the depth of field and fog (the site adds
      those), cut to the slot's own box, at twice the size it's shown; what the compositor spills past the box (glare) goes
      into a "spill" overlay. These come back to the slot's card on the drawing table, to "use this" if you like it.
+  5. the camera (post.json "camera", "depths"; 25 Oct): its lens, film, F-stop and focus, the toy camera's settings
+     (tools/blender/toycam.py), and how far away every layer is (the page's other things too: the traveller, the sky), so the
+     site can slide them as a camera would and move the focus itself.
 """
 
 import json
@@ -32,6 +36,9 @@ import sys
 
 import bpy
 import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import toycam                                       # (tools/blender/toycam.py)
 
 POST = 'post: put light, mist and glow here'
 
@@ -107,9 +114,16 @@ def world_fog(scene):
     if not w or not w.node_tree:
         return 0.0, None
     out = next((n for n in w.node_tree.nodes if n.type == 'OUTPUT_WORLD' and getattr(n, 'is_active_output', True)), None)
-    if not out or not out.inputs['Volume'].is_linked:
-        return 0.0, None
-    node = out.inputs['Volume'].links[0].from_node
+    if out and out.inputs['Volume'].is_linked:
+        node = out.inputs['Volume'].links[0].from_node
+    else:
+        # a volume node named or labelled "haze" in the World, left unplugged: fog for the site only. (plugged in, Blender
+        # draws it too, but a sun's light then never gets through it, so a 3D model lit by a sun goes black in Blender's
+        # own render: an infinite fog swallows light from infinitely far away)
+        node = next((n for n in w.node_tree.nodes if 'haze' in (n.name + ' ' + n.label).lower() and n.type.startswith('VOLUME')
+                     or 'haze' in (n.name + ' ' + n.label).lower() and n.type == 'PRINCIPLED_VOLUME'), None)
+        if node is None:
+            return 0.0, None
 
     def val(name, default):
         s = node.inputs.get(name)
@@ -175,7 +189,9 @@ def compositing_on(scene):
 def why_baked(scene, L, comp):
     """what about this layer the site can't do itself (-> a reason, or '')"""
     p = L['plane']
-    extra = [o for o in L['col'].all_objects if o is not p and o.visible_get() is not False and not o.hide_render]
+    if L['col'].get('dav_3d'):
+        return 'it\'s 3D (its own Blender scene)'
+    extra = [o for o in L['col'].all_objects if o is not p and o.type not in ('EMPTY', 'LIGHT') and not o.hide_render]
     if extra:
         return 'there\'s more in its collection than its picture (' + ', '.join(o.name for o in extra[:3]) + ')'
     if lit_of(p) > 0.001:
@@ -202,7 +218,7 @@ class Hold:
         self.grown = {}
         r = scene.render
         self.r = (r.use_border, r.use_crop_to_border, r.border_min_x, r.border_max_x, r.border_min_y, r.border_max_y,
-                  r.resolution_percentage, r.filepath, r.film_transparent, r.use_compositing)
+                  r.resolution_percentage, r.filepath, r.film_transparent, r.use_compositing, r.engine)
 
     def no_fog(self):
         w = self.scene.world
@@ -256,15 +272,16 @@ class Hold:
         self.grown = {}
         r = sc.render
         (r.use_border, r.use_crop_to_border, r.border_min_x, r.border_max_x, r.border_min_y, r.border_max_y,
-         r.resolution_percentage, r.filepath, r.film_transparent, r.use_compositing) = self.r
+         r.resolution_percentage, r.filepath, r.film_transparent, r.use_compositing, r.engine) = self.r
 
 
-def only(scene, keep):
-    keep = set(keep)
+def only(scene, keep, hold, force=()):
+    """only these render (as they were: what you'd switched off in the render stays off), and force ones even if off"""
+    keep, force = set(keep), set(force)
     for o in scene.objects:
         if o.type in ('LIGHT', 'CAMERA'):
             continue                                      # (the lights light everything, as in the scene)
-        o.hide_render = o not in keep
+        o.hide_render = not (o in force or (o in keep and not hold.obs.get(o.name, False)))
 
 
 def render(scene, path, box=None, W=1920, H=1080, pad=0, pct=100):
@@ -348,12 +365,23 @@ def post(info_path, out):
         p = L['plane']
         d = depth_of(scene, p.matrix_world.translation)
         b, h = blur_px(scene, d, W), haze(density, d)
-        hidden = bool(p.hide_render or L['col'].hide_render)
+        hidden = bool(L['col'].hide_render or (p.hide_render and not L['col'].get('dav_3d')))
         e = res['slots'].setdefault(L['slot'], {})
         key = 'over' if L['over'] else 'self'
         e[key] = {'depth': round(d, 3), 'blur': b, 'haze': h}
         if hidden:
             e[key]['hidden'] = True
+
+    # 5. the camera, and how far away every picture is (the page's other things too), for the site's toy camera
+    cd = scene.camera.data
+    res['camera'] = {'lens': round(cd.lens, 3), 'film': round(cd.sensor_width, 3), 'unit': scene.unit_settings.scale_length or 1.0,
+                     'fstop': round(cd.dof.aperture_fstop, 3), 'focus': round(focus_distance(scene), 3),
+                     'dof': bool(cd.dof.use_dof), 'toy': toycam.read(scene.camera)}
+    res['depths'] = {}
+    for L in layers:
+        if L['layer'] == 0 or L['over'] or not L['slot'] or L['col'].hide_render:
+            continue
+        res['depths'][L['slot']] = round(depth_of(scene, L['plane'].matrix_world.translation), 3)
 
     hold = Hold(scene)
     try:
@@ -374,7 +402,7 @@ def post(info_path, out):
             hold.no_fog()
             scene.render.use_compositing = False          # (the compositor's part is in the baked pictures and the spill)
             planes = [L['plane'] for L in layers]
-            only(scene, obs + planes)
+            only(scene, obs, hold, force=planes)   # (every picture, 3D ones' flat pictures too, holds it out)
             shots = []
             for value in (0.0, 1.0):                      # (over black pictures, then over white ones)
                 for p in planes:
@@ -407,10 +435,26 @@ def post(info_path, out):
                 size = max(36.0, own, blur_px(scene, d, W) * 3.0)      # (a light with no Radius: a small glow)
                 if not (-size < x < W + size and -size < y < H + size):
                     continue                                     # (off the screen)
-                res['bokeh'].append({'name': o.name, 'x': round(x / W, 4), 'y': round(y / H, 4), 'size': round(size, 1),
+                # what it hangs on: the picture of this scene whose box it's in, nearest in distance (a lamp in the port
+                # city goes with the city as it moves), its place a share of that box
+                anchor, best = None, None
+                for L in layers:
+                    b = L['box']
+                    if L['slot'] not in mine or L['over'] or not b or not (b['x'] <= x <= b['x'] + b['w'] and b['y'] <= y <= b['y'] + b['h']):
+                        continue
+                    gap = abs(depth_of(scene, L['plane'].matrix_world.translation) - d)
+                    if best is None or gap < best:
+                        anchor, best = L, gap
+                extra = {}
+                if anchor:
+                    b = anchor['box']
+                    extra = {'on': anchor['slot'], 'ox': round((x - b['x']) / b['w'], 4), 'oy': round((y - b['y']) / b['h'], 4),
+                             # (further away than the picture: behind it, the city in front of its lamps' glow)
+                             'behind': d > depth_of(scene, anchor['plane'].matrix_world.translation)}
+                res['bokeh'].append(dict(extra, **{'name': o.name, 'x': round(x / W, 4), 'y': round(y / H, 4), 'size': round(size, 1),
                                      'colour': srgb(o.data.color), 'strength': round(min(1.0, max(0.12, o.data.energy / 100.0)), 3),
                                      'pulse': float(o.get('pulse', 5.0)), 'drift': float(o.get('drift', 6.0)),
-                                     'day': float(o.get('day', 0.35))})
+                                     'day': float(o.get('day', 0.35))}))
 
         # 4. pictures the site can't do itself, baked, without depth of field or fog; the compositor's spill kept apart
         spill = None
@@ -426,9 +470,27 @@ def post(info_path, out):
             on['w'], on['h'] = min(W, box['x'] + box['w']) - on['x'], min(H, box['y'] + box['h']) - on['y']
             if on['w'] < 2 or on['h'] < 2:
                 continue
-            scene.camera.data.dof.use_dof = False
-            hold.no_fog()
-            only(scene, list(L['col'].all_objects))
+            three = bool(L['col'].get('dav_3d'))
+            if three:
+                # 3D: as real as it gets. its own render engine and samples (Cycles for the rock), and the depth of field
+                # and fog done for real across its shape; the site then leaves it as it is (post-<scene>.json "baked")
+                eng = L['col'].get('dav_engine')
+                if eng:
+                    try_set(scene.render, 'engine', eng)
+                    if eng == 'CYCLES':
+                        try_set(scene.cycles, 'samples', int(L['col'].get('dav_samples') or 128))
+                        try_set(scene.cycles, 'device', L['col'].get('dav_device') or 'GPU')
+                keep = [o for o in L['col'].all_objects if o is not L['plane']]
+                hold.no_fog()                             # (the fog's laid on after, by its distance: see above world_fog)
+                for o in scene.objects:                   # (lit only by its own lights, as in its own scene)
+                    if o.type == 'LIGHT' and o not in keep:
+                        o.hide_render = True
+            else:
+                # a flat picture: without the depth of field and fog (the site lays those on, live, as everywhere else)
+                scene.camera.data.dof.use_dof = False
+                hold.no_fog()
+                keep = list(L['col'].all_objects)
+            only(scene, keep, hold)
             name = L['slot'].replace('assets/', '').replace('/', '-')
             path = os.path.join(out, 'baked', name + '-wide.png')
             render(scene, path, on, W, H, PAD)
@@ -439,8 +501,11 @@ def post(info_path, out):
             bx, by = int(round((on['x'] - x0) * S)), int(round((on['y'] - y0) * S))
             bw, bh = int(round(on['w'] * S)), int(round(on['h'] * S))
             inner = a[by:by + bh, bx:bx + bw].copy()
+            if three and density > 0 and fogc:
+                h = haze(density, depth_of(scene, L['plane'].matrix_world.translation))
+                inner[..., :3] = inner[..., :3] * (1 - h) + np.array(srgb(fogc), dtype=np.float32) / 255 * h   # (the file's colours, straight: alpha as it is)
             save(inner, os.path.join(out, 'baked', name + '.png'))
-            res['baked'].append({'slot': L['slot'], 'file': 'baked/' + name + '.png', 'why': why,
+            res['baked'].append({'slot': L['slot'], 'file': 'baked/' + name + '.png', 'why': why, 'real': three,
                                  'cut': on['w'] < box['w'] - 1 or on['h'] < box['h'] - 1})
             if PAD:
                 # what the compositor adds past the box (glare, glow): the same render without it, taken away. what the

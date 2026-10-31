@@ -43,13 +43,13 @@
             art: '<svg viewBox="0 0 40 60" aria-hidden="true"><rect x="8" y="4" width="24" height="10" rx="2" fill="#f3f0e6" stroke="#9a968a"/>' +
                  '<rect x="6" y="14" width="28" height="42" rx="4" fill="#e0782a" opacity=".92"/><rect x="10" y="24" width="20" height="18" fill="#f8f4ea"/>' +
                  '<path d="M13 30 H27 M13 35 H24" stroke="#8a8a8a" stroke-width="1.6"/><path d="M10 18 V52" stroke="#f7b070" stroke-width="2" opacity=".6"/></svg>' },
-        revolver: { name: 'the revolver', slot: 'assets/city/revolver', hint: 'aim and click. Esc to put it away.', cursor: 'reticle', keep: true,
+        revolver: { name: 'the revolver', slot: 'assets/city/revolver', hint: 'aim and click. R to reload. Esc to put it away.', cursor: 'reticle', keep: true,
             art: '<svg viewBox="0 0 100 60" aria-hidden="true"><path d="M8 14 H70 V26 H8 Z" fill="#4a4f57"/><rect x="4" y="15" width="6" height="10" fill="#2f3339"/>' +
                  '<rect x="46" y="12" width="26" height="22" rx="5" fill="#5b616a"/><circle cx="52" cy="23" r="2" fill="#2f3339"/><circle cx="60" cy="23" r="2" fill="#2f3339"/><circle cx="68" cy="23" r="2" fill="#2f3339"/>' +
                  '<path d="M66 30 L86 30 L94 56 L76 58 Z" fill="#6e4a30"/><path d="M58 32 Q60 44 70 42" fill="none" stroke="#2f3339" stroke-width="3"/><rect x="70" y="8" width="6" height="6" fill="#2f3339"/></svg>' },
         // reset 4 only: the white revolver, given back with the traveller after the pact (sky/hell.js, sky/revolver.js). it's for
         // the Claubes, the pictures round the false god, and the false god: it won't point at the traveller
-        'white-revolver': { name: 'the white revolver', slot: 'assets/items/white-revolver', hint: 'aim and click. it\u2019s for them, not for you. Esc to put it away.', cursor: 'reticle', keep: true,
+        'white-revolver': { name: 'the white revolver', slot: 'assets/items/white-revolver', hint: 'aim and click. it\u2019s for them, not for you. R to reload, Esc to put it away.', cursor: 'reticle', keep: true,
             art: '<svg viewBox="0 0 100 60" aria-hidden="true"><path d="M8 14 H70 V26 H8 Z" fill="#f4f1ea" stroke="#b9b2a2" stroke-width="1"/><rect x="4" y="15" width="6" height="10" fill="#d8d2c4"/>' +
                  '<rect x="46" y="12" width="26" height="22" rx="5" fill="#fbf9f4" stroke="#b9b2a2" stroke-width="1"/><circle cx="52" cy="23" r="2" fill="#8a1a14"/><circle cx="60" cy="23" r="2" fill="#8a1a14"/><circle cx="68" cy="23" r="2" fill="#8a1a14"/>' +
                  '<path d="M66 30 L86 30 L94 56 L76 58 Z" fill="#ebe5d8" stroke="#b9b2a2" stroke-width="1"/><path d="M79 38 L85 50" stroke="#8a1a14" stroke-width="1.4"/><path d="M58 32 Q60 44 70 42" fill="none" stroke="#c9c2b2" stroke-width="3"/><rect x="70" y="8" width="6" height="6" fill="#d8d2c4"/></svg>' }

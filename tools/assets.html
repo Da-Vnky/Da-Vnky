@@ -1389,8 +1389,45 @@
         row.appendChild(openB); row.appendChild(postB); row.appendChild(fresh);
         box.appendChild(row);
         box.appendChild(el('p', 's3-note', 'Every slot of ' + esc(sc.name) + ' that’s showing, each its own layer at its own distance from the camera, in its place and order on the page' +
-            ' (in the map’s “show” view below). Add depth of field, fog, light and compositing in Blender and save; then post-processing → site.'));
+            ' (in the map’s “show” view below). Add depth of field, fog, light and compositing in Blender and save; then post-processing → site.' +
+            ' The toy camera (the page seen through a lens: it slides with the pointer, sways, has grain and dark corners, and moves its focus to what you point at)' +
+            ' is set on the camera, “the page”: Object Properties › Custom Properties, the “toy …” ones.'));
+        // the page's own hand-made blur (the sea's rock) on or off under Blender's depth of field, and which slots come in as 3D
+        var opts = el('div', 's3-row s3-opts');
+        var own = el('label', '', '<input type="checkbox"> keep the page’s own hand-made blur (like the rock’s) under Blender’s depth of field');
+        own.title = 'unticked: Blender’s depth of field is the only blur on this scene’s pictures (the default while it’s on)';
+        own.querySelector('input').addEventListener('change', function () {
+            var keep = this.checked;
+            api('/__draw/scene-ownblur', { scene: sc.id, keep: keep }).then(function (r) {
+                if (r.error) return say(r.error, true);
+                say((keep ? 'the page’s own blur stays' : 'the page’s own blur is off') + (r.onSite ? ': on the site now (have a look).' : ': it goes on the site with the next post-processing.'));
+            });
+        });
+        opts.appendChild(own);
+        var threeBox = el('div', 's3-three');
+        box.appendChild(opts); box.appendChild(threeBox);
         box.appendChild(now); box.appendChild(outs);
+        function showThree(st) {
+            var b = st.blend, three = st.three || [], flat = st.flat || [];
+            own.querySelector('input').checked = !!(st.settings && st.settings.ownBlur);
+            threeBox.innerHTML = '';
+            if (!b || (!three.length && !flat.length)) return;
+            var row = el('p', 's3-note', 'in 3D (their own Blender scenes, from their cards): ');
+            three.concat(flat).forEach(function (slot) {
+                var l = el('label', '', '<input type="checkbox"' + (flat.indexOf(slot) < 0 ? ' checked' : '') + '> ' + esc(slot.replace(/^assets\//, '')));
+                l.title = 'ticked: it comes in as its 3D model; unticked: as its flat picture (from the next “a fresh copy”)';
+                l.querySelector('input').addEventListener('change', function () {
+                    var flatNow = !this.checked;
+                    api('/__draw/scene-flat', { scene: sc.id, slot: slot, flat: flatNow }).then(function (r) {
+                        if (r.error) return say(r.error, true);
+                        say(slot.replace(/^assets\//, '') + (flatNow ? ' comes in as its flat picture' : ' comes in as 3D') + ' from the next “a fresh copy”.');
+                    });
+                });
+                row.appendChild(l);
+                row.appendChild(document.createTextNode(' '));
+            });
+            threeBox.appendChild(row);
+        }
         var timer = null;
         var hasBlend = false;
         function busy(on) { openB.disabled = on; postB.disabled = on || noPost || !hasBlend; }
@@ -1425,13 +1462,14 @@
                     fresh.querySelector('input').checked = false;
                     say((r.opened ? 'opened in Blender: ' : 'made: ') + (r.made === false ? 'your scene, as you left it.' :
                         'a new scene, ' + r.layers + ' layers of ' + sc.name + (r.others || r.pieces ? ' (and, in their places, ' + [r.others ? r.others + ' of other tabs’ slots that show here, like the traveller and the sky' : '', r.pieces ? r.pieces + ' of the page’s own' : ''].filter(Boolean).join(' and ') + ')' : '') + '.') +
-                        ' It’s ' + r.file + '.' + (r.cut && r.cut.length ? ' Partly off the screen (only what shows is in): ' + r.cut.map(function (x) { return x.replace(/^assets\//, ''); }).join(', ') + '.' : ''));
+                        ' It’s ' + r.file + '.' + (r.three && r.three.length ? ' In 3D (their own Blender scenes): ' + r.three.map(function (x) { return x.replace(/^assets\//, ''); }).join(', ') + '.' : '') + (r.cut && r.cut.length ? ' Partly off the screen (only what shows is in): ' + r.cut.map(function (x) { return x.replace(/^assets\//, ''); }).join(', ') + '.' : ''));
                 } else {
                     say('post-processing done: ' + (r.summary || 'nothing to do') + '. ' + (r.onSite ? 'It’s on the site now (have a look at the page; publish to put it live).' : r.empty ? 'Nothing went on the site.' : ''));
                 }
             });
         }
         function show(st) {
+            showThree(st);
             var b = st.blend;
             now.innerHTML = b ? 'in Blender: <b>' + esc(b.file) + '</b> · ' + (b.layers || '?') + ' layers, photographed ' + esc(b.made || '') +
                 (b.view ? ' (“' + esc(b.view) + '”)' : '') + ' · saved ' + ago(b.saved) : 'not in Blender yet.';

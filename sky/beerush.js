@@ -40,8 +40,7 @@
         try { localStorage.setItem('bee-rush-taken', '1'); } catch (e) {}
         var gun = I.has('white-revolver') ? 'white-revolver' : 'revolver';
         if (!I.has(gun)) I.add(gun, { quiet: true });
-        I.hold(gun);
-        if (Sky.sfx) Sky.sfx('reload', { or: 'pickup' });
+        I.hold(gun);                                    // (sky/revolver.js cocks it as it comes into the hand)
         I.say('the revolver’s in your hand. the bee is right there.', 4200);
         tempt();
         tag.classList.add('taken');

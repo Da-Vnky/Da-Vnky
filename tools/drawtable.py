@@ -1202,7 +1202,7 @@ def blender_scene(slot, fresh=False, view=None):
     blend = os.path.join(folder, stem + '.blend')
     if os.path.exists(blend):                           # (a fresh one: the old one is kept, out of the way)
         os.replace(blend, os.path.join(folder, '_' + stem + time.strftime('-%Y%m%d-%H%M%S') + '.blend'))
-    args = [blender_run(exe), '-b', '--factory-startup', '--python', BLENDER_SCENE, '--',
+    args = [blender_run(exe), '-b', '--python', BLENDER_SCENE, '--',
             '--w', str(W), '--h', str(H), '--out', blend, '--render', '//' + stem + '-render-', '--slot', slot]
     for key, name in (('guide', 'guide.png'), ('marks', 'measurements.png')):
         p = os.path.join(folder, 'layers', name)

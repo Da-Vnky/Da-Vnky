@@ -4,7 +4,7 @@ scene_set.py: a whole scene of the site as a Blender set, for the asset manager'
 tools/scenes.py photographs the scene's page layer by layer (each slot showing on it on its own, see-through round it, the
 page's own pieces, and the backdrop) and runs this with Blender in the background, then opens what it made:
 
-    blender -b --factory-startup --python tools/blender/scene_set.py -- --layers <folder>/layers.json --out <folder>/<scene>.blend
+    blender -b --python tools/blender/scene_set.py -- --layers <folder>/layers.json --out <folder>/<scene>.blend
 
 The set:
   - a camera ("the page") that sees exactly what the page shows (1920 x 1080; the render is twice that, as the slots'
@@ -14,6 +14,11 @@ The set:
     layer the page paints on top a step nearer. Each is named by its slot, in a collection of its own (open "layers" in the
     outliner). Move a layer nearer or further (G Y, or its Location Y) and it stays exactly where it is on the page, only
     bigger or smaller in the 3D world (its "keeps its place" modifier), so focus, fog and light fall on it at its depth.
+  - a slot with a Blender scene of its own on the drawing table (its card's "draw it in > Blender") that has something 3D in
+    it (a model, yarn, strokes) comes in as that, not the flat picture: everything in it but its camera, under "<slot> (3D)",
+    sized and placed so it covers the slot's box from this camera; its own lights light only it (light linking). Move it
+    nearer or further with the empty named by the slot (G Y): it keeps its place, as the pictures do (drivers). The flat
+    picture is still there, hidden ("<slot> (picture)")
   - what else is on the page, each in its place in the stack, in "the page's other things": other tabs' slots that show here
     (the traveller, the sun and clouds…) and the page's own pieces that aren't slots ("the page itself": a letter, words);
     and furthest back, in "backdrop", "the page's background" (the colours behind it all)
@@ -24,6 +29,8 @@ The set:
     "post-processing → site" as pictures over the page (a box with a volume material for mist, lit by a spot light for
     shafts; each collection inside it its own picture), and its Point lights as bokeh. The World's fog (World > Volume) and
     the camera's depth of field are done live by the site on each layer, at its distance (tools/blender/scene_post.py)
+  - the toy camera's settings on the camera (Custom Properties, tools/blender/toycam.py): the site's camera slides, sways,
+    darkens its corners, has grain and moves its focus to what the visitor points at (sky/postfx.js)
   - the render: see-through, colours as painted (Standard), EEVEE. F12 shows the whole scene as it would look.
 
 Works with Blender 4.2 and on.
@@ -32,12 +39,14 @@ Works with Blender 4.2 and on.
 import json
 import math
 import os
+import re
 import sys
 
 import bpy
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import yarn                                         # (tools/blender/yarn.py)
+import toycam                                       # (tools/blender/toycam.py)
 
 LENS, SENSOR = 50.0, 36.0          # the camera's lens and film (mm): at 1 unit away it sees SENSOR / LENS units across
 BACK, FRONT = 24.0, 8.0            # how far away the back layer and the front layer start (the backdrop goes BACK + 8)
@@ -185,7 +194,128 @@ def layer(scene, parent, L, depth, W, H, folder, i):
     col['dav_box'] = json.dumps(L.get('box') or box)     # (where it is on the page, all of it)
     col['dav_at'] = json.dumps(box)                      # (what the picture holds: what it painted on the screen)
     col['dav_file'] = L['file']
+    if L.get('mine', True) and not L.get('over') and import_3d(scene, col, plane, L, depth, W, H):
+        THREE.append(L['slot'])
     return plane
+
+
+THREE = []                         # (the slots that came in as 3D)
+SOLID = {'MESH', 'CURVE', 'SURFACE', 'META', 'FONT', 'VOLUME', 'POINTCLOUD'}
+
+
+def strokes_in(ob):
+    """how many strokes a Grease Pencil object holds (the new kind, 4.3 on)"""
+    n = 0
+    for layer in getattr(ob.data, 'layers', []):
+        for fr in getattr(layer, 'frames', []):
+            dr = getattr(fr, 'drawing', None)
+            n += len(getattr(dr, 'strokes', []) or [])
+    return n
+
+
+def drive(ob, path, index, parent, factor):
+    """ob's path[index] = factor x how far away the parent is (its Location Y): a driver"""
+    fc = ob.driver_add(path, index)
+    drv = fc.driver
+    drv.type = 'SCRIPTED'
+    var = drv.variables.new()
+    var.name, var.type = 'y', 'SINGLE_PROP'
+    var.targets[0].id_type = 'OBJECT'
+    var.targets[0].id = parent
+    var.targets[0].data_path = 'location[1]'
+    drv.expression = '%.8f * y' % factor                 # (a simple expression: runs without Python scripts allowed)
+
+
+def import_3d(scene, col, plane, L, depth, W, H):
+    """the slot's own Blender scene (its drawing-table .blend, if it has more in it than an empty canvas: a 3D model, yarn,
+    strokes), brought in instead of the flat picture, where the picture was: everything in it but its camera, sized so it
+    covers the slot's box from this camera, at the picture's distance. -> True if it did"""
+    path = L.get('blend')
+    if not path or not os.path.exists(path):
+        return False
+    with bpy.data.libraries.load(path, link=False) as (src, dst):
+        dst.scenes = src.scenes[:1]
+    if not dst.scenes:
+        return False
+    there = dst.scenes[0]
+    obs = [o for o in there.objects if o.type != 'CAMERA']
+    solid = [o for o in obs if o.type in SOLID or (o.type in ('GREASEPENCIL', 'GPENCIL') and strokes_in(o))]
+    cam = there.camera
+    if not solid or cam is None or cam.data.type != 'ORTHO':
+        bpy.data.scenes.remove(there)                    # (nothing 3D in it: the picture stays)
+        return False
+    # its canvas: the camera's frame (orthographic, the longer side ortho_scale across), round the camera's X and Z
+    rw, rh = there.render.resolution_x, there.render.resolution_y
+    wide = cam.data.ortho_scale if rw >= rh else cam.data.ortho_scale * rw / rh
+    cx, cz = cam.matrix_world.translation.x, cam.matrix_world.translation.z
+    # where its picture is drawn on the page (the slot's <img>, as fitted in its box), else its box: the canvas goes there
+    box = L.get('drawn') or L.get('box') or L.get('at')
+    fw = SENSOR / LENS
+    fh = fw * H / W
+    k = (box['w'] / W * fw) / wide                      # (one of its units, 1 unit from this camera)
+    mx = ((box['x'] + box['w'] / 2) / W - .5) * fw
+    mz = (.5 - (box['y'] + box['h'] / 2) / H) * fh
+    short = L['slot'].replace('assets/', '')
+    plane.name = short + ' (picture)'                   # (its name goes to what you move, below)
+    # what you move: an empty at the picture's distance (G Y: nearer or further, and everything keeps its place)
+    where = bpy.data.objects.new(short, None)
+    where.empty_display_type, where.empty_display_size = 'PLAIN_AXES', 0.3
+    col.objects.link(where)
+    where.location = (0.0, depth, 0.0)
+    where.lock_rotation = (True, True, True)
+    plane.location = (0.0, 0.0, 0.0)
+    plane.parent = where
+    plane.hide_render = True                             # (the flat picture, kept for reference: the 3D stands in for it)
+    plane.hide_set(True)
+    # its own scene, scaled and placed by drivers on how far away "where" is
+    holder = bpy.data.objects.new(short + ' (3D)', None)
+    holder.empty_display_type, holder.empty_display_size = 'CUBE', 0.05
+    col.objects.link(holder)
+    holder.parent = where
+    drive(holder, 'location', 0, where, mx - k * cx)
+    drive(holder, 'location', 2, where, mz - k * cz)
+    for i in range(3):
+        drive(holder, 'scale', i, where, k)
+    names = set(o.name for o in obs)
+    for o in obs:
+        for c in list(o.users_collection):
+            c.objects.unlink(o)
+        col.objects.link(o)
+        if o.parent is None or o.parent.name not in names:
+            # (its own Location, Rotation and Scale, now inside the holder: appended objects' world matrix isn't worked
+            # out yet, so it's their own transform that's kept)
+            o.parent = holder
+            o.matrix_parent_inverse.identity()
+        o.name = short + ': ' + re.sub(r'\.\d{3}$', '', o.name)
+        if o.type == 'LIGHT':                            # (its lights light only it: light linking, Blender 4.0 on)
+            try:
+                o.light_linking.receiver_collection = col
+            except Exception:
+                pass
+            if o.data.type != 'SUN':
+                # (shrunk to fit, a lamp is nearer to what it lights, and light falls off with the square of the distance:
+                # its power shrinks with it, so it lights the model just as it did in its own scene)
+                fc = o.data.driver_add('energy')
+                drv = fc.driver
+                drv.type = 'SCRIPTED'
+                var = drv.variables.new()
+                var.name, var.type = 'y', 'SINGLE_PROP'
+                var.targets[0].id_type = 'OBJECT'
+                var.targets[0].id = where
+                var.targets[0].data_path = 'location[1]'
+                drv.expression = '%.8f * y * y' % (o.data.energy * k * k)
+    for ob in (where, holder):
+        ob['dav_slot'] = L['slot']
+    col['dav_3d'] = True
+    col['dav_blend'] = path
+    col['dav_engine'] = there.render.engine            # (post-processing renders it as its own scene did: Cycles for the rock)
+    try:
+        col['dav_samples'] = int(there.cycles.samples)
+        col['dav_device'] = there.cycles.device
+    except AttributeError:
+        pass
+    bpy.data.scenes.remove(there)
+    return True
 
 
 def make(info_path, out):
@@ -193,7 +323,7 @@ def make(info_path, out):
     folder = os.path.dirname(os.path.abspath(info_path))
     W, H, S = info.get('w', 1920), info.get('h', 1080), info.get('scale', 2)
     scene = bpy.context.scene
-    for ob in list(scene.objects):                      # (the factory scene's cube, light and camera)
+    for ob in list(scene.objects):                      # (the startup file's own objects: the cube, light and camera)
         bpy.data.objects.remove(ob, do_unlink=True)
     for c in list(scene.collection.children):           # (and its empty "Collection")
         bpy.data.collections.remove(c)
@@ -212,6 +342,7 @@ def make(info_path, out):
     cam.lock_location = cam.lock_rotation = cam.lock_scale = (True, True, True)
     scene.camera = cam
     cd.show_passepartout, cd.passepartout_alpha = True, 0.9
+    toycam.add(cam)                                     # (the toy camera's settings: Object Properties > Custom Properties)
 
     layers = info['layers']
     back = [L for L in layers if L.get('backdrop')]
@@ -243,7 +374,7 @@ def make(info_path, out):
     cd.dof.aperture_fstop = 1.2
 
     # light from the upper right, as on the site (it only shows on layers you've made "Lit", the yarn, and what you add)
-    sun = bpy.data.objects.new('sun', bpy.data.lights.new('sun', 'SUN'))
+    sun = bpy.data.objects.new("the page's sun", bpy.data.lights.new("the page's sun", 'SUN'))
     scene.collection.objects.link(sun)
     sun.data.energy = 4.0
     sun.rotation_euler = (math.radians(55), math.radians(-25), math.radians(-35))
@@ -308,19 +439,36 @@ def make(info_path, out):
                     for flag in ('show_floor', 'show_axis_x', 'show_axis_y', 'show_axis_z'):
                         try_set(space.overlay, flag, False)
 
+    # (a slot that came in as 3D is lit by its own lights only, as in its own scene: the page's lights leave it out)
+    threes = [c for c in bpy.data.collections if c.get('dav_3d')]
+    if threes:
+        try:
+            rc = bpy.data.collections.new("the page's lights leave out")
+            for c in threes:
+                rc.children.link(c)
+            for item in rc.collection_children:
+                item.light_linking.link_state = 'EXCLUDE'
+            for o in scene.objects:
+                if o.type == 'LIGHT' and not any(o.name in c.objects for c in threes):
+                    o.light_linking.receiver_collection = rc
+        except Exception:
+            pass
+
     note = bpy.data.texts.new('how to')
     note.from_string('This is ' + (info.get('name') or info.get('scene') or 'a scene') + ' (' + info.get('page', '') + ', '
                      + (('the view "' + info['view'] + '"') if info.get('view') else 'as it first opens') + ', '
                      + str(len(rest)) + ' layers, photographed ' + info.get('made', '') + ').\n\n' + __doc__)
     scene['dav_scene'] = info.get('scene') or ''
     scene['dav_page'] = info.get('page') or ''
-    try_set(bpy.context.preferences.filepaths, 'save_version', 0)
+    # (saved once, the pictures by paths relative to it, so the folder can move. your Blender settings are your own: it's
+    # started without --factory-startup, so your preferences, add-ons and GPU are as you keep them, and nothing here changes them)
+    for img in bpy.data.images:
+        if img.filepath and not img.filepath.startswith('//'):
+            try:
+                img.filepath = bpy.path.relpath(os.path.abspath(bpy.path.abspath(img.filepath)), start=os.path.dirname(os.path.abspath(out)))
+            except ValueError:                                     # (another drive: it stays as it is)
+                pass
     bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(out), relative_remap=True, compress=True)
-    try:
-        bpy.ops.file.make_paths_relative()
-        bpy.ops.wm.save_mainfile()
-    except Exception:
-        pass
     return len(rest)
 
 
@@ -329,4 +477,4 @@ if __name__ == '__main__':
     if not d.get('layers') or not d.get('out'):
         sys.exit('scene_set.py needs -- --layers <layers.json> --out <file.blend> (see the top of the file)')
     n = make(d['layers'], d['out'])
-    print(json.dumps({'made': d['out'].replace('\\', '/'), 'layers': n}), flush=True)
+    print(json.dumps({'made': d['out'].replace('\\', '/'), 'layers': n, 'three': THREE}), flush=True)
