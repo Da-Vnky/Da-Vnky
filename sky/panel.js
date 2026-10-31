@@ -523,6 +523,57 @@
         'twinkle': function (out, t) {                                 // a star's soft chime
             [1568, 2093, 2637].forEach(function (f, i) { tone(out, t + i * 0.09, 'sine', f, f * 0.998, 0.9, 0.12); });
         },
+        'gull-cry': function (out, t, size) {                          // a seagull's "kyow, kyow…": a nasal, raspy cry that rises
+            // and falls, two to four of them (size: 0 far off, duller and softer … 1 right past you). (31 Oct, sky/gulls.js)
+            var near = size === undefined ? 0.5 : size, n = 2 + (Math.random() < 0.5 ? 1 : 0) + (near > 0.6 ? 1 : 0);
+            var dull = filter('lowpass', 1800 + near * 4800, 0.7);
+            dull.connect(out);
+            for (var i = 0, at = t; i < n; i++) {
+                var f = (1550 - i * 70) * (0.94 + Math.random() * 0.12), len = 0.3 + Math.random() * 0.08;
+                var o = ctx.createOscillator(), o2 = ctx.createOscillator(), mix = gain(1), o2g = gain(0.45);
+                o.type = 'sawtooth'; o2.type = 'square';
+                [o, o2].forEach(function (x, k) {                      // (up a little at the start, then a long fall)
+                    var m = k ? 1.006 : 1;
+                    x.frequency.setValueAtTime(f * 0.8 * m, at);
+                    x.frequency.linearRampToValueAtTime(f * 1.15 * m, at + 0.05);
+                    x.frequency.exponentialRampToValueAtTime(f * 0.6 * m, at + len);
+                });
+                o.connect(mix); o2.connect(o2g); o2g.connect(mix);
+                var g = gain(0), rasp = gain(0.65), am = ctx.createOscillator(), amg = gain(0.35);
+                chain(mix, filter('bandpass', 1900, 2.5), g);          // (the beak's two hollows)
+                chain(mix, filter('bandpass', 3300, 4), g);
+                chain(g, rasp, dull);
+                am.frequency.value = 22 + Math.random() * 8;           // (the rasp: the cry's loudness shivering)
+                am.connect(amg); amg.connect(rasp.gain);
+                g.gain.setValueAtTime(0.0001, at);
+                g.gain.linearRampToValueAtTime(0.5, at + 0.025);
+                g.gain.linearRampToValueAtTime(0.42, at + len * 0.6);
+                g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+                [o, o2, am].forEach(function (x) { x.start(at); x.stop(at + len + 0.05); });
+                at += len - 0.03 + Math.random() * 0.1;
+            }
+        },
+        'chirps': function (out, t) {                                  // a flock going over: little chirps from three of them, and
+            // the soft whirr of their wings (31 Oct: the sky's birds, sky/sky.js)
+            for (var b = 0; b < 3; b++) {
+                var base = 3000 + b * 520 + Math.random() * 300, at = t + b * 0.13 + Math.random() * 0.1;
+                for (var c = 0, cn = 3 + Math.floor(Math.random() * 4); c < cn; c++) {
+                    tone(out, at, 'sine', base, base * (1.45 + Math.random() * 0.2), 0.05, 0.09);
+                    if (Math.random() < 0.5) tone(out, at + 0.055, 'sine', base * 1.3, base * 0.95, 0.04, 0.06);
+                    at += 0.12 + Math.random() * 0.2;
+                }
+            }
+            var n = ctx.createBufferSource(); n.buffer = noiseBuf('white', 3);
+            var bp = filter('bandpass', 1100, 0.8), w = gain(0), flap = gain(0.5), beat = ctx.createOscillator(), bg = gain(0.5);
+            chain(n, bp, w, flap, out);
+            beat.frequency.value = 12 + Math.random() * 4;
+            beat.connect(bg); bg.connect(flap.gain);
+            w.gain.setValueAtTime(0.0001, t);
+            w.gain.linearRampToValueAtTime(0.05, t + 0.3);
+            w.gain.linearRampToValueAtTime(0.0001, t + 1.2);
+            n.start(t, Math.random() * 2); n.stop(t + 1.3);
+            beat.start(t); beat.stop(t + 1.3);
+        },
         'wish': function (out, t) {                                    // a shooting star: a rising sparkle
             for (var i = 0; i < 9; i++) tone(out, t + i * 0.06, 'sine', 1200 + i * 190, 1200 + i * 190, 0.5, 0.07);
             var f = noiseHit(out, t, 1.1, 'highpass', 5000, 0, 0.06, 0.2);

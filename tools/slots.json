@@ -919,6 +919,21 @@
      ]
     },
     {
+     "name": "the seagulls (sky/gulls.js): far off over the water and the port city, and now and then a big one right past the camera",
+     "slots": [
+      {
+       "slot": "assets/sea/seagull-far",
+       "what": "a seagull far off, flying (the four that wheel over the water and round the port city, and the one that now and then crosses the whole sea all use it). facing right (it's turned round to fly left); a GIF or animated WebP can beat its wings, or glide. by day; fewer at dusk; gone to roost at night",
+       "size": "about 2:1 (shown about 40 px wide), see-through round it"
+      },
+      {
+       "slot": "assets/sea/seagull-near",
+       "what": "a seagull right past the camera, out of focus like the rock: now and then it sweeps across the top of the screen, or hangs in the wind near a top corner and peels away. draw it sharp, facing right: the page blurs it (and turns it round to come from the right). a GIF or animated WebP can beat its wings",
+       "size": "about 2:1 (shown up to 440 px wide), see-through round it"
+      }
+     ]
+    },
+    {
      "name": "letters and bottles",
      "slots": [
       {
@@ -3328,6 +3343,16 @@
       {
        "slot": "assets/sounds/splash",
        "what": "something landing in the sea (pitched for its size)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/seagulls",
+       "what": "the seagulls over the sea calling (a few cries, a second or two): now and then while they're about, by day, quietly when they're far off and louder as a big one goes past. until yours is in, a drawn cry (\u201ckyow, kyow\u201d)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/birds",
+       "what": "the flock of birds that flies across the sky by day, on every page: chirping and the whirr of their wings, a second or two, as they come in and again halfway over. until yours is in, drawn chirps",
        "kind": "sound"
       },
       {

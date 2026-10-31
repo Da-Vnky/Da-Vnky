@@ -969,6 +969,20 @@
         flyLayer.appendChild(el);
         return { cfg: f, el: el, x: 0, y: 0, on: false, next: 0 };
     });
+    // (31 Oct) the flock's own sound: assets/sounds/birds (a recording of yours), else panel.js's "chirps": as it comes in,
+    // and again as it's halfway over. not before the visitor's first click, not on the asset manager's map, not in a
+    // hidden tab or while the site's hushed. (the sea's seagulls have their own: sky/gulls.js)
+    function birdCalls(c, W) {
+        if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
+        if (document.documentElement.classList.contains('dav-map')) return;
+        var across = (W + c.size + 40) / c.speed;
+        [1.2, across * 0.5].forEach(function (at, i) {
+            setTimeout(function () {
+                if (document.hidden || (Sky.sounds && Sky.sounds.hushed)) return;
+                sfx('birds', { or: 'chirps', volume: i ? 0.35 : 0.28 });
+            }, at * 1000);
+        });
+    }
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     function ambient(now) {
         if (!sailing()) { ambientOn = false; flyers.forEach(function (f) { f.on = false; f.el.classList.remove('flying'); }); return; }
@@ -991,7 +1005,7 @@
                 f.y = H * (c.high[0] + Math.random() * (c.high[1] - c.high[0])) / 100;
                 f.born = t;
                 f.el.classList.add('flying');
-                if (c.name === 'birds') flockStart(f.el);
+                if (c.name === 'birds') { flockStart(f.el); birdCalls(c, W); }
             }
             f.x += c.speed * dt;
             var bob = c.name === 'shooting-star' ? (f.x - f.x0) * 0.28 : Math.sin(t * 0.9 + f.born) * 6;

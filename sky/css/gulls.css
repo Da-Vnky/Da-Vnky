@@ -1,0 +1,161 @@
+/* =====================================================================
+   gulls.css — the look of sky/gulls.js: seagulls over the sea, far off and up close.
+   Everything moves with translate / rotate / scale / opacity (the graphics card's work); a picture is only drawn
+   again while a drawn gull's wings beat.
+   ===================================================================== */
+
+/* ---------------- far off: in the sea's layer (in front of the far wave, behind the city and the dock) ---------------- */
+.ground-sea .sea-gulls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(100% + 40vh);                   /* (up over the water and round the city's roofs) */
+    pointer-events: none;
+    /* by day all of them, at dusk fewer (the .early ones go first), at night none: they've gone to roost */
+    opacity: clamp(0, calc(1 - 2.4 * var(--night, 0) - .25 * var(--dusk, 0)), 1);
+    transition: opacity 3s ease;
+}
+.ground-sea .sea-gull.far {
+    position: absolute;
+    left: var(--gx, 50%);
+    top: var(--gy, 30%);
+    width: clamp(26px, 2.5vw, 48px);
+    aspect-ratio: 100 / 46;
+}
+.ground-sea .sea-gull.early { opacity: clamp(0, calc(1 - 1.7 * var(--dusk, 0)), 1); transition: opacity 3s ease; }
+.ground-sea .sea-gull .sg-body {
+    filter: brightness(var(--sea-dim)) saturate(var(--sea-sat));   /* (the sea's own night dimming) */
+}
+.sea-gull .sg-body,
+.sea-gull .sg-body > .placeholder,
+.sea-gull .sg-body > .art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.sea-gull .sg-body { position: absolute; inset: 0; }
+
+/* a slow loop: right and up, round, left and down, round again (an ellipse --gr wide, --gh tall), turning to face the way
+   it's going at each end */
+.ground-sea .sea-gull.wheel { animation: sg-wheel var(--gs, 18s) linear var(--gd, 0s) infinite; }
+.ground-sea .sea-gull.wheel .sg-body { animation: sg-face var(--gs, 18s) linear var(--gd, 0s) infinite; }
+@keyframes sg-wheel {
+    0%    { translate: calc(-1 * var(--gr)) 0; }
+    12.5% { translate: calc(-.707 * var(--gr)) calc(-.707 * var(--gh)); }
+    25%   { translate: 0 calc(-1 * var(--gh)); }
+    37.5% { translate: calc(.707 * var(--gr)) calc(-.707 * var(--gh)); }
+    50%   { translate: var(--gr) 0; }
+    62.5% { translate: calc(.707 * var(--gr)) calc(.707 * var(--gh)); }
+    75%   { translate: 0 var(--gh); }
+    87.5% { translate: calc(-.707 * var(--gr)) calc(.707 * var(--gh)); }
+    100%  { translate: calc(-1 * var(--gr)) 0; }
+}
+@keyframes sg-face {
+    0%, 44% { scale: 1 1; rotate: -4deg; }
+    50%     { scale: .05 1; rotate: 0deg; }
+    56%, 94% { scale: -1 1; rotate: 4deg; }
+    100%    { scale: 1 1; rotate: -4deg; }
+}
+
+/* now and then one crossing the whole sea (gulls.js sets its height and how long it takes; leftward: the other way) */
+.ground-sea .sea-gull.crossing { left: 0; top: var(--gy, 20%); opacity: 0; }
+.ground-sea .sea-gull.crossing.going { animation: sg-cross var(--gc, 28s) linear forwards; }
+.ground-sea .sea-gull.crossing.going.leftward { animation-direction: reverse; }
+.ground-sea .sea-gull.crossing.leftward .sg-body { scale: -1 1; }
+@keyframes sg-cross {
+    0%   { translate: -8vw 0; opacity: 0; }
+    3%   { opacity: 1; }
+    30%  { translate: 30vw -1.6vh; }
+    60%  { translate: 66vw .8vh; }
+    97%  { opacity: 1; }
+    100% { translate: 112vw -1vh; opacity: 0; }
+}
+
+/* the drawn gull's wings: a few beats, then a long glide (each gull at its own pace, --gf) */
+.sea-gull .sg-wing { transform-box: view-box; }
+.sea-gull .far-wing { transform-origin: 47px 26px; }
+.sea-gull .near-wing { transform-origin: 51px 26px; }
+.sea-gull.far .sg-wing { animation: sg-flap var(--gf, 2.2s) ease-in-out infinite; }
+.sea-gull.far .near-wing { animation-delay: -.06s; }
+@keyframes sg-flap {
+    0%, 46% { transform: scaleY(1); }
+    56%     { transform: scaleY(-.45); }
+    66%     { transform: scaleY(1); }
+    76%     { transform: scaleY(-.45); }
+    86%, 100% { transform: scaleY(1); }
+}
+
+/* ---------------- up close: over the page, like the rock (fixed, behind everything you can press) ---------------- */
+.sea-gulls-near {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity .9s ease;
+}
+/* from the right: the whole flight mirrored about the middle of the screen (the gull facing the way it goes) */
+.sea-gulls-near.from-right { scale: -1 1; }
+body.scope-view .sea-gulls-near,
+body.sky-view .sea-gulls-near { opacity: 0; }   /* (like the rock: not while looking up) */
+.sea-gull.near {
+    position: absolute;
+    left: 0;
+    top: var(--ny, 8vh);
+    width: clamp(170px, 22vw, 440px);
+    aspect-ratio: 100 / 46;
+    opacity: 0;
+    will-change: translate, opacity;
+}
+/* out of focus, and dimmed as the light goes, as the rock is (the blur's on the picture, so it's worked out once and
+   then only moved about) */
+.sea-gull.near .sg-body {
+    filter: blur(7px) brightness(calc(.92 - .5 * var(--dusk, 0) - .14 * var(--night, 0))) saturate(calc(1 - .4 * var(--dusk, 0)));
+}
+/* a sweep across the top of the screen, a little rise and fall, two beats of the wings and then gliding */
+.sea-gull.near.go-sweep { animation: sg-sweep 7s cubic-bezier(.35, .1, .65, .9) forwards; }
+.sea-gull.near.go-sweep .sg-wing { animation: sg-flap-big 1.3s ease-in-out 2; }
+@keyframes sg-sweep {
+    0%   { translate: -32vw 5vh; rotate: 5deg; opacity: 1; }
+    45%  { translate: 40vw -2vh; rotate: -3deg; }
+    100% { translate: 112vw 4vh; rotate: 4deg; opacity: 1; }
+}
+@keyframes sg-flap-big {
+    0%, 100% { transform: scaleY(1); }
+    45%      { transform: scaleY(-.5); }
+}
+/* hanging in the wind near the top-left corner: it glides in, holds there, nudged about by the gusts, and peels away */
+.sea-gull.near.go-hang { animation: sg-hang 11s ease-in-out forwards; }
+.sea-gull.near.go-hang .sg-wing { animation: sg-trim 2.4s ease-in-out infinite; }
+@keyframes sg-hang {
+    0%   { translate: -30vw -20vh; rotate: 12deg; opacity: 1; }
+    16%  { translate: 2vw 0; rotate: -4deg; }
+    27%  { translate: 3.4vw 1.4vh; rotate: 2deg; }
+    39%  { translate: 1.6vw -.6vh; rotate: -3deg; }
+    52%  { translate: 3.8vw .9vh; rotate: 3deg; }
+    65%  { translate: 2.2vw -.4vh; rotate: -2deg; }
+    78%  { translate: 3vw .7vh; rotate: 1deg; }
+    100% { translate: -26vw -30vh; rotate: -16deg; opacity: 1; }
+}
+@keyframes sg-trim {
+    0%, 100% { transform: scaleY(1); }
+    50%      { transform: scaleY(.86); }
+}
+@media (max-width: 620px) {
+    .sea-gull.near { width: 46vw; }
+    .sea-gull.near .sg-body { filter: blur(4px) brightness(calc(.92 - .5 * var(--dusk, 0) - .14 * var(--night, 0))); }
+}
+
+/* ---------------- the asset manager's map: all still and showing (one big one parked top left) ---------------- */
+html.dav-map .sea-gull,
+html.dav-map .sea-gull * { animation: none !important; }
+html.dav-map .sea-gull.near.parked { opacity: 1; translate: 3vw 2vh; }
+html.dav-map .ground-sea .sea-gulls { opacity: 1; }
+
+/* ---------------- those who'd rather nothing moved: the far ones still, the near one never comes ---------------- */
+@media (prefers-reduced-motion: reduce) {
+    .sea-gull,
+    .sea-gull * { animation: none !important; }
+}

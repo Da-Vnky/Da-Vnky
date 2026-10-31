@@ -30,7 +30,7 @@
     if (!Sky || !root.classList.contains('stage-strings')) return;     // (resets 1 and 2: sky/state.js)
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    var PROPS = '.sun, .moon, .cloud, .flyer-blimp, .flyer-balloon, .flyer-birds';
+    var PROPS = '.sun, .moon, .cloud, .storm-cloud, .flyer-blimp, .flyer-balloon, .flyer-birds';   // (31 Oct: the storm's clouds too)
     var TILTS = /(^|\s)(sun|moon)(\s|$)/;          // (hung by one rope: the whole prop tilts with it)
     // the swing of the prop on its rope
     var PERIOD = 3.4;                               // seconds for one swing there and back
@@ -51,7 +51,7 @@
     var BEAT_LIFT = 4;                              // how far a beat tugs the birds up (px)
     var BEAT_KICK = 170;                             // and how hard it twitches their rope
     // where each rope is tied on, as shares of its prop's box (across, down): the same places as sky.css's drawn ropes
-    var TIES = { sun: [[.5, .5]], moon: [[.27, .5]], cloud: [[.3, .6], [.7, .6]], 'flyer-blimp': [[.32, .4], [.68, .4]],
+    var TIES = { sun: [[.5, .5]], moon: [[.27, .5]], cloud: [[.3, .6], [.7, .6]], 'storm-cloud': [[.3, .6], [.7, .6]], 'flyer-blimp': [[.32, .4], [.68, .4]],
                  'flyer-balloon': [[.5, .38]], 'flyer-birds': [[.5, .45]] };
     var LIVE = !root.classList.contains('dav-map');  // (the asset manager's map: the ropes stay drawn the plain way, still)
 
