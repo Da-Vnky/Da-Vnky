@@ -540,6 +540,7 @@ def post_scene(scene_id):
     if toy.get('on'):
         bits = [w for w, k in (('slides', 'move'), ('sways', 'handheld'), ('vignette', 'vignette'), ('grain', 'grain'),
                                ('warmth', 'warmth'), ('punch', 'punch'), ('rack focus', 'rack')) if toy.get(k)]
+        bits.append('sharp: ' + (toy.get('keep') or 'the traveller, ship, dock and city'))
         summary.append('toy camera: ' + (', '.join(bits) or 'on, everything at 0') + ' (%d layers)' % len(site.get('depths', {})))
     elif site.get('camera'):
         summary.append("toy camera: off (the camera's \"toy camera\" property)")

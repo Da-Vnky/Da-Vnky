@@ -65,7 +65,8 @@ friend **skizy**'s server pleroma.nexus as a subdomain, published by pushing to 
    - the sea is set up that way now (focus on the ship, far wave pushed back, haze, bokeh in the port city).
    - **the toy camera** (25 Oct, first version, on the sea; *The toy camera* in CLAUDE.md): the page seen through a lens, the
      "matchbox car" look. Each layer slides by its Blender distance as the pointer moves, a faint handheld sway, vignette, grain,
-     warmth, and the focus racks to what the visitor points at. Set on Blender's camera ("toy …" custom properties).
+     warmth; the traveller, ship and city always stay in focus, and the pointer only stretches the focus a little
+     towards what it rests on (31 Oct; `toy: keep sharp`, `toy: focus reach` on the camera). Set on Blender's camera ("toy …" custom properties).
 3. **Next ideas he's raised, not built yet**: cursor **relighting** and **depth parallax / parallax occlusion** from per-slot
    depth and normal maps exported from Blender (WebGL on the page, phones by tilt or drift); a **"boil"** (hand-drawn line
    wobble) on the waves, live (an SVG turbulence filter stepping ~10 fps) or from the Painterly add-on's animation; **rope

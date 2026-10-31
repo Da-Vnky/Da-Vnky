@@ -119,13 +119,19 @@
     //   it slides: as the pointer moves (on a phone, slowly by itself) the camera moves a little sideways and up and down, and
     //     turns to keep the focus where it is, so what's nearer slides one way and what's further the other, each by exactly as
     //     much as Blender's camera would show (move, in Blender units); "handheld" adds a faint sway
-    //   the focus follows what the visitor points at (rest a moment on the rock, the ship, the city), taking "rack" seconds,
-    //     and goes back to Blender's own focus once they point at nothing; each picture's blur from the lens, as scene_post.py
+    //   what's sharp: everything from the nearest to the furthest of its subjects ("keep sharp": the traveller, the ship,
+    //     the dock and the city unless Blender says otherwise) is always in focus, and only what's nearer or further blurs, as
+    //     much as the lens would blur it from the edge of that sharp stretch (31 Oct, the artist: the city and the boat went
+    //     out of focus as the focus wandered after the pointer). Resting the pointer on something nearer or further stretches
+    //     the sharp part a little ("focus reach" of the way) towards it, taking "rack" seconds, and lets go after a while
     //   the lens: darker corners, grain, a touch of warmth (or cool), and "punch" (more colour and contrast)
     // Only translate, opacity and the pictures' own blur() change (the graphics card's work: nothing is drawn again), and the
     // slide is added on top of whatever else moves the picture (a Web Animation with composite "add": the sea's drift, the
     // waves' swell, the rock's lean all go on as before). No picture slides so far that the edge of the screen shows past it.
     var canAdd = typeof KeyframeEffect !== 'undefined' && 'composite' in KeyframeEffect.prototype;
+    // the subjects kept sharp when Blender's camera doesn't name its own ("toy: keep sharp"), and how far the pointer stretches
+    // the sharp part towards what it rests on ("toy: focus reach": a share of the way; 0 = never)
+    var KEEP = /^assets\/characters\/|\/(ship|boat|dock|city)$/, REACH = .35;
     var grainTile = null;
     function grain() {                                  // (a tile of grey specks, drawn once, like the static's)
         if (grainTile) return grainTile;
@@ -144,13 +150,22 @@
     function toyCamera(data, showing) {
         var cam = data.camera, toy = cam.toy, unit = cam.unit || 1;
         var f = cam.lens / 1000 / unit, film = cam.film / 1000 / unit, fstop = Math.max(.01, cam.fstop || 1);
-        var rest = cam.focus || 16, focus = rest;
+        var rest = cam.focus || 16, focus = rest;          // (focus: what the camera turns about as it slides: Blender's)
         var hover = !(window.matchMedia && matchMedia('(hover: none)').matches);
         // how blurred something d away is with the focus s away (px on a 1920-wide screen): as scene_post.py's blur_px
         function blurAt(d, s) {
             if (!cam.dof || d <= 0 || s <= f) return 0;
             return (f / fstop) * f * Math.abs(d - s) / (d * (s - f)) / film * 1920 / 3;
         }
+        // what's always sharp: from the nearest of the subjects to the furthest (and Blender's own focus, if it's outside them)
+        var keep = (toy.keep || '').split(',').map(function (x) { return x.trim().replace(/^assets\//, ''); }).filter(Boolean);
+        var dists = Object.keys(data.depths).filter(function (slot) {
+            return keep.length ? keep.indexOf(slot.replace(/^assets\//, '')) !== -1 : KEEP.test(slot);
+        }).map(function (slot) { return data.depths[slot]; });
+        var near0 = Math.min.apply(null, dists.concat(rest)), far0 = Math.max.apply(null, dists.concat(rest));
+        var near = near0, far = far0, reach = toy.reach == null ? REACH : toy.reach;
+        // how blurred something d away is: nothing between near and far, else as the lens blurs it from the nearer edge
+        function blurIn(d) { return d < near ? blurAt(d, near) : d > far ? blurAt(d, far) : 0; }
         // every picture with a distance (one inside another picture, like the bottle's cork, moves with it)
         var items = [];
         Object.keys(data.depths).forEach(function (slot) {
@@ -166,7 +181,7 @@
         });
         items.forEach(function (it) {
             for (var p = it.el.parentElement; p; p = p.parentElement) if (p.toy) { it.up = p.toy; break; }
-            if (it.blurs) lay(it.el, blurAt(it.d, rest), it.el.postfx ? it.el.postfx.tint : '', data.ownBlur === false);
+            if (it.blurs) lay(it.el, blurIn(it.d), it.el.postfx ? it.el.postfx.tint : '', data.ownBlur === false);
         });
 
         // the slide: px on this screen for a camera moved by (cx, cy) Blender units, turned to keep the focus put
@@ -201,19 +216,22 @@
             } else it.anim.effect.setKeyframes([{ translate: v }, { translate: v }]);
         }
 
-        // the focus: to what the visitor rests on, and back to Blender's own after a while on nothing
-        var from = rest, to = rest, t0 = 0, racking = false, wait = null;
+        // the focus: stretched a little towards what the visitor rests on, and back to just the subjects after a while on nothing
+        var from = [near0, far0], to = [near0, far0], t0 = 0, racking = false, wait = null;
         function refocus() {
             items.forEach(function (it) {
                 if (!it.blurs || !it.el.postfx) return;
-                it.el.postfx.blur = blurAt(it.d, focus);
+                it.el.postfx.blur = blurIn(it.d);
                 put(it.el);
             });
         }
         function rackTo(d) {
-            if (Math.abs(d - to) < .05) return;
-            from = focus; to = d; t0 = performance.now();
-            if (!toy.rack || still) { focus = d; racking = false; refocus(); return; }
+            var n = near0, fa = far0;                    // (the subjects always stay inside it: it only ever grows a little)
+            if (d < near0) n = near0 - (near0 - d) * reach;
+            if (d > far0) fa = far0 + (d - far0) * reach;
+            if (Math.abs(n - to[0]) < .05 && Math.abs(fa - to[1]) < .05) return;
+            from = [near, far]; to = [n, fa]; t0 = performance.now();
+            if (!toy.rack || still) { near = n; far = fa; racking = false; refocus(); return; }
             racking = true;
             if (still || !canAdd) { (function step() { if (tick(performance.now())) requestAnimationFrame(step); })(); }
         }
@@ -307,7 +325,7 @@
             wait = setTimeout(function () {
                 var it = onWhat(mx, my);
                 if (it) return rackTo(it.d);
-                wait = setTimeout(function () { rackTo(rest); }, now ? 0 : 2100);   // (on nothing a while: back to Blender's focus)
+                wait = setTimeout(function () { rackTo(rest); }, now ? 0 : 2100);   // (on nothing a while: back to just the subjects)
             }, now ? 0 : 350);
         }
 
@@ -318,7 +336,8 @@
             last = now;
             if (racking) {
                 var k = Math.min(1, (now - t0) / (toy.rack * 1000)), e = k < .5 ? 2 * k * k : 1 - 2 * (1 - k) * (1 - k);
-                focus = from + (to - from) * e;
+                near = from[0] + (to[0] - from[0]) * e;
+                far = from[1] + (to[1] - from[1]) * e;
                 refocus();
                 if (k >= 1) racking = false;
             }
@@ -370,7 +389,8 @@
         });
         if (toy.grain > 0) lens.style.setProperty('--tc-tile', grain());
         Sky.postfx.camera = {
-            get focus() { return focus; }, rest: rest, items: items, rackTo: rackTo, blurAt: blurAt, pick: onWhat,
+            get focus() { return focus; }, get sharp() { return [near, far]; }, rest: rest, items: items, rackTo: rackTo,
+            blurAt: blurAt, blurIn: blurIn, pick: onWhat,
             get at() { return [cx, cy]; }
         };
         return lens;
