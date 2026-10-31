@@ -112,6 +112,9 @@
     pointer-events: none;
 }
 html:has(.postfx-layer:not(.away) .toycam) .page-lens { display: none; }
+/* (31 Oct) from reset 5 on (the veil coming off), no lens at all: no grain, corners or warmth, here or on the sea (the sea's
+   focus stays: that's not the lens) */
+html:is([data-reset="5"], [data-reset="6"], [data-reset="7"], [data-reset="8"]) :is(.page-lens, .toycam) { display: none; }
 
 /* (for a moment, while the toy camera asks what's painted under the pointer: everything can be found there) */
 html.toycam-picking * { pointer-events: auto !important; }

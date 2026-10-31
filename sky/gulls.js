@@ -19,6 +19,11 @@
    it passes), else a drawn cry (sky/panel.js "gull-cry"). nothing before the visitor's first click, nothing while the
    site's hushed, never more than one at a time. (the sky's birds have their own sound: sky/sky.js)
 
+   resets 1 and 2 (31 Oct: the world's a stage set there): they're props on sticks from below, low along the horizon,
+   pushed along a track at a steady speed and bobbing in an even sine wave, turning sharply at each end, like a shooting
+   gallery's (TRACK below; gulls.css "stage"). the big one past the camera is a puppet on a stick too, swept across the same
+   mechanical way (and never hangs in the wind).
+
    moving is all CSS (sky/css/gulls.css): this only decides when the next one comes.
    ===================================================================== */
 
@@ -37,6 +42,15 @@
         { x: 44, y: 40, r: 7.5, h: 3, s: 23, d: -7, dusk: true },   // (dusk: it's the first to go)
         { x: 26, y: 30, r: 5, h: 2.6, s: 17, d: -14, dusk: true }
     ];
+    // resets 1 and 2: each one's track instead. x where it starts (% across), w how far it goes (vw), s how long one way
+    // takes (s), h how high its row is over the horizon (vh), b one bob (s), a how far it bobs (vh)
+    var TRACK = [
+        { x: 54, w: 30, s: 16, h: 2.2, b: 1.1, a: .7 },
+        { x: 70, w: 24, s: 12, h: 6.5, b: .9, a: .5 },
+        { x: 22, w: 36, s: 21, h: .6, b: 1.4, a: .8 },
+        { x: 8, w: 26, s: 14, h: 4.2, b: 1.2, a: .6 }
+    ];
+    var STAGE = root.classList.contains('stage-strings');        // (sky/state.js: resets 1 and 2)
 
     // the drawn gull: white body, grey back and wings with black tips, a yellow beak (the dock's gull's kind), facing
     // right, wings up in the middle of a beat. its two wings beat round their shoulders (gulls.css .sg-wing)
@@ -70,8 +84,10 @@
     far.setAttribute('aria-hidden', 'true');
     FAR.forEach(function (f, i) {
         var g = gull('far wheel g' + (i + 1) + (f.dusk ? ' early' : ''), 'assets/sea/seagull-far', false);
+        var t = TRACK[i];
         g.style.cssText = '--gx:' + f.x + '%;--gy:' + f.y + '%;--gr:' + f.r + 'vw;--gh:' + f.h + 'vh;--gs:' + f.s + 's;--gd:' + f.d + 's;' +
-            '--gf:' + (1.9 + i * 0.37).toFixed(2) + 's';
+            '--gf:' + (1.9 + i * 0.37).toFixed(2) + 's;' +
+            '--sx:' + t.x + '%;--sw:' + t.w + 'vw;--st:' + t.s + 's;--sh:' + t.h + 'vh;--sb:' + t.b + 's;--sa:' + t.a + 'vh';
         far.appendChild(g);
     });
     var crosser = gull('far crossing', 'assets/sea/seagull-far', false);
@@ -113,7 +129,7 @@
     crosser.addEventListener('animationend', function (e) { if (e.target === crosser) crosser.classList.remove('going'); });
 
     // a big one past the camera: a sweep across the top, or a while hanging in the wind near a top corner
-    var MOVES = ['sweep', 'sweep', 'hang'];
+    var MOVES = STAGE ? ['sweep'] : ['sweep', 'sweep', 'hang'];
     function pass() {
         later(pass, NEAR_EVERY, true);
         if (calm || roosting() || away() || near.className.indexOf(' go-') !== -1) return;

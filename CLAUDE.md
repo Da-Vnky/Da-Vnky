@@ -502,11 +502,21 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   → `Sky.sfx('seagulls', { or: 'gull-cry' })`: quiet far ones every `CALL_EVERY` 9-26 s, a louder one as the near one passes
   (and sometimes as one crosses); never before the first click (`navigator.userActivation`), while hushed, away or roosting,
   or within 2.5 s of the last; quieter at dusk. `Sky.gulls = { far, near, crosser, pass(move), cross() }` for checking.
-  **On ropes in resets 1-2** (31 Oct, Victor: those resets are still "fake"): `html.stage-strings .sea-gull::before`, the
-  sky's rope (or `--rope-art`), tied behind the back (left 52%, bottom 46%), 300vh up; far ones 1.6px (`--gull-rope`) and
-  dimmed with the sea, the near one `clamp(5px, .9vw, 12px)` (phones 6px) and blurred like it. The near one's banking is on
-  `.sg-body` (`sg-sweep-tilt`, `sg-hang-tilt`, same length and easing as its `translate`), so its rope stays upright. They're
-  carried by the CSS, not ropes.js (an animation would override its `translate`), so they don't swing.
+  **Props on sticks in resets 1-2** (31 Oct, Victor: those resets are "fake"; first ropes from above, then the same day: "rather
+  than ropes, they be propped up by sticks from below … lower around the horizon and be moved along a path in a very
+  uniform/mechanical and robotic way, so like a sin wave"): under `html.stage-strings` (gulls.css "stage") the far ones stand on
+  rows just above the horizon (`top: calc(40vh - var(--sh))`: the horizon is about 40vh down their layer at every screen
+  shape), each on its own track (gulls.js `TRACK`: start `--sx`, length `--sw`, one way `--st`, row `--sh`, bob `--sb`/`--sa`):
+  `sg-track` linear back and forth, `sg-bob` an even sine (ease-in-out, alternate) on `.sg-body`, `sg-turn` a sharp flip at each
+  end (steps, twice the track's time, same delay), the drawn wings ticking evenly (`sg-tick`); the crosser the same on its own
+  row (`sg-cross-track`). The stick is `.sg-body::before` (from its belly, 100vh down; aluminium since later on 31 Oct, Victor:
+  "look more like metal/aluminium", then "darker, like an oxidized aluminum almost and slightly thinner": dull dark greys
+  shaded round, a soft chalky sheen, faint oxide blotches along it; far ones 1.5px, the near one `clamp(5px, .8vw, 12px)`,
+  phones 6px; the near one's meets its belly in a little dark clamp, `.sg-body::after`; inside the body, so it dims, and
+  for the near one blurs, with it; the far ones' disappear behind the nearer waves). The near one is a puppet: only sweeps
+  (`MOVES`), `sg-push` linear at 34vh (phones 40vh), bobbing, its thick stick (`--stick-w`) off the bottom of the screen, passing in
+  front of the ship and traveller as it goes. Elsewhere (resets 3+) it's all as above. The near one's banking is on `.sg-body`
+  (`sg-sweep-tilt`, `sg-hang-tilt`), so a stick would stay upright in a hang too.
   Tested 31 Oct (Playwright): midday, golden hour, night at 1600 x 900 and 390 x 844, the map, a sweep and a hang, the
   smoke test (resets 1, 3, 4, 8) and phones.py (only the three it reported before).
 
@@ -796,7 +806,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   page postfx.js runs on (index, workshop, city, living, template; not skizy's room, beyond.html, the desk or `?map`). No focus,
   slide or sway (those stay the sea's toy camera). **`WHOLE_LENS = false` at the top of it: the grain alone** (if he decides
   against the corners and warmth). postfx.css hides it while a scene's own toy camera shows its lens
-  (`html:has(.postfx-layer:not(.away) .toycam) .page-lens`), so the sea has its own, once.
+  (`html:has(.postfx-layer:not(.away) .toycam) .page-lens`), so the sea has its own, once. **From reset 5 on, no lens at all**
+  (31 Oct, Victor: "the grain is good, but should be removed after reset 4"): postfx.css hides `.page-lens` and every `.toycam`
+  under `html[data-reset="5"…"8"]`, the sea's too (its focus and slide are the toy camera's script, not the lens, so they stay).
 - **Speed on the site**: the blur is the browser's own `blur()` (the graphics card), only the fog's tint is an SVG colour
   matrix; bokeh animate only scale/transform/opacity (`--bk-o`, `will-change`).
 - **The page's own hand-made blur** (the rock's `blur(7px)` in ground-sea.css): the site json's `ownBlur` false takes `blur()`
