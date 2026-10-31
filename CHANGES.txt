@@ -14,11 +14,13 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+
+== published ==
+
+2026-10-31 08:37 · V
 - Seagulls on the sea: a few small ones wheel far off over the water and round the port city, now and then one crosses the whole sea, and now and then a big one goes past the camera out of focus (sweeping across the top, or hanging in the wind by the top-left corner). Fewer at dusk, gone at night. New slots assets/sea/seagull-far and seagull-near (drawn stand-ins until the artist's).
 - The seagulls call now and then (new sound slot assets/sounds/seagulls; a drawn cry until one's recorded), and the sky's flock of birds chirps as it flies over, on every page (new sound slot assets/sounds/birds; drawn chirps until then). Nothing before the visitor's first click.
 - The storm's clouds hang on ropes in resets 1 and 2, like the fair-weather clouds (two each).
-
-== published ==
 
 2026-10-31 07:49 · V
 - Thunder has five recorded rolls now (the artist's Zapsplat thunder, as thunder and thunder-2 to thunder-5 in the asset manager, nested under thunder): one is picked at random each time, never the same one twice running.

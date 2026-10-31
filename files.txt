@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1480 1429344296
-city.html 10043 1319142242
-desk.html 6191 178000496
-index.html 5419 1112431195
-living.html 133827 174921827
-window-sky.html 1334 1253708446
-workshop.html 22278 1575389552
+beyond.html 1480 241805555
+city.html 10043 2947461250
+desk.html 6191 2108747909
+index.html 5539 3631080584
+living.html 133827 2541303375
+window-sky.html 1334 2803492028
+workshop.html 22278 1343101110
 sky/ambient.js 5331 3835869943
 sky/attic.js 34823 3422008340
 sky/babble.js 51258 123196756
@@ -30,6 +30,7 @@ sky/ground-city.js 21686 1654325007
 sky/ground-countryside.js 13331 1871014694
 sky/ground-sea.js 60814 1684067408
 sky/ground-view.js 6301 1081822792
+sky/gulls.js 10310 2830335377
 sky/hand.js 1836 1437817105
 sky/hell.js 23672 1084288424
 sky/house.js 11177 2717587795
@@ -50,7 +51,7 @@ sky/music.js 61630 2836453616
 sky/noise.js 11398 890663370
 sky/notes.js 5607 2800503109
 sky/paint.js 41912 972334459
-sky/panel.js 70963 3251030276
+sky/panel.js 74536 1452288583
 sky/peeper.js 31642 2382478789
 sky/porch.js 19007 2031860182
 sky/post.js 21656 2013340171
@@ -58,8 +59,8 @@ sky/postfx.js 31609 444785610
 sky/records.js 37374 197731851
 sky/resets.js 17505 2303591725
 sky/revolver.js 30172 854091000
-sky/ropes.js 19084 2810990965
-sky/sky.js 147896 833521911
+sky/ropes.js 19173 2660912337
+sky/sky.js 148794 1736502318
 sky/songpad.js 8196 2333869894
 sky/source.js 3809 654057405
 sky/state.js 22583 46021903
@@ -72,7 +73,7 @@ sky/veil.js 18751 509778180
 sky/watchers.js 14154 3869253767
 sky/weather.js 25754 4255422177
 sky/paper.css 8047 1201821797
-sky/sky.css 61447 3148439350
+sky/sky.css 61911 505761178
 sky/css/ambient.css 435 4199751144
 sky/css/attic.css 15736 521837829
 sky/css/bathroom.css 16836 855192362
@@ -96,6 +97,7 @@ sky/css/ground-city.css 5505 2510993983
 sky/css/ground-countryside.css 834 2965982463
 sky/css/ground-sea.css 16758 2537770896
 sky/css/ground-view.css 788 375225604
+sky/css/gulls.css 7190 1873039184
 sky/css/hell.css 10082 3168670266
 sky/css/inkpad.css 8326 4156737891
 sky/css/inventory.css 6010 1973479581
