@@ -212,8 +212,9 @@ html.stage-strings .ground-sea .sea-gull.far .sg-wing { animation: sg-tick .45s 
     to   { transform: scaleY(-.4); }
 }
 /* the stick: from its belly down, out of sight behind the waves (it's inside the gull's body, so it dims, and for the near one
-   blurs, with it). (31 Oct, the artist: "look more like metal/aluminium") a polished aluminium rod: cool grey, shaded round,
-   a bright highlight a little off its middle and a fainter one on the far side, so it reads as a tube catching the light.
+   blurs, with it). (31 Oct, the artist: "look more like metal/aluminium", then "darker, like an oxidized aluminum almost and
+   slightly thinner") a weathered aluminium rod: dull dark greys shaded round, only a soft, chalky sheen where the light
+   catches it, faint blotches of oxide along its length.
    the artist's own stick: none yet (a slot can come later) */
 html.stage-strings .sea-gull .sg-body::before {
     content: "";
@@ -221,14 +222,16 @@ html.stage-strings .sea-gull .sg-body::before {
     z-index: -1;
     left: 50%;
     top: 52%;
-    width: var(--stick-w, 2px);
+    width: var(--stick-w, 1.5px);
     height: 100vh;
-    margin-left: calc(var(--stick-w, 2px) / -2);
+    margin-left: calc(var(--stick-w, 1.5px) / -2);
     pointer-events: none;
-    background: linear-gradient(90deg,
-        #5d646c 0%, #9aa3ad 14%, #d8dee4 28%, #fbfdff 36%, #c6ced6 46%,
-        #8d969f 62%, #b3bbc3 78%, #6e767f 92%, #4c535a 100%);
-    box-shadow: 0 0 0 .5px rgba(40, 46, 54, .35);
+    background:
+        repeating-linear-gradient(180deg, rgba(196, 200, 190, 0) 0 23px, rgba(196, 200, 190, .14) 23px 31px, rgba(196, 200, 190, 0) 31px 57px,
+                                          rgba(40, 42, 40, .18) 57px 64px, rgba(40, 42, 40, 0) 64px 97px),
+        linear-gradient(90deg,
+            #2f3337 0%, #4a4f54 16%, #6e7376 32%, #8b8f8e 40%, #6a6f72 52%,
+            #4f5458 68%, #5c6164 82%, #3a3e42 94%, #2a2d30 100%);
 }
 /* the big one's rod meets its belly in a little clamp: a ring of darker metal with a screw */
 html.stage-strings .sea-gull.near .sg-body::after {
@@ -243,12 +246,12 @@ html.stage-strings .sea-gull.near .sg-body::after {
     border-radius: 3px;
     pointer-events: none;
     background:
-        radial-gradient(circle at 50% 50%, #3b4148 0 14%, transparent 16%),
-        linear-gradient(90deg, #4a5158, #a9b2bb 30%, #e9eef2 42%, #8f98a1 64%, #50575f);
+        radial-gradient(circle at 50% 50%, #1f2225 0 14%, transparent 16%),
+        linear-gradient(90deg, #2c3034, #5a5f63 30%, #7f8483 42%, #4e5356 64%, #2d3134);
 }
 /* the big one past the camera: a puppet on a stick, pushed across lower down, steadily, bobbing; its stick runs off the
    bottom of the screen */
-html.stage-strings .sea-gull.near { --stick-w: clamp(7px, 1.1vw, 16px); top: 34vh; }
+html.stage-strings .sea-gull.near { --stick-w: clamp(5px, .8vw, 12px); top: 34vh; }
 html.stage-strings .sea-gull.near.go-sweep { animation: sg-push 9s linear forwards; }
 html.stage-strings .sea-gull.near.go-sweep .sg-body { animation: sg-bob .9s ease-in-out infinite alternate; --sa: 1.6vh; }
 html.stage-strings .sea-gull.near.go-sweep .sg-wing { animation: sg-tick .5s ease-in-out infinite alternate; }
@@ -257,7 +260,7 @@ html.stage-strings .sea-gull.near.go-sweep .sg-wing { animation: sg-tick .5s eas
     100% { translate: 112vw 0; opacity: 1; }
 }
 @media (max-width: 620px) {
-    html.stage-strings .sea-gull.near { --stick-w: 8px; top: 40vh; }
+    html.stage-strings .sea-gull.near { --stick-w: 6px; top: 40vh; }
 }
 
 /* ---------------- the asset manager's map: all still and showing (one big one parked top left) ---------------- */
