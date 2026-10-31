@@ -117,7 +117,18 @@
     var light = Sky.moonlight && Sky.moonlight(kit, { glass: function () { return kit.querySelector('.kitchen-window'); },
                                                      inset: [8 / 160, 8 / 130, 8 / 160, 8 / 130], cut: true, slot: 'assets/living/kitchen-' });
     H.on(function (what, name) { if (name === 'kitchen' && light) light.fit(); });
-    H.room('kitchen', { parent: 'hall', here: function () { return inside; }, busy: function () { return busy; }, enter: goIn, leave: goOut });
+    // (a place tab, sky/house.js jump: out of here at once, nothing moving)
+    function shutNow() {
+        if (!inside) return;
+        inside = false; busy = false;
+        shutAll(true);
+        H.stop(me);
+        body.classList.remove('in-kitchen', 'kitchen-panning', 'kitchen-now');
+        kit.setAttribute('aria-hidden', 'true');
+        H.fire('leave', 'kitchen');
+    }
+    H.room('kitchen', { parent: 'hall', here: function () { return inside; }, busy: function () { return busy; }, enter: goIn, leave: goOut,
+                        now: function () { busy = false; openKitchen(true); }, gone: shutNow });
     if (door) door.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('kitchen'); });
     if (back) back.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('hall'); });
     if (location.hash === '#kitchen') setTimeout(function () { if (Sky.sides) Sky.sides.goNow('hall'); setTimeout(function () { openKitchen(true); }, 80); }, 120);

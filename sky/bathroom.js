@@ -299,7 +299,10 @@
     }
     SIDES.forEach(function (sd) {
         H.room(sd.name, { parent: 'living', here: function () { return inSide === sd; }, busy: function () { return busy; },
-                          enter: function () { goTo(sd); }, leave: goHome });
+                          enter: function () { goTo(sd); }, leave: goHome,
+                          // (a place tab, sky/house.js jump: in or out at once)
+                          now: function () { busy = false; goTo(sd, true); },
+                          gone: function () { if (inSide === sd) homeNow(); } });
     });
 
     if (secret) {

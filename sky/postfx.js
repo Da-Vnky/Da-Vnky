@@ -495,6 +495,24 @@
         done.push(id);
     }
 
+    // (31 Oct) the film grain: the sea's toy camera's grain, over every scene of every page (skizy's room has its own and
+    // doesn't load this). A scene whose toy camera brings its own grain hides this one while it shows (postfx.css), so it's
+    // never there twice; the same tile, the same hop, the strength of the sea's camera (Blender's "toy: grain", .25)
+    var GRAIN = .25;
+    (function filmGrain() {
+        if (document.querySelector('.film-grain')) return;
+        var g = document.createElement('div'), lens = document.createElement('div'), i = document.createElement('i');
+        g.className = 'film-grain';
+        g.setAttribute('aria-hidden', 'true');
+        lens.className = 'toycam';
+        lens.style.setProperty('--tc-grain', GRAIN);
+        lens.style.setProperty('--tc-tile', grain());
+        i.className = 'tc-grain';
+        lens.appendChild(i);
+        g.appendChild(lens);
+        document.body.appendChild(g);
+    })();
+
     mine.forEach(function (sf) {
         Sky.findAsset('assets/' + sf[1] + '/post-' + sf[0] + '.json', function (url, data) { if (url) apply(sf[0], data); });
     });

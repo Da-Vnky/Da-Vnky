@@ -102,5 +102,15 @@
 @media (prefers-reduced-motion: reduce) {
     .toycam .tc-grain { animation: none; }
 }
+/* (31 Oct) the film grain over every scene (sky/postfx.js filmGrain): the toy camera's grain on its own, over the whole screen,
+   taking no clicks. Hidden while a scene's own toy camera brings its grain (the sea's), so it's never doubled */
+.film-grain {
+    position: fixed;
+    inset: 0;
+    z-index: 2147479000;
+    pointer-events: none;
+}
+html:has(.postfx-layer:not(.away) .tc-grain) .film-grain { display: none; }
+
 /* (for a moment, while the toy camera asks what's painted under the pointer: everything can be found there) */
 html.toycam-picking * { pointer-events: auto !important; }

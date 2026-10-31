@@ -14,6 +14,10 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Place tabs in the house (the living space, the kitchen, the porch) now take the traveller there at once instead of walking room by room; walking is only for doors, arrows, the ladder and the like. Tabs to other pages don't walk them off or in either (arriving at the sea by a tab, they're already on the dock by the sign).
+- In the front garden the traveller now stands on the middle of the walkway and walks straight up to the front door (no more step left, then right).
+- The porch can be reached from the front garden itself: click the porch (its steps, deck or railing) and the traveller walks up the path and the steps onto it. The porch tab from the garden now lands them at the top of the porch steps instead of coming out of the house's front door.
+- The sea's film grain (from its toy camera) is now on every scene: the workshop, the rooftop, every room of the house, the front garden and the template page (not skizy's room, which has its own). The sea keeps just its own, never twice.
 
 == published ==
 

@@ -3,9 +3,11 @@
    homepage's "visit home" sign brings you. The house from the garden path,
    under the site's own sky (the sun, the moon, the clouds, the stars: the
    top of the picture is open). Click the front door: the traveller walks
-   up the path, the door opens, they go in, and it's the hallway.
-   Going anywhere else from here (a place tab) just leaves the garden behind.
-   Down the porch's steps (sky/porch.js) comes here too: fromPorch().
+   up the path, the door opens, they go in, and it's the hallway. Click the
+   porch (its steps, deck or railing): up the path and the steps onto it, and
+   it's the porch (sky/porch.js fromGarden). A place tab just leaves the
+   garden behind (sky/house.js jump). Down the porch's steps (sky/porch.js)
+   comes here too: fromPorch().
 
    Its look: sky/css/front.css. The markup and its stand-ins: living.html.
    slots (assets/living/): front-house (the whole 1600 x 900 picture: house, garden, path,
@@ -21,9 +23,13 @@
     if (!Sky || !Sky.house || !front || Sky.front) return;
     var H = Sky.house, sfx = Sky.sfx, walk = H.walk, place = H.place, standAt = H.standAt;
     var me = front.querySelector('.front-character'), hit = front.querySelector('.front-door-hit');
+    var porchHit = front.querySelector('.front-porch-hit');
     var hall = document.querySelector('.hallway'), hallMe = hall && hall.querySelector('.hall-character');
     var out = hall && hall.querySelector('.hall-out');
-    var STAND = 44;                                        // where the traveller stands on the path (% across)
+    // where the traveller stands on the path (% across, the middle of them: front.css centres them on it). (31 Oct, the
+    // artist: they stood left of the walkway, so going in they stepped right first; the path runs up the middle of the
+    // picture, and the picture's always centred on the screen, so its middle is the screen's)
+    var STAND = 50;
     function say(t, ms) { Sky.say(t, ms || 2600); }
     function pctOf(el) { return H.pctOf(el); }             // (across the whole window: the garden's the whole screen)
 
@@ -63,31 +69,62 @@
         busy = false;
     }
 
-    // the front door: up the path, the door opens, and in they go (to the hallway)
-    function goIn() {
-        if (!here || busy) return;
-        busy = true;
-        var r = me.getBoundingClientRect(), d = hit.getBoundingClientRect();
-        // (somewhere else instead, on the way to the path: they stop where they are)
-        H.setOff(function () { H.stop(me); busy = false; });
-        walk(me, standAt(me, pctOf(hit)), function () {
+    // up the path from the middle of the walkway to the front door (and smaller as they go, to the door's height); then
+    // `there()`. off the path's middle (they never are, now): over to it first
+    function upThePath(there, then) {
+        var d = hit.getBoundingClientRect();
+        function climb() {
             H.through();
-            r = me.getBoundingClientRect();
+            var r = me.getBoundingClientRect();
             var scale = Math.max(0.2, Math.min(1, d.height * 0.95 / r.height));
             var dx = (d.left + d.width / 2) - (r.left + r.width / 2), dy = d.bottom - r.bottom;
+            me.classList.remove('face-left');
             me.classList.add('walking');
             var steps = setInterval(function () { sfx('step', { size: 0.3 }); }, 380);
             var up = me.animate([
                 { transform: 'translate(0, 0) scale(1)', transformOrigin: '50% 100%' },
                 { transform: 'translate(' + dx.toFixed(0) + 'px, ' + dy.toFixed(0) + 'px) scale(' + scale.toFixed(3) + ')', transformOrigin: '50% 100%' }
             ], { duration: 2200, easing: 'cubic-bezier(.3,0,.6,1)', fill: 'forwards' });
-            setTimeout(function () { front.classList.add('door-open'); sfx('door', { size: 0.5 }); }, 1500);
+            if (there) setTimeout(there, 1500);
             up.onfinish = function () {
                 clearInterval(steps);
                 me.classList.remove('walking');
-                me.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, fill: 'forwards' }).onfinish = inside;
+                then();
             };
+        }
+        if (Math.abs(H.leftPct(me) - STAND) < 1.5) { climb(); return; }
+        // (somewhere else instead, on the way to the path: they stop where they are)
+        H.setOff(function () { H.stop(me); busy = false; });
+        walk(me, STAND, climb);
+    }
+    // the front door: up the path, the door opens, and in they go (to the hallway)
+    function goIn() {
+        if (!here || busy) return;
+        busy = true;
+        upThePath(function () { front.classList.add('door-open'); sfx('door', { size: 0.5 }); }, function () {
+            me.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, fill: 'forwards' }).onfinish = inside;
         });
+    }
+    // the porch (31 Oct): up the path and the steps onto it, then the black, and the porch comes up out of it with them at
+    // the top of its steps (sky/porch.js fromGarden)
+    function goUp() {
+        if (!here || busy || !Sky.porch || !Sky.porch.fromGarden) return false;
+        busy = true;
+        upThePath(null, function () {
+            body.classList.add('front-going-in');
+            setTimeout(function () {
+                var root = document.documentElement;
+                root.classList.add('front-snap');
+                close(false);
+                Sky.porch.fromGarden();
+                requestAnimationFrame(function () { requestAnimationFrame(function () {
+                    root.classList.remove('front-snap');
+                    body.classList.remove('front-going-in');
+                    busy = false;
+                }); });
+            }, 500);
+        });
+        return true;
     }
     // in through the door (27 Sep: the hallway used to show up behind the see-through sky of the house while
     // the garden faded, and things slid): a short black, the hallway set up in it with nothing moving, and out of the
@@ -119,8 +156,10 @@
     // the garden is outside the house, through its front door (into the hallway). anywhere else: a place tab, and the
     // garden's just left behind (the living space's: fading into it; the kitchen's: straight to the hallway, and on)
     H.room('front', { parent: 'hall', here: function () { return here; }, busy: function () { return busy; }, leave: goIn,
+                      gone: function () { close(false); },                      // (a place tab, sky/house.js jump)
                       away: function (to) {
                           if (to === 'hall') return false;
+                          if (to === 'porch') return goUp();             // (31 Oct: up the front steps, not out through the house)
                           close(to === 'living');
                           if (to === 'living') { try { history.replaceState(null, '', location.pathname + location.search); } catch (err) {} return true; }
                           if (Sky.sides) Sky.sides.goNow('hall');
@@ -128,6 +167,7 @@
                           return true;
                       } });
     if (hit) hit.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('hall'); });
+    if (porchHit) porchHit.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('porch'); });
 
     if (location.hash === '#front') open();
 

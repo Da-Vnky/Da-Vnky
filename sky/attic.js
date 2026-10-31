@@ -291,7 +291,20 @@
     var light = Sky.moonlight && Sky.moonlight(attic, { glass: function () { return attic.querySelector('.attic-window'); },
                                                        inset: [.12, .12, .12, .12], round: true, cut: true, slot: 'assets/living/attic-' });
     H.on(function (what, name) { if (name === 'attic' && light) light.fit(); });
-    H.room('attic', { parent: 'hall', here: function () { return up; }, busy: function () { return climbing; }, enter: climbUp, leave: climbDown });
+    // (a place tab, sky/house.js jump: down from here at once, nothing moving)
+    function shutNow() {
+        if (!up) return;
+        up = false; climbing = false;
+        stop(me);
+        me.classList.remove('into-hole', 'out-of-hole');
+        closeBook(true);
+        body.classList.remove('in-attic', 'attic-panning', 'attic-now');
+        attic.setAttribute('aria-hidden', 'true');
+        if (hallMe) hallMe.classList.remove('up-ladder', 'down-ladder');
+        H.fire('leave', 'attic');
+    }
+    H.room('attic', { parent: 'hall', here: function () { return up; }, busy: function () { return climbing; }, enter: climbUp, leave: climbDown,
+                      now: function () { climbing = false; openAttic(true); }, gone: shutNow });
     if (ladder) ladder.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('attic'); });
     if (hole) hole.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); H.go('hall'); });
     // living.html#attic: start up there (the debug page's preview)

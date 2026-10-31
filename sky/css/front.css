@@ -106,6 +106,24 @@ body.has-room.in-front .sky-links {
     cursor: pointer;
     border-radius: 3px;
 }
+/* (31 Oct) the porch: its steps, deck and railing either side of the door (stand-in coordinates, x 456-1144, y 540-692
+   of 1600 x 900). a click walks the traveller up the path and the steps onto it (sky/front.js goUp). under the door's own
+   click area, so the door still goes in */
+.front .front-porch-hit {
+    position: absolute;
+    left: 28.5%;
+    top: 60%;
+    width: 43%;
+    height: 16.9%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    pointer-events: auto;
+}
+.front .front-porch-hit:focus-visible { outline: 2px dashed rgba(255, 236, 190, .7); outline-offset: 2px; }
+.front .front-porch-hit:hover .kh-hint,
+.front .front-porch-hit:focus-visible .kh-hint { opacity: 1; }
 /* pointing at it: the door itself glows (a warm light round its own shape, not a box) */
 .front .front-door-hit:focus-visible {
     outline: none;
@@ -136,10 +154,12 @@ body.has-room.in-front .sky-links {
     opacity: 1;
 }
 
-/* the traveller, on the path by the gate */
+/* the traveller, on the path by the gate: centred on --front-stand (31 Oct: the middle of the walkway, so going up to the
+   door is straight up the path; sky/front.js) */
 .front .front-character {
     position: absolute;
     left: calc(var(--front-stand) * 1%);
+    translate: -50% 0;
     bottom: 3vh;
     height: 25vh;
     z-index: 5;

@@ -787,6 +787,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   site json is `{ baked: true }` and postfx.js leaves it alone. Flat slots' bakes stay `-blender-post.png`, without DOF/fog.
   `only()` keeps whatever was switched off for render off (the rock's hidden brushstroke curves).
 - **The toy camera** (25 Oct) builds on this: see *The toy camera* below.
+- **Film grain on every scene** (31 Oct, Victor: "my claude also added a sort of static overlay to the sea scene, just add that
+  same static to the rest of the scenes except skizy's room which already has that"; it was the sea's toy-camera grain):
+  postfx.js `filmGrain()` puts `.film-grain` (fixed, z 2147479000, no clicks) with a `.toycam > .tc-grain` inside on every page
+  postfx.js runs on (index, workshop, city, living, template; not skizy's room, beyond.html, the desk or `?map`), at `GRAIN` .25
+  (the sea camera's `toy: grain`), the same tile and hop. postfx.css hides it while a scene's own toy-camera grain shows
+  (`html:has(.postfx-layer:not(.away) .tc-grain) .film-grain`), so the sea has it once, at Blender's strength.
 - **Speed on the site**: the blur is the browser's own `blur()` (the graphics card), only the fog's tint is an SVG colour
   matrix; bokeh animate only scale/transform/opacity (`--bk-o`, `will-change`).
 - **The page's own hand-made blur** (the rock's `blur(7px)` in ground-sea.css): the site json's `ownBlur` false takes `blur()`
@@ -938,9 +944,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   from the left (`body.in-kitchen`, hallway moved with `translate`, like the attic). Its arrow on the right
   (`.kitchen-back`, `back-right`) / Escape = back into the hallway from its left edge. `living.html#kitchen` starts in there.
 - **Its own place tab** (sky.js `PLACES`: `kitchen`, `href: living.html#kitchen`, `tabOnly` = no plank on the homepage
-  signpost; icon: a pie, slot `assets/ui/place-kitchen`). On living.html kitchen.js catches the click (capture) and the
-  traveller walks there through the rooms in between (`Sky.house.go('kitchen')`, see "The house: its rooms");
-  `tabHere()` marks it "you are here" while inside.
+  signpost; icon: a pie, slot `assets/ui/place-kitchen`). On living.html house.js takes the click and puts the traveller
+  there at once (`Sky.house.jump('kitchen')`, 31 Oct; see "The house: its rooms"), and marks it "you are here" while inside.
 - **The fridge** (`.kitchen-fridge`: `.kf-door` over `.kf-inside`, slots `kitchen-fridge`, `kitchen-fridge-inside`):
   click → the traveller walks over (`reach()`), the door swings open (rotateY); click the inside or the door to shut. The
   inside (the whole fridge's body) is hidden only once the door has swung shut (`transition: visibility 0s .55s`; 16 Oct,
@@ -978,7 +983,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   garden; a tab that stops being "you are here" stays a `<span>`, so sky.css styles every `.place-tab:not(.here)` as a link,
   11 Oct: the living space's tab looked dead from the hallway), Escape (back one room), the
   shelf book. `go` = `ask(nav(name))`: `nav` works out the next room on the way (`toward`), starts that leg, and queues
-  `nav(name)` to carry on from there, so the kitchen tab from the bathroom walks bath → living → hall → kitchen.
+  `nav(name)` to carry on from there, so going to the kitchen from the bathroom walks bath → living → hall → kitchen (the
+  place tabs don't walk since 31 Oct: `jump`, below).
 - **Changing your mind on the way** (27 Sep, Victor): a leg calls `setOff(cancel)` as it starts walking (another
   click then cancels it: `cancel()` puts the room's flags back, the traveller stops where they are, and the new trip
   starts from there), `through()` once it commits (the rooms sliding, the ladder, the front door: a click then waits,
@@ -992,6 +998,17 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - `Sky.house.on(fn)`: fn('enter' / 'leave', room) as rooms slide (every room, not just the side ones; told the current
   room straight away when added). `Sky.house.where()` is the room they're in (marker.js keeps drawings per room by it).
   `Sky.house.busy` / `going`.
+- **Place tabs teleport** (31 Oct, Victor: "instead of having the character walk to a location when you press a tab, just
+  teleport the character there instantly, the walking should only be for if you're manually clicking on doors and arrows"):
+  house.js `tabClick` → `Sky.house.jump(to)`: every room open now that isn't on the way to `to` is shut at once (`gone()`,
+  deepest first), then each room on the way in opened at once (`now(from)`, outermost first), under `html.front-snap` (no
+  transitions) for two frames. Each room registers `now`/`gone` beside `enter`/`leave`: bathroom.js's three (`goTo(sd, true)`,
+  `homeNow`), kitchen.js / porch.js / attic.js `shutNow` and `openX(true)`, front.js `gone` = `close(false)`. A room without
+  them makes jump walk there (`nav`) instead. The porch's `now(from)` with `from === 'front'` puts them at the top of its steps
+  (`openPorch(true, 'steps')`). Tabs to another page (sky.js `leave(href, quick)`): the send-offs get `quick` and leave out
+  their walks (ground-sea.js's walk off the dock; the homepage has no tabs, so it's its signpost that still walks), the next
+  page's arrival is `via: 'tab'` (sky.js `arrive()` walks nobody in; the sea puts them straight at `talkSpot`). Doors, arrows,
+  the ladder, the hole, Escape and the signpost still walk (`Sky.house.go`).
 - `Sky.sides` (bathroom.js) is what's left of the side rooms' own API: `inSide`, `goNow(name)` (instant, for
   `living.html#hallway` and the like), the shelf book and the secret wall (`pullBook`, `bookGone`, `book`, `wall`).
 
@@ -1100,6 +1117,15 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   the full width always shows and tall screens cut the sides): `front-house` (the house, garden, path, fence; sky
   see-through), `front-door` / `front-door-open` (whole-canvas overlays, the door at 770–830 × 492–612). The click
   target `.front-door-hit` sits on those coordinates in % (front.css). Windows and the porch lamp glow with `--dusk`.
+- **They stand on the walkway's middle** (31 Oct, Victor: they stood left of it, so going in they stepped right first):
+  `STAND` 50, and front.css centres `.front-character` on it (`translate: -50% 0`); the door is always at the screen's middle
+  (the stage is centred), so `upThePath` goes straight up (it only walks over first if they're ever more than 1.5% off it).
+- **The porch from the garden** (31 Oct, Victor: the porch tab came out through the house's front door; he chose "both"):
+  `.front-porch-hit` (living.html, before the door's button so the door wins; front.css: x 456-1144, y 540-692 of the stand-in,
+  the steps, deck and railing, hint "the porch") → `Sky.house.go('porch')` → front's `away('porch')` → `goUp()`: up the path
+  to the top of the steps (`upThePath`, no door opening), the black, and in it `Sky.porch.fromGarden()` (the hallway then the
+  porch put in place, the traveller at its steps, `STEPS` 50), then they step along to `STAND`. The porch tab from the garden
+  teleports to the same spot (house.js `jump`, porch `now('front')`).
 - Click the door: the traveller walks over, then up the path (one animation, scaled down to the door's height), the
   door opens, they fade in → a short black (`.front-black`, `body.front-going-in`), and in it, with every transition off
   (`html.front-snap`), `Sky.sides.goNow('hall')` and the garden closed; out of the black the hall traveller steps in from
