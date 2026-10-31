@@ -1122,7 +1122,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (the stage is centred), so `upThePath` goes straight up (it only walks over first if they're ever more than 1.5% off it).
 - **The porch from the garden** (31 Oct, Victor: the porch tab came out through the house's front door; he chose "both"):
   `.front-porch-hit` (living.html, before the door's button so the door wins; front.css: x 456-1144, y 540-692 of the stand-in,
-  the steps, deck and railing, hint "the porch") → `Sky.house.go('porch')` → front's `away('porch')` → `goUp()`: up the path
+  the steps, deck and railing, hint "the porch"; upright phones x 640-960 only, so it's all on the screen) → `Sky.house.go('porch')` → front's `away('porch')` → `goUp()`: up the path
   to the top of the steps (`upThePath`, no door opening), the black, and in it `Sky.porch.fromGarden()` (the hallway then the
   porch put in place, the traveller at its steps, `STEPS` 50), then they step along to `STAND`. The porch tab from the garden
   teleports to the same spot (house.js `jump`, porch `now('front')`).

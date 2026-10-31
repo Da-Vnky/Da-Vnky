@@ -121,6 +121,10 @@ body.has-room.in-front .sky-links {
     cursor: pointer;
     pointer-events: auto;
 }
+/* an upright phone shows only the middle of the picture: just the steps and the deck either side of them (x 640-960) */
+@media (max-width: 620px) {
+    .front .front-porch-hit { left: 40%; width: 20%; }
+}
 .front .front-porch-hit:focus-visible { outline: 2px dashed rgba(255, 236, 190, .7); outline-offset: 2px; }
 .front .front-porch-hit:hover .kh-hint,
 .front .front-porch-hit:focus-visible .kh-hint { opacity: 1; }
