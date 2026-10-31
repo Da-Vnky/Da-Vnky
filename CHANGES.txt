@@ -17,6 +17,14 @@ How it works
 
 == published ==
 
+2026-10-31 07:49 · V
+- Thunder has five recorded rolls now (the artist's Zapsplat thunder, as thunder and thunder-2 to thunder-5 in the asset manager, nested under thunder): one is picked at random each time, never the same one twice running.
+- Dropping the traveller into the sea makes a plop, like a stone into deep water (new sound slot assets/sounds/plop; the ship and bottles keep the splash).
+- The boat's splash plays the recorded splash as it is, no longer slowed down and pitched low (a bottle's small splash is still a little brighter).
+- The little companion (una, the sugar drop) is switched off on the site. A new "on the site" tick at the top of the asset manager's companion tab brings it back (kept in assets/characters/kotodama-looks.json as on: true, then publish); the asset manager's map and the companion page (tools/kotodama.html, which now opens living.html?companion) always show it, so it can still be drawn, tried and heard.
+- The little Claubes talk now: every line in their speech bubbles is babbled in a squeaky little voice of their own (the companion's voice module, sky/babble.js), each one a little higher or lower, two at most at once. Robed in reset 4, and chanting on the diagram in the dungeon, they use the old imp's evil voice instead. New sound slots assets/sounds/kotodama-claube and kotodama-imp take a sheet of your own (like the companion's); until then they're made-up voices. babble.js now loads on every page that has Claubes (the sea, the workshop, the rooftop, the template).
+- A flicked-away Claube's squeaky wheee is now in its own babbled voice, swooping up and fading off into the distance (an own recording at assets/sounds/claube-flick still plays instead).
+
 2026-10-31 06:23 · V
 - The sea's toy camera keeps the ship, the traveller, the dock and the city in focus all the time now: the focus no longer wanders after the pointer (the waves and the rock under it kept pulling it near, blurring the boat and the city). Resting the pointer on something nearer or further only sharpens it a little.
 - Blender's toy camera has two new settings on the camera (run tools/blender/toycam.py once in the scene's Scripting tab to add them): 'toy: keep sharp' (slot names that always stay in focus; empty = the traveller, ship, dock and city) and 'toy: focus reach' (how far the pointer stretches the focus, 0 to 1).

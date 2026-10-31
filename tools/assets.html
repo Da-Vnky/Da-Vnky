@@ -314,6 +314,10 @@
     .lk-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(110,82,54,.35); }
     .lk-acts .say { font-style: italic; font-size: .9rem; color: var(--faded); }
     .lk-acts .say.dirty { color: var(--red); }
+    .lk-on { display: flex; align-items: baseline; gap: 10px; margin: 0 0 14px; padding: 10px 14px; border: 1px dashed rgba(110,82,54,.4); border-radius: 10px; cursor: pointer; }
+    .lk-on input { transform: scale(1.25); }
+    .lk-on b { font: normal 1.05rem "IM Fell English SC", Georgia, serif; color: var(--ink); }
+    .lk-on span { font-style: italic; font-size: .9rem; color: var(--faded); }
     .lk .yes { padding: 6px 16px; border: 0; border-radius: 999px; background: var(--red); color: #f8eed6; cursor: pointer; font-style: italic; }
     .lk .yes:disabled { opacity: .45; cursor: default; }
     .lk .plain { padding: 5px 13px; border: 1px solid rgba(110,82,54,.45); border-radius: 999px; background: none; color: var(--ink); cursor: pointer; font-style: italic; font-size: .9rem; }
@@ -1194,7 +1198,14 @@
         box.appendChild(el('h2', '', 'how it looks <small>the sugar drop</small>'));
         box.appendChild(el('p', 'sub', 'these change the drawn one (and how it hops, wobbles and chats). a picture of yours in its slots below still wins over the drawing. try things here: they show on the house underneath as you go, and on the site once you press “keep these” and publish.'));
         var bodyEl = el('div', 'lk-body'), acts = el('div', 'lk-acts');
-        box.appendChild(bodyEl); box.appendChild(acts);
+        // (31 Oct) whether it's on the site at all: off unless this is ticked (on: true in the looks file). the map below,
+        // and the companion page, always have it, so it can be drawn and tried while it's off
+        var onBox = el('label', 'lk-on'), onTick = document.createElement('input');
+        onTick.type = 'checkbox';
+        onTick.addEventListener('change', function () { edit(function () { if (onTick.checked) LK.draft.on = true; else delete LK.draft.on; }); });
+        onBox.appendChild(onTick); onBox.appendChild(el('b', '', 'on the site'));
+        var onSay = el('span', '', ''); onBox.appendChild(onSay);
+        box.appendChild(onBox); box.appendChild(bodyEl); box.appendChild(acts);
 
         function full(k) { return LOOK.spec(k, LK.draft); }
         function made(k) { return LOOK.spec(k, null); }
@@ -1215,7 +1226,8 @@
         }
         function clean() {
             prune();
-            var out = { what: 'the little companion: how it looks and behaves. kept by the asset manager (the little companion tab); only what was changed from sky/kotodama-look.js is here. remove this file to put it back as it was made.' };
+            var out = { what: 'the little companion: how it looks and behaves. kept by the asset manager (the little companion tab); only what was changed from sky/kotodama-look.js is here, and on: true while it is on the site. remove this file to put it back as it was made (and off the site).' };
+            if (LK.draft.on === true) out.on = true;
             if (LK.draft.kinds && LK.draft.kinds.una) out.kinds = { una: copy(LK.draft.kinds.una) };
             return out;
         }
@@ -1277,6 +1289,8 @@
             if (!box.isConnected && !all) return;
             // the one picked: the drawing, and everything about it
             var sp = full(LK.kind), k = LK.kind;
+            onTick.checked = LK.draft.on === true; onTick.disabled = !LK.read;
+            onSay.textContent = LK.draft.on === true ? 'it follows the traveller around the house for every visitor (once kept and published).' : 'off: visitors don’t meet it. tick to bring it back (keep these, then publish). the map below shows it either way.';
             bodyEl.innerHTML = '';
             var left = el('div', 'lk-left'), right = el('div', 'lk-right');
             stage = el('div', 'lk-stage');

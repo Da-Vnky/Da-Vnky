@@ -55,7 +55,10 @@
           assets/characters/mini-claube-menace   reset 4: the ones left, smiling at the traveller (else the happy one)
           assets/characters/claube-giblet-1 … 4  what's left of one, shot with the white revolver
           assets/ui/cursor-flick                 the pointer over them (a small PNG)
-   sounds: assets/sounds/flick, claube-shot, rumble, absorb, ricochet, claube-scream, claube-burst (and blip, for the words)
+   sounds: assets/sounds/flick, claube-shot, rumble, absorb, ricochet, claube-scream, claube-burst
+   their voices (sky/babble.js, must load before this file): every bubble is said in babble too, in their own squeaky
+          voice (claube) or, robed or chanting on the diagram, the imp's: assets/sounds/kotodama-claube and kotodama-imp,
+          a sheet of your own each (like the companion's), else made-up ones
    ===================================================================== */
 
 (function () {
@@ -285,7 +288,7 @@
         if (el._going) return;
         if (warded() || (R4() && !gone4good())) { ward(el, px, py, true); return; }
         el._going = true;
-        sfx('flick'); sfx('claube-flick', { delay: 0.04 });
+        sfx('flick'); wheee(el);
         var r = el.getBoundingClientRect(), dir = px < r.left + r.width / 2 ? 1 : -1;
         var dx = dir * (window.innerWidth * (0.5 + Math.random() * 0.4)), up = -(window.innerHeight * (0.5 + Math.random() * 0.4));
         el.style.transition = 'none';
@@ -448,7 +451,7 @@
         chantT = setInterval(function () {
             var e = crew.querySelectorAll('.mini-claube');
             if (crew.classList.contains('menace')) return;                               // (they've stopped singing: they just smile)
-            if (e.length && Math.random() < 0.6) say(e[Math.floor(Math.random() * e.length)], CHANTS[Math.floor(Math.random() * CHANTS.length)], 1800);
+            if (e.length && Math.random() < 0.6) say(e[Math.floor(Math.random() * e.length)], CHANTS[Math.floor(Math.random() * CHANTS.length)], 1800, true);
         }, 2600);
     }
     var reseat = null;
@@ -555,6 +558,7 @@
             dungeonStatic();
             if (Sky.staticNoise) Sky.staticNoise.burst(0.8, 500);
             // the rest: not a step, not a word. they turn to the traveller and smile
+            hush();
             var me = document.querySelector('.dungeon .character'), mx = me ? me.getBoundingClientRect().left + me.getBoundingClientRect().width / 2 : 0;
             crew.querySelectorAll('.mini-claube').forEach(function (o) { var q = o.getBoundingClientRect(); o.classList.toggle('flip', q.left > mx); o.querySelector('.mc-bubble').classList.remove('on'); });
             if (out.length) return;
@@ -645,14 +649,65 @@
         out = []; save();
         if (line) sfx('angry', { size: 0.1 });
     }
-    function say(el, text, ms) {
+    function say(el, text, ms, chant) {
         var b = el.querySelector('.mc-bubble');
         if (!b) return;
         b.textContent = text;
         b.classList.add('on');
         clearTimeout(b._t);
         b._t = setTimeout(function () { b.classList.remove('on'); }, ms || 1800);
+        voice(el, text, chant);
     }
+
+    /* ---------------- their voices (sky/babble.js) ---------------- */
+    // every line in a bubble is said in babble too: their own squeaky little voice ('claube'), or, robed (reset 4) or
+    // chanting on the diagram, the imp's ('imp'). the same words always sound the same. at most two of them talking at
+    // once (seven at once would be a wall of noise: the rest just show their bubble), each its own pitch, nothing before
+    // the visitor's first click (babble.js waits for one), and quiet when the sound's hushed or turned right down
+    var MOST = 2, talking = [], lastTalk = 0;
+    function voiceFor() { return robed() || crew.classList.contains('worship') ? 'imp' : 'claube'; }
+    function kindOf(text, chant) {
+        if (chant) return 'hum';                                                    // (a chant is sung)
+        if (!/[a-z]/i.test(text)) return /\)/.test(text) ? 'giggle' : 'gasp';       // (":)" a giggle, "!!!" a gasp)
+        if (/^(he|hi|ha|ho)+[!.]*$/i.test(text)) return 'giggle';
+        if (/\?\s*$/.test(text)) return 'ask';
+        if (/!\s*$/.test(text)) return 'exclaim';
+        if (/(…|\.\.\.)\s*$/.test(text)) return 'sigh';
+        return 'say';
+    }
+    function voice(el, text, chant) {
+        var B = Sky.babble;
+        if (!B || !B.awake || document.hidden || (Sky.sounds && Sky.sounds.hushed)) return;
+        talking = talking.filter(function (t) { return !t.done; });
+        if (talking.length >= MOST) return;
+        var name = voiceFor(), kind = kindOf(text, chant);
+        B.want(name);                                                               // (a sheet of your own, if there is one)
+        if (el._pitch === undefined) el._pitch = Math.round(Math.random() * 6 - 2); // (each one a little higher or lower)
+        var t = { done: false, h: null }, now = Date.now(), wait = Math.max(0, lastTalk + 140 - now);   // (two at once: one just after the other)
+        lastTalk = now + wait;
+        talking.push(t);
+        setTimeout(function () {
+            if (t.done) return;
+            var o = { kind: kind, pitch: el._pitch + (chant ? -3 : 0), speed: chant ? 0.8 : 1 };
+            if (/[a-z]/i.test(text)) o.text = text;
+            t.h = B.say(name, B.plan(name, o), {
+                syl: function () { el.classList.add('mc-syl'); clearTimeout(el._sylT); el._sylT = setTimeout(function () { el.classList.remove('mc-syl'); }, 70); },
+                done: function () { t.done = true; }
+            });
+        }, wait);
+    }
+    // flicked away, its "wheeee" as it flies off: your recording (assets/sounds/claube-flick) if there is one, else
+    // babbled in its own voice, swooping up and falling away (babble.js whee). always heard, however many are talking
+    var ownWhee = false;
+    Sky.findAsset('assets/sounds/claube-flick.mp3|assets/sounds/claube-flick.ogg', function (u) { ownWhee = !!u; });
+    function wheee(el) {
+        var B = Sky.babble;
+        if (ownWhee || !B || !B.awake) { sfx('claube-flick', { delay: 0.04 }); return; }
+        if (el._pitch === undefined) el._pitch = Math.round(Math.random() * 6 - 2);
+        B.want('claube');
+        setTimeout(function () { B.whee('claube', { pitch: el._pitch }); }, 40);
+    }
+    function hush() { talking.forEach(function (t) { t.done = true; if (t.h) t.h.stop(); }); talking = []; }
     // happy now and then says so
     setInterval(function () {
         var chatty = crew.classList.contains('happy') || (after4() && crew.classList.contains('dancing'));      // (after reset 4 they talk while they dance too)

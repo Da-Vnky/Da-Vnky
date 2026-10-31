@@ -208,6 +208,18 @@ body.inv-holding .mini-claube {
 .mini-claube .mc-bubble.on {
     opacity: 1;
 }
+/* talking (sky/babble.js): a little hop up on each syllable (translate, so it adds to the dancing's transform) */
+.mini-claube .mc-body {
+    transition: translate .06s ease-out;
+}
+.mini-claube.mc-syl .mc-body {
+    translate: 0 -6%;
+}
+@media (prefers-reduced-motion: reduce) {
+    .mini-claube.mc-syl .mc-body {
+        translate: none;
+    }
+}
 .mc-pop {
     position: fixed;
     z-index: 6;

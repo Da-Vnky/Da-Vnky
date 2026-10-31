@@ -11,6 +11,7 @@ evilrecord.ogg
 kotodama-una.ogg
 paper-roll.ogg
 paper-unroll.ogg
+plop.ogg
 rain.ogg
 revolver-close.ogg
 revolver-cock.ogg
@@ -19,3 +20,12 @@ revolver-load-3.ogg
 revolver-load-4.ogg
 revolver-load.ogg
 revolver-open.ogg
+splash.ogg
+surface.ogg
+thunder-2.ogg
+thunder-3.ogg
+thunder-4.ogg
+thunder-5.ogg
+thunder.ogg
+wind.ogg
+windowrain.ogg

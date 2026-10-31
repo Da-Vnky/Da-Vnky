@@ -1247,6 +1247,13 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 
 ## The little companion (sky/kotodama.js, sky/babble.js, 17 Oct)
 
+- **31 Oct: switched off on the site** (Victor: "just disable them, I can turn them on from assets manager, cause I like em all, but
+  they shouldn't be there anymore"). kotodama.js makes the companion only when the looks file has `on: true`, or in `?map`, or
+  with `?companion` on localhost (`FORCED`); otherwise `Sky.kotodama` is there but empty (`ready` true, `el` null, its calls do
+  nothing). The asset manager's companion tab has an **"on the site"** tick at the top (`.lk-on`; `clean()` writes `on: true`,
+  "keep these" saves it, then publish). tools/kotodama.html opens `living.html?companion`. No looks file = off. Its voice
+  module now talks for the Claubes too (31 Oct: see *Claubes* → **Their voices**).
+
 - **21 Oct, one companion only** (Victor: "remove the little creatures that show up on days of the week, it's too much bloat"):
   una, the sugar drop, every day, following the traveller. Gone: the other five kinds (pixie, kitsune, imp, hollow, mochi: their
   `DEFAULTS`, their `VOICES` in babble.js, the voice-only waves pulse-blend/dual-evil/sub-hollow, their scales and squish styles), the
@@ -1565,6 +1572,12 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   weather sets its channels every frame; when `set()` also ran the tick, window rain made ~50 taps × 60 frames a
   second and the browser's sound engine collapsed, taking every sound effect with it (Victor: "rain, then back inside
   breaks the sfx"; inside is where the window rain plays). Never schedule sounds per frame.
+- **Thunder** (31 Oct, Victor's Zapsplat thunder, .ogg 48 kHz through `asset_put`): `assets/sounds/thunder` and `thunder-2` …
+  `thunder-5` (the asset manager nests them under thunder by name); panel.js `thunderFile()` picks any that are in at random,
+  never the one heard last; none = the drawn rumble. **The plop**: `assets/sounds/plop`, played when the visitor drops the
+  traveller into the sea (ground-sea.js, the fall's splash is then silent: `mateSplash(0.5, true)`; stand-in: the splash).
+  **The recorded splash is never slowed**: its playbackRate is `max(1, 1.3 - .55 × size)` (the boat's used to be ~.6, deep
+  and slow; a bottle's is still a little brighter).
 - The traveller's dialogue box (`Sky.speak`) sits near the top, not over the traveller (it used to eat clicks
   meant for them).
 - **ElevenLabs** (30 Oct, Victor, trying whether Claude's sound effects are worth it): the CLI is installed (`npm i -g
@@ -1905,6 +1918,26 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   drum's angle + the swing's 22°), `.rv-ch.in` (a round popping in; the drum turns the next empty chamber to the top first).
   Tested 30 Oct (Playwright, sounds logged): take in hand, three shots, R, six quick shots and the automatic reload, put away.
 - **Claubes** (`claubes.js`, the P(Doom) easter egg):
+  - **Their voices** (31 Oct, Victor: "maybe use the voices for the claudes"; he picked their own voice, and "the evil
+    companion's" for the robed ones and the chants): every bubble (`say(el, text, ms, chant)`) is also said through
+    `Sky.babble` (`voice()`): babble.js `VOICES.claube` (new: base 560, pulse-blend, small mouth, quick, `gain` .6) out in
+    the house; `VOICES.imp` (Argon's corrupted one, brought back from before 21 Oct with its `phrygdom` scale and `dual-evil`
+    wave, `gain` .7) when `robed()` or worshipping (`voiceFor`). Chants are sung (`hum`, 3 semitones lower, .8 speed); the kind
+    comes from the text (`kindOf`: ? ask, ! exclaim, … sigh, "hehe" / ":)" giggle, "!!!" gasp), the words passed as `text`
+    so a line always sounds the same; each Claube its own `el._pitch` (-2…+4). At most `MOST` 2 at once (six "eek!"s: two
+    voiced, the second 140 ms after), nothing before babble's first click (`B.awake`), while hushed, or in a hidden tab;
+    `hush()` when one's slain (the rest go silent). Each syllable bobs it (`.mc-syl`, `translate` in claubes.css). `V.gain`
+    is new in babble.js (the bus's level, in `say` and `render`). Slots `assets/sounds/kotodama-claube`, `kotodama-imp`
+    (sheets like una's; `B.want` loads one the first time that voice speaks). babble.js is on every page with claubes.js
+    (index, workshop, city, living, template), before it. Tested 31 Oct (Playwright, calls logged): happy lines, a shot
+    (two of six voiced), the dungeon's chants (imp), reset 4 robed and warded (imp), reset 5's AFTER4 lines, hushed (none),
+    offline renders of every kind in both voices (peaks .6–.9, no NaN). Not heard by Claude: Victor to listen.
+    **The flick's "wheee"** (31 Oct, Victor: "the sound effect for the wee via the babble js"): `wheee(el)` in claubes.js plays
+    babble.js `whee('claube', { pitch })` (one long "ee": `ev.path` [share of the syllable, Hz] carries its pitch up 1.6× in the
+    first fifth and down to half by the end, `ev.away` fades it and closes the lowpass to 1200 Hz, as it flies off; the made-up
+    voice and a sheet both follow a path), 40 ms after the flick's whoosh; always heard (not counted in `MOST`). His own
+    `assets/sounds/claube-flick`, if he adds one, plays instead (`ownWhee`), as does panel.js's old synth stand-in when babble
+    isn't awake. Tested: a real click on a Claube logs the whee; rendered, it peaks .35 and fades out over ~.9 s.
   - **Once a reset**: the song calls them out once (`run:claubes-called`); who's out is kept for the reset
     (`run:claubes-out`, not the visit). Any that are shot, flicked or scatter (the traveller or a record shot)
     are gone for the rest of the reset. The debug page's Claubes switch clears all this.

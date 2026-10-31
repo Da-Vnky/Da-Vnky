@@ -3222,8 +3222,32 @@
       },
       {
        "slot": "assets/sounds/thunder",
-       "what": "one roll of thunder (played now and then, not looped)",
+       "what": "one roll of thunder (played now and then, not looped). thunder-2 to thunder-5 are more takes: any that are in are picked at random, never the same one twice running",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/thunder-2",
+       "what": "another take of thunder (second of five), picked at random with the others",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/thunder-3",
+       "what": "another take of thunder (third of five), picked at random with the others",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/thunder-4",
+       "what": "another take of thunder (fourth of five), picked at random with the others",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/thunder-5",
+       "what": "another take of thunder (fifth of five), picked at random with the others",
+       "kind": "sound",
+       "optional": true
       },
       {
        "slot": "assets/sounds/ambient",
@@ -3310,6 +3334,12 @@
        "slot": "assets/sounds/surface",
        "what": "the traveller bobbing back up",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/plop",
+       "what": "the traveller dropped into the sea by the visitor: a plop, like a stone into deep water (until it's in, the splash)",
+       "kind": "sound",
+       "optional": true
       },
       {
        "slot": "assets/sounds/climb-out",
@@ -3475,13 +3505,25 @@
       },
       {
        "slot": "assets/sounds/claube-flick",
-       "what": "a little claube flicked away: its squeaky “wheee”",
+       "what": "a little claube flicked away: its squeaky “wheee” as it flies off. until yours is in, it’s babbled in their own voice (kotodama-claube, below), swooping up and falling away",
        "kind": "sound"
       },
       {
        "slot": "assets/sounds/claube-shot",
        "what": "a little claube, shot",
        "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/kotodama-claube",
+       "what": "the little Claubes’ voice: every line in their bubbles is babbled in it. a sheet like the companion’s (every syllable sung once on its own note with a gap after each: a i u e o, ka ki ku ke ko, ma mi mu me mo, pa pi pu pe po, ta te to, na ni no, ra ri ru ro, at A4, then C5, then G4). until it’s in, a made-up squeaky one",
+       "kind": "sound",
+       "optional": true
+      },
+      {
+       "slot": "assets/sounds/kotodama-imp",
+       "what": "the robed Claubes’ voice (reset 4), and every Claube’s as they chant on the diagram in the dungeon: a sheet like the one above. until it’s in, the imp’s made-up voice (Argon’s corrupted one)",
+       "kind": "sound",
+       "optional": true
       },
       {
        "slot": "assets/sounds/loot",

@@ -417,14 +417,26 @@
     }
     setInterval(function () { channels.forEach(function (ch) { if (ch.tick && ctx && ctx.state === 'running') ch.tick(ch.level); }); }, 1000);
 
-    // one roll of thunder (your own: assets/sounds/thunder.mp3)
-    var thunderFile;
-    Sky.findAsset('assets/sounds/thunder.mp3|assets/sounds/thunder.ogg', function (url) { thunderFile = url || null; });
+    // one roll of thunder (your own: assets/sounds/thunder, and more takes as thunder-2 … thunder-5 (31 Oct): any of
+    // them that are there, picked at random, never the same one twice running)
+    var thunderFiles = [], lastThunder = -1;
+    ['thunder', 'thunder-2', 'thunder-3', 'thunder-4', 'thunder-5'].forEach(function (n) {
+        Sky.findAsset('assets/sounds/' + n + '.mp3|assets/sounds/' + n + '.ogg', function (url) { if (url) thunderFiles.push(url); });
+    });
+    function thunderFile() {
+        var n = thunderFiles.length;
+        if (!n) return null;
+        var i = Math.floor(Math.random() * (n > 1 ? n - 1 : 1));
+        if (n > 1 && i >= lastThunder && lastThunder >= 0) i++;             // (skip the one heard last)
+        lastThunder = i;
+        return thunderFiles[i];
+    }
     function thunder(loud, delay, out, muffled) {
         if (!ac() || ctx.state !== 'running') return;
         loud = Math.max(0, Math.min(1, loud)) * (muffled ? 0.6 : 1);
-        if (thunderFile) {
-            setTimeout(function () { if (quiet()) return; var a = new Audio(thunderFile); a.volume = loud; a.play().catch(function () {}); }, (delay || 0) * 1000);
+        var file = thunderFile();
+        if (file) {
+            setTimeout(function () { if (quiet()) return; var a = new Audio(file); a.volume = loud; a.play().catch(function () {}); }, (delay || 0) * 1000);
             return;
         }
         var dest = out || master, t = ctx.currentTime + (delay || 0), len = 3 + Math.random() * 2.5;
@@ -902,7 +914,9 @@
                 if (quiet()) return;                                   // (hushed: a recording plays outside the engine, so it's simply not played)
                 var a = new Audio(sfxFiles[name]);
                 a.volume = vol;
-                if (name === 'splash' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = 1.3 - 0.55 * size; }
+                // a small splash (a bottle) is a little brighter; a big one (the boat) plays the recording as it is, never slowed
+                // down (31 Oct: the boat has a proper deep splash of its own now)
+                if (name === 'splash' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = Math.max(1, 1.3 - 0.55 * size); }
                 if (name === 'angry' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = 0.9 + 0.45 * size; }
                 a.play().catch(function () {});
             }, delay * 1000);

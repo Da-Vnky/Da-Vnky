@@ -928,7 +928,8 @@
             goUnder(run, SWIM_AFTER_DROP);
         }, true);
         var fallMs = 300 + Math.max(0, crew.b - surfaceB()) / 2.2;
-        setTimeout(function () { if (run === crew.run) mateSplash(0.5); }, Math.max(120, fallMs * 0.75));
+        // dropped in by you: a plop, like a stone into deep water (assets/sounds/plop; until it's there, the usual splash)
+        setTimeout(function () { if (run !== crew.run) return; mateSplash(0.5, true); sfx('plop', { or: 'splash', size: 0.5 }); }, Math.max(120, fallMs * 0.75));
     }
 
     Sky.onFrame(function (p) {

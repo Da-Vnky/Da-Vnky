@@ -57,7 +57,7 @@
 </header>
 <main>
     <section>
-        <div class="stage"><iframe id="house" title="the house, with the companion in it" src="../living.html"></iframe></div>
+        <div class="stage"><iframe id="house" title="the house, with the companion in it" src="../living.html?companion"></iframe></div>
         <div class="rooms" id="rooms"></div>
         <p class="status" style="margin-top:8px">browsers won't play a sound until there's been a click in the page: if it's quiet, click the room once.</p>
     </section>
@@ -109,7 +109,7 @@
     function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
     function chips(box, list, on) { Object.keys(list).forEach(function (k) { var b = el('button', 'chip', list[k]); b.dataset.k = k; b.onclick = function () { on(k, b); }; box.appendChild(b); }); }
     function wake() { var b = B(); if (b) b.wake(); }
-    function load() { frame.src = '../living.html' + (room ? '#' + room : ''); }
+    function load() { frame.src = '../living.html?companion' + (room ? '#' + room : ''); }
 
     var rooms = document.getElementById('rooms');
     Object.keys(ROOMS).forEach(function (n) { var b = el('button', 'chip stage-chip', n); b.onclick = function () { room = ROOMS[n]; load(); }; rooms.appendChild(b); });

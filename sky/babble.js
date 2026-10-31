@@ -3,7 +3,8 @@
    syllable at a time, the way little game characters talk. made for the
    companion in the house (sky/kotodama.js), but anything can use it.
 
-     a voice     the companion's (una's: VOICES below): how
+     a voice     the companion's (una's), the Claubes' (claube), the robed
+                 Claubes' and their chants (imp): VOICES below. how
                  high it sits, the scale its tune keeps to, how long its
                  syllables are, how bright or hollow it sounds, how much
                  its pitch bounces about, a little room around it.
@@ -29,6 +30,8 @@
      saying it   say(voice, plan, { syl, done }): every syllable scheduled on
                  the sound's own clock up front, and syl(event) called as each
                  one sounds (to open a mouth, type a letter, bob)
+     a wheee     whee(voice, { pitch }): a squeal flying off, swooping up and
+                 falling away into the distance (a Claube flicked away)
      body sounds squish(voice, 'jump' | 'land', how hard): a quiet little
                  gel squish for hopping about (yours, if you add
                  assets/sounds/kotodama-hop / kotodama-land)
@@ -61,7 +64,8 @@
     // scales, as steps up from the voice's own note (semitones)
     var SCALES = {
         majpent:   [0, 2, 4, 7, 9],              // sunny, can't go wrong
-        sugar:     [0, 2, 4, 7, 9]               // the sugar scale (below): A B C# E F#, heard as A6/9
+        phrygdom:  [0, 1, 4, 5, 7, 8, 10],       // mischief (the imp's)
+        sugar:    [0, 2, 4, 7, 9]               // the sugar scale (below): A B C# E F#, heard as A6/9
     };
 
     /* the sugar scale: the sugar drop's own way of singing its words. it's made only of notes the sheet has (A major
@@ -149,6 +153,22 @@
             // nopitch: every syllable played exactly as sung, at its own note (the sheet has the notes it needs)
             breathe: 1, pace: 230, air: 0, nopitch: true, melody: 'sugar',
             favour: 'pu mi ra ko no pi ma ni ru'.split(' '), squish: 'sugar'
+        },
+        // the little Claubes (sky/claubes.js, 31 Oct): high, quick, squeaky toy chirps, a small mouth. gain: how loud
+        // against the others (there are seven of them). assets/sounds/kotodama-claube, a sheet of your own, replaces it
+        claube: {
+            name: 'claube', base: 560, scale: 'majpent', wave: 'pulse-blend', formant: 1.8, q: 8, hpf: 280, lpf: 8800,
+            detune: 10, bounce: 32, fm: 150, fmRatio: 3, dur: 54, gap: 34, plosive: 50, chirp2: 26, reverb: 0.12,
+            vib: 30, vibRate: 7, gliss: 55, erratic: true, color: 0, gain: 0.6,
+            favour: 'ku ro pu ko pi po'.split(' ')
+        },
+        // the imp (Argon's corrupted one, the companion's evil voice until 21 Oct): the robed Claubes' voice in reset 4,
+        // and every Claube's as it chants on the diagram. assets/sounds/kotodama-imp replaces it
+        imp: {
+            name: 'imp', base: 290, scale: 'phrygdom', wave: 'dual-evil', formant: 1.45, q: 12.5, hpf: 180, lpf: 6400,
+            detune: 38, bounce: -42, fm: 320, fmRatio: 1.4, dur: 75, gap: 48, plosive: 75, chirp2: 15, reverb: 0.22,
+            vib: 54, vibRate: 7.6, gliss: 145, erratic: true, color: 0.3, gain: 0.7,
+            favour: 'ke ki ka ta te ku'.split(' ')
         }
     };
     function voiceOf(name) { return VOICES[name] || VOICES.una; }
@@ -451,7 +471,7 @@
         var lead = 0.05;
         if (e) {
             var now = e.ctx.currentTime + lead, sheet = sheetNow(name);
-            bus = e.ctx.createGain(); bus.gain.value = 1;
+            bus = e.ctx.createGain(); bus.gain.value = V.gain || 1;
             var send = e.ctx.createGain(); send.gain.value = V.reverb;
             bus.connect(e.master); bus.connect(send); send.connect(e.hall);
             P.events.forEach(function (ev) {
@@ -473,6 +493,16 @@
         };
     }
 
+    // whee(voice, { pitch, dur }): a squeal flying off, "wheeee": one long ee that swoops up an octave in its first fifth,
+    // then falls away below where it started, fading and dulling as it goes (a Claube flicked away: sky/claubes.js)
+    function whee(name, o) {
+        o = o || {};
+        var V = voiceOf(name), f = V.base * 1.6 * Math.pow(2, (o.pitch || 0) / 12), dur = o.dur || 1.1;
+        var ev = { t: 0, syl: 'i', txt: 'wheee!', hz: f, dur: dur, vowel: 'i', loud: 1.5, exclaim: true, away: true,
+                   path: [[0, f * 0.75], [0.18, f * 1.6], [0.45, f * 1.2], [1, f * 0.5]], first: true, last: true, word: 0, next: null, wordEnd: true, lineStart: true };
+        return say(name, { voice: name, kind: 'whee', events: [ev], total: dur + 0.1, text: 'wheee!' }, o);
+    }
+
     // one syllable, made up: two oscillators, an fm chirp, three mouth filters, a puff for the consonant
     function synthSyl(e, V, ev, t, out) {
         var ctx = e.ctx, f0 = safeHz(ev.hz), dur = clamp(ev.dur, 0.03, 2.5);
@@ -489,16 +519,27 @@
         }
         var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g2 = ctx.createGain(), two = true, sub = 1;
         switch (V.wave) {
-            case 'tri-sine':    o1.type = 'triangle'; o2.type = 'sine';     g2.gain.value = 0.5; break;
+            case 'pulse-blend': o1.type = 'triangle'; o2.type = 'square';   g2.gain.value = 0.38; break;
+            case 'dual-evil':   o1.type = 'sawtooth'; o2.type = 'square';   g2.gain.value = 0.65; break;
+            case 'tri-sine':   o1.type = 'triangle'; o2.type = 'sine';     g2.gain.value = 0.5; break;
             default:            o1.type = V.wave || 'sawtooth'; o2.type = o1.type; g2.gain.value = 0.55; two = V.detune > 0;
         }
-        o1.frequency.setValueAtTime(startF, t); o1.frequency.exponentialRampToValueAtTime(endF, t + glide);
-        if (two) {
-            o2.frequency.setValueAtTime(safeHz(startF * sub), t); o2.frequency.exponentialRampToValueAtTime(safeHz(endF * sub), t + glide);
-            o2.detune.setValueAtTime(V.detune, t);
+        if (ev.path) {
+            // a pitch path of its own ([share of the syllable, Hz], …): the wheee
+            [o1].concat(two ? [o2] : []).forEach(function (o, n) {
+                var k = n ? sub : 1;
+                ev.path.forEach(function (p, i) { if (i) o.frequency.exponentialRampToValueAtTime(safeHz(p[1] * k), t + p[0] * dur); else o.frequency.setValueAtTime(safeHz(p[1] * k), t); });
+            });
+            if (two) o2.detune.setValueAtTime(V.detune, t);
+        } else {
+            o1.frequency.setValueAtTime(startF, t); o1.frequency.exponentialRampToValueAtTime(endF, t + glide);
+            if (two) {
+                o2.frequency.setValueAtTime(safeHz(startF * sub), t); o2.frequency.exponentialRampToValueAtTime(safeHz(endF * sub), t + glide);
+                o2.detune.setValueAtTime(V.detune, t);
+            }
         }
         // vibrato on a held note
-        if (ev.sing && V.vib > 0) {
+        if ((ev.sing || ev.path) && V.vib > 0) {
             var vo = ctx.createOscillator(), vg = ctx.createGain();
             vo.frequency.value = V.vibRate; vg.gain.setValueAtTime(0.001, t); vg.gain.linearRampToValueAtTime(V.vib, t + Math.min(dur * 0.3, 0.12) + 0.05);
             vo.connect(vg); vg.connect(o1.detune); if (two) vg.connect(o2.detune);
@@ -526,13 +567,19 @@
         var env = ctx.createGain(), att = ev.sing ? Math.min(0.04, dur * 0.14) : 0.006, rel = ev.sing ? Math.min(0.16, dur * 0.4) : Math.min(0.032, dur * 0.36);
         var peak = 0.5 * (ev.loud || 1);
         env.gain.setValueAtTime(0.0001, t); env.gain.linearRampToValueAtTime(peak, t + att);
-        env.gain.setValueAtTime(peak * 0.9, t + Math.max(att, dur - rel)); env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        if (ev.away) {
+            // flying off into the distance: fading the whole way, and duller as it goes
+            env.gain.exponentialRampToValueAtTime(peak * 0.6, t + dur * 0.3); env.gain.exponentialRampToValueAtTime(peak * 0.25, t + dur * 0.7); env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+            lp.frequency.setValueAtTime(lp.frequency.value, t + dur * 0.25); lp.frequency.exponentialRampToValueAtTime(1200, t + dur);
+        } else {
+            env.gain.setValueAtTime(peak * 0.9, t + Math.max(att, dur - rel)); env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        }
         lp.connect(env); env.connect(out);
         consonant(e, V, ev, t, out, vw);
         o1.start(t); fm.start(t); o1.stop(t + dur + 0.03); fm.stop(t + dur + 0.03);
         if (two) { o2.start(t); o2.stop(t + dur + 0.03); }
         // and now and then a second little chirp, a fourth up
-        if (!ev.sing && !ev.second && V.chirp2 && Math.random() * 100 < V.chirp2) {
+        if (!ev.sing && !ev.path && !ev.second && V.chirp2 && Math.random() * 100 < V.chirp2) {
             synthSyl(e, V, { hz: f0 * Math.pow(2, 5 / 12), dur: dur * 0.55, vowel: 'i', syl: 'i', loud: (ev.loud || 1) * 0.7, second: true }, t + dur * 0.78, out);
         }
     }
@@ -566,6 +613,13 @@
             // end; a quick one rings into the next and fades there (the whole of it, breath and all, at a word's end)
             var br = clamp(V.breathe || 0, 0, 1), whole = natural * (0.5 + 0.5 * br);
             dur = br >= 1 || held || ev.wordEnd || ev.next === null ? whole : Math.max(Math.min(whole, ev.next + 0.05 + 0.12 * br), Math.min(natural, ev.dur));
+        } else if (ev.path) {
+            // the wheee: the vowel's steady middle looped, carried along the pitch path
+            src.loop = true; src.loopStart = sl.start + sl.dur * 0.32; src.loopEnd = sl.start + sl.dur * 0.72;
+            ev.path.forEach(function (p, i) {
+                var r = clamp(p[1] / sl.hz, 0.5, 2.5);
+                if (i) src.playbackRate.exponentialRampToValueAtTime(r, t + p[0] * dur); else src.playbackRate.setValueAtTime(r, t);
+            });
         } else if (held && dur > natural * 0.8) {
             // a held note: loop the steady middle of the vowel, with vibrato
             src.loop = true; src.loopStart = sl.start + sl.dur * 0.32; src.loopEnd = sl.start + sl.dur * 0.72;
@@ -606,9 +660,14 @@
         var peak = clamp(0.9 * sl.norm * (ev.loud || 1), 0, 3), att = held ? 0.03 : 0.004 + 0.008 * soft;
         var rel = held ? Math.min(0.18, dur * 0.4) : (soft ? Math.min(dur * 0.55, 0.05 + 0.13 * soft) : Math.min(0.03, dur * 0.3));
         env.gain.setValueAtTime(0.0001, t); env.gain.linearRampToValueAtTime(peak, t + att);
-        env.gain.setValueAtTime(peak * 0.92, t + Math.max(att, dur - rel));
-        if (soft && (!held || V.nopitch)) { env.gain.setTargetAtTime(0.0001, t + Math.max(att, dur - rel), rel / 3.2); dur += 0.02; }   // (a natural fade, not a cut)
-        else env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        if (ev.away) {                                     // (flying off: fading the whole way, duller as it goes)
+            env.gain.exponentialRampToValueAtTime(peak * 0.6, t + dur * 0.3); env.gain.exponentialRampToValueAtTime(peak * 0.25, t + dur * 0.7); env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+            lp.frequency.setValueAtTime(lp.frequency.value, t + dur * 0.25); lp.frequency.exponentialRampToValueAtTime(1200, t + dur);
+        } else {
+            env.gain.setValueAtTime(peak * 0.92, t + Math.max(att, dur - rel));
+            if (soft && (!held || V.nopitch)) { env.gain.setTargetAtTime(0.0001, t + Math.max(att, dur - rel), rel / 3.2); dur += 0.02; }   // (a natural fade, not a cut)
+            else env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        }
         lp.connect(env); env.connect(out);
         if (V.air && (ev.wordEnd || ev.lineStart)) breath(e, V, ev, ev.lineStart && !ev.wordEnd ? t - 0.16 : t + dur * 0.55, out, ev.lineStart && !ev.wordEnd);
         if (src.loop) src.start(t, sl.start); else src.start(t, sl.start, Math.min(sl.dur, dur * Math.max(rate, 1) * 1.3 + 0.02));
@@ -640,6 +699,7 @@
         var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext, sr = 44100;
         var ctx = new OAC(2, Math.ceil(sr * (P.total + 1.6)), sr), e = build(ctx, LEVEL), V = voiceOf(name), sheet = sheetNow(name);
         var bus = ctx.createGain(), send = ctx.createGain();
+        bus.gain.value = V.gain || 1;
         send.gain.value = V.reverb;
         bus.connect(e.master); bus.connect(send); send.connect(e.hall);
         P.events.forEach(function (ev) { (sheet ? sampleSyl : synthSyl)(e, V, ev, 0.05 + ev.t, bus, sheet); });
@@ -688,7 +748,7 @@
 
     Sky.babble = {
         voices: VOICES, scales: SCALES, syllables: SYLLABLES,
-        voice: voiceOf, plan: plan, say: say, render: render, squish: squish, want: want, wake: wake, chop: chop,
+        voice: voiceOf, plan: plan, say: say, whee: whee, render: render, squish: squish, want: want, wake: wake, chop: chop,
         sheet: function (name) { want(name); return sheets[name] || Promise.resolve(null); },
         get awake() { return awake; }, get ctx() { return E && E.ctx; }
     };

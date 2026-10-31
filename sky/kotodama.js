@@ -851,9 +851,13 @@
        ====================================================================== */
     var one = null, ready = false, waiting = [];
     function when(fn) { return function () { var a = arguments; if (ready) { return one ? fn.apply(one, [one].concat([].slice.call(a))) : undefined; } waiting.push(function () { if (one) fn.apply(one, [one].concat([].slice.call(a))); }); }; }
+    // (31 Oct) it's switched off on the site until "on the site" is ticked in the asset manager's companion tab (kept
+    // as on: true in the looks file). the asset manager's map always has it, and so does the companion page (?companion,
+    // on this computer only), so it can still be drawn, tried and heard.
+    var FORCED = MAPPING || (LOCAL && /[?&]companion\b/.test(location.search));
     Sky.findAsset(LOOK.file + '.json', function (url, data) {
         if (data && typeof data === 'object') SAVED = data;
-        one = Companion('una');
+        if (SAVED && SAVED.on === true || FORCED) one = Companion('una');
         ready = true;
         waiting.splice(0).forEach(function (f) { f(); });
     });
