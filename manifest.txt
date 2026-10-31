@@ -54,7 +54,7 @@ sky/panel.js 70116
 sky/peeper.js 31642
 sky/porch.js 19007
 sky/post.js 21656
-sky/postfx.js 29489
+sky/postfx.js 31609
 sky/records.js 37374
 sky/resets.js 17505
 sky/revolver.js 30172

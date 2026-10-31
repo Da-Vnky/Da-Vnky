@@ -14,10 +14,12 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- The sea's toy camera keeps the ship, the traveller, the dock and the city in focus all the time now: the focus no longer wanders after the pointer (the waves and the rock under it kept pulling it near, blurring the boat and the city). Resting the pointer on something nearer or further only sharpens it a little.
-- Blender's toy camera has two new settings on the camera (run tools/blender/toycam.py once in the scene's Scripting tab to add them): 'toy: keep sharp' (slot names that always stay in focus; empty = the traveller, ship, dock and city) and 'toy: focus reach' (how far the pointer stretches the focus, 0 to 1).
 
 == published ==
+
+2026-10-31 06:23 · V
+- The sea's toy camera keeps the ship, the traveller, the dock and the city in focus all the time now: the focus no longer wanders after the pointer (the waves and the rock under it kept pulling it near, blurring the boat and the city). Resting the pointer on something nearer or further only sharpens it a little.
+- Blender's toy camera has two new settings on the camera (run tools/blender/toycam.py once in the scene's Scripting tab to add them): 'toy: keep sharp' (slot names that always stay in focus; empty = the traveller, ship, dock and city) and 'toy: focus reach' (how far the pointer stretches the focus, 0 to 1).
 
 2026-10-31 06:00 · V
 - The shell versions of the tools (publish.sh, content.sh, preview.sh, webp.sh) now use the first Python that actually runs, so on Windows they no longer pick the Microsoft Store's stand-in python3 (which only says Python was not found) and skip the desk and the CHANGES lines when publishing.
