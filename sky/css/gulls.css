@@ -116,7 +116,7 @@ body.sky-view .sea-gulls-near { opacity: 0; }   /* (like the rock: not while loo
 }
 /* a sweep across the top of the screen, a little rise and fall, two beats of the wings and then gliding. (31 Oct) the
    way it moves is on the gull, the way it banks on its body (in step: the same length and easing), so in resets 1 and 2
-   its rope hangs straight down from the flies however it tips (below) */
+   its stick stays upright however it tips (below) */
 .sea-gull.near.go-sweep { animation: sg-sweep 7s cubic-bezier(.35, .1, .65, .9) forwards; }
 .sea-gull.near.go-sweep .sg-body { animation: sg-sweep-tilt 7s cubic-bezier(.35, .1, .65, .9) forwards; }
 .sea-gull.near.go-sweep .sg-wing { animation: sg-flap-big 1.3s ease-in-out 2; }
@@ -167,28 +167,76 @@ body.sky-view .sea-gulls-near { opacity: 0; }   /* (like the rock: not while loo
     .sea-gull.near .sg-body { filter: blur(4px) brightness(calc(.92 - .5 * var(--dusk, 0) - .14 * var(--night, 0))); }
 }
 
-/* ---------------- resets 1 and 2: they're props too, hung on ropes from the flies like everything in the sky ----------------
-   (31 Oct) the same rope as the sky's (sky.css "props on ropes", or the artist's assets/sky/rope), tied on behind the gull's
-   back and running up out of sight. the far ones' ropes are thin (far off) and go behind the city with them; the near one's
-   is thick and as out of focus as it is. they're carried along with the gulls (the CSS moves them, not sky/ropes.js, so they
-   don't swing) */
-html.stage-strings .sea-gull::before {
-    content: ""; position: absolute; z-index: -1; left: 52%; bottom: 46%; width: var(--gull-rope, 1.6px); height: 300vh;
-    margin-left: calc(var(--gull-rope, 1.6px) / -2); pointer-events: none;
-    background:
-        linear-gradient(90deg, rgba(0,0,0,.38), rgba(0,0,0,0) 38%, rgba(255,236,200,.22) 52%, rgba(0,0,0,.42)),
-        repeating-linear-gradient(-58deg, #5b4229 0 1.6px, #8d6c45 1.6px 3.6px, #6e5234 3.6px 5.2px);
-    filter: brightness(calc(1 - .45 * var(--dusk, 0)));
+/* ---------------- resets 1 and 2: they're props too, on sticks from below (31 Oct) ----------------
+   low along the horizon (about 40vh down their layer at any screen: the top of the sea), each pushed along its own track at
+   a steady speed (linear), bobbing in an even sine wave (ease-in-out, back and forth), and turning sharply at each end, like
+   the ducks in a shooting gallery. the stick runs down from its belly into the waves (the nearer waves hide it; the big one's
+   goes off the bottom of the screen). gulls.js TRACK gives each its row (--sh), start (--sx), length (--sw), speed (--st)
+   and bob (--sb, --sa). no swinging, no wheeling: a machine moves them */
+html.stage-strings .ground-sea .sea-gull.far {
+    top: calc(40vh - var(--sh, 2vh));
+    left: var(--sx, 20%);
 }
-html.stage-strings.has-rope-art .sea-gull::before { background: var(--rope-art) center bottom / 100% auto repeat-y; }
-html.stage-strings .ground-sea .sea-gull.far::before { filter: brightness(var(--sea-dim, 1)) saturate(var(--sea-sat, 1)); }
-html.stage-strings .sea-gull.near { --gull-rope: clamp(5px, .9vw, 12px); }
-html.stage-strings .sea-gull.near::before {
-    filter: blur(7px) brightness(calc(.92 - .5 * var(--dusk, 0) - .14 * var(--night, 0)));
+html.stage-strings .ground-sea .sea-gull.wheel { animation: sg-track var(--st, 16s) linear var(--gd, 0s) infinite alternate; }
+html.stage-strings .ground-sea .sea-gull.wheel .sg-body {
+    animation: sg-bob var(--sb, 1.2s) ease-in-out infinite alternate,
+               sg-turn calc(var(--st, 16s) * 2) steps(1) var(--gd, 0s) infinite;
+}
+@keyframes sg-track {
+    from { translate: 0 0; }
+    to   { translate: var(--sw, 30vw) 0; }
+}
+@keyframes sg-bob {
+    from { translate: 0 calc(-1 * var(--sa, .7vh)); }
+    to   { translate: 0 var(--sa, .7vh); }
+}
+@keyframes sg-turn {
+    0%  { scale: 1 1; }
+    50% { scale: -1 1; }
+}
+/* the one crossing the whole sea: the same, on the lowest row, straight across */
+html.stage-strings .ground-sea .sea-gull.crossing { --sh: 3.2vh; left: 0; }
+html.stage-strings .ground-sea .sea-gull.crossing.going { animation: sg-cross-track var(--gc, 28s) linear forwards; }
+html.stage-strings .ground-sea .sea-gull.crossing.going.leftward { animation-direction: reverse; }
+html.stage-strings .ground-sea .sea-gull.crossing .sg-body { animation: sg-bob 1s ease-in-out infinite alternate; }
+@keyframes sg-cross-track {
+    0%   { translate: -8vw 0; opacity: 0; }
+    2%   { opacity: 1; }
+    98%  { opacity: 1; }
+    100% { translate: 112vw 0; opacity: 0; }
+}
+/* the drawn wings beat evenly, like clockwork */
+html.stage-strings .ground-sea .sea-gull.far .sg-wing { animation: sg-tick .45s ease-in-out infinite alternate; }
+@keyframes sg-tick {
+    from { transform: scaleY(1); }
+    to   { transform: scaleY(-.4); }
+}
+/* the stick: from its belly down, out of sight behind the waves (it's inside the gull's body, so it dims, and for the near one
+   blurs, with it). the artist's own stick: none yet (a slot can come later) */
+html.stage-strings .sea-gull .sg-body::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 52%;
+    width: var(--stick-w, 2px);
+    height: 100vh;
+    margin-left: calc(var(--stick-w, 2px) / -2);
+    pointer-events: none;
+    background: linear-gradient(90deg, #4a3220, #8a6440 45%, #a57c50 55%, #5a3e28);
+}
+/* the big one past the camera: a puppet on a stick, pushed across lower down, steadily, bobbing; its stick runs off the
+   bottom of the screen */
+html.stage-strings .sea-gull.near { --stick-w: clamp(7px, 1.1vw, 16px); top: 34vh; }
+html.stage-strings .sea-gull.near.go-sweep { animation: sg-push 9s linear forwards; }
+html.stage-strings .sea-gull.near.go-sweep .sg-body { animation: sg-bob .9s ease-in-out infinite alternate; --sa: 1.6vh; }
+html.stage-strings .sea-gull.near.go-sweep .sg-wing { animation: sg-tick .5s ease-in-out infinite alternate; }
+@keyframes sg-push {
+    0%   { translate: -32vw 0; opacity: 1; }
+    100% { translate: 112vw 0; opacity: 1; }
 }
 @media (max-width: 620px) {
-    html.stage-strings .sea-gull.near { --gull-rope: 6px; }
-    html.stage-strings .sea-gull.near::before { filter: blur(4px) brightness(calc(.92 - .5 * var(--dusk, 0) - .14 * var(--night, 0))); }
+    html.stage-strings .sea-gull.near { --stick-w: 8px; top: 40vh; }
 }
 
 /* ---------------- the asset manager's map: all still and showing (one big one parked top left) ---------------- */
