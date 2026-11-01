@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1480 1102347949
-city.html 10043 1387032213
-desk.html 6191 742906387
-index.html 5539 1825446574
-living.html 133992 800466675
-window-sky.html 1334 1719928570
-workshop.html 22278 3342622924
+beyond.html 1480 4059837082
+city.html 10159 487864640
+desk.html 6191 1045836850
+index.html 5655 472836750
+living.html 134108 623157356
+window-sky.html 1334 3010502777
+workshop.html 22394 3595476527
 sky/ambient.js 5331 3835869943
 sky/attic.js 35422 1573528092
 sky/babble.js 51258 123196756
@@ -16,11 +16,12 @@ sky/beyond.js 10960 423359035
 sky/books.js 13450 616855077
 sky/claubes.js 55004 1260380663
 sky/crate.js 36569 3934218302
+sky/crt.js 11702 956834042
 sky/desk.js 74768 2666348685
 sky/dungeon.js 12457 3696996852
 sky/embeds.js 28094 2944414207
 sky/eye.js 16191 3367252742
-sky/forget.js 11169 3887718809
+sky/forget.js 11442 2674953206
 sky/frames.js 7570 2003764363
 sky/front.js 10353 2677373260
 sky/gallery.js 10270 1558824951
@@ -55,7 +56,7 @@ sky/panel.js 75378 1959816862
 sky/peeper.js 31642 2382478789
 sky/porch.js 20443 470835649
 sky/post.js 21656 2013340171
-sky/postfx.js 33146 1046028315
+sky/postfx.js 33334 633450609
 sky/records.js 37374 197731851
 sky/resets.js 18375 2176178781
 sky/revolver.js 29892 1875281153
@@ -83,6 +84,7 @@ sky/css/beyond.css 2644 3959879294
 sky/css/books.css 4721 4205520486
 sky/css/claubes.css 17912 3866222852
 sky/css/crate.css 15195 526352604
+sky/css/crt.css 7142 103458288
 sky/css/desk.css 16259 3308899224
 sky/css/dungeon.css 8657 1474013307
 sky/css/embeds.css 9867 82469728
@@ -118,7 +120,7 @@ sky/css/panel.css 6477 2617790568
 sky/css/peeper.css 10831 2113135204
 sky/css/porch.css 14940 2912709671
 sky/css/post.css 7933 3819112703
-sky/css/postfx.css 5522 3547625763
+sky/css/postfx.css 5598 2911021099
 sky/css/records.css 19836 2189892337
 sky/css/resets.css 4109 4173273641
 sky/css/revolver.css 6200 1527050092

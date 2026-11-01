@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code, and their sizes in bytes (for older loading screens).
 beyond.html 1480
-city.html 10043
+city.html 10159
 desk.html 6191
-index.html 5539
-living.html 133992
+index.html 5655
+living.html 134108
 window-sky.html 1334
-workshop.html 22278
+workshop.html 22394
 sky/ambient.js 5331
 sky/attic.js 35422
 sky/babble.js 51258
@@ -16,11 +16,12 @@ sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 55004
 sky/crate.js 36569
+sky/crt.js 11702
 sky/desk.js 74768
 sky/dungeon.js 12457
 sky/embeds.js 28094
 sky/eye.js 16191
-sky/forget.js 11169
+sky/forget.js 11442
 sky/frames.js 7570
 sky/front.js 10353
 sky/gallery.js 10270
@@ -55,7 +56,7 @@ sky/panel.js 75378
 sky/peeper.js 31642
 sky/porch.js 20443
 sky/post.js 21656
-sky/postfx.js 33146
+sky/postfx.js 33334
 sky/records.js 37374
 sky/resets.js 18375
 sky/revolver.js 29892
@@ -83,6 +84,7 @@ sky/css/beyond.css 2644
 sky/css/books.css 4721
 sky/css/claubes.css 17912
 sky/css/crate.css 15195
+sky/css/crt.css 7142
 sky/css/desk.css 16259
 sky/css/dungeon.css 8657
 sky/css/embeds.css 9867
@@ -118,7 +120,7 @@ sky/css/panel.css 6477
 sky/css/peeper.css 10831
 sky/css/porch.css 14940
 sky/css/post.css 7933
-sky/css/postfx.css 5522
+sky/css/postfx.css 5598
 sky/css/records.css 19836
 sky/css/resets.css 4109
 sky/css/revolver.css 6200
