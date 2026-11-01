@@ -20,6 +20,10 @@ How it works
 
 == published ==
 
+2026-10-31 16:43 · V
+- In resets 1 and 2 the seagulls are now stage props on thin, dark, weathered aluminium rods from below instead of ropes: low along the horizon, pushed along a track at a steady speed, bobbing in an even sine wave and turning sharply at each end, like a shooting gallery's; the big one past the camera is a puppet on a stick pushed across the same way.
+- From reset 5 on there's no grain or lens at all, the sea's included (its focus effect stays).
+
 2026-10-31 11:39 · V
 - Place tabs in the house (the living space, the kitchen, the porch) now take the traveller there at once instead of walking room by room; walking is only for doors, arrows, the ladder and the like. Tabs to other pages don't walk them off or in either (arriving at the sea by a tab, they're already on the dock by the sign).
 - In the front garden the traveller now stands on the middle of the walkway and walks straight up to the front door (no more step left, then right).
