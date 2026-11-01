@@ -217,6 +217,10 @@
     /* ---------------- the sound (through the shared sound engine) ---------------- */
     var volume = get(localStorage, VOL);
     if (typeof volume !== 'number') volume = VOLUME;
+    // how loud the slider's place really is (1 Nov: the slider went straight to the loudness, and ears hear that as
+    // hardly changing over most of its length). now it curves, the way a mixer's fader does: as loud as ever at the
+    // usual place (VOLUME), much quieter low down, silent at 0
+    function loudness() { return Math.min(1, VOLUME * Math.pow(volume / VOLUME, 2)); }
     function indoors() { return document.body.classList.contains('has-room') && !document.body.classList.contains('is-outside'); }
     // outside you hear the rain itself; inside, rain on the window (assets/sounds/windowrain, or the drawn one)
     var rainCh = Sky.sounds ? Sky.sounds.channel('rain') : null;
@@ -250,7 +254,11 @@
             ui.body = body;
             ui.vol = body.querySelector('.wx-vol');
             ui.vol.value = Math.round(volume * 100);
-            ui.vol.addEventListener('input', function () { volume = ui.vol.value / 100; put(localStorage, VOL, volume); });
+            ui.vol.addEventListener('input', function () {
+                volume = ui.vol.value / 100;
+                put(localStorage, VOL, volume);
+                if (Sky.sounds && Sky.sounds.thunderAt) Sky.sounds.thunderAt(loudness());    // (and a roll of thunder already going, too)
+            });
             body.addEventListener('click', function (e) {
                 var b = e.target.closest('[data-choice]');
                 // clicking your choice again turns the weather off (the plain sky, as it is without weather)
@@ -305,7 +313,7 @@
             flash.animate([{ opacity: 0 }, { opacity: 0.55 }, { opacity: 0.1 }, { opacity: 0.35 }, { opacity: 0 }], { duration: 520, easing: 'ease-out' });
             if (!boltArt) bolt.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0.2 }, { opacity: 0.9 }, { opacity: 0 }], { duration: 480, easing: 'ease-out' });
         }
-        if (Sky.sounds && volume > 0) Sky.sounds.thunder(volume * (0.5 + Math.random() * 0.5), 0.3 + Math.random() * 2.2, null, indoors());
+        if (Sky.sounds && volume > 0) Sky.sounds.thunder(loudness() * (0.5 + Math.random() * 0.5), 0.3 + Math.random() * 2.2, null, indoors(), loudness());
     }
 
     /* ---------------- rain and snow ---------------- */
@@ -389,7 +397,7 @@
             strike();
             nextBolt = t + 7000 + Math.random() * 16000;
         }
-        var inside = indoors(), heard = /\bin-(dungeon|hell)\b/.test(document.body.className) ? 0 : volume;   // (not a sound of it down below)
+        var inside = indoors(), heard = /\bin-(dungeon|hell)\b/.test(document.body.className) ? 0 : loudness();   // (not a sound of it down below)
         if (rainCh) rainCh.set((inside ? 0 : 1) * now.rain * heard, 0.6);
         if (paneCh) paneCh.set((inside ? 1 : 0) * now.rain * heard, 0.6);
         if (windCh) windCh.set(Math.max(0, now.wind - 0.2) * 0.9 * heard);

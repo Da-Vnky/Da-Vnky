@@ -431,12 +431,28 @@
         lastThunder = i;
         return thunderFiles[i];
     }
-    function thunder(loud, delay, out, muffled) {
+    // at: how loud the weather's slider had it as this roll began (sky/weather.js). the recorded rolls play outside the
+    // sound engine, so a roll already going is turned up or down by hand as the slider moves (thunderAt below)
+    var rolling = [];
+    function thunderAt(now) {
+        rolling.forEach(function (a) {
+            if (a._at === undefined) return;                                   // (the noise machine's storm: its own level)
+            a.volume = a._at > 0 ? Math.max(0, Math.min(1, a._loud * now / a._at)) : 0;
+        });
+    }
+    function thunder(loud, delay, out, muffled, at) {
         if (!ac() || ctx.state !== 'running') return;
         loud = Math.max(0, Math.min(1, loud)) * (muffled ? 0.6 : 1);
         var file = thunderFile();
         if (file) {
-            setTimeout(function () { if (quiet()) return; var a = new Audio(file); a.volume = loud; a.play().catch(function () {}); }, (delay || 0) * 1000);
+            setTimeout(function () {
+                if (quiet()) return;
+                var a = new Audio(file);
+                a.volume = loud; a._loud = loud; a._at = at;
+                rolling.push(a);
+                a.onended = a.onerror = function () { var i = rolling.indexOf(a); if (i !== -1) rolling.splice(i, 1); };
+                a.play().catch(a.onended);
+            }, (delay || 0) * 1000);
             return;
         }
         var dest = out || master, t = ctx.currentTime + (delay || 0), len = 3 + Math.random() * 2.5;
@@ -986,6 +1002,7 @@
     Sky.sounds = {
         channel: channel,
         thunder: thunder,
+        thunderAt: thunderAt,
         sfx: sfx,
         hush: hush,
         get hushed() { return quiet(); },
