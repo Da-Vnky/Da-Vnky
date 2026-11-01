@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1480 4059837082
-city.html 10159 487864640
-desk.html 6191 1045836850
-index.html 5655 472836750
-living.html 134108 623157356
-window-sky.html 1334 3010502777
-workshop.html 22394 3595476527
+beyond.html 1480 450974957
+city.html 10159 958714654
+desk.html 6191 3471906058
+index.html 5655 1029793785
+living.html 134108 2027175902
+window-sky.html 1334 2925668546
+workshop.html 22394 2086911035
 sky/ambient.js 5331 3835869943
 sky/attic.js 35422 1573528092
 sky/babble.js 51258 123196756
@@ -16,7 +16,7 @@ sky/beyond.js 10960 423359035
 sky/books.js 13450 616855077
 sky/claubes.js 55004 1260380663
 sky/crate.js 36569 3934218302
-sky/crt.js 11702 956834042
+sky/crt.js 11898 179215718
 sky/desk.js 74768 2666348685
 sky/dungeon.js 12457 3696996852
 sky/embeds.js 28094 2944414207
@@ -84,7 +84,7 @@ sky/css/beyond.css 2644 3959879294
 sky/css/books.css 4721 4205520486
 sky/css/claubes.css 17912 3866222852
 sky/css/crate.css 15195 526352604
-sky/css/crt.css 7142 103458288
+sky/css/crt.css 7538 596094635
 sky/css/desk.css 16259 3308899224
 sky/css/dungeon.css 8657 1474013307
 sky/css/embeds.css 9867 82469728

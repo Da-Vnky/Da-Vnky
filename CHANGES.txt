@@ -14,9 +14,11 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- Reset 1's television is easier to read: the scanlines and the red-green-blue stripes are lighter, and on phones much lighter (the stripes nearly gone, the colour split smaller and none in the middle of the screen), since there the lines are as big as on a computer next to much smaller words.
 
 == published ==
+
+2026-11-01 15:31 · V
+- Reset 1's television is easier to read: the scanlines and the red-green-blue stripes are lighter, and on phones much lighter (the stripes nearly gone, the colour split smaller and none in the middle of the screen), since there the lines are as big as on a computer next to much smaller words.
 
 2026-11-01 01:18 · V
 - The film grain is half as strong everywhere (the sea's too): it was a bit much. One number in sky/css/postfx.css (.toycam .tc-grain's opacity) sets it for the whole site.

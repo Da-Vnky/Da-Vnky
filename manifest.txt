@@ -16,7 +16,7 @@ sky/beyond.js 10960
 sky/books.js 13450
 sky/claubes.js 55004
 sky/crate.js 36569
-sky/crt.js 11702
+sky/crt.js 11898
 sky/desk.js 74768
 sky/dungeon.js 12457
 sky/embeds.js 28094
@@ -84,7 +84,7 @@ sky/css/beyond.css 2644
 sky/css/books.css 4721
 sky/css/claubes.css 17912
 sky/css/crate.css 15195
-sky/css/crt.css 7142
+sky/css/crt.css 7538
 sky/css/desk.css 16259
 sky/css/dungeon.css 8657
 sky/css/embeds.css 9867
