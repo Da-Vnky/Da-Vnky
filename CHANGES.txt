@@ -14,6 +14,7 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Reset 1's television now looks filmed by a camera: rainbow moiré ripples drifting over it, a dark band rolling slowly up (the scanlines are gone), fuller colours with the bright parts glowing, and the tube's rounded corners back (no glare).
 
 == published ==
 

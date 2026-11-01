@@ -6,12 +6,14 @@
    camera take over: sky/postfx.js); the end of reset 1 switches the set
    off before the white comes (sky/forget.js calls Sky.crt.off).
 
-     the picture   scanlines, the red-green-blue stripes of the tube's mask, colour
-                   fringes on the words and round the screen's edges (red one side,
-                   blue the other, the way the phosphor smears out there), a bright
-                   band rolling slowly down, a faint flicker, the glass's glare (a
-                   band of light along the top that curves down at the corners), and
-                   the tube's dark rounded corners
+     the picture   as if the set were being filmed by a camera (1 Nov, the artist's photos of
+                   old televisions on film): the red-green-blue stripes of the tube's mask,
+                   rainbow ripples drifting over the picture where the camera's pixels and
+                   the mask's stripes don't line up (moiré), a dark band rolling slowly up
+                   (the camera and the set not quite in step), the colours brighter and the
+                   bright parts glowing, red and blue coming apart towards the edges, a faint
+                   flicker, and the tube's rounded corners. no scanlines (the band does their
+                   work, and both together was too busy) and no glare on the glass
      the broadcast a blinking red "● REC" and "LIVE", which camera this is (each page
                    and room has its own number) and how long the visit's been on air
      switching on  once a visit, the first page: the picture opens out of a bright line
@@ -34,8 +36,10 @@
     var STRENGTH = 1;                                    // how strong the whole set looks
     var SPLIT = 3;                                       // how far apart (px) red and blue come at the very edges of the screen
     var SPLIT_MIDDLE = .2;                               // … and in the middle, as a share of that
-    // (1 Nov: on a phone, much less, and none in the middle, or the words can't be read)
-    if (matchMedia('(max-width: 620px), (max-height: 500px)').matches) { SPLIT = 1.5; SPLIT_MIDDLE = 0; }
+    var PUNCH = 1.25;                                    // how much brighter the colours (1 = as they are)
+    var GLOW = .3, GLOW_PX = 3;                          // how much the bright parts glow, and how far (px)
+    // (1 Nov: on a phone, much less, and none in the middle, and no glow, or the words can't be read)
+    if (matchMedia('(max-width: 620px), (max-height: 500px)').matches) { SPLIT = 1.5; SPLIT_MIDDLE = 0; PUNCH = 1.15; GLOW = 0; }
     var still = matchMedia('(prefers-reduced-motion: reduce)');
     var on = !!S && S.reset === 1 && !root.classList.contains('dav-map') && STRENGTH > 0;
     if (!on) { Sky.crt = { on: false, off: function (done) { if (done) done(); } }; return; }
@@ -83,7 +87,17 @@
                 '<feColorMatrix in="SourceGraphic" type="matrix" values="' + channel('b') + '" result="b"/>' +
                 '<feDisplacementMap in="b" in2="map" xChannelSelector="R" yChannelSelector="G" result="b2"/>' +
                 '<feComposite in="r2" in2="g" operator="arithmetic" k2="1" k3="1" result="rg"/>' +
-                '<feComposite in="rg" in2="b2" operator="arithmetic" k2="1" k3="1"/></filter>';
+                '<feComposite in="rg" in2="b2" operator="arithmetic" k2="1" k3="1" result="pic"/>' +
+                // (the colours as a camera films a television: fuller, a little more contrast)
+                '<feColorMatrix in="pic" type="saturate" values="' + PUNCH + '" result="vivid"/>' +
+                '<feComponentTransfer in="vivid" result="punchy">' + ['R', 'G', 'B'].map(function (c) {
+                    return '<feFunc' + c + ' type="linear" slope="1.08" intercept="-0.03"/>'; }).join('') + '</feComponentTransfer>' +
+                // (the glow: only the brightest parts, blurred and added back over the picture)
+                (GLOW > 0 ? '<feComponentTransfer in="punchy" result="hot">' + ['R', 'G', 'B'].map(function (c) {
+                    return '<feFunc' + c + ' type="linear" slope="2.6" intercept="-1.6"/>'; }).join('') + '</feComponentTransfer>' +
+                    '<feGaussianBlur in="hot" stdDeviation="' + GLOW_PX + '" result="bloom"/>' +
+                    '<feComposite in="punchy" in2="bloom" operator="arithmetic" k2="1" k3="' + (GLOW * STRENGTH) + '"/>' : '') +
+                '</filter>';
             body.appendChild(lens);
         }
         var f = lens.querySelector('filter'), img = lens.querySelector('feImage'), maps = lens.querySelectorAll('feDisplacementMap');
@@ -137,7 +151,7 @@
     set.className = 'crt';
     set.setAttribute('aria-hidden', 'true');
     set.dataset.slot = 'assets/ui/crt-glass';
-    set.innerHTML = '<i class="crt-lines"></i><i class="crt-mask"></i><i class="crt-roll"></i><i class="crt-flick"></i>' +
+    set.innerHTML = '<i class="crt-mask"></i><i class="crt-moire"></i><i class="crt-roll"></i><i class="crt-flick"></i>' +
         '<div class="crt-glass" data-asset="assets/ui/crt-glass"></div><i class="crt-tube"></i>' +
         '<div class="crt-live"><span class="crt-rec"><b class="crt-dot">●</b> REC</span><span>LIVE</span><span class="crt-cam"></span><span class="crt-time"></span></div>';
     body.appendChild(set);
