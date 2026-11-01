@@ -872,7 +872,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     `auto 100%` repeat-x strip; `alphaOf` reads each picture once at ≤ 256 px, alpha > 40), and the drawn stand-ins by their shapes
     (`html.toycam-picking *` → pointer-events for one `elementsFromPoint`).
   - **The lens** (`.toycam` in postfx.css): `.tc-grade` (soft-light warm or `.cool`), `.tc-vignette` (two radial gradients),
-    `.tc-grain` (a 128 px tile drawn once, hopping 8 places in .8 s with `steps(1)`: transform only), `.punch` (backdrop-filter
+    `.tc-grain` (a 128 px tile drawn once, hopping 8 places in .8 s with `steps(1)`: transform only; its opacity is
+    `--tc-grain × .28`, halved from .55 on 1 Nov, Victor: "turn the grain down across the site, it's a bit much"), `.punch` (backdrop-filter
     saturate/contrast). Settings as `--tc-*` variables.
   - reduced motion: no slide, no sway, still grain, the focus changes at once. `?map`: none of it (postfx.js does nothing there).
   - `Sky.postfx.camera = { focus, sharp, rest, items, rackTo(d), blurAt(d, s), blurIn(d), pick(x, y), at }` for checking.

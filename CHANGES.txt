@@ -14,6 +14,7 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- The film grain is half as strong everywhere (the sea's too): it was a bit much. One number in sky/css/postfx.css (.toycam .tc-grain's opacity) sets it for the whole site.
 
 == published ==
 
