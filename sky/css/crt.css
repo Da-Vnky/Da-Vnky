@@ -58,53 +58,15 @@
     88% { opacity: calc(var(--crt) * .025); }
     90% { opacity: 0; }
 }
-/* the glass: a soft glare top left and a sheen along the top (or the artist's own glass, assets/ui/crt-glass) */
+/* the glass: nothing drawn (1 Nov: the drawn glare went, the artist didn't like it); the artist's own, if there is one,
+   assets/ui/crt-glass, laid over the whole screen */
 .crt .crt-glass > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
-.crt .crt-glass:has(> .art) .crt-glare { display: none; }
-.crt .crt-glare {
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(ellipse 55% 40% at 26% 18%, rgba(255, 255, 255, .11), rgba(255, 255, 255, 0) 70%),
-        linear-gradient(172deg, rgba(255, 255, 255, .07) 0%, rgba(255, 255, 255, 0) 22%),
-        radial-gradient(ellipse 120% 100% at 50% 50%, rgba(255, 255, 255, 0) 60%, rgba(160, 200, 255, .05) 100%);
-    mix-blend-mode: screen;
-    opacity: var(--crt);
-}
-/* the tube: its rounded corners (black beyond them) and the picture darkening towards its edges, as on a curved screen */
+/* the picture darkening towards the edges of the screen, as an old tube does (square: no rounded corners) */
 .crt .crt-tube {
-    border-radius: 7vmin / 9vmin;
     box-shadow:
-        0 0 0 40vmax #050505,
-        inset 0 0 calc(var(--crt) * 16vmin) calc(var(--crt) * 3vmin) rgba(0, 0, 0, .72),
-        inset 0 0 calc(var(--crt) * 3vmin) rgba(0, 0, 0, .55),
-        inset 0 0 0 1px rgba(255, 255, 255, .06);
+        inset 0 0 calc(var(--crt) * 16vmin) calc(var(--crt) * 3vmin) rgba(0, 0, 0, .6),
+        inset 0 0 calc(var(--crt) * 3vmin) rgba(0, 0, 0, .45);
 }
-/* colour fringing round the edges: the phosphor's red and blue smear apart where the tube curves away, strongest right at
-   the screen's edges (red down the left and along the top, blue down the right and along the bottom), gone by the middle */
-.crt .crt-fringe {
-    border-radius: 7vmin / 9vmin;                        /* (the tube's own shape: its black corners stay black) */
-    background:
-        linear-gradient(to right, rgba(255, 30, 80, .34) 0, rgba(255, 30, 80, .12) 2.5vmin, rgba(255, 30, 80, 0) 8vmin),
-        linear-gradient(to left, rgba(40, 190, 255, .34) 0, rgba(40, 190, 255, .12) 2.5vmin, rgba(40, 190, 255, 0) 8vmin),
-        linear-gradient(to bottom, rgba(255, 30, 80, .2) 0, rgba(255, 30, 80, 0) 5vmin),
-        linear-gradient(to top, rgba(40, 190, 255, .2) 0, rgba(40, 190, 255, 0) 5vmin);
-    mix-blend-mode: screen;
-    opacity: var(--crt);
-}
-/* the glass's glare: a band of light along the top of the tube that curves down with its corners and fades down the sides,
-   and a thin bright line on its very edge */
-.crt .crt-arc,
-.crt .crt-rim {
-    inset: 0;
-    border-radius: 7vmin / 9vmin;
-    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 18%, rgba(0, 0, 0, .35) 40%, transparent 62%);
-    mask-image: linear-gradient(to bottom, #000 0, #000 18%, rgba(0, 0, 0, .35) 40%, transparent 62%);
-    mix-blend-mode: screen;
-    opacity: var(--crt);
-}
-.crt .crt-arc { box-shadow: inset 0 4vmin 3vmin -2.4vmin rgba(235, 245, 255, .3), inset 0 1.2vmin 1.2vmin -.8vmin rgba(255, 255, 255, .24); }
-.crt .crt-rim { border-top: 1.5px solid rgba(255, 255, 255, .42); border-left: 1px solid rgba(255, 255, 255, .16); border-right: 1px solid rgba(255, 255, 255, .16); }
 /* the broadcast's mark: a blinking red ● REC, then LIVE, the camera and the time on air (bottom right, clear of every
    page's buttons; on a phone, up top in the middle, where nothing's tapped) */
 .crt .crt-live {
@@ -126,8 +88,10 @@
 @keyframes crt-blink { 50% { opacity: 0; } }
 .crt .crt-time { opacity: .75; }
 
-/* the words on the screen bleed a little red and blue, as an old tube smears them */
-html.crt-on body { text-shadow: .7px 0 rgba(255, 30, 70, calc(var(--crt) * .45)), -.7px 0 rgba(30, 190, 255, calc(var(--crt) * .45)); }
+/* the colours coming apart: the whole picture, through the SVG filter crt.js writes (#crt-split): red pushed one way and
+   blue the other, a little everywhere and most at the very edges, as on a real tube. html is the one element a filter
+   doesn't spoil fixed positions on */
+html.crt-on.crt-split { filter: url(#crt-split); }
 
 /* switching on and off: two black halves closing on a bright line (and opening off it), over everything but the white-out */
 .crt-power {
@@ -174,10 +138,8 @@ html.crt-on body { text-shadow: .7px 0 rgba(255, 30, 70, calc(var(--crt) * .45))
 .crt-fade { background: #000; animation: crt-fade .4s ease-in both; }
 @keyframes crt-fade { from { opacity: 0; } to { opacity: 1; } }
 
-/* phones: the tube's corners a little tighter */
+/* phones: the mark up top in the middle, where nothing's tapped */
 @media (max-width: 620px), (max-height: 500px) {
-    .crt .crt-tube { border-radius: 5vmin / 6vmin; }
-    .crt .crt-arc, .crt .crt-rim, .crt .crt-fringe { border-radius: 5vmin / 6vmin; }
     .crt .crt-live { font-size: 9px; gap: .7em; right: auto; bottom: auto; left: 50%; top: calc(3vmin + 58px); transform: translateX(-50%); }
 }
 
