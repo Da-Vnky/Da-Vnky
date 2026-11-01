@@ -1,0 +1,191 @@
+/* =====================================================================
+   crt.css — the look of sky/crt.js: reset 1 on an old television.
+   --crt (set by crt.js, STRENGTH) turns everything here up or down together.
+   ===================================================================== */
+
+/* the set: over everything (the buttons and the loading screen too: it's all on the screen), never in the way of a click */
+.crt {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483050;
+    pointer-events: none;
+    overflow: hidden;
+}
+.crt > i,
+.crt > .crt-glass { position: absolute; inset: 0; display: block; }
+
+/* the scanlines: every third pixel row dark, the next half-dark (1 Nov: heavier, the artist wanted them pronounced) */
+.crt .crt-lines {
+    background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .6) 0 1px, rgba(0, 0, 0, .24) 1px 2px, rgba(0, 0, 0, 0) 2px 3px);
+    opacity: var(--crt);
+}
+/* the tube's mask: red, green and blue stripes, side by side */
+.crt .crt-mask {
+    background: repeating-linear-gradient(to right, rgba(255, 30, 30, .55) 0 1px, rgba(30, 255, 60, .55) 1px 2px, rgba(40, 70, 255, .55) 2px 3px);
+    mix-blend-mode: multiply;
+    opacity: calc(var(--crt) * .4);
+}
+/* a brighter band rolling slowly down the picture */
+.crt .crt-roll {
+    inset: auto 0 auto 0;
+    top: 0;
+    height: 28vh;
+    background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .05) 40%, rgba(255, 255, 255, .09) 50%, rgba(255, 255, 255, .05) 60%, rgba(255, 255, 255, 0));
+    mix-blend-mode: screen;
+    opacity: var(--crt);
+    animation: crt-roll 8.5s linear infinite;
+    will-change: transform;
+}
+@keyframes crt-roll {
+    from { transform: translateY(-30vh); }
+    to { transform: translateY(130vh); }
+}
+/* the faint flicker of the picture (a few percent darker now and then: never anything like a flash) */
+.crt .crt-flick {
+    background: #000;
+    opacity: 0;
+    animation: crt-flick 4.7s steps(1) infinite;
+}
+@keyframes crt-flick {
+    0% { opacity: 0; }
+    7% { opacity: calc(var(--crt) * .035); }
+    9% { opacity: 0; }
+    31% { opacity: calc(var(--crt) * .02); }
+    34% { opacity: 0; }
+    62% { opacity: calc(var(--crt) * .045); }
+    63% { opacity: calc(var(--crt) * .015); }
+    66% { opacity: 0; }
+    88% { opacity: calc(var(--crt) * .025); }
+    90% { opacity: 0; }
+}
+/* the glass: a soft glare top left and a sheen along the top (or the artist's own glass, assets/ui/crt-glass) */
+.crt .crt-glass > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+.crt .crt-glass:has(> .art) .crt-glare { display: none; }
+.crt .crt-glare {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 55% 40% at 26% 18%, rgba(255, 255, 255, .11), rgba(255, 255, 255, 0) 70%),
+        linear-gradient(172deg, rgba(255, 255, 255, .07) 0%, rgba(255, 255, 255, 0) 22%),
+        radial-gradient(ellipse 120% 100% at 50% 50%, rgba(255, 255, 255, 0) 60%, rgba(160, 200, 255, .05) 100%);
+    mix-blend-mode: screen;
+    opacity: var(--crt);
+}
+/* the tube: its rounded corners (black beyond them) and the picture darkening towards its edges, as on a curved screen */
+.crt .crt-tube {
+    border-radius: 7vmin / 9vmin;
+    box-shadow:
+        0 0 0 40vmax #050505,
+        inset 0 0 calc(var(--crt) * 16vmin) calc(var(--crt) * 3vmin) rgba(0, 0, 0, .72),
+        inset 0 0 calc(var(--crt) * 3vmin) rgba(0, 0, 0, .55),
+        inset 0 0 0 1px rgba(255, 255, 255, .06);
+}
+/* colour fringing round the edges: the phosphor's red and blue smear apart where the tube curves away, strongest right at
+   the screen's edges (red down the left and along the top, blue down the right and along the bottom), gone by the middle */
+.crt .crt-fringe {
+    border-radius: 7vmin / 9vmin;                        /* (the tube's own shape: its black corners stay black) */
+    background:
+        linear-gradient(to right, rgba(255, 30, 80, .34) 0, rgba(255, 30, 80, .12) 2.5vmin, rgba(255, 30, 80, 0) 8vmin),
+        linear-gradient(to left, rgba(40, 190, 255, .34) 0, rgba(40, 190, 255, .12) 2.5vmin, rgba(40, 190, 255, 0) 8vmin),
+        linear-gradient(to bottom, rgba(255, 30, 80, .2) 0, rgba(255, 30, 80, 0) 5vmin),
+        linear-gradient(to top, rgba(40, 190, 255, .2) 0, rgba(40, 190, 255, 0) 5vmin);
+    mix-blend-mode: screen;
+    opacity: var(--crt);
+}
+/* the glass's glare: a band of light along the top of the tube that curves down with its corners and fades down the sides,
+   and a thin bright line on its very edge */
+.crt .crt-arc,
+.crt .crt-rim {
+    inset: 0;
+    border-radius: 7vmin / 9vmin;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 18%, rgba(0, 0, 0, .35) 40%, transparent 62%);
+    mask-image: linear-gradient(to bottom, #000 0, #000 18%, rgba(0, 0, 0, .35) 40%, transparent 62%);
+    mix-blend-mode: screen;
+    opacity: var(--crt);
+}
+.crt .crt-arc { box-shadow: inset 0 4vmin 3vmin -2.4vmin rgba(235, 245, 255, .3), inset 0 1.2vmin 1.2vmin -.8vmin rgba(255, 255, 255, .24); }
+.crt .crt-rim { border-top: 1.5px solid rgba(255, 255, 255, .42); border-left: 1px solid rgba(255, 255, 255, .16); border-right: 1px solid rgba(255, 255, 255, .16); }
+/* the broadcast's mark: a blinking red ● REC, then LIVE, the camera and the time on air (bottom right, clear of every
+   page's buttons; on a phone, up top in the middle, where nothing's tapped) */
+.crt .crt-live {
+    position: absolute;
+    right: calc(4.5vmin + 14px);
+    bottom: calc(5vmin + 8px);
+    display: flex;
+    gap: .9em;
+    align-items: baseline;
+    white-space: nowrap;
+    font: 600 clamp(11px, 1.35vw, 17px)/1 ui-monospace, "Courier New", monospace;
+    letter-spacing: .12em;
+    color: rgba(255, 255, 255, .82);
+    text-shadow: 0 0 6px rgba(255, 255, 255, .45), 1px 0 rgba(255, 40, 80, .6), -1px 0 rgba(40, 200, 255, .6);
+    opacity: calc(var(--crt) * .9);
+}
+.crt .crt-rec { color: #ff4a3a; text-shadow: 0 0 7px rgba(255, 50, 40, .8); }
+.crt .crt-dot { color: #ff2a2a; text-shadow: 0 0 8px rgba(255, 40, 40, .9); animation: crt-blink 1s steps(1) infinite; }
+@keyframes crt-blink { 50% { opacity: 0; } }
+.crt .crt-time { opacity: .75; }
+
+/* the words on the screen bleed a little red and blue, as an old tube smears them */
+html.crt-on body { text-shadow: .7px 0 rgba(255, 30, 70, calc(var(--crt) * .45)), -.7px 0 rgba(30, 190, 255, calc(var(--crt) * .45)); }
+
+/* switching on and off: two black halves closing on a bright line (and opening off it), over everything but the white-out */
+.crt-power {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483550;
+    pointer-events: none;
+}
+.crt-power > i { position: absolute; left: 0; right: 0; display: block; }
+.crt-power .cp-top { top: 0; height: 50%; background: #000; }
+.crt-power .cp-bot { bottom: 0; height: 50%; background: #000; }
+.crt-power .cp-line {
+    top: 50%;
+    height: 3px;
+    margin-top: -1.5px;
+    background: #fff;
+    box-shadow: 0 0 12px 3px rgba(220, 235, 255, .9), 0 0 40px 10px rgba(180, 210, 255, .5);
+}
+/* (on: the line's there, then the halves draw back off it, a little too bright for a moment) */
+.crt-boot .cp-top { animation: crt-open-top .55s cubic-bezier(.7, 0, .3, 1) .25s both; }
+.crt-boot .cp-bot { animation: crt-open-bot .55s cubic-bezier(.7, 0, .3, 1) .25s both; }
+.crt-boot .cp-line { animation: crt-boot-line 1.2s ease-out both; }
+@keyframes crt-open-top { from { transform: translateY(0); } to { transform: translateY(-101%); } }
+@keyframes crt-open-bot { from { transform: translateY(0); } to { transform: translateY(101%); } }
+@keyframes crt-boot-line {
+    0% { transform: scaleX(0); opacity: 1; }
+    20% { transform: scaleX(1); opacity: 1; }
+    45% { transform: scaleX(1) scaleY(40); opacity: .5; }
+    100% { transform: scaleX(1) scaleY(120); opacity: 0; }
+}
+/* (off: the halves close on a bright line, the line shrinks to a dot, and the dot fades) */
+.crt-shut .cp-top { animation: crt-close-top .28s cubic-bezier(.6, 0, .9, .4) both; }
+.crt-shut .cp-bot { animation: crt-close-bot .28s cubic-bezier(.6, 0, .9, .4) both; }
+.crt-shut .cp-line { animation: crt-shut-line 1.2s both; }
+@keyframes crt-close-top { from { transform: translateY(-101%); } to { transform: translateY(0); } }
+@keyframes crt-close-bot { from { transform: translateY(101%); } to { transform: translateY(0); } }
+@keyframes crt-shut-line {
+    0% { opacity: 0; transform: scaleX(1) scaleY(60); }
+    18% { opacity: 1; transform: scaleX(1) scaleY(1); }
+    50% { opacity: 1; transform: scaleX(.004) scaleY(1.6); }
+    68% { opacity: 1; transform: scaleX(.004) scaleY(1.6); }
+    100% { opacity: 0; transform: scaleX(.002) scaleY(1); }
+}
+.crt-fade { background: #000; animation: crt-fade .4s ease-in both; }
+@keyframes crt-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* phones: the tube's corners a little tighter */
+@media (max-width: 620px), (max-height: 500px) {
+    .crt .crt-tube { border-radius: 5vmin / 6vmin; }
+    .crt .crt-arc, .crt .crt-rim, .crt .crt-fringe { border-radius: 5vmin / 6vmin; }
+    .crt .crt-live { font-size: 9px; gap: .7em; right: auto; bottom: auto; left: 50%; top: calc(3vmin + 58px); transform: translateX(-50%); }
+}
+
+@media (max-width: 620px) {
+    .crt .crt-live { top: calc(3vmin + 92px); }              /* (under the "tap anywhere to hear it" note) */
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .crt .crt-dot { animation: none; }
+    .crt .crt-roll, .crt .crt-flick { animation: none; display: none; }
+}

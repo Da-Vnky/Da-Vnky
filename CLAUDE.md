@@ -831,6 +831,25 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   rope.py start Blender with his own preferences, add-ons and GPU. Nothing changes his preferences any more (slot_scene used to
   set `save_version` 0): each file is saved once, its pictures' paths made relative by hand (`bpy.path.relpath`).
 
+## Reset 1 on a television (sky/crt.js, sky/css/crt.css, 1 Nov)
+
+- Victor: "have the entire website look like it was on a crt for the first reset … enough to make someone say without a doubt it
+  was trumanesque"; reset 1 is "just crt tv as the effect", the grain and the sea's post-processing from reset 2. crt.js (index,
+  workshop, city, living, template, after postfx.js) builds `.crt` (z 2147483050: over the buttons and the loading screen, under
+  the white-out; no clicks) only when `davSave.reset === 1` and not `?map`: `.crt-lines` (every third row dark, the next
+  half-dark: Victor asked for them pronounced), `.crt-mask` (red-green-blue stripes, multiply), `.crt-roll` (a bright band, 8.5 s
+  down), `.crt-flick` (a few % darker now and then, never a flash), `.crt-glass` (slot `assets/ui/crt-glass`; the drawn glare
+  till then), `.crt-tube` (rounded corners black beyond, the edges darkened), `.crt-fringe` (red down the left and top, blue down
+  the right and bottom, strongest right at the edges, clipped to the tube's shape), `.crt-arc` + `.crt-rim` (the glare along the
+  top that curves down with the corners and fades down the sides), and `.crt-live`: a blinking red ● REC, LIVE, `CAM nn` (`CAMS`
+  by page, and by `Sky.house.where()` in the house) and the time on air since the visit's first page (sessionStorage
+  `crt-since`); bottom right, on phones top middle under the buttons. Words get a red/blue `text-shadow`. `--crt` = `STRENGTH`
+  (top of crt.js) scales it all. Switching on: once a visit (sessionStorage `crt-warm`), `.crt-power.crt-boot` (the picture
+  opens off a bright line, sound `crt-on`). Switching off: forget.js `reset()` going to the next reset calls `Sky.crt.off(white)`
+  first (`.crt-shut`: halves close on a line, the line shrinks to a dot, 1.25 s, sound `crt-off`). Reduced motion: no roll,
+  flicker, blink or switching on; off is a fade. postfx.js returns at once in reset 1 (no lens, grain, blur, haze or toy
+  camera); the rock keeps its own CSS blur there.
+
 ## The toy camera: the page seen through a lens (sky/postfx.js, tools/blender/toycam.py, 25 Oct)
 
 - Victor: a "matchbox car" look, "as if the page is being viewed via a camera", like Blender's depth of field makes the set look

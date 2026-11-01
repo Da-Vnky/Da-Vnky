@@ -480,6 +480,11 @@
        "optional": true
       },
       {
+       "slot": "assets/ui/crt-glass",
+       "what": "reset 1 is on an old television: the set's glass, laid over the whole screen and stretched to fit (glare, a reflection, a bezel if you like); see-through where the picture shows. the scanlines and the tube's dark corners are drawn under it either way",
+       "size": "1920 x 1080, see-through"
+      },
+      {
        "slot": "assets/ui/beyond",
        "what": "beyond.html, the end for those who went home: deep space, still (stars are drawn over it)",
        "size": "1920 x 1080",
@@ -3890,6 +3895,16 @@
       {
        "slot": "assets/sounds/skip",
        "what": "reset 7: the world skipping, a moment come round twice",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/crt-on",
+       "what": "reset 1: the television warming up, the first page of a visit (a thunk and a rising whine)",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/crt-off",
+       "what": "the end of reset 1: the television switched off (a click, the picture collapsing, a fading whine)",
        "kind": "sound"
       },
       {

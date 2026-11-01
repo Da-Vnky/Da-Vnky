@@ -111,11 +111,15 @@
                 localStorage.setItem('gnosis-phrases', JSON.stringify(had));
             } catch (e) {}
         }
-        whiteOut('assets/ui/reset-screen|assets/ui/forget-screen', caption || '', function () {
-            if (typeof how === 'function') return Promise.resolve(how());
-            if (S) S.nextReset();
-            return Promise.resolve();
-        }, to, phrase || '', claim || '');
+        var white = function () {
+            whiteOut('assets/ui/reset-screen|assets/ui/forget-screen', caption || '', function () {
+                if (typeof how === 'function') return Promise.resolve(how());
+                if (S) S.nextReset();
+                return Promise.resolve();
+            }, to, phrase || '', claim || '');
+        };
+        // (1 Nov) reset 1 is on a television (sky/crt.js): going on to reset 2, the set's switched off first
+        if (typeof how !== 'function' && Sky.crt && Sky.crt.on) Sky.crt.off(white); else white();
     }
 
     /* ---------------- the reset manager: in your preview only ---------------- */

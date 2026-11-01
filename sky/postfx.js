@@ -29,6 +29,8 @@
     'use strict';
     var Sky = window.Sky;
     if (!Sky || !Sky.findAsset || document.documentElement.classList.contains('dav-map')) return;
+    // (1 Nov) reset 1 is on a television (sky/crt.js): none of this there, no grain, no focus, no haze. it starts in reset 2
+    if (window.davSave && window.davSave.reset === 1) return;
 
     // each page's scenes, and the folder their post-processing is in (a new scene with a map: add it here)
     var SCENES = {
