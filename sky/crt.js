@@ -34,6 +34,8 @@
     var STRENGTH = 1;                                    // how strong the whole set looks
     var SPLIT = 3;                                       // how far apart (px) red and blue come at the very edges of the screen
     var SPLIT_MIDDLE = .2;                               // … and in the middle, as a share of that
+    // (1 Nov: on a phone, much less, and none in the middle, or the words can't be read)
+    if (matchMedia('(max-width: 620px), (max-height: 500px)').matches) { SPLIT = 1.5; SPLIT_MIDDLE = 0; }
     var still = matchMedia('(prefers-reduced-motion: reduce)');
     var on = !!S && S.reset === 1 && !root.classList.contains('dav-map') && STRENGTH > 0;
     if (!on) { Sky.crt = { on: false, off: function (done) { if (done) done(); } }; return; }
