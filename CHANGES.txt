@@ -14,6 +14,10 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+
+== published ==
+
+2026-10-31 19:20 · V
 - Reset 7's death no longer strobes: as the timer races, day and night turn at most about once a second and only from late afternoon to late evening (with reduced motion it simply falls to night). The timer's own racing picture (assets/workshop/timer-racing) now shows while it races, if one's drawn.
 - Once a visitor has chosen to stay at the end, the world is quiet: the workshop timer works again, the porch is just a porch (no watcher, no knocking, no notes) and the microwave clock says 12:00.
 - On every reset's white-out, the Demiurge's claim for that sphere now shows first, in dark red, and the traveller's phrase answers it underneath; the white holds a little longer to read both.
@@ -25,8 +29,6 @@ How it works
 - Reset 6: the hallway's eye that never blinks has to be covered now: take a tea towel from the kitchen's third drawer, put it over the eye, and every other eye in the house stares as it weeps the key onto the floor. New slots assets/items/tea-towel, assets/living/towel-on-eye and sound assets/sounds/cloth.
 - Reset 5: the paint's coming away in three places now (the living-room wallpaper, a corner of the canvas on the workshop easel, a seam on the sea's far wave); pull each open to see a line of the world's code behind it, and the key falls out of the last one. The mirror says the paint's dry. New slots assets/workshop/canvas-peel(-open), assets/sea/horizon-seam(-open), sound assets/sounds/paint-peel.
 - The Demiurge at the end, the eye in the sky through the telescope in reset 6, and the Demiurge's 'sky's eye' relic are now the artist's own sun eye and pupil (assets/sky/sun-eyeball, sun-pupil) when they have no picture of their own, as below in reset 4 already was.
-
-== published ==
 
 2026-10-31 17:24 · V
 - New: .claude/agents/architect.md, a read-only planning helper for Claude (it explores the code and returns a step-by-step plan before big changes; it never edits files). Not part of the site.
