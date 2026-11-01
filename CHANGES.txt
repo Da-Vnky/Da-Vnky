@@ -15,6 +15,7 @@ How it works
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
 - The weather's sound slider works the way a mixer's fader does now: as loud as ever at its usual place, much quieter low down, silent at 0; and a roll of thunder already sounding turns down (or up) with it, instead of carrying on at the loudness it started with.
+- The biggest pictures are WebP now, so pages download about a third to two thirds less: the workshop's paintings, the hall of shame (the False God still moves), the record sleeves and the P(Doom) one, the five skies, the sun's glow, the pictures in the letters and three visitors' paintings (28 files, 49 MB down to about 11). Ones bigger than 2560 across were made 2560; the old files are still in the repo's history. The frames' lists and the letters now name the .webp files.
 
 == published ==
 

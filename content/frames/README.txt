@@ -10,4 +10,4 @@ Already on the easel, or a visitor's piece in the portfolio? "move to the
 walls pool" on its card moves it here (the frames it hangs in keep it).
 
 By hand: put the picture here and write content/frames/<name> in a room's
-frames.json, e.g. { "3": "content/frames/droolers.png" }.
+frames.json, e.g. { "3": "content/frames/droolers.webp" }.

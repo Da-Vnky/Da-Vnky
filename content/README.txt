@@ -40,7 +40,7 @@ Take a file out, and it's gone. That's the whole job.
                       In the workshop a name alone is one of your paintings
                       (content/workshop/); in the living space, a visitor's.
                       A name alone is from content/workshop/visitors/; a path works
-                      too (content/workshop/cat.png). Set it with the "hang in"
+                      too (content/workshop/cat.webp). Set it with the "hang in"
                       buttons in the content manager.
 
   content/shame/frames.json
