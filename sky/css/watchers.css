@@ -48,6 +48,70 @@
 .watcher.still.weeping::after { animation: we-tear 1.6s ease-in .5s forwards; }
 @keyframes we-tear { 0% { opacity: 0; } 20% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(46px) scaleY(1.6); } }
 .watcher.still.gone { opacity: 0; pointer-events: none; transition: opacity 1s; }
+.watcher.still.covered { pointer-events: none; cursor: default; }
+/* holding the tea towel over it: a faint light round it, to say "here" */
+body[data-holding="tea-towel"] .watcher.still:not(.covered):hover,
+body[data-holding="tea-towel"] .watcher.still:not(.covered):focus-visible { filter: drop-shadow(0 0 4px rgba(0, 0, 0, .7)) drop-shadow(0 0 8px rgba(255, 240, 200, .8)); }
+
+/* the towel over it (reset 6): it drops over the eye, hung from just above it, and the cloth darkens as the eye weeps
+   through it. your own: assets/living/towel-on-eye (square, see-through round it; the eye sits a third of the way down) */
+.we-towel {
+    position: absolute;
+    z-index: 4;
+    width: clamp(64px, 6.4vw, 104px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -60%);
+    opacity: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .45));
+    transition: transform .45s cubic-bezier(.3, 1.4, .5, 1), opacity .2s;
+}
+.we-towel.up { transform: translate(-50%, -34%); opacity: 1; }
+.we-towel > svg,
+.we-towel > .art { display: block; width: 100%; height: 100%; object-fit: contain; transition: filter 2.8s ease-in; }
+.we-towel.soaked > svg,
+.we-towel.soaked > .art { filter: brightness(.72) sepia(.25); }
+/* the wet patch, spreading from where the eye is */
+.we-towel::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    top: 12%;
+    bottom: 18%;
+    border-radius: 45% 45% 50% 50% / 35% 35% 65% 65%;
+    background: radial-gradient(ellipse 50% 44% at 50% 36%, rgba(60, 38, 26, .78), rgba(60, 38, 26, .4) 60%, transparent 100%);
+    mix-blend-mode: multiply;
+    opacity: 0;
+    transform: scale(.4, .3);
+    transform-origin: 50% 30%;
+    transition: opacity 2.6s ease-in, transform 3.2s ease-out;
+}
+.we-towel.soaked::after { opacity: 1; transform: none; }
+/* and now and then a drop, off the bottom of the cloth and down the wall */
+.we-towel::before {
+    content: "";
+    position: absolute;
+    left: 52%;
+    top: 88%;
+    width: 4px;
+    height: 6px;
+    border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+    background: rgba(200, 215, 235, .85);
+    box-shadow: 0 0 3px rgba(255, 255, 255, .5);
+    opacity: 0;
+}
+.we-towel.soaked::before { animation: we-drip 3.4s ease-in 1.6s infinite; }
+@keyframes we-drip { 0% { opacity: 0; transform: none; } 15% { opacity: 1; transform: none; } 70% { opacity: .9; transform: translateY(60px) scaleY(1.5); } 100% { opacity: 0; transform: translateY(90px) scaleY(1.7); } }
+
+/* they all saw that: every eye in the house wide open at once, staring at the traveller, the pupils gone big */
+.watcher.stare {
+    transform: translate(-50%, -50%) scale(1.18);
+    opacity: 1;
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, .7)) drop-shadow(0 0 6px rgba(160, 20, 10, .45));
+    transition: transform .16s cubic-bezier(.2, 1.6, .4, 1), opacity .16s, filter .4s;
+}
+.watcher.stare .we-look { transform: translate(var(--lx, 0px), var(--ly, 0px)) scale(1.12); transform-box: fill-box; transform-origin: 50% 50%; transition: transform .5s ease-out; }
 
 /* ---------------- the eye in the sky (through the telescope, looking up) ---------------- */
 .gaze {
@@ -77,6 +141,10 @@
 }
 .gaze .ge-eye > svg,
 .gaze .ge-eye > .art { display: block; width: 100%; height: 100%; object-fit: contain; }
+/* (the artist's sun eye instead of the drawn one: sky/eye.js) */
+.gaze .ge-eye.sun-eye { aspect-ratio: 1; width: min(48vh, 56vw); }
+.gaze .ge-eye.sun-eye > svg.placeholder { display: none; }
+.gaze.staring .ge-eye.sun-eye .e-pin { scale: 1.8; transition: scale 1.5s ease-in; }
 .gaze .ge-eye:focus-visible { outline: none; }
 .gaze .ge-look { transform: translate(calc(var(--lx, 0px) * 2.4), calc(var(--ly, 0px) * 2.4)); transition: transform .3s ease-out; }
 .gaze.open .ge-eye { opacity: 1; transform: translate(-50%, -50%) scaleY(1); pointer-events: auto; cursor: pointer; }
@@ -112,4 +180,10 @@
 @media (prefers-reduced-motion: reduce) {
     .watcher, .gaze .ge-eye, .gaze .ge-look, .watcher .we-look { transition: none; }
     .watcher.blink { animation: none; }
+    /* (the stare and the towel: only a fade) */
+    .watcher.stare { transform: translate(-50%, -50%); transition: opacity .6s; }
+    .watcher.stare .we-look { transform: translate(var(--lx, 0px), var(--ly, 0px)); transition: none; }
+    .we-towel, .we-towel.up { transform: translate(-50%, -34%); transition: opacity .6s; }
+    .we-towel::after { transform: none; transition: opacity 2.6s; }
+    .we-towel.soaked::before { animation: none; }
 }

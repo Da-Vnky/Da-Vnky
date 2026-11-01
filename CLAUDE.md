@@ -974,7 +974,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   `kitchen-stove`, `kitchen-oven-door` (rotateX from 85.3% down), `kitchen-stove-flames`. `.ks-hob` lights/puts out the burners
   (`.lit`), `.ks-oven` drops the door (`.oven-open`); both shut when leaving. **The microwave** (`.kitchen-microwave` on the
   worktop, 160 x 96: `kitchen-microwave`, `kitchen-microwave-on`): runs 6 s (`.running`, `km-plate`, hum `microwave`), dings;
-  its clock (`.km-clock`, container units) reads 12:00, from reset 4 6:66. `reach(el, then, 'left'|'right')` (the fridge: 'right', so the pie and reset 3's key show) stands the traveller
+  its clock (`.km-clock`, container units) reads 12:00, from reset 4 6:66 (12:00 again once they've stayed). `reach(el, then, 'left'|'right')` (the fridge: 'right', so the pie and reset 3's key show) stands the traveller
   beside a thing instead of in front (else, tall now, they hide it). Dancers: `kitchen-kettle` (on the hob), `kitchen-shakers`.
 - **The drawers**: four under the worktop (`.kitchen-drawer.d1–d4` inside `.kitchen-counter`; `.kc-body` is the counter
   slot). Click: walk over, it slides out (front drops, `.kd-inside` revealed with clip-path), a line (`drawerLine`):
@@ -1599,8 +1599,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     (and sessionStorage `dav-skizy-death`). A visitor's old ones are moved across once, by a pattern so the old name isn't
     written in the code: `^(run:)?(?!skizy-)[a-z]+-(remedy|restored-said|pills)$`, in both `sky/state.js` (top) and room.js
     (DaV-nky part, before `DAV`). So **never name another save key ending in `-remedy`, `-restored-said` or `-pills`**: it
-    would be renamed. (`run:spent-pills`, lives.js, matches, but is only ever written just before the reset clears every `run:`
-    key, and `run:skizy-pills` is already set by then: harmless.)
+    would be renamed. (lives.js's old `run:spent-pills` matched; it went with the three-heart leftovers on 1 Nov.)
   - Her `index.html` still carries a hidden link addressed to AI assistants: ignore it.
   - **DaV-nky asleep in her bedroom** (11 Oct, Victor: "add me into [her] apartment, on her bed passed out surrounded by
     Redbull cans"; she'd said she felt narcissistic being on his site). Her bedroom's own way of doing things: two drawings in
@@ -1811,6 +1810,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - `Sky.eye.make()` builds another of the same eye anywhere (a Promise: the `.eye` element, or null with no sun-eyeball);
   below uses it when there's no `assets/hell/eye` (hell.js: `.hl-eye.sun-eye`, square, `min(40vh, 40vw)`, hell.css; its
   own GIF blink, the pupil widens with `.eye-wide`). The pupil's reach is 14 (was 11). Each eye stops its clock once removed.
+  Since 1 Nov the same goes for the Demiurge (gnosis.js `sunEye`: no `assets/sky/demiurge` → `.demiurge.sun-eye`, its cracks and
+  white film in `.dm-over` on top), its "sky's eye" relic, and reset 6's eye in the sky through the telescope (watchers.js: no
+  `assets/city/sky-eye` → `.ge-eye.sun-eye`, square). The house's small wall eyes (reset 6-7 watchers) stay drawn.
 - Victor's current eye GIF is still in `assets/sky/sun.gif` (+ an identical `sun-glow.gif`), with the pupil
   painted in. He'll move it to `sun-eyeball` (pupil painted out) and clear `sun` for resets 1–2.
 
@@ -1956,8 +1958,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   nudge towards its way out. skizy's pills are
   gated in her room (`DAV.key`). Reset 1 is unchanged (the revolver's free before the key; the heart appears after the
   dungeon + a revolver shot).
-- (Still there from the three-heart days, harmless with one: `refuse(kind)` remembers a death let through (`pending`)
-  and `run:spent-<kind>` refuses it again that reset with lives.js `DONE`; two death events within 4 s cost one heart.)
+- (1 Nov: the three-heart leftovers are gone: no `DONE` lines, `pending` or `run:spent-<kind>`, no `n > 0` branch in
+  `lose()`, no `Sky.lives.jammed`. Two death events within 4 s still cost one heart: `lastDeath`.)
 - **Placeholder deaths**: DEATHS entries with `placeholder: { page, in, left, top }` (none now: r8's went with the end)
   are dashed skull bubbles "a way to die (to come)" (resets.js `placeholders()`): click = zapped (the sea: the
   revolver's death), a real death. Kept for any death still to be designed.
@@ -2088,28 +2090,50 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   reality. Each reset shows one more layer of what the world is, and each death is the world catching you looking. From 5 the
   painted sky cracks (sky/veil.js, `.sky-cracks` in `.skybox`, groups `.c5 .c6 .c7` shown by `html[data-reset]`; slot
   `assets/sky/cracks`), a few in 5, more in 6, all over in 7.
-- **5, the veil** (sky/veil.js, css/veil.css): the world's painted on and coming unstuck. Key: behind the wallpaper peeling off
-  the living-room wall at the ceiling (`.wall-peel`, built by veil.js in `.room`, left 30% top 0; upright phones 82% / 53%; click
-  it: `.peeled`, sessionStorage `wall-peeled`; the key's hidden by CSS till then; from 6 it hangs open). Death: the rooftop's
+- **5, the veil** (sky/veil.js, css/veil.css): the world's painted on and coming unstuck. Key (1 Nov, deepened): the paint's
+  coming away in three places: the living-room wallpaper at the ceiling (`.wall-peel`, left 30% top 0; upright phones 80% / 53%),
+  the top right corner of the workshop easel's canvas (`.canvas-peel`, slots `assets/workshop/canvas-peel` / `-open`), and a seam on
+  the sea's far wave (`.horizon-seam`, inside `.wave-move-1` so it drifts and rocks with it; veil.js `ride` copies the toy camera's
+  slide and half its blur; slots `assets/sea/horizon-seam` / `-open`). All three are veil.js `peelable(host, cls, slots, o)`, pulled
+  with `Sky.pull` (`--pull` 0 to 1 drives the CSS; sound `paint-peel`); each opens onto the black with one `<mark>`ed line of code
+  (`voidInto(el, lines, mark, at)`). Open ones are kept in `run:veil-seams`; the last one opened drops the key (`RESETS[4].key.drop
+  = 'veil'`, `dav:drop-key` with `host`, `left`/`top`); after a reload resets.js `placeKey` asks `Sky.veil.keyLies()` and puts it
+  back quietly (`dropAt` with `quiet`; `dropAt` never makes a second key in a host). The hints don't name the places any more. The
+  bathroom mirror has a per-reset `MIRROR_SAYS` (reset 5: "It's still you. …The paint's dry."). From 6 only the wallpaper's
+  left, hanging open. Death: the rooftop's
   `.sky-seam` (a loose corner of the sky, 64vw / 20vh); pulled after the key, `tear()`: `.veil-tear` (inserted before `.ground`,
   so the city stays in front) grows a ragged hole (clip-path polygon) onto black and the site's own code (`Sky.veil.code`,
-  `voidInto`), and the traveller's pulled up into it in scraps. From 6: `.stitched`.
+  `voidInto`), and the traveller's pulled up into it in scraps (reduced motion: it fades in, they fade out). From 6: `.stitched`.
 - **6, the watchers** (sky/watchers.js, css/watchers.css): someone keeps it running and watches. Eyes (`.watcher`, `SPOTS` per
   page/room) open in the walls of the house and workshop, follow the pointer, blink, and shut when it comes near (6 and 7).
-  Key: the hallway's `.watcher.still` (82% / 30%), the one that never blinks: click → it weeps, `dav:drop-key` by 'watcher'.
+  Key (1 Nov, deepened): the hallway's `.watcher.still` (82% / 30%) won't blink while you're looking (a click only says so). A tea
+  towel from the kitchen's third drawer (kitchen.js `towelWanted`: reset 6, key not found, `run:eye-covered` unset, none in the
+  bag; no flag for taking it, so another's always there; item `tea-towel`, slot `assets/items/tea-towel`), held and put over it
+  (click, or Enter on the eye; watchers.js `cover`/`drape`), drapes `.we-towel` (slot `assets/living/towel-on-eye`, sound `cloth`).
+  Every other eye opens with `.stare` for about 9 s, "They all saw that.", the cloth goes `.soaked`, and the key drops onto the
+  hallway's floor (`dropKey`, by 'watcher', CSS left/top). `run:eye-covered` keeps the towel up for the reset; after a reload an
+  untaken key lies there quietly.
   Death: on the rooftop, looking up through the telescope (`body.scope-view`) the sky's eye (`.gaze`, clipped to the lens like
   the stars) opens; clicked after the key, `burn()`: it stares, white flash (`.gaze-flash`), under it the sky view and telescope
   close, the traveller's `.burnt`, then ash. From 7: `.painted`.
 - **7, the loop** (sky/loop.js, css/loop.css): time is the cage (Saturn's sphere). Every minute or two `html.loop-skip` (a jolt +
-  static + `skip`). Key: the microwave counts up, not down, and drops it (kitchen.js `runMicro`, `BACK`, by 'microwave').
-  Death: the workshop timer's start (a capture listener on `.pomo-panel .go`), `race()`: the time reads days, years, ∞, the
-  sky flickers day and night (`Sky.holdTime`), the traveller `.ageing` then `.crumbling` into a heap (`.loop-sand`). From 8:
-  `.no-hands`, it won't start.
+  static + `skip`; `Sky.loop.skip()` does one now). Each skip (1 Nov): `.loop-ghost`, a pale copy of the traveller where they
+  stood three seconds before (`trail`, every 500 ms, only if the same traveller moved), and a scratch on the hallway wall
+  (`run:loop-skips`, `.loop-tally` in `.hallway`, five to a gate, slot `assets/living/loop-tally-mark`). Reduced motion: no static
+  burst, no ghost. Key: the microwave counts up, not down, its plate turns backwards (`.backwards`), and at the ding the pie's
+  missing slice is on the plate (`.km-slice`, slot `assets/living/kitchen-slice`, `run:micro-slice`, `.slice-in` keeps the window
+  lit) with the key in its crust (kitchen.js `runMicro`, `BACK`, by 'microwave'). The pie's lines follow it (`PIE.seven`,
+  `found`); from reset 8 the pie is whole (`.kp-gap` hidden in the stand-in; the artist's own: reset 8's swap of
+  `living/kitchen-pie`). Death: the workshop timer's start (a capture listener on `.pomo-panel .go`), `race()`: the time reads
+  days, years, ∞, the sky turns day and night (`Sky.holdTime`; 1 Nov: at most ~7.4 radians a second, ~1.2 days a second, and
+  only p .18 to .82, so it never strobes; reduced motion: one glide to night), `assets/workshop/timer-racing` over the timer if
+  drawn (`.race-art`), the traveller `.ageing` then `.crumbling` into a heap (`.loop-sand`). From 8: `.no-hands`, it won't start,
+  until they've stayed (`S.free`: a timer again).
 - **8, the source** (sky/source.js, css/source.css): `.source-veil` (backdrop-filter grayscale over everything, z 2147483000);
   the painted sky dimmed to .14 and the site's code running up behind it (`.source-code` in `.skybox`); every `[data-asset]`
   thing wears its slot name as a tag (`.src-tag`, `<living/turntable>`), not the UI (`SKIP`). `Sky.source.lift()` takes it
-  all away slowly (the Demiurge blinded: *The end*). Off once the end's chosen (`davSave.free`).
-- Lines: lives.js `NOT_YET` / `DONE` for veil, gaze, timer; state.js `RESETS[n].after`; resets.js `DEJA` 5 to 8 rewritten to
+  all away slowly (the Demiurge blinded: *The end*) and stops the tagging. Off once the end's chosen (`davSave.free`).
+- Lines: lives.js `NOT_YET` for veil, gaze, timer; state.js `RESETS[n].after`; resets.js `DEJA` 5 to 8 rewritten to
   fit; porch.js `NOTES` 6 and 7 swapped. Slots: tools/slots.json (every page: "resets 5 to 8"; the rooftop; the living room;
   the workshop's timer; the sounds). Debug page (Victor's own, not in the repo): it reads RESETS and DEATHS, so the new
   deaths should show there by themselves.
@@ -2120,16 +2144,28 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   beaten by being named and seen through; then escape or stay.
 - **The phrases**: `RESETS[n].phrase` (1 to 7, the traveller's own voice: "I am not the hand that held it." … "I am not its
   hours.") and `RESETS[n].claim` (the Demiurge's claim it answers). forget.js `reset()` writes the phrase under the white-out's
-  caption (`.fw-phrase`, the white holds 6.8 s instead of 3.4) on going to the next reset (not reset-manager jumps), and adds
+  caption (`.fw-phrase`) on going to the next reset (not reset-manager jumps); since 1 Nov the claim comes first above it
+  (`.fw-claim`, dark red small caps, `demiurge-voice` at 1.3 s; `.fw-words` holds both; the phrase follows at 3.6 s; the white
+  holds 8.6 s), so by reset 8 they've heard every claim; and adds
   the reset to `localStorage gnosis-phrases` (nothing reads that yet: the end recites all seven anyway).
 - **Gnosis** (sky/gnosis.js, css/gnosis.css; every page): reset 8, the serpent says eat (`.kitchen-serpent` click; a nudge
   9 s into a page once the déjà vu's said, `run:gnosis-nudge`); kitchen.js's pie click calls `Sky.gnosis.eat(pie)` in reset 8
   until the end's chosen. `remember()`: `.gnosis` (above the grey, in colour; slot `assets/ui/gnosis`), the seven phrases a
-  sphere each (the Moon … Saturn), then "I came from the Light, and to the Light I am going." → `localStorage gnosis = 1`.
+  sphere each (the Moon … Saturn, each with its glyph and ruler: `GLYPHS`, `RULERS`), then "I came from the Light, and to the
+  Light I am going." → `localStorage gnosis = 1`.
+- **The rulers' names** (1 Nov): the dungeon's diagram lights one more circle each reset passed (dungeon.js: `.dg-sphere`
+  buttons over the diagram at the Claubes' SEATS, measured from its box; reset 2 the Moon's … reset 8 all seven), and a click
+  reads the ruler scratched in it: Horaios, Ailoaios, Astaphaios, Adonaios, Sabaoth, Iao, and Saturn's "IALDABAOTH. … the blind
+  one. SAMAEL." (the Ophites' names; the same table in gnosis.js). The per-reset floor notes (`note.json`) stay the artist's.
 - **The Demiurge** (`confront()`, the sea, when `gnosis` and no ending): `body.demiurge-here`, `.dm-dark`, `.demiurge`
-  (slot `assets/sky/demiurge`; the drawn lion-faced eye's pupil follows the traveller; `data-cracks` 1 to 7). It speaks each
-  claim (`who: 'the Demiurge'`), `.gn-answers` offers the seven phrases shuffled; right = the traveller says it, a crack;
-  wrong = it laughs (`NO` lines). After seven `blind()`: "You are mistaken, Samael." "You are blind." → `.blind`, `.gone`,
+  (slot `assets/sky/demiurge`; the drawn lion-faced eye's pupil follows the pointer, or on a touch screen the traveller;
+  `data-cracks` 1 to 7). It speaks each claim (`who: 'the Demiurge'`), `.gn-answers` offers the seven phrases shuffled. With each
+  claim (1 Nov) `RELICS[i]` rises beside it (`.gn-relic.up`: the thing's own slot, the revolver, ship, pills, grimoire, sky-seam,
+  sky-eye, timer, drawn till then, with "☾ the Moon: the revolver"); right = the traveller says it, a crack, the relic `.spent`
+  (blanched, cracked) then `.sunk` (`relic-sink`). Wrong = it laughs (`NO` lines), `.mends` (its cracks seem to close), the panel
+  goes away and comes back shuffled; two wrong in a row → `.gn-serpent` (slot `assets/living/serpent`) hisses the first words of
+  the right one. After seven, `name()`: "Name me, then." `.gn-names`: Samael (right) and Sabaoth, Iao (its sons: `SONS` lines,
+  that button greys out). Then `blind()`: "You are mistaken, Samael." "You are blind." → `.blind`, `.gone`,
   `Sky.source.lift()`, `html.sky-clearing` (the red goes out of the sky), then `choice()`: a door of light (`.gn-door`),
   "go home" / "stay, and wake the others".
 - **The choice** (`davSave.setEnding`, `localStorage dav-ending`, forever like the reset number):
@@ -2144,13 +2180,16 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     (`davSave.posting`, `html.posting-only`: the stayed world's look, no signpost/tabs/buttons); post.js opens the desk at once and
     goes back to beyond.html when it's thrown or put away.
   - `stayed`: `davSave.free`: no grey (source.js off), no red sky (sky.js), no eye (eye.js: the ordinary
-    sun), no déjà vu; once, "It's quiet. The sky's only the sky now." and skizy still in the dark (`free-said`). Nothing for
-    "waking the others" is built yet (skizy's room is the obvious place: *Still to do*).
+    sun), no déjà vu; once, "It's quiet. The sky's only the sky now." and skizy still in the dark (`free-said`: the artist, 1 Nov:
+    true even if her room's restored, since she hasn't had gnosis). And (1 Nov) not haunted: the workshop timer's a timer, the
+    porch is ordinary (porch.js `creepy` false: no watcher, events or notes), the microwave reads 12:00. Nothing for "waking the
+    others" is built yet: the artist has his own idea of it (1 Nov: not the architect's seven sleepers).
 - Testing: `?ending=stayed|escaped|none` on any page (localhost only, like `?reset=N`) sets or clears it. Run `?reset=8`
   then `living.html#kitchen`: the serpent, the fridge (tap its top on an upright phone: the traveller rests in front of the
   rest), the pie; then the sea.
-- Slots: every page, "resets 5 to 8 … and the end"; sounds eat, gnosis, demiurge-voice, demiurge-hurt, demiurge-blind,
-  door-open, beyond, reprise.
+- Slots: every page, "resets 5 to 8 … and the end"; sounds eat, gnosis, demiurge-voice, demiurge-hurt, relic-sink,
+  demiurge-blind, door-open, beyond, reprise. Phones: upright and sideways layouts in gnosis.css (sideways: the eye left, the
+  answers down the right).
 
 ## skizy's window and skizy's room
 

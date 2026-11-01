@@ -464,8 +464,13 @@
        "size": "120 x 64, see-through"
       },
       {
+       "slot": "assets/items/tea-towel",
+       "what": "reset 6: a tea towel from the kitchen’s third drawer, in the hotbar (put over the hallway’s eye that never blinks)",
+       "size": "square-ish, see-through"
+      },
+      {
        "slot": "assets/sky/demiurge",
-       "what": "reset 8, the end: the Demiurge come down over the sea, a lion-faced eye with a mane of fire (the page cracks it seven times, films it white and fades it away; the drawn one's pupil follows the traveller)",
+       "what": "reset 8, the end: the Demiurge come down over the sea, a lion-faced eye with a mane of fire (the page cracks it seven times, films it white and fades it away; the drawn one's pupil follows the pointer, or the traveller on a touch screen)",
        "size": "800 x 800, see-through round it"
       },
       {
@@ -869,6 +874,16 @@
        "tileGuide": "assets/templates/wave-4-guide.png"
       },
       {
+       "slot": "assets/sea/horizon-seam",
+       "what": "reset 5: a seam along the far wave, the paint of the water lifting off at its right end (black shows in the crack). it’s one of the three places the paint’s coming away; it drifts with the far wave",
+       "size": "320 x 120, see-through: the lifting end on the right"
+      },
+      {
+       "slot": "assets/sea/horizon-seam-open",
+       "what": "reset 5, once it’s pulled: the strip of painted water peeled down, hanging off its left end (the black and a line of code show through the gap behind it)",
+       "size": "320 x 120, see-through"
+      },
+      {
        "slot": "assets/sea/ship",
        "what": "the ship, facing right, keel about 90% down (-glow: its lamps)",
        "size": "1200 x 1000",
@@ -1051,6 +1066,16 @@
        "slot": "assets/workshop/easel",
        "what": "the easel your paintings sit on (keep the canvas 17%–83% across, 6%–56% down)",
        "size": "62:100"
+      },
+      {
+       "slot": "assets/workshop/canvas-peel",
+       "what": "reset 5: the paint on the easel’s canvas lifting at its top right corner, folded down like a dog-ear (its bare back showing; black shows behind it). one of the three places the paint’s coming away",
+       "size": "200 x 200, see-through: its top right on the canvas’s top right corner"
+      },
+      {
+       "slot": "assets/workshop/canvas-peel-open",
+       "what": "reset 5, once it’s pulled: the skin of paint come away and hanging down off the left of the gap it left (the black and a line of code show in the gap)",
+       "size": "200 x 200, see-through"
       },
       {
        "slot": "assets/workshop/paint-easel",
@@ -1493,7 +1518,7 @@
       },
       {
        "slot": "assets/living/wall-peel",
-       "what": "reset 5: the wallpaper’s corner come away at the ceiling, folded down (a dog-ear; black shows behind it). reset 5’s key is behind it",
+       "what": "reset 5: the wallpaper’s corner come away at the ceiling, folded down (a dog-ear; black shows behind it). one of the three places the paint’s coming away (reset 5’s key falls out of the last one opened)",
        "size": "240 x 300, see-through: the corner at the top right"
       },
       {
@@ -1772,6 +1797,11 @@
        "size": "long and thin, about 1:10, hangs from its top"
       },
       {
+       "slot": "assets/living/loop-tally-mark",
+       "what": "reset 7: one scratch on the hallway wall, counting the skips (stretched to each mark, five to a gate: the fifth lies across the four)",
+       "size": "about 8 x 72, see-through"
+      },
+      {
        "slot": "assets/living/hall-hatch-open",
        "what": "the hatch, open (a dark square up into the attic)",
        "size": "about 600 x 150, stretched to fit"
@@ -1785,6 +1815,11 @@
        "slot": "assets/living/hall-lamp-broken",
        "what": "what's left of the hallway lamp on the floor, once it's been pulled down",
        "size": "about 480 x 120, see-through"
+      },
+      {
+       "slot": "assets/living/towel-on-eye",
+       "what": "reset 6: the tea towel hung over the hallway’s eye that never blinks (the eye sits a third of the way down it). the page darkens it as the eye weeps through, and drips from its bottom edge",
+       "size": "400 x 400, see-through round it"
       }
      ]
     }
@@ -2016,6 +2051,11 @@
        "slot": "assets/living/kitchen-pie",
        "what": "the apple pie in the fridge (reset 3: the key is stuck in it, its ring sticking out)",
        "size": "about 100:44, see-through"
+      },
+      {
+       "slot": "assets/living/kitchen-slice",
+       "what": "reset 7: the slice that's been missing from the pie, warm on the microwave's plate (reset 7's key lies in its crust). from reset 8 the pie is whole: give it its own picture as reset 8's kitchen-pie in the resets tabs",
+       "size": "about 40:18, see-through"
       },
       {
        "slot": "assets/living/kitchen-stove",
@@ -3818,6 +3858,11 @@
        "kind": "sound"
       },
       {
+       "slot": "assets/sounds/paint-peel",
+       "what": "reset 5: a skin of dried paint peeling off (the corner of the workshop’s canvas, the seam on the sea’s far wave)",
+       "kind": "sound"
+      },
+      {
        "slot": "assets/sounds/eye-open",
        "what": "reset 6: an eye opening (the ones in the walls, quiet; and the one in the sky)",
        "kind": "sound"
@@ -3835,6 +3880,11 @@
       {
        "slot": "assets/sounds/weep",
        "what": "reset 6: the hallway’s eye closing, a tear running",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/cloth",
+       "what": "reset 6: a cloth flapped out and dropped over something (the tea towel over the eye)",
        "kind": "sound"
       },
       {
@@ -3870,6 +3920,11 @@
       {
        "slot": "assets/sounds/demiurge-hurt",
        "what": "reset 8: a phrase lands and the Demiurge cracks",
+       "kind": "sound"
+      },
+      {
+       "slot": "assets/sounds/relic-sink",
+       "what": "reset 8: what the Demiurge claimed them with goes back under the sea",
        "kind": "sound"
       },
       {

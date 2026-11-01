@@ -404,7 +404,11 @@
 
     /* ---------------- the mirror ---------------- */
     if (!mirror) return;
-    var words = mirror.dataset.say || "Despite everything, it's still you.";
+    // (1 Nov) what it says in a reset of its own, if it has one; every other reset, data-say on the mirror in living.html
+    var MIRROR_SAYS = {
+        5: 'It’s still you. …The paint’s dry.'
+    };
+    var words = (DS && MIRROR_SAYS[DS.reset]) || mirror.dataset.say || "Despite everything, it's still you.";
     mirror.setAttribute('role', 'button');
     mirror.setAttribute('tabindex', '0');
     mirror.setAttribute('aria-label', 'look in the mirror');

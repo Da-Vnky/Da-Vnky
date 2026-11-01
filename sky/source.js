@@ -38,7 +38,7 @@
     }
 
     // every thing, with its name (the slot it's drawn from) on it
-    var SKIP = '.cp, .place-tabs, .hotbar, .lives, .signpost, .peep-ui, .pomo-panel, .records, .post, .studio, .mc-say, .source-veil, .moonlight, .demiurge, .dm-dark, .gn-answers, .gn-door, .gn-choice, .gnosis';
+    var SKIP = '.cp, .place-tabs, .hotbar, .lives, .signpost, .peep-ui, .pomo-panel, .records, .post, .studio, .mc-say, .source-veil, .moonlight, .demiurge, .dm-dark, .gn-answers, .gn-relic, .gn-serpent, .gn-door, .gn-choice, .gnosis';
     function nameOf(el) {
         var n = (el.dataset.asset || '').split('|')[0].replace(/^assets\//, '');
         return n ? '<' + n + '>' : '';
@@ -59,12 +59,13 @@
             el.appendChild(t);
         });
     }
-    setTimeout(tagAll, 1200);
-    setInterval(tagAll, 4000);                                  // (things that turn up later: a room sliding in, a bottle)
+    var first = setTimeout(tagAll, 1200);
+    var again = setInterval(function () { if (!document.hidden) tagAll(); }, 4000);     // (things that turn up later: a room sliding in, a bottle)
     document.documentElement.classList.add('source-view');
 
     // the Demiurge gone blind (sky/gnosis.js): the code stops, the grey fades off, the names go
     function lift() {
+        clearTimeout(first); clearInterval(again);                  // (no more names on things once it's blind)
         document.documentElement.classList.add('source-lifting');
         setTimeout(function () { veil.remove(); document.querySelectorAll('.src-tag').forEach(function (t) { t.remove(); }); document.documentElement.classList.remove('source-view'); }, 5200);
     }

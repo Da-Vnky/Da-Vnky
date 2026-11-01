@@ -1,5 +1,5 @@
 // DaV-nky — lines for the parts of the room that belong to the artist's game (room.js, "DaV-nky", at the end).
-// written by Claude for DaV-nky. NOT part of Cestaudi's script (script.js). keep, rewrite or cut anything here.
+// written by Claude for DaV-nky. NOT part of skizy's script (script.js). keep, rewrite or cut anything here.
 // same format as script.js: an exchange is a list of [speaker, text, how].
 
 const c = t => ['claube', t];

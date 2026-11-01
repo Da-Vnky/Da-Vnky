@@ -7,7 +7,8 @@
                    on, dying costs a life. its picture: the reset's own
                    assets/resets/reset-<n>/key, or assets/ui/key for all of them.
                    a key with "drop" isn't hidden: something drops it where it
-                   happens (reset 4's eye, 6's watcher, 7's microwave)
+                   happens (reset 4's eye, 6's watcher, 7's microwave, and 5's: the last of
+                   the three places the paint's coming away, sky/veil.js)
      the roof      the jump off the roof, and the street far below (a cutscene): no longer a death of
                    its own (27 Sep: one death a reset). it's how reset 3's ends: back from skizy's room,
                    the traveller goes off the edge (skizyDeath), and the next reset starts on the porch
@@ -74,8 +75,12 @@
         el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') take(e); });
         return el;
     }
+    // (a key that's dropped and wasn't taken before a reload: put back where it fell, so nobody's stuck without it.
+    // 5's veil: the last of the three places the paint came away, sky/veil.js)
+    var LIES = { veil: function () { return Sky.veil && Sky.veil.keyLies && Sky.veil.keyLies(); } };
     function placeKey() {
         var k = S.info && S.info.key;
+        if (k && k.drop && LIES[k.drop] && !keyFound()) { var at = LIES[k.drop](); if (at) dropAt(at); return; }
         if (!k || k.drop || k.page !== PAGE || keyFound()) return;
         var host = document.querySelector(k.in);
         if (!host) return;
@@ -84,26 +89,30 @@
         el.style.top = k.in === 'body' ? k.top + 'vh' : k.top + '%';
     }
     // dropped: it falls from where it was (x, y: on the screen) to the floor there, with a little bounce.
-    // host: a room to drop it in (5 Oct: the hallway's eye, the kitchen's microwave), so it goes with the room as it slides
-    document.addEventListener('dav:drop-key', function (e) {
-        var k = S.info && S.info.key, d = e.detail || {};
+    // host: a room to drop it in (5 Oct: the hallway's eye, the kitchen's microwave), so it goes with the room as it slides;
+    // left/top instead of x, y: where in the host, as CSS (1 Nov: '62%'). quiet: it's lying there already (after a reload)
+    function dropAt(d) {
+        var k = S.info && S.info.key;
         if (!k || k.drop !== d.by || keyFound()) return;
+        if (d.host && d.host.querySelector('.reset-key')) return;           // (it's there already)
         var el;
         if (d.host) {
-            var hr = d.host.getBoundingClientRect();
             el = makeKey(d.host, false);
-            el.style.left = (d.x - hr.left) + 'px'; el.style.top = (d.y - hr.top) + 'px';
+            if (d.left != null) { el.style.left = d.left; el.style.top = d.top; }
+            else { var hr = d.host.getBoundingClientRect(); el.style.left = (d.x - hr.left) + 'px'; el.style.top = (d.y - hr.top) + 'px'; }
         } else {
             el = makeKey(body, true);
             el.style.left = d.x + 'px'; el.style.top = d.y + 'px';
         }
         el.style.zIndex = d.z || 6;                                         // (below, in reset 4: over everything down there)
+        if (d.quiet) return;
         el.animate([{ translate: '0 -60px', opacity: 0 }, { translate: '0 -60px', opacity: 1, offset: 0.1 }, { translate: '0 0', offset: 0.55 },
                     { translate: '0 -14px', offset: 0.72 }, { translate: '0 0', offset: 0.86 }, { translate: '0 -3px', offset: 0.93 }, { translate: '0 0', opacity: 1 }],
                    { duration: 900, easing: 'ease-in' });
         setTimeout(function () { sfx('key-drop', { or: 'tap' }); }, 480);
         say('something small fell with a clink.', 2600);
-    });
+    }
+    document.addEventListener('dav:drop-key', function (e) { dropAt(e.detail || {}); });
     // (found before the hearts turned up: they turn up unlocked)
     if (keyFound() && Sky.lives && !Sky.lives.unlocked) Sky.lives.unlock();
 

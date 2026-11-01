@@ -166,13 +166,17 @@
         });
         fridge.querySelector('.kf-inside').addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); fridgeOpen(false); });
     }
-    var PIE = { before: 'An apple pie. Someone’s already had a slice.', three: 'An apple pie. …Where did the slice go?', after: 'Apple pie. Again.' };
+    // (the slice that's missing from it since reset 1 is found in reset 7, going round in the microwave; from reset 8 the pie's
+    // whole: html[data-reset="8"] in css/kitchen.css, or the artist's assets/resets/reset-8/living/kitchen-pie)
+    var PIE = { before: 'An apple pie. Someone’s already had a slice.', three: 'An apple pie. …Where did the slice go?', after: 'Apple pie. Again.',
+                seven: 'Apple pie. Still a slice missing. It’s been missing every single time.', found: 'The slice from the microwave would fit it exactly.',
+                whole: 'A whole apple pie. Nobody’s had a slice. Nobody ever has.' };
     if (pie) pie.addEventListener('click', function (e) {
         if (e.target.closest('.reset-key')) return;                       // (the key: sky/resets.js takes it)
         e.preventDefault(); e.stopPropagation();
         var n = S ? S.reset : 1;
         if (n === 8 && !S.ending && Sky.gnosis && Sky.gnosis.eat) { Sky.gnosis.eat(pie); return; }     // (reset 8: eat, and know. sky/gnosis.js)
-        say(keyInPie() ? 'Something’s stuck in it. Something metal.' : n < 3 ? PIE.before : n === 3 ? PIE.three : PIE.after, 2600);
+        say(keyInPie() ? 'Something’s stuck in it. Something metal.' : n < 3 ? PIE.before : n === 3 ? PIE.three : n === 7 ? (sliceIn() ? PIE.found : PIE.seven) : n === 8 ? PIE.whole : PIE.after, 2600);
     });
 
     /* ---------------- the drawers ---------------- */
@@ -182,8 +186,16 @@
         if (n === 1) return 'Forks, knives, spoons. One of the spoons is bent.';
         if (n === 2) return keyOut ? 'The junk drawer. Rubber bands, dead batteries… and a note: “it’s in the fridge.”'
                                    : 'The junk drawer. Rubber bands, dead batteries, a menu for a place that closed years ago.';
-        if (n === 3) return 'Tea towels, folded like someone cared.';
+        if (n === 3) return towelWanted() ? 'Tea towels, folded like someone cared. …I’ll take one. You never know what needs covering.'
+                                          : 'Tea towels, folded like someone cared.';
         return r < 3 ? 'Recipe cards in careful handwriting. “Apple pie” is underlined twice.' : 'Recipe cards. Every one of them is for apple pie.';
+    }
+    // reset 6 (the watchers): the third drawer gives them a tea towel, for the hallway's eye that never blinks (sky/watchers.js).
+    // as long as the key's still out there and there isn't one in the bag already. nothing's kept about taking one, so if the
+    // bag's gone (a new visit) there's always another
+    function towelWanted() {
+        var I = Sky.inventory;
+        return !!S && S.reset === 6 && S.get('key') !== '1' && S.get('eye-covered') !== '1' && !!I && !I.has('tea-towel');
     }
     var drawers = Array.prototype.slice.call(kit.querySelectorAll('.kitchen-drawer'));
     function shutAll(quiet) {
@@ -199,7 +211,9 @@
             reach(d, function () {
                 d.classList.add('open'); d.setAttribute('aria-expanded', 'true');
                 sfx('drawer', { or: 'tap', size: 0.6 });
-                setTimeout(function () { say(drawerLine(+d.dataset.drawer), 3400); }, 350);
+                var n = +d.dataset.drawer, towel = n === 3 && towelWanted();
+                setTimeout(function () { say(drawerLine(n), 3400); }, 350);
+                if (towel) setTimeout(function () { if (towelWanted()) Sky.inventory.add('tea-towel'); }, 3000);   // (into the bag, once they've said so)
             });
         });
     });
@@ -242,12 +256,27 @@
     /* ---------------- the microwave: it runs, it hums, it dings. there's nothing in it ---------------- */
     var micro = kit.querySelector('.kitchen-microwave'), clock = micro && micro.querySelector('.km-clock');
     var RUN = 6, running = false;
-    function idleClock() {                                               // (reset 4 on: the clock's wrong)
+    function idleClock() {                                               // (reset 4 on: the clock's wrong; till they've stayed)
         if (!clock) return;
-        clock.textContent = S && S.reset >= 4 ? '6:66' : '12:00';
+        clock.textContent = S && S.reset >= 4 && !S.free ? '6:66' : '12:00';
         micro.classList.add('blink');
     }
     idleClock();
+    // reset 7: the slice that's been missing from the pie since reset 1, found going round on the plate (kept for the reset)
+    function sliceIn() { return !!(S && S.reset === 7 && S.get('micro-slice') === '1'); }
+    if (micro && S && S.reset === 7) {
+        var slice = document.createElement('div');
+        slice.className = 'km-slice';
+        slice.dataset.asset = 'assets/living/kitchen-slice';
+        slice.setAttribute('aria-hidden', 'true');
+        slice.innerHTML = '<svg class="placeholder" viewBox="0 0 40 18" aria-hidden="true"><path d="M3 15 L20 4 L37 13 Z" fill="#e0a456" stroke="#7a4a1a" stroke-width="1.2"/>' +
+            '<path d="M3 15 L37 13 L37 16 L3 17.5 Z" fill="#c9883a" stroke="#7a4a1a" stroke-width="1"/><path d="M5 15 L36 13.4" stroke="#8a1a2a" stroke-width="1.4"/>' +
+            '<g stroke="#a8642a" stroke-width="1.4" stroke-linecap="round"><path d="M14 10 L18 13 M22 8 L26 12"/></g>' +
+            '<g fill="none" stroke="rgba(255,240,200,.7)" stroke-width="1" stroke-linecap="round"><path d="M14 3 q2 -2 0 -3"/><path d="M22 2 q2 -2 0 -3"/></g></svg>';
+        micro.insertBefore(slice, micro.querySelector('.km-clock'));
+        if (Sky.fillAssets) Sky.fillAssets(micro);
+        if (sliceIn()) micro.classList.add('slice-in');
+    }
     function runMicro() {
         if (running || !micro) return;
         running = true;
@@ -256,6 +285,7 @@
         sfx('microwave', { size: 0.5 });
         // (reset 7, the loop: it counts the wrong way, up instead of down; and the first time, the reset's key is on the plate)
         var BACK = !!S && S.reset === 7, left = RUN;
+        micro.classList.toggle('backwards', BACK);
         clock.textContent = '0:0' + (BACK ? 0 : left);
         var tick = setInterval(function () {
             left--;
@@ -266,17 +296,20 @@
             sfx('ding', { size: 0.5 });
             clock.textContent = 'End';
             micro.classList.add('blink');
+            var first = BACK && !sliceIn();
+            if (BACK) { S.set('micro-slice', '1'); micro.classList.add('slice-in'); }
             if (BACK && S.get('key') !== '1') {
                 var mr = micro.getBoundingClientRect();
-                document.dispatchEvent(new CustomEvent('dav:drop-key', { detail: { by: 'microwave', host: kit, x: mr.left + mr.width * 0.42, y: mr.bottom - 4 } }));
+                document.dispatchEvent(new CustomEvent('dav:drop-key', { detail: { by: 'microwave', host: kit, x: mr.left + mr.width * 0.37, y: mr.top + mr.height * 0.78 } }));
             }
-            if (inside) setTimeout(function () { say(microLine(), 2800); }, 400);
+            if (inside) setTimeout(function () { say(microLine(first), first ? 3600 : 2800); }, 400);
             setTimeout(function () { running = false; idleClock(); }, 3200);
         }, 1000);
     }
-    function microLine() {
+    function microLine(first) {
         var r = S ? S.reset : 1;
-        if (r === 7) return 'Ding. It counted up, not down. …It keeps its own time.';
+        if (r === 7 && first) return 'Ding. …The slice. The one missing from the pie. It’s been going round in here the whole time.';
+        if (r === 7) return 'Ding. It counted up again. The plate went round the wrong way.';
         return r < 3 ? 'Ding. There was nothing in it.' : r === 3 ? 'Ding. Nothing in it. …It’s warm anyway.' : 'Ding. Something in there is warm now.';
     }
     if (micro) micro.querySelector('.km-hit').addEventListener('click', function (e) {

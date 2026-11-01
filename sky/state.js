@@ -154,13 +154,14 @@
         // 5 to 7 (5 Oct): the world uncovering itself, a layer a reset. the sky cracks a little more each time (sky/veil.js)
         { n: 5, name: 'the veil',    theme: 'the world is painted on, and it\u2019s coming unstuck', deaths: ['veil'],
           phrase: 'I am not the painted sky.',        claim: 'I painted every sky you ever saw. You are under it.',
-          // (behind the wallpaper peeling off the living-room wall: sky/veil.js)
-          key: { page: 'living',   in: '.wall-peel', left: 62, top: 50, where: 'the living space: behind the wallpaper peeling off the wall' },
-          after: '\u2026And the sky over the rooftop. One corner of it has come loose.' },
+          // (1 Nov: the paint's coming away in three places, and the key falls out of the last one pulled open: sky/veil.js)
+          key: { page: 'living',   drop: 'veil', where: 'three places the paint\u2019s coming away: the living-room wallpaper, the corner of the canvas on the workshop\u2019s easel, a seam on the sea\u2019s far wave. pull all three open; the key falls out of the last' },
+          after: '\u2026That\u2019s all of it come away. And the sky over the rooftop: one corner of it has come loose too.' },
         { n: 6, name: 'the watchers', theme: 'someone keeps it all running, and watches', deaths: ['gaze'],
           phrase: 'I am not what it sees.',           claim: 'I have watched you every moment. What I see, I own.',
-          key: { page: 'living',   drop: 'watcher', where: 'the hallway: the one eye in the wall that never blinks. click it and it weeps the key' },
-          after: '\u2026Something up there is looking down. Through the telescope, I\u2019d see it looking.' },
+          // (it won't blink while anyone's looking: a tea towel from the kitchen's third drawer, put over it. sky/watchers.js)
+          key: { page: 'living',   drop: 'watcher', where: 'the hallway: the one eye in the wall that never blinks. cover it (a tea towel, the kitchen\u2019s third drawer) and it weeps the key onto the floor' },
+          after: '\u2026They all saw me do it. And something bigger up there is looking down. Through the telescope, I\u2019d see it looking.' },
         { n: 7, name: 'the loop',    theme: 'time is the cage: it has always been the same day', deaths: ['timer'],
           phrase: 'I am not its hours.',              claim: 'Every hour you have lived, I counted. Your time is mine.',
           key: { page: 'living',   drop: 'microwave', where: 'the kitchen: run the microwave. it counts the wrong way, and the key is on the plate' },
