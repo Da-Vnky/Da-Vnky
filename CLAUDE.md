@@ -1813,7 +1813,7 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   Since 1 Nov the same goes for the Demiurge (gnosis.js `sunEye`: no `assets/sky/demiurge` → `.demiurge.sun-eye`, its cracks and
   white film in `.dm-over` on top), its "sky's eye" relic, and reset 6's eye in the sky through the telescope (watchers.js: no
   `assets/city/sky-eye` → `.ge-eye.sun-eye`, square). The house's small wall eyes (reset 6-7 watchers) stay drawn.
-- Victor's current eye GIF is still in `assets/sky/sun.gif` (+ an identical `sun-glow.gif`), with the pupil
+- Victor's current eye GIF was in `assets/sky/sun.gif` (+ an identical glow twin, `sun-glow`, a moving WebP since 1 Nov), with the pupil
   painted in. He'll move it to `sun-eyeball` (pupil painted out) and clear `sun` for resets 1–2.
 
 ## Paper and canvas (sky/textures.js)
@@ -1833,7 +1833,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 
 ## Lighter pictures for visitors: baked/ (tools/bake.py, 16 Oct)
 
-- **Switched off for now** (16 Oct, Victor: "no bake then, we'll leave it till the site is about done"): publish.bat /
+- **The big pictures themselves are WebP since 1 Nov** (Victor: "Don't bake until it's done … if it's possible to convert them to
+  webp to save space just do that instead and keep them all loaded"): 28 pictures over 150 KB that weren't WebP were converted
+  in place with bake.py's own `bake_one` (its rules: at most 2560 across, moving ones kept moving, kept only when smaller), the
+  originals `git rm`'d (still in the history), and the files that name them by name updated (content/shame, living and workshop
+  `frames.json`, three letters, two READMEs). 49.4 MB → 11.2 MB; per page in the test browser: the sea 36.5 → 21.9 MB, the
+  living space 44.7 → 27.7, the workshop 36.9 → 14.1. Already-WebP files (the waves, the rock, vinyl-texture) and bake.py's
+  `SKIP` (sun-eyeball, bottles, skizy's room…) were left alone. New uploads aren't converted: the same could be done again.
+- **Baking itself is switched off for now** (16 Oct, Victor: "no bake then, we'll leave it till the site is about done"): publish.bat /
   publish.sh have the step as a comment, and `baked/` is in .gitignore (a test bake's folder may still sit in his folder and
   DaVnky-A: harmless, never published). **To switch it on**: uncomment the step in both, take `baked/` out of .gitignore.
   sky.js asks for baked.json only when catalog.txt lists it, so with no bake published nothing is fetched.
