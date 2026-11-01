@@ -841,15 +841,24 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   doesn't look too visually noisy") for a dark rolling band, and the rounded corners back, "just don't add the glare".
 - crt.js (index, workshop, city, living, template, after postfx.js) builds `.crt` (z 2147483050: over the buttons and the
   loading screen, under the white-out; no clicks) only when `davSave.reset === 1` and not `?map`: `.crt-mask` (red-green-blue
-  stripes, multiply), `.crt-moire` (the camera's moiré: rainbow arcs, a `repeating-radial-gradient` 21vmin a cycle centred below
-  the screen, soft-light at .15, masked into patches, the box 140% and drifting by transform over 41 s), `.crt-roll` (a dark band,
+  stripes, multiply), `.crt-moire` (the camera's moiré, soft-light at .4, masked into patches, the box 124% and drifting
+  up and down by transform over 41 s; its picture `--moire-art` is worked out by crt.js `moireArt()`, below), `.crt-roll` (a dark band,
   .17 at its middle, rolling up in 11 s), `.crt-flick` (a few % darker now and then, never a flash), `.crt-glass` (slot
   `assets/ui/crt-glass`, nothing drawn), `.crt-tube` (rounded corners, `7vmin / 9vmin`, phones `5vmin / 6vmin`, black beyond them
   by a 40vmax spread shadow, and the edges darkened; no glare), and `.crt-live`: a blinking red ● REC, LIVE, `CAM nn` (`CAMS` by page, and by
   `Sky.house.where()` in the house) and the time on air since the visit's first page (sessionStorage `crt-since`); bottom right,
   on phones top middle under the buttons. `--crt` = `STRENGTH` scales it all.
+- **The moiré is simulated, not drawn** (1 Nov, Victor: "the curvature of the bands doesn't make sense … use actual formulas
+  that explain that phenomenon"): `moireArt(phone)` films the tube with a pretend camera, once, 600 ms after the page loads
+  (~a few hundredths of a second). The tube: `LINES` scanlines and `STRIPES` phosphor stripes, screen_c(u, v) = (1 − a + a·cos²(π
+  LINES (v+1)/2)) · (1 − b + b·cos²(π (STRIPES (u+1)/2 − c/3))), a .8, b .45. The glass and lens: (u, v) = (x, y)(1 + K r²), K .009
+  (barrel), turned by `TILT` .0025 rad. The sensor: `SENSOR_W` × `SENSOR_H` (960 × 600; phones 640 × 400) point samples behind
+  an RGGB Bayer filter, no anti-aliasing filter. The video: each colour averaged over its own samples in 4 × 4 blocks (demosaic +
+  downscale), what's left is the beat (`LINES` = rows − 6.5, `STRIPES` = columns + 7.5: about 6-7 bands each way), bending
+  round the middle and crowding at the edges from the lens, coloured by the Bayer offsets; normalised round grey (128 ± 55 per
+  standard deviation) into a 240 × 150 PNG.
 - **Readable** (1 Nov, Victor: "I can barely read anything on mobile"): the mask at .3; on phones (`(max-width: 620px),
-  (max-height: 500px)`) the mask at .08, the moiré .08, the band at .7, the split `SPLIT` 1.5 with `SPLIT_MIDDLE` 0, `PUNCH` 1.15
+  (max-height: 500px)`) the mask at .08, the moiré .18, the band at .7, the split `SPLIT` 1.5 with `SPLIT_MIDDLE` 0, `PUNCH` 1.15
   and no glow (crt.js): there a CSS pixel is 2-3 of the screen's, so the stripes are as big as on a computer beside much smaller
   words. (No scanlines since later on 1 Nov.)
 - **The colour split**: `html.crt-on.crt-split { filter: url(#crt-split) }` (on html, the one element a filter doesn't spoil

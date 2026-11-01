@@ -143,6 +143,61 @@
         if (!told) settle();
     }
 
+    // the moiré's picture (crt.css .crt-moire), worked out the way it really happens when a camera films a television,
+    // not drawn by hand. moiré is aliasing: two fine regular patterns laid over each other show a third, much coarser one,
+    // their difference ("beat"). here the two are the tube's own and the camera sensor's:
+    //
+    //   the tube   lines across it, LINES of them top to bottom, and the mask's red-green-blue phosphor stripes, STRIPES
+    //              of them side to side. at a point (u, v) of the screen (each -1…1), colour c (0 red, 1 green, 2 blue) is
+    //                screen_c(u, v) = (1 − a + a·cos²(π·LINES·(v+1)/2)) · (1 − b + b·cos²(π·(STRIPES·(u+1)/2 − c/3)))
+    //              (a, b: how deep the gaps between lines and between stripes are)
+    //   the glass  bulges, and the lens bends it more: a point the camera sees at (x, y) on its sensor (each -1…1, from
+    //              the middle) came from the screen at
+    //                (u, v) = (x, y) · (1 + K·r²),  r² = x² + y²·ASPECT²      (barrel distortion)
+    //              turned by TILT (no camera's ever quite level)
+    //   the sensor SENSOR_W × SENSOR_H pixels, each a point sample, behind a Bayer filter: red where row and column are both
+    //              even, blue where both are odd, green on the rest. each pixel only ever records its own colour of the
+    //              screen there. no anti-aliasing filter in front (most phones have none: that's why they see moiré)
+    //   the video  is watched much smaller than the sensor: each colour is averaged over SHRINK × SHRINK pixels (its own
+    //              samples only, which is a demosaic and a downscale in one). that average keeps the beat and loses the fine
+    //              patterns, so what's left is the moiré: bands where LINES and the sensor's rows nearly match, about
+    //              |LINES − SENSOR_H| of them (and |STRIPES − SENSOR_W| upright ones). the lens makes the tube's lines closer
+    //              together towards the edges, so the beat changes there: the bands bend round the middle and crowd in at
+    //              the edges, as they do on film. and since red, green and blue are sampled at different pixels (the Bayer
+    //              pattern), each colour's bands fall in a different place: the rainbow
+    //
+    // the result is centred on grey (what's left once the average is taken away), for crt.css to lay over the page with
+    // soft-light. worked out once, after the page has drawn (it takes a few hundredths of a second)
+    function moireArt(phone) {
+        var SHRINK = 4, SENSOR_W = phone ? 640 : 960, SENSOR_H = phone ? 400 : 600;
+        var LINES = SENSOR_H - 6.5, STRIPES = SENSOR_W + 7.5;          // (about six or seven bands each way)
+        var A = .8, B = .45, K = .009, TILT = .0025, ASPECT = SENSOR_H / SENSOR_W;
+        var W = SENSOR_W / SHRINK, H = SENSOR_H / SHRINK, sum = new Float32Array(W * H * 3), n = new Float32Array(W * H * 3);
+        var cs = Math.cos(TILT), sn = Math.sin(TILT);
+        for (var j = 0; j < SENSOR_H; j++) for (var i = 0; i < SENSOR_W; i++) {
+            var c = (j & 1) === 0 && (i & 1) === 0 ? 0 : ((j & 1) === 1 && (i & 1) === 1 ? 2 : 1);    // (the Bayer filter)
+            var x = (i + .5) / SENSOR_W * 2 - 1, y = (j + .5) / SENSOR_H * 2 - 1;
+            var bend = 1 + K * (x * x + y * y * ASPECT * ASPECT), u = (x * cs - y * ASPECT * sn) * bend, v = (y * cs + x / ASPECT * sn) * bend;
+            var line = Math.cos(Math.PI * LINES * (v + 1) / 2), stripe = Math.cos(Math.PI * (STRIPES * (u + 1) / 2 - c / 3));
+            var k = ((j / SHRINK | 0) * W + (i / SHRINK | 0)) * 3 + c;
+            sum[k] += (1 - A + A * line * line) * (1 - B + B * stripe * stripe);
+            n[k]++;
+        }
+        var mean = [0, 0, 0], dev = [0, 0, 0], N = W * H, ch, q;
+        for (q = 0; q < N * 3; q++) sum[q] /= n[q] || 1;
+        for (ch = 0; ch < 3; ch++) { for (q = 0; q < N; q++) mean[ch] += sum[q * 3 + ch]; mean[ch] /= N; }
+        for (ch = 0; ch < 3; ch++) { for (q = 0; q < N; q++) dev[ch] += Math.pow(sum[q * 3 + ch] - mean[ch], 2); dev[ch] = Math.sqrt(dev[ch] / N) || 1; }
+        var cv = document.createElement('canvas');
+        cv.width = W; cv.height = H;
+        var g = cv.getContext('2d'), im = g.createImageData(W, H), d = im.data;
+        for (q = 0; q < N; q++) {
+            for (ch = 0; ch < 3; ch++) d[q * 4 + ch] = Math.max(0, Math.min(255, 128 + 55 * (sum[q * 3 + ch] - mean[ch]) / dev[ch]));
+            d[q * 4 + 3] = 255;
+        }
+        g.putImageData(im, 0, 0);
+        return cv.toDataURL('image/png');
+    }
+
     // which camera this is: each page, and each of the house's rooms, its own
     var PAGE = (location.pathname.replace(/.*\//, '').replace(/\.html$/, '') || 'index');
     var CAMS = { index: 1, workshop: 2, city: 3, template: 9, living: 4, bath: 5, hall: 6, kitchen: 7, porch: 8, attic: 10, front: 11, dungeon: 12 };
@@ -156,6 +211,7 @@
         '<div class="crt-live"><span class="crt-rec"><b class="crt-dot">●</b> REC</span><span>LIVE</span><span class="crt-cam"></span><span class="crt-time"></span></div>';
     body.appendChild(set);
     if (Sky.fillAssets) Sky.fillAssets(set);
+    setTimeout(function () { set.style.setProperty('--moire-art', 'url("' + moireArt(matchMedia('(max-width: 620px), (max-height: 500px)').matches) + '")'); }, 600);
     var cam = set.querySelector('.crt-cam'), time = set.querySelector('.crt-time');
     function camFor(where) { cam.textContent = 'CAM ' + ('0' + (CAMS[where] || CAMS[PAGE] || 1)).slice(-2); }
     camFor(PAGE);
