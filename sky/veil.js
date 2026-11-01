@@ -10,12 +10,17 @@
                    cracking, not the things hung in front of it.
                    slot: assets/sky/cracks (one see-through picture of cracks over a
                    whole sky; a version per reset in the resets tabs if you like)
-     the wallpaper reset 5, the living space: a corner of the wallpaper has come
-                   away at the ceiling. pull it down: behind it there's no wall,
-                   only the black and the lines it's all written in. the reset's
-                   key is in there. from reset 6 it hangs open.
-                   slots: assets/living/wall-peel (the curl of wallpaper, closed),
-                   assets/living/wall-peel-open (hanging down), assets/living/behind-the-wall
+     the paint     reset 5: three places the paint's coming away (1 Nov). pull each
+                   one away: behind it there's nothing, only the black and the lines
+                   it's all written in, one of them lit up. the key falls out of the
+                   last of the three opened (run:veil-seams keeps which, for the reset).
+                   the wallpaper in the living space (from reset 6 it hangs open):
+                     assets/living/wall-peel (the corner, folded down), wall-peel-open
+                     (hanging down), assets/living/behind-the-wall
+                   the canvas on the workshop's easel, at its top right corner:
+                     assets/workshop/canvas-peel, canvas-peel-open
+                   a seam along the sea's far wave (it drifts with the wave):
+                     assets/sea/horizon-seam, horizon-seam-open
      the sky       reset 5, the rooftop: one corner of the painted sky has come
                    unstuck. once the key's found, pull it: the sky tears open onto
                    what's behind it (nothing: the black, and the lines), and the
@@ -24,7 +29,8 @@
                    slots: assets/city/sky-seam (the loose corner), assets/city/sky-stitched
                    (sewn shut), assets/city/behind-the-sky (what the tear opens onto)
      sounds        sky-tear (the sky ripping), void-wind (the pull through it),
-                   wall-peel (the wallpaper coming down): stand-ins until yours
+                   wall-peel (the wallpaper coming down), paint-peel (the canvas's paint
+                   and the sea's coming away): stand-ins until yours
 
    its look: sky/css/veil.css
    ===================================================================== */
@@ -50,15 +56,23 @@
             codeWait.splice(0).forEach(function (f) { f(codeText); });
         });
     }
-    // a black with the lines in it (behind the wallpaper, behind the sky)
-    function voidInto(el, lines) {
+    // a black with the lines in it (behind the wallpaper, behind the sky). mark: one line of its own, lit up (a <mark>),
+    // on line number "at" (1 Nov: the three places the paint's come away each have one)
+    function voidInto(el, lines, mark, at) {
         var pre = document.createElement('pre');
         pre.className = 'void-lines';
         pre.setAttribute('aria-hidden', 'true');
+        var lit = null;
+        if (mark) { lit = document.createElement('mark'); lit.textContent = mark; pre.appendChild(lit); }
         el.appendChild(pre);
         code(function (t) {
-            var all = t.split('\n'), from = Math.floor(Math.random() * Math.max(1, all.length - lines));
-            pre.textContent = all.slice(from, from + lines).join('\n');
+            var all = t.split('\n'), from = Math.floor(Math.random() * Math.max(1, all.length - lines)), got = all.slice(from, from + lines);
+            if (!lit) { pre.textContent = got.join('\n'); return; }
+            var i = Math.max(0, Math.min(got.length, at == null ? Math.floor(got.length / 2) : at));
+            pre.textContent = '';
+            pre.appendChild(document.createTextNode(got.slice(0, i).join('\n') + (i ? '\n' : '')));
+            pre.appendChild(lit);
+            pre.appendChild(document.createTextNode('\n' + got.slice(i).join('\n')));
         });
         return pre;
     }
@@ -100,10 +114,113 @@
         if (Sky.fillAssets) Sky.fillAssets(skybox);
     }
 
-    /* ---------------- the wallpaper (the living space) ---------------- */
-    // (both drawn on a 120 x 150 box, the top edge at the ceiling)
+    /* ---------------- three places the paint's coming away (reset 5) ----------------
+       (1 Nov) the wallpaper in the living space, a corner of the canvas on the workshop's easel, and a seam along the
+       sea's far wave. each one is taken hold of and pulled away (Sky.pull, like the wallpaper always was): behind it
+       there's nothing, only the black and the lines it's all written in, one of them lit up. the reset remembers which
+       are open (run:veil-seams, a list), and the key falls out of whichever is opened last, the third (sky/resets.js
+       catches it; after a reload it's put back where it fell). from reset 6 the wallpaper still hangs open; the canvas
+       and the sea have been painted over (they're gone) */
+    var SEAMS = ['wall', 'canvas', 'horizon'];
+    var places = {};                                                    // the ones on this page, by id
+    function opened() {
+        try {
+            var l = JSON.parse(S.get('veil-seams') || '[]');
+            return Array.isArray(l) ? l.filter(function (x) { return SEAMS.indexOf(x) !== -1; }) : [];
+        } catch (e) { return []; }
+    }
+    function markOpen(id) {
+        var l = opened();
+        if (l.indexOf(id) === -1) l.push(id);
+        S.set('veil-seams', JSON.stringify(l));
+        return l;
+    }
+    // (a visit from before 1 Nov, with the wallpaper already down: it counts)
+    try { if (R === 5 && sessionStorage.getItem('wall-peeled') === '1') { markOpen('wall'); sessionStorage.removeItem('wall-peeled'); } } catch (e) {}
+
+    // the key, out of the last one opened: it falls where that one says (key: [left, top], in % of it)
+    function dropKey(id, quiet) {
+        var p = places[id];
+        if (!p || S.get('key') === '1') return null;
+        var d = { by: 'veil', host: p.el, left: p.key[0] + '%', top: p.key[1] + '%', quiet: !!quiet };
+        if (!quiet) document.dispatchEvent(new CustomEvent('dav:drop-key', { detail: d }));
+        return d;
+    }
+    // (after a reload: all three open, the key not taken. sky/resets.js asks, and puts it back where it fell)
+    function keyLies() {
+        var l = opened();
+        if (R !== 5 || l.length < SEAMS.length) return null;
+        return dropKey(l[l.length - 1], true);
+    }
+
+    // one place where the paint's come away, and how it's pulled:
+    //   host   where it goes in the page;  cls   its classes (where it sits and how it looks: sky/css/veil.css)
+    //   slots  [the corner, lifting; the strip, pulled away; what's behind it (optional)]
+    //   o      id ('wall', 'canvas', 'horizon'), label, closed / opened (the drawn stand-ins), open (already open),
+    //          line (the one line of the world's code that's lit up behind it), at (which line it's on), lines (how many),
+    //          dir / need (which way it's pulled, and how far: px, or a function of the element), sound, key ([left, top]:
+    //          where the key lands if it falls out of this one), and what the traveller says: tap (only clicked),
+    //          gave (it came away), again (clicked once it's open)
+    function peelable(host, cls, slots, o) {
+        var el = document.createElement('div');
+        el.className = cls + ' peel' + (o.open || opened().indexOf(o.id) !== -1 ? ' peeled' : '');
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('aria-label', o.label);
+        el.dataset.slot = slots.join(' ');
+        el.dataset.peel = o.id;
+        el.innerHTML = '<div class="pl-behind"' + (slots[2] ? ' data-asset="' + slots[2] + '"' : '') + '></div>' +
+            '<div class="pl-curl" data-asset="' + slots[0] + '">' + o.closed + '</div>' +
+            '<div class="pl-open" data-asset="' + slots[1] + '">' + o.opened + '</div>';
+        host.appendChild(el);
+        voidInto(el.querySelector('.pl-behind'), o.lines || 14, o.line, o.at);
+        if (Sky.fillAssets) Sky.fillAssets(el);
+        var place = places[o.id] = { el: el, key: o.key || [50, 70] };
+
+        function tearDown() {
+            el.style.removeProperty('--pull');
+            if (el.classList.contains('peeled')) return;
+            el.classList.add('peeled');
+            sfx(o.sound || 'wall-peel', { or: 'paper-unroll' });
+            if (R !== 5) { setTimeout(function () { say(o.gave, 3200); }, 500); return; }
+            var l = markOpen(o.id), all = l.length >= SEAMS.length;
+            setTimeout(function () { say(o.gave, 3200); }, 500);
+            if (all) setTimeout(function () { if (el.isConnected) dropKey(o.id); }, 2400);
+            // (more to find: said so, without saying where)
+            else if (S.get('key') !== '1') setTimeout(function () { say(MORE[l.length] || MORE[1], 3400); }, 4000);
+        }
+        function poke(e) {
+            if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+            if (busyHands() || (e.target.closest && e.target.closest('.reset-key'))) return;
+            e.preventDefault(); e.stopPropagation();                         // (the workshop's easel under it mustn't open)
+            if (el.classList.contains('peeled')) { say(o.again, 3200); return; }
+            if (e.type === 'keydown') tearDown();                            // (by hand it's pulled: below)
+        }
+        el.addEventListener('click', poke);
+        el.addEventListener('keydown', poke);
+        // (11 Oct: grabbed, then pulled) take hold of the corner and pull: it lifts further off (--pull, 0 to 1: how it
+        // lifts is in veil.css), and far enough it comes away. let go too soon and it settles back
+        Sky.pull(el, {
+            dir: o.dir,
+            need: function () { return typeof o.need === 'function' ? o.need(el) : (o.need || 60); },
+            can: function (e) { return !el.classList.contains('peeled') && !(e.target.closest && e.target.closest('.reset-key')); },
+            move: function (k) { el.style.setProperty('--pull', k.toFixed(3)); },
+            give: tearDown,
+            back: function () { el.style.removeProperty('--pull'); },
+            tap: function () { say(o.tap, 2600); }
+        });
+        return place;
+    }
+    // what the traveller says after one or two of the three (it can't be the only place)
+    var MORE = {
+        1: 'It can’t be the only place. The paint’s coming away somewhere else too, I can feel it.',
+        2: 'Two. There’s one more somewhere. Somewhere the paint’s still lifting.'
+    };
+
+    // the wallpaper (the living space): a corner come away at the ceiling. (both drawn on a 120 x 150 box, the top edge at
+    // the ceiling.) from reset 6 it hangs open
     var PEEL = '<svg class="placeholder" viewBox="0 0 120 150" aria-hidden="true">' +
-        // a dog-ear: the corner of the paper has folded down off the wall, its plain back showing (the black behind it: .wp-behind)
+        // a dog-ear: the corner of the paper has folded down off the wall, its plain back showing (the black behind it: .pl-behind)
         '<path d="M40 0 L120 70 L51 79 Z" fill="#e6dbc0" stroke="#8f7f62" stroke-width="1.2" stroke-linejoin="round"/>' +
         '<path d="M46 9 L110 66 M52 22 L98 64" stroke="#c4b591" stroke-width=".9"/>' +
         '<path d="M40 0 L120 70" stroke="rgba(0,0,0,.35)" stroke-width="2.2"/></svg>';
@@ -112,55 +229,86 @@
         '<g transform="rotate(64 2 2)"><path d="M2 2 H86 V92 L78 100 L70 94 L60 104 L50 96 L40 106 L30 97 L20 104 L10 96 L2 100 Z" style="fill: var(--wall, #3f5a55)" stroke="rgba(0,0,0,.4)" stroke-width="1.2"/>' +
         '<path d="M14 2 V98 M40 2 V104 M66 2 V98" stroke="rgba(255,240,210,.1)" stroke-width="9"/></g></svg>';
     var room = document.querySelector('.room');
-    var wallKeyHere = R === 5;
-    if (room && PAGE === 'living' && R >= 5 && R <= 7) {
-        var wp = document.createElement('div');
-        wp.className = 'furnish wall-peel' + (R > 5 ? ' peeled' : '');
-        wp.setAttribute('role', 'button');
-        wp.setAttribute('tabindex', '0');
-        wp.setAttribute('aria-label', 'the wallpaper, peeling');
-        wp.dataset.slot = 'assets/living/wall-peel assets/living/wall-peel-open assets/living/behind-the-wall';
-        wp.innerHTML = '<div class="wp-behind" data-asset="assets/living/behind-the-wall"></div>' +
-            '<div class="wp-curl" data-asset="assets/living/wall-peel">' + PEEL + '</div>' +
-            '<div class="wp-open" data-asset="assets/living/wall-peel-open">' + PEELED + '</div>';
-        room.appendChild(wp);
-        voidInto(wp.querySelector('.wp-behind'), 14);
-        if (Sky.fillAssets) Sky.fillAssets(wp);
-        try { if (sessionStorage.getItem('wall-peeled') === '1') wp.classList.add('peeled'); } catch (e) {}
-        var curl = wp.querySelector('.wp-curl');
-        var tearDown = function () {
-            curl.style.transition = curl.style.transform = '';
-            wp.classList.add('peeled');
-            try { sessionStorage.setItem('wall-peeled', '1'); } catch (e2) {}
-            sfx('wall-peel', { or: 'paper-unroll' });
-            setTimeout(function () { say('It came away in one long strip. There’s no wall behind it.', 3200); }, 500);
-        };
-        var peel = function (e) {
-            if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
-            if (busyHands() || e.target.closest('.reset-key')) return;
-            e.preventDefault(); e.stopPropagation();
-            if (wp.classList.contains('peeled')) {
-                say(R === 5 ? 'Behind the wallpaper there’s no wall. Just the dark, and writing in it.' : 'It’s still hanging open. Nobody’s papered over it.', 3200);
-                return;
-            }
-            if (e.type === 'keydown') tearDown();                            // (by hand it's pulled: below)
-        };
-        wp.addEventListener('click', peel);
-        wp.addEventListener('keydown', peel);
-        // (11 Oct: grabbed, then pulled) take hold of the curl and pull it down: it lifts further off the wall, and
-        // far enough it tears away in one strip. let go too soon and it curls back
-        Sky.pull(wp, {
-            dir: [0.25, 1],
-            need: function () { return Math.max(50, wp.offsetHeight * 0.55); },
-            can: function (e) { return !wp.classList.contains('peeled') && !(e.target.closest && e.target.closest('.reset-key')); },
-            move: function (k) {
-                curl.style.transition = 'none';
-                curl.style.transform = 'rotate(' + (-4 - 18 * k).toFixed(1) + 'deg) scale(' + (1.04 + 0.16 * k).toFixed(3) + ') translateY(' + (12 * k).toFixed(1) + '%)';
-            },
-            give: tearDown,
-            back: function () { curl.style.transition = ''; curl.style.transform = ''; },
-            tap: function () { say('It’s coming away at the corner. You could pull it down.', 2600); }
+    if (room && PAGE === 'living' && R >= 5 && R <= 7) peelable(room, 'furnish wall-peel',
+        ['assets/living/wall-peel', 'assets/living/wall-peel-open', 'assets/living/behind-the-wall'], {
+            id: 'wall', open: R > 5, label: 'the wallpaper, peeling', closed: PEEL, opened: PEELED,
+            line: '// only paper.', at: 3, lines: 14,
+            dir: [0.25, 1], need: function (el) { return Math.max(50, el.offsetHeight * 0.55); },
+            sound: 'wall-peel', key: [62, 50],
+            tap: 'It’s coming away at the corner. You could pull it down.',
+            gave: 'It came away in one long strip. There’s no wall behind it.',
+            again: R === 5 ? 'Behind the wallpaper there’s no wall. Just the dark, and writing in it.' : 'It’s still hanging open. Nobody’s papered over it.'
         });
+
+    // the canvas on the workshop's easel: the paint lifting at its top right corner, like a skin. (drawn on a 100 x 150 box,
+    // its top right on the canvas's top right corner: the gap is the square at the top, the skin hangs down below it.)
+    // reset 5 only
+    var LIFT = '<svg class="placeholder" viewBox="0 0 100 150" aria-hidden="true">' +
+        // the corner of the paint, folded down off the canvas: its back is bare, a little cracked
+        '<path d="M45 0 L100 55 L45 55 Z" fill="#e9dcc0" stroke="#8a7656" stroke-width="1.2" stroke-linejoin="round"/>' +
+        '<path d="M52 12 L54 50 M62 22 L64 50 M74 33 L76 50 M50 30 L80 40" stroke="#c7b48c" stroke-width=".8" fill="none"/>' +
+        '<path d="M45 0 L100 55" stroke="rgba(0,0,0,.4)" stroke-width="2.2"/></svg>';
+    var LIFTED = '<svg class="placeholder" viewBox="0 0 100 150" aria-hidden="true">' +
+        // the skin of paint, come away and hanging off the bottom of the gap it left (the painted side: brushstrokes)
+        '<g transform="rotate(10 2 100)"><path d="M2 100 H78 L76 118 L68 126 L60 121 L50 131 L40 124 L30 134 L20 126 L10 132 L2 126 Z" fill="#b98a4e" stroke="rgba(0,0,0,.4)" stroke-width="1.2"/>' +
+        '<path d="M6 106 Q34 101 72 108 M4 116 Q30 111 70 119" stroke="#7d5a32" stroke-width="4" fill="none" opacity=".55"/>' +
+        '<path d="M10 111 Q38 106 66 113 M8 122 Q26 118 52 124" stroke="#e2c58c" stroke-width="2.2" fill="none" opacity=".6"/></g></svg>';
+    var easel = document.querySelector('.easel');
+    if (easel && PAGE === 'workshop' && R === 5) peelable(easel, 'canvas-peel',
+        ['assets/workshop/canvas-peel', 'assets/workshop/canvas-peel-open'], {
+            id: 'canvas', label: 'the paint on the canvas, lifting at a corner', closed: LIFT, opened: LIFTED,
+            line: '// someone\n// painted this.', at: 2, lines: 10,
+            dir: [-0.6, 0.8], need: function (el) { return Math.max(44, el.offsetWidth * 0.75); },
+            sound: 'paint-peel', key: [58, 52],
+            tap: 'The paint’s lifting off the canvas at the corner. You could peel it back.',
+            gave: 'The paint came away like a skin. There’s nothing under it. Not even canvas.',
+            again: 'Behind the paint there’s no canvas. Just the dark, and that one line.'
+        });
+
+    // the sea: a seam along the far wave, the paint of the water lifting off it at one end. (drawn on a 160 x 60 box.) it's
+    // in the far wave's own layer (sky/ground-sea.js), so it drifts and rocks with it. reset 5 only
+    var SPLIT = '<svg class="placeholder" viewBox="0 0 160 60" aria-hidden="true">' +
+        // the hairline the water's split along, and its right end lifting off (the back of the paint is bare)
+        '<path d="M4 36 L20 33 L34 37 L52 31 L70 35 L88 30 L100 33" fill="none" stroke="rgba(14,12,10,.65)" stroke-width="1.6" stroke-linejoin="round"/>' +
+        '<path d="M100 33 L118 30 L134 34 L154 28 Q150 12 132 8 Q114 6 100 33 Z" fill="#e6dcc4" stroke="#8a7d64" stroke-width="1.1" stroke-linejoin="round"/>' +
+        '<path d="M108 26 Q122 14 144 16" stroke="#c4b591" stroke-width=".8" fill="none"/></svg>';
+    var SPLIT_OPEN = '<svg class="placeholder" viewBox="0 0 160 60" aria-hidden="true">' +
+        // the strip of painted water, peeled down and hanging off its left end (wave colours, a line of foam)
+        '<g transform="rotate(24 4 34)"><path d="M4 34 H118 L114 42 L104 39 L94 45 L82 40 L70 46 L58 41 L46 46 L34 41 L22 45 L10 40 L4 44 Z" fill="#56636f" stroke="rgba(0,0,0,.45)" stroke-width="1"/>' +
+        '<path d="M8 37 Q30 34 54 37 T110 36" stroke="#e2d9c6" stroke-width="1.6" fill="none" opacity=".75"/></g></svg>';
+    var far = PAGE === 'sea' && R === 5 && document.querySelector('.ground-sea .wave-move-1');
+    if (far) {
+        var seam5 = peelable(far, 'horizon-seam',
+            ['assets/sea/horizon-seam', 'assets/sea/horizon-seam-open'], {
+                id: 'horizon', label: 'the far sea, split along a seam', closed: SPLIT, opened: SPLIT_OPEN,
+                line: '// the sea stops here.', at: 2, lines: 6,
+                dir: [0, 1], need: 50,
+                sound: 'paint-peel', key: [52, 74],
+                tap: 'The far sea’s split along a seam, and the edge is lifting. You could pull it.',
+                gave: 'The far sea peeled back like wet paper. There’s nothing past it.',
+                again: 'The sea stops there. Behind it, only the dark, and the writing.'
+            });
+        ride(seam5.el);
+    }
+    // (the sea's toy camera, sky/postfx.js, slides the far wave's picture a little as the visitor looks about, and blurs it.
+    // the seam's painted on that wave, so it slides with it, the same amount, and its paint blurs half as much: the black and
+    // the writing behind it stay sharp. it waits a while for the camera, then gives up)
+    function ride(el) {
+        var it = null, tries = 0, was = '', blur = '';
+        (function find() {
+            var cam = Sky.postfx && Sky.postfx.camera;
+            it = cam && (cam.items || []).filter(function (x) { return x.slot === 'assets/sea/wave-1'; })[0];
+            if (it) return step();
+            if (++tries < 40 && el.isConnected) setTimeout(find, 500);
+        })();
+        function step() {
+            if (!el.isConnected) return;
+            var v = it.x.toFixed(1) + 'px ' + it.y.toFixed(1) + 'px';
+            if (v !== was) el.style.translate = was = v;
+            var p = it.el.postfx, b = p ? (p.blur * innerWidth / 1920 / 2).toFixed(1) + 'px' : '0px';
+            if (b !== blur) el.style.setProperty('--seam-blur', blur = b);
+            requestAnimationFrame(step);
+        }
     }
 
     /* ---------------- the sky over the rooftop ---------------- */
@@ -237,7 +385,10 @@
         var N = 46, jag = [], W = window.innerWidth, H = window.innerHeight, big = Math.hypot(W, H) * 1.1, t0 = performance.now(), MS = 3200;
         for (var i = 0; i < N; i++) jag.push(0.72 + Math.random() * 0.5);
         var poly = t.querySelector('polygon');
-        (function frame(now) {
+        // (reduced motion: no growing, no tumbling, no scraps: the sky fades to what's behind it, and they fade into it)
+        var calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (calm) { t.style.opacity = '0'; t.style.transition = 'opacity 1.6s'; requestAnimationFrame(function () { t.style.opacity = '1'; }); }
+        if (!calm) (function frame(now) {
             if (!t.isConnected) return;
             var k = Math.min(1, (now - t0) / MS), r = big * (k * k * (3 - 2 * k)) + 8, pts = [];
             for (var j = 0; j < N; j++) {
@@ -252,6 +403,7 @@
         setTimeout(function () {
             var r = ch.getBoundingClientRect(), dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2);
             ch.classList.remove('walking', 'talking');
+            if (calm) { ch.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1800, fill: 'forwards' }); return; }
             ch.animate([
                 { transform: 'translate(0, 0) rotate(0)', opacity: 1 },
                 { transform: 'translate(0, -' + (r.height * 0.25) + 'px) rotate(-8deg)', opacity: 1, offset: 0.25 },
@@ -288,5 +440,6 @@
         ], { duration: 900 + Math.random() * 700, easing: 'cubic-bezier(.4,0,.9,.5)', fill: 'forwards' }).onfinish = function () { s.remove(); };
     }
 
-    Sky.veil = { code: code, voidInto: voidInto, get keyBehindWall() { return wallKeyHere; } };
+    Sky.veil = { code: code, voidInto: voidInto, peelable: peelable, keyLies: keyLies, places: places,
+                 get opened() { return opened(); } };
 })();

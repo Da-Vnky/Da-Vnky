@@ -289,3 +289,21 @@ body.paper-open .cp {
         animation: none;
     }
 }
+
+/* the diagram's circles, one more lit each reset passed (sky/dungeon.js): a name scratched in each */
+.dungeon .dg-sphere {
+    position: absolute;
+    z-index: 5 !important;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 50%, rgba(255, 190, 110, .55) 0%, rgba(220, 70, 30, .32) 45%, rgba(160, 20, 10, 0) 72%);
+    mix-blend-mode: screen;
+    cursor: pointer;
+    animation: dg-sphere 3.2s ease-in-out infinite;
+}
+.dungeon .dg-sphere:hover,
+.dungeon .dg-sphere:focus-visible { background: radial-gradient(ellipse at 50% 50%, rgba(255, 220, 150, .8) 0%, rgba(240, 90, 40, .45) 45%, rgba(160, 20, 10, 0) 72%); outline: none; }
+@keyframes dg-sphere { 50% { opacity: .62; } }
+body.inv-holding .dungeon .dg-sphere { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .dungeon .dg-sphere { animation: none; } }

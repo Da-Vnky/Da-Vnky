@@ -57,6 +57,53 @@
     window.addEventListener('load', placeGlows);
     setTimeout(placeGlows, 600);
 
+    /* ---------------- the diagram's seven circles: one more lit each reset, a name scratched in each ----------------
+       the circles are the seven spheres' rulers (Saturn at the back, then round: Jupiter, Mars, the Sun, Venus, Mercury,
+       the Moon: the same places as the Claubes' SEATS in sky/claubes.js). each reset passed lights its sphere's circle
+       (reset 2: the Moon's … reset 8: all seven), and a lit one has its ruler's name in it: what the Demiurge is called
+       is the last of them (sky/gnosis.js, the same names) */
+    var diagram = dg.querySelector('.dungeon-diagram');
+    var SPHERES = [['the Moon', 'Horaios', [0.269, 0.316]], ['Mercury', 'Ailoaios', [0.212, 0.566]], ['Venus', 'Astaphaios', [0.372, 0.766]],
+                   ['the Sun', 'Adonaios', [0.628, 0.766]], ['Mars', 'Sabaoth', [0.788, 0.566]], ['Jupiter', 'Iao', [0.731, 0.316]],
+                   ['Saturn', 'Ialdabaoth', [0.5, 0.205]]];
+    var passed = window.davSave ? Math.min(7, window.davSave.reset - 1) : 0;
+    var rings = [];
+    if (diagram && passed > 0) {
+        SPHERES.forEach(function (sp, i) {
+            if (i >= passed) return;
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'dg-sphere';
+            b.setAttribute('aria-label', sp[0] + '’s circle');
+            b.style.animationDelay = (-i * 0.7).toFixed(1) + 's';
+            b.addEventListener('click', function (e) {
+                e.stopPropagation();
+                Sky.say(i === 6 ? 'Scratched into Saturn’s circle, in the blood: IALDABAOTH. And under it, smaller: the blind one. SAMAEL.'
+                                : 'Scratched into ' + sp[0] + '’s circle, in the blood: ' + sp[1].toUpperCase() + '.', 4200);
+                Sky.sfx('page-turn', { size: 0.3, volume: 0.4 });
+            });
+            diagram.parentNode.insertBefore(b, diagram.nextSibling);
+            rings.push([b, sp[2]]);
+        });
+    }
+    function placeRings() {
+        if (!rings.length) return;
+        var d = diagram.getBoundingClientRect(), o = diagram.parentNode.getBoundingClientRect();    // (an svg has no offsetLeft)
+        var x = d.left - o.left, y = d.top - o.top, w = d.width, h = d.height;
+        if (!w) return;
+        rings.forEach(function (r) {
+            r[0].style.left = (x + w * r[1][0] - w * 0.075) + 'px';
+            r[0].style.top = (y + h * r[1][1] - h * 0.075) + 'px';
+            r[0].style.width = (w * 0.15) + 'px';
+            r[0].style.height = (h * 0.15) + 'px';
+        });
+    }
+    placeRings();
+    window.addEventListener('resize', placeRings);
+    window.addEventListener('load', placeRings);
+    setTimeout(placeRings, 600);
+    if (Sky.house && Sky.house.on) Sky.house.on(function (what, name) { if (what === 'enter' && name === 'dungeon') setTimeout(placeRings, 50); });
+
     /* ---------------- the paper on the floor (write it in the content manager: notes -> the paper in the dungeon) ---------------- */
     var paperEl = dg.querySelector('.dungeon-paper');
     if (paperEl) {

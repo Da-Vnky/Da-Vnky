@@ -340,12 +340,6 @@
             return;
         }
         if (Sky.lives && Sky.lives.refuse('revolver')) return;                    // (from reset 2, not before the key: sky/lives.js)
-        // the lock's off and there's more than one heart left: it won't fire (sky/lives.js; with one heart, never)
-        if (Sky.lives && Sky.lives.jammed) {
-            Sky.sfx('jammed', { or: 'tap' });
-            I.say('it’s jammed.', 1600);
-            return;
-        }
         if (!spend()) return;
         // the last heart: no falling down, no getting up. the world goes straight to white (sky/lives.js)
         if (Sky.lives && Sky.lives.last) { dying = true; bang(); Sky.lives.final(); return; }

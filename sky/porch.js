@@ -42,7 +42,7 @@
     var watcher = porch.querySelector('.porch-watcher'), walker = porch.querySelector('.porch-walker');
     var neighbour = porch.querySelector('.porch-neighbour'), crows = porch.querySelector('.porch-crows');
     var DOOR = 5, STAND = 38;                               // where the traveller comes out (the door) and stands (% across)
-    var reset = S ? S.reset : 1, creepy = reset >= 3;
+    var reset = S ? S.reset : 1, creepy = reset >= 3 && !(S && S.free);       // (once they've stayed: just a porch again)
     var H = Sky.house, sfx = Sky.sfx;
     function say(t, ms) { Sky.say(t, ms || 2800); }
 

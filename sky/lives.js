@@ -29,7 +29,7 @@
     var body = document.body, S = window.davSave;
     var ALWAYS = !!S && S.reset >= 2 && S.reset < 8;    // from reset 2: the hearts are always there, and locked till the key
     // (reset 8: no heart at all. there's nothing left to kill there: its way on is knowing, sky/gnosis.js)
-    if (S && S.reset >= 8) { Sky.lives = { left: 1, shown: false, unlocked: false, jammed: false, last: false, locked: false, counts: false,
+    if (S && S.reset >= 8) { Sky.lives = { left: 1, shown: false, unlocked: false, last: false, locked: false, counts: false,
         unlock: function () {}, refuse: function () { return false; }, final: function () {}, give: function () {} }; return; }
     // what the traveller says trying a way to die before the key's found (from reset 2)
     var NOT_YET = {
@@ -39,21 +39,10 @@
         grimoire:    'My hand stops above the page. It won’t let me sign. Not yet.',
         diagram:     'The circle drinks the bullet… and waits. It isn’t time yet.',
         // (5 Oct: resets 5 to 7. each one points at where its key is)
-        veil:        'A corner of the sky’s come unstuck. My hand won’t pull it. Not yet. …The wallpaper at home was peeling too.',
-        gaze:        'It shuts the moment I meet it. Not yet. …There was one in the hallway that never blinked.',
+        veil:        'A corner of the sky’s come unstuck. My hand won’t pull it. Not yet. …The paint’s coming away in more than one place. I haven’t found them all.',
+        gaze:        'It shuts the moment I meet it. Not yet. …The one in the hallway never blinks. Something would have to make it stop seeing.',
         timer:       'I know how this ends. I’ve watched it end a hundred times. Not yet. …Something in the kitchen keeps its own time.',
         placeholder: 'Not yet. There’s something I have to find first.'
-    };
-    // each way to die costs a heart once a reset. tried again after that, it doesn't happen, and the traveller says why
-    var DONE = {
-        boat:        'Not the boat again. It didn’t stick the first time.',
-        pills:       'Not again. It didn’t take the first time.',
-        grimoire:    'The pact’s already made. The book has nothing more to ask.',
-        diagram:     'The circle already took what it wanted.',
-        veil:        'It stitched itself shut behind me.',
-        gaze:        'It’s already seen me. That was enough.',
-        timer:       'The hands won’t move. It already ran out.',
-        placeholder: 'Not that one again. It has to be something else.'
     };
     function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function put(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
@@ -114,30 +103,18 @@
     // this reset's death costs the heart,
     // but only once the lock's off (this reset's hidden key): until then they're safe
     function unlocked() { return get('lives-unlocked') === '1'; }
-    // the way to die that's just been let through (refuse() below), so the death that follows can use it up for the reset
-    var pending = null, lastDeath = 0;
-    function kindOf(k) { return String(k || '').replace(/[^a-z0-9:-]/gi, ''); }
-    function spent(kind) { return !!S && S.get('spent-' + kindOf(kind)) === '1'; }
+    var lastDeath = 0;
     document.addEventListener('dav:traveller-died', function () {
         if (!(shown() && unlocked())) return;
         var now = Date.now();
         if (now - lastDeath < 4000) return;                           // (one death, one heart: never two for the same fall)
         lastDeath = now;
-        if (pending && now - pending.at < 30000 && S) S.set('spent-' + kindOf(pending.kind), '1');
-        pending = null;
         lose();
     });
     // the heart goes, and the world with it, there and then (27 Sep: an instant death, straight into the reset's
     // white-out, "No more lives left" written on it; no breaking heart, no wait)
     var resetting = false;
-    function lose() {
-        if (resetting) return;
-        var n = left() - 1;
-        put('lives-left', Math.max(0, n));
-        draw();
-        if (n > 0) { say(n === 1 ? 'one life left.' : n + ' lives left.'); return; }
-        endReset();
-    }
+    function lose() { if (!resetting) endReset(); }
     function endReset() {
         resetting = true;
         put('lives-left', 0);
@@ -156,15 +133,10 @@
     draw();
     // a way to die, tried before the key (from reset 2): it doesn't happen, and the traveller says why
     var saidAt = 0;
-    // (and once the key's found: a way to die that's already cost a heart this reset is off too, with its own line)
+    // (one heart, one death a reset: the death that takes it ends the reset, so nothing needs refusing after the key)
     function refuse(kind) {
-        var counts = shown() && unlocked(), base = String(kind || '').split(':')[0];
-        if (counts && kind !== 'revolver' && spent(kind)) return no(DONE[base] || DONE.placeholder);
-        if (!ALWAYS || unlocked()) {
-            if (counts && kind !== 'revolver') pending = { kind: kind, at: Date.now() };
-            return false;
-        }
-        return no(NOT_YET[base] || NOT_YET.placeholder);
+        if (!ALWAYS || unlocked()) return false;
+        return no(NOT_YET[String(kind || '').split(':')[0]] || NOT_YET.placeholder);
     }
     function no(line) {
         var now = Date.now();
@@ -188,8 +160,6 @@
             var lk = el.querySelector('.l-lock');
             if (lk && shown()) { lk.classList.add('popping'); setTimeout(draw, 800); } else draw();
         },
-        // the revolver only fires on the last heart (with one heart this never jams it)
-        get jammed() { return shown() && unlocked() && left() > 1; },
         // on the last heart, the revolver doesn't kill them: it ends the reset, there and then
         get last() { return shown() && unlocked() && left() === 1; },
         // from reset 2, until the key: every way to die is off (true = refused, and the traveller's said why)

@@ -40,50 +40,137 @@ html[data-reset="7"] .sky-cracks g { display: inline; }
 .sky-cracks .cr-edge path { fill: none; stroke: rgba(255, 250, 236, .32); stroke-width: 1.2; stroke-linejoin: round; transform: translate(1.6px, 1.2px); vector-effect: non-scaling-stroke; }
 html[data-reset="7"] .sky-cracks .cr-line path { stroke: rgba(10, 8, 6, .62); stroke-width: 2; }
 
-/* ---------------- the wallpaper, peeling (reset 5 on: the living space) ---------------- */
+/* ---------------- three places the paint's coming away (reset 5: sky/veil.js peelable) ----------------
+   each one: .pl-behind (the black, with the lines in it), .pl-curl (the corner lifting) and .pl-open (the strip,
+   pulled away), stacked in one box. while it's held, --pull goes from 0 to 1 (how far it's been pulled), and the corner
+   lifts with it; .peeled once it's come away */
+.peel {
+    position: absolute;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.peel > div:not(.reset-key) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    pointer-events: none;           /* (the box takes the tap; the strip hanging out of it mustn't cover what's under it) */
+}
+.peel > div > svg,
+.peel > div > .art { display: block; width: 100%; height: auto; }
+.peel .pl-behind {
+    height: 100%;
+    overflow: hidden;
+    background: #050506;
+    box-shadow: inset 0 0 14px #000;
+    transition: clip-path .9s cubic-bezier(.5, 0, .3, 1);
+}
+.peel .pl-behind > .art { height: 100%; object-fit: cover; }
+.peel .pl-curl { transition: opacity .25s, transform .3s; }
+.peel .pl-open { opacity: 0; transition: opacity .15s, transform 1s cubic-bezier(.4, 0, .3, 1.35); }
+.peel:focus-visible { outline: 2px dashed #fff6dc; outline-offset: 3px; }
+.peel.peeled .pl-behind { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+.peel.peeled .pl-curl { opacity: 0; }
+.peel.peeled .pl-open { opacity: 1; transform: none; }
+.peel.held .pl-curl { transition: none; }
+/* the one line of the world's code that's lit up behind each */
+.peel .void-lines mark {
+    white-space: pre-wrap;
+    color: #f2fff4;
+    background: rgba(120, 255, 170, .16);
+    text-shadow: 0 0 6px rgba(150, 255, 190, .9);
+    padding: 0 2px;
+    opacity: 0;
+    transition: opacity 1.2s .7s;
+}
+.peel.peeled .void-lines mark { opacity: 1; }
+/* the key's in the gap once it's fallen out (sky/resets.js puts it there) */
+.peel .reset-key { width: 30%; min-width: 22px; }
+.peel:not(.peeled) .reset-key { visibility: hidden; pointer-events: none; }
+
+/* the wallpaper (the living space): its corner at the ceiling */
 .room .wall-peel {
     left: 30%;
     top: 0;
     width: max(84px, 7.5vw);
     aspect-ratio: 120 / 150;
     z-index: 3;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
 }
-.wall-peel > div:not(.reset-key) {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    pointer-events: none;           /* (the box takes the tap; the strip hanging out of it mustn't cover the radio, upright) */
-}
-.wall-peel > div > svg,
-.wall-peel > div > .art { display: block; width: 100%; height: auto; }
 /* behind it: the wall isn't there. closed, a sliver of it under the folded corner; open, the whole gap the strip left */
-.wall-peel .wp-behind {
-    height: 70%;
-    overflow: hidden;
-    background: #050506;
-    box-shadow: inset 0 0 14px #000;
-    clip-path: polygon(33% 0, 100% 0, 100% 44%);
-    transition: clip-path .9s cubic-bezier(.5, 0, .3, 1);
+.wall-peel .pl-behind { height: 70%; clip-path: polygon(33% 0, 100% 0, 100% 44%); }
+.wall-peel .pl-behind .void-lines { font-size: 7px; padding-left: 24%; }   /* (clear of the strip hanging down its left side) */
+.wall-peel .pl-curl { transform-origin: 70% 20%; }
+.wall-peel .pl-open { transform-origin: 2% 1%; transform: rotate(-64deg); }
+.wall-peel:hover .pl-curl,
+.wall-peel:focus-visible .pl-curl { transform: rotate(-4deg) scale(1.04); }
+.wall-peel.held .pl-curl {
+    transform: rotate(calc(-4deg - 18deg * var(--pull, 0))) scale(calc(1.04 + .16 * var(--pull, 0))) translateY(calc(12% * var(--pull, 0)));
 }
-.wall-peel .wp-behind .void-lines { font-size: 7px; }
-.wall-peel .wp-behind > .art { height: 100%; object-fit: cover; }
-.wall-peel .wp-curl { transform-origin: 70% 20%; transition: opacity .25s, transform .3s; }
-.wall-peel .wp-open { opacity: 0; transform-origin: 2% 1%; transform: rotate(-64deg); transition: opacity .15s, transform 1s cubic-bezier(.4, 0, .3, 1.35); }
-.wall-peel:hover .wp-curl,
-.wall-peel:focus-visible .wp-curl { transform: rotate(-4deg) scale(1.04); }
-.wall-peel:focus-visible { outline: 2px dashed #fff6dc; outline-offset: 3px; }
-.wall-peel.peeled .wp-behind { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
-.wall-peel.peeled .wp-curl { opacity: 0; }
-.wall-peel.peeled .wp-open { opacity: 1; transform: none; }
-/* the key's in the gap: you can't see it till the paper's down (sky/resets.js puts it there) */
-.wall-peel .reset-key { width: 30%; min-width: 22px; z-index: 2; }
-.wall-peel:not(.peeled) .reset-key { visibility: hidden; pointer-events: none; }
 @media (max-width: 620px) {
     /* (an upright phone: the strip of wall on the right, above where the secret door opens) */
-    .room .wall-peel { left: 82%; top: 53%; width: 15vw; }
+    .room .wall-peel { left: 80%; top: 53%; width: 17vw; }
+}
+
+/* the canvas on the workshop's easel: its top right corner (the canvas is 17% to 83% across the easel, 6% to 56% down) */
+.easel .canvas-peel {
+    left: 47%;
+    top: 6%;
+    width: 36%;
+    min-width: 44px;
+    aspect-ratio: 100 / 150;
+    z-index: 2;
+}
+.canvas-peel .pl-behind { height: 66.67%; clip-path: polygon(45% 0, 100% 0, 100% 55%); }
+.canvas-peel .pl-behind .void-lines { font-size: 7.5px; padding: 6px 5px; }
+.canvas-peel .pl-curl { transform-origin: 80% 15%; }
+.canvas-peel .pl-open { transform-origin: 2% 66.67%; transform: rotate(-80deg); }
+.canvas-peel:hover .pl-curl,
+.canvas-peel:focus-visible .pl-curl { transform: rotate(4deg) scale(1.05); }
+.canvas-peel.held .pl-curl { transform: rotate(calc(4deg + 14deg * var(--pull, 0))) scale(calc(1.05 + .2 * var(--pull, 0))); }
+/* (it's the corner you're on, not the easel: its glow and "look closer" stay off) */
+.easel:has(.canvas-peel:hover) .easel-canvas { box-shadow: 0 3px 6px rgba(0, 0, 0, .35); }
+.easel:has(.canvas-peel:hover) .easel-hint { opacity: 0; }
+
+/* (phones: smaller writing, so the lit line fits in the smaller gaps) */
+@media (max-width: 620px), (max-height: 500px) {
+    .wall-peel .pl-behind .void-lines { font-size: 5.5px; padding-left: 20%; padding-right: 2px; }
+    .easel .canvas-peel { min-width: 60px; }
+    .canvas-peel .pl-behind .void-lines { font-size: 5.5px; padding: 4px 3px; }
+}
+
+/* the sea: a seam along the far wave, inside that wave's own layer (it drifts and rocks with it; the layer is the sea's
+   height and a little wider than the screen). the far wave's water shows from about 17% to 36% down it */
+.ground-sea .horizon-seam {
+    left: 31%;
+    top: 16%;
+    width: clamp(96px, 8.5vw, 150px);
+    aspect-ratio: 160 / 60;
+    pointer-events: auto;
+}
+.horizon-seam .pl-curl,
+.horizon-seam .pl-open { filter: brightness(var(--sea-dim)) saturate(var(--sea-sat)) blur(var(--seam-blur, 0px)); }
+/* (painted water: it darkens with the sea, and blurs a little with the far wave: sky/veil.js ride) */
+.horizon-seam .pl-behind { clip-path: polygon(62% 50%, 74% 36%, 92% 30%, 96% 46%, 80% 56%); }
+.horizon-seam.peeled .pl-behind { clip-path: polygon(2% 52%, 18% 30%, 40% 34%, 62% 22%, 98% 26%, 96% 70%, 74% 80%, 50% 72%, 26% 84%, 4% 72%); }
+.horizon-seam .pl-behind .void-lines { font-size: 8px; padding: 2px 6px; }
+.horizon-seam .pl-curl { transform-origin: 64% 55%; }
+.horizon-seam .pl-open { transform-origin: 3% 57%; transform: rotate(-24deg); }
+.horizon-seam:hover .pl-curl,
+.horizon-seam:focus-visible .pl-curl { transform: rotate(-3deg) scale(1.04); }
+.horizon-seam.held .pl-curl { transform: rotate(calc(-3deg + 10deg * var(--pull, 0))) translateY(calc(18% * var(--pull, 0))) scale(calc(1.04 + .12 * var(--pull, 0))); }
+.horizon-seam .reset-key { width: 16%; min-width: 18px; }
+@media (max-width: 620px) {
+    /* (an upright phone: the sea's a strip; the seam sits left of where the traveller waits on the dock, over the far wave) */
+    .ground-sea .horizon-seam { left: 24%; width: 120px; }
+}
+
+/* no peeling about with reduced motion: they only fade (held, the corner fades as you pull) */
+@media (prefers-reduced-motion: reduce) {
+    .peel .pl-curl, .peel .pl-open, .peel .pl-behind { transition: opacity .4s; }
+    .peel .pl-curl, .peel.held .pl-curl, .peel:hover .pl-curl, .peel:focus-visible .pl-curl { transform: none; }
+    .peel.held .pl-curl { opacity: calc(1 - .6 * var(--pull, 0)); }
+    .peel .pl-open { transform: none; }
+    .peel .void-lines mark { transition: opacity .4s; }
 }
 
 /* ---------------- the sky over the rooftop (reset 5 on) ---------------- */

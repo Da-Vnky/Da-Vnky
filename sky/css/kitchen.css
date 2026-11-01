@@ -612,6 +612,24 @@ body.kitchen-now .hallway {
     75% { transform: translateX(5px); }
     100% { transform: translateX(0); }
 }
+/* reset 7: the plate turns the wrong way, and when it dings the pie's missing slice is on it (kept lit while it's there) */
+.kitchen .kitchen-microwave.running.backwards .km-plate { animation-direction: reverse; }
+.kitchen .km-slice {
+    position: absolute;
+    left: 24.4%;
+    top: 61%;
+    z-index: 1;
+    width: 25%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .6s;
+}
+.kitchen .km-slice > svg,
+.kitchen .km-slice > .art { display: block; width: 100%; height: auto; }
+.kitchen .kitchen-microwave.slice-in .km-slice { opacity: 1; }
+.kitchen .kitchen-microwave.slice-in:not(.running) .km-on { opacity: .6; }
+/* from reset 8 the pie is whole (the stand-in's gap filled in) */
+html[data-reset="8"] .kitchen-pie .kp-gap { display: none; }
 /* its clock, in the display (120-148 across, 16-30 down of 160 x 96) */
 .kitchen .km-clock {
     position: absolute;

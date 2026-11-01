@@ -50,13 +50,19 @@
         try { return new URL('../index.html', me ? me.src : location.href).href; } catch (e) { return 'index.html'; }
     })();
     // phrase (5 Oct): what the reset's death leaves them with, written on the white under the caption (sky/state.js
-    // RESETS[n].phrase): the white holds a little longer, to read it
-    function whiteOut(slot, caption, work, to, phrase) {
+    // RESETS[n].phrase): the white holds a little longer, to read it. claim (1 Nov): first, in the Demiurge's own voice,
+    // what it claims of them in that sphere (RESETS[n].claim), and the phrase answers it: by reset 8 they've heard every one
+    function whiteOut(slot, caption, work, to, phrase, claim) {
         var w = document.createElement('div');
         w.className = 'forget-white';
         w.innerHTML = '<div class="fw-world">' + wireframe() + '</div>' + (caption ? '<div class="fw-caption">' + caption + '</div>' : '') +
-            (phrase ? '<div class="fw-phrase"></div>' : '');
+            (phrase ? '<div class="fw-words">' + (claim ? '<div class="fw-claim"></div>' : '') + '<div class="fw-phrase"></div></div>' : '');
         if (phrase) w.querySelector('.fw-phrase').textContent = phrase;
+        if (phrase && claim) {
+            w.querySelector('.fw-claim').textContent = claim;
+            w.classList.add('has-claim');
+            setTimeout(function () { sfx('demiurge-voice', { or: 'murmur', size: 0.6, volume: 0.7 }); }, 1300);
+        }
         document.body.appendChild(w);
         Sky.findAsset(slot, function (url) {
             if (!url) return;
@@ -70,7 +76,7 @@
         var job = work();
         setTimeout(function () {
             job.then(function () { location.replace(to || location.pathname + location.search); });
-        }, phrase ? 6800 : 3400);
+        }, phrase && claim ? 8600 : phrase ? 6800 : 3400);
     }
     function wipe() {
         try { localStorage.clear(); } catch (e) {}
@@ -97,6 +103,7 @@
         // going on to the next reset (not a jump in the reset manager): this reset's phrase, kept for good in "gnosis-phrases"
         // (the reset numbers whose phrase they've seen: the end, sky/gnosis.js)
         var phrase = typeof how !== 'function' && S && S.info && S.info.phrase;
+        var claim = phrase && S.info.claim;
         if (phrase) {
             try {
                 var had = JSON.parse(localStorage.getItem('gnosis-phrases') || '[]');
@@ -108,7 +115,7 @@
             if (typeof how === 'function') return Promise.resolve(how());
             if (S) S.nextReset();
             return Promise.resolve();
-        }, to, phrase || '');
+        }, to, phrase || '', claim || '');
     }
 
     /* ---------------- the reset manager: in your preview only ---------------- */

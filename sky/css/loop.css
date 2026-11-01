@@ -13,12 +13,66 @@ html.loop-skip body { animation: loop-skip .54s steps(1, end); }
     64%, 100% { transform: none; filter: none; }
 }
 
+/* the ghost a skip leaves: the traveller, pale, where they were standing three seconds ago */
+.loop-ghost {
+    position: fixed;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    filter: grayscale(1) brightness(1.3);
+    mix-blend-mode: screen;
+    animation: loop-ghost 1.6s ease-out forwards;
+}
+.loop-ghost > svg,
+.loop-ghost > .art { display: block; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; }
+@keyframes loop-ghost { 0% { opacity: .55; } 20% { opacity: .45; } 100% { opacity: 0; } }
+
+/* someone keeps count on the hallway wall: a scratch a skip, five to a gate */
+.loop-tally {
+    position: absolute;
+    left: 6%;
+    top: 22%;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.1vh 1.6vh;
+    width: 15vh;
+    pointer-events: none;
+    opacity: .78;
+    mix-blend-mode: multiply;
+}
+.loop-tally .lt-gate { position: relative; display: flex; gap: .55vh; height: 3.6vh; }
+.loop-tally i {
+    display: block;
+    width: .4vh;
+    height: 100%;
+    border-radius: 1px;
+    background: linear-gradient(#5a4632, #3a2a1c 60%, #6a5440);
+    transform: rotate(calc(var(--lean, 0) * 1deg));
+}
+.loop-tally i:nth-child(2) { --lean: -3; height: 94%; }
+.loop-tally i:nth-child(3) { --lean: 2; }
+.loop-tally i:nth-child(4) { --lean: -1; height: 97%; }
+.loop-tally .lt-cross {
+    position: absolute;
+    left: -.6vh;
+    top: 42%;
+    width: 4.2vh;
+    height: .4vh;
+    transform: rotate(-24deg);
+}
+.loop-tally.has-art i { background: var(--tally-art) center / 100% 100% no-repeat; }
+@media (max-width: 620px) { .loop-tally { left: 4%; top: 18%; } }
+
 /* the workshop's timer, racing: it spins, and the room flickers day and night through the window */
 .pomodoro.racing { animation: loop-race .18s linear infinite; }
 @keyframes loop-race { 50% { transform: rotate(4deg); } }
 .pomodoro.racing .pomo-dial { transform-box: fill-box; transform-origin: 50% 100%; animation: loop-hand .25s linear infinite; }
 @keyframes loop-hand { to { transform: rotate(360deg); } }
 body.loop-racing .pomo-panel .pp-time { font-variant-numeric: tabular-nums; color: #9a3b1f; }
+/* (its own racing picture, if there is one, over its usual one) */
+.pomodoro.has-race-art > :not(.race-art) { visibility: hidden; }
+.pomodoro .race-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; }
 /* (from reset 8: no hands) */
 .pomodoro.no-hands .pomo-dial { display: none; }
 
@@ -54,4 +108,5 @@ body.loop-racing .pomo-panel .pp-time { font-variant-numeric: tabular-nums; colo
 .loop-sand > .art { display: block; width: 100%; height: auto; }
 @media (prefers-reduced-motion: reduce) {
     html.loop-skip body, .pomodoro.racing, .pomodoro.racing .pomo-dial { animation: none; }
+    .loop-ghost { display: none; }
 }
