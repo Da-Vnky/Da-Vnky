@@ -831,6 +831,34 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   rope.py start Blender with his own preferences, add-ons and GPU. Nothing changes his preferences any more (slot_scene used to
   set `save_version` 0): each file is saved once, its pictures' paths made relative by hand (`bpy.path.relpath`).
 
+## Reset 1 on a television (sky/crt.js, sky/css/crt.css, 1 Nov)
+
+- Victor: "have the entire website look like it was on a crt for the first reset … enough to make someone say without a doubt it
+  was trumanesque"; reset 1 is "just crt tv as the effect", the grain and the sea's post-processing from reset 2. Then: the
+  coloured bands at the sides and the drawn glare and rounded corners went ("it looks too much like an iPhone"), for a real
+  colour split "slightly higher at the very edges affecting those pixels".
+- crt.js (index, workshop, city, living, template, after postfx.js) builds `.crt` (z 2147483050: over the buttons and the
+  loading screen, under the white-out; no clicks) only when `davSave.reset === 1` and not `?map`: `.crt-lines` (every third row
+  dark, the next half-dark), `.crt-mask` (red-green-blue stripes, multiply), `.crt-roll` (a bright band, 8.5 s down),
+  `.crt-flick` (a few % darker now and then, never a flash), `.crt-glass` (slot `assets/ui/crt-glass`, nothing drawn), `.crt-tube`
+  (the edges darkened, square), and `.crt-live`: a blinking red ● REC, LIVE, `CAM nn` (`CAMS` by page, and by
+  `Sky.house.where()` in the house) and the time on air since the visit's first page (sessionStorage `crt-since`); bottom right,
+  on phones top middle under the buttons. `--crt` = `STRENGTH` scales it all.
+- **The colour split**: `html.crt-on.crt-split { filter: url(#crt-split) }` (on html, the one element a filter doesn't spoil
+  fixed positions on). `splitFilter()` writes the SVG filter (`svg.crt-defs`): the picture's red and blue each pulled out
+  (`feColorMatrix`) and moved by `feDisplacementMap` over a map (`splitMap`: a 192-wide canvas, each point's direction out from
+  the middle, its size `SPLIT_MIDDLE` .2 of the most in the middle up to all of it at the edges, from 55% of the way out),
+  then added back to the green (`feComposite arithmetic`). `SPLIT` 3 px at the edges, red outwards, blue inwards; drawn again
+  on resize. It's costly (headless Chromium without a GPU: the sea 10.8 → 3.8 frames a second), so `settle()` times the page
+  once a visit, 2.5 s after the first page settles: 1.5 s with it (under 22 ms a frame: kept), else 1.5 s without; slower by
+  over 1.35× → off for the visit (sessionStorage `crt-split` off/on). The overlay is inside the filter too, so the scanlines
+  and mask split at the edges as well.
+- Switching on: once a visit (sessionStorage `crt-warm`), `.crt-power.crt-boot` (the picture opens off a bright line, sound
+  `crt-on`). Switching off: forget.js `reset()` going to the next reset calls `Sky.crt.off(white)` first (`.crt-shut`: halves
+  close on a line, the line shrinks to a dot, 1.25 s, sound `crt-off`). Reduced motion: no roll, flicker, blink or switching
+  on; off is a fade. postfx.js returns at once in reset 1 (no lens, grain, blur, haze or toy camera); the rock keeps its own
+  CSS blur there.
+
 ## The toy camera: the page seen through a lens (sky/postfx.js, tools/blender/toycam.py, 25 Oct)
 
 - Victor: a "matchbox car" look, "as if the page is being viewed via a camera", like Blender's depth of field makes the set look
@@ -872,7 +900,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
     `auto 100%` repeat-x strip; `alphaOf` reads each picture once at ≤ 256 px, alpha > 40), and the drawn stand-ins by their shapes
     (`html.toycam-picking *` → pointer-events for one `elementsFromPoint`).
   - **The lens** (`.toycam` in postfx.css): `.tc-grade` (soft-light warm or `.cool`), `.tc-vignette` (two radial gradients),
-    `.tc-grain` (a 128 px tile drawn once, hopping 8 places in .8 s with `steps(1)`: transform only), `.punch` (backdrop-filter
+    `.tc-grain` (a 128 px tile drawn once, hopping 8 places in .8 s with `steps(1)`: transform only; its opacity is
+    `--tc-grain × .28`, halved from .55 on 1 Nov, Victor: "turn the grain down across the site, it's a bit much"), `.punch` (backdrop-filter
     saturate/contrast). Settings as `--tc-*` variables.
   - reduced motion: no slide, no sway, still grain, the focus changes at once. `?map`: none of it (postfx.js does nothing there).
   - `Sky.postfx.camera = { focus, sharp, rest, items, rackTo(d), blurAt(d, s), blurIn(d), pick(x, y), at }` for checking.

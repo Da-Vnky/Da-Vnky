@@ -85,7 +85,7 @@
     inset: -128px;
     background: var(--tc-tile) 0 0 / 128px repeat;
     mix-blend-mode: overlay;
-    opacity: calc(var(--tc-grain) * .55);
+    opacity: calc(var(--tc-grain) * .28);              /* (1 Nov: half what it was, everywhere: it was a bit much) */
     animation: toycam-grain .8s steps(1) infinite;
     will-change: transform;
 }
