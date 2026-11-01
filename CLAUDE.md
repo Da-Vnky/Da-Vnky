@@ -844,6 +844,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   (the edges darkened, square), and `.crt-live`: a blinking red ● REC, LIVE, `CAM nn` (`CAMS` by page, and by
   `Sky.house.where()` in the house) and the time on air since the visit's first page (sessionStorage `crt-since`); bottom right,
   on phones top middle under the buttons. `--crt` = `STRENGTH` scales it all.
+- **Readable** (1 Nov, Victor: "I can barely read anything on mobile"): lines .48 / .16, the mask at .3; on phones (`(max-width:
+  620px), (max-height: 500px)`) lines .26 / .06, the mask at .08, and the split `SPLIT` 1.5 with `SPLIT_MIDDLE` 0 (crt.js):
+  there a CSS pixel is 2-3 of the screen's, so the lines are as big as on a computer beside much smaller words.
 - **The colour split**: `html.crt-on.crt-split { filter: url(#crt-split) }` (on html, the one element a filter doesn't spoil
   fixed positions on). `splitFilter()` writes the SVG filter (`svg.crt-defs`): the picture's red and blue each pulled out
   (`feColorMatrix`) and moved by `feDisplacementMap` over a map (`splitMap`: a 192-wide canvas, each point's direction out from
