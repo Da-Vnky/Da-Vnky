@@ -1,7 +1,7 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
-2026-09-24-claube-by-skizy.png
-2026-09-24-clutterflies-by-skizy.png
+2026-09-24-claube-by-skizy.webp
+2026-09-24-clutterflies-by-skizy.webp
 2026-09-24-untitled.png
-2026-10-13-water-by-louie.png
+2026-10-13-water-by-louie.webp
 2026-10-23-albi-they-said-vroom-by-artyf.png

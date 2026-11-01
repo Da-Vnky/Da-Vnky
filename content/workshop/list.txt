@@ -1,9 +1,9 @@
 # written by tools/update-lists.sh: every file in this folder.
 # no need to edit it; it's rewritten each commit.
-10.jpg
-The-Broken-Jug.png
-Untitled-1 24 .jpg
-cat.png
+10.webp
+The-Broken-Jug.webp
+Untitled-1 24 .webp
+cat.webp
 foot.jpg
 frames.json
 notes.json

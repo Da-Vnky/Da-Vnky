@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: every file on the site a visitor loads: its size in bytes, and a checksum.
-beyond.html 1480 2122448634
-city.html 10043 3341505934
-desk.html 6191 3454650115
-index.html 5539 744330470
-living.html 133992 2189236396
-window-sky.html 1334 2092142246
-workshop.html 22278 2291555991
+beyond.html 1480 1102347949
+city.html 10043 1387032213
+desk.html 6191 742906387
+index.html 5539 1825446574
+living.html 133992 800466675
+window-sky.html 1334 1719928570
+workshop.html 22278 3342622924
 sky/ambient.js 5331 3835869943
 sky/attic.js 35422 1573528092
 sky/babble.js 51258 123196756
@@ -51,7 +51,7 @@ sky/music.js 61630 2836453616
 sky/noise.js 11398 890663370
 sky/notes.js 5607 2800503109
 sky/paint.js 41912 972334459
-sky/panel.js 74536 1452288583
+sky/panel.js 75378 1959816862
 sky/peeper.js 31642 2382478789
 sky/porch.js 20443 470835649
 sky/post.js 21656 2013340171
@@ -71,7 +71,7 @@ sky/timer.js 8976 3273599647
 sky/tub.js 14927 953816602
 sky/veil.js 30215 373106084
 sky/watchers.js 22126 3782487369
-sky/weather.js 25754 4255422177
+sky/weather.js 26342 698735682
 sky/paper.css 8047 1201821797
 sky/sky.css 61911 505761178
 sky/css/ambient.css 435 4199751144
@@ -179,17 +179,17 @@ assets/sky/cloud-3.webp 48514 32872620
 assets/sky/cloud-4.webp 37152 764510579
 assets/sky/cloud-5.webp 41906 2625160310
 assets/sky/cloud.webp 164358 205180145
-assets/sky/list.txt 388 3425809627
+assets/sky/list.txt 394 1351365147
 assets/sky/moon.webp 20958 550342124
 assets/sky/plank.webp 15162 184616038
-assets/sky/skybox-day.jpg 507563 3898106660
-assets/sky/skybox-dusk.jpg 936292 1272459089
-assets/sky/skybox-golden.jpg 675239 272661867
-assets/sky/skybox-night.jpg 830846 1476267125
-assets/sky/skybox-sunset.jpg 794813 1217934353
+assets/sky/skybox-day.webp 237216 3156545607
+assets/sky/skybox-dusk.webp 584890 1434655125
+assets/sky/skybox-golden.webp 346388 2230252830
+assets/sky/skybox-night.webp 510908 2802964034
+assets/sky/skybox-sunset.webp 438852 3054554765
 assets/sky/storm-cloud.webp 301172 1975028208
 assets/sky/sun-eyeball.gif 3752006 4021813688
-assets/sky/sun-glow.gif 1689312 2903571900
+assets/sky/sun-glow.webp 45190 31779325
 assets/sky/sun-pupil.png 23661 81897278
 assets/sky/sun.png 131647 2758304869
 assets/sounds/bang-2.ogg 40811 1216716837
@@ -240,58 +240,58 @@ content/claude/list.txt 169 76452382
 content/dungeon/list.txt 124 1680728230
 content/dungeon/paper.json 163 2584569784
 content/frames/Dario Modei of CLAUBE.jpg 98487 4164404709
-content/frames/Elo Maw the Grokikivius.jpg 8260121 1684651524
+content/frames/Elo Maw the Grokikivius.webp 399106 4219606398
 content/frames/Mark Zuckerberg of the Matrix.webp 12688 1584633969
 content/frames/Nadella Satya is Micro Soft.jpg 522655 3925892983
 content/frames/Sam GPT.jpg 95050 4272185731
-content/frames/Sundar Pichai of Googolian.jpg 527485 3281858091
-content/frames/The False God.gif 4458112 3686044716
-content/frames/Untitled-1.jpg 289421 3273443044
-content/frames/droolers.png 1117345 4250865322
-content/frames/list.txt 323 3935320285
+content/frames/Sundar Pichai of Googolian.webp 331728 602059582
+content/frames/The False God.webp 1864728 1892696841
+content/frames/Untitled-1.webp 130244 2522267694
+content/frames/droolers.webp 80012 2344556898
+content/frames/list.txt 328 2597144640
 content/living/01-where heaven and earth meet.jpg 890805 3644886012
 content/living/01-where heaven and earth meet.ogg 5245641 2666587994
-content/living/02-Song on the Beach.jpg 412921 54104781
 content/living/02-Song on the Beach.ogg 5696623 3554461221
-content/living/03-Aerie.jpg 248646 1773964025
+content/living/02-Song on the Beach.webp 171650 3391617982
 content/living/03-Aerie.ogg 8072227 3937702694
+content/living/03-Aerie.webp 105114 1807092595
 content/living/04-Frame of Mind.jpg 122551 761190908
 content/living/04-Frame of Mind.ogg 6578711 2709216259
-content/living/06-I'm Upping My P(Doom).gif 5004432 2443245632
 content/living/06-I'm Upping My P(Doom).ogg 3850549 3391402029
+content/living/06-I'm Upping My P(Doom).webp 2508026 200449081
 content/living/albums.txt 123 775924658
-content/living/frames.json 181 1213809079
-content/living/list.txt 382 703812112
+content/living/frames.json 185 2805089289
+content/living/list.txt 385 3133229567
 content/sea/2026-09-25-hello-world.txt 213 4016599039
 content/sea/2026-09-25-mmmmm.jpg 46663 2745439658
-content/sea/2026-10-11-1000046960.gif 2123373 3293693275
-content/sea/2026-10-11-1739877026713f.gif 2774744 3208548333
+content/sea/2026-10-11-1000046960.webp 725510 2579790124
+content/sea/2026-10-11-1739877026713f.webp 896466 569764661
 content/sea/2026-10-11-aerie.mp3 9023573 813840972
 content/sea/2026-10-11-concierto-de-aranjuez-2-satz-adagio-musikkapelle-l.mp3 11314280 3696836528
-content/sea/2026-10-11-handwriting-test.txt 119 3848642082
-content/sea/2026-10-11-handwritten-2.png 447652 1112768135
-content/sea/2026-10-11-handwritten.png 178954 4018374124
+content/sea/2026-10-11-handwriting-test.txt 120 2166281095
+content/sea/2026-10-11-handwritten-2.webp 142900 80806678
+content/sea/2026-10-11-handwritten.webp 67170 323458966
 content/sea/2026-10-11-if-ur-seeing-this-video.txt 86 1342626792
-content/sea/2026-10-11-if-ur-seeing-this.txt 274 700905633
-content/sea/2026-10-11-rdt-20261006-1235456651558376399295008.gif 251967 3217743450
-content/sea/2026-10-11-the-site-so-far.txt 594 839400045
+content/sea/2026-10-11-if-ur-seeing-this.txt 275 2612101753
+content/sea/2026-10-11-rdt-20261006-1235456651558376399295008.webp 61222 632978368
+content/sea/2026-10-11-the-site-so-far.txt 595 340301734
 content/sea/2026-10-13-a-sad-cartoon.ogg 4334898 3403252524
 content/sea/2026-10-13-a.txt 107 2749905057
 content/sea/2026-10-13-handwritten.png 109369 946285472
-content/sea/2026-10-13-iliiaite.png 609079 4137729307
+content/sea/2026-10-13-iliiaite.webp 70790 3390748323
 content/sea/2026-10-14-traffic.txt 117 350456124
 content/sea/2026-10-21-sigh.txt 575 2483732443
-content/sea/list.txt 702 3498494336
+content/sea/list.txt 708 410952846
 content/sea/written.json 227 193115504
-content/shame/frames.json 359 3564234737
+content/shame/frames.json 362 177894662
 content/shame/list.txt 125 95844360
-content/workshop/10.jpg 1427761 2095253941
-content/workshop/The-Broken-Jug.png 5177409 3929771409
-content/workshop/Untitled-1 24 .jpg 9470638 788155672
-content/workshop/cat.png 1037509 504963118
+content/workshop/10.webp 210500 4164258506
+content/workshop/The-Broken-Jug.webp 257760 3590365777
+content/workshop/Untitled-1 24 .webp 698086 3183444776
+content/workshop/cat.webp 87842 3354596033
 content/workshop/foot.jpg 114929 1267704861
-content/workshop/frames.json 77 3506889498
-content/workshop/list.txt 198 1723977824
+content/workshop/frames.json 80 3723578760
+content/workshop/list.txt 202 4082259213
 content/workshop/notes.json 114 2593788045
 content/books/book-1/list.txt 113 3293401086
 content/books/book-2/list.txt 113 3293401086
@@ -312,20 +312,20 @@ content/living/05-A Stranger to You/11-Fangs.ogg 5865027 3745151823
 content/living/05-A Stranger to You/12-The Ladder.ogg 7335034 1772305530
 content/living/05-A Stranger to You/13-Gifted Every Strength.ogg 11225220 922856948
 content/living/05-A Stranger to You/14-No Stranger To You.ogg 6574440 3617579379
-content/living/05-A Stranger to You/cover.jpg 875566 2526375604
-content/living/05-A Stranger to You/list.txt 417 500846178
+content/living/05-A Stranger to You/cover.webp 539374 3073271099
+content/living/05-A Stranger to You/list.txt 418 3676411230
 content/living/bottles/2026-09-24-from-skizy.txt 50 2780802433
 content/living/bottles/2026-09-24-untitled.png 103361 3665461875
 content/living/bottles/2026-10-11-from-claude.txt 751 97236426
 content/living/bottles/2026-10-13-a-bottle.jpg 61855 3451892792
 content/living/bottles/board.json 132 3001581082
 content/living/bottles/list.txt 225 1104328745
-content/workshop/visitors/2026-09-24-claube-by-skizy.png 600582 939281079
-content/workshop/visitors/2026-09-24-clutterflies-by-skizy.png 464922 1738138300
+content/workshop/visitors/2026-09-24-claube-by-skizy.webp 88884 1818288684
+content/workshop/visitors/2026-09-24-clutterflies-by-skizy.webp 38682 3631661775
 content/workshop/visitors/2026-09-24-untitled.png 65299 1509521949
-content/workshop/visitors/2026-10-13-water-by-louie.png 611338 1745471353
+content/workshop/visitors/2026-10-13-water-by-louie.webp 80620 1162417759
 content/workshop/visitors/2026-10-23-albi-they-said-vroom-by-artyf.png 108307 1532833011
-content/workshop/visitors/list.txt 280 1119117600
+content/workshop/visitors/list.txt 283 1662530477
 baked/baked.json 11417 2994304259
 baked/assets/sea/wave-1.webp 820736 2381707885
 baked/assets/sea/wave-2.webp 417666 3934367618
