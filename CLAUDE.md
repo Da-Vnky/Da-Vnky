@@ -845,8 +845,9 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   .17 at its middle, rolling up in 11 s), `.crt-flick` (a few % darker now and then, never a flash), `.crt-glass` (slot
   `assets/ui/crt-glass`, nothing drawn), `.crt-tube` (rounded corners, `7vmin / 9vmin`, phones `5vmin / 6vmin`, black beyond them
   by a 40vmax spread shadow, and the edges darkened; no glare), and `.crt-live`: a blinking red ● REC, LIVE, `CAM nn` (`CAMS` by page, and by
-  `Sky.house.where()` in the house) and the time on air since the visit's first page (sessionStorage `crt-since`); bottom right,
-  on phones top middle under the buttons. `--crt` = `STRENGTH` scales it all.
+  `Sky.house.where()` in the house) and the visitor's own date and time, `YYYY-MM-DD HH:MM:SS`, like a security camera (2 Nov,
+  Victor; it used to count up from the visit's first page); bottom right, on phones top middle under the buttons. It stays
+  hidden while the loading screen is up (crt.css `html:has(#dav-loader:not(.gone))`) and fades in after. `--crt` = `STRENGTH` scales it all.
 - **No moiré** (2 Nov, Victor: "I don't like how the moire effect ended up coming off can you please remove that?"): it was
   simulated (a pretend camera's Bayer sensor aliasing the tube's lines, `moireArt()`), and is gone with its layer; the git
   history has it (commit 3a66d46) if it's ever wanted again.
