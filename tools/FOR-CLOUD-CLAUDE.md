@@ -3,6 +3,9 @@
 Victor: paste this whole file as the first message of a new session on **Da-Vnky/Da-Vnky** (or, once it's published and
 uploaded, just say "read tools/FOR-CLOUD-CLAUDE.md"), and write what you want done under *The task*.
 
+**2 Nov 2026: the cloud sessions are over** (the credit ran out). This file is kept only until Victor deletes it with the
+GitHub tools: see `tools/BACK-TO-LOCAL.md`.
+
 Written 31 Oct 2026. Cloud sessions are only used until **4 Nov 2026** (when Victor's cloud credit ends); after that
 everything happens on his own computer, and this file and the GitHub tools can go.
 
