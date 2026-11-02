@@ -2298,12 +2298,102 @@
             return;
         }
     }, true);
+    /* ---------------- the bitcrush (1 Nov) ----------------
+       the record player's lo-fi (sky/music.js) is the artist's plugin done live: every 4th sample held and rounded to 8 bits.
+       in reset 1, the television's reset, it's stuck on, and not only on the records: every sound the site makes goes through
+       it (the sound effects, the ambience, the weather, the voices, the bee, the songs in letters). from reset 2 it's only the
+       record player's again, with its slider working.
+         Sky.crush.all          true in reset 1: everything crushed
+         Sky.crush.out(ctx, n)  n (the last node of a sound engine) to the speakers: through the bitcrush in reset 1
+         Sky.crush.media(el)    an <audio> or <video> of the site's own through it (reset 1; the page's own play()s do this
+                                by themselves)
+         Sky.crush.node(ctx)    a Promise of the effect for that AudioContext (null if this browser can't) */
+    var crush = (function () {
+    var PROC = [
+        "// the lo-fi effect, sample by sample (runs in the browser's audio thread: an AudioWorklet)",
+        "//   amount 1: every 4th sample held (a quarter of 44.1 kHz: 11025) and rounded to 8 bits, like the artist's plugin",
+        "//   amount 0: the song untouched. in between, the sample rate climbs and the bits grow as the slider comes down",
+        "class DavLofi extends AudioWorkletProcessor {",
+        "    static get parameterDescriptors() { return [{ name: 'amount', defaultValue: 1, minValue: 0, maxValue: 1, automationRate: 'a-rate' }]; }",
+        "    constructor(o) {",
+        "        super();",
+        "        var p = (o && o.processorOptions) || {};",
+        "        this.rate = p.rate || 11025; this.bits = p.bits || 8;",
+        "        this.phase = [1, 1]; this.held = [0, 0];",
+        "    }",
+        "    process(inputs, outputs, params) {",
+        "        var inp = inputs[0], out = outputs[0], am = params.amount, sr = sampleRate;",
+        "        for (var ch = 0; ch < out.length; ch++) {",
+        "            var y = out[ch], x = inp[ch] || inp[0];",
+        "            if (!x) { y.fill(0); continue; }",
+        "            var ph = this.phase[ch], h = this.held[ch];",
+        "            for (var i = 0; i < y.length; i++) {",
+        "                var a = am.length > 1 ? am[i] : am[0];",
+        "                if (a <= 0.0005) { y[i] = x[i]; ph = 1; h = x[i]; continue; }",
+        "                ph += Math.pow(this.rate / sr, a);",
+        "                if (ph >= 1) { ph -= Math.floor(ph); h = x[i]; }",
+        "                var q = 2 / Math.pow(2, 16 - (16 - this.bits) * a);",
+        "                y[i] = Math.round(h / q) * q;",
+        "            }",
+        "            this.phase[ch] = ph; this.held[ch] = h;",
+        "        }",
+        "        return true;",
+        "    }",
+        "}",
+        "registerProcessor('dav-lofi', DavLofi);"
+    ].join('\n');
+        var RATE = 11025, BITS = 8;
+        var all = !!(window.davSave && window.davSave.reset === 1 && !document.documentElement.classList.contains('dav-map'));
+        function can() { return !!(window.AudioWorkletNode && window.isSecureContext && (window.AudioContext || window.webkitAudioContext)); }
+        var mods = [];                                     // (the effect has to be loaded into each AudioContext once)
+        function node(ctx, amount) {
+            if (!can() || !ctx || !ctx.audioWorklet) return Promise.resolve(null);
+            var m = null;
+            mods.forEach(function (x) { if (x.ctx === ctx) m = x; });
+            if (!m) { m = { ctx: ctx, ready: ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([PROC], { type: 'application/javascript' }))) }; mods.push(m); }
+            return m.ready.then(function () {
+                var n = new AudioWorkletNode(ctx, 'dav-lofi', { outputChannelCount: [2], processorOptions: { rate: RATE, bits: BITS } });
+                n.parameters.get('amount').value = amount === undefined ? 1 : amount;
+                return n;
+            }).catch(function () { return null; });
+        }
+        function out(ctx, from) {
+            from.connect(ctx.destination);
+            if (!all || (window.OfflineAudioContext && ctx instanceof window.OfflineAudioContext)) return;
+            node(ctx, 1).then(function (n) {
+                if (!n) return;
+                from.disconnect();
+                from.connect(n); n.connect(ctx.destination);
+            });
+        }
+        var shared = null;
+        function media(el) {
+            if (el && el.davCrushed && shared && shared.state !== 'running') shared.resume().catch(function () {});
+            if (!all || !el || el.davCrushed || !can()) return false;
+            var src = el.currentSrc || el.src;
+            try { if (!src || new URL(src, location.href).origin !== location.origin) return false; } catch (e) { return false; }   // (another site's file: it would go silent)
+            try {
+                if (!shared) shared = new (window.AudioContext || window.webkitAudioContext)();
+                if (shared.state !== 'running') shared.resume().catch(function () {});
+                out(shared, shared.createMediaElementSource(el));
+                el.davCrushed = true;
+                return true;
+            } catch (e) { return false; }
+        }
+        // the page's own players (a song or a video in a letter): through it as they start
+        if (all) document.addEventListener('play', function (e) {
+            var t = e.target;
+            if (t && (t.tagName === 'AUDIO' || t.tagName === 'VIDEO') && !t.muted) media(t);
+        }, true);
+        return { all: all, can: can, node: node, out: out, media: media, proc: PROC, rate: RATE, bits: BITS };
+    })();
+
     // the little things nearly every script wants: a sound effect (sky/panel.js), and a line said (sky/inventory.js)
     function sfx(name, opts) { if (window.Sky && Sky.sounds) return Sky.sounds.sfx(name, opts); }
     function say(text, ms) { if (window.Sky && Sky.inventory && Sky.inventory.say) Sky.inventory.say(text, ms); }
 
     window.Sky = {
-        escape: escape, ESC: ESC, sfx: sfx, say: say, speak: speak, ARROW_ART: ARROW_ART, pull: pull,
+        escape: escape, ESC: ESC, sfx: sfx, say: say, speak: speak, ARROW_ART: ARROW_ART, pull: pull, crush: crush,
         // run fn(p) every frame the scene changes; p goes 0 (noon) → 1 (midnight)
         onFrame: function (fn) { hooks.push(fn); fn(shown); },
         // run fn(go) when a sign or constellation is clicked; return true and

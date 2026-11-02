@@ -240,42 +240,13 @@
     /* ---------------- lo-fi: the bitcrush, live ---------------- */
     var LOFI_KEY = 'records-lofi', LOFI_MS = 1200;     // how long the slider takes, and the sound with it
     var LOFI_RATE = 11025, LOFI_BITS = 8;              // the artist's plugin: a quarter of 44.1 kHz, 8 bits
-    // the effect itself, sample by sample (it runs in the browser's audio thread: an AudioWorklet)
-    var LOFI_PROC = [
-        "// the lo-fi effect, sample by sample (runs in the browser's audio thread: an AudioWorklet)",
-        "//   amount 1: every 4th sample held (a quarter of 44.1 kHz: 11025) and rounded to 8 bits, like the artist's plugin",
-        "//   amount 0: the song untouched. in between, the sample rate climbs and the bits grow as the slider comes down",
-        "class DavLofi extends AudioWorkletProcessor {",
-        "    static get parameterDescriptors() { return [{ name: 'amount', defaultValue: 1, minValue: 0, maxValue: 1, automationRate: 'a-rate' }]; }",
-        "    constructor(o) {",
-        "        super();",
-        "        var p = (o && o.processorOptions) || {};",
-        "        this.rate = p.rate || 11025; this.bits = p.bits || 8;",
-        "        this.phase = [1, 1]; this.held = [0, 0];",
-        "    }",
-        "    process(inputs, outputs, params) {",
-        "        var inp = inputs[0], out = outputs[0], am = params.amount, sr = sampleRate;",
-        "        for (var ch = 0; ch < out.length; ch++) {",
-        "            var y = out[ch], x = inp[ch] || inp[0];",
-        "            if (!x) { y.fill(0); continue; }",
-        "            var ph = this.phase[ch], h = this.held[ch];",
-        "            for (var i = 0; i < y.length; i++) {",
-        "                var a = am.length > 1 ? am[i] : am[0];",
-        "                if (a <= 0.0005) { y[i] = x[i]; ph = 1; h = x[i]; continue; }",
-        "                ph += Math.pow(this.rate / sr, a);",
-        "                if (ph >= 1) { ph -= Math.floor(ph); h = x[i]; }",
-        "                var q = 2 / Math.pow(2, 16 - (16 - this.bits) * a);",
-        "                y[i] = Math.round(h / q) * q;",
-        "            }",
-        "            this.phase[ch] = ph; this.held[ch] = h;",
-        "        }",
-        "        return true;",
-        "    }",
-        "}",
-        "registerProcessor('dav-lofi', DavLofi);"
-    ].join('\n');
+    var LOFI_PROC = Sky.crush.proc;                     // (the effect itself, sample by sample: sky/sky.js, "the bitcrush")
     var lofi = { on: true, ctx: null, node: null, ready: null, built: false, failed: false };
     try { lofi.on = localStorage.getItem(LOFI_KEY) !== '0'; } catch (e) {}
+    // reset 1 (the television's): stuck on, whatever they chose before (that's kept for reset 2 on, when it moves again)
+    var LOFI_STUCK = !!(Sky.crush && Sky.crush.all);
+    if (LOFI_STUCK) lofi.on = true;
+    var STUCK_LINES = ['It won’t budge.', 'Stuck. Everything sounds like this here.', 'It’s jammed all the way up.'], stuckAt = 0;
     function lofiCan() { return !!(window.AudioWorkletNode && window.isSecureContext && (window.AudioContext || window.webkitAudioContext)); }
     function lofiCtx() {
         if (lofi.ctx || lofi.failed) return lofi.ctx;
@@ -324,6 +295,10 @@
     document.addEventListener('pointerdown', lofiWake, true);
     document.addEventListener('keydown', lofiWake, true);
     function setLofi(on) {
+        if (LOFI_STUCK) {                                   // (reset 1: it won't move. a line, and the slider shudders: 'lofi-stuck')
+            if (!on) { Sky.say(STUCK_LINES[stuckAt++ % STUCK_LINES.length], 2400); emit('lofi-stuck'); }
+            return;
+        }
         lofi.on = !!on;
         try { localStorage.setItem(LOFI_KEY, lofi.on ? '1' : '0'); } catch (e) {}
         var prm = lofi.node && lofi.node.parameters.get('amount');
@@ -870,9 +845,13 @@
         ui.lofi.classList.toggle('on', lofi.on);
         ui.lofi.setAttribute('aria-pressed', String(lofi.on));
         ui.lofi.setAttribute('aria-label', 'lo-fi (the bitcrush): ' + (lofi.on ? 'on' : 'off'));
-        ui.lofi.querySelector('.mu-lofi-state').textContent = lofi.on ? 'on' : 'off';
+        ui.lofi.querySelector('.mu-lofi-state').textContent = LOFI_STUCK ? 'stuck' : (lofi.on ? 'on' : 'off');
+        ui.lofi.classList.toggle('stuck', LOFI_STUCK);
     }
-    listeners.push(function (what) { if (what === 'lofi') drawLofi(); });
+    listeners.push(function (what) {
+        if (what === 'lofi') drawLofi();
+        if (what === 'lofi-stuck' && ui.lofi) { ui.lofi.classList.remove('jolt'); void ui.lofi.offsetWidth; ui.lofi.classList.add('jolt'); }
+    });
     document.documentElement.style.setProperty('--lofi-ms', LOFI_MS + 'ms');
 
     Sky.music = {
@@ -885,7 +864,7 @@
         pause: pause, toggle: toggle, next: next, prev: prev, stop: stop, hush: hush,
         setTracks: setTracks, setVolume: setVolume, dressGrooves: dressGrooves,
         // the lo-fi slider: Sky.music.lofi.on, .set(true / false), .can (this browser can do it), .ms (how long it slides)
-        lofi: { get on() { return lofi.on; }, set: setLofi, get can() { return lofiCan(); }, ms: LOFI_MS,
+        lofi: { get on() { return lofi.on; }, set: setLofi, get can() { return lofiCan(); }, ms: LOFI_MS, stuck: LOFI_STUCK,
                 get live() { return lofi.built && !!lofi.ctx && lofi.ctx.state === 'running'; }, get node() { return lofi.node; } },
         on: function (fn) { listeners.push(fn); }
     };

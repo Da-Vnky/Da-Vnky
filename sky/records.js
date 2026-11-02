@@ -90,7 +90,8 @@
             lofiBtn.classList.toggle('on', on);
             lofiBtn.setAttribute('aria-pressed', String(on));
             lofiBtn.setAttribute('aria-label', 'the lo-fi slider (the bitcrush): ' + (on ? 'on' : 'off'));
-            lofiBtn.querySelector('.tt-lofi-hint').textContent = on ? 'lo-fi · on' : 'lo-fi · off';
+            lofiBtn.querySelector('.tt-lofi-hint').textContent = M.lofi.stuck ? 'lo-fi · stuck' : (on ? 'lo-fi · on' : 'lo-fi · off');
+            lofiBtn.classList.toggle('stuck', !!M.lofi.stuck);
         };
         lofiBtn.addEventListener('click', function (e) {
             e.preventDefault(); e.stopPropagation();                         // (not the crate: just the slider)
@@ -98,7 +99,10 @@
             Sky.sfx('lofi-slide', { or: 'tap', size: 0.3 });
         });
         lofiBtn.addEventListener('keydown', function (e) { e.stopPropagation(); });
-        M.on(function (what) { if (what === 'lofi') drawLofi(); });
+        M.on(function (what) {
+            if (what === 'lofi') drawLofi();
+            if (what === 'lofi-stuck') { lofiBtn.classList.remove('jolt'); void lofiBtn.offsetWidth; lofiBtn.classList.add('jolt'); }   // (reset 1: it won't move)
+        });
         drawLofi();
         if (Sky.fillAssets) Sky.fillAssets(lofiBtn);
     }

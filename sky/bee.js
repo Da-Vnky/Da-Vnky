@@ -411,14 +411,16 @@
     function Engine(ctx) {
         var master = ctx.createGain(), limit = ctx.createDynamicsCompressor();
         limit.threshold.value = -3; limit.knee.value = 0; limit.ratio.value = 20; limit.attack.value = .002; limit.release.value = .12;
-        master.connect(limit); limit.connect(ctx.destination);
+        var out = ctx.createGain();                              // (to the speakers: through the bitcrush in reset 1, sky/sky.js)
+        master.connect(limit); limit.connect(out);
+        if (Sky.crush) Sky.crush.out(ctx, out); else out.connect(ctx.destination);
         var dry = ctx.createGain(); dry.connect(master);
         var verb = ctx.createConvolver(); verb.buffer = hall(ctx); verb.connect(master);
         var echo = ctx.createGain(), dl = ctx.createDelay(1), dr = ctx.createDelay(1), fl = ctx.createGain(), fr = ctx.createGain();
         dl.delayTime.value = .3; dr.delayTime.value = .3; fl.gain.value = .32; fr.gain.value = .32;
         echo.connect(dl); dl.connect(fl); fl.connect(dr); dr.connect(fr); fr.connect(dl);
         dl.connect(panner(ctx, -.6, master)); dr.connect(panner(ctx, .6, master));
-        return { ctx: ctx, master: master, dry: dry, verb: verb, echo: echo };
+        return { ctx: ctx, master: master, dry: dry, verb: verb, echo: echo, out: out };
     }
     function panner(ctx, p, to) {
         if (!ctx.createStereoPanner) { var g = ctx.createGain(); if (to) g.connect(to); return g; }
@@ -1552,7 +1554,7 @@
         if (hum || MAPPING) return;
         var V = voice();
         if (!V) return;
-        var c = V.ctx, out = c.createGain(), pan = panner(c, 0, c.destination), wing = c.createGain(), lfo = c.createOscillator(), depth = c.createGain();
+        var c = V.ctx, out = c.createGain(), pan = panner(c, 0, V.out), wing = c.createGain(), lfo = c.createOscillator(), depth = c.createGain();
         out.gain.value = 0;
         out.connect(pan);
         wing.gain.value = .55;                                       // (the wingbeat: the buzz swells and dips)

@@ -540,3 +540,13 @@ body.music-playing .wobbles {
         animation: none;
     }
 }
+
+/* reset 1: the lo-fi switch is stuck on (sky/music.js LOFI_STUCK). pressing it only makes the knob shudder */
+.cp .mu-lofi.stuck .mu-lofi-state { opacity: .7; font-style: italic; }
+.cp .mu-lofi.jolt .mu-lofi-knob { animation: mu-lofi-jolt .38s ease-out; }
+@keyframes mu-lofi-jolt {
+    0%, 100% { translate: 0 0; }
+    25% { translate: -3px 0; }
+    55% { translate: 2px 0; }
+    80% { translate: -1px 0; }
+}

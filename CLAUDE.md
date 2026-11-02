@@ -877,6 +877,20 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   on; off is a fade. postfx.js returns at once in reset 1 (no lens, grain, blur, haze or toy camera); the rock keeps its own
   CSS blur there.
 
+- **Everything bitcrushed in reset 1** (2 Nov, Victor: "make it so that the bitcrush on the record player can't be toggled off
+  1st reset and applied to the site's music and sounds as well … they should all be removed second reset, and the toggle for
+  record player work in second reset onwards"): the effect (the AudioWorklet's code, `PROC`) moved to sky.js **"the bitcrush"**,
+  `Sky.crush = { all, can, node(ctx), out(ctx, node), media(el), proc }`; `all` = reset 1 and not `?map`. `out(ctx, last)`
+  connects an engine's last node to the speakers, and in reset 1 swaps a `dav-lofi` node in between once its module's loaded
+  (never for an OfflineAudioContext): panel.js's `master` (every synth sound effect, the ambience, the weather, noise.js),
+  babble.js's limiter (the Claubes' voices), bee.js's new `out` (its voice and its hum). panel.js `crushed(a)` takes its
+  recordings (sound effects, thunder) into the engine in reset 1 (`createMediaElementSource` → master). A capture `play`
+  listener sends the page's own `<audio>`/`<video>` (songs and videos in letters) through a shared context in reset 1, only
+  same-origin ones (a desk file from Supabase would go silent). music.js `LOFI_STUCK`: the records' lo-fi is on whatever the
+  visitor chose (their choice is kept for reset 2), `set(false)` only says a line (`STUCK_LINES`) and emits `lofi-stuck`: the
+  record player's knob and the panel's switch shudder (`.jolt`, records.css / music.css), both read "stuck". From reset 2 none
+  of it: the slider works as before. Not crushed: other sites' players in letters (iframes), beyond.html.
+
 ## The toy camera: the page seen through a lens (sky/postfx.js, tools/blender/toycam.py, 25 Oct)
 
 - Victor: a "matchbox car" look, "as if the page is being viewed via a camera", like Blender's depth of field makes the set look
