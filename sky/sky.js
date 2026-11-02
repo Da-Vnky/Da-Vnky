@@ -2304,6 +2304,8 @@
        it (the sound effects, the ambience, the weather, the voices, the bee, the songs in letters). from reset 2 it's only the
        record player's again, with its slider working.
          Sky.crush.all          true in reset 1: everything crushed
+         Sky.crush.context()    reset 1: the one sound engine (an AudioContext at 44.1 kHz) every sound on the page shares,
+                                with one bitcrush at its very end; null in other resets (each piece makes its own, as before)
          Sky.crush.out(ctx, n)  n (the last node of a sound engine) to the speakers: through the bitcrush in reset 1
          Sky.crush.media(el)    an <audio> or <video> of the site's own through it (reset 1; the page's own play()s do this
                                 by themselves)
@@ -2322,17 +2324,22 @@
         "        this.phase = [1, 1]; this.held = [0, 0];",
         "    }",
         "    process(inputs, outputs, params) {",
-        "        var inp = inputs[0], out = outputs[0], am = params.amount, sr = sampleRate;",
+        "        var inp = inputs[0], out = outputs[0], am = params.amount, sr = sampleRate, still = am.length === 1;",
+        "        var a0 = am[0], st0 = Math.pow(this.rate / sr, a0), q0 = 2 / Math.pow(2, 16 - (16 - this.bits) * a0);",
         "        for (var ch = 0; ch < out.length; ch++) {",
         "            var y = out[ch], x = inp[ch] || inp[0];",
         "            if (!x) { y.fill(0); continue; }",
+        "            if (still && a0 <= 0.0005) { y.set(x); this.phase[ch] = 1; this.held[ch] = x[x.length - 1]; continue; }",
         "            var ph = this.phase[ch], h = this.held[ch];",
         "            for (var i = 0; i < y.length; i++) {",
-        "                var a = am.length > 1 ? am[i] : am[0];",
-        "                if (a <= 0.0005) { y[i] = x[i]; ph = 1; h = x[i]; continue; }",
-        "                ph += Math.pow(this.rate / sr, a);",
+        "                var st = st0, q = q0;",
+        "                if (!still) {",
+        "                    var a = am[i];",
+        "                    if (a <= 0.0005) { y[i] = x[i]; ph = 1; h = x[i]; continue; }",
+        "                    st = Math.pow(this.rate / sr, a); q = 2 / Math.pow(2, 16 - (16 - this.bits) * a);",
+        "                }",
+        "                ph += st;",
         "                if (ph >= 1) { ph -= Math.floor(ph); h = x[i]; }",
-        "                var q = 2 / Math.pow(2, 16 - (16 - this.bits) * a);",
         "                y[i] = Math.round(h / q) * q;",
         "            }",
         "            this.phase[ch] = ph; this.held[ch] = h;",
@@ -2357,25 +2364,42 @@
                 return n;
             }).catch(function () { return null; });
         }
+        // reset 1: one shared sound engine for the whole page, so there's one bitcrush running, not one per piece (the
+        // record player, the sound effects, the voices and the bee each had their own, and together they struggled)
+        var shared = null, bus = null;
+        function context() {
+            if (!all || !can()) return null;
+            if (shared) return shared;
+            var C = window.AudioContext || window.webkitAudioContext;
+            try { shared = new C({ sampleRate: 44100, latencyHint: 'playback' }); }          // (44.1 kHz: then "every 4th sample" is exact)
+            catch (e) { try { shared = new C(); } catch (e2) { return null; } }
+            bus = shared.createGain();
+            bus.connect(shared.destination);                                                  // (till the bitcrush has loaded)
+            node(shared, 1).then(function (n) { if (!n) return; bus.disconnect(); bus.connect(n); n.connect(shared.destination); });
+            var wake = function () { if (shared.state !== 'running') shared.resume().catch(function () {}); };
+            ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) { document.addEventListener(ev, wake, { capture: true, passive: true }); });
+            return shared;
+        }
         function out(ctx, from) {
+            if (all && ctx === context()) { from.connect(bus); return; }
             from.connect(ctx.destination);
             if (!all || (window.OfflineAudioContext && ctx instanceof window.OfflineAudioContext)) return;
-            node(ctx, 1).then(function (n) {
+            node(ctx, 1).then(function (n) {                                                  // (an engine of its own: its own bitcrush)
                 if (!n) return;
                 from.disconnect();
                 from.connect(n); n.connect(ctx.destination);
             });
         }
-        var shared = null;
         function media(el) {
             if (el && el.davCrushed && shared && shared.state !== 'running') shared.resume().catch(function () {});
             if (!all || !el || el.davCrushed || !can()) return false;
             var src = el.currentSrc || el.src;
             try { if (!src || new URL(src, location.href).origin !== location.origin) return false; } catch (e) { return false; }   // (another site's file: it would go silent)
             try {
-                if (!shared) shared = new (window.AudioContext || window.webkitAudioContext)();
-                if (shared.state !== 'running') shared.resume().catch(function () {});
-                out(shared, shared.createMediaElementSource(el));
+                var c = context();
+                if (!c) return false;
+                if (c.state !== 'running') c.resume().catch(function () {});
+                out(c, c.createMediaElementSource(el));
                 el.davCrushed = true;
                 return true;
             } catch (e) { return false; }
@@ -2385,7 +2409,7 @@
             var t = e.target;
             if (t && (t.tagName === 'AUDIO' || t.tagName === 'VIDEO') && !t.muted) media(t);
         }, true);
-        return { all: all, can: can, node: node, out: out, media: media, proc: PROC, rate: RATE, bits: BITS };
+        return { all: all, can: can, node: node, out: out, media: media, context: context, proc: PROC, rate: RATE, bits: BITS };
     })();
 
     // the little things nearly every script wants: a sound effect (sky/panel.js), and a line said (sky/inventory.js)

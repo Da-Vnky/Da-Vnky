@@ -668,7 +668,7 @@
         if (E || MAPPING) return E;
         var AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return null;
-        try { E = Engine(new AC()); } catch (e) { return null; }
+        try { E = Engine((Sky.crush && Sky.crush.context()) || new AC()); } catch (e) { return null; }   // (reset 1: the page's one shared engine)
         loadVoice(E);
         return E;
     }

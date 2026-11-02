@@ -96,7 +96,7 @@
         if (warmed) return;
         warmed = true;
         ['bang', 'bang-2', 'white-bang', 'revolver-cock', 'revolver-open', 'revolver-close', 'revolver-load', 'revolver-load-2', 'revolver-load-3', 'revolver-load-4'].forEach(function (n) {
-            soundUrl(n, function (url) { if (url) { var a = new Audio(); a.preload = 'auto'; a.src = url; } });
+            soundUrl(n, function (url) { if (!url) return; if (Sky.sounds && Sky.sounds.warm) Sky.sounds.warm(url); else { var a = new Audio(); a.preload = 'auto'; a.src = url; } });
         });
     }
 
