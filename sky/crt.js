@@ -14,7 +14,8 @@
                    flicker, and the tube's rounded corners. no scanlines (the band does their
                    work, and both together was too busy) and no glare on the glass
      the broadcast a blinking red "● REC" and "LIVE", which camera this is (each page
-                   and room has its own number) and how long the visit's been on air
+                   and room has its own number) and the date and time where they are, like a
+                   security camera's (it shows once the loading screen has gone)
      switching on  once a visit, the first page: the picture opens out of a bright line
      switching off at the end of reset 1: the picture squeezes to a line, then a dot
 
@@ -159,12 +160,11 @@
     function camFor(where) { cam.textContent = 'CAM ' + ('0' + (CAMS[where] || CAMS[PAGE] || 1)).slice(-2); }
     camFor(PAGE);
 
-    // on air since the visit's first page
-    var since = +(session('crt-since') || 0);
-    if (!since) { since = Date.now(); session('crt-since', String(since)); }
+    // the date and time where the visitor is, as a security camera stamps its picture (2 Nov: it used to count up from 0)
     function tick() {
-        var t = Math.floor((Date.now() - since) / 1000), two = function (n) { return (n < 10 ? '0' : '') + n; };
-        time.textContent = two(Math.floor(t / 3600)) + ':' + two(Math.floor(t / 60) % 60) + ':' + two(t % 60);
+        var d = new Date(), two = function (n) { return (n < 10 ? '0' : '') + n; };
+        time.textContent = d.getFullYear() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate()) + ' ' +
+            two(d.getHours()) + ':' + two(d.getMinutes()) + ':' + two(d.getSeconds());
         if (Sky.house && Sky.house.where) camFor(Sky.house.where());     // (the house: whichever room they're in now)
     }
     tick();
