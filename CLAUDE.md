@@ -478,6 +478,14 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   the stylesheet's folder (sky/css/), so the first version (a brightness mask, published 2 Nov) never showed anything; and
   **not `has-art` on the `.wave-move`** (sky.css `.layer.has-art > :not(.layer-art)` hides a layer's own drawing). The drawn
   stand-in waves don't glow.
+- **The ship lit by the waves** (2 Nov, Victor: "since we added a bloom it looks wrong that the boat isn't being affected, can you
+  make the boat light up if it's near the water?"): ground-sea.js `shipLit(url)` (svgArt's `done` for `assets/sea/ship`) adds, in
+  the ship's own svg, `<g class="ship-lit-g" mask="url(#ship-lit-mask)">` round a copy of his ship picture (`.ship-lit`, not
+  `.art`, so the night doesn't dim it) through `#ship-lit-glow`: tinted `SHIP_TINT` .45 towards `SHIP_LIGHT` #52c2a3 (the waves'
+  crests, measured from his wave-3), a slight bloom (`SHIP_BLOOM` 1.6); the mask fades from the waterline (`SHIP_LIT_FROM` 94 of
+  its 100-high canvas) to nothing at `SHIP_LIT_TO` 52. Inside `.hull`, so it rocks and shakes with it. ground-sea.css: only with
+  `.sea-glow`, opacity the waves' glow's × `--ship-near` (placeShip: 1 on the water, 0 once lifted `SHIP_LIFT_DARK` 150 px). Only
+  for his ship picture (the drawn stand-in doesn't light).
 - **The rocks** (`.sea-rock`, fixed, z 2, `data-asset="assets/sea/rock"`, a drawn stand-in; Victor, later on 19 Oct: "add a medium
   sized one directly to the right of it, they should overlap slightly, make it one asset", he'll paint the group himself): one
   picture (viewBox 780 x 420: the big rock in 0-500, the middling one 440-774 behind it), 47vw x 42vh, `xMinYMax meet` / `contain`

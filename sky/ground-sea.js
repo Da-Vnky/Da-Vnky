@@ -305,7 +305,39 @@
         });
     }, 1000);
     // slot: the ship
-    Sky.svgArt(sea.querySelector('.ship .hull'), 'assets/sea/ship', [0, 0, 120, 100]);
+    Sky.svgArt(sea.querySelector('.ship .hull'), 'assets/sea/ship', [0, 0, 120, 100], shipLit);
+    // the ship lit by the waves at night (2 Nov, the artist: the waves' tops glow now, "it looks wrong that the boat isn't
+    // being affected, can you make the boat light up if it's near the water"): a copy of the artist's ship over it, not
+    // dimmed by the night, tinted towards the waves' glowing tops (SHIP_LIGHT: their colour, measured from the waves), lit
+    // from the waterline and fading out upwards (SHIP_LIT_FROM / SHIP_LIT_TO: where on its 100-high canvas), with a slight
+    // bloom. as strong as the waves' glow, and less the higher it's lifted off the water (--ship-near, placeShip below)
+    var SHIP_LIFT_DARK = 150;                                             // (px lifted off the water by which its glow is gone)
+    var SHIP_LIGHT = '#52c2a3', SHIP_LIT_FROM = 94, SHIP_LIT_TO = 52, SHIP_TINT = .45, SHIP_BLOOM = 1.6;
+    function shipLit(url) {
+        if (!url) return;
+        var svg = sea.querySelector('.ship'), hull = svg.querySelector('.hull'), NS = 'http://www.w3.org/2000/svg';
+        if (svg.querySelector('.ship-lit')) return;
+        var defs = document.createElementNS(NS, 'defs');
+        defs.innerHTML = '<linearGradient id="ship-lit-fade" gradientUnits="userSpaceOnUse" x1="0" y1="' + SHIP_LIT_FROM + '" x2="0" y2="' + SHIP_LIT_TO + '">' +
+                '<stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
+            '<mask id="ship-lit-mask" maskUnits="userSpaceOnUse" x="-20" y="-20" width="160" height="140"><rect x="-20" y="-20" width="160" height="140" fill="url(#ship-lit-fade)"/></mask>' +
+            '<filter id="ship-lit-glow" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">' +
+                '<feFlood flood-color="' + SHIP_LIGHT + '" result="sea"/>' +
+                '<feComposite in="sea" in2="SourceAlpha" operator="in" result="tint"/>' +            // (the waves' colour, in the ship's shape)
+                '<feComposite in="SourceGraphic" in2="tint" operator="arithmetic" k2="' + (1 - SHIP_TINT) + '" k3="' + SHIP_TINT + '" result="lit"/>' +
+                '<feGaussianBlur in="lit" stdDeviation="' + SHIP_BLOOM + '" result="blur"/>' +
+                '<feComponentTransfer in="blur" result="bloom"><feFuncA type="linear" slope=".5"/></feComponentTransfer>' +
+                '<feMerge><feMergeNode in="bloom"/><feMergeNode in="lit"/></feMerge></filter>';
+        svg.insertBefore(defs, svg.firstChild);
+        var main = hull.querySelector('.art'), lit = main.cloneNode();
+        lit.setAttribute('class', 'ship-lit');                                // (not .art: that one's dimmed by the night)
+        lit.setAttribute('filter', 'url(#ship-lit-glow)');
+        var g = document.createElementNS(NS, 'g');
+        g.setAttribute('class', 'ship-lit-g');
+        g.setAttribute('mask', 'url(#ship-lit-mask)');
+        g.appendChild(lit);
+        hull.appendChild(g);                                                  // (inside the hull, so it rocks and shakes with it)
+    }
 
     /* ---------------- the dock, on the right ---------------- */
     var dock = sea.querySelector('.dock'), dockAt = null;
@@ -461,6 +493,8 @@
             paintWaves(p, (performance.now() - (sailStart || performance.now())) / 1000);
         }
         ship.style.left = shipLeft(p) + 'px';
+        var near = Math.max(0, Math.min(1, 1 + (drag.y + drag.dip) / SHIP_LIFT_DARK));   // (on the water 1, lifted away 0)
+        if (Math.abs(near - (ship._near === undefined ? -1 : ship._near)) > .02) { ship._near = near; ship.style.setProperty('--ship-near', near.toFixed(2)); }
         shipBob.x = drag.x + drag.sx;
         shipBob.y = drag.y + drag.dip + bob;
         ship.style.transform =

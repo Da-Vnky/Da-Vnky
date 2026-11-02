@@ -426,6 +426,17 @@ html.sea-pan .ground-sea .wave-move-4 { --wave-pan: -3vw; }
     html.sea-pan body[data-page="home"] .signpost { animation: sea-pan var(--sea-pan-s) ease-in-out infinite alternate; }
 }
 
+/* the ship lit from below by the waves' glowing tops at night (ground-sea.js shipLit): as strong as the waves' glow, less the
+   higher it's lifted off the water (--ship-near), none by day */
+.ship .ship-lit-g {
+    display: none;
+    pointer-events: none;
+}
+.ground-sea.sea-glow .ship .ship-lit-g {
+    display: inline;
+    opacity: calc((.2 * var(--dusk, 0) + .45 * var(--night, 0)) * var(--ship-near, 1));
+}
+
 /* the artist's dock and ship darken with the sea (their -glow twins don't) */
 .ground-sea .dock .art:not(.glow-layer),
 .ship .art:not(.glow-layer) {
