@@ -14,9 +14,11 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- The sea at night: the waves' tops now really do glow (the first version never showed: the wave pictures' address was read from the wrong folder). The mask is each wave's own crest, found from its shape, lifted out of the night's dimming and fading downwards, with a slight bloom; the far waves keep their blur.
 
 == published ==
+
+2026-11-01 21:27 · V
+- The sea at night: the waves' tops now really do glow (the first version never showed: the wave pictures' address was read from the wrong folder). The mask is each wave's own crest, found from its shape, lifted out of the night's dimming and fading downwards, with a slight bloom; the far waves keep their blur.
 
 2026-11-01 21:02 · V
 - Reset 1's television: the REC / LIVE / CAM mark shows the visitor's own date and time, like a security camera (it used to count up from 0), and waits until the loading screen has gone before it appears.
