@@ -3,6 +3,8 @@
 For Claude Code (or any assistant) starting cold in `C:\Users\Victor\Desktop\DaV-nky`. `CLAUDE.md` is the full manual (2000+
 lines, one section per system): this is the map and the current direction, so you know which parts of it to open.
 Written 24 Oct 2026. **Keep it true**: when a goal is reached or changes, change it here.
+**2 Nov: the cloud sessions are over.** If `tools/BACK-TO-LOCAL.md` still exists, read it first: the last steps of
+leaving GitHub, and what the cloud built that nobody has checked by ear or on his screens yet.
 
 Read in this order: this file → the top of `CHANGES.txt` (what changed lately, and what's waiting to be published) → the
 sections of `CLAUDE.md` your task touches (its `## ` headings are listed at the end of this file).

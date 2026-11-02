@@ -4,7 +4,9 @@ Victor's personal site, **dav-nky.pleroma.nexus**: a da Vinci–notebook world (
 feel) that's also a small game. Hosted on his friend skizy's server (pleroma.nexus) as a subdomain. Read
 this before changing anything; keep it up to date when something here stops being true.
 
-**New here? Start with `tools/FOR-CLAUDE-CODE.md`** (24 Oct): what DaV-nky is, how it's built, what Victor is working towards
+**Back from the cloud (2 Nov)?** Read `tools/BACK-TO-LOCAL.md` once: the cloud sessions are over (Victor's credit ran out
+on 2 Nov); it has the last steps (merge, one last github-publish, then the GitHub tools can go), what keeps running, and what
+nobody has checked yet. **New here? Start with `tools/FOR-CLAUDE-CODE.md`** (24 Oct): what DaV-nky is, how it's built, what Victor is working towards
 now, and a map of this file. `tools/FOR-FABLE.md` (21 Oct) held two jobs for skizy's Fable: the debug pass (Fable did it) and "open this scene in Blender"
 (Claude did it on 24 Oct: see *A whole scene in Blender*). **Working with skizy (or skizy's Claude)?** Start with `tools/FOR-SKIZY.md`: the tools on Linux / VS Code (`tools/content.sh`,
 `publish.sh`, `pull.sh`, `preview.sh`, `tools/vscode/tasks.json`), slots, and what's hers. Keep it true too.
@@ -80,8 +82,8 @@ now, and a map of this file. `tools/FOR-FABLE.md` (21 Oct) held two jobs for ski
   `tools/vscode/tasks.json` (all of them as VS Code tasks, Windows too; copied into `.vscode/` once, see FOR-SKIZY.md), `tools/skizy-room-slots.py` (the "skizy's room" slots
   written again from her room's files, keeping measured crops). `tools/debug.html` stays gitignored (a cheat page if
   published): Victor sends skizy the file.
-- **Working from GitHub** (5 Oct, Victor: only while his Claude cloud-session credit lasts, to 4 Nov 2026; he does
-  everything locally after that). A copy of the repo on GitHub (git remote `github` in his folder; Forgejo stays `origin`
+- **Working from GitHub** (5 Oct, Victor: only while his Claude cloud-session credit lasts. **It ran out on 2 Nov 2026**:
+  everything is local again. `tools/BACK-TO-LOCAL.md` says how to retire what follows; until then it's kept as it was). A copy of the repo on GitHub (git remote `github` in his folder; Forgejo stays `origin`
   and the real home) so Claude's cloud sessions (claude.ai/code) can work on it; they can only clone from and push to
   GitHub, never Forgejo. Two tools of their own, so `publish.bat` / `pull.sh` stay exactly as they were and the GitHub
   ones can simply be deleted later:
