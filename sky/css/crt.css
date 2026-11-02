@@ -20,24 +20,6 @@
     mix-blend-mode: multiply;
     opacity: calc(var(--crt) * .3);
 }
-/* moiré: the rainbow ripples a camera sees on a television, where its own rows of pixels and the tube's don't line up.
-   its picture (--moire-art) is worked out by crt.js from how a camera sensor aliases the tube's lines, stronger in
-   some places than others, drifting slowly up and down (1 Nov, from the artist's photos) */
-.crt .crt-moire {
-    inset: -12%;
-    background: var(--moire-art, none) center / 100% 100% no-repeat;
-    -webkit-mask-image: radial-gradient(ellipse 45% 38% at 30% 38%, #000, transparent 72%), radial-gradient(ellipse 40% 34% at 70% 62%, #000, transparent 70%), radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0, 0, 0, .35), transparent 80%);
-            mask-image: radial-gradient(ellipse 45% 38% at 30% 38%, #000, transparent 72%), radial-gradient(ellipse 40% 34% at 70% 62%, #000, transparent 70%), radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0, 0, 0, .35), transparent 80%);
-    mix-blend-mode: soft-light;
-    opacity: calc(var(--crt) * .4);
-    animation: crt-moire 41s ease-in-out infinite alternate;
-    will-change: transform;
-}
-@keyframes crt-moire {
-    from { transform: translate3d(0, -4vmin, 0); }
-    to { transform: translate3d(0, 4vmin, 0); }
-}
-
 /* a dark band rolling slowly up the picture: the camera and the set not quite in step */
 .crt .crt-roll {
     inset: auto 0 auto 0;
@@ -156,9 +138,8 @@ html.crt-on.crt-split { filter: url(#crt-split); }
 /* phones: the mark up top in the middle, where nothing's tapped, and everything lighter */
 @media (max-width: 620px), (max-height: 500px) {
     /* (1 Nov: on a phone the stripes are as big as on a computer, next to much smaller words: so nearly gone, and the
-       ripples and the band lighter, or nothing can be read) */
+       band lighter, or nothing can be read) */
     .crt .crt-mask { opacity: calc(var(--crt) * .08); }
-    .crt .crt-moire { opacity: calc(var(--crt) * .18); }
     .crt .crt-roll { opacity: calc(var(--crt) * .7); }
     .crt .crt-tube { border-radius: 5vmin / 6vmin; }
     .crt .crt-live { font-size: 9px; gap: .7em; right: auto; bottom: auto; left: 50%; top: calc(3vmin + 58px); transform: translateX(-50%); }
@@ -171,5 +152,4 @@ html.crt-on.crt-split { filter: url(#crt-split); }
 @media (prefers-reduced-motion: reduce) {
     .crt .crt-dot { animation: none; }
     .crt .crt-roll, .crt .crt-flick { animation: none; display: none; }
-    .crt .crt-moire { animation: none; }
 }

@@ -38,7 +38,7 @@
         if (ctx) return ctx;
         var AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return null;
-        ctx = new AC();
+        ctx = (Sky.crush && Sky.crush.context()) || new AC();      // (reset 1: the page's one shared engine, sky/sky.js)
         master = ctx.createGain();
         master.gain.value = quiet() ? 0 : 1;
         if (Sky.crush) Sky.crush.out(ctx, master); else master.connect(ctx.destination);                            // (to the speakers: through the bitcrush in reset 1, sky/sky.js)
@@ -62,11 +62,32 @@
     }
     ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) { document.addEventListener(ev, wake, { capture: true, passive: true }); });
 
-    // a recording played outside the engine (a sound effect, a thunderclap): in reset 1 it's taken in, so it goes through
-    // the bitcrush with everything else (sky/sky.js Sky.crush)
+    // a recording played outside the engine (a thunderclap): in reset 1 it's taken in, so it goes through the bitcrush
+    // with everything else (sky/sky.js Sky.crush)
     function crushed(a) {
         if (!Sky.crush || !Sky.crush.all || !ac()) return;
         try { ctx.createMediaElementSource(a).connect(master); } catch (e) {}
+    }
+    // reset 1: a sound effect of yours is fetched and unpacked once, kept, and played from memory inside the engine (a
+    // fresh <audio> through the bitcrush every time was slow to start and stumbled when several came at once)
+    var unpacked = {};
+    function unpack(url) {
+        if (!unpacked[url]) unpacked[url] = fetch(url).then(function (r) { if (!r.ok) throw r.status; return r.arrayBuffer(); })
+            .then(function (b) { return new Promise(function (ok, no) { ctx.decodeAudioData(b, ok, no); }); })
+            .catch(function (e) { delete unpacked[url]; throw e; });
+        return unpacked[url];
+    }
+    function inMemory() { return !!(Sky.crush && Sky.crush.all && ac()); }
+    function playKept(url, vol, rate, orElse) {
+        unpack(url).then(function (buf) {
+            if (quiet()) return;
+            var src = ctx.createBufferSource(), g = gain(vol);
+            src.buffer = buf;
+            if (rate) src.playbackRate.value = rate;
+            src.connect(g); g.connect(master);
+            if (ctx.state !== 'running') ctx.resume().catch(function () {});
+            src.start();
+        }, orElse);
     }
 
     var bufs = {};
@@ -985,16 +1006,21 @@
         var size = opts.size, delay = opts.delay || 0;
         var vol = sfxVol * (opts.volume === undefined ? 1 : Math.max(0, Math.min(1, opts.volume)));   // (volume: a share of the usual loudness)
         if (sfxFiles[name]) {                                          // your recording
-            setTimeout(function () {
+            // a small splash (a bottle) is a little brighter; a big one (the boat) plays the recording as it is, never slowed
+            // down (31 Oct: the boat has a proper deep splash of its own now)
+            var rate = 0;
+            if (name === 'splash' && size !== undefined) rate = Math.max(1, 1.3 - 0.55 * size);
+            if (name === 'angry' && size !== undefined) rate = 0.9 + 0.45 * size;
+            var url = sfxFiles[name], plain = function () {
                 if (quiet()) return;                                   // (hushed: a recording plays outside the engine, so it's simply not played)
-                var a = new Audio(sfxFiles[name]);
-                crushed(a);
+                var a = new Audio(url);
                 a.volume = vol;
-                // a small splash (a bottle) is a little brighter; a big one (the boat) plays the recording as it is, never slowed
-                // down (31 Oct: the boat has a proper deep splash of its own now)
-                if (name === 'splash' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = Math.max(1, 1.3 - 0.55 * size); }
-                if (name === 'angry' && size !== undefined) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = 0.9 + 0.45 * size; }
+                if (rate) { a.preservesPitch = false; a.mozPreservesPitch = false; a.playbackRate = rate; }
                 a.play().catch(function () {});
+            };
+            setTimeout(function () {
+                if (inMemory()) playKept(url, vol, rate, plain);       // (reset 1: inside the engine, through the bitcrush)
+                else plain();
             }, delay * 1000);
             return;
         }
@@ -1015,6 +1041,9 @@
         sfx: sfx,
         hush: hush,
         get hushed() { return quiet(); },
+        // fetch a recording ahead, so its first play isn't late (reset 1 keeps it unpacked; other resets let the browser
+        // keep the file): Sky.sounds.warm(url)
+        warm: function (url) { if (!url) return; if (inMemory()) unpack(url).catch(function () {}); else { var a = new Audio(); a.preload = 'auto'; a.src = url; } },
         get sfxVolume() { return sfxVol; },
         set sfxVolume(v) { sfxVol = Math.max(0, Math.min(1, v)); try { localStorage.setItem(SFX_KEY, sfxVol); } catch (e) {} },
         has: function (name) { return !!SYNTHS[name]; },

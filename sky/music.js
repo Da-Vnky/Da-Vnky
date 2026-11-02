@@ -250,6 +250,7 @@
     function lofiCan() { return !!(window.AudioWorkletNode && window.isSecureContext && (window.AudioContext || window.webkitAudioContext)); }
     function lofiCtx() {
         if (lofi.ctx || lofi.failed) return lofi.ctx;
+        if (LOFI_STUCK && Sky.crush.context()) return (lofi.ctx = Sky.crush.context());     // (reset 1: the page's one shared engine)
         var C = window.AudioContext || window.webkitAudioContext;
         try { lofi.ctx = new C({ sampleRate: 44100, latencyHint: 'playback' }); }              // (44.1 kHz: then "every 4th sample" is exact)
         catch (e) { try { lofi.ctx = new C(); } catch (e2) { lofi.failed = true; } }
@@ -261,6 +262,11 @@
         if (lofi.ready) return lofi.ready;
         var ctx = lofiCtx();
         if (!ctx) return Promise.resolve(false);
+        if (LOFI_STUCK && ctx === Sky.crush.context()) {                 // (reset 1: the song joins every other sound, through the one bitcrush)
+            try { Sky.crush.out(ctx, ctx.createMediaElementSource(audio)); lofi.built = true; }
+            catch (e) { lofi.failed = true; }
+            return (lofi.ready = Promise.resolve(lofi.built));
+        }
         lofi.ready = ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([LOFI_PROC], { type: 'application/javascript' }))).then(function () {
             lofi.node = new AudioWorkletNode(ctx, 'dav-lofi', { outputChannelCount: [2], processorOptions: { rate: LOFI_RATE, bits: LOFI_BITS } });
             lofi.node.parameters.get('amount').value = lofi.on ? 1 : 0;

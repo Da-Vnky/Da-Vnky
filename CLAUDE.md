@@ -841,24 +841,17 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   doesn't look too visually noisy") for a dark rolling band, and the rounded corners back, "just don't add the glare".
 - crt.js (index, workshop, city, living, template, after postfx.js) builds `.crt` (z 2147483050: over the buttons and the
   loading screen, under the white-out; no clicks) only when `davSave.reset === 1` and not `?map`: `.crt-mask` (red-green-blue
-  stripes, multiply), `.crt-moire` (the camera's moiré, soft-light at .4, masked into patches, the box 124% and drifting
-  up and down by transform over 41 s; its picture `--moire-art` is worked out by crt.js `moireArt()`, below), `.crt-roll` (a dark band,
+  stripes, multiply), `.crt-roll` (a dark band,
   .17 at its middle, rolling up in 11 s), `.crt-flick` (a few % darker now and then, never a flash), `.crt-glass` (slot
   `assets/ui/crt-glass`, nothing drawn), `.crt-tube` (rounded corners, `7vmin / 9vmin`, phones `5vmin / 6vmin`, black beyond them
   by a 40vmax spread shadow, and the edges darkened; no glare), and `.crt-live`: a blinking red ● REC, LIVE, `CAM nn` (`CAMS` by page, and by
   `Sky.house.where()` in the house) and the time on air since the visit's first page (sessionStorage `crt-since`); bottom right,
   on phones top middle under the buttons. `--crt` = `STRENGTH` scales it all.
-- **The moiré is simulated, not drawn** (1 Nov, Victor: "the curvature of the bands doesn't make sense … use actual formulas
-  that explain that phenomenon"): `moireArt(phone)` films the tube with a pretend camera, once, 600 ms after the page loads
-  (~a few hundredths of a second). The tube: `LINES` scanlines and `STRIPES` phosphor stripes, screen_c(u, v) = (1 − a + a·cos²(π
-  LINES (v+1)/2)) · (1 − b + b·cos²(π (STRIPES (u+1)/2 − c/3))), a .8, b .45. The glass and lens: (u, v) = (x, y)(1 + K r²), K .009
-  (barrel), turned by `TILT` .0025 rad. The sensor: `SENSOR_W` × `SENSOR_H` (960 × 600; phones 640 × 400) point samples behind
-  an RGGB Bayer filter, no anti-aliasing filter. The video: each colour averaged over its own samples in 4 × 4 blocks (demosaic +
-  downscale), what's left is the beat (`LINES` = rows − 6.5, `STRIPES` = columns + 7.5: about 6-7 bands each way), bending
-  round the middle and crowding at the edges from the lens, coloured by the Bayer offsets; normalised round grey (128 ± 55 per
-  standard deviation) into a 240 × 150 PNG.
+- **No moiré** (2 Nov, Victor: "I don't like how the moire effect ended up coming off can you please remove that?"): it was
+  simulated (a pretend camera's Bayer sensor aliasing the tube's lines, `moireArt()`), and is gone with its layer; the git
+  history has it (commit 3a66d46) if it's ever wanted again.
 - **Readable** (1 Nov, Victor: "I can barely read anything on mobile"): the mask at .3; on phones (`(max-width: 620px),
-  (max-height: 500px)`) the mask at .08, the moiré .18, the band at .7, the split `SPLIT` 1.5 with `SPLIT_MIDDLE` 0, `PUNCH` 1.15
+  (max-height: 500px)`) the mask at .08, the band at .7, the split `SPLIT` 1.5 with `SPLIT_MIDDLE` 0, `PUNCH` 1.15
   and no glow (crt.js): there a CSS pixel is 2-3 of the screen's, so the stripes are as big as on a computer beside much smaller
   words. (No scanlines since later on 1 Nov.)
 - **The colour split**: `html.crt-on.crt-split { filter: url(#crt-split) }` (on html, the one element a filter doesn't spoil
@@ -869,8 +862,8 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   and a glow (the brightest parts, slope 2.6 / -1.6, blurred `GLOW_PX` 3 and added at `GLOW` .3; none on phones). `SPLIT` 3 px at the edges, red outwards, blue inwards; drawn again
   on resize. It's costly (headless Chromium without a GPU: the sea 10.8 → 3.8 frames a second), so `settle()` times the page
   once a visit, 2.5 s after the first page settles: 1.5 s with it (under 22 ms a frame: kept), else 1.5 s without; slower by
-  over 1.35× → off for the visit (sessionStorage `crt-split` off/on). The overlay is inside the filter too, so the mask and
-  the moiré split at the edges as well. Split off = no colour punch or glow either.
+  over 1.35× → off for the visit (sessionStorage `crt-split` off/on). The overlay is inside the filter too, so the mask splits at
+  the edges as well. Split off = no colour punch or glow either.
 - Switching on: once a visit (sessionStorage `crt-warm`), `.crt-power.crt-boot` (the picture opens off a bright line, sound
   `crt-on`). Switching off: forget.js `reset()` going to the next reset calls `Sky.crt.off(white)` first (`.crt-shut`: halves
   close on a line, the line shrinks to a dot, 1.25 s, sound `crt-off`). Reduced motion: no roll, flicker, blink or switching
@@ -890,6 +883,19 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
   visitor chose (their choice is kept for reset 2), `set(false)` only says a line (`STUCK_LINES`) and emits `lofi-stuck`: the
   record player's knob and the panel's switch shudder (`.jolt`, records.css / music.css), both read "stuck". From reset 2 none
   of it: the slider works as before. Not crushed: other sites' players in letters (iframes), beyond.html.
+- **One engine, one bitcrush** (2 Nov, Victor: "all sound effects are struggling with the bitcrush filter, is there some way to
+  have it affect all sounds (except skizy's room)?"): the first version gave each piece its own AudioContext and its own
+  `dav-lofi` (panel.js, babble.js, bee.js, music.js: four or five worklets on the audio thread), and every recorded sound effect
+  was a fresh `<audio>` taken into the graph. Now in reset 1 `Sky.crush.context()` is **the page's one AudioContext** (44.1 kHz)
+  with a `bus` → one `dav-lofi` → the speakers, made on first use and resumed on the first pointerdown/keydown/touchend; panel.js
+  `ac()`, babble.js `engine()`, bee.js `voice()` and music.js `lofiCtx()` take it instead of `new AudioContext()`, `out(ctx, n)`
+  connects into `bus`, and music.js `lofiBuild` sends the song's element straight in (no node of its own). panel.js's recorded
+  sound effects are fetched and decoded once (`unpack`, kept per address) and played from memory (`playKept`: a BufferSource →
+  a gain → `master`; splash/angry pitch as `playbackRate`; the `<audio>` way if decoding fails); `Sky.sounds.warm(url)` fetches
+  ahead (revolver.js `warm()` uses it). Thunder and the channels' loops stay elements, taken into the same engine. The
+  worklet works out its hold step and rounding once a block when the amount isn't moving (always, in reset 1). Measured
+  (Playwright): reset 1 = 1 AudioContext, 1 bitcrush, recordings played from memory; reset 2 = as before. skizy's room never
+  loads panel.js or sky.js, so nothing there is crushed.
 
 ## The toy camera: the page seen through a lens (sky/postfx.js, tools/blender/toycam.py, 25 Oct)
 

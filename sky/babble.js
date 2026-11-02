@@ -182,7 +182,7 @@
         if (E || MAPPING || !awake) return E;
         var AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return null;
-        try { E = build(new AC(), level()); } catch (e) { return null; }
+        try { E = build((window.Sky && Sky.crush && Sky.crush.context()) || new AC(), level()); } catch (e) { return null; }   // (reset 1: the page's one shared engine)
         return E;
     }
     // the parts every voice plays through: its loudness, a gentle limiter, a small room, a puff of noise
