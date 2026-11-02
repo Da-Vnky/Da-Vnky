@@ -89,9 +89,10 @@
         return '<svg class="placeholder" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMinYMax slice" aria-hidden="true">' +
                '<g class="cb">' + b + '</g><g class="cl">' + l + '</g></svg>';
     })();
-    // the waves' night glow (2 Nov): how bright a pixel of the artist's wave must be to glow (0-1), how sharply it comes on
-    // past that, the bloom's blur (px) and strength, and from when in the day it's drawn at all (sky time: .3 = the dusk's start)
-    var GLOW_FROM = .52, GLOW_SLOPE = 3.2, BLOOM_PX = 4, BLOOM = .55, GLOW_AFTER = .3;
+    // the waves' night glow (2 Nov): how deep each wave's top is (a share of the sea's height, measured down from the wave's
+    // own top edge), how softly it fades out below that (a share of it), the bloom's blur (px) and strength, and from when in
+    // the day it's drawn at all (sky time: .3 = the dusk's start)
+    var TOP = .12, TOP_SOFT = .45, BLOOM_PX = 5, BLOOM = .45, GLOW_AFTER = .3;
     var sea = document.createElement('div');
     sea.className = 'ground ground-sea';
     sea.setAttribute('aria-hidden', 'true');
@@ -253,32 +254,56 @@
             svg.style.backgroundImage = 'url("' + url + '")';
             // (2 Nov) and a copy of it for the night's glow (ground-sea.css "the waves glow at night")
             svg.parentNode.classList.add('wave-glows');               // (not has-art: sky.css hides a .layer.has-art's own drawing)
-            svg.parentNode.style.setProperty('--wave-art', 'url("' + url + '")');
+            svg.parentNode.style.setProperty('--wave-art', 'url("' + new URL(url, location.href).href + '")');   // (whole: a url in a variable is read from the stylesheet's folder, sky/css/)
             glowFilter();
         });
     });
     // the waves glow at night (2 Nov, the artist: his waves are bright, and the night dims them like everything else, so
-    // their brightest parts come back through, with a slight bloom). a copy of each wave over it (.wave-move::after),
-    // through this filter: how bright each pixel is becomes how solid it is, and only the bright ones are kept (the
-    // mask), then the same, blurred a little, under them (the bloom). it fades in with the dusk and is fullest at night
+    // their tops come back through, with a slight bloom). a copy of each wave over it (.wave-move::after), through this
+    // filter: the mask is the wave's own top, found from its shape (where the wave is, but wasn't a little higher up:
+    // its crest, however it curls), softened so it fades out downwards; through it the wave's own colours show, as by day,
+    // and under them the same, blurred a little (the bloom). it fades in with the dusk and is fullest at night
     // (ground-sea.css); by day it isn't drawn at all (.sea-glow, below)
-    var glowMade = false;
+    // (made with its numbers already in, and made again under a new name when the sea's size changes: a filter changed in
+    // place after it's first been drawn isn't always drawn again, and the glow stayed empty)
+    var glowDefs = null, glowTop = 0, glowN = 0;
     function glowFilter() {
-        if (glowMade) return;
-        glowMade = true;
-        var d = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        d.setAttribute('class', 'sea-glow-defs');
-        d.setAttribute('aria-hidden', 'true');
-        d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
-        d.innerHTML = '<filter id="sea-wave-glow" x="-2%" y="-10%" width="104%" height="120%" color-interpolation-filters="sRGB">' +
-            '<feColorMatrix in="SourceGraphic" type="luminanceToAlpha" result="lum"/>' +
-            '<feComponentTransfer in="lum" result="mask"><feFuncA type="linear" slope="' + GLOW_SLOPE + '" intercept="' + (-GLOW_FROM * GLOW_SLOPE) + '"/></feComponentTransfer>' +
-            '<feComposite in="SourceGraphic" in2="mask" operator="in" result="bright"/>' +
-            '<feGaussianBlur in="bright" stdDeviation="' + BLOOM_PX + '" result="blur"/>' +
+        var h = (sea.querySelector('.wave-move') || sea).offsetHeight || 260, top = Math.max(6, Math.round(h * TOP));
+        if (top === glowTop) return;
+        glowTop = top;
+        if (!glowDefs) {
+            glowDefs = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            glowDefs.setAttribute('class', 'sea-glow-defs');
+            glowDefs.setAttribute('aria-hidden', 'true');
+            glowDefs.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+            document.body.appendChild(glowDefs);
+            var later = null;
+            addEventListener('resize', function () { clearTimeout(later); later = setTimeout(glowFilter, 300); });
+        }
+        var id = 'sea-wave-glow-' + (++glowN);
+        glowDefs.innerHTML = '<filter id="' + id + '" x="-2%" y="-10%" width="104%" height="120%" color-interpolation-filters="sRGB">' +
+            '<feOffset in="SourceAlpha" dy="' + top + '" result="lower"/>' +                 // (the wave, moved down by its top's depth)
+            '<feComposite in="SourceAlpha" in2="lower" operator="out" result="edge"/>' +      // (where it is but that isn't: its top)
+            '<feGaussianBlur in="edge" stdDeviation="' + (top * TOP_SOFT).toFixed(1) + '" result="soft"/>' +
+            '<feComponentTransfer in="soft" result="mask"><feFuncA type="linear" slope="1.8"/></feComponentTransfer>' +
+            '<feComposite in="SourceGraphic" in2="mask" operator="in" result="tops"/>' +
+            '<feGaussianBlur in="tops" stdDeviation="' + BLOOM_PX + '" result="blur"/>' +
             '<feComponentTransfer in="blur" result="bloom"><feFuncA type="linear" slope="' + BLOOM + '"/></feComponentTransfer>' +
-            '<feMerge><feMergeNode in="bloom"/><feMergeNode in="bright"/></feMerge></filter>';
-        document.body.appendChild(d);
+            '<feMerge><feMergeNode in="bloom"/><feMergeNode in="tops"/></feMerge></filter>';
+        sea.style.setProperty('--wave-glow', 'url("#' + id + '")');
     }
+    // the glow takes each wave's own depth of field too (sky/postfx.js blurs and hazes the far waves by their distance, on the
+    // wave itself, and changes it as the camera moves): copied across every second while it's glowing, or the far waves'
+    // tops came out sharp in front of their own blurred bodies
+    setInterval(function () {
+        if (!sea.classList.contains('sea-glow') || document.hidden) return;
+        waves.forEach(function (svg) {
+            var box = svg.parentNode;
+            if (!box.classList.contains('wave-glows')) return;
+            var dof = (getComputedStyle(svg).filter.match(/url\([^)]*postfx[^)]*\)|blur\([^)]*\)/g) || []).join(' ');
+            if (box.dataset.dof !== dof) { box.dataset.dof = dof; box.style.setProperty('--wave-dof', dof || 'opacity(1)'); }
+        });
+    }, 1000);
     // slot: the ship
     Sky.svgArt(sea.querySelector('.ship .hull'), 'assets/sea/ship', [0, 0, 120, 100]);
 
