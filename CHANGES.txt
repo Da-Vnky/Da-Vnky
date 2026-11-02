@@ -14,10 +14,12 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- Reset 1's television: the REC / LIVE / CAM mark shows the visitor's own date and time, like a security camera (it used to count up from 0), and waits until the loading screen has gone before it appears.
-- The sea at night: the bright parts of the waves (their crests and light strokes) glow through the night's darkening, with a slight bloom; it comes on from dusk and is strongest at night (sky/ground-sea.js, sky/css/ground-sea.css).
 
 == published ==
+
+2026-11-01 21:02 · V
+- Reset 1's television: the REC / LIVE / CAM mark shows the visitor's own date and time, like a security camera (it used to count up from 0), and waits until the loading screen has gone before it appears.
+- The sea at night: the bright parts of the waves (their crests and light strokes) glow through the night's darkening, with a slight bloom; it comes on from dusk and is strongest at night (sky/ground-sea.js, sky/css/ground-sea.css).
 
 2026-11-01 20:50 · V
 - Reset 1's television: the moiré (rainbow ripples) is gone.
