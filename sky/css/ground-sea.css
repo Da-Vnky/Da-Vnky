@@ -156,16 +156,16 @@
     }
 }
 /* the waves glow at night (2 Nov): over each of the artist's waves, a copy of it through ground-sea.js's #sea-wave-glow (only its
-   brightest parts, and a slight bloom of them), so where the waves were painted bright the night's dimming lets them through
-   again. none by day (.sea-glow is on from late afternoon); it fades in with the dusk and is fullest at night. its own layer
-   (will-change), so only its opacity changes as the evening goes on, and the filtered picture is drawn once */
+   top, its crest, found from its own shape and fading out downwards, and a slight bloom of it), so the night's dimming lifts
+   off the waves' tops. none by day (.sea-glow is on from late afternoon); it fades in with the dusk and is fullest at night.
+   its own layer (will-change), so only its opacity changes as the evening goes on, and the filtered picture is drawn once */
 .ground-sea.sea-glow .wave-move.wave-glows::after {
     content: "";
     position: absolute;
     inset: 0;
     background: var(--wave-art) left bottom / auto 100% repeat-x;
-    filter: url(#sea-wave-glow);
-    opacity: calc(.18 * var(--dusk, 0) + .5 * var(--night, 0));
+    filter: var(--wave-glow, opacity(1)) var(--wave-dof, opacity(1));   /* (ground-sea.js glowFilter, and the wave's own depth of field) */
+    opacity: calc(.2 * var(--dusk, 0) + .45 * var(--night, 0));
     will-change: opacity;
     pointer-events: none;
 }
