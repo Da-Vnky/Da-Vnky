@@ -836,31 +836,60 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - Victor: "have the entire website look like it was on a crt for the first reset … enough to make someone say without a doubt it
   was trumanesque"; reset 1 is "just crt tv as the effect", the grain and the sea's post-processing from reset 2. Then: the
   coloured bands at the sides and the drawn glare and rounded corners went ("it looks too much like an iPhone"), for a real
-  colour split "slightly higher at the very edges affecting those pixels".
+  colour split "slightly higher at the very edges affecting those pixels". Later on 1 Nov, from his photos of televisions filmed
+  by a camera: "emulate the sort of recording of a screen effect these have", the scanlines out ("remove the scanline … so it
+  doesn't look too visually noisy") for a dark rolling band, and the rounded corners back, "just don't add the glare".
 - crt.js (index, workshop, city, living, template, after postfx.js) builds `.crt` (z 2147483050: over the buttons and the
-  loading screen, under the white-out; no clicks) only when `davSave.reset === 1` and not `?map`: `.crt-lines` (every third row
-  dark, the next half-dark), `.crt-mask` (red-green-blue stripes, multiply), `.crt-roll` (a bright band, 8.5 s down),
-  `.crt-flick` (a few % darker now and then, never a flash), `.crt-glass` (slot `assets/ui/crt-glass`, nothing drawn), `.crt-tube`
-  (the edges darkened, square), and `.crt-live`: a blinking red ● REC, LIVE, `CAM nn` (`CAMS` by page, and by
+  loading screen, under the white-out; no clicks) only when `davSave.reset === 1` and not `?map`: `.crt-mask` (red-green-blue
+  stripes, multiply), `.crt-moire` (the camera's moiré, soft-light at .4, masked into patches, the box 124% and drifting
+  up and down by transform over 41 s; its picture `--moire-art` is worked out by crt.js `moireArt()`, below), `.crt-roll` (a dark band,
+  .17 at its middle, rolling up in 11 s), `.crt-flick` (a few % darker now and then, never a flash), `.crt-glass` (slot
+  `assets/ui/crt-glass`, nothing drawn), `.crt-tube` (rounded corners, `7vmin / 9vmin`, phones `5vmin / 6vmin`, black beyond them
+  by a 40vmax spread shadow, and the edges darkened; no glare), and `.crt-live`: a blinking red ● REC, LIVE, `CAM nn` (`CAMS` by page, and by
   `Sky.house.where()` in the house) and the time on air since the visit's first page (sessionStorage `crt-since`); bottom right,
   on phones top middle under the buttons. `--crt` = `STRENGTH` scales it all.
-- **Readable** (1 Nov, Victor: "I can barely read anything on mobile"): lines .48 / .16, the mask at .3; on phones (`(max-width:
-  620px), (max-height: 500px)`) lines .26 / .06, the mask at .08, and the split `SPLIT` 1.5 with `SPLIT_MIDDLE` 0 (crt.js):
-  there a CSS pixel is 2-3 of the screen's, so the lines are as big as on a computer beside much smaller words.
+- **The moiré is simulated, not drawn** (1 Nov, Victor: "the curvature of the bands doesn't make sense … use actual formulas
+  that explain that phenomenon"): `moireArt(phone)` films the tube with a pretend camera, once, 600 ms after the page loads
+  (~a few hundredths of a second). The tube: `LINES` scanlines and `STRIPES` phosphor stripes, screen_c(u, v) = (1 − a + a·cos²(π
+  LINES (v+1)/2)) · (1 − b + b·cos²(π (STRIPES (u+1)/2 − c/3))), a .8, b .45. The glass and lens: (u, v) = (x, y)(1 + K r²), K .009
+  (barrel), turned by `TILT` .0025 rad. The sensor: `SENSOR_W` × `SENSOR_H` (960 × 600; phones 640 × 400) point samples behind
+  an RGGB Bayer filter, no anti-aliasing filter. The video: each colour averaged over its own samples in 4 × 4 blocks (demosaic +
+  downscale), what's left is the beat (`LINES` = rows − 6.5, `STRIPES` = columns + 7.5: about 6-7 bands each way), bending
+  round the middle and crowding at the edges from the lens, coloured by the Bayer offsets; normalised round grey (128 ± 55 per
+  standard deviation) into a 240 × 150 PNG.
+- **Readable** (1 Nov, Victor: "I can barely read anything on mobile"): the mask at .3; on phones (`(max-width: 620px),
+  (max-height: 500px)`) the mask at .08, the moiré .18, the band at .7, the split `SPLIT` 1.5 with `SPLIT_MIDDLE` 0, `PUNCH` 1.15
+  and no glow (crt.js): there a CSS pixel is 2-3 of the screen's, so the stripes are as big as on a computer beside much smaller
+  words. (No scanlines since later on 1 Nov.)
 - **The colour split**: `html.crt-on.crt-split { filter: url(#crt-split) }` (on html, the one element a filter doesn't spoil
   fixed positions on). `splitFilter()` writes the SVG filter (`svg.crt-defs`): the picture's red and blue each pulled out
   (`feColorMatrix`) and moved by `feDisplacementMap` over a map (`splitMap`: a 192-wide canvas, each point's direction out from
   the middle, its size `SPLIT_MIDDLE` .2 of the most in the middle up to all of it at the edges, from 55% of the way out),
-  then added back to the green (`feComposite arithmetic`). `SPLIT` 3 px at the edges, red outwards, blue inwards; drawn again
+  then added back to the green (`feComposite arithmetic`); then the camera's colour: `saturate` `PUNCH` 1.25, contrast ×1.08,
+  and a glow (the brightest parts, slope 2.6 / -1.6, blurred `GLOW_PX` 3 and added at `GLOW` .3; none on phones). `SPLIT` 3 px at the edges, red outwards, blue inwards; drawn again
   on resize. It's costly (headless Chromium without a GPU: the sea 10.8 → 3.8 frames a second), so `settle()` times the page
   once a visit, 2.5 s after the first page settles: 1.5 s with it (under 22 ms a frame: kept), else 1.5 s without; slower by
-  over 1.35× → off for the visit (sessionStorage `crt-split` off/on). The overlay is inside the filter too, so the scanlines
-  and mask split at the edges as well.
+  over 1.35× → off for the visit (sessionStorage `crt-split` off/on). The overlay is inside the filter too, so the mask and
+  the moiré split at the edges as well. Split off = no colour punch or glow either.
 - Switching on: once a visit (sessionStorage `crt-warm`), `.crt-power.crt-boot` (the picture opens off a bright line, sound
   `crt-on`). Switching off: forget.js `reset()` going to the next reset calls `Sky.crt.off(white)` first (`.crt-shut`: halves
   close on a line, the line shrinks to a dot, 1.25 s, sound `crt-off`). Reduced motion: no roll, flicker, blink or switching
   on; off is a fade. postfx.js returns at once in reset 1 (no lens, grain, blur, haze or toy camera); the rock keeps its own
   CSS blur there.
+
+- **Everything bitcrushed in reset 1** (2 Nov, Victor: "make it so that the bitcrush on the record player can't be toggled off
+  1st reset and applied to the site's music and sounds as well … they should all be removed second reset, and the toggle for
+  record player work in second reset onwards"): the effect (the AudioWorklet's code, `PROC`) moved to sky.js **"the bitcrush"**,
+  `Sky.crush = { all, can, node(ctx), out(ctx, node), media(el), proc }`; `all` = reset 1 and not `?map`. `out(ctx, last)`
+  connects an engine's last node to the speakers, and in reset 1 swaps a `dav-lofi` node in between once its module's loaded
+  (never for an OfflineAudioContext): panel.js's `master` (every synth sound effect, the ambience, the weather, noise.js),
+  babble.js's limiter (the Claubes' voices), bee.js's new `out` (its voice and its hum). panel.js `crushed(a)` takes its
+  recordings (sound effects, thunder) into the engine in reset 1 (`createMediaElementSource` → master). A capture `play`
+  listener sends the page's own `<audio>`/`<video>` (songs and videos in letters) through a shared context in reset 1, only
+  same-origin ones (a desk file from Supabase would go silent). music.js `LOFI_STUCK`: the records' lo-fi is on whatever the
+  visitor chose (their choice is kept for reset 2), `set(false)` only says a line (`STUCK_LINES`) and emits `lofi-stuck`: the
+  record player's knob and the panel's switch shudder (`.jolt`, records.css / music.css), both read "stuck". From reset 2 none
+  of it: the slider works as before. Not crushed: other sites' players in letters (iframes), beyond.html.
 
 ## The toy camera: the page seen through a lens (sky/postfx.js, tools/blender/toycam.py, 25 Oct)
 

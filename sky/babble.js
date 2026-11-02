@@ -190,7 +190,8 @@
         var master = ctx.createGain(), limit = ctx.createDynamicsCompressor();
         limit.threshold.value = -8; limit.knee.value = 6; limit.ratio.value = 6; limit.attack.value = 0.003; limit.release.value = 0.12;
         master.gain.value = gain;
-        master.connect(limit); limit.connect(ctx.destination);
+        master.connect(limit);
+        if (window.Sky && Sky.crush) Sky.crush.out(ctx, limit); else limit.connect(ctx.destination);   // (reset 1: through the bitcrush)
         // a small room: the same for everyone, each voice sends to it as much as it likes
         var hall = ctx.createConvolver(), wet = ctx.createGain();
         var len = Math.floor(ctx.sampleRate * 1.4), ir = ctx.createBuffer(2, len, ctx.sampleRate);

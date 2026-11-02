@@ -41,7 +41,7 @@
         ctx = new AC();
         master = ctx.createGain();
         master.gain.value = quiet() ? 0 : 1;
-        master.connect(ctx.destination);
+        if (Sky.crush) Sky.crush.out(ctx, master); else master.connect(ctx.destination);                            // (to the speakers: through the bitcrush in reset 1, sky/sky.js)
         ctx.onstatechange = function () { refreshAll(); };
         return ctx;
     }
@@ -61,6 +61,13 @@
         channels.forEach(function (c) { c.blocked = false; });
     }
     ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) { document.addEventListener(ev, wake, { capture: true, passive: true }); });
+
+    // a recording played outside the engine (a sound effect, a thunderclap): in reset 1 it's taken in, so it goes through
+    // the bitcrush with everything else (sky/sky.js Sky.crush)
+    function crushed(a) {
+        if (!Sky.crush || !Sky.crush.all || !ac()) return;
+        try { ctx.createMediaElementSource(a).connect(master); } catch (e) {}
+    }
 
     var bufs = {};
     function noiseBuf(color, seconds) {
@@ -448,6 +455,7 @@
             setTimeout(function () {
                 if (quiet()) return;
                 var a = new Audio(file);
+                crushed(a);
                 a.volume = loud; a._loud = loud; a._at = at;
                 rolling.push(a);
                 a.onended = a.onerror = function () { var i = rolling.indexOf(a); if (i !== -1) rolling.splice(i, 1); };
@@ -980,6 +988,7 @@
             setTimeout(function () {
                 if (quiet()) return;                                   // (hushed: a recording plays outside the engine, so it's simply not played)
                 var a = new Audio(sfxFiles[name]);
+                crushed(a);
                 a.volume = vol;
                 // a small splash (a bottle) is a little brighter; a big one (the boat) plays the recording as it is, never slowed
                 // down (31 Oct: the boat has a proper deep splash of its own now)

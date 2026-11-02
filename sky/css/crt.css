@@ -14,31 +14,43 @@
 .crt > i,
 .crt > .crt-glass { position: absolute; inset: 0; display: block; }
 
-/* the scanlines: every third pixel row dark, the next half-dark (1 Nov: heavier, the artist wanted them pronounced) */
-.crt .crt-lines {
-    background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .48) 0 1px, rgba(0, 0, 0, .16) 1px 2px, rgba(0, 0, 0, 0) 2px 3px);
-    opacity: var(--crt);
-}
 /* the tube's mask: red, green and blue stripes, side by side */
 .crt .crt-mask {
     background: repeating-linear-gradient(to right, rgba(255, 30, 30, .55) 0 1px, rgba(30, 255, 60, .55) 1px 2px, rgba(40, 70, 255, .55) 2px 3px);
     mix-blend-mode: multiply;
     opacity: calc(var(--crt) * .3);
 }
-/* a brighter band rolling slowly down the picture */
+/* moiré: the rainbow ripples a camera sees on a television, where its own rows of pixels and the tube's don't line up.
+   its picture (--moire-art) is worked out by crt.js from how a camera sensor aliases the tube's lines, stronger in
+   some places than others, drifting slowly up and down (1 Nov, from the artist's photos) */
+.crt .crt-moire {
+    inset: -12%;
+    background: var(--moire-art, none) center / 100% 100% no-repeat;
+    -webkit-mask-image: radial-gradient(ellipse 45% 38% at 30% 38%, #000, transparent 72%), radial-gradient(ellipse 40% 34% at 70% 62%, #000, transparent 70%), radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0, 0, 0, .35), transparent 80%);
+            mask-image: radial-gradient(ellipse 45% 38% at 30% 38%, #000, transparent 72%), radial-gradient(ellipse 40% 34% at 70% 62%, #000, transparent 70%), radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0, 0, 0, .35), transparent 80%);
+    mix-blend-mode: soft-light;
+    opacity: calc(var(--crt) * .4);
+    animation: crt-moire 41s ease-in-out infinite alternate;
+    will-change: transform;
+}
+@keyframes crt-moire {
+    from { transform: translate3d(0, -4vmin, 0); }
+    to { transform: translate3d(0, 4vmin, 0); }
+}
+
+/* a dark band rolling slowly up the picture: the camera and the set not quite in step */
 .crt .crt-roll {
     inset: auto 0 auto 0;
     top: 0;
-    height: 28vh;
-    background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .05) 40%, rgba(255, 255, 255, .09) 50%, rgba(255, 255, 255, .05) 60%, rgba(255, 255, 255, 0));
-    mix-blend-mode: screen;
+    height: 36vh;
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, .1) 30%, rgba(0, 0, 0, .17) 50%, rgba(0, 0, 0, .1) 70%, rgba(0, 0, 0, 0));
     opacity: var(--crt);
-    animation: crt-roll 8.5s linear infinite;
+    animation: crt-roll 11s linear infinite;
     will-change: transform;
 }
 @keyframes crt-roll {
-    from { transform: translateY(-30vh); }
-    to { transform: translateY(130vh); }
+    from { transform: translateY(105vh); }
+    to { transform: translateY(-40vh); }
 }
 /* the faint flicker of the picture (a few percent darker now and then: never anything like a flash) */
 .crt .crt-flick {
@@ -61,9 +73,11 @@
 /* the glass: nothing drawn (1 Nov: the drawn glare went, the artist didn't like it); the artist's own, if there is one,
    assets/ui/crt-glass, laid over the whole screen */
 .crt .crt-glass > .art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
-/* the picture darkening towards the edges of the screen, as an old tube does (square: no rounded corners) */
+/* the tube: its rounded corners (black beyond them) and the picture darkening towards its edges. no glare */
 .crt .crt-tube {
+    border-radius: 7vmin / 9vmin;
     box-shadow:
+        0 0 0 40vmax #050505,
         inset 0 0 calc(var(--crt) * 16vmin) calc(var(--crt) * 3vmin) rgba(0, 0, 0, .6),
         inset 0 0 calc(var(--crt) * 3vmin) rgba(0, 0, 0, .45);
 }
@@ -89,7 +103,8 @@
 .crt .crt-time { opacity: .75; }
 
 /* the colours coming apart: the whole picture, through the SVG filter crt.js writes (#crt-split): red pushed one way and
-   blue the other, a little everywhere and most at the very edges, as on a real tube. html is the one element a filter
+   blue the other, a little everywhere and most at the very edges, as on a real tube; then the colours fuller and the
+   brightest parts glowing, as a camera films a television. html is the one element a filter
    doesn't spoil fixed positions on */
 html.crt-on.crt-split { filter: url(#crt-split); }
 
@@ -138,12 +153,14 @@ html.crt-on.crt-split { filter: url(#crt-split); }
 .crt-fade { background: #000; animation: crt-fade .4s ease-in both; }
 @keyframes crt-fade { from { opacity: 0; } to { opacity: 1; } }
 
-/* phones: the mark up top in the middle, where nothing's tapped */
+/* phones: the mark up top in the middle, where nothing's tapped, and everything lighter */
 @media (max-width: 620px), (max-height: 500px) {
-    /* (1 Nov: on a phone the lines and stripes are as big as on a computer, next to much smaller words: so much lighter,
-       and the stripes nearly gone, or nothing can be read) */
-    .crt .crt-lines { background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .26) 0 1px, rgba(0, 0, 0, .06) 1px 2px, rgba(0, 0, 0, 0) 2px 3px); }
+    /* (1 Nov: on a phone the stripes are as big as on a computer, next to much smaller words: so nearly gone, and the
+       ripples and the band lighter, or nothing can be read) */
     .crt .crt-mask { opacity: calc(var(--crt) * .08); }
+    .crt .crt-moire { opacity: calc(var(--crt) * .18); }
+    .crt .crt-roll { opacity: calc(var(--crt) * .7); }
+    .crt .crt-tube { border-radius: 5vmin / 6vmin; }
     .crt .crt-live { font-size: 9px; gap: .7em; right: auto; bottom: auto; left: 50%; top: calc(3vmin + 58px); transform: translateX(-50%); }
 }
 
@@ -154,4 +171,5 @@ html.crt-on.crt-split { filter: url(#crt-split); }
 @media (prefers-reduced-motion: reduce) {
     .crt .crt-dot { animation: none; }
     .crt .crt-roll, .crt .crt-flick { animation: none; display: none; }
+    .crt .crt-moire { animation: none; }
 }
