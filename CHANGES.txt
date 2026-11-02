@@ -14,10 +14,12 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- The sea at night: the ship catches the waves' glow, a soft sea-green light from the waterline fading up its hull and sail, less the higher it's lifted off the water.
-- New tools/BACK-TO-LOCAL.md: the cloud sessions' handoff now that they're over (2 Nov): the last steps (merge on GitHub, run tools/github-publish.bat once more, then the GitHub tools and FOR-CLOUD-CLAUDE.md can be deleted), what keeps running on its own (the Supabase keep-alive on GitHub), what the cloud built lately and what nobody has heard or seen on the artist's own screens yet. CLAUDE.md, FOR-CLAUDE-CODE.md and FOR-CLOUD-CLAUDE.md point to it.
 
 == published ==
+
+2026-11-02 00:35 · V
+- The sea at night: the ship catches the waves' glow, a soft sea-green light from the waterline fading up its hull and sail, less the higher it's lifted off the water.
+- New tools/BACK-TO-LOCAL.md: the cloud sessions' handoff now that they're over (2 Nov): the last steps (merge on GitHub, run tools/github-publish.bat once more, then the GitHub tools and FOR-CLOUD-CLAUDE.md can be deleted), what keeps running on its own (the Supabase keep-alive on GitHub), what the cloud built lately and what nobody has heard or seen on the artist's own screens yet. CLAUDE.md, FOR-CLAUDE-CODE.md and FOR-CLOUD-CLAUDE.md point to it.
 
 2026-11-01 21:27 · V
 - The sea at night: the waves' tops now really do glow (the first version never showed: the wave pictures' address was read from the wrong folder). The mask is each wave's own crest, found from its shape, lifted out of the night's dimming and fading downwards, with a slight bloom; the far waves keep their blur.

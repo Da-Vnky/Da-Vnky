@@ -1,11 +1,11 @@
 # written by tools/update-lists.sh: the pages and code (for older loading screens: see catalog.txt).
-beyond.html 1480 1497293686
-city.html 10159 1128199097
-desk.html 6191 1683495740
-index.html 5655 4250903478
-living.html 134108 1004150537
-window-sky.html 1334 414689806
-workshop.html 22394 1777464260
+beyond.html 1480 4244151100
+city.html 10159 2172711736
+desk.html 6191 481960849
+index.html 5655 3716386849
+living.html 134108 3628428359
+window-sky.html 1334 1081738006
+workshop.html 22394 4146509996
 sky/ambient.js 5331 3835869943
 sky/attic.js 35422 1573528092
 sky/babble.js 51461 1611227468
@@ -29,7 +29,7 @@ sky/gnosis.js 27385 2559899648
 sky/gore.js 18303 352316465
 sky/ground-city.js 21686 1654325007
 sky/ground-countryside.js 13331 1871014694
-sky/ground-sea.js 65841 3572784470
+sky/ground-sea.js 69232 2323251922
 sky/ground-view.js 6301 1081822792
 sky/gulls.js 11465 931241446
 sky/hand.js 1836 1437817105
@@ -97,7 +97,7 @@ sky/css/gnosis.css 11537 722521896
 sky/css/gore.css 5281 3967197097
 sky/css/ground-city.css 5505 2510993983
 sky/css/ground-countryside.css 834 2965982463
-sky/css/ground-sea.css 17698 2762146984
+sky/css/ground-sea.css 18111 3756580390
 sky/css/ground-view.css 788 375225604
 sky/css/gulls.css 12681 3909105234
 sky/css/hell.css 10082 3168670266
