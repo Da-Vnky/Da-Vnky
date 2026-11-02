@@ -14,6 +14,8 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
+- Reset 1's television: the moiré (rainbow ripples) is gone.
+- Reset 1's bitcrush: every sound on the page now goes through one shared sound engine with a single bitcrush at its end (it was one per piece: the sound effects, the voices, the bee, the record player each ran their own, and struggled), and the recorded sound effects are loaded once and played from memory, so they start on time. From reset 2 nothing changes. skizy's room was never part of it.
 
 == published ==
 
