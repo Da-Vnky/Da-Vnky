@@ -14,10 +14,12 @@ How it works
 
 == not published yet ==
 (write here what you changed, a line each starting with "- ". publishing moves them into the log below.)
-- Reset 1's television now looks filmed by a camera: rainbow moiré ripples drifting over it (worked out from how a camera's sensor really aliases a television's lines, so they bend the way real ones do), a dark band rolling slowly up (the scanlines are gone), fuller colours with the bright parts glowing, and the tube's rounded corners back (no glare).
-- Reset 1: the bitcrush is stuck on (the record player's slider and the music panel's switch only shudder) and every sound the site makes goes through it too: sound effects, the ambience, the weather, the Claubes' voices, the bee, songs in letters. From reset 2 it's only the record player's again, and its slider works.
 
 == published ==
+
+2026-11-01 17:03 · V
+- Reset 1's television now looks filmed by a camera: rainbow moiré ripples drifting over it (worked out from how a camera's sensor really aliases a television's lines, so they bend the way real ones do), a dark band rolling slowly up (the scanlines are gone), fuller colours with the bright parts glowing, and the tube's rounded corners back (no glare).
+- Reset 1: the bitcrush is stuck on (the record player's slider and the music panel's switch only shudder) and every sound the site makes goes through it too: sound effects, the ambience, the weather, the Claubes' voices, the bee, songs in letters. From reset 2 it's only the record player's again, and its slider works.
 
 2026-11-01 15:31 · V
 - Reset 1's television is easier to read: the scanlines and the red-green-blue stripes are lighter, and on phones much lighter (the stripes nearly gone, the colour split smaller and none in the middle of the screen), since there the lines are as big as on a computer next to much smaller words.
