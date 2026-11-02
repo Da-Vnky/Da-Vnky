@@ -464,6 +464,15 @@ url() from a variable. `Sky.css(text)` is still there, only for styles that can'
 - **Night on the sea**: `.ground-sea { --sea-dim, --sea-sat }` from `--dusk`/`--night` (down to about .34 brightness, .6
   saturation at night): every wave (`brightness() saturate()` before its drop-shadow), and his dock and ship pictures
   (`.dock .art:not(.glow-layer)`, `.ship .art:not(.glow-layer)`: CSS filters on SVG `<image>`s work in Chromium and Firefox).
+- **The waves glow at night** (2 Nov, Victor: "create a mask that removes some of the overlaid night filter since the
+  underlying wave values are already bright at night and look like they'd glow, then add a very slight bloom"): each of his
+  wave pictures gets a copy over it (`.wave-move.wave-glows::after`, `--wave-art`, ground-sea.css "the waves glow at night")
+  through ground-sea.js's SVG filter `#sea-wave-glow` (`glowFilter()`): `luminanceToAlpha` → only pixels brighter than
+  `GLOW_FROM` .52 (ramped by `GLOW_SLOPE` 3.2) keep their colour, undimmed, and under them the same blurred `BLOOM_PX` 4 at
+  `BLOOM` .55. Opacity `.18 dusk + .5 night` (its own layer: only the opacity changes through the evening); `.sea-glow` on
+  `.ground-sea` from sky time `GLOW_AFTER` .3, so by day it isn't drawn. **Not `has-art` on the `.wave-move`**: sky.css
+  `.layer.has-art > :not(.layer-art)` hides a layer's own drawing (that hid the waves in the first try). The drawn stand-in
+  waves don't glow.
 - **The rocks** (`.sea-rock`, fixed, z 2, `data-asset="assets/sea/rock"`, a drawn stand-in; Victor, later on 19 Oct: "add a medium
   sized one directly to the right of it, they should overlap slightly, make it one asset", he'll paint the group himself): one
   picture (viewBox 780 x 420: the big rock in 0-500, the middling one 440-774 behind it), 47vw x 42vh, `xMinYMax meet` / `contain`

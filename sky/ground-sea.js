@@ -89,6 +89,9 @@
         return '<svg class="placeholder" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMinYMax slice" aria-hidden="true">' +
                '<g class="cb">' + b + '</g><g class="cl">' + l + '</g></svg>';
     })();
+    // the waves' night glow (2 Nov): how bright a pixel of the artist's wave must be to glow (0-1), how sharply it comes on
+    // past that, the bloom's blur (px) and strength, and from when in the day it's drawn at all (sky time: .3 = the dusk's start)
+    var GLOW_FROM = .52, GLOW_SLOPE = 3.2, BLOOM_PX = 4, BLOOM = .55, GLOW_AFTER = .3;
     var sea = document.createElement('div');
     sea.className = 'ground ground-sea';
     sea.setAttribute('aria-hidden', 'true');
@@ -248,8 +251,34 @@
             if (!url) return;
             svg.classList.add('has-art');
             svg.style.backgroundImage = 'url("' + url + '")';
+            // (2 Nov) and a copy of it for the night's glow (ground-sea.css "the waves glow at night")
+            svg.parentNode.classList.add('wave-glows');               // (not has-art: sky.css hides a .layer.has-art's own drawing)
+            svg.parentNode.style.setProperty('--wave-art', 'url("' + url + '")');
+            glowFilter();
         });
     });
+    // the waves glow at night (2 Nov, the artist: his waves are bright, and the night dims them like everything else, so
+    // their brightest parts come back through, with a slight bloom). a copy of each wave over it (.wave-move::after),
+    // through this filter: how bright each pixel is becomes how solid it is, and only the bright ones are kept (the
+    // mask), then the same, blurred a little, under them (the bloom). it fades in with the dusk and is fullest at night
+    // (ground-sea.css); by day it isn't drawn at all (.sea-glow, below)
+    var glowMade = false;
+    function glowFilter() {
+        if (glowMade) return;
+        glowMade = true;
+        var d = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        d.setAttribute('class', 'sea-glow-defs');
+        d.setAttribute('aria-hidden', 'true');
+        d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+        d.innerHTML = '<filter id="sea-wave-glow" x="-2%" y="-10%" width="104%" height="120%" color-interpolation-filters="sRGB">' +
+            '<feColorMatrix in="SourceGraphic" type="luminanceToAlpha" result="lum"/>' +
+            '<feComponentTransfer in="lum" result="mask"><feFuncA type="linear" slope="' + GLOW_SLOPE + '" intercept="' + (-GLOW_FROM * GLOW_SLOPE) + '"/></feComponentTransfer>' +
+            '<feComposite in="SourceGraphic" in2="mask" operator="in" result="bright"/>' +
+            '<feGaussianBlur in="bright" stdDeviation="' + BLOOM_PX + '" result="blur"/>' +
+            '<feComponentTransfer in="blur" result="bloom"><feFuncA type="linear" slope="' + BLOOM + '"/></feComponentTransfer>' +
+            '<feMerge><feMergeNode in="bloom"/><feMergeNode in="bright"/></feMerge></filter>';
+        document.body.appendChild(d);
+    }
     // slot: the ship
     Sky.svgArt(sea.querySelector('.ship .hull'), 'assets/sea/ship', [0, 0, 120, 100]);
 
@@ -933,6 +962,7 @@
     }
 
     Sky.onFrame(function (p) {
+        sea.classList.toggle('sea-glow', p > GLOW_AFTER);              // (the waves' night glow: only from late afternoon)
         paintWaves(p, 0);
         paintDock(p);
         placeShip();
